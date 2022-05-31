@@ -7,9 +7,9 @@
         </div>
         <div class="itsm-page-content">
             <ul class="bk-notice-tab">
-                <li v-for="(item, index) in remindWayList"
-                    :key="item.id"
-                    :class="{ 'bk-check-notice': acticeTab === item.id }"
+                <li v-for="(item, index) in noticeType"
+                    :key="item.typeName"
+                    :class="{ 'bk-check-notice': acticeTab === item.typeName }"
                     @click="changeNotice(item, index)">
                     <span>{{ item.name }}</span>
                 </li>
@@ -71,9 +71,9 @@
                     <bk-form ref="basicFrom" :model="formData" :label-width="300" width="700" form-type="vertical" :rules="rules">
                         <bk-form-item :label="$t(`m['通知方式']`)" :required="true" :property="'noticeType'">
                             <bk-select :disabled="true" v-model="formData.noticeType" searchable>
-                                <bk-option v-for="option in noticeTypeLIST"
-                                    :key="option.id"
-                                    :id="option.id"
+                                <bk-option v-for="option in noticeType"
+                                    :key="option.typeName"
+                                    :id="option.typeName"
                                     :name="option.name">
                                 </bk-option>
                             </bk-select>
@@ -115,6 +115,7 @@
 <script>
     import editorNotice from '../processManagement/notice/editorNotice.vue'
     import permission from '@/mixins/permission.js'
+    import { mapState } from 'vuex'
     export default {
         name: 'Notice',
         components: {
@@ -184,7 +185,10 @@
         computed: {
             sliderStatus () {
                 return this.$store.state.common.slideStatus
-            }
+            },
+            ...mapState({
+                noticeType: state => state.common.configurInfo.notify_type
+            })
         },
         watch: {
             acticeTab: {
@@ -199,7 +203,7 @@
         },
         methods: {
             changeNotice (item, index) {
-                this.acticeTab = item.id
+                this.acticeTab = item.typeName
                 this.getNoticeList()
             },
             async handleSelectUserBy (val) {
@@ -211,7 +215,6 @@
                         used_by: val
                     }
                     const res = await this.$store.dispatch('project/getAction', parmas)
-                    console.log(res)
                     if (res.data && res.result) {
                         const list = res.data
                         for (const item in list) {
@@ -220,7 +223,6 @@
                                 name: list[item]
                             })
                         }
-                        console.log(this.actionList)
                     }
                 } catch (e) {
                     console.log(e)

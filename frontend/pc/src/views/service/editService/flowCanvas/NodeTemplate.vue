@@ -147,6 +147,7 @@
                     { type: 'ROUTER', iconStyle: 'icon-icon-person' },
                     { type: 'TASK', iconStyle: 'icon-api-icon' },
                     { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
+                    { type: 'WEBHOOK', iconStyle: 'icon-webhook-2' },
                     { type: 'TASK-DEVOPS', iconStyle: 'icon-devops-task-icon' },
                     { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
                     { type: 'SIGN', iconStyle: 'icon-sign-node-white f18' }
@@ -157,6 +158,7 @@
                     { type: 'TASK-SOPS', name: this.$t(`m.treeinfo["标准运维节点"]`), iconStyle: 'icon-task-icon' },
                     { type: 'TASK-DEVOPS', name: this.$t(`m["蓝盾节点"]`), iconStyle: 'icon-devops-task-icon' },
                     { type: 'SIGN', name: this.$t(`m.treeinfo['会签节点']`), iconStyle: 'icon-sign-node' },
+                    { type: 'WEBHOOK', name: this.$t(`m['WEBHOOK节点']`), iconStyle: 'icon-webhook-2' },
                     { type: 'APPROVAL', name: this.$t(`m.treeinfo['审批节点']`), iconStyle: 'icon-approval-node' },
                     { type: 'COVERAGE', name: this.$t(`m.treeinfo["汇聚网关"]`), iconStyle: 'icon-flow-branch' },
                     { type: 'ROUTER-P', name: this.$t(`m.treeinfo["并行网关"]`), iconStyle: 'icon-flow-convergence' },

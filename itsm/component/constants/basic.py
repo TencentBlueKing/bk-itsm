@@ -44,10 +44,14 @@ class ConstantDict(dict):
     """
 
     def __setitem__(self, key, value):
-        raise TypeError("'%s' object does not support item assignment" % self.__class__.__name__)
+        raise TypeError(
+            "'%s' object does not support item assignment" % self.__class__.__name__
+        )
 
     def update(self, **kwargs):
-        raise TypeError("'%s' object does not support item assignment" % self.__class__.__name__)
+        raise TypeError(
+            "'%s' object does not support item assignment" % self.__class__.__name__
+        )
 
 
 # 返回状态码
@@ -76,10 +80,10 @@ LEN_XXX_LONG = 20000
 # 字段默认值
 EMPTY_INT = 0
 EMPTY_STRING = ""
-EMPTY_DISPLAY_STRING = '--'
+EMPTY_DISPLAY_STRING = "--"
 EMPTY_LIST = []
 EMPTY_DICT = ConstantDict({})
-EMPTY_VARIABLE = {'inputs': [], 'outputs': []}
+EMPTY_VARIABLE = {"inputs": [], "outputs": []}
 DEFAULT_BK_BIZ_ID = -1
 EMPTY = "EMPTY"
 
@@ -101,12 +105,22 @@ CACHE_1H = 1 * 60 * 60
 WEIXIN = "WEIXIN"
 EMAIL = "EMAIL"
 SMS = "SMS"
+GENERAL_NOTICE = "GENERAL"
 
 NOTIFY_TYPE_CHOICES = [
     (WEIXIN, "微信"),
     (EMAIL, "邮箱"),
     (SMS, "短信"),
 ]
+
+# 兼容已存在的通知方式
+# GENERAL_NOTICE 不作为通知方式, 不存入 Notify
+NOTIFY_TYPE_MAPPING = {"weixin": WEIXIN, "mail": EMAIL, "sms": SMS}
+
+# 内置通知方式
+# GENERAL_NOTICE 通知模版, 存入 CustomNotice
+# 在获取通知方式失败时使用通用通知模版构建通知信息
+BUILTIN_NOTIFY_TYPE = [WEIXIN, EMAIL, SMS, GENERAL_NOTICE]
 
 HOLIDAY = "HOLIDAY"
 WORKDAY = "WORKDAY"
@@ -128,26 +142,91 @@ WEEKDAY_CHOICES = [
 ]
 
 # 日志来源
-WEB = 'WEB'
-MOBILE = 'MOBILE'
-API = 'API'
-SYS = 'SYS'  # 特指提单/结束节点
+WEB = "WEB"
+MOBILE = "MOBILE"
+API = "API"
+SYS = "SYS"  # 特指提单/结束节点
 
 # 0点~23点
 NOTIFY_FREQ_CHOICES = tuple(60 * 60 * i for i in range(25))
 NOTIFY_GLOBAL_VARIABLES = [
-    {"key": "sn", "name": _("单号"), "source": "ticket", "hidden": False, "type": "STRING"},
-    {"key": "title", "name": _("标题(单据)"), "source": "ticket", "hidden": False, "type": "STRING"},
-    {"key": "creator", "name": _("提单人"), "source": "ticket", "hidden": False, "type": "MEMBER"},
-    {"key": "create_at", "name": _("提单时间"), "source": "ticket", "hidden": False, "type": "DATETIME"},
-    {"key": "service_type_name", "name": _("服务项"), "source": "ticket", "hidden": False, "type": "STRING"},
-    {"key": "catalog_fullname", "name": _("服务目录"), "source": "ticket", "hidden": False, "type": "STRING"},
-    {"key": "catalog_service_name", "name": _("服务（服务目录+服务项）"), "source": "ticket", "hidden": False, "type": "STRING"},
-    {"key": "current_status_display", "name": _("单据状态"), "source": "ticket", "hidden": False, "type": "STRING"},
-    {"key": "running_status", "name": _("当前步骤(单据)"), "source": "ticket", "hidden": False, "type": "STRING"},
-    {"key": "ticket_url", "name": _("单据详情链接"), "source": "ticket", "hidden": False, "type": "STRING"},
+    {
+        "key": "sn",
+        "name": _("单号"),
+        "source": "ticket",
+        "hidden": False,
+        "type": "STRING",
+    },
+    {
+        "key": "title",
+        "name": _("标题(单据)"),
+        "source": "ticket",
+        "hidden": False,
+        "type": "STRING",
+    },
+    {
+        "key": "creator",
+        "name": _("提单人"),
+        "source": "ticket",
+        "hidden": False,
+        "type": "MEMBER",
+    },
+    {
+        "key": "create_at",
+        "name": _("提单时间"),
+        "source": "ticket",
+        "hidden": False,
+        "type": "DATETIME",
+    },
+    {
+        "key": "service_type_name",
+        "name": _("服务项"),
+        "source": "ticket",
+        "hidden": False,
+        "type": "STRING",
+    },
+    {
+        "key": "catalog_fullname",
+        "name": _("服务目录"),
+        "source": "ticket",
+        "hidden": False,
+        "type": "STRING",
+    },
+    {
+        "key": "catalog_service_name",
+        "name": _("服务（服务目录+服务项）"),
+        "source": "ticket",
+        "hidden": False,
+        "type": "STRING",
+    },
+    {
+        "key": "current_status_display",
+        "name": _("单据状态"),
+        "source": "ticket",
+        "hidden": False,
+        "type": "STRING",
+    },
+    {
+        "key": "running_status",
+        "name": _("当前步骤(单据)"),
+        "source": "ticket",
+        "hidden": False,
+        "type": "STRING",
+    },
+    {
+        "key": "ticket_url",
+        "name": _("单据详情链接"),
+        "source": "ticket",
+        "hidden": False,
+        "type": "STRING",
+    },
     # {"key": "sla_cost_percent", "name": _("单据处理进度"), "source": "ticket", "hidden": False, "type": "STRING"},
-    {"key": "ticket_current_processors", "name": _("当前各节点处理人"), "source": "ticket", "type": "MEMBERS"},
+    {
+        "key": "ticket_current_processors",
+        "name": _("当前各节点处理人"),
+        "source": "ticket",
+        "type": "MEMBERS",
+    },
 ]
 
 TICKET_GLOBAL_VARIABLES = [
@@ -155,16 +234,61 @@ TICKET_GLOBAL_VARIABLES = [
     # ticket.create -> constant content is invalid with error ['Undefined' object has no attribute 'creator']
     {"key": "ticket_sn", "name": _("单号"), "source": "ticket", "type": "STRING"},
     {"key": "ticket_title", "name": _("标题"), "source": "ticket", "type": "STRING"},
-    {"key": "ticket_ticket_url", "name": _("单据链接"), "source": "ticket", "type": "STRING"},
+    {
+        "key": "ticket_ticket_url",
+        "name": _("单据链接"),
+        "source": "ticket",
+        "type": "STRING",
+    },
     {"key": "ticket_creator", "name": _("提单人"), "source": "ticket", "type": "MEMBER"},
-    {"key": "ticket_create_at", "name": _("提单时间"), "source": "ticket", "type": "DATETIME"},
-    {"key": "ticket_service_type", "name": _("服务项"), "source": "ticket", "type": "STRING"},
-    {"key": "ticket_current_status", "name": _("单据状态"), "source": "ticket", "type": "STRING"},
-    {"key": "ticket_current_status_display", "name": _("单据状态名称"), "source": "ticket", "type": "STRING"},
-    {"key": "ticket_bk_biz_id", "name": _("关联业务ID"), "source": "ticket", "type": "STRING"},
-    {"key": "ticket_current_processors", "name": _("当前各节点处理人"), "source": "ticket", "type": "MEMBERS"},
-    {"key": "ticket_sops_task_summary", "name": _("SOPS总结信息"), "source": "ticket", "type": "STRING"},
-    {"key": "ticket_all_task_processors", "name": _("所有任务处理人"), "source": "ticket", "type": "MEMBERS"},
+    {
+        "key": "ticket_create_at",
+        "name": _("提单时间"),
+        "source": "ticket",
+        "type": "DATETIME",
+    },
+    {
+        "key": "ticket_service_type",
+        "name": _("服务项"),
+        "source": "ticket",
+        "type": "STRING",
+    },
+    {
+        "key": "ticket_current_status",
+        "name": _("单据状态"),
+        "source": "ticket",
+        "type": "STRING",
+    },
+    {
+        "key": "ticket_current_status_display",
+        "name": _("单据状态名称"),
+        "source": "ticket",
+        "type": "STRING",
+    },
+    {
+        "key": "ticket_bk_biz_id",
+        "name": _("关联业务ID"),
+        "source": "ticket",
+        "type": "STRING",
+    },
+    {
+        "key": "ticket_current_processors",
+        "name": _("当前各节点处理人"),
+        "source": "ticket",
+        "type": "MEMBERS",
+    },
+    {
+        "key": "ticket_sops_task_summary",
+        "name": _("SOPS总结信息"),
+        "source": "ticket",
+        "type": "STRING",
+    },
+    {
+        "key": "ticket_all_task_processors",
+        "name": _("所有任务处理人"),
+        "source": "ticket",
+        "type": "MEMBERS",
+    },
 ]
 
 TASK_GLOBAL_VARIABLES = [
@@ -172,13 +296,33 @@ TASK_GLOBAL_VARIABLES = [
     # ticket.create -> constant content is invalid with error ['Undefined' object has no attribute 'creator']
     {"key": "task_id", "name": _("任务ID"), "source": "task", "type": "STRING"},
     {"key": "task_name", "name": _("任务名称"), "source": "task", "type": "STRING"},
-    {"key": "task_component_type_display", "name": _("任务类型名"), "source": "task", "type": "STRING"},
+    {
+        "key": "task_component_type_display",
+        "name": _("任务类型名"),
+        "source": "task",
+        "type": "STRING",
+    },
     {"key": "task_creator", "name": _("任务创建人"), "source": "task", "type": "MEMBER"},
     {"key": "task_operator", "name": _("任务处理人"), "source": "task", "type": "MEMBER"},
-    {"key": "task_create_at", "name": _("任务创建时间"), "source": "task", "type": "DATETIME"},
+    {
+        "key": "task_create_at",
+        "name": _("任务创建时间"),
+        "source": "task",
+        "type": "DATETIME",
+    },
     {"key": "task_status", "name": _("任务状态"), "source": "task", "type": "STRING"},
-    {"key": "task_status_display", "name": _("任务状态名"), "source": "task", "type": "STRING"},
-    {"key": "task_sops_step_list", "name": _("SOPS步骤信息"), "source": "task", "type": "STRING"},
+    {
+        "key": "task_status_display",
+        "name": _("任务状态名"),
+        "source": "task",
+        "type": "STRING",
+    },
+    {
+        "key": "task_sops_step_list",
+        "name": _("SOPS步骤信息"),
+        "source": "task",
+        "type": "STRING",
+    },
 ]
 
 # 开始序号
@@ -194,3 +338,6 @@ TIME_DELTA = {
     "months": "DATE_FORMAT({field_name},'%%Y-%%m')",
     "years": "DATE_FORMAT({field_name},'%%Y')",
 }
+
+
+EXEMPT_HTTPS_REDIRECT = ("/openapi/", "/api/iam/resources/v1", "/monitor/")

@@ -28,6 +28,7 @@ from urllib.parse import urljoin
 
 from blueapps.conf.default_settings import *  # noqa
 from blueapps.conf.log import get_logging_config_dict
+from blueapps.opentelemetry.utils import inject_logging_trace_info
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
@@ -39,7 +40,7 @@ from config import (
     BK_PAAS_HOST,
     BK_PAAS_INNER_HOST,
 )
-from itsm.monitor.opentelemetry.utils import inject_logging_trace_info
+
 
 # 标准运维页面服务地址
 SITE_URL_SOPS = "/o/bk_sops/"
@@ -91,7 +92,6 @@ INSTALLED_APPS += (
     "corsheaders",
     "django_filters",
     # "autofixture",
-    "requests_tracker",
     # wiki
     "django.contrib.humanize.apps.HumanizeConfig",
     "django_nyt.apps.DjangoNytConfig",
@@ -103,6 +103,7 @@ INSTALLED_APPS += (
     # 'flower',
     # 'monitors',
     "itsm.monitor",
+    "blueapps.opentelemetry.instrument_app",
 )
 
 # IAM 开启开关
@@ -153,10 +154,7 @@ MIDDLEWARE = (
     # 'itsm.component.misc_middlewares.NginxAuthProxy',
     "itsm.component.misc_middlewares.InstrumentProfilerMiddleware",
     # 'pyinstrument.middleware.ProfilerMiddleware',
-    "django_prometheus.middleware.PrometheusAfterMiddleware",
 )
-
-MIDDLEWARE = ("django_prometheus.middleware.PrometheusBeforeMiddleware",) + MIDDLEWARE
 
 # 所有环境的日志级别可以在这里配置
 # LOG_LEVEL = 'DEBUG'
@@ -207,7 +205,6 @@ inject_formatters = ("verbose",)
 # 日志中添加trace_id
 ENABLE_OTEL_TRACE = True if os.getenv("BKAPP_ENABLE_OTEL_TRACE", "0") == "1" else False
 if ENABLE_OTEL_TRACE:
-    INSTALLED_APPS += ("itsm.monitor.opentelemetry.instrument_app",)
     trace_format = "[trace_id]: %(otelTraceID)s [span_id]: %(otelSpanID)s [resource.service.name]: %(otelServiceName)s"
     inject_logging_trace_info(LOGGING, inject_formatters, trace_format)
 
@@ -859,3 +856,14 @@ def redirect_func(request):
 
 
 BLUEAPPS_PAGE_401_RESPONSE_FUNC = redirect_func
+
+try:
+    # 自动过单时间，默认为20
+    AUTO_APPROVE_TIME = int(os.environ.get("AUTO_APPROVE_TIME", 20))
+except Exception:
+    AUTO_APPROVE_TIME = 20
+
+
+OPEN_VOICE_NOTICE = (
+    True if os.getenv("BKAPP_OPEN_VOICE_NOTICE", "false").lower() == "true" else False
+)

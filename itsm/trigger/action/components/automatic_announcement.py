@@ -59,7 +59,7 @@ class AutomaticAnnouncementComponent(BaseComponent):
         web_hook_ids = self.data.get_one_of_inputs("web_hook_id")
         content = self.data.get_one_of_inputs("content")
         mentioned_list = self.data.get_one_of_inputs("mentioned_list")
-        chat_id = self.data.get_one_of_inputs("chat_id")
+        chat_id = self.data.get_one_of_inputs("chat_id", "")
 
         chat_ids = None
         if len(chat_id) != 0:

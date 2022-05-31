@@ -199,13 +199,15 @@
                             :desc="node.desc"
                             :required="true"
                             :ext-cls="'bk-mt20-item'">
-                            <bk-button v-if="isShowDataSourcebtn" :disabled="isDisabled" class="configuration-data-source" theme="primary" title="配置数据源" :outline="true" @click="openDataSource">配置数据源</bk-button>
+                            <bk-button v-if="isShowDataSourcebtn" :disabled="isDisabled" class="configuration-data-source" theme="primary" :title="$t(`m['配置数据源']`)" :outline="true" @click="openDataSource">{{ $t(`m['配置数据源']`)}}</bk-button>
                             <bk-dialog
                                 v-model="isShowDataSource"
                                 width="960"
-                                :title="formInfo.source_type === 'API' ? '配置接口数据' : '配置自定义数据'"
+                                :title="formInfo.source_type === 'API' ? $t(`m['配置接口数据']`) : $t(`m['配置自定义数据']`)"
                                 theme="primary"
-                                :mask-close="false">
+                                :auto-close="false"
+                                :mask-close="false"
+                                @confirm="validateContent">
                                 <data-content ref="dataContent"
                                     :form-info="formInfo"
                                     :workflow="workflow"
@@ -655,6 +657,14 @@
             }
         },
         methods: {
+            validateContent () {
+                const result = this.checkField()
+                if (result) {
+                    this.openDataSource()
+                } else {
+                    this.isShowDataSource = false
+                }
+            },
             openDataSource () {
                 this.isShowDataSource = true
             },
@@ -1266,7 +1276,7 @@
                     // 判断key，name的值
                     this.fieldInfo.list.forEach(item => {
                         item.nameCheck = item.name.length > 120 || item.name.length === 0
-                        item.keyCheck = !(/^[a-zA-Z0-9_]+$/.test(item.key))
+                        item.keyCheck = !(/[a-zA-Z0-9]+$/.test(item.key))
                     })
                     // 判断重复的key和name
                     this.fieldInfo.list.forEach((item, index) => {
@@ -1356,7 +1366,7 @@
     @import '../../../../../scss/mixins/clearfix.scss';
     @import "../../../../../scss/mixins/scroller";
     .configuration-data-source {
-        width: 102px;
+        // width: 102px;
         height: 32px;
         border: 1px solid #3a84ff;
         border-radius: 4px;

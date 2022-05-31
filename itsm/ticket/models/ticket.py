@@ -137,6 +137,7 @@ from itsm.component.constants import (
     TIME_DELTA,
     LEN_XX_LONG,
     TASK_DEVOPS_STATE,
+    WEBHOOK_STATE,
 )
 from itsm.component.constants.trigger import (
     CREATE_TICKET,
@@ -150,6 +151,8 @@ from itsm.component.constants.trigger import (
     LEAVE_STATE,
     THROUGH_TRANSITION,
     SOURCE_TICKET,
+    GLOBAL_LEAVE_STATE,
+    GLOBAL_ENTER_STATE,
 )
 from common.shortuuid import uuid as _uu
 from itsm.component.utils.client_backend_query import (
@@ -443,6 +446,31 @@ class Status(Model):
         self.contexts.update(**kwargs)
         self.save()
 
+    def run_auto_approve(self, state_id):
+        from itsm.pipeline_plugins.components.collections.tasks import auto_approve
+
+        if not state_id:
+            return
+
+        msg = "检测到当前处理人包含提单人，系统自动过单"
+        callback_data = {
+            "fields": self.ticket.get_approve_fields(state_id, msg),
+            "ticket_id": self.ticket.id,
+            "source": "SYS",
+            "operator": self.ticket.creator,
+            "state_id": state_id,
+        }
+        logger.info(
+            "检测到当前单据开启了自动过单，即将准备自动过单, ticket_id={}, state_id={}, callback_data={}".format(
+                self.ticket.id, state_id, callback_data
+            )
+        )
+        activity_id = self.ticket.activity_for_state(state_id)
+        auto_approve.apply_async(
+            (self.id, self.ticket.creator, activity_id, callback_data),
+            countdown=settings.AUTO_APPROVE_TIME,
+        )  # 20秒之后自动回调
+
     def set_next_action(self, operator="system", **kwargs):
         """
         设置节点的操作动作和状态
@@ -480,9 +508,18 @@ class Status(Model):
                 )
                 if set(finished_processor_list) & set(new_processor_list):
                     raise DeliverOperateError("不允许向已经处理的人转单")
+
                 self.set_processors(
                     kwargs.get("processors_type", "PERSON"), kwargs.get("processors")
                 )
+                if (
+                    self.ticket.creator in new_processor_list
+                    and self.ticket.flow.is_auto_approve
+                ):
+                    # 提单人异常分派给自己的情况，并且开启了自动过单
+
+                    if "state_id" in kwargs:
+                        self.run_auto_approve(kwargs.get("state_id"))
 
             if action_type in [CLAIM_OPERATE, DISTRIBUTE_OPERATE]:
                 # 操作流状态机：派单->认领->处理
@@ -929,11 +966,20 @@ class Status(Model):
             from_ticket_status = TicketStatus.objects.get(
                 service_type=service_type, key=self.ticket.current_status
             )
-            to_ticket_status = (
-                TicketStatus.objects.filter(service_type=service_type)
-                .filter(key=setting.get("name"))
-                .first()
-            )
+
+            if setting.get("name") in TICKET_STATUS_DICT.keys():
+                to_ticket_status = (
+                    TicketStatus.objects.filter(service_type=service_type)
+                    .filter(key=setting.get("name"))
+                    .first()
+                )
+            else:
+                to_ticket_status = (
+                    TicketStatus.objects.filter(service_type=service_type)
+                    .filter(name=setting.get("name"))
+                    .first()
+                )
+
             # 是否满足单据状态流转设置
             if (
                 to_ticket_status
@@ -1024,11 +1070,15 @@ class Status(Model):
         )
         ordering = "CASE %s END" % clauses
 
+        filter_experssion = Q(state_id=self.state_id) | Q(
+            workflow_field_id__in=workflow_field_order
+        )
+
+        if self.is_first_status:
+            filter_experssion = filter_experssion | Q(workflow_field_id=0)
+
         return (
-            self.ticket.fields.filter(
-                Q(state_id=self.state_id)
-                | Q(workflow_field_id__in=workflow_field_order)
-            )
+            self.ticket.fields.filter(filter_experssion)
             .exclude(source=BASE_MODEL)
             .extra(
                 select={"ordering": ordering},
@@ -1064,7 +1114,7 @@ class Status(Model):
     def is_stopped(self):
         """结束/终止/失败"""
         stop_status = copy.deepcopy(self.STOPPED_STATUS)
-        if self.type in [TASK_STATE, TASK_SOPS_STATE, TASK_DEVOPS_STATE]:
+        if self.type in [TASK_STATE, TASK_SOPS_STATE, TASK_DEVOPS_STATE, WEBHOOK_STATE]:
             stop_status.pop()
         return self.status in stop_status
 
@@ -1904,6 +1954,16 @@ class Ticket(Model, BaseTicket):
         from itsm.openapi.ticket.serializers import SimpleLogsSerializer
 
         return SimpleLogsSerializer(self.logs.all(), many=True).data
+
+    @property
+    def ticket_complex_logs(self):
+        """
+        复杂单据日志
+        """
+
+        from itsm.openapi.ticket.serializers import ComplexLogsSerializer
+
+        return ComplexLogsSerializer(self.logs.all(), many=True).data
 
     @property
     def task_operators(self):
@@ -3040,12 +3100,13 @@ class Ticket(Model, BaseTicket):
             status = RUNNING
             action_type = (
                 SYSTEM_OPERATE
-                if state.type in [TASK_STATE, TASK_SOPS_STATE, TASK_DEVOPS_STATE]
+                if state.type
+                in [TASK_STATE, TASK_SOPS_STATE, TASK_DEVOPS_STATE, WEBHOOK_STATE]
                 else TRANSITION_OPERATE
             )
 
         defaults = {
-            "bk_biz_id": self.bk_biz_id,
+            "bk_biz_id": self.bk_biz_id or DEFAULT_BK_BIZ_ID,
             "status": status,
             "tag": getattr(state, "tag", DEFAULT_STRING),
             "name": state.name,
@@ -3446,8 +3507,8 @@ class Ticket(Model, BaseTicket):
             context={"dst_state": status.id, "operator": self.creator},
         )
 
-        # 全局 进入节点 触发球
-        self.send_trigger_signal(ENTER_STATE, sender=self.flow.workflow_id)
+        # 全局 进入节点 触发器
+        self.send_trigger_signal(GLOBAL_ENTER_STATE, sender=self.flow.workflow_id)
 
         # 提单节点给提单人发送关注通知邮件, 非提单节点给处理人发送单据待办通知邮件
         context = {}
@@ -3520,7 +3581,7 @@ class Ticket(Model, BaseTicket):
             self.start_sla(state_id)
 
         # 全局 进入节点 触发球
-        self.send_trigger_signal(ENTER_STATE, sender=self.flow.workflow_id)
+        self.send_trigger_signal(GLOBAL_ENTER_STATE, sender=self.flow.workflow_id)
 
         # 发送进入节点的信号
         self.send_trigger_signal(
@@ -3551,7 +3612,7 @@ class Ticket(Model, BaseTicket):
             "ticket_url": self.ticket_url,
             "sn": self.sn,
             "catalog_service_name": self.catalog_service_name,
-            "running_status": self.running_status
+            "running_status": self.running_status,
         }
 
     def set_current_processors(self):
@@ -3718,7 +3779,7 @@ class Ticket(Model, BaseTicket):
         self.send_trigger_signal(LEAVE_STATE, state_id)
 
         # 全局触发器
-        self.send_trigger_signal(LEAVE_STATE, sender=self.flow.workflow_id)
+        self.send_trigger_signal(GLOBAL_LEAVE_STATE, sender=self.flow.workflow_id)
 
     def do_in_state(self, state_id, fields, operator, source):
         """节点内动作
@@ -3757,7 +3818,7 @@ class Ticket(Model, BaseTicket):
                 LEAVE_STATE, state_id, context={"operator": operator}
             )
             # 全局触发器
-            self.send_trigger_signal(LEAVE_STATE, sender=self.flow.workflow_id)
+            self.send_trigger_signal(GLOBAL_LEAVE_STATE, sender=self.flow.workflow_id)
 
     def do_after_create(self, fields, from_ticket_id=None, source=WEB):
         # 创建关联关系
@@ -4618,6 +4679,75 @@ class Ticket(Model, BaseTicket):
         resume_at = datetime.now()
         for task in self._sla_tasks.filter(task_status=SLA_PAUSED):
             task.resume(resume_at)
+
+    def get_approve_fields(self, state_id, msg):
+        node_fields = TicketField.objects.filter(state_id=state_id, ticket_id=self.id)
+        fields = []
+        remarked = False
+        for field in node_fields:
+            if field.meta.get("code") == APPROVE_RESULT:
+                fields.append(
+                    {
+                        "id": field.id,
+                        "key": field.key,
+                        "type": field.type,
+                        "choice": field.choice,
+                        "value": "true",
+                    }
+                )
+            else:
+                if not remarked:
+                    fields.append(
+                        {
+                            "id": field.id,
+                            "key": field.key,
+                            "type": field.type,
+                            "choice": field.choice,
+                            "value": msg,
+                        }
+                    )
+                    remarked = True
+
+        return fields
+
+    @property
+    def comment(self):
+        return self.comments.comments
+
+    @property
+    def stars(self):
+        return self.comments.stars
+
+    def create_dynamic_fields(self, dynamic_fields):
+        """
+        dynamic_fields: list:[{
+            "type": "INT",
+            "name": "年龄",
+            "value": 1
+        }]
+        """
+        if not dynamic_fields:
+            return
+
+        fields = []
+        for field in dynamic_fields:
+            ticket_field = copy.deepcopy(field)
+            ticket_field.pop("workflow_id", None)
+            ticket_field.pop("flow_type", None)
+
+            # 填充默认值
+            default = ticket_field.pop("default", "")
+            if default:
+                ticket_field.update(_value=default)
+
+            ticket_field["ticket_id"] = self.id
+
+            ticket_field.pop("api_info", None)
+            ticket_field.pop("project_key", None)
+            ticket_field["workflow_field_id"] = 0
+            fields.append(TicketField(**ticket_field))
+
+        TicketField.objects.bulk_create(fields)
 
 
 class TicketOrganization(Model):

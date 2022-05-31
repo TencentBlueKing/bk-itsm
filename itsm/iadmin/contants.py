@@ -41,6 +41,7 @@ from itsm.component.constants import (
     WAITING_FOR_CONFIRM,
     NOTIFY_FOLLOWER_OPERATE,
     NODE_FAILED,
+    GENERAL_NOTICE,
 )
 from itsm.sla.constants import (
     SLA_HANDLE_WARNING_NOTIFY,
@@ -391,7 +392,7 @@ CSS_TEMPLATE = """
 </style>
 """
 
-TASK_SMS_CONTENT_COMMON = TASK_WEIXIN_CONTENT_COMMON = """
+TASK_GENERAL_CONTENT_COMMON = TASK_SMS_CONTENT_COMMON = TASK_WEIXIN_CONTENT_COMMON = """
  标题：${title}
  单号：<a href="${ticket_url}">${sn}</a>
  任务名称：${task_name}
@@ -406,10 +407,10 @@ SMS_CONTENT_COMMON = WEIXIN_CONTENT_COMMON = """
   单号：<a href="${ticket_url}">${sn}</a>
  ${message}"""
 
-SMS_CONTENT_DONE = WEIXIN_CONTENT_DONE = """您的需求(${title})已经处理完成，现邀请您为我们的服务进行评价。您的反馈对我们非常重要！感谢回复与建议，祝您工作愉快！
- ${ticket_url}"""
+GENERAL_CONTENT_DONE = SMS_CONTENT_DONE = WEIXIN_CONTENT_DONE = """您的需求(${title})已经处理完成，现邀请您为我们的服务进行评价。您的反馈对我们非常重要！感谢回复与建议，祝您工作愉快！
+${ticket_url}"""
 
-SMS_CONTENT_FOLLOW = WEIXIN_CONTENT_FOLLOW = """ 你有一条${service_type_name}工单需要关注
+GENERAL_CONTENT_FOLLOW = SMS_CONTENT_FOLLOW = WEIXIN_CONTENT_FOLLOW = """你有一条${service_type_name}工单需要关注
  标题：${title}
  单号：<a href="${ticket_url}">${sn}</a>
  服务目录：${catalog_service_name}
@@ -428,14 +429,14 @@ SMS_CONTENT_FAILED = WEIXIN_CONTENT_FAILED = """
  当前环节：${running_status}
  失败信息：${message}"""
 
-WEIXIN_CONTENT_OPERATE = """
+GENERAL_CONTENT_OPERATE = WEIXIN_CONTENT_OPERATE = """
  标题：${title}
  单号：<a href="${ticket_url}">${sn}</a>
  服务目录：${catalog_service_name}
  当前环节：${running_status}
  """
 
-ATTENTION_SMS_CONTENT_COMMON = ATTENTION_WEIXIN_CONTENT_COMMON = """
+GENERAL_CONTENT_COMMON = ATTENTION_SMS_CONTENT_COMMON = ATTENTION_WEIXIN_CONTENT_COMMON = """
  标题：${title}
  单号：${sn}
  服务：${catalog_service_name}
@@ -483,6 +484,22 @@ ATTENTION_EMAIL_TEMPLATE = """
 NOTIFY_TITLE_COMMON = "『ITSM』${service_type_name}单【${action}】"
 TASK_NOTIFY_TITLE_COMMON = "『ITSM』${service_type_name}单任务【${action}】"
 ATTENTION_TITLE_COMMON = "『ITSM』您关注的单据动态有更新"
+
+
+GENERAL_NOTIFY_TEMPLATE_LIST = [
+    [NOTIFY_TITLE_COMMON, """ ${message}""", SUPERVISE_OPERATE, GENERAL_NOTICE, "TICKET"],
+    [NOTIFY_TITLE_COMMON, GENERAL_CONTENT_DONE, INVITE_OPERATE, GENERAL_NOTICE, "TICKET"],
+    [NOTIFY_TITLE_COMMON, GENERAL_CONTENT_DONE, FINISHED, GENERAL_NOTICE, "TICKET"],
+    [NOTIFY_TITLE_COMMON, GENERAL_CONTENT_COMMON, TERMINATE_OPERATE, GENERAL_NOTICE, "TICKET"],
+    [NOTIFY_TITLE_COMMON, GENERAL_CONTENT_COMMON, SUSPEND_OPERATE, GENERAL_NOTICE, "TICKET"],
+    [NOTIFY_TITLE_COMMON, GENERAL_CONTENT_COMMON, UNSUSPEND_OPERATE, GENERAL_NOTICE, "TICKET"],
+    [NOTIFY_TITLE_COMMON, GENERAL_CONTENT_FOLLOW, FOLLOW_OPERATE, GENERAL_NOTICE, "TICKET"],
+    [NOTIFY_TITLE_COMMON, GENERAL_CONTENT_OPERATE, TRANSITION_OPERATE, GENERAL_NOTICE, "TICKET"],
+    [TASK_NOTIFY_TITLE_COMMON, TASK_GENERAL_CONTENT_COMMON, WAITING_FOR_OPERATE, GENERAL_NOTICE, "TASK"],
+    [TASK_NOTIFY_TITLE_COMMON, TASK_GENERAL_CONTENT_COMMON, WAITING_FOR_CONFIRM, GENERAL_NOTICE, "TASK"],
+    [NOTIFY_TITLE_COMMON, SMS_CONTENT_FAILED, NODE_FAILED, GENERAL_NOTICE, "TICKET"],
+]
+
 
 NOTIFY_TEMPLATE = [
     # title_template content_template action notify_type used_by
@@ -716,7 +733,7 @@ NOTIFY_TEMPLATE = [
         EMAIL,
         "TICKET",
     ),
-]
+] + GENERAL_NOTIFY_TEMPLATE_LIST
 
 SWITCH_ON = "on"
 SWITCH_OFF = "off"

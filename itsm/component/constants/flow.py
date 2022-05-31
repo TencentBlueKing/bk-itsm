@@ -38,9 +38,20 @@ ROUTER_P_STATE = "ROUTER-P"
 COVERAGE_STATE = "COVERAGE"
 END_STATE = "END"
 VIRTUAL_STATE = "MIGRATE"
+WEBHOOK_STATE = "WEBHOOK"
 
 GATEWAY_STATES = [ROUTER_P_STATE, COVERAGE_STATE]
-NORMAL_STATES = [START_STATE, NORMAL_STATE, TASK_STATE, TASK_SOPS_STATE, TASK_DEVOPS_STATE, SIGN_STATE, END_STATE, APPROVAL_STATE]
+NORMAL_STATES = [
+    START_STATE,
+    NORMAL_STATE,
+    TASK_STATE,
+    TASK_SOPS_STATE,
+    TASK_DEVOPS_STATE,
+    WEBHOOK_STATE,
+    SIGN_STATE,
+    END_STATE,
+    APPROVAL_STATE,
+]
 
 STATE_TYPE_CHOICES = [
     (START_STATE, "开始节点(圆形)"),
@@ -50,6 +61,7 @@ STATE_TYPE_CHOICES = [
     (TASK_STATE, "自动节点"),
     (TASK_SOPS_STATE, "标准运维节点"),
     (TASK_DEVOPS_STATE, "蓝盾任务节点"),
+    (WEBHOOK_STATE, "WebHook节点"),
     (ROUTER_STATE, "分支网关节点(菱形)"),
     (ROUTER_P_STATE, "并行网关节点"),
     (COVERAGE_STATE, "汇聚网关节点"),
@@ -245,7 +257,7 @@ SUPPORTED_TYPE = [
     "MEMBERS",
     "CUSTOM-FORM",
     "INPUTSELECT",
-    "RICHTEXT"
+    "RICHTEXT",
 ]
 
 EXPORT_SUPPORTED_TYPE = [
@@ -265,7 +277,10 @@ EXPORT_SUPPORTED_TYPE = [
     "INPUTSELECT",
 ]
 
-DEFAULT_SHOW_CONDITION = {"type": "and", "expressions": [{"key": "G_INT_1", "condition": "==", "value": 1}]}
+DEFAULT_SHOW_CONDITION = {
+    "type": "and",
+    "expressions": [{"key": "G_INT_1", "condition": "==", "value": 1}],
+}
 SHOW_DIRECTLY = 1
 SHOW_BY_CONDITION = 0
 
@@ -304,7 +319,12 @@ TYPE_CHOICES = [
     ("CASCADE", "级联"),
 ]
 
-SOURCE_CHOICES = [("CUSTOM", "自定义数据"), ("API", "接口数据"), ("DATADICT", "数据字典"), ("RPC", "系统数据")]
+SOURCE_CHOICES = [
+    ("CUSTOM", "自定义数据"),
+    ("API", "接口数据"),
+    ("DATADICT", "数据字典"),
+    ("RPC", "系统数据"),
+]
 
 LAYOUT_CHOICES = [
     ("COL_6", "半行"),
@@ -325,11 +345,21 @@ TRIGGER_TYPE = [
 ]
 
 DEFAULT_FLOW_CONDITION = {
-    "expressions": [{"type": "and", "expressions": [{"key": "G_INT_1", "condition": "==", "value": 1}]}],
+    "expressions": [
+        {
+            "type": "and",
+            "expressions": [{"key": "G_INT_1", "condition": "==", "value": 1}],
+        }
+    ],
     "type": "and",
 }
 
-DEFAULT_API_INSTANCE = {"bk_biz_id": {"req_body": {"fields": ["bk_biz_id", "bk_biz_name"]}, "rsp_data": "data.info"}}
+DEFAULT_API_INSTANCE = {
+    "bk_biz_id": {
+        "req_body": {"fields": ["bk_biz_id", "bk_biz_name"]},
+        "rsp_data": "data.info",
+    }
+}
 
 NORMAL_STATE_LABEL_PREFIX = "|N"
 ROUTER_STATE_LABEL_PREFIX = "|P"
