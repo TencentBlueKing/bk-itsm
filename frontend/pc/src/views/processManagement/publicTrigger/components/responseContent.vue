@@ -77,16 +77,16 @@
                             v-model="item.performData.displayName"
                             style="width: 260px;"></bk-input>
                     </bk-form-item>
-                    <bk-form-item
-                        :required="true"
-                        :label="$t(`m.trigger['触发次数']`)"
-                        :ext-cls="'bk-field-schema'">
-                        <bk-radio-group v-model="item.performData.repeat">
-                            <bk-radio :value="'one'" :ext-cls="'mr50 pr10'">{{$t(`m.trigger['一次']`)}}</bk-radio>
-                            <bk-radio :value="'more'">{{$t(`m.trigger['不限']`)}}</bk-radio>
-                        </bk-radio-group>
-                    </bk-form-item>
                 </template>
+                <bk-form-item
+                    :required="true"
+                    :label="$t(`m.trigger['触发次数']`)"
+                    :ext-cls="'bk-field-schema'">
+                    <bk-radio-group v-model="item.performData.repeat">
+                        <bk-radio :value="'one'" :disabled="disableRepeat" :ext-cls="'mr50 pr10'">{{$t(`m.trigger['一次']`)}}</bk-radio>
+                        <bk-radio :value="'more'">{{$t(`m.trigger['不限']`)}}</bk-radio>
+                    </bk-radio-group>
+                </bk-form-item>
             </bk-form>
             <p class="bk-error-info" v-if="item.contentStatus">{{$t(`m.trigger['您还有内容未填写，请确认。']`)}}</p>
         </div>
@@ -127,6 +127,9 @@
             // 是否显示前台触发 radio
             isShowFrontendTrigger () {
                 return !this.onlyBackendSignals.includes(this.signal)
+            },
+            disableRepeat () {
+                return this.signal === 'GLOBAL_LEAVE_STATE' || this.signal === 'GLOBAL_ENTER_STATE'
             }
         },
         watch: {
@@ -134,6 +137,14 @@
                 handler (val) {
                     if (!val) {
                         this.item.performData.runMode = 'BACKEND'
+                    }
+                },
+                immediate: true
+            },
+            signal: {
+                handler (val) {
+                    if (val === 'GLOBAL_LEAVE_STATE' || val === 'GLOBAL_ENTER_STATE') {
+                        this.item.performData.repeat = 'more'
                     }
                 },
                 immediate: true
