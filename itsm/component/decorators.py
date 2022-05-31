@@ -291,3 +291,16 @@ def custom_apigw_required(view_func):
         return view_func(self, request, *args, **kwargs)
 
     return _wrapped_view
+
+
+def apigw_required(view_func):
+    """apigw装饰器"""
+
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        request.jwt = JWTClient(request)
+        if not request.jwt.is_valid:
+            return jwt_invalid_view(request)
+        return view_func(request, *args, **kwargs)
+
+    return _wrapped_view
