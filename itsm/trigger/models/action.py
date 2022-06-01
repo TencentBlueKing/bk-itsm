@@ -199,20 +199,23 @@ class Action(TriggerBaseModel):
         return self.action_schema.get_operate_type_display()
 
     def render_params(self, template_value):
-        if isinstance(template_value, str):
-            return Template(template_value).render(**self.context)
-        if isinstance(template_value, dict):
-            render_value = {}
-            for key, value in template_value.items():
-                render_value[key] = self.render_params(value)
-            return render_value
-        if isinstance(template_value, list):
-            return [self.render_params(value) for value in template_value]
+        try:
+            if isinstance(template_value, str):
+                return Template(template_value).render(**self.context)
+            if isinstance(template_value, dict):
+                render_value = {}
+                for key, value in template_value.items():
+                    render_value[key] = self.render_params(value)
+                return render_value
+            if isinstance(template_value, list):
+                return [self.render_params(value) for value in template_value]
+        except NameError:
+            return template_value
         return template_value
 
-    @property
-    def action_params(self):
+    def action_params(self, context):
         self.update_context()
+        self.context.update(context)
         return self.render_params(self.action_schema.params)
 
     @property
