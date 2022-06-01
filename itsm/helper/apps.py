@@ -15,14 +15,15 @@ class HelperConfig(AppConfig):
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    'SELECT `app`, `name` FROM django_migrations where app="blueapps" and name="0002_smart_initial";'
+                    'SELECT `app`, `name` FROM django_migrations where app="account" and name="0002_smart_initial";'
                 )
                 rows = cursor.fetchall()
                 if len(rows) > 0:
                     return True
 
-        except BaseException as err:
-            logger.Exception(str(err))
+        except Exception:
+            print("This is the first deployment")
+            return False
 
         return False
 
@@ -31,6 +32,7 @@ class HelperConfig(AppConfig):
         blueapps的数据升级
         """
         if not self.is_before_2_6_0():
+            print("发现非2.6.0 之前的升级版本，已跳过修复")
             return
 
         migrations = (
@@ -67,4 +69,6 @@ class HelperConfig(AppConfig):
                         )
                     )
         except BaseException as err:
-            logger.Exception(str(err))
+            logger.info("fix_for_blueapps_after_2_6_0 error = {}".format(str(err)))
+
+        print("fix_for_blueapps_after_2_6_0 end")
