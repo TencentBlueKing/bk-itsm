@@ -32,15 +32,16 @@
             @confirm="confirmTrigger">
             <p style="margin-bottom: 10px">{{ $t(`m['触发器名称：']`) + trigger.display_name }}</p>
             <bk-form
+                v-if="isshowForm"
                 :key="new Date().getTime()"
                 :form-type="'horizontal'"
                 :label-width="100"
                 ref="conductorForm">
-                <template v-if="item.key === 'api'">
+                <template v-if="item && item.key === 'api'">
                     <api-call :item="item">
                     </api-call>
                 </template>
-                <template v-else-if="item.key === 'modify_field'">
+                <template v-else-if="item && item.key === 'modify_field'">
                     <modify-field :field-schema="item.field_schema"></modify-field>
                 </template>
                 <template v-else>
@@ -87,7 +88,10 @@
             changeConductor
         },
         props: {
-            item: Object
+            item: {
+                type: Object,
+                default: () => {}
+            }
         },
         data () {
             return {
@@ -95,6 +99,11 @@
                 trigger: '',
                 checkedbox: false,
                 errorTip: false
+            }
+        },
+        computed: {
+            isshowForm () {
+                return this.item || false
             }
         },
         methods: {
@@ -202,15 +211,13 @@
                                     subItem.field_schema.forEach(subField => {
                                         let valueItem = []
                                         if (subField.type === 'MULTI_MEMBERS' || subField.type === 'MEMBERS') {
-                                            subField.value.forEach((item) => {
-                                                const value = {}
-                                                value.ref_type = subField.referenceType
-                                                value.value = {
-                                                    member_type: item.key,
-                                                    members: item.value[0]
-                                                }
-                                                valueItem.push(value)
-                                            })
+                                            const value = {}
+                                            value.ref_type = subField.referenceType
+                                            value.value = {
+                                                member_type: subField.value[0].key,
+                                                members: subField.value[0].value.toString()
+                                            }
+                                            valueItem.push(value)
                                         } else {
                                             valueItem = subField.value
                                         }
@@ -232,7 +239,7 @@
                                 value.ref_type = field.referenceType
                                 value.value = {
                                     member_type: field.value[0].key,
-                                    members: field.value[0].value[0]
+                                    members: field.value[0].value.toString()
                                 }
                                 valueItem.push(value)
                             } else {
