@@ -697,7 +697,11 @@
                 this.openFormInfo.isShow = false
             },
             openTriggerDialog (trigger) {
-                const getTriggerParams = this.$store.dispatch('trigger/getTriggerParams', { params: {}, id: trigger.id })
+                const context = {}
+                this.nodeInfo.fields.forEach((item) => {
+                    context[item.key] = item.val
+                })
+                const getTriggerParams = this.$store.dispatch('trigger/getTriggerParams', { params: { context: context }, id: trigger.id })
                 const getResponseList = this.$store.dispatch('trigger/getResponseList')
                 Promise.all([getTriggerParams, getResponseList]).then(res => {
                     const curTrigger = res[0].data
