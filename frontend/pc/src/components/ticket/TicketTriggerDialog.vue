@@ -153,8 +153,6 @@
                             if (schema.required) {
                                 if (schema.type === 'MEMBERS' || schema.type === 'MULTI_MEMBERS') {
                                     schema.value.forEach(schemaValue => {
-                                        console.log(schemaValue)
-                                        debugger
                                         if (schemaValue.value.length === 0 || schemaValue.key === '') {
                                             status = true
                                         }
@@ -257,7 +255,6 @@
                         // params.push(paramsItem)
                     })
                 }
-                console.log(paramsItem)
                 this.$store.dispatch('trigger/executeTrigger', { params: paramsItem, id: this.trigger.id }).then(() => {
                     this.$bkMessage({
                         message: '执行成功',
