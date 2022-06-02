@@ -74,15 +74,13 @@ class BaseNotifier(object):
         # 1.获取消息通知类型
         try:
             result = client_backend.cmsi.get_msg_type()
-            notify_type_list = [
-                ins["type"].upper() for ins in result if ins["is_active"]
-            ]
+            notify_type_list = [ins["type"] for ins in result if ins["is_active"]]
         except ComponentCallError as e:
             logger.error("查询消息通知类型失败，error:{}".format(e))
             raise e
-        # 2.判断当前通知类型是否可用
+        # 2.判断当前通知类型是否可用""
         #   考虑到流程中配置某通知途径，后续可能下线的情况，因而做校验
-        if self.notify_type not in notify_type_list:
+        if self.notify_type.lower() not in notify_type_list:
             logger.info("不支持当前通知类型，notify_type:{}".format(self.notify_type))
             return
         # 3.构建通用消息发送接口参数

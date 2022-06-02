@@ -2571,5 +2571,11 @@ export const m = {
     '输入“{{”可选择引用变量': 'Enter "{{" to select a reference variable',
     '触发器名称：': 'Trigger name:',
     '至少勾选一项': 'Check at least one',
-    '带*的表单项不能为空！': 'Form items with * cannot be empty!'
+    '带*的表单项不能为空！': 'Form items with * cannot be empty!',
+    '输入你所要的条件，如： resp.result==ture 或者 false': 'Enter the condition you want, such as: resp.result==ture or false',
+    '输入变量来源，如：resp.message': 'Input variable source, such as: resp.message.message',
+    '配置数据源': 'Configure the data source',
+    '配置接口数据': 'Configure interface data',
+    '配置自定义数据': 'Configure custom data',
+    '内容': 'Content'
 }

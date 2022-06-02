@@ -876,27 +876,27 @@ class TicketModelViewSet(ModelViewSet):
         )
         node_status = ticket.node_status.get(state_id=state_id)
 
-        with transaction.atomic():
-            # 单据审批新增事务控制
-            if node_status.type in [SIGN_STATE, APPROVAL_STATE]:
-                SignTask.objects.update_or_create(
-                    status_id=node_status.id,
-                    processor=request.user.username,
-                    defaults={"status": "RUNNING"},
-                )
-            else:
-                node_status.status = QUEUEING
-                node_status.save()
-
-            res = ticket.activity_callback(
-                state_id, request.user.username, fields, request.source
+        # 单据审批新增事务控制
+        if node_status.type in [SIGN_STATE, APPROVAL_STATE]:
+            SignTask.objects.update_or_create(
+                status_id=node_status.id,
+                processor=request.user.username,
+                defaults={"status": "RUNNING"},
             )
-            if not res.result:
-                logger.warning(
-                    "callback error， current state id %s, error message: %s"
-                    % (state_id, res.message)
-                )
-                ticket.node_status.filter(state_id=state_id).update(status=RUNNING)
+        else:
+            node_status.status = QUEUEING
+            node_status.save()
+
+        res = ticket.activity_callback(
+            state_id, request.user.username, fields, request.source
+        )
+        if not res.result:
+            logger.warning(
+                "callback error， current state id %s, error message: %s"
+                % (state_id, res.message)
+            )
+            ticket.node_status.filter(state_id=state_id).update(status=RUNNING)
+
         return Response(
             {
                 "code": ResponseCodeStatus.OK

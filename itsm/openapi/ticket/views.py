@@ -74,6 +74,8 @@ from itsm.openapi.ticket.serializers import (
     TicketResultSerializer,
     TicketFilterSerializer,
     ProceedApprovalSerializer,
+    DynamicFieldSerializer,
+    TicketComplexLogsSerializer,
 )
 from itsm.openapi.ticket.validators import (
     openapi_operate_validate,
@@ -322,7 +324,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
         return Response(self.serializer_class(ticket).data)
 
-    @action(detail=False, methods=["get"], serializer_class=TicketLogsSerializer)
+    @action(detail=False, methods=["get"])
     @custom_apigw_required
     def get_ticket_logs(self, request):
         """
@@ -341,7 +343,12 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
                 }
             )
 
-        return Response(self.serializer_class(ticket).data)
+        show_type = request.query_params.get("show_type", "simple")
+        serializer_class = TicketLogsSerializer
+        if show_type == "complex":
+            serializer_class = TicketComplexLogsSerializer
+
+        return Response(serializer_class(ticket).data)
 
     @action(detail=False, methods=["post"])
     @catch_openapi_exception
@@ -367,7 +374,17 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         serializer = TicketCreateSerializer(data=data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
+
+        dynamic_fields = data.get("dynamic_fields", [])
+
+        if dynamic_fields:
+            ser = DynamicFieldSerializer(data=dynamic_fields, many=True)
+            ser.is_valid(raise_exception=True)
+            dynamic_fields = ser.data
+
         try:
+            # 创建额外的全局字段
+            instance.create_dynamic_fields(dynamic_fields)
             instance.do_after_create(
                 data["fields"], request.data.get("from_ticket_id", None)
             )
@@ -377,6 +394,9 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
                 "[openapi][create_ticket]-> 单据创建失败， 错误原因 error={}".format(e)
             )
             instance.delete()
+            # 删除单据字段
+            keys = [field["key"] for field in dynamic_fields]
+            TicketField.objects.filter(ticket_id=instance.id, key__in=keys).delete()
             raise CreateTicketError()
 
         logger.info(

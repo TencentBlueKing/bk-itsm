@@ -30,6 +30,7 @@ import jsonfield
 
 from django.db import models
 from django.utils.translation import ugettext as _
+from mako.template import Template
 
 from itsm.component.utils.client_backend_query import get_bk_users
 from itsm.component.constants import (
@@ -69,6 +70,7 @@ class Action(TriggerBaseModel):
         "component_name",
         "end_time",
         "ex_data",
+        "component_type",
     )
 
     signal = models.CharField(
@@ -110,6 +112,8 @@ class Action(TriggerBaseModel):
     ex_data = jsonfield.JSONField(
         _("执行错误信息"), help_text=_("状态为失败的时候记录的错误日志"), default=EMPTY_DICT
     )
+
+    params = jsonfield.JSONField(_("执行的参数"), help_text=_("手动触发器实际执行的参数信息"), default={})
 
     objects = ActionManagers()
 
@@ -171,9 +175,9 @@ class Action(TriggerBaseModel):
     @property
     def component_obj(self):
         self.context.update(self.outputs if self.outputs else EMPTY_DICT)
-        if self.temporary_params is not None:
+        if self.params:
             return self.action_schema.component_class(
-                self.context, self.temporary_params, self.id, self.count_down
+                self.context, self.params, self.id, self.count_down
             )
         return self.action_schema.component_class(
             self.context, self.action_schema.params, self.id, self.count_down
@@ -193,6 +197,23 @@ class Action(TriggerBaseModel):
     @property
     def operate_type(self):
         return self.action_schema.get_operate_type_display()
+
+    def render_params(self, template_value):
+        if isinstance(template_value, str):
+            return Template(template_value).render(**self.context)
+        if isinstance(template_value, dict):
+            render_value = {}
+            for key, value in template_value.items():
+                render_value[key] = self.render_params(value)
+            return render_value
+        if isinstance(template_value, list):
+            return [self.render_params(value) for value in template_value]
+        return template_value
+
+    @property
+    def action_params(self):
+        self.update_context()
+        return self.render_params(self.action_schema.params)
 
     @property
     def trigger_name(self):
@@ -236,6 +257,10 @@ class Action(TriggerBaseModel):
     @property
     def need_refresh(self):
         return self.action_schema.component_class.need_refresh
+
+    @property
+    def component_type(self):
+        return self.action_schema.component_type
 
     @property
     def component_name(self):

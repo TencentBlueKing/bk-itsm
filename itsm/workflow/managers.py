@@ -26,6 +26,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import copy
 import json
 import os
+import random
+import string
 import time
 import six
 from six.moves import range
@@ -1809,17 +1811,21 @@ class GlobalVariableManager(Manager):
         """创建全局变量"""
         mapping = {"string": "STRING", "number": "INT", "boolean": "BOOLEAN"}
         inst_data_dict = {item["ref_path"]: item["key"] for item in inst_data}
+
         # 取消有效
         self.filter(state_id=state_id, flow_id=flow_id).update(is_valid=False)
         for gvar in validate_data:
             if gvar["source"] != "global":
                 continue
+            key = get_random_key(gvar["name"])
+            if key[0].isdigit():
+                # 开头为数字，重新生成
+                first_letter = random.choice(string.ascii_letters)
+                key = first_letter + key[1:]
             gvar.update(
                 {
                     "type": mapping.get(gvar["type"], gvar["type"]),
-                    "key": inst_data_dict.get(
-                        gvar["ref_path"], get_random_key(gvar["name"])
-                    ),
+                    "key": inst_data_dict.get(gvar["ref_path"], key),
                 }
             )
             self.update_or_create(
