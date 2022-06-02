@@ -385,7 +385,8 @@ class ActionViewSet(component_viewsets.ModelViewSet):
             }
         )
 
-    @action(methods=["get"], detail=True)
+    @action(methods=["post"], detail=True)
     def params(self, request, *args, **kwargs):
         instance = self.get_object()
-        return Response(instance.action_params)
+        context = request.data.get("context", {})
+        return Response(instance.action_params(context))
