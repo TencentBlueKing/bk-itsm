@@ -32,15 +32,16 @@
             @confirm="confirmTrigger">
             <p style="margin-bottom: 10px">{{ $t(`m['触发器名称：']`) + trigger.display_name }}</p>
             <bk-form
+                v-if="isshowForm"
                 :key="new Date().getTime()"
                 :form-type="'horizontal'"
                 :label-width="100"
                 ref="conductorForm">
-                <template v-if="item.key === 'api'">
+                <template v-if="item && item.key === 'api'">
                     <api-call :item="item">
                     </api-call>
                 </template>
-                <template v-else-if="item.key === 'modify_field'">
+                <template v-else-if="item && item.key === 'modify_field'">
                     <modify-field :field-schema="item.field_schema"></modify-field>
                 </template>
                 <template v-else>
@@ -87,7 +88,10 @@
             changeConductor
         },
         props: {
-            item: Object
+            item: {
+                type: Object,
+                default: () => {}
+            }
         },
         data () {
             return {
@@ -95,6 +99,11 @@
                 trigger: '',
                 checkedbox: false,
                 errorTip: false
+            }
+        },
+        computed: {
+            isshowForm () {
+                return this.item || false
             }
         },
         methods: {
@@ -144,7 +153,9 @@
                             if (schema.required) {
                                 if (schema.type === 'MEMBERS' || schema.type === 'MULTI_MEMBERS') {
                                     schema.value.forEach(schemaValue => {
-                                        if (schemaValue.value[0].value.length === 0 || schemaValue.key === '') {
+                                        console.log(schemaValue)
+                                        debugger
+                                        if (schemaValue.value.length === 0 || schemaValue.key === '') {
                                             status = true
                                         }
                                     })
@@ -206,7 +217,7 @@
                                             value.ref_type = subField.referenceType
                                             value.value = {
                                                 member_type: subField.value[0].key,
-                                                members: subField.value[0].value[0]
+                                                members: subField.value[0].value.toString()
                                             }
                                             valueItem.push(value)
                                         } else {
@@ -230,7 +241,7 @@
                                 value.ref_type = field.referenceType
                                 value.value = {
                                     member_type: field.value[0].key,
-                                    members: field.value[0].value[0]
+                                    members: field.value[0].value.toString()
                                 }
                                 valueItem.push(value)
                             } else {
@@ -246,6 +257,7 @@
                         // params.push(paramsItem)
                     })
                 }
+                console.log(paramsItem)
                 this.$store.dispatch('trigger/executeTrigger', { params: paramsItem, id: this.trigger.id }).then(() => {
                     this.$bkMessage({
                         message: '执行成功',
