@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 
 from itsm.component.decorators import apigw_required
 from itsm.service.models import Service
 
 
 @apigw_required
+@require_GET
 def services(request):
     service_list = Service.objects.all().values("id", "name")
     return JsonResponse(
@@ -23,6 +25,7 @@ def services(request):
 
 
 @apigw_required
+@require_GET
 def service_fields(request):
     try:
         service = Service.objects.get(id=request.GET.get("service_id"))
