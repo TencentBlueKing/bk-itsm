@@ -49,10 +49,10 @@ class Model(models.Model):
     """基础字段"""
 
     DISPLAY_FIELDS = (
-        'creator',
-        'create_at',
-        'updated_by',
-        'update_at',
+        "creator",
+        "create_at",
+        "updated_by",
+        "update_at",
     )
 
     creator = models.CharField(_("创建人"), max_length=LEN_NORMAL)
@@ -93,7 +93,7 @@ class Model(models.Model):
             retry += 1
         else:
             # 尝试60次一直重复，则放弃生成key
-            return '##Err##'
+            return "##Err##"
 
         return key
 
@@ -109,7 +109,7 @@ class TicketStatusConfig(Model):
     objects = managers.TicketStatusConfigManager()
 
     class Meta:
-        app_label = 'ticket_status'
+        app_label = "ticket_status"
         verbose_name = _("工单状态配置")
         verbose_name_plural = _("工单状态配置")
 
@@ -120,12 +120,14 @@ class TicketStatusConfig(Model):
     def init_ticket_status_config(cls):
         """初始化配置表信息"""
         if cls.objects.exists():
-            print('ticket_status_config exists, skip init ticket_status_config data')
+            print("ticket_status_config exists, skip init ticket_status_config data")
             return
 
         service_types = list(ServiceCategory.objects.values_list("key", flat=True))
         for service_type in service_types:
-            cls.objects.create(creator="system", configured=True, service_type=service_type)
+            cls.objects.create(
+                creator="system", configured=True, service_type=service_type
+            )
 
     @property
     def service_type_name(self):
@@ -135,12 +137,12 @@ class TicketStatusConfig(Model):
     def ticket_status(self):
         """对应服务类型下状态信息"""
         all_status = TicketStatus.objects.filter(service_type=self.service_type).all()
-        return '/'.join([status.name for status in all_status])
+        return "/".join([_(status.name) for status in all_status])
 
     @classmethod
     def update_config(cls, service_type, user, configured=None):
         """更新配置需更新更新时间和更新人"""
-        updated_by = getattr(user, 'username', 'guest')
+        updated_by = getattr(user, "username", "guest")
         update_kwargs = {"updated_by": updated_by, "update_at": datetime.now()}
         if configured is not None:
             update_kwargs.update({"configured": configured})
@@ -156,10 +158,14 @@ class TicketStatus(Model):
     key = models.CharField(_("状态关键字"), max_length=LEN_LONG)
     name = models.CharField(_("状态名称"), max_length=LEN_LONG)
     color_hex = models.CharField(_("二进制颜色"), max_length=LEN_SHORT, blank=True)
-    desc = models.CharField(_("状态说明"), max_length=LEN_LONG, default=EMPTY_STRING, null=True,
-                            blank=True)
+    desc = models.CharField(
+        _("状态说明"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True
+    )
     flow_status = models.CharField(
-        _('流程状态'), max_length=LEN_SHORT, choices=FLOW_STATUS_CHOICES, default=PROCESS_RUNNING
+        _("流程状态"),
+        max_length=LEN_SHORT,
+        choices=FLOW_STATUS_CHOICES,
+        default=PROCESS_RUNNING,
     )
     order = models.IntegerField(_("序号"), default=EMPTY_INT)
     is_builtin = models.BooleanField(_("是否内置状态"), default=False)
@@ -170,7 +176,7 @@ class TicketStatus(Model):
     objects = managers.TicketStatusManager()
 
     class Meta:
-        app_label = 'ticket_status'
+        app_label = "ticket_status"
         verbose_name = _("工单状态")
         verbose_name_plural = _("工单状态")
 
@@ -182,17 +188,19 @@ class TicketStatus(Model):
         """初始化默认工单状态"""
 
         service_types = list(ServiceCategory.objects.values_list("key", flat=True))
-        for service_type, status in itertools.product(service_types, BUILTIN_TICKET_STATUS):
+        for service_type, status in itertools.product(
+            service_types, BUILTIN_TICKET_STATUS
+        ):
             cls.objects.update_or_create(
                 defaults={
-                    'name': status["name"],
-                    'color_hex': status["color_hex"],
-                    'flow_status': status["flow_status"],
-                    'order': status["order"],
-                    'is_builtin': status["is_builtin"],
-                    'is_start': status["is_start"],
-                    'is_over': status["is_over"],
-                    'is_suspend': status["is_suspend"],
+                    "name": status["name"],
+                    "color_hex": status["color_hex"],
+                    "flow_status": status["flow_status"],
+                    "order": status["order"],
+                    "is_builtin": status["is_builtin"],
+                    "is_start": status["is_start"],
+                    "is_over": status["is_over"],
+                    "is_suspend": status["is_suspend"],
                 },
                 key=status["key"],
                 service_type=service_type,
@@ -204,7 +212,10 @@ class TicketStatus(Model):
         status_info = {}
         for status in all_status:
             status_key = "{}_{}".format(status["service_type"], status["key"])
-            status_info[status_key] = {"name": status["name"], "over": status["is_over"]}
+            status_info[status_key] = {
+                "name": status["name"],
+                "over": status["is_over"],
+            }
         return status_info
 
     def get_to_status_ids(self):
@@ -215,8 +226,11 @@ class TicketStatus(Model):
 
     @property
     def to_status(self):
-        return self.__class__.objects.filter(id__in=self.to_status_id_set).exclude(
-            key='SUSPENDED').order_by("order")
+        return (
+            self.__class__.objects.filter(id__in=self.to_status_id_set)
+            .exclude(key="SUSPENDED")
+            .order_by("order")
+        )
 
     @property
     def to_status_keys(self):
@@ -224,8 +238,9 @@ class TicketStatus(Model):
 
     @property
     def to_over_status(self):
-        return self.__class__.objects.filter(id__in=self.to_status_id_set, is_over=True).order_by(
-            "order")
+        return self.__class__.objects.filter(
+            id__in=self.to_status_id_set, is_over=True
+        ).order_by("order")
 
     @property
     def to_over_status_keys(self):
@@ -243,26 +258,42 @@ class StatusTransit(Model):
 
     service_type = models.CharField(_("服务类型"), max_length=LEN_NORMAL)
 
-    from_status = models.ForeignKey(help_text=_("源状态"), to=TicketStatus,
-                                    related_name="from_transits", on_delete=models.CASCADE)
-    to_status = models.ForeignKey(help_text=_("目标状态"), to=TicketStatus, related_name="to_transits",
-                                  on_delete=models.CASCADE)
+    from_status = models.ForeignKey(
+        help_text=_("源状态"),
+        to=TicketStatus,
+        related_name="from_transits",
+        on_delete=models.CASCADE,
+    )
+    to_status = models.ForeignKey(
+        help_text=_("目标状态"),
+        to=TicketStatus,
+        related_name="to_transits",
+        on_delete=models.CASCADE,
+    )
     is_auto = models.BooleanField(_("是否自动转换"), default=False)
     threshold = models.IntegerField(_("阈值"), default=EMPTY_INT)
     threshold_unit = models.CharField(
-        _("时长单位"), max_length=LEN_SHORT, default='m',
-        choices=[('m', "分钟"), ('h', "小时"), ('d', "天"), ]
+        _("时长单位"),
+        max_length=LEN_SHORT,
+        default="m",
+        choices=[
+            ("m", "分钟"),
+            ("h", "小时"),
+            ("d", "天"),
+        ],
     )
 
     objects = managers.StatusTransitManager()
 
     class Meta:
-        app_label = 'ticket_status'
+        app_label = "ticket_status"
         verbose_name = _("状态转换规则")
         verbose_name_plural = _("状态转换规则")
 
     def __unicode__(self):
-        return "{}-{}({})".format(self.from_status.name, self.to_status.name, self.service_type)
+        return "{}-{}({})".format(
+            self.from_status.name, self.to_status.name, self.service_type
+        )
 
     @property
     def from_status_name(self):
@@ -296,16 +327,21 @@ class StatusTransit(Model):
 
             # 每个源状态的流转
             for from_status, to_status_list in list(transit_map.items()):
-                from_status_inst = TicketStatus.objects.get(service_type=service_type,
-                                                            key=from_status)
+                from_status_inst = TicketStatus.objects.get(
+                    service_type=service_type, key=from_status
+                )
 
                 for to_status in to_status_list:
-                    to_status_inst = TicketStatus.objects.get(service_type=service_type,
-                                                              key=to_status)
+                    to_status_inst = TicketStatus.objects.get(
+                        service_type=service_type, key=to_status
+                    )
 
                     if from_status and to_status_inst:
                         transits.append(
-                            cls(service_type=service_type, from_status=from_status_inst,
-                                to_status=to_status_inst)
+                            cls(
+                                service_type=service_type,
+                                from_status=from_status_inst,
+                                to_status=to_status_inst,
+                            )
                         )
         cls.objects.bulk_create(transits)
