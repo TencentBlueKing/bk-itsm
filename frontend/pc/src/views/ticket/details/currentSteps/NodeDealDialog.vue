@@ -196,7 +196,7 @@
                     type: '',
                     value: ''
                 },
-                excludeAssignList: ['CMDB', 'VARIABLE', 'EMPTY', 'STARTER_LEADER', 'OPEN', 'STARTER', 'BY_ASSIGNOR', 'ASSIGN_LEADER', 'IAM', 'API', 'ORGANIZATION']
+                excludeAssignList: ['CMDB', 'VARIABLE', 'EMPTY', 'STARTER_LEADER', 'OPEN', 'STARTER', 'BY_ASSIGNOR', 'ASSIGN_LEADER', 'IAM', 'API', 'ORGANIZATION', 'SYSTEM']
             }
         },
         computed: {
