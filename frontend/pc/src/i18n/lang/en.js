@@ -2598,5 +2598,18 @@ export const m = {
     '从已有的服务复制': 'Copy from an existing service',
     '字段类型': 'Field Type',
     '控件库': 'Control library',
-    '已有字段': 'Existing field'
+    '已有字段': 'Existing field',
+    '创建服务': 'Create Service',
+    '新建服务': 'Create Service',
+    '导入服务': 'Import Service',
+    '选择目录': 'select directory',
+    'SLA': 'SLA',
+    '任务': 'Task',
+    '已选：': 'Selected:',
+    '收起': 'Put Away',
+    '更多': 'More',
+    '进行中': 'RUNNING',
+    '已完成': 'FINISHED',
+    '已撤销': 'REVOKED',
+    '已终止': 'TERMINATED'
 }
