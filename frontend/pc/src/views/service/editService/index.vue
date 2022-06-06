@@ -23,7 +23,7 @@
 <template>
     <div>
         <nav-title :show-icon="true"
-            :title-name="serviceInfo.name || $t(`m.serviceConfig['新建服务']`)"
+            :title-name="serviceInfo.name || $t(`m['新建服务']`)"
             @goBack="onBackIconClick">
             <div slot="step">
                 <bk-steps ext-cls="steps-icon"

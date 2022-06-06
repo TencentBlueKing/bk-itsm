@@ -323,14 +323,14 @@
             <bk-dialog
                 width="800"
                 v-model="isImportServiceShow"
-                title="导入服务"
+                :title="$t(`m['导入服务']`)"
                 theme="primary"
                 :auto-close="false"
                 :mask-close="false"
                 @confirm="importConfirm"
                 @cancel="closeImport">
                 <bk-form ref="importForm" id="importForm">
-                    <bk-form-item label="选择目录" required>
+                    <bk-form-item :label="$t(`m['选择目录']`)" required>
                         <bk-cascade
                             v-model="importCatalogId"
                             :list="dirList"
@@ -340,7 +340,7 @@
                             @change="handleChangeTree">
                         </bk-cascade>
                     </bk-form-item>
-                    <bk-form-item label="选择文件" required>
+                    <bk-form-item :label="$t(`m['选择文件']`)" required>
                         <bk-button class="bk-btn-file" style="width: 100px">
                             <input class="bk-input-file" type="file" ref="importInput" @change="handleFile" />
                             {{ $t(`m['选择文件']`) }}
