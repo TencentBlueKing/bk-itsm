@@ -234,9 +234,11 @@
                 // 当前节点有权限不显示异常分派
                 this.isShowAssgin = this.ticketInfo.auth_actions.includes('ticket_management') && !this.hasNodeOptAuth
             }
+            this.$store.commit('project/setProjectId', this.ticketInfo.project_key)
         },
         beforeDestroy () {
             this.clearTicketTimer()
+            this.$store.commit('project/setProjectId', window.DEFAULT_PROJECT)
         },
         methods: {
             // 同步数据，需等待 ticketInfo 返回
