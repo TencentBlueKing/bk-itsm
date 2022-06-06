@@ -89,7 +89,12 @@ class TicketStateDraft(models.Model):
 class TicketComment(models.Model):
     """工单满意度表"""
 
-    SOURCE_CHOICE = [("WEB", "蓝鲸平台"), ("SMS", "短信邀请"), ("SYS", "系统自评")]
+    SOURCE_CHOICE = [
+        ("WEB", "蓝鲸平台"),
+        ("SMS", "短信邀请"),
+        ("SYS", "系统自评"),
+        ("API", "OPENAPI"),
+    ]
 
     ticket = models.OneToOneField(
         "ticket.Ticket",

@@ -74,6 +74,7 @@ from itsm.openapi.ticket.serializers import (
     TicketResultSerializer,
     TicketFilterSerializer,
     ProceedApprovalSerializer,
+    CommentSerializer,
     DynamicFieldSerializer,
     TicketComplexLogsSerializer,
 )
@@ -83,7 +84,13 @@ from itsm.openapi.ticket.validators import (
     openapi_unsuspend_validate,
 )
 from itsm.service.models import ServiceCatalog, Service
-from itsm.ticket.models import Ticket, TicketField, SignTask, TicketEventLog
+from itsm.ticket.models import (
+    Ticket,
+    TicketField,
+    SignTask,
+    TicketEventLog,
+    TicketComment,
+)
 from itsm.ticket.serializers import TicketList, TicketSerializer
 from itsm.ticket.tasks import start_pipeline
 from itsm.ticket.validators import (
@@ -650,6 +657,25 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
                 )
             }
         )
+
+    @action(
+        detail=False,
+        methods=["post"],
+    )
+    @catch_openapi_exception
+    @custom_apigw_required
+    def comment(self, request, *args, **kwargs):
+        """新增评论"""
+        ser = CommentSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        data = ser.data
+        ticket_comment = TicketComment.objects.get(ticket_id=data["ticket_id"])
+        ticket_comment.stars = data["stars"]
+        ticket_comment.comments = data["comments"]
+        ticket_comment.source = "API"
+        ticket_comment.save()
+        ticket_comment.creator = data["operator"]
+        return Response()
 
     @action(detail=False, methods=["get"])
     @catch_openapi_exception

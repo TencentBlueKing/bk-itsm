@@ -40,6 +40,10 @@ from itsm.component.constants import (
     SIGN_STATE,
 )
 from itsm.component.exceptions import ParamError
+from itsm.ticket.models import Ticket
+from itsm.ticket.serializers import (
+    TicketComment,
+)
 from itsm.component.utils.basic import get_random_key
 from itsm.ticket.models import Status
 from itsm.ticket.serializers import TicketSerializer, TicketStateOperateSerializer
@@ -446,3 +450,37 @@ class TicketFilterSerializer(serializers.Serializer):
     )
     exclude_ticket_id__in = serializers.CharField(required=False)
     current_processor = serializers.CharField(required=False)
+
+
+class CommentSerializer(serializers.Serializer):
+    """工单评价序列化"""
+
+    ticket_id = serializers.IntegerField(required=False)
+    operator = serializers.CharField(max_length=16, required=True)
+    sn = serializers.CharField(required=True)
+    stars = serializers.IntegerField(required=True, max_value=6, min_value=1)
+    comments = serializers.CharField(
+        required=False, max_length=LEN_LONG, allow_null=True, allow_blank=True
+    )
+
+    def validate(self, attrs):
+        sn = attrs.get("sn", "")
+        try:
+            ticket = Ticket.objects.get(sn=sn)
+        except Ticket.DoesNotExist:
+            raise ParamError(_("sn={}对应的单据不存在!".format(sn)))
+
+        if ticket.current_status != "FINISHED":
+            raise ParamError(_("单据未结束，不允许评价!"))
+
+        try:
+            ticket_comment = TicketComment.objects.get(ticket_id=ticket.id)
+        except TicketComment.DoesNotExist:
+            raise ParamError(_("单据评价记录未存在，无法评价!"))
+
+        if ticket_comment.stars != 0:
+            raise ParamError(_("该单据已经被评论，请勿重复评论"))
+
+        attrs["ticket_id"] = ticket.id
+
+        return attrs
