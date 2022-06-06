@@ -77,7 +77,7 @@ def index(request):
             "IS_ITSM_ADMIN": 1
             if UserRole.is_itsm_superuser(request.user.username)
             else 0,
-            "CUSTOM_TITLE": TITLE,
+            "CUSTOM_TITLE": TITLE(),
             "USE_LOG": "true",
             "LOGIN_URL": LOGIN_URL,
             "LOG_NAME": settings.LOG_NAME or _("流程服务"),
@@ -104,7 +104,7 @@ def get_footer(request):
     return JsonResponse(
         {
             "result": True,
-            "data": Template(FOOTER).render(year=datetime.datetime.now().year),
+            "data": Template(FOOTER()).render(year=datetime.datetime.now().year),
             "code": "OK",
             "message": "success",
         }
