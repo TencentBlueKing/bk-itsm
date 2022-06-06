@@ -25,19 +25,26 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
-TITLE = "{} | {}".format(_("流程服务"), _("腾讯蓝鲸智云"))
 DOC_URL = settings.BK_IEOD_DOC_URL
 
-FOOTER = """
-        <div class="copyright">
-            <ul class="link-list">
-                <a href="wxwork://message?uin=8444252571319680" class="link-item">{}</a>
-                <a href="{}" class="link-item" target="_blank">{}</a>
-            </ul>
-            <div class="desc">Copyright &copy; 2012-${{year}} Tencent BlueKing. All Rights Reserved.V2.6.1</div>
-        </div>
-        """.format(
-    _("联系BK助手"), settings.BK_DESKTOP_URL, _("蓝鲸桌面")
-)
+
+def get_title():
+    return "{} | {}".format(_("流程服务"), _("腾讯蓝鲸智云"))
+
+
+def get_footer():
+    FOOTER = """
+            <div class="copyright">
+                <ul class="link-list">
+                    <a href="wxwork://message?uin=8444252571319680" class="link-item">{}</a>
+                    <a href="{}" class="link-item" target="_blank">{}</a>
+                </ul>
+                <div class="desc">Copyright &copy; 2012-${{year}} Tencent BlueKing. All Rights Reserved.V2.6.1</div>
+            </div>
+            """.format(
+        _("联系BK助手"), settings.BK_DESKTOP_URL, _("蓝鲸桌面")
+    )
+    return FOOTER
+
 
 LOGIN_URL = settings.BK_IEOD_LOGIN_URL
