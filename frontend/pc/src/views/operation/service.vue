@@ -123,6 +123,7 @@
     import ChartCard from './components/chartCard.vue'
     import TableChart from './components/tableChart.vue'
     import LineChart from './components/lineChart.vue'
+    import i18n from '@/i18n/index.js'
 
     const FORMAT = 'YYYY-MM-DD'
 
@@ -135,15 +136,15 @@
         },
         {
             key: 'creator',
-            name: '用户ID'
+            name: i18n.t(`m['用户ID']`)
         },
         {
             key: 'organization',
-            name: '所在组织'
+            name: i18n.t(`m['所在组织']`)
         },
         {
             key: 'count',
-            name: '提单量',
+            name: i18n.t(`m['提单量']`),
             colorMark: true,
             align: 'right',
             width: 120
@@ -205,7 +206,7 @@
                 },
                 shortcuts: [
                     {
-                        text: '今天',
+                        text: this.$t(`m['今天']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().format(FORMAT)
@@ -213,7 +214,7 @@
                         }
                     },
                     {
-                        text: '昨天',
+                        text: this.$t(`m['昨天']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().subtract(1, 'day').format(FORMAT)
@@ -221,7 +222,7 @@
                         }
                     },
                     {
-                        text: '前天',
+                        text: this.$t(`m['前天']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().subtract(2, 'day').format(FORMAT)
@@ -229,7 +230,7 @@
                         }
                     },
                     {
-                        text: '一周前',
+                        text: this.$t(`m['一周前']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().subtract(1, 'week').format(FORMAT)
@@ -237,7 +238,7 @@
                         }
                     },
                     {
-                        text: '一个月前',
+                        text: this.$t(`m['一个月前']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().subtract(1, 'month').format(FORMAT)
@@ -245,7 +246,7 @@
                         }
                     },
                     {
-                        text: '三个月前',
+                        text: this.$t(`m['三个月前']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().subtract(3, 'month').format(FORMAT)
@@ -253,7 +254,7 @@
                         }
                     },
                     {
-                        text: '半年前',
+                        text: this.$t(`m['半年前']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().subtract(6, 'month').format(FORMAT)
@@ -261,7 +262,7 @@
                         }
                     },
                     {
-                        text: '一年前',
+                        text: this.$t(`m['一年前']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().subtract(1, 'year').format(FORMAT)
