@@ -53,6 +53,7 @@ from itsm.component.constants import (
     APPROVAL_STATE,
     TASK_STATE,
     TASK_SOPS_STATE,
+    FIELD_BIZ,
 )
 from itsm.component.utils.basic import create_version_number, get_random_key
 from itsm.postman.models import RemoteApiInstance
@@ -482,7 +483,6 @@ class State(Model):
 
     def add_fields_from_table(self, fields):
         """增加公共字段到节点"""
-
         with transaction.atomic():
             for field in fields:
                 field.pop("id", None)
@@ -490,6 +490,11 @@ class State(Model):
                     workflow_id=self.workflow.id, source=TABLE, key=field["key"]
                 )
                 field.update(basic_info)
+
+                if field["key"] == FIELD_BIZ:
+                    self.workflow.is_biz_needed = True
+                    self.workflow.save()
+
                 obj, created = self.workflow.fields.get_or_create(
                     key=field["key"], state=self
                 )

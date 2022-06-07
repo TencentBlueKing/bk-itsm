@@ -317,7 +317,14 @@ DEFAULT_TABLE = [
     (
         "默认",
         "默认基础模型",
-        [FIELD_TITLE, FIELD_PY_IMPACT, FIELD_PX_URGENCY, FIELD_PRIORITY, FIELD_STATUS],
+        [
+            FIELD_TITLE,
+            FIELD_PY_IMPACT,
+            FIELD_PX_URGENCY,
+            FIELD_PRIORITY,
+            FIELD_STATUS,
+            FIELD_BIZ,
+        ],
     ),
     (
         "变更",
