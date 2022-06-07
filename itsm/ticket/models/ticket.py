@@ -3137,15 +3137,9 @@ class Ticket(Model, BaseTicket):
         if Status.objects.filter(state_id=state_id, ticket_id=self.id).exists():
             # state_id, ticket_id对应唯一未删除的status，若存在多个，则存在BUG
             status = Status.objects.get(state_id=state_id, ticket_id=self.id)
-            last_operator = dotted_name(
-                self.logs.filter(status=status.id).last().operator
-            )
-            current_processors = (
-                f_processors if state.type == TASK_STATE else last_operator
-            )
             defaults.update(
                 processors_type=status.processors_type,
-                processors=current_processors,
+                processors=status.processors,
                 distribute_type="PROCESS",
                 action_type="TRANSITION",
                 status=RUNNING,
