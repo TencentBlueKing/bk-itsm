@@ -2510,9 +2510,9 @@ export const m = {
     '正在进行中': 'In progress',
     '当前处理人': 'current handler ',
     '请输入28个字符以内的项目代号': 'Please enter a project code within 28 characters',
-    '高': 'high',
-    '中': 'Medium',
-    '低': 'Low',
+    // '高': 'high',
+    // '中': 'Medium',
+    // '低': 'Low',
     '应用到其它类型': 'Apply to other types',
     '变更管理': 'Change',
     '事件管理': 'Event',
@@ -2611,5 +2611,8 @@ export const m = {
     '进行中': 'RUNNING',
     '已完成': 'FINISHED',
     '已撤销': 'REVOKED',
-    '已终止': 'TERMINATED'
+    '已终止': 'TERMINATED',
+    '当审批节点的审批人为申请人时，自动通过': 'When the approver of the approval node is the applicant, it is automatically passed',
+    '字段配置': 'Field config',
+    '字段属性': 'Field properties'
 }

@@ -96,7 +96,7 @@
         </div>
         <div v-show="crtForm" class="drag-line" @mousedown="handleDragLine"></div>
         <div v-show="crtForm" class="edit-service-field">
-            <div class="edit-service-title">字段属性</div>
+            <div class="edit-service-title">{{$t(`m['字段属性']`) }}</div>
             <div class="edit-service-forms">
                 <template v-for="form in ticketNodeForm">
                     <form-edit-item
