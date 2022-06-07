@@ -367,17 +367,18 @@ class Status(Model):
         )
         # Filter unprocessed user
         processor_list = list(set(user_list).difference(processed_user_list))
+
+        def custom_cmp(x, y):
+            keep = -1
+            reverse = 1
+            if user_list.index(x) < user_list.index(y):
+                return keep
+            else:
+                return reverse
+
+        processor_list.sort(key=functools.cmp_to_key(custom_cmp))
+
         if self.is_sequential and processor_list:
-
-            def custom_cmp(x, y):
-                keep = -1
-                reverse = 1
-                if user_list.index(x) < user_list.index(y):
-                    return keep
-                else:
-                    return reverse
-
-            processor_list.sort(key=functools.cmp_to_key(custom_cmp))
             processor = processor_list[0]
         else:
             processor = ",".join(processor_list)
