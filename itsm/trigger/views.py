@@ -380,7 +380,7 @@ class ActionViewSet(component_viewsets.ModelViewSet):
             {
                 "result": result,
                 "message": message,
-                "data": None,
+                "data": {"action_id": instance.id},
                 "code": ResponseCodeStatus.OK,
             }
         )
