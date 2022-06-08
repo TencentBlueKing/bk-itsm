@@ -268,7 +268,7 @@ if locals().get("DISABLED_APPS"):
 # Django 项目配置 - i18n
 # ==============================================================================
 TIME_ZONE = "Asia/Shanghai"
-LANGUAGE_CODE = os.environ.get("BKAPP_BACKEND_LANGUAGE", "zh_CN")
+LANGUAGE_CODE = os.environ.get("BKAPP_BACKEND_LANGUAGE", "zh-hans")
 SITE_ID = 1
 USE_I18N = True
 USE_L10N = True
@@ -799,7 +799,7 @@ WEIXIN_APP_EXTERNAL_SHARE_HOST = "{}weixin/".format(
 TICKET_NOTIFY_HOST = WEIXIN_APP_EXTERNAL_SHARE_HOST
 
 FILE_CHARSET = "utf-8"
-LANGUAGE_CODE = "zh-hans"
+# LANGUAGE_CODE = "zh-hans"
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # celery允许接收的数据格式，可以是一个字符串，比如'json'
