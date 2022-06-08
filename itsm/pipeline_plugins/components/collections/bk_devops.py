@@ -27,7 +27,12 @@ import logging
 
 from django.conf import settings
 
-from itsm.component.constants import SYSTEM_OPERATE, FINISHED, TRANSITION_OPERATE, NODE_FAILED
+from itsm.component.constants import (
+    SYSTEM_OPERATE,
+    FINISHED,
+    TRANSITION_OPERATE,
+    NODE_FAILED,
+)
 from itsm.component.apigw import client as apigw_client
 from itsm.ticket.models import Ticket, TicketGlobalVariable
 from itsm.ticket.serializers import StatusSerializer
@@ -43,7 +48,7 @@ class BkDevOpsService(ItsmBaseService):
     __need_schedule__ = True
     interval = StaticIntervalGenerator(3)
 
-    def prepare_build_params(self, devops_info):
+    def prepare_build_params(self, devops_info, ticket):
         """
         构建流水线参数
         @param devops_info: 蓝盾节点参数 Type: dict
@@ -63,6 +68,7 @@ class BkDevOpsService(ItsmBaseService):
                 "value": "test",
                 "name": "bkapp_code",
                 "key": "bkapp_code"
+                "type: "variable" or "const" 分别代表变量与常量
             }]
         }
         @return params: 流水线参数 Type: dict
@@ -77,16 +83,28 @@ class BkDevOpsService(ItsmBaseService):
         }
         """
         # 1.从表单数据中拿出key-value
+
+        fields = ticket.fields.values_list("key", "_value")
+        variables = TicketGlobalVariable.objects.filter(
+            ticket_id=ticket.id
+        ).values_list("key", "value")
+        values = dict(list(fields) + list(variables))
+
         constants = {}
+        # 支持引用变量
         if devops_info["constants"]:
-            constants = {constant["key"]: constant["value"] for constant in
-                         devops_info["constants"]}
+            for constant in devops_info["constants"]:
+                key = constant["key"]
+                if constant.get("type", "const") == "variable":
+                    constants[key] = values.get(constant["value"], "")
+                else:
+                    constants[key] = constant["value"]
 
         # 2.构建蓝盾流水线api所需参数
         params = {
             "username": devops_info["username"],
-            "project_id": devops_info["project_id"]['value'],
-            "pipeline_id": devops_info["pipeline_id"]['value']
+            "project_id": devops_info["project_id"]["value"],
+            "pipeline_id": devops_info["pipeline_id"]["value"],
         }
         params.update(constants)
         return params
@@ -114,11 +132,17 @@ class BkDevOpsService(ItsmBaseService):
             error_message_template = kwargs.get("error_message_template")
             ticket = kwargs.get("ticket")
             state_id = kwargs.get("state_id")
-            self.update_info(current_node, devops_result, error_message=error_message,
-                             result=result)
-            current_node.set_failed_status(operator=processors, message=error_message_template,
-                                           detail_message=error_message)
-            ticket.node_status.filter(state_id=state_id).update(action_type=TRANSITION_OPERATE)
+            self.update_info(
+                current_node, devops_result, error_message=error_message, result=result
+            )
+            current_node.set_failed_status(
+                operator=processors,
+                message=error_message_template,
+                detail_message=error_message,
+            )
+            ticket.node_status.filter(state_id=state_id).update(
+                action_type=TRANSITION_OPERATE
+            )
             # 发送通知
             ticket.notify(
                 state_id=state_id,
@@ -142,7 +166,7 @@ class BkDevOpsService(ItsmBaseService):
         state_id = data.inputs.state_id
         ticket = Ticket.objects.get(id=ticket_id)
         ticket.do_before_enter_state(state_id, by_flow=self.by_flow)
-        processors = ticket.current_processors[1: -1]
+        processors = ticket.current_processors[1:-1]
 
         data.set_outputs("params_devops_result_{}".format(state_id), False)
         current_node = ticket.node_status.get(state_id=state_id)
@@ -161,13 +185,17 @@ class BkDevOpsService(ItsmBaseService):
         # 2.获取蓝盾节点参数
         state = ticket.state(state_id)
         try:
-            devops_info = current_node.query_params if current_node.query_params else state[
-                "extras"].get("devops_info")
+            devops_info = (
+                current_node.query_params
+                if current_node.query_params
+                else state["extras"].get("devops_info")
+            )
 
         except KeyError as error:
             logger.info(
                 "get devops_info error from State instance，error info: {}, state id: {}".format(
-                    error, state_id)
+                    error, state_id
+                )
             )
             self.do_exit_plugins(
                 result=False,
@@ -177,12 +205,12 @@ class BkDevOpsService(ItsmBaseService):
                 processors=processors,
                 error_message_template=error_message_template,
                 ticket=ticket,
-                state_id=state_id
+                state_id=state_id,
             )
             return False
 
         # 3.构建流水线启动参数
-        build_params = self.prepare_build_params(devops_info)
+        build_params = self.prepare_build_params(devops_info, ticket)
 
         # 4.构建 api_info
         api_info = [
@@ -194,7 +222,10 @@ class BkDevOpsService(ItsmBaseService):
             }
         ]
         current_node.create_action_log(
-            "system", "开始启动蓝盾流水线【{name}】", source=SYSTEM_OPERATE, action_type=SYSTEM_OPERATE,
+            "system",
+            "开始启动蓝盾流水线【{name}】",
+            source=SYSTEM_OPERATE,
+            action_type=SYSTEM_OPERATE,
             fields=api_info,
         )
         self.update_info(current_node, devops_result, build_params=build_params)
@@ -206,7 +237,9 @@ class BkDevOpsService(ItsmBaseService):
             devops_pipeline_id = build_params.get("pipeline_id")
         except Exception as error:
             logger.info(
-                "check params error，error info: {}, build params: {}".format(error, build_params)
+                "check params error，error info: {}, build params: {}".format(
+                    error, build_params
+                )
             )
             self.do_exit_plugins(
                 result=False,
@@ -216,7 +249,7 @@ class BkDevOpsService(ItsmBaseService):
                 processors=processors,
                 error_message_template=error_message_template,
                 ticket=ticket,
-                state_id=state_id
+                state_id=state_id,
             )
             return False
 
@@ -224,14 +257,19 @@ class BkDevOpsService(ItsmBaseService):
         try:
             build_result = apigw_client.devops.pipeline_build_start(build_params)
             devops_build_id = build_result.get("id")
-            build_url = "{}/{}/{}/detail/{}".format(str(settings.DEVOPS_CLIENT_URL).rstrip(),
-                                                    devops_project_id, devops_pipeline_id,
-                                                    devops_build_id)
+            build_url = "{}/{}/{}/detail/{}".format(
+                str(settings.DEVOPS_CLIENT_URL).rstrip(),
+                devops_project_id,
+                devops_pipeline_id,
+                devops_build_id,
+            )
             self.update_info(current_node, devops_result, build_url=build_url)
 
         except Exception as error:
             logger.info(
-                "build pipeline error，error info: {}, build params: {}".format(error, build_params)
+                "build pipeline error，error info: {}, build params: {}".format(
+                    error, build_params
+                )
             )
             self.do_exit_plugins(
                 result=False,
@@ -241,7 +279,7 @@ class BkDevOpsService(ItsmBaseService):
                 processors=processors,
                 error_message_template=error_message_template,
                 ticket=ticket,
-                state_id=state_id
+                state_id=state_id,
             )
             return False
 
@@ -272,7 +310,7 @@ class BkDevOpsService(ItsmBaseService):
         state_id = data.inputs.state_id
         ticket = Ticket.objects.get(id=parent_data.inputs.ticket_id)
         current_node = ticket.node_status.get(state_id=state_id)
-        processors = ticket.current_processors[1: -1]
+        processors = ticket.current_processors[1:-1]
 
         # 2.创建全局变量
         devops_result, created = TicketGlobalVariable.objects.get_or_create(
@@ -280,7 +318,7 @@ class BkDevOpsService(ItsmBaseService):
             name="devops_result_{}".format(state_id),
             state_id=state_id,
             ticket_id=ticket.id,
-            value=""
+            value="",
         )
 
         # 3.构建查询状态所需参数
@@ -288,8 +326,9 @@ class BkDevOpsService(ItsmBaseService):
             error_message = "invalid callback_data, devops_build_id is null"
             data.outputs.ex_data = error_message
             logger.info(
-                "get devops_build_id error，error info: {}, data outputs: {}".format(error_message,
-                                                                                    data.outputs)
+                "get devops_build_id error，error info: {}, data outputs: {}".format(
+                    error_message, data.outputs
+                )
             )
             self.do_exit_plugins(
                 result=False,
@@ -299,7 +338,7 @@ class BkDevOpsService(ItsmBaseService):
                 processors=processors,
                 error_message_template=error_message,
                 ticket=ticket,
-                state_id=state_id
+                state_id=state_id,
             )
             self.finish_schedule()
             return False
@@ -324,7 +363,7 @@ class BkDevOpsService(ItsmBaseService):
                 processors=processors,
                 error_message_template=str(error),
                 ticket=ticket,
-                state_id=state_id
+                state_id=state_id,
             )
             self.finish_schedule()
             return False
@@ -346,7 +385,7 @@ class BkDevOpsService(ItsmBaseService):
                 processors=processors,
                 error_message_template=error_message,
                 ticket=ticket,
-                state_id=state_id
+                state_id=state_id,
             )
             # 结束轮询
             self.finish_schedule()
@@ -364,7 +403,7 @@ class BkDevOpsService(ItsmBaseService):
                 processors=processors,
                 error_message_template=error_message,
                 ticket=ticket,
-                state_id=state_id
+                state_id=state_id,
             )
             # 结束轮询
             self.finish_schedule()
@@ -381,7 +420,9 @@ class BkDevOpsService(ItsmBaseService):
                 )
             else:
                 error_message_detail = "status: {}".format(current_status)
-            error_message = "{}, error message: {}".format(error_message_info, error_message_detail)
+            error_message = "{}, error message: {}".format(
+                error_message_info, error_message_detail
+            )
             self.do_exit_plugins(
                 result=False,
                 current_node=current_node,
@@ -390,7 +431,7 @@ class BkDevOpsService(ItsmBaseService):
                 processors=processors,
                 error_message_template=error_message,
                 ticket=ticket,
-                state_id=state_id
+                state_id=state_id,
             )
             # 结束轮询
             self.finish_schedule()
