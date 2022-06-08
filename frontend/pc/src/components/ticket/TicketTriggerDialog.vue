@@ -73,6 +73,19 @@
                 {{ $t(`m['带*的表单项不能为空！']`)}}
             </p>
         </bk-dialog>
+        <bk-dialog v-model="info.show"
+            theme="primary"
+            :mask-close="false"
+            footer-position="center"
+            @confirm="refechTicket">
+            <div class="status">
+                <i v-if="info.status === 'success'" style="color: green" class="bk-itsm-icon icon-success status-icon"></i>
+                <i v-else-if="info.status === 'error'" style="color: red" class="bk-itsm-icon icon-itsm-icon-four status-icon"></i>
+                <i v-else class="bk-itsm-icon icon-icon-loading status-load-icon"></i>
+                <p class="title">{{ info.title}}</p>
+                <p class="title">{{ info.subTitle}}</p>
+            </div>
+        </bk-dialog>
     </div>
 </template>
 <script>
@@ -98,7 +111,13 @@
                 isTrigger: false,
                 trigger: '',
                 checkedbox: false,
-                errorTip: false
+                errorTip: false,
+                info: {
+                    show: false,
+                    status: 'loading',
+                    title: 'loading…',
+                    subTitle: ''
+                }
             }
         },
         computed: {
@@ -110,6 +129,30 @@
             openDialog (trigger) {
                 this.isTrigger = true
                 this.trigger = trigger
+            },
+            refechTicket () {
+                this.$store.commit('taskHistoryRefreshFunc')
+                if (this.trigger.need_refresh || !this.trigger.can_repeat) {
+                    this.$emit('init-info')
+                }
+            },
+            getTriggerStatus (id) {
+                this.$store.dispatch('ticket/getTriggerStatus', id).then(res => {
+                    const list = ['FAILED', 'SUCCEED']
+                    if (!list.includes(res.data.status)) {
+                        const setTimeoutFunc = setTimeout(
+                            () => {
+                                this.getTriggerStatus(id)
+                            }, 1000
+                        )
+                        this.$once('hook:beforeDestroy', () => {
+                            clearInterval(setTimeoutFunc)
+                        })
+                    } else {
+                        this.info.title = res.data.status_name
+                        this.info.status = res.data.status === 'FAILED' ? 'error' : 'success'
+                    }
+                })
             },
             checkInfo () {
                 let status = false
@@ -255,15 +298,13 @@
                         // params.push(paramsItem)
                     })
                 }
-                this.$store.dispatch('trigger/executeTrigger', { params: paramsItem, id: this.trigger.id }).then(() => {
+                this.$store.dispatch('trigger/executeTrigger', { params: paramsItem, id: this.trigger.id }).then(res => {
                     this.$bkMessage({
                         message: '执行成功',
                         theme: 'success'
                     })
-                    this.$store.commit('taskHistoryRefreshFunc')
-                    if (this.trigger.need_refresh || !this.trigger.can_repeat) {
-                        this.$emit('init-info')
-                    }
+                    this.info.show = true
+                    this.getTriggerStatus(res.data.action_id)
                 }).catch((res) => {
                     errorHandler(res, this)
                 }).finally(() => {
@@ -352,5 +393,37 @@
 }
 /deep/ .bk-send-message {
     border: 1px solid #dcdee5;
+}
+@keyframes rotation {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(360deg);
+    }
+}
+.status {
+    text-align: center;
+    .status-icon {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        font-size: 40px;
+    }
+    .status-load-icon {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        color: #3a84ff;
+        font-size: 40px;
+        -webkit-transform: rotate(360deg);
+        animation: rotation 1.5s linear infinite;
+        -moz-animation: rotation 1.5s linear infinite;
+        -webkit-animation: rotation 1.5s linear infinite;
+        -o-animation: rotation 1.5s linear infinite;
+    }
+    .title {
+        margin-top: 10px;
+    }
 }
 </style>
