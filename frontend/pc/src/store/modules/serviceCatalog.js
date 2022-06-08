@@ -23,68 +23,68 @@
 import ajax from '../../utils/ajax'
 
 export default {
-    namespaced: true,
-    state: {
-        treeMore: false
-    },
-    mutations: {
-        // 改变树操作面板显示隐藏
-        changeTreeOperat (state, value) {
-            state.treeMore = value
-        }
-    },
-    actions: {
-        getTranslateData ({ commit, state, dispatch }, params) {
-            return ajax.get(`service/catalogs/translate_view/`, { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        getTreeData ({ commit, state, dispatch }, params) {
-            return ajax.get(`service/catalogs/tree_view/`, { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        getList ({ commit, state, dispatch }, params) {
-            return ajax.get(`service/catalogs/`, { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        create ({ commit, state, dispatch }, params) {
-            delete params['parent_name']
-            return ajax.post(`service/catalogs/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        delete ({ commit, state, dispatch }, id) {
-            return ajax.delete(`service/catalogs/${id}/`).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        update ({ commit, state, dispatch }, params) {
-            let id = params.id
-            return ajax.put(`service/catalogs/${id}/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 节点排序
-        moveNode ({ commit, state, dispatch }, {params, id}) {
-            return ajax.post(`service/catalogs/${id}/move/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 表格排序
-        moveTableNode ({ commit, state, dispatch }, {params, id}) {
-            return ajax.post(`service/catalog_services/${id}/move/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        }
+  namespaced: true,
+  state: {
+    treeMore: false
+  },
+  mutations: {
+    // 改变树操作面板显示隐藏
+    changeTreeOperat(state, value) {
+      state.treeMore = value
     }
+  },
+  actions: {
+    getTranslateData({ commit, state, dispatch }, params) {
+      return ajax.get(`service/catalogs/translate_view/`, { params: params }).then(response => {
+        let res = response.data
+        return res
+      })
+    },
+    getTreeData({ commit, state, dispatch }, params) {
+      return ajax.get(`service/catalogs/tree_view/`, { params: params }).then(response => {
+        let res = response.data
+        return res
+      })
+    },
+    getList({ commit, state, dispatch }, params) {
+      return ajax.get(`service/catalogs/`, { params: params }).then(response => {
+        let res = response.data
+        return res
+      })
+    },
+    create({ commit, state, dispatch }, params) {
+      delete params['parent_name']
+      return ajax.post(`service/catalogs/`, params).then(response => {
+        let res = response.data
+        return res
+      })
+    },
+    delete({ commit, state, dispatch }, id) {
+      return ajax.delete(`service/catalogs/${id}/`).then(response => {
+        let res = response.data
+        return res
+      })
+    },
+    update({ commit, state, dispatch }, params) {
+      let id = params.id
+      return ajax.put(`service/catalogs/${id}/`, params).then(response => {
+        let res = response.data
+        return res
+      })
+    },
+    // 节点排序
+    moveNode({ commit, state, dispatch }, { params, id }) {
+      return ajax.post(`service/catalogs/${id}/move/`, params).then(response => {
+        let res = response.data
+        return res
+      })
+    },
+    // 表格排序
+    moveTableNode({ commit, state, dispatch }, { params, id }) {
+      return ajax.post(`service/catalog_services/${id}/move/`, params).then(response => {
+        let res = response.data
+        return res
+      })
+    }
+  }
 }

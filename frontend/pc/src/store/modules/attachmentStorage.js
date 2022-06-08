@@ -23,54 +23,54 @@
 import ajax from '../../utils/ajax'
 
 export default {
-    namespaced: true,
-    state: {},
-    mutations: {},
-    actions: {
-        // 后台缓存
-        clearStorage ({ commit, state, dispatch }, params) {
-            return ajax.get('misc/clean_cache/', { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 文件存储位置
-        getattachmentStorage ({ commit, state, dispatch }, params) {
-            return ajax.get('iadmin/system_settings/', { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        putattachmentStorage ({ commit, state, dispatch }, { params, id }) {
-            return ajax.put(`iadmin/system_settings/${id}/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 组织结构开关
-        get_organization_structure ({ commit, state, dispatch }, params) {
-            return ajax.get('iadmin/system_settings/', { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        enable_organization_structure ({ commit, state, dispatch }, { params, id }) {
-            return ajax.put(`iadmin/system_settings/${id}/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        getEnableStatus ({ commit, state, dispatch }, params) {
-            return ajax.get('iadmin/system_settings/').then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        putEnableStatus ({ commit, state, dispatch }, { params, id }) {
-            return ajax.put(`iadmin/system_settings/${id}/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        }
+  namespaced: true,
+  state: {},
+  mutations: {},
+  actions: {
+    // 后台缓存
+    clearStorage({ commit, state, dispatch }, params) {
+      return ajax.get('misc/clean_cache/', { params: params }).then(response => {
+        let res = response.data
+        return res
+      })
+    },
+    // 文件存储位置
+    getattachmentStorage({ commit, state, dispatch }, params) {
+      return ajax.get('iadmin/system_settings/', { params: params }).then(response => {
+        let res = response.data
+        return res
+      })
+    },
+    putattachmentStorage({ commit, state, dispatch }, { params, id }) {
+      return ajax.put(`iadmin/system_settings/${id}/`, params).then(response => {
+        let res = response.data
+        return res
+      })
+    },
+    // 组织结构开关
+    get_organization_structure({ commit, state, dispatch }, params) {
+      return ajax.get('iadmin/system_settings/', { params: params }).then(response => {
+        let res = response.data
+        return res
+      })
+    },
+    enable_organization_structure({ commit, state, dispatch }, { params, id }) {
+      return ajax.put(`iadmin/system_settings/${id}/`, params).then(response => {
+        let res = response.data
+        return res
+      })
+    },
+    getEnableStatus({ commit, state, dispatch }, params) {
+      return ajax.get('iadmin/system_settings/').then(response => {
+        let res = response.data
+        return res
+      })
+    },
+    putEnableStatus({ commit, state, dispatch }, { params, id }) {
+      return ajax.put(`iadmin/system_settings/${id}/`, params).then(response => {
+        let res = response.data
+        return res
+      })
     }
+  }
 }

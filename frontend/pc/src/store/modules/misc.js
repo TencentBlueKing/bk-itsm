@@ -23,15 +23,15 @@
 import ajax from '../../utils/ajax'
 
 export default {
-    namespaced: true,
-    state: {},
-    mutations: {},
-    actions: {
-        clean_cache ({ commit, state, dispatch }, params) {
-            return ajax.post('misc/clean_cache/', params).then(response => {
-                let res = response.data
-                return res
-            })
-        }
+  namespaced: true,
+  state: {},
+  mutations: {},
+  actions: {
+    clean_cache({ commit, state, dispatch }, params) {
+      return ajax.post('misc/clean_cache/', params).then(response => {
+        let res = response.data
+        return res
+      })
     }
+  }
 }

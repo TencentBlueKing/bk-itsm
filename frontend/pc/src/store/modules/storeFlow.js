@@ -23,16 +23,16 @@
 import ajax from '../../utils/ajax'
 
 export default {
-    namespaced: true,
-    state: {
-        deleteOpen: {}
-    },
-    mutations: {
-        changeDelete (state, value) {
-            state.deleteOpen = value
-        }
-    },
-    actions: {
-        
+  namespaced: true,
+  state: {
+    deleteOpen: {}
+  },
+  mutations: {
+    changeDelete(state, value) {
+      state.deleteOpen = value
     }
+  },
+  actions: {
+
+  }
 }

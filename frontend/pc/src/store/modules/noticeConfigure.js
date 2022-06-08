@@ -23,27 +23,27 @@
 import ajax from '../../utils/ajax'
 
 export default {
-    namespaced: true,
-    state: {},
-    mutations: {},
-    actions: {
-        getNoticeList ({ commit, state, dispatch }, { params }) {
-            return ajax.get(`iadmin/custom_notify_template/`, { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        changeNotice ({ commit, state, dispatch }, { params, id }) {
-            return ajax.put(`iadmin/custom_notify_template/${id}/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        getVariableList ({ commit, state, dispatch }) {
-            return ajax.get(`iadmin/custom_notify_template/variable_list/`).then(response => {
-                let res = response.data
-                return res
-            })
-        }
+  namespaced: true,
+  state: {},
+  mutations: {},
+  actions: {
+    getNoticeList({ commit, state, dispatch }, { params }) {
+      return ajax.get(`iadmin/custom_notify_template/`, { params: params }).then(response => {
+        let res = response.data
+        return res
+      })
+    },
+    changeNotice({ commit, state, dispatch }, { params, id }) {
+      return ajax.put(`iadmin/custom_notify_template/${id}/`, params).then(response => {
+        let res = response.data
+        return res
+      })
+    },
+    getVariableList({ commit, state, dispatch }) {
+      return ajax.get(`iadmin/custom_notify_template/variable_list/`).then(response => {
+        let res = response.data
+        return res
+      })
     }
+  }
 }
