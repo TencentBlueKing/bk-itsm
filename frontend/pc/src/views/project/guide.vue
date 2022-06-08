@@ -100,7 +100,7 @@
                 const resourceData = {
                     project: [{
                         id: projectInfo.key || '0',
-                        name: projectInfo.name || '默认项目'
+                        name: projectInfo.name || this.$t(`m['默认项目']`)
                     }]
                 }
                 const params = this.applyForPermission(['project_view'], projectInfo.auth_actions, resourceData, true)

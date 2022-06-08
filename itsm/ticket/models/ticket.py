@@ -368,17 +368,18 @@ class Status(Model):
         )
         # Filter unprocessed user
         processor_list = list(set(user_list).difference(processed_user_list))
+
+        def custom_cmp(x, y):
+            keep = -1
+            reverse = 1
+            if user_list.index(x) < user_list.index(y):
+                return keep
+            else:
+                return reverse
+
+        processor_list.sort(key=functools.cmp_to_key(custom_cmp))
+
         if self.is_sequential and processor_list:
-
-            def custom_cmp(x, y):
-                keep = -1
-                reverse = 1
-                if user_list.index(x) < user_list.index(y):
-                    return keep
-                else:
-                    return reverse
-
-            processor_list.sort(key=functools.cmp_to_key(custom_cmp))
             processor = processor_list[0]
         else:
             processor = ",".join(processor_list)
@@ -1071,11 +1072,15 @@ class Status(Model):
         )
         ordering = "CASE %s END" % clauses
 
+        filter_experssion = Q(state_id=self.state_id) | Q(
+            workflow_field_id__in=workflow_field_order
+        )
+
+        if self.is_first_status:
+            filter_experssion = filter_experssion | Q(workflow_field_id=0)
+
         return (
-            self.ticket.fields.filter(
-                Q(state_id=self.state_id)
-                | Q(workflow_field_id__in=workflow_field_order)
-            )
+            self.ticket.fields.filter(filter_experssion)
             .exclude(source=BASE_MODEL)
             .extra(
                 select={"ordering": ordering},
@@ -1957,6 +1962,16 @@ class Ticket(Model, BaseTicket):
         from itsm.openapi.ticket.serializers import SimpleLogsSerializer
 
         return SimpleLogsSerializer(self.logs.all(), many=True).data
+
+    @property
+    def ticket_complex_logs(self):
+        """
+        复杂单据日志
+        """
+
+        from itsm.openapi.ticket.serializers import ComplexLogsSerializer
+
+        return ComplexLogsSerializer(self.logs.all(), many=True).data
 
     @property
     def task_operators(self):
@@ -3135,15 +3150,9 @@ class Ticket(Model, BaseTicket):
         if Status.objects.filter(state_id=state_id, ticket_id=self.id).exists():
             # state_id, ticket_id对应唯一未删除的status，若存在多个，则存在BUG
             status = Status.objects.get(state_id=state_id, ticket_id=self.id)
-            last_operator = dotted_name(
-                self.logs.filter(status=status.id).last().operator
-            )
-            current_processors = (
-                f_processors if state.type == TASK_STATE else last_operator
-            )
             defaults.update(
                 processors_type=status.processors_type,
-                processors=current_processors,
+                processors=status.processors,
                 distribute_type="PROCESS",
                 action_type="TRANSITION",
                 status=RUNNING,
@@ -4708,6 +4717,45 @@ class Ticket(Model, BaseTicket):
                     remarked = True
 
         return fields
+
+    @property
+    def comment(self):
+        return self.comments.comments
+
+    @property
+    def stars(self):
+        return self.comments.stars
+
+    def create_dynamic_fields(self, dynamic_fields):
+        """
+        dynamic_fields: list:[{
+            "type": "INT",
+            "name": "年龄",
+            "value": 1
+        }]
+        """
+        if not dynamic_fields:
+            return
+
+        fields = []
+        for field in dynamic_fields:
+            ticket_field = copy.deepcopy(field)
+            ticket_field.pop("workflow_id", None)
+            ticket_field.pop("flow_type", None)
+
+            # 填充默认值
+            default = ticket_field.pop("default", "")
+            if default:
+                ticket_field.update(_value=default)
+
+            ticket_field["ticket_id"] = self.id
+
+            ticket_field.pop("api_info", None)
+            ticket_field.pop("project_key", None)
+            ticket_field["workflow_field_id"] = 0
+            fields.append(TicketField(**ticket_field))
+
+        TicketField.objects.bulk_create(fields)
 
 
 class TicketOrganization(Model):

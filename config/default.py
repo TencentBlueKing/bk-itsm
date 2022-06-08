@@ -28,6 +28,7 @@ from urllib.parse import urljoin
 
 from blueapps.conf.default_settings import *  # noqa
 from blueapps.conf.log import get_logging_config_dict
+from blueapps.opentelemetry.utils import inject_logging_trace_info
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
@@ -39,7 +40,7 @@ from config import (
     BK_PAAS_HOST,
     BK_PAAS_INNER_HOST,
 )
-from itsm.monitor.opentelemetry.utils import inject_logging_trace_info
+
 
 # 标准运维页面服务地址
 SITE_URL_SOPS = "/o/bk_sops/"
@@ -102,17 +103,18 @@ INSTALLED_APPS += (
     # 'flower',
     # 'monitors',
     "itsm.monitor",
+    "blueapps.opentelemetry.instrument_app",
     "itsm.plugin_service",
 )
 
 # IAM 开启开关
-USE_IAM = True if os.getenv("USE_IAM", "true").lower() == "true" else False
-if USE_IAM:
-    INSTALLED_APPS += (
-        "iam",
-        "iam.contrib.iam_migration",
-        "itsm.auth_iam",
-    )
+# USE_IAM = True if os.getenv("USE_IAM", "true").lower() == "true" else False
+# if USE_IAM:
+#     INSTALLED_APPS += (
+#         "iam",
+#         "iam.contrib.iam_migration",
+#         "itsm.auth_iam",
+#     )
 
 # 这里是默认的中间件，大部分情况下，不需要改动
 # 如果你已经了解每个默认 MIDDLEWARE 的作用，确实需要去掉某些 MIDDLEWARE，或者改动先后顺序，请去掉下面的注释，然后修改
@@ -153,10 +155,7 @@ MIDDLEWARE = (
     # 'itsm.component.misc_middlewares.NginxAuthProxy',
     "itsm.component.misc_middlewares.InstrumentProfilerMiddleware",
     # 'pyinstrument.middleware.ProfilerMiddleware',
-    "django_prometheus.middleware.PrometheusAfterMiddleware",
 )
-
-MIDDLEWARE = ("django_prometheus.middleware.PrometheusBeforeMiddleware",) + MIDDLEWARE
 
 # 所有环境的日志级别可以在这里配置
 # LOG_LEVEL = 'DEBUG'
@@ -207,7 +206,6 @@ inject_formatters = ("verbose",)
 # 日志中添加trace_id
 ENABLE_OTEL_TRACE = True if os.getenv("BKAPP_ENABLE_OTEL_TRACE", "0") == "1" else False
 if ENABLE_OTEL_TRACE:
-    INSTALLED_APPS += ("itsm.monitor.opentelemetry.instrument_app",)
     trace_format = "[trace_id]: %(otelTraceID)s [span_id]: %(otelSpanID)s [resource.service.name]: %(otelServiceName)s"
     inject_logging_trace_info(LOGGING, inject_formatters, trace_format)
 
@@ -271,7 +269,7 @@ if locals().get("DISABLED_APPS"):
 # Django 项目配置 - i18n
 # ==============================================================================
 TIME_ZONE = "Asia/Shanghai"
-LANGUAGE_CODE = os.environ.get("BKAPP_BACKEND_LANGUAGE", "zh_CN")
+LANGUAGE_CODE = os.environ.get("BKAPP_BACKEND_LANGUAGE", "zh-hans")
 SITE_ID = 1
 USE_I18N = True
 USE_L10N = True
@@ -802,7 +800,7 @@ WEIXIN_APP_EXTERNAL_SHARE_HOST = "{}weixin/".format(
 TICKET_NOTIFY_HOST = WEIXIN_APP_EXTERNAL_SHARE_HOST
 
 FILE_CHARSET = "utf-8"
-LANGUAGE_CODE = "zh-hans"
+# LANGUAGE_CODE = "zh-hans"
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # celery允许接收的数据格式，可以是一个字符串，比如'json'

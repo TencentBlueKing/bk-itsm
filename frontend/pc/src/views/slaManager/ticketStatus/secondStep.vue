@@ -37,7 +37,7 @@
                 </template>
             </bk-table-column>
             <template v-for="item in statusOwnList">
-                <bk-table-column :label="item.name" :key="item.id">
+                <bk-table-column :label="localeCookie ? item.name : item.flow_status" :key="item.id">
                     <template slot-scope="props">
                         <template v-if="props.row.checkBoxStatus">
                             <bk-checkbox class="bk-outline-none"
@@ -160,6 +160,7 @@
 <script>
     import { errorHandler } from '../../../utils/errorHandler.js'
     import commonMix from '../../commonMix/common.js'
+    import cookie from 'cookie'
     export default {
         name: 'secondStep',
         mixins: [commonMix],
@@ -200,10 +201,12 @@
                 dataList: [],
                 flowList: [],
                 isDropdownShow: false,
-                rules: {}
+                rules: {},
+                localeCookie: false
             }
         },
         async mounted () {
+            this.localeCookie = cookie.parse(document.cookie).blueking_language === 'zh-cn'
             // 列表数据添加流转信息
             await this.getTypeStatus()
             await this.listAddFlow()

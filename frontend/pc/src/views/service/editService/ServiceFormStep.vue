@@ -25,7 +25,7 @@
         <!-- 字段选择 -->
         <div :class="['field-option', isShowField ? 'field-hide' : '']">
             <div style="overflow: hidden; height: 100%;">
-                <div class="field-type">字段类型</div>
+                <div class="field-type">{{ $t(`m['字段类型']`)}}</div>
                 <div class="show-field" @click="handleShowField">
                     <i :class="['bk-itsm-icon', isShowField ? 'icon-xiangyou1' : 'icon-xiangzuo1']"></i>
                 </div>
@@ -33,12 +33,12 @@
                     <div class="field-content">
                         <!-- <div class="field-title">控件库</div> -->
                         <div class="field-title">
-                            <span>控件库</span>
+                            <span>{{ $t(`m['控件库']`) }}</span>
                             <bk-input class="search-field" size="small" :right-icon="'bk-icon icon-search'" @enter="handleSearchLibrary"></bk-input>
                         </div>
                         <ul class="field-list">
                             <li class="field-item" v-for="(field, index) in fieldsLibrary" :key="index" @click="onAddFormClick(field)">
-                                <span class="field-name">{{ field.name }}</span>
+                                <span v-bk-tooltips.light="field.name" class="field-name">{{ field.name }}</span>
                             </li>
                         </ul>
                         <div v-if="fieldsLibrary.length === 0" class="public-field"><i class="bk-itsm-icon icon-itsm-icon-four-zero" style="font-size: 14px"></i> 已有字段不存在你搜索的内容</div>
@@ -46,12 +46,12 @@
                     <div class="field-content">
                         <!-- <div class="field-title">已有字段</div> -->
                         <div class="field-title">
-                            <span>已有字段</span>
+                            <span>{{ $t(`m['已有字段']`) }}</span>
                             <bk-input class="search-field" size="small" :right-icon="'bk-icon icon-search'" @enter="handleSearchField"></bk-input>
                         </div>
                         <ul class="field-list">
                             <li class="field-item" v-for="(field, index) in publicFields" :key="index" @click="addField(field)">
-                                <span class="field-name">{{ field.name }}</span>
+                                <span class="field-name" v-bk-tooltips.light="field.name">{{ field.name }}</span>
                             </li>
                         </ul>
                         <div v-if="publicFields.length === 0" class="public-field"><i class="bk-itsm-icon icon-itsm-icon-four-zero" style="font-size: 14px"></i> 已有字段不存在你搜索的内容</div>
@@ -96,7 +96,7 @@
         </div>
         <div v-show="crtForm" class="drag-line" @mousedown="handleDragLine"></div>
         <div v-show="crtForm" class="edit-service-field">
-            <div class="edit-service-title">字段属性</div>
+            <div class="edit-service-title">{{$t(`m['字段属性']`) }}</div>
             <div class="edit-service-forms">
                 <template v-for="form in ticketNodeForm">
                     <form-edit-item
@@ -117,13 +117,14 @@
             width="800"
             :value="isCreateService"
             :mask-close="false"
-            :title="'创建服务'"
+            :title="$t(`m['创建服务']`)"
             :auto-close="false"
             @confirm="onBasicFormSubmit"
             @cancel="onBasicFormCancel">
             <bk-form
                 ref="basicForm"
                 form-type="vertical"
+                :label-width="'300'"
                 class="basic-form"
                 :rules="rules"
                 :model="formData">
@@ -190,32 +191,33 @@
     import ServiceForm from './ServiceForm.vue'
     import ChooseServiceTemplateDialog from './ChooseServiceTemplateDialog.vue'
     import FormEditItem from './FormEditItem.vue'
+    import i18n from '@/i18n/index.js'
 
     const fieldsLibrary = [
-        { name: '单行文本', icon: 'icon-apps', type: 'STRING' },
-        { name: '多行文本', icon: 'icon-apps', type: 'TEXT' },
-        { name: '数字', icon: 'icon-apps', type: 'INT' },
-        { name: '日期', icon: 'icon-apps', type: 'DATE' },
-        { name: '时间', icon: 'icon-apps', type: 'DATETIME' },
-        { name: '表格', icon: 'icon-apps', type: 'TABLE' },
-        { name: '单选下拉框', icon: 'icon-apps', type: 'SELECT' },
-        { name: '可输入单选下拉框', icon: 'icon-apps', type: 'INPUTSELECT' },
-        { name: '多选下拉框', icon: 'icon-apps', type: 'MULTISELECT' },
-        { name: '复选框', icon: 'icon-apps', type: 'CHECKBOX' },
-        { name: '单选框', icon: 'icon-apps', type: 'RADIO' },
-        { name: '单选人员选择', icon: 'icon-apps', type: 'MEMBER' },
-        { name: '多选人员选择', icon: 'icon-apps', type: 'MEMBERS' },
-        { name: '富文本', icon: 'icon-apps', type: 'RICHTEXT' },
-        { name: '附件上传', icon: 'icon-apps', type: 'FILE' },
-        { name: '自定义表格', icon: 'icon-apps', type: 'CUSTOMTABLE' },
-        { name: '树形选择', icon: 'icon-apps', type: 'TREESELECT' },
-        { name: '链接', icon: 'icon-apps', type: 'LINK' },
-        { name: '自定义表单', icon: 'icon-apps', type: 'CUSTOM-FORM' }
+        { name: i18n.t(`m['单行文本']`), icon: 'icon-apps', type: 'STRING' },
+        { name: i18n.t(`m['多行文本']`), icon: 'icon-apps', type: 'TEXT' },
+        { name: i18n.t(`m['数字']`), icon: 'icon-apps', type: 'INT' },
+        { name: i18n.t(`m['日期']`), icon: 'icon-apps', type: 'DATE' },
+        { name: i18n.t(`m['时间']`), icon: 'icon-apps', type: 'DATETIME' },
+        { name: i18n.t(`m['表格']`), icon: 'icon-apps', type: 'TABLE' },
+        { name: i18n.t(`m['单选下拉框']`), icon: 'icon-apps', type: 'SELECT' },
+        { name: i18n.t(`m['可输入单选下拉框']`), icon: 'icon-apps', type: 'INPUTSELECT' },
+        { name: i18n.t(`m['多选下拉框']`), icon: 'icon-apps', type: 'MULTISELECT' },
+        { name: i18n.t(`m['复选框']`), icon: 'icon-apps', type: 'CHECKBOX' },
+        { name: i18n.t(`m['单选框']`), icon: 'icon-apps', type: 'RADIO' },
+        { name: i18n.t(`m['单选人员选择']`), icon: 'icon-apps', type: 'MEMBER' },
+        { name: i18n.t(`m['多选人员选择']`), icon: 'icon-apps', type: 'MEMBERS' },
+        { name: i18n.t(`m['富文本']`), icon: 'icon-apps', type: 'RICHTEXT' },
+        { name: i18n.t(`m['附件上传']`), icon: 'icon-apps', type: 'FILE' },
+        { name: i18n.t(`m['自定义表格']`), icon: 'icon-apps', type: 'CUSTOMTABLE' },
+        { name: i18n.t(`m['树形选择']`), icon: 'icon-apps', type: 'TREESELECT' },
+        { name: i18n.t(`m['链接']`), icon: 'icon-apps', type: 'LINK' },
+        { name: i18n.t(`m['自定义表单']`), icon: 'icon-apps', type: 'CUSTOM-FORM' }
     ]
     const serviceFormCreateWays = [
-        { name: '选择推荐服务模板', key: 'recom', icon: 'icon-apps' },
-        { name: '从已有的服务复制', key: 'created', icon: 'icon-apps' },
-        { name: '自定义表单', key: 'custom', icon: 'icon-apps' }
+        { name: i18n.t(`m['选择推荐服务模板']`), key: 'recom', icon: 'icon-apps' },
+        { name: i18n.t(`m['从已有的服务复制']`), key: 'created', icon: 'icon-apps' },
+        { name: i18n.t(`m['自定义表单']`), key: 'custom', icon: 'icon-apps' }
     ]
     export default {
         name: 'ServiceFormStep',
@@ -899,6 +901,9 @@
                     color: #63656e;
                     font-size: 12px;
                     cursor: pointer;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
                 }
             }
             .public-field {

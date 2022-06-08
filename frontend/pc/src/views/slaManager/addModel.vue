@@ -536,7 +536,7 @@
             // 添加时段
             addTimeFrame (index, type) {
                 const temp = {
-                    name: '晚上',
+                    name: this.$t(`m.slaContent["晚上"]`),
                     changStatus: false,
                     value: ['08:00:00', '12:00:00']
                 }

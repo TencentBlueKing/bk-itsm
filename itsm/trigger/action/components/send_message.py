@@ -66,7 +66,7 @@ def get_sub_components():
         else:
             base_component = build_send_base_component(notify[0])
             base_component.name = _(notify[1])
-            base_component.notify_type = notify[0]
+            base_component.notify_type = notify[0].lower()
             base_component.code = "send_{}_message".format(notify[0].lower())
             sub_components.append(base_component)
     return sub_components

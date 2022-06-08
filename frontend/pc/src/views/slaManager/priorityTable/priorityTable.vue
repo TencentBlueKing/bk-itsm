@@ -62,9 +62,9 @@
                         }"
                         :class="{ 'bk-scope-none': index === degreeList.length - 1, 'bk-editor-el': priorityConten.editorStatus }">
                         <div class="bk-form-content" v-if="priorityConten.editorStatus">
-                            <bk-checkbox :ext-cls="'cus-ellipsis'" :value="item.key" :title="item.name">{{ $t(`m["${ item.name }"]`)}}</bk-checkbox>
+                            <bk-checkbox :ext-cls="'cus-ellipsis'" :value="item.key" :title="item.name">{{ item.name }}</bk-checkbox>
                         </div>
-                        <span class="bk-normal-word" v-else>{{ $t(`m["${ item.name }"]`)}}</span>
+                        <span class="bk-normal-word" v-else>{{ item.name }}</span>
                     </li>
                 </ul>
             </bk-checkbox-group>
@@ -160,9 +160,6 @@
             initDate () {
                 // 影响范围
                 this.scopeList = JSON.parse(JSON.stringify(this.priorityConten.info.impact))
-                this.scopeList.forEach(item => {
-                    item.name = this.$t(`m["${item.name}"]`)
-                })
                 this.scopCheckList = this.scopeList.map(item => {
                     if (item.is_enabled) {
                         return item.key
@@ -177,9 +174,6 @@
                 }).filter(item => item)
                 this.contentList = JSON.parse(JSON.stringify(this.priorityConten.info.priority_matrix))
                 this.typeList = JSON.parse(JSON.stringify(this.priorityConten.info.priority))
-                this.typeList.forEach(item => {
-                    item.name = this.$t(`m["${item.name}"]`)
-                })
             },
             changeScopeCheck (newVal) {
                 this.scopeList.forEach(item => {
@@ -418,7 +412,7 @@
                 span {
                     position: absolute;
                     top: 50%;
-                    left: 50%;
+                    // left: 50%;
                     transform: translate(-50%, -50%);
                     width: calc(100% - 40px);
                     text-align: center;

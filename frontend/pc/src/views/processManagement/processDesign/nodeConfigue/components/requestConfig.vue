@@ -25,12 +25,12 @@
         <template v-if="acticeTab === 'auth'">
             <div class="param-config">
                 <bk-radio-group v-model="config.authRadio">
-                    <bk-radio :value="'None'">{{ $t(`m['无需认证']`) }}</bk-radio>
+                    <bk-radio :value="'none'">{{ $t(`m['无需认证']`) }}</bk-radio>
                     <bk-radio :value="'bearer_token'">Bearer Token</bk-radio>
                     <bk-radio :value="'basic_auth'">Basic Auth</bk-radio>
                 </bk-radio-group>
                 <div class="bk-radio-config">
-                    <div v-if="config.authRadio === 'None'">
+                    <div v-if="config.authRadio === 'none'">
                         <span>{{ $t(`m['该请求不需要任何认证']`) }}</span>
                     </div>
                     <div v-else-if="config.authRadio === 'bearer_token'">
@@ -122,7 +122,7 @@
                 <div class="setting-option">
                     <p class="mb5">{{ $t(`m['请求超时']`) }}</p>
                     <div class="setting-content">
-                        <bk-input behavior="simplicity" :disabled="disable" :clearable="true" v-model="config.settings.timeout"></bk-input>
+                        <bk-input type="number" behavior="simplicity" :max="1000" :min="0" v-model="config.settings.timeout"></bk-input>
                         <span style="margin-left: 5px">s</span>
                     </div>
                 </div>
@@ -194,7 +194,7 @@
                         username: '',
                         password: ''
                     },
-                    authRadio: 'None',
+                    authRadio: 'none',
                     queryParams: [
                         {
                             check: false,
@@ -293,7 +293,7 @@
                     const { auth, settings, query_params, body } = this.configur.extras.webhook_info
                     this.config.queryParams = [...query_params, ...this.config.queryParams]
                     this.config.settings.timeout = settings.timeout
-                    this.config.authRadio = auth.auth_type
+                    this.config.authRadio = auth.auth_type || 'none'
                     // const { username, password, Token } = auth_config
                     if (auth.auth_type === 'bearer_token') {
                         this.config.auth_config.Token = auth.auth_config.token
@@ -352,7 +352,7 @@
                             this.config.auth_config.password = auth.auth_config.password
                         }
                     } else {
-                        this.config.authRadio = 'None'
+                        this.config.authRadio = 'none'
                     }
                 }
             }

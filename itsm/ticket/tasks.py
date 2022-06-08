@@ -460,14 +460,16 @@ def send_message(username, queryset):
 
     logger.info("[send_message] 正在准备发送数据")
 
-    filters = [Q(current_processors__contains=",{},".format(username))]
-    general_roles = UserRole.get_general_role_by_user(username)
+    dotted_username = dotted_name(username)
+
+    filters = [Q(current_processors__contains=dotted_username)]
+    general_roles = UserRole.get_general_role_by_user(dotted_username)
     for role in general_roles:
         filters.append(Q(current_processors__contains=dotted_name(role["id"])))
 
     filters = reduce(operator.or_, filters)
     tickets = queryset.filter(filters).values("sn", "title", "id")
-    count = len(tickets)
+    count = tickets.count()
     if count == 0:
         logger.info("[send_message] 当前用户有0条待处理单据，已跳过")
         return

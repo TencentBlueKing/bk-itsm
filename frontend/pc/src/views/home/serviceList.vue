@@ -122,11 +122,11 @@
                             </ul>
                             <div class="show-more" v-if="type === 'all' && group.data.length > 16" @click="toggleFold(group.name)">
                                 <template v-if="activeFold">
-                                    <span>更多</span>
+                                    <span>{{ $t(`m['更多']`) }}</span>
                                     <i class="bk-icon icon-angle-down"></i>
                                 </template>
                                 <template v-else>
-                                    <span>收起</span>
+                                    <span>{{ $t(`m['收起']`) }}</span>
                                     <i class="bk-icon icon-angle-up"></i>
                                 </template>
                             </div>

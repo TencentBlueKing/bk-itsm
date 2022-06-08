@@ -24,14 +24,24 @@
     <div class="bk-basic-node" v-bkloading="{ isLoading: isLoading }">
         <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
             <bk-form data-test-id="service-form-sopsNode" :label-width="150" :model="basicsFormData" ref="basicsForm" :rules="rules" :ext-cls="'bk-form'" form-type="vertical">
-                <bk-form-item data-test-id="sopsNode-select-nodeName" :label="$t(`m.treeinfo['节点名称：']`)" :required="true" :property="'name'">
+                <bk-form-item
+                    data-test-id="sopsNode-select-nodeName"
+                    :label="$t(`m.treeinfo['节点名称：']`)"
+                    error-display-type="normal"
+                    :required="true"
+                    :property="'name'">
                     <bk-input
                         :ext-cls="'bk-form-width'"
                         v-model="basicsFormData.name"
                         maxlength="120">
                     </bk-input>
                 </bk-form-item>
-                <bk-form-item data-test-id="sopsNode-select-processType" :label="$t(`m['流程类型：']`)" :required="true" :property="'processType'">
+                <bk-form-item
+                    data-test-id="sopsNode-select-processType"
+                    error-display-type="normal"
+                    :label="$t(`m['流程类型：']`)"
+                    :required="true"
+                    :property="'processType'">
                     <bk-select
                         :ext-cls="'bk-form-width bk-form-display'"
                         v-model="basicsFormData.processType"
@@ -46,7 +56,7 @@
                         </bk-option>
                     </bk-select>
                 </bk-form-item>
-                <bk-form-item data-test-id="sopsNode-select-business" :label="$t(`m['关联业务：']`)" :required="true" :property="'projectId'">
+                <bk-form-item data-test-id="sopsNode-select-business" error-display-type="normal" :label="$t(`m['关联业务：']`)" :required="true" :property="'projectId'">
                     <bk-select
                         :ext-cls="'bk-form-width bk-form-display'"
                         v-model="basicsFormData.projectId"
@@ -64,7 +74,7 @@
                         </bk-option>
                     </bk-select>
                 </bk-form-item>
-                <bk-form-item data-test-id="sopsNode-select-processTemplate" :label="$t(`m['流程模板：']`)" :required="true" :property="'templateId'">
+                <bk-form-item data-test-id="sopsNode-select-processTemplate" :label="$t(`m['流程模板：']`)" error-display-type="normal" :required="true" :property="'templateId'">
                     <bk-select
                         :ext-cls="'bk-form-width bk-form-display'"
                         v-model="basicsFormData.templateId"
@@ -579,11 +589,9 @@
                 this.$parent.closeConfigur()
             },
             submit () {
-                console.log(this.$refs.processors.getValue())
                 // 处理人为空校验
                 if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
                     this.checkStatus.processors = true
-                    return
                 }
                 if (this.$refs.getParam) {
                     this.renderFormValidate = this.$refs.getParam.getRenderFormValidate()
@@ -593,9 +601,9 @@
                 if (this.secondClick) {
                     return
                 }
-                this.secondClick = true
                 this.$refs.basicsForm.validate().then(_ => {
-                    if (this.renderFormValidate) {
+                    if (this.renderFormValidate && this.$refs.processors.verifyValue()) {
+                        this.secondClick = true
                         const formData = []
                         const biz = {
                             name: this.$t(`m.treeinfo["业务"]`),
@@ -694,14 +702,10 @@
         border-bottom: 1px solid #E9EDF1;
         margin-bottom: 20px;
     }
-    // /deep/ .bk-form-content {
-    //     width: 448px;
-    // }
     .bk-form-width {
         width: 448px;
     }
     .bk-form-display {
-        float: left;
         margin-right: 10px;
     }
 </style>

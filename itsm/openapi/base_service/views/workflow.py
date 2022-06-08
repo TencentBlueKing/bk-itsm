@@ -12,7 +12,7 @@ from itsm.workflow.serializers import WorkflowSerializer
 from itsm.workflow.utils import translate_constant_2
 
 
-class WorkflowViewSet(viewsets.ReadOnlyModelViewSet):
+class WorkflowViewSet(viewsets.ModelViewSet):
     serializer_class = WorkflowSerializer
     queryset = Workflow.objects.prefetch_related("notify").order_by("-update_at")
 
@@ -22,7 +22,11 @@ class WorkflowViewSet(viewsets.ReadOnlyModelViewSet):
 
     @custom_apigw_required
     def retrieve(self, request, *args, **kwargs):
-        return super(WorkflowViewSet, self).retrieve(self, request, *args, **kwargs)
+        return super(WorkflowViewSet, self).retrieve(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def update(self, request, *args, **kwargs):
+        return super(WorkflowViewSet, self).update(request, *args, **kwargs)
 
     @action(detail=False, methods=["get"])
     @custom_apigw_required

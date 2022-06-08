@@ -141,29 +141,29 @@
                     { id: 'SMS', name: this.$t('m.treeinfo["手机短信"]') }
                 ],
                 userByList: [
-                    { id: 'TICKET', name: '单据' },
-                    { id: 'SLA', name: 'SLA' },
-                    { id: 'TASK', name: '任务' }
+                    { id: 'TICKET', name: this.$t(`m['单据']`) },
+                    { id: 'SLA', name: this.$t(`m['SLA']`) },
+                    { id: 'TASK', name: this.$t(`m['任务']`) }
                 ],
                 rules: {
                     noticeType: [
                         {
                             required: true,
-                            message: '必选项',
+                            message: this.$t(`m['必选项']`),
                             trigger: 'blur'
                         }
                     ],
                     noticeAction: [
                         {
                             required: true,
-                            message: '必选项',
+                            message: this.$t(`m['必选项']`),
                             trigger: 'blur'
                         }
                     ],
                     noticeUserBy: [
                         {
                             required: true,
-                            message: '必选项',
+                            message: this.$t(`m['必选项']`),
                             trigger: 'blur'
                         }
                     ]
@@ -215,7 +215,6 @@
                         used_by: val
                     }
                     const res = await this.$store.dispatch('project/getAction', parmas)
-                    console.log(res)
                     if (res.data && res.result) {
                         const list = res.data
                         for (const item in list) {
@@ -224,7 +223,6 @@
                                 name: list[item]
                             })
                         }
-                        console.log(this.actionList)
                     }
                 } catch (e) {
                     console.log(e)
