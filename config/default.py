@@ -41,7 +41,6 @@ from config import (
     BK_PAAS_INNER_HOST,
 )
 
-
 # 标准运维页面服务地址
 SITE_URL_SOPS = "/o/bk_sops/"
 
@@ -68,7 +67,6 @@ INSTALLED_APPS += (
     "django_signal_valve",
     # itsm
     "itsm.gateway",
-    "itsm.helper",
     "itsm.role",
     "itsm.pipeline_plugins",
     "itsm.ticket",
@@ -105,6 +103,8 @@ INSTALLED_APPS += (
     "itsm.monitor",
     "blueapps.opentelemetry.instrument_app",
 )
+
+INSTALLED_APPS = ("itsm.helper",) + INSTALLED_APPS
 
 # IAM 开启开关
 USE_IAM = True if os.getenv("USE_IAM", "true").lower() == "true" else False
@@ -862,7 +862,6 @@ try:
     AUTO_APPROVE_TIME = int(os.environ.get("AUTO_APPROVE_TIME", 20))
 except Exception:
     AUTO_APPROVE_TIME = 20
-
 
 OPEN_VOICE_NOTICE = (
     True if os.getenv("BKAPP_OPEN_VOICE_NOTICE", "false").lower() == "true" else False
