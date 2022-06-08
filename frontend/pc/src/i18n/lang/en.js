@@ -2611,5 +2611,6 @@ export const m = {
     '进行中': 'RUNNING',
     '已完成': 'FINISHED',
     '已撤销': 'REVOKED',
-    '已终止': 'TERMINATED'
+    '已终止': 'TERMINATED',
+    '节点处理人为空时，直接跳过且不视为异常': 'When the node handler is empty, it is skipped directly and is not regarded as an exception'
 }
