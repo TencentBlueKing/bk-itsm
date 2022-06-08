@@ -80,7 +80,7 @@
                             :true-value="true"
                             :false-value="false"
                             v-model="formData.is_auto_approve">
-                            当审批节点的审批人为申请人时，自动通过
+                            {{ $t(`m['当审批节点的审批人为申请人时，自动通过']`) }}
                         </bk-checkbox>
                     </bk-form-item>
                 </bk-form>

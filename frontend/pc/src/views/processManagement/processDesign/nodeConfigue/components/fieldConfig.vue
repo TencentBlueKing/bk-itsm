@@ -22,7 +22,7 @@
 
 <template>
     <div class="bk-field-info mb20">
-        <p v-if="isShowTitle" class="bk-field-title">字段配置</p>
+        <p v-if="isShowTitle" class="bk-field-title">{{ $t(`m['字段配置']`) }}</p>
         <div class="bk-node-btn">
             <bk-button
                 data-test-id="fieldConfig-button-addField"
