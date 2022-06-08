@@ -119,39 +119,44 @@
           return {};
         },
       },
-        data () {
-            return {
-                moveFlag: false,
-                clickSecond: false,
-                toolStatus: false,
-                valueInfo: {
-                    node: {},
-                    line: {}
-                },
-                typeList: [
-                    { type: 'NORMAL', iconStyle: 'icon-icon-person' },
-                    { type: 'ROUTER', iconStyle: 'icon-icon-person' },
-                    { type: 'TASK', iconStyle: 'icon-api-icon' },
-                    { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
-                    { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
-                    { type: 'WEBHOOK', iconStyle: 'icon-icon-webhook-2' },
-                    { type: 'SIGN', iconStyle: 'icon-sign-node-white f18' }
-                ],
-                clickList: [
-                    { type: 'NORMAL', name: this.$t(`m.treeinfo["手动节点"]`), iconStyle: 'icon-icon-artificial' },
-                    { type: 'TASK', name: this.$t(`m.treeinfo["API节点"]`), iconStyle: 'icon-api-node' },
-                    { type: 'TASK-SOPS', name: this.$t(`m.treeinfo["标准运维节点"]`), iconStyle: 'icon-task-icon' },
-                    { type: 'SIGN', name: this.$t(`m.treeinfo['会签节点']`), iconStyle: 'icon-sign-node' },
-                    { type: 'WEBHOOK', name: this.$t(`m['WEBHOOK节点']`), iconStyle: 'icon-icon-webhook-2' },
-                    { type: 'APPROVAL', name: this.$t(`m.treeinfo['审批节点']`), iconStyle: 'icon-approval-node' },
-                    { type: 'COVERAGE', name: this.$t(`m.treeinfo["汇聚网关"]`), iconStyle: 'icon-flow-branch' },
-                    { type: 'ROUTER-P', name: this.$t(`m.treeinfo["并行网关"]`), iconStyle: 'icon-flow-convergence' },
-                    { type: 'COPY', name: this.$t(`m.treeinfo["复制节点"]`), iconStyle: 'icon-copy-new' }
-                ],
-                currentNode: {}
-            }
+      canvasData: {
+        type: Object,
+        default() {
+          return {};
         },
-
+      },
+    },
+    data() {
+      return {
+        moveFlag: false,
+        clickSecond: false,
+        toolStatus: false,
+        valueInfo: {
+          node: {},
+          line: {},
+        },
+        typeList: [
+          { type: 'NORMAL', iconStyle: 'icon-icon-person' },
+          { type: 'ROUTER', iconStyle: 'icon-icon-person' },
+          { type: 'TASK', iconStyle: 'icon-api-icon' },
+          { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
+          { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
+          { type: 'WEBHOOK', iconStyle: 'icon-icon-webhook-2' },
+          { type: 'SIGN', iconStyle: 'icon-sign-node-white f18' },
+        ],
+        clickList: [
+          { type: 'NORMAL', name: this.$t('m.treeinfo["手动节点"]'), iconStyle: 'icon-icon-artificial' },
+          { type: 'TASK', name: this.$t('m.treeinfo["API节点"]'), iconStyle: 'icon-api-node' },
+          { type: 'TASK-SOPS', name: this.$t('m.treeinfo["标准运维节点"]'), iconStyle: 'icon-task-icon' },
+          { type: 'SIGN', name: this.$t('m.treeinfo[\'会签节点\']'), iconStyle: 'icon-sign-node' },
+          { type: 'WEBHOOK', name: this.$t('m[\'WEBHOOK节点\']'), iconStyle: 'icon-icon-webhook-2' },
+          { type: 'APPROVAL', name: this.$t('m.treeinfo[\'审批节点\']'), iconStyle: 'icon-approval-node' },
+          { type: 'COVERAGE', name: this.$t('m.treeinfo["汇聚网关"]'), iconStyle: 'icon-flow-branch' },
+          { type: 'ROUTER-P', name: this.$t('m.treeinfo["并行网关"]'), iconStyle: 'icon-flow-convergence' },
+          { type: 'COPY', name: this.$t('m.treeinfo["复制节点"]'), iconStyle: 'icon-copy-new' },
+        ],
+        currentNode: {},
+      };
     },
     mounted() {
       this.toolStatus = localStorage.getItem('toolStatus') || false;
@@ -258,7 +263,7 @@
             this.$emit('updateNode', this.valueInfo);
             this.addNewLine(node, res.data.id);
           })
-            .catch((res) => {
+            .catch(res => {
               errorHandler(res, this);
             })
             .finally(() => {
@@ -266,7 +271,7 @@
               this.$store.commit('deployCommon/changeNodeStatus', false);
             });
         } else {
-          const { id } = this.node.nodeInfo;
+          const id = this.node.nodeInfo.id;
           this.$store.dispatch('deployCommon/copyNode', id).then((res) => {
             this.valueInfo.node = {
               id: `node_${res.data.id}`,
@@ -281,7 +286,7 @@
             this.$emit('updateNode', this.valueInfo);
             // this.addNewLine(node, res.data.id)
           })
-            .catch((res) => {
+            .catch(res => {
               errorHandler(res, this);
             })
             .finally(() => {
@@ -317,7 +322,7 @@
           this.$emit('fastAddNode', this.valueInfo);
           this.$emit('updateLine', this.valueInfo.line, 'add');
         })
-          .catch((res) => {
+          .catch(res => {
             errorHandler(res, this);
           });
       },
