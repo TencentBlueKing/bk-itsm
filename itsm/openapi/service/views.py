@@ -69,11 +69,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
         """
         服务项列表
         """
-
-        project_key = request.query_params.get(
-            "project_key", DEFAULT_PROJECT_PROJECT_KEY
-        )
-        queryset = self.queryset.filter(project_key=project_key).all()
+        queryset = self.queryset.all()
 
         catalog_id = request.query_params.get("catalog_id")
         if catalog_id:
@@ -103,13 +99,8 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
         """
         服务项详情
         """
-        project_key = request.query_params.get(
-            "project_key", DEFAULT_PROJECT_PROJECT_KEY
-        )
         try:
-            service = self.queryset.get(
-                pk=request.query_params.get("service_id"), project_key=project_key
-            )
+            service = self.queryset.get(pk=request.query_params.get("service_id"))
         except Service.DoesNotExist:
             return Response(
                 {

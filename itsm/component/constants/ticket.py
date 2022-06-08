@@ -173,6 +173,8 @@ EXPORT_FIELDS = [
     {"id": "create_at", "name": _("创建时间")},
     {"id": "end_at", "name": _("结束时间")},
     {"id": "service_name", "name": _("服务")},
+    {"id": "stars", "name": _("满意度评分")},
+    {"id": "comment", "name": _("满意度评价")},
 ]
 
 # regex

@@ -219,6 +219,7 @@
                 </data-content>
               </bk-dialog>
             </bk-form-item>
+<<<<<<< HEAD
           </template>
         </template>
       </template>
@@ -282,6 +283,132 @@
                 :disabled="showType.layoutList.some(node => node === formInfo.type)">
                 {{layout.name}}
               </bk-radio>
+=======
+            <div class="bk-form-item bk-relate-conditions" style="width: 100%"
+                v-if="formInfo.regex === 'ASSOCIATED_FIELD_VALIDATION' && !isEditPublic">
+                <div class="bk-form-content" style="margin-left: 0">
+                    <p class="bk-form-p">{{$t(`m.newCommon["字段间关系"]`)}}</p>
+                    <bk-radio-group v-model="formInfo.regex_config.rule.type">
+                        <bk-radio :value="'and'" :ext-cls="'mr20'">{{$t(`m.treeinfo['且']`)}}</bk-radio>
+                        <bk-radio :value="'or'">{{$t(`m.treeinfo['或']`)}}</bk-radio>
+                    </bk-radio-group>
+                </div>
+                <div class="bk-between-form"
+                    v-for="(expression, index) in formInfo.regex_config.rule.expressions"
+                    :key="index">
+                    <p class="current-field">{{$t(`m.newCommon["当前字段"]`)}}</p>
+                    <bk-select style="width: 120px"
+                        :ext-cls="'field-valid-select'"
+                        v-model="expression.condition"
+                        :clearable="false">
+                        <bk-option v-for="option in betweenList"
+                            :key="option.id"
+                            :id="option.typeName"
+                            :name="option.name">
+                        </bk-option>
+                    </bk-select>
+                    <bk-select style="width: 210px"
+                        :ext-cls="'field-valid-select'"
+                        v-model="expression.key"
+                        :clearable="false"
+                        @change="onRegexFieldChange($event, expression)">
+                        <bk-option v-for="option in regexFieldList"
+                            :key="option.id"
+                            :id="option.key"
+                            :name="option.name">
+                        </bk-option>
+                    </bk-select>
+                    <div class="bk-between-operate">
+                        <i class="bk-itsm-icon icon-flow-add" @click="addExpression()"></i>
+                        <i class="bk-itsm-icon icon-flow-reduce"
+                            :class="{ 'bk-no-delete': formInfo.regex_config.rule.expressions.length === 1 }"
+                            @click="deleteExpression(index)"></i>
+                    </div>
+                </div>
+            </div>
+            <template v-if="formInfo.regex === 'CUSTOM'">
+                <bk-form-item
+                    :label="$t(`m.treeinfo['正则规则']`)"
+                    :required="true"
+                    :property="'key'"
+                    :error-display-type="'normal'"
+                    :ext-cls="'bk-halfline-item bk-halfline-margin bk-mt20-item'">
+                    <bk-input
+                        v-model="formInfo.customRegex"
+                        :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
+                        :placeholder="$t(`m.treeinfo['请输入正则规则']`)">
+                    </bk-input>
+                </bk-form-item>
+            </template>
+        </bk-form>
+        <bk-form
+            :label-width="200"
+            class="bk-form-vertical"
+            :form-type="formAlign"
+            :model="formInfo"
+            ref="dataForm">
+            <template v-if="showType.sourceList.some(type => type === formInfo.type)">
+                <bk-form-item
+                    :label="$t(`m.treeinfo['数据源']`)"
+                    :required="true"
+                    :ext-cls="'bk-mt20-item'">
+                    <data-source ref="dataSource"
+                        :form-info="formInfo"
+                        :prc-data="prcData"
+                        :change-info="assignValue"
+                        :api-info="apiInfo.api_info"
+                        :dictionary-data="dictionaryData"
+                        @changeApiInfo="changeApiInfo"
+                        @getRpcData="getRpcData">
+                    </data-source>
+                </bk-form-item>
+                <template v-if="(formInfo.source_type !== 'DATADICT' && formInfo.source_type !== 'RPC') || (formInfo.source_type === 'RPC' && prcTable.length)">
+                    <template v-for="(node, nodeIndex) in globalChoise.source_type">
+                        <bk-form-item
+                            v-if="node.typeName === formInfo.source_type"
+                            :key="nodeIndex"
+                            :label="node.name"
+                            :desc="node.desc"
+                            :required="true"
+                            :ext-cls="'bk-mt20-item'">
+                            <bk-button v-if="isShowDataSourcebtn" :disabled="isDisabled" class="configuration-data-source" theme="primary" :title="$t(`m['配置数据源']`)" :outline="true" @click="openDataSource">{{ $t(`m['配置数据源']`)}}</bk-button>
+                            <bk-dialog
+                                v-model="isShowDataSource"
+                                width="960"
+                                :title="formInfo.source_type === 'API' ? $t(`m['配置接口数据']`) : $t(`m['配置自定义数据']`)"
+                                theme="primary"
+                                :auto-close="false"
+                                :mask-close="false"
+                                @confirm="validateContent">
+                                <data-content ref="dataContent"
+                                    :form-info="formInfo"
+                                    :workflow="workflow"
+                                    :state="state"
+                                    :change-info="assignValue"
+                                    :api-detail="apiDetail"
+                                    :api-info="apiInfo.api_info"
+                                    :kv-relation="apiInfo.kv_relation"
+                                    :prc-table="prcTable"
+                                    :field-info="fieldInfo">
+                                </data-content>
+                            </bk-dialog>
+                        </bk-form-item>
+                    </template>
+                </template>
+            </template>
+            <template v-if="formInfo.type === 'CUSTOMTABLE'">
+                <bk-form-item
+                    data-test-id="field_form_custom"
+                    :label="$t(`m.treeinfo['自定义数据']`)"
+                    :required="true"
+                    :ext-cls="'bk-mt20-item'">
+                    <div @click="checkStatus.customTableStatus = false">
+                        <custom-table-data :custom-table-info="customTableInfo"></custom-table-data>
+                        <p class="bk-field-error" v-if="checkStatus.customTableStatus">{{ $t('m.treeinfo["请填写正确格式的自定义数据"]') }}</p>
+                    </div>
+                    <div class="bk-form-disabled" v-if="(changeInfo.is_builtin || changeInfo.source === 'TABLE' || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT')) && formInfo.key !== 'bk_biz_id'"></div>
+                </bk-form-item>
+>>>>>>> d47a448bfd2d4806c38711cffd36f50d4a41999a
             </template>
           </bk-radio-group>
         </bk-form-item>
@@ -460,6 +587,7 @@
         default() {
           return {};
         },
+<<<<<<< HEAD
       },
       // 挂载后是否触发 changeType
       autoSelectedType: {
@@ -487,6 +615,19 @@
             rule: {
               expressions: [],
               type: 'and',
+=======
+        methods: {
+            validateContent () {
+                const result = this.checkField()
+                if (result) {
+                    this.openDataSource()
+                } else {
+                    this.isShowDataSource = false
+                }
+            },
+            openDataSource () {
+                this.isShowDataSource = true
+>>>>>>> d47a448bfd2d4806c38711cffd36f50d4a41999a
             },
           },
           customRegex: '',
@@ -1273,8 +1414,40 @@
                 if (node.key === item.key) {
                   item.keyCheck = true;
                 }
+<<<<<<< HEAD
                 if (node.name === item.name) {
                   item.nameCheck = true;
+=======
+                return params
+            },
+            // 字段校验
+            checkField () {
+                this.checkStatus.customStatus = false
+                this.checkStatus.customTableStatus = false
+                this.checkStatus.customFormStatus = false
+                // 自定义数据
+                const customTypeList = ['SELECT', 'MULTISELECT', 'CHECKBOX', 'RADIO', 'TABLE']
+                if (customTypeList.some(item => this.formInfo.type === item) && this.formInfo.source_type === 'CUSTOM') {
+                    // 判断key，name的值
+                    this.fieldInfo.list.forEach(item => {
+                        item.nameCheck = item.name.length > 120 || item.name.length === 0
+                        item.keyCheck = !(/[a-zA-Z0-9]+$/.test(item.key))
+                    })
+                    // 判断重复的key和name
+                    this.fieldInfo.list.forEach((item, index) => {
+                        this.fieldInfo.list.forEach((node, nodeIndex) => {
+                            if (index !== nodeIndex) {
+                                if (node.key === item.key) {
+                                    item.keyCheck = true
+                                }
+                                if (node.name === item.name) {
+                                    item.nameCheck = true
+                                }
+                            }
+                        })
+                    })
+                    this.checkStatus.customStatus = this.fieldInfo.list.some(item => (item.nameCheck || item.keyCheck))
+>>>>>>> d47a448bfd2d4806c38711cffd36f50d4a41999a
                 }
               }
             });
@@ -1353,7 +1526,7 @@
     @import '../../../../../scss/mixins/clearfix.scss';
     @import "../../../../../scss/mixins/scroller";
     .configuration-data-source {
-        width: 102px;
+        // width: 102px;
         height: 32px;
         border: 1px solid #3a84ff;
         border-radius: 4px;

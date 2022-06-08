@@ -21,68 +21,68 @@
   -->
 
 <template>
-  <div class="bk-field-info mb20">
-    <p v-if="isShowTitle" class="bk-field-title">字段配置</p>
-    <div class="bk-node-btn">
-      <bk-button
-        data-test-id="fieldConfig-button-addField"
-        v-if="configur.type !== 'APPROVAL'"
-        :theme="'default'"
-        :title="$t(`m.treeinfo['新增字段']`)"
-        class="mr10"
-        @click="addField">
-        {{$t(`m.treeinfo['新增字段']`)}}
-      </bk-button>
-      <bk-button
-        data-test-id="fieldConfig-button-addModelField"
-        v-if="configur.type !== 'APPROVAL' && configur.type !== 'SIGN' && !templateStage"
-        :theme="'default'"
-        :title="$t(`m.treeinfo['选择模型字段']`)"
-        class="mr10"
-        @click="openAddModule">
-        {{$t(`m.treeinfo['选择模型字段']`)}}
-      </bk-button>
-      <bk-button :theme="'default'"
-        data-test-id="fieldConfig-button-previewField"
-        :title="$t(`m.treeinfo['字段预览']`)"
-        class="mr10"
-        style="float: right; border: 0"
-        :disabled="!showTabList.length"
-        @click="previewField">
-        <i class="bk-itsm-icon icon-itsm-icon-three" style="font-size: 16px"></i>
-        {{$t(`m.treeinfo['字段预览']`)}}
-      </bk-button>
-    </div>
-    <!-- 表格拖拽 -->
-    <div class="mt15 bk-draggable" v-bkloading="{ isLoading: isDataLoading }">
-      <table class="bk-draggable-table">
-        <thead>
-          <tr>
-            <th>{{ $t('m.treeinfo["字段名称"]') }}</th>
-            <th style="max-width: 150px;">{{ $t('m.treeinfo["唯一标识"]') }}</th>
-            <th>{{ $t('m.treeinfo["字段类型"]') }}</th>
-            <!-- <th style="max-width: 100px;">{{ $t('m.treeinfo["字段值"]') }}</th> -->
-            <th>{{ $t('m.treeinfo["是否只读"]') }}</th>
-            <th style="min-width: 50px;">{{ $t('m.treeinfo["布局"]') }}</th>
-            <th style="max-width: 100px;">{{ $t('m.treeinfo["字段描述"]') }}</th>
-            <th>{{ $t('m.treeinfo["是否必填"]') }}</th>
-            <th>{{ $t('m.treeinfo["更新人"]') }}</th>
-            <th>{{ $t('m.treeinfo["操作"]') }}</th>
-          </tr>
-        </thead>
-        <draggable tag="tbody" v-model="showTabList" @end="updateInfo" handle=".move-handler-content">
-          <template v-if="showTabList.length">
-            <tr v-for="(item, index) in showTabList" :key="index">
-              <td class="move-handler-content">
-                <span><i class="bk-itsm-icon icon-move-new move-handler"></i>{{item.name}}</span>
-              </td>
-              <td style="max-width: 150px;" :title="item.key">
-                {{item.key}}
-              </td>
-              <td>
-                {{item.typeName || '--'}}
-              </td>
-              <!-- <td style="max-width: 100px;" :title="item.fieldValue">
+    <div class="bk-field-info mb20">
+        <p v-if="isShowTitle" class="bk-field-title">{{ $t(`m['字段配置']`) }}</p>
+        <div class="bk-node-btn">
+            <bk-button
+                data-test-id="fieldConfig-button-addField"
+                v-if="configur.type !== 'APPROVAL'"
+                :theme="'default'"
+                :title="$t(`m.treeinfo['新增字段']`)"
+                class="mr10"
+                @click="addField">
+                {{$t(`m.treeinfo['新增字段']`)}}
+            </bk-button>
+            <bk-button
+                data-test-id="fieldConfig-button-addModelField"
+                v-if="configur.type !== 'APPROVAL' && configur.type !== 'SIGN' && !templateStage"
+                :theme="'default'"
+                :title="$t(`m.treeinfo['选择模型字段']`)"
+                class="mr10"
+                @click="openAddModule">
+                {{$t(`m.treeinfo['选择模型字段']`)}}
+            </bk-button>
+            <bk-button :theme="'default'"
+                data-test-id="fieldConfig-button-previewField"
+                :title="$t(`m.treeinfo['字段预览']`)"
+                class="mr10"
+                style="float: right; border: 0"
+                :disabled="!showTabList.length"
+                @click="previewField">
+                <i class="bk-itsm-icon icon-itsm-icon-three" style="font-size: 16px"></i>
+                {{$t(`m.treeinfo['字段预览']`)}}
+            </bk-button>
+        </div>
+        <!-- 表格拖拽 -->
+        <div class="mt15 bk-draggable" v-bkloading="{ isLoading: isDataLoading }">
+            <table class="bk-draggable-table">
+                <thead>
+                    <tr>
+                        <th>{{ $t('m.treeinfo["字段名称"]') }}</th>
+                        <th style="max-width: 150px;">{{ $t('m.treeinfo["唯一标识"]') }}</th>
+                        <th>{{ $t('m.treeinfo["字段类型"]') }}</th>
+                        <!-- <th style="max-width: 100px;">{{ $t('m.treeinfo["字段值"]') }}</th> -->
+                        <th>{{ $t('m.treeinfo["是否只读"]') }}</th>
+                        <th style="min-width: 50px;">{{ $t('m.treeinfo["布局"]') }}</th>
+                        <th style="max-width: 100px;">{{ $t('m.treeinfo["字段描述"]') }}</th>
+                        <th>{{ $t('m.treeinfo["是否必填"]') }}</th>
+                        <th>{{ $t('m.treeinfo["更新人"]') }}</th>
+                        <th>{{ $t('m.treeinfo["操作"]') }}</th>
+                    </tr>
+                </thead>
+                <draggable tag="tbody" v-model="showTabList" @end="updateInfo" handle=".move-handler-content">
+                    <template v-if="showTabList.length">
+                        <tr v-for="(item, index) in showTabList" :key="index">
+                            <td class="move-handler-content">
+                                <span><i class="bk-itsm-icon icon-move-new move-handler"></i>{{item.name}}</span>
+                            </td>
+                            <td style="max-width: 150px;" :title="item.key">
+                                {{item.key}}
+                            </td>
+                            <td>
+                                {{item.typeName || '--'}}
+                            </td>
+                            <!-- <td style="max-width: 100px;" :title="item.fieldValue">
                                 {{item.fieldValue || '--'}}
                             </td> -->
               <td style="max-width: 100px;"

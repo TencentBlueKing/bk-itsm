@@ -851,3 +851,12 @@ url("scss/icon/fonts/commonicon.eot?#iefix") format("embedded-opentype");
 .icon-pinglun:before {
 	content: "\e220";
 }
+.icon-kaishi:before {
+	content: "\e221";
+}
+.icon-jieshu:before {
+	content: "\e222";
+}
+.icon-webhook-2:before {
+	content: "\e224";
+}

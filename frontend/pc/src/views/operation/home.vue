@@ -288,12 +288,12 @@
     },
   ];
 
-  const STATUS_MAP = {
-    RUNNING: '进行中',
-    FINISHED: '已完成',
-    REVOKED: '已撤销',
-    TERMINATED: '已终止',
-  };
+    const STATUS_MAP = {
+        'RUNNING': i18n.t(`m['进行中']`),
+        'FINISHED': i18n.t(`m['已完成']`),
+        'REVOKED': i18n.t(`m['已撤销']`),
+        'TERMINATED': i18n.t(`m['已终止']`)
+    }
 
   export default {
     name: 'OperationHome',

@@ -296,7 +296,7 @@
     box-shadow: 0px 2px 6px 0px rgba(6, 6, 6, 0.1);
     min-height: 207px;
     .form-list {
-        height: calc(100vh - 300px);
+        height: calc(100vh - 212px);
         padding: 10px 0px;
         overflow: auto;
         @include scroller;

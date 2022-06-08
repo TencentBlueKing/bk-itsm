@@ -49,20 +49,28 @@ def get_doc_url():
 # else:
 
 # 企业版非企业版，统一跳到蓝鲸官网去
-TITLE = "{} | {}".format(_("流程服务"), _("腾讯蓝鲸智云"))
 DOC_URL = "https://bk.tencent.com/docs/markdown/流程服务/产品白皮书/产品简介/README.md"
 
-FOOTER = """
-        <div class="copyright">
-            <ul class="link-list">
-                <a href="https://wpa1.qq.com/KziXGWJs?_type=wpa&qidian=true" class="link-item">{}</a>
-                <a href="http://bk.tencent.com/s-mart/community/" class="link-item" target="_blank">{}</a>
-                <a href="http://bk.tencent.com/" class="link-item" target="_blank">{}</a>
-            </ul>
-            <div class="desc">Copyright &copy; 2012-${{year}} Tencent BlueKing. All Rights Reserved.V2.6.1</div>
-        </div>
-        """.format(
-    _("技术支持"), _("社区论坛"), _("产品官网")
-)
+
+def get_title():
+    TITLE = "{} | {}".format(_("流程服务"), _("腾讯蓝鲸智云"))
+    return TITLE
+
+
+def get_footer():
+    FOOTER = """
+            <div class="copyright">
+                <ul class="link-list">
+                    <a href="https://wpa1.qq.com/KziXGWJs?_type=wpa&qidian=true" class="link-item">{}</a>
+                    <a href="http://bk.tencent.com/s-mart/community/" class="link-item" target="_blank">{}</a>
+                    <a href="http://bk.tencent.com/" class="link-item" target="_blank">{}</a>
+                </ul>
+                <div class="desc">Copyright &copy; 2012-${{year}} Tencent BlueKing. All Rights Reserved.V2.6.1</div>
+            </div>
+            """.format(
+        _("技术支持"), _("社区论坛"), _("产品官网")
+    )
+    return FOOTER
+
 
 LOGIN_URL = settings.BK_PAAS_HOST + "/login/"

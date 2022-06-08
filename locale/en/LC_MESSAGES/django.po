@@ -432,12 +432,6 @@ msgstr ""
 msgid "执行成功"
 msgstr "Process successful"
 
-#: itsm/component/constants/task.py:449 itsm/component/constants/ticket.py:101
-#, fuzzy
-#| msgid "终止"
-msgid "已终止"
-msgstr "Terminate"
-
 #: itsm/component/constants/task.py:450
 #, fuzzy
 #| msgid "已完成"
@@ -467,12 +461,6 @@ msgstr "Suspend"
 #: itsm/component/constants/ticket.py:90 itsm/iadmin/contants.py:117
 msgid "已完成"
 msgstr "Closed"
-
-#: itsm/component/constants/ticket.py:112
-#, fuzzy
-#| msgid "被撤销"
-msgid "已撤销"
-msgstr "Revoked"
 
 #: itsm/component/constants/ticket.py:139 itsm/sla/models/policy.py:136
 msgid "紧急程度"
@@ -7532,3 +7520,15 @@ msgstr "Iam roles"
 
 msgid "是否使用权限中心角色"
 msgstr "Whether to use iam role"
+
+msgid "满意度评分"
+msgstr "Satisfaction rating"
+
+msgid "满意度评价"
+msgstr "Satisfaction comment"
+
+msgid "已终止"
+msgstr "Terminate"
+
+msgid "已撤销"
+msgstr "Revoked"
