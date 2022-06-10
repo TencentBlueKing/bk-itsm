@@ -232,7 +232,7 @@
                         :true-value="true"
                         :false-value="false"
                         v-model="formInfo.is_allow_skip">
-                        节点处理人为空时，直接跳过且不视为异常
+                        {{$t(`m['节点处理人为空时，直接跳过且不视为异常']`) }}
                     </bk-checkbox>
                 </bk-form-item>
             </bk-form>
