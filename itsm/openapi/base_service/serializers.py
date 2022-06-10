@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.db import transaction
 from rest_framework import serializers
 from django.utils.translation import ugettext as _
 
@@ -9,7 +10,6 @@ from itsm.service.validators import key_validator
 from itsm.workflow.models import (
     Workflow,
     DEFAULT_ENGINE_VERSION,
-    transaction,
     LEN_LONG,
     Field,
     GlobalVariable,
