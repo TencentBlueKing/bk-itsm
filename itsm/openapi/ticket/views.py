@@ -90,6 +90,7 @@ from itsm.ticket.models import (
     SignTask,
     TicketEventLog,
     TicketComment,
+    Status,
 )
 from itsm.ticket.serializers import TicketList, TicketSerializer
 from itsm.ticket.tasks import start_pipeline
@@ -700,3 +701,20 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         else:
             ticket.delete_follower(user)
         return Response()
+
+    @action(detail=False, methods=["get"])
+    @catch_openapi_exception
+    @custom_apigw_required
+    def get_approver(self, request, *args, **kwargs):
+        """关注or取关"""
+        sn = request.query_params.get("sn")
+        state_id = request.query_params.get("state_id")
+        try:
+            ticket = Ticket.objects.get(sn=sn)
+        except Ticket.DoesNotExist:
+            raise ParamError("sn[{}]对应的单据不存在！".format(sn))
+
+        status = Status.objects.get(ticket_id=ticket.id, state_id=state_id)
+        sign_tasks = SignTask.objects.filter(status_id=status.id)
+        processors = [task.processor for task in sign_tasks]
+        return Response({"approver": ",".join(processors)})

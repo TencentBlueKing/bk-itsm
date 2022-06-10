@@ -1,15 +1,27 @@
 # -*- coding: utf-8 -*-
+from django.db import transaction
 from rest_framework import serializers
 from django.utils.translation import ugettext as _
 
+from itsm.component.exceptions import ParamError
 from itsm.service.models import ServiceCatalog
 from itsm.service.serializers import ServiceSerializer
 from itsm.service.validators import key_validator
-from itsm.workflow.models import Workflow, DEFAULT_ENGINE_VERSION, transaction, LEN_LONG
+from itsm.workflow.models import (
+    Workflow,
+    DEFAULT_ENGINE_VERSION,
+    LEN_LONG,
+    Field,
+    GlobalVariable,
+)
+from itsm.workflow.serializers import (
+    FieldSerializer,
+    AuthModelSerializer,
+    FieldValidator,
+)
 
 
 class OpenApiServiceSerializer(ServiceSerializer):
-
     key = serializers.CharField(
         required=False,
         error_messages={"blank": _("编码不能为空")},
@@ -60,3 +72,38 @@ class OpenApiServiceSerializer(ServiceSerializer):
             updated_by=validated_data["updated_by"],
         )
         return work_flow_instance
+
+
+class CustomFieldValidator(FieldValidator):
+    def key_validate(self, value):
+        """
+        key的有效性校验
+        """
+        self.field_key_validate(value.get("key"))
+
+        if value.get("state_id") is None and not value.get("is_builtin", False):
+            raise ParamError(_("非内置字段state_id不允许为空"))
+
+        if value.get("id") is None:
+            if (
+                Field.objects.filter(
+                    workflow_id=value.get("workflow"), key=value.get("key")
+                ).exists()
+                or GlobalVariable.objects.filter(
+                    flow_id=value.get("workflow").id, key=value.get("key")
+                ).exists()
+            ):
+                raise ParamError(_("当前流程已存在唯一标识【{}】，请重新输入").format(value.get("key")))
+
+
+class BatchSaveFieldSerializer(FieldSerializer):
+    id = serializers.IntegerField(required=True, allow_null=True)
+
+    def __init__(self, *args, **kwargs):
+        super(AuthModelSerializer, self).__init__(*args, **kwargs)
+        self.resource_permissions = {}
+        self.validators = [CustomFieldValidator(self.instance)]
+
+    def to_representation(self, instance):
+        data = super(serializers.ModelSerializer, self).to_representation(instance)
+        return data
