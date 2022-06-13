@@ -104,6 +104,7 @@ INSTALLED_APPS += (
     # 'monitors',
     "itsm.monitor",
     "blueapps.opentelemetry.instrument_app",
+    "itsm.plugin_service",
 )
 
 # IAM 开启开关
