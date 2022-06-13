@@ -13,6 +13,7 @@ from itsm.workflow.models import (
     LEN_LONG,
     Field,
     GlobalVariable,
+    State,
 )
 from itsm.workflow.serializers import (
     FieldSerializer,
@@ -80,10 +81,6 @@ class CustomFieldValidator(FieldValidator):
         key的有效性校验
         """
         self.field_key_validate(value.get("key"))
-
-        if value.get("state_id") is None and not value.get("is_builtin", False):
-            raise ParamError(_("非内置字段state_id不允许为空"))
-
         if value.get("id") is None:
             if (
                 Field.objects.filter(
@@ -97,7 +94,10 @@ class CustomFieldValidator(FieldValidator):
 
 
 class BatchSaveFieldSerializer(FieldSerializer):
-    id = serializers.IntegerField(required=True, allow_null=True)
+    id = serializers.IntegerField(required=False, allow_null=True)
+    state = serializers.PrimaryKeyRelatedField(
+        many=False, queryset=State.objects.all(), allow_null=True
+    )
 
     def __init__(self, *args, **kwargs):
         super(AuthModelSerializer, self).__init__(*args, **kwargs)
