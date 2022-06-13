@@ -105,6 +105,25 @@
                     <!-- 状态 icon, API 节点和标准运维节点才显示 -->
                     <task-status :status="nodeInfo.status"></task-status>
                 </p>
+                <span class="right-float">
+                    <!-- 响应按钮 -->
+                    <bk-button
+                        v-if="nodeInfo.is_reply_need"
+                        class="bk-sla-respons mr10"
+                        :disabled="nodeInfo.is_replied"
+                        :icon="nodeInfo.is_replied ? 'bk-icon icon-check-1' : ''"
+                        :loading="replyBtnLoading"
+                        @click="replyAssignDeliver()">
+                        {{ $t(`m['响应']`)}}
+                    </bk-button>
+                    <span class="full-screen-wrap">
+                        <i v-if="!isFullScreen" class="bk-itsm-icon icon-order-open" @click.stop="openFullScreen(nodeInfo)"></i>
+                        <span v-else class="exit-full-screen" @click.stop="onCloseFullScreen">
+                            <i class="bk-itsm-icon icon-order-close"></i>
+                            <span class="exit-text">{{$t(`m.common['退出全屏']`)}}</span>
+                        </span>
+                    </span>
+                </span>
             </div>
             <collapse-transition v-if="!readOnly">
                 <div class="bk-node-form" v-show="unfold">
@@ -818,7 +837,7 @@
 
                 .node-title-processor{
                     display: inline-block;
-                    max-width: 80%;
+                    max-width: 76%;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
