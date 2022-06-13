@@ -76,10 +76,10 @@
         <bk-dialog v-model="info.show"
             theme="primary"
             :mask-close="false"
-            footer-position="center"
+            :show-footer="false"
             @confirm="refechTicket">
             <div class="status">
-                <i v-if="info.status === 'success'" style="color: green" class="bk-itsm-icon icon-success status-icon"></i>
+                <i v-if="info.status === 'success'" style="color: #3fc06d" class="bk-itsm-icon icon-success status-icon"></i>
                 <i v-else-if="info.status === 'error'" style="color: red" class="bk-itsm-icon icon-itsm-icon-four status-icon"></i>
                 <i v-else class="bk-itsm-icon icon-icon-loading status-load-icon"></i>
                 <p class="title">{{ info.title}}</p>
@@ -299,12 +299,10 @@
                     })
                 }
                 this.$store.dispatch('trigger/executeTrigger', { params: paramsItem, id: this.trigger.id }).then(res => {
-                    this.$bkMessage({
-                        message: '执行成功',
-                        theme: 'success'
-                    })
-                    this.info.show = true
-                    this.getTriggerStatus(res.data.action_id)
+                    if (res.result) {
+                        this.info.show = true
+                        this.getTriggerStatus(res.data.action_id)
+                    }
                 }).catch((res) => {
                     errorHandler(res, this)
                 }).finally(() => {
@@ -406,16 +404,17 @@
     text-align: center;
     .status-icon {
         display: inline-block;
-        width: 40px;
-        height: 40px;
-        font-size: 40px;
+        width: 60px;
+        height: 60px;
+        font-size: 60px;
+        margin-top: 20px;
     }
     .status-load-icon {
         display: inline-block;
-        width: 40px;
-        height: 40px;
+        width: 60px;
+        height: 60px;
         color: #3a84ff;
-        font-size: 40px;
+        font-size: 60px;
         -webkit-transform: rotate(360deg);
         animation: rotation 1.5s linear infinite;
         -moz-animation: rotation 1.5s linear infinite;
@@ -424,6 +423,7 @@
     }
     .title {
         margin-top: 10px;
+        font-size: 20px;
     }
 }
 </style>
