@@ -32,11 +32,15 @@ from common.log import logger
 class OpenapiConfig(AppConfig):
     name = "itsm.openapi"
 
+    def get_esb_public_key(self):
+        client = get_client_by_user(settings.SYSTEM_USE_API_ACCOUNT)
+        esb_result = client.esb.get_api_public_key()
+        return esb_result
+
     def ready(self):
         print("init api public key")
         if not settings.IS_PAAS_V3:
-            client = get_client_by_user(settings.SYSTEM_USE_API_ACCOUNT)
-            esb_result = client.esb.get_api_public_key()
+            esb_result = self.get_esb_public_key()
             if esb_result["result"]:
                 esb_public_key = esb_result["data"]["public_key"]
                 try:
@@ -52,4 +56,21 @@ class OpenapiConfig(AppConfig):
                 logger.warning(
                     "[API] get esb public key error: %s" % esb_result["message"]
                 )
+        if settings.IS_PAAS_V3 and settings.RUN_VER == "ieod":
+            esb_result = self.get_esb_public_key()
+            if esb_result["result"]:
+                esb_public_key = esb_result["data"]["public_key"]
+                try:
+                    from apigw_manager.apigw.helper import PublicKeyManager
+
+                    PublicKeyManager().set("esb-ieod-clouds", esb_public_key)
+                except Exception:
+                    logger.exception(
+                        "[API] apigw_manager_context table is not migrated"
+                    )
+            else:
+                logger.warning(
+                    "[API] get esb public key error: %s" % esb_result["message"]
+                )
+
         print("init api public success")
