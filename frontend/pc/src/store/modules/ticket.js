@@ -45,6 +45,9 @@ export default {
         
     },
     actions: {
+        getTriggerStatus ({ commit, state, dispatch }, id) {
+            return ajax.get(`/trigger/actions/${id}/`).then(response => response.data)
+        },
         // 获取单据数量（待办、审批）
         getTicketsCount ({ commit, state, dispatch }) {
             return ajax.get('ticket/receipts/total_count/').then(response => {
