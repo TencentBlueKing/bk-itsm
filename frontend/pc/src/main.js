@@ -62,12 +62,16 @@ import locales from "element-ui/lib/locale";
 // view components
 import App from "./App";
 // components
-import router from "./router";
-import Exception from "./components/common/exception";
-import ArrowsLeftIcon from "./components/common/layout/ArrowsLeftIcon";
-import "./utils/login.js";
-import i18n from "./i18n/index.js";
-import store from "./store";
+import router from './router'
+import Exception from './components/common/exception'
+import ArrowsLeftIcon from './components/common/layout/ArrowsLeftIcon'
+import './utils/login.js'
+import i18n from './i18n/index.js'
+import store from './store'
+
+import { ProcessFormPlugin } from './assets/processFormPlugin/processFormPlugin.js'
+import './assets/processFormPlugin/processFormPlugin.css'
+Vue.use(ProcessFormPlugin)
 // 自定义指令
 import directives from "./directives";
 Vue.use(directives);

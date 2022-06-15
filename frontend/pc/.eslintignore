@@ -9,5 +9,7 @@ src/assets/jsflow.js
 src/views/common/memberSelect
 src/views/slaManager/ticketStatus/firstStep.vue
 src/views/processManagement/processDesign/nodeConfigue/autoComponents/responseDataNode.vue
+src/assets/jsflow.js
+src/assets/processFormPlugin
 src/views/commonComponent/customUpload/
 
