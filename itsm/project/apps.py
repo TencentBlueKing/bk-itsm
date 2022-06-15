@@ -36,15 +36,21 @@ from django.db.models.signals import post_migrate
 def app_ready_handler(sender, **kwargs):
     from itsm.project.models import Project
 
-    print('init default project start')
+    print("init default project start")
     try:
         Project.init_default_project()
     except Exception as e:
-        print('init default project exception: %s' % e)
+        print("init default project exception: %s" % e)
+
+    print("init lesscode project start")
+    try:
+        Project.init_lesscode_project()
+    except Exception as e:
+        print("init lesscode project exception: %s" % e)
 
 
 class ProjectConfig(AppConfig):
-    name = 'itsm.project'
+    name = "itsm.project"
 
     def ready(self):
         post_migrate.connect(app_ready_handler, sender=self)
