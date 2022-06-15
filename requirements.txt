@@ -91,7 +91,7 @@ typing-extensions==3.7.4.3
 anyjson==0.3.3
 
 #bkouth
-PyJWT>=1.6.4
+PyJWT==1.6.4
 cryptography==3.3.2
 
 # prometheus
@@ -123,4 +123,4 @@ Jinja2==2.11.1
 jmespath==0.10.0
 requests_toolbelt==0.9.1
 
-apigw-manager[cryptography]>=1.0.7
+apigw-manager[cryptography]==1.0.7
