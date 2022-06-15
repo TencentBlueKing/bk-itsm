@@ -68,7 +68,6 @@ INSTALLED_APPS += (
     "django_signal_valve",
     # itsm
     "itsm.gateway",
-    "itsm.helper",
     "itsm.role",
     "itsm.pipeline_plugins",
     "itsm.ticket",
@@ -106,6 +105,8 @@ INSTALLED_APPS += (
     "itsm.monitor",
     "blueapps.opentelemetry.instrument_app",
 )
+
+INSTALLED_APPS = ("itsm.helper",) + INSTALLED_APPS
 
 AUTHENTICATION_BACKENDS += ("apigw_manager.apigw.authentication.UserModelBackend",)
 

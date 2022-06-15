@@ -2612,7 +2612,10 @@ export const m = {
     '已完成': 'FINISHED',
     '已撤销': 'REVOKED',
     '已终止': 'TERMINATED',
+    '节点处理人为空时，直接跳过且不视为异常': 'When the node handler is empty, it is skipped directly and is not regarded as an exception',
     '当审批节点的审批人为申请人时，自动通过': 'When the approver of the approval node is the applicant, it is automatically passed',
     '字段配置': 'Field config',
-    '字段属性': 'Field properties'
+    '字段属性': 'Field properties',
+    '为必选项!': 'Required!',
+    '必选项': 'Required'
 }

@@ -98,6 +98,7 @@
             :value.sync="addDirectory.show"
             :title="addDirectory.title"
             :mask-close="false"
+            :auto-close="false"
             @confirm="submitAdd"
             @cancel="toggleDialog">
             <bk-form

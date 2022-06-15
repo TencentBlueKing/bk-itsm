@@ -183,6 +183,7 @@ class FieldViewSet(BaseFieldViewSet):
                     item["creator"] = operator
                     item["updated_by"] = operator
                     item["workflow_id"] = item.pop("workflow")
+                    item["state_id"] = item.pop("state")
                     field_id = Field.objects.create(**item).id
                     current_ids.append(field_id)
 
