@@ -58,7 +58,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
         service.save()
         return Response()
 
-    # @custom_apigw_required
+    @custom_apigw_required
     @action(detail=True, methods=["post"], permission_classes=())
     def save_configs(self, request, *args, **kwargs):
         """

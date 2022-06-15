@@ -39,6 +39,7 @@ from config import (
     PROJECT_ROOT,
     BK_PAAS_HOST,
     BK_PAAS_INNER_HOST,
+    RUN_VER,
 )
 
 # 标准运维页面服务地址
@@ -84,6 +85,7 @@ INSTALLED_APPS += (
     "data_migration",
     # 'silk',
     "mptt",
+    "apigw_manager.apigw",
     "django_mptt_admin",
     "django_extensions",
     "rest_framework",
@@ -105,6 +107,11 @@ INSTALLED_APPS += (
 )
 
 INSTALLED_APPS = ("itsm.helper",) + INSTALLED_APPS
+
+AUTHENTICATION_BACKENDS += ("apigw_manager.apigw.authentication.UserModelBackend",)
+
+IS_PAAS_V3 = int(os.getenv("BKPAAS_MAJOR_VERSION", False)) == 3
+IS_OPEN_V3 = IS_PAAS_V3 and RUN_VER == "open"
 
 # IAM 开启开关
 USE_IAM = True if os.getenv("USE_IAM", "true").lower() == "true" else False
@@ -153,7 +160,9 @@ MIDDLEWARE = (
     # enable nginx http-auth
     # 'itsm.component.misc_middlewares.NginxAuthProxy',
     "itsm.component.misc_middlewares.InstrumentProfilerMiddleware",
-    # 'pyinstrument.middleware.ProfilerMiddleware',
+    "apigw_manager.apigw.authentication.ApiGatewayJWTGenericMiddleware",  # JWT 认证
+    "apigw_manager.apigw.authentication.ApiGatewayJWTAppMiddleware",  # JWT 透传的应用信息
+    "apigw_manager.apigw.authentication.ApiGatewayJWTUserMiddleware",  # JWT 透传的用户信息
 )
 
 # 所有环境的日志级别可以在这里配置
@@ -866,3 +875,8 @@ except Exception:
 OPEN_VOICE_NOTICE = (
     True if os.getenv("BKAPP_OPEN_VOICE_NOTICE", "false").lower() == "true" else False
 )
+
+# apigw的配置
+BK_APIGW_NAME = os.getenv("BK_APIGW_NAME", "bk-itsm")
+# APIGW 访问地址
+BK_APIGW_URL_TMPL = os.getenv("BK_API_URL_TMPL")

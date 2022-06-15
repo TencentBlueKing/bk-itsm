@@ -2,4 +2,8 @@
 
 echo "migrate database and cache"
 python manage.py migrate --no-input
+
 python manage.py createcachetable django_cache
+
+echo "init apigw public key"
+python manage.py sync_saas_apigw
