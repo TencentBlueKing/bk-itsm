@@ -26,9 +26,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import os
 import traceback
 from functools import wraps
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from rest_framework.exceptions import ValidationError as RrfValidationError
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.utils.translation import ugettext as _
 
 from itsm.component.bkoauth.jwt_client import JWTClient, jwt_invalid_view
@@ -280,14 +282,39 @@ def fbv_exception_handler(view_func):
     return _exception_handler
 
 
+# def custom_apigw_required(view_func):
+#     """apigw装饰器"""
+#
+#     @wraps(view_func)
+#     def _wrapped_view(self, request, *args, **kwargs):
+#         request.jwt = JWTClient(request)
+#         if not request.jwt.is_valid:
+#             return jwt_invalid_view(request)
+#         return view_func(self, request, *args, **kwargs)
+#
+#     return _wrapped_view
+
+
 def custom_apigw_required(view_func):
     """apigw装饰器"""
 
     @wraps(view_func)
     def _wrapped_view(self, request, *args, **kwargs):
-        request.jwt = JWTClient(request)
-        if not request.jwt.is_valid:
-            return jwt_invalid_view(request)
+
+        exempt = getattr(settings, "BK_APIGW_REQUIRE_EXEMPT", False)
+        if exempt:
+            return view_func(request, *args, **kwargs)
+
+        if not hasattr(request, "jwt"):
+            logger.warning(
+                "can not found jwt in request, "
+                "make sure ApiGatewayJWTGenericMiddleware is config in middlewares or receive jwt is valid"
+                # noqa
+            )
+            return HttpResponse(
+                status=403, content="This API can only be accessed through API gateway"
+            )
+
         return view_func(self, request, *args, **kwargs)
 
     return _wrapped_view
