@@ -290,14 +290,14 @@ class BkPluginService(ItsmBaseService):
         state = ticket.flow.get_state(state_id)
         variables = state["variables"].get("outputs", [])
 
-        plugin_code = data.outputs.get("is_schedule")
+        plugin_code = data.outputs.get("plugin_code")
         trace_id = data.outputs.get("trace_id")
 
         try:
             client = PluginServiceApiClient(plugin_code=plugin_code)
             result, resp = client.get_schedule(trace_id=trace_id)
         except Exception:
-            err_message = "轮训服务调用异常 message = {}".format(resp.get("message"))
+            err_message = "轮询服务调用异常"
             self.do_exit_plugins(
                 ticket,
                 state_id,
