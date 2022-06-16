@@ -122,3 +122,5 @@ pyCryptodome==3.14.1
 Jinja2==2.11.1
 jmespath==0.10.0
 requests_toolbelt==0.9.1
+
+drf-yasg==1.20.0
