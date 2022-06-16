@@ -72,6 +72,11 @@
                 <i class="bk-itsm-icon icon-approval-node" style="font-size: 26px;"></i>
             </div>
         </li>
+        <li v-bk-tooltips.right="$t(`m['蓝鲸插件节点']`)">
+            <div class="entry-item entry-gateway" data-type="BK-PLUGIN" style="margin: 12px 0 2px;">
+                <i class="bk-itsm-icon icon-itsm-icon-three-five" style="font-size: 26px;"></i>
+            </div>
+        </li>
         <li v-bk-tooltips.right="$t(`m.treeinfo['并行网关']`)">
             <div class="entry-item entry-gateway" data-type="ROUTER-P">
                 <i class="bk-itsm-icon icon-flow-convergence"></i>
