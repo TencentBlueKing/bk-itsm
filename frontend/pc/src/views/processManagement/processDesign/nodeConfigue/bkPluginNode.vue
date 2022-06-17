@@ -236,6 +236,7 @@
                 layout: [],
                 outputsData: [],
                 outputsVarList: {},
+                primarySchema: {},
                 formData: {},
                 formType: 'vertical',
                 rules: {
@@ -259,9 +260,9 @@
             this.initData()
             this.getRelatedFields()
             // 初始变量下拉选择的状态
-            Object.keys(this.schema.properties).map(item => {
-                this.$set(this.hookedVarList, item, false)
-            })
+            // Object.keys(this.schema.properties).map(item => {
+            //     this.$set(this.hookedVarList, item, false)
+            // })
         },
         methods: {
             async initData () {
@@ -280,6 +281,8 @@
                     this.basicInfo.version = this.configur.extras.bk_plugin_info.version
                     this.getFormInfo(this.basicInfo.version)
                     this.formData = this.configur.extras.bk_plugin_info.inputs
+                    this.primarySchema = this.configur.extras.bk_plugin_info.inputs
+                    this.schema = this.primarySchema
                     // this.outputsData = Object.keys(this.configur.extras.bk_plugin_info.inputs.properties).map(item => {
                     //     console.log(item)
                     //     return this.configur.extras.bk_plugin_info.inputs.properties[item]
@@ -298,17 +301,36 @@
                 })
             },
             onChangeChecked (value, path, schema) {
-                console.log(value, this.schema)
+                console.log(this.schema)
+                const data = Object.assign({}, this.formData)
+                if (value) {
+                    if (schema.type === 'integer') {
+                        schema.type = 'string'
+                    }
+                    Object.assign(schema, { 'ui:component': { name: 'bk-input', props: { disabled: true, value: data[path] } } })
+                    console.log(schema, '1111111111')
+                } else {
+                    Object.assign(schema, { 'ui:component': { name: 'bk-input', props: { disabled: false, value: data[path] } } })
+                    console.log(schema, '222222222')
+                    // Object.assign(schema, initSchemaItem[path], { default: data })
+                }
+                // this.schema = JSON.stringify(curSchemaItem, null, 2)
+                // console.log(curSchemaItem)
+                // console.log(curSchemaItem, initSchemaItem)
                 if (!value) {
-                    this.formData[path] = ''
+                    // this.formData[path] = ''
                     this.hookSelectList[path] = ''
                 }
+                console.log(this.schema)
+                this.formKey = new Date().getTime()
             },
             changeConstant (value, path, schema) {
+                if (schema.type === 'integer') {
+                    schema.type = 'string'
+                }
                 this.hookSelectList[path] = '${' + value + '}'
-                this.formData[path] = this.hookSelectList[path]
+                Object.assign(schema, { 'ui:component': { name: 'bk-input', props: { disabled: true, value: this.hookSelectList[path] } } })
                 this.formKey = new Date().getTime()
-                console.log(this.hookSelectList)
             },
             onchangeOutputCheck (value, props) {
                 this.outputsVarList[props.$index] = value
@@ -340,7 +362,6 @@
                 this.formData[path] = '{{' + item.key + '}}'
                 this.$set(this.hookedVarList, path, false)
                 this.formKey = new Date().getTime()
-                const data = Object.assign({}, this.formData)
             },
             onSelectplugin (value) {
                 this.schema = {}
@@ -391,6 +412,8 @@
                 this.$parent.closeConfigur()
             },
             submit () {
+                console.log(this.formData)
+                debugger
                 const { value: processors, type: processors_type } = this.$refs.processors.getValue()
                 const bk_plugin_info = { plugin_code: this.basicInfo.plugin, version: this.basicInfo.version, inputs: this.formData, context: {} }
                 if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
