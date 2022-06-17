@@ -68,44 +68,47 @@
                 <p>{{ $t(`m.treeinfo['输入参数']`) }}:</p>
                 <p>{{ $t(`m['执行蓝鲸插件需要填写的参数信息']`) }}</p>
             </div>
-            <BkRenderForm
-                class="bk-form-plugin"
-                v-model="formData"
-                ref="bkForm"
-                :schema="schema"
-                :layout="layout"
-                :rules="rules"
-                :form-type="formType"
-                :context="{
-                    ...context,
-                    rules: {}
-                }"
-                :http-adapter="{
-                    responseParse: {
-                        labelKey: 'name',
-                        valueKey: 'id'
-                    }
-                }"
-                :key="formKey">
-                <template #suffix="{ path, schema: schemaField }">
-                    <bk-checkbox
-                        ext-cls="select-check"
-                        v-model="hookVarList[path]"
-                        @change="onChangeChecked($event, path ,schemaField)">
-                    </bk-checkbox>
-                    <bk-select :disabled="!hookVarList[path]" style="width: 200px;"
-                        :value="hookSelectList[path].replace(/^\$\{/, '').replace(/\}$/, '')"
-                        ext-cls="select-custom"
-                        searchable
-                        @selected="changeConstant($event, path ,schemaField)">
-                        <bk-option v-for="option in stateList"
-                            :key="option.id"
-                            :id="option.key"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </template>
-            </BkRenderForm>
+            <template v-if="Object.keys(formData).length !== 0">
+                <BkRenderForm
+                    class="bk-form-plugin"
+                    v-model="formData"
+                    ref="bkForm"
+                    :schema="schema"
+                    :layout="layout"
+                    :rules="rules"
+                    :form-type="formType"
+                    :context="{
+                        ...context,
+                        rules: {}
+                    }"
+                    :http-adapter="{
+                        responseParse: {
+                            labelKey: 'name',
+                            valueKey: 'id'
+                        }
+                    }"
+                    :key="formKey">
+                    <template #suffix="{ path, schema: schemaField }">
+                        <bk-checkbox
+                            ext-cls="select-check"
+                            v-model="hookVarList[path]"
+                            @change="onChangeChecked($event, path ,schemaField)">
+                        </bk-checkbox>
+                        <bk-select :disabled="!hookVarList[path]" style="width: 200px;"
+                            :value="hookSelectList[path].replace(/^\$\{/, '').replace(/\}$/, '')"
+                            ext-cls="select-custom"
+                            searchable
+                            @selected="changeConstant($event, path ,schemaField)">
+                            <bk-option v-for="option in stateList"
+                                :key="option.id"
+                                :id="option.key"
+                                :name="option.name">
+                            </bk-option>
+                        </bk-select>
+                    </template>
+                </BkRenderForm>
+            </template>
+            <no-data v-else></no-data>
             <div class="bk-params-title">
                 <p>{{ $t(`m['输出参数']`) }}:</p>
                 <p>{{ $t(`m['蓝鲸插件执行之后的输出，可以通过勾选的方式作为引用变量在后面的节点使用']`) }}</p>
@@ -117,7 +120,7 @@
                     <bk-table-column label="key" prop="key"></bk-table-column>
                     <bk-table-column label="设置为引用变量">
                         <template slot-scope="props">
-                            <bk-checkbox @change="onchangeOutputCheck($event, props)" v-model="outputsVarList[props.$index]"></bk-checkbox>
+                            <bk-checkbox @change="onchangeOutputCheck($event, props)" v-model="outputsVarList[props.row.key]"></bk-checkbox>
                         </template>
                     </bk-table-column>
                 </bk-table>
@@ -152,7 +155,7 @@
     import dealPerson from './components/dealPerson.vue'
     import commonTriggerList from '../../taskTemplate/components/commonTriggerList'
     import BasicCard from '@/components/common/layout/BasicCard.vue'
-    // import NoData from '@/components/common/NoData.vue'
+    import NoData from '@/components/common/NoData.vue'
     import i18n from '@/i18n/index.js'
     function newRequiredRule () {
         return {
@@ -167,7 +170,7 @@
         components: {
             BasicCard,
             commonTriggerList,
-            // NoData
+            NoData,
             dealPerson,
             BkRenderForm
         },
@@ -241,15 +244,15 @@
                 formData: {},
                 formType: 'vertical',
                 rules: {
-                    maxLength20: { validator: '{{ $self.value.length < 20}}', message: '长度必须大于 20' },
-                    number: { validator: '/!^[0-9]*$/', message: '必须是数字' },
-                    required: { message: '值不能为空', validator: '{{ $self.value !== ""}}' },
-                    reservedWord: { validator: '{{ !$self.value.includes("bk") }}', message: '不能使用保留字符' }
+                    maxLength20: { validator: '{{ $self.value.length < 20}}', message: this.$t(`m['长度必须大于 20']`) },
+                    number: { validator: '/!^[0-9]*$/', message: this.$t(`m['必须是数字']`) },
+                    required: { message: this.$t(`m['值不能为空']`), validator: '{{ $self.value !== ""}}' },
+                    reservedWord: { validator: '{{ !$self.value.includes("bk") }}', message: this.$t(`m['不能使用保留字符']`) }
                 },
                 context: {
                     bizId: 1,
                     site_url: '/o/bk_sops/',
-                    projectId: 'b37778ec757544868a01e1f01f07037f',
+                    projectId: this.$route.query.project_id,
                     baseURL: '',
                     pod_name: 'test_pod_name'
                 }
@@ -285,8 +288,12 @@
                     this.primarySchema = this.configur.extras.bk_plugin_info.inputs
                     this.schema = this.primarySchema
                     const outputs_var_list = this.configur.extras.outputs_var_list || {}
+                    const input_var_list = this.configur.extras.input_var_list || {}
                     Object.keys(outputs_var_list).map(item => {
                         this.$set(this.outputsVarList, item, outputs_var_list[item])
+                    })
+                    Object.keys(input_var_list).map(item => {
+                        this.$set(this.hookVarList, item, input_var_list[item])
                     })
                 }
             },
@@ -322,11 +329,12 @@
                     schema.type = 'string'
                 }
                 this.hookSelectList[path] = '${' + value + '}'
+                this.formData[path] = this.hookSelectList[path]
                 Object.assign(schema, { 'ui:component': { name: 'bk-input', props: { disabled: true, value: this.hookSelectList[path] } } })
                 this.formKey = new Date().getTime()
             },
             onchangeOutputCheck (value, props) {
-                this.outputsVarList[props.$index] = value
+                this.outputsVarList[props.row.key] = value
             },
             // 计算处理人类型需要排除的类型
             getExcludeRoleTypeList () {
@@ -415,24 +423,23 @@
                 this.$parent.closeConfigur()
             },
             submit () {
-                console.log(this.outputsData)
                 const { value: processors, type: processors_type } = this.$refs.processors.getValue()
                 const bk_plugin_info = { plugin_code: this.basicInfo.plugin, version: this.basicInfo.version, inputs: this.formData, context: {} }
                 const outputs = []
-                for (const item in this.outputsData) {
-                    if (!this.outputsVarList[item]) {
-                        continue
+                this.outputsData.forEach(item => {
+                    console.log(item)
+                    if (!this.outputsVarList[item.key]) {
+                        return
                     }
-                    if (this.outputsVarList[item]) {
+                    if (this.outputsVarList[item.key]) {
                         outputs.push({
-                            name: this.outputsData[item].title,
-                            ref_path: 'resp.outputs.' + item,
+                            name: item.title,
+                            ref_path: 'resp.outputs.' + item.key,
                             source: 'global',
                             type: 'STRING'
                         })
                     }
-                }
-                debugger
+                })
                 if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
                     this.checkStatus.processors = true
                     return
@@ -449,7 +456,8 @@
                     is_draft: false,
                     extras: {
                         bk_plugin_info: bk_plugin_info,
-                        outputs_var_list: this.outputsVarList
+                        outputs_var_list: this.outputsVarList,
+                        input_var_list: this.hookVarList
                     },
                     variables: { outputs: outputs },
                     workflow: this.configur.workflow
@@ -457,7 +465,7 @@
                 const stateId = this.configur.id
                 this.$store.dispatch('cdeploy/putWebHook', { params, stateId }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.treeinfo["保存成功"]`),
+                        message: this.$t(`m['保存成功']`),
                         theme: 'success'
                     })
                     this.$parent.closeConfigur()
