@@ -68,10 +68,6 @@
                 <p>{{ $t(`m.treeinfo['输入参数']`) }}:</p>
                 <p>{{ $t(`m['执行蓝鲸插件需要填写的参数信息，可以使用 {{ 来使用流程内的变量']`) }}</p>
             </div>
-            <!-- <div class="bk-params-title">
-                <p>{{ $t(`m['输出参数']`) }}:</p>
-                <p>{{ $t(`m['蓝鲸插件执行之后的输出，可以通过勾选的方式作为引用变量在后面的节点使用']`) }}</p>
-            </div> -->
             <BkRenderForm
                 class="bk-form-plugin"
                 v-model="formData"
@@ -90,16 +86,41 @@
                         valueKey: 'id'
                     }
                 }"
-                :key="formKey"
-                @change="changeFormItem">
-                <template #suffix="{ path }">
-                    <div v-if="hookedVarList[path]" class="var-select">
-                        <ul style="width: 100%; height: 100%">
-                            <li v-for="varItem in stateList" :key="varItem.key" @click.prevent="handleVarClick(varItem, path)">{{ varItem.name}}({{varItem.key}})</li>
-                        </ul>
-                    </div>
+                :key="formKey">
+                <template #suffix="{ path, schema: schemaField }">
+                    <bk-checkbox
+                        ext-cls="select-check"
+                        v-model="hookVarList[path]"
+                        @change="onChangeChecked($event, path ,schemaField)">
+                    </bk-checkbox>
+                    <bk-select :disabled="!hookVarList[path]" style="width: 200px;"
+                        :value="hookSelectList[path].replace(/^\$\{/, '').replace(/\}$/, '')"
+                        ext-cls="select-custom"
+                        searchable
+                        @selected="changeConstant($event, path ,schemaField)">
+                        <bk-option v-for="option in stateList"
+                            :key="option.id"
+                            :id="option.key"
+                            :name="option.name">
+                        </bk-option>
+                    </bk-select>
                 </template>
             </BkRenderForm>
+            <div class="bk-params-title">
+                <p>{{ $t(`m['输出参数']`) }}:</p>
+                <p>{{ $t(`m['蓝鲸插件执行之后的输出，可以通过勾选的方式作为引用变量在后面的节点使用']`) }}</p>
+            </div>
+            <div style="padding: 20px">
+                <bk-table
+                    :data="outputsData">
+                    <bk-table-column label="名称" prop="title"></bk-table-column>
+                    <bk-table-column label="设置为引用变量">
+                        <template slot-scope="props">
+                            <bk-checkbox @change="onchangeOutputCheck($event, props)"></bk-checkbox>
+                        </template>
+                    </bk-table-column>
+                </bk-table>
+            </div>
             <common-trigger-list :origin="'state'"
                 :node-type="configur.type"
                 :source-id="flowInfo.id"
@@ -182,6 +203,8 @@
                 },
                 pluginList: [],
                 versionList: [],
+                hookVarList: {},
+                hookSelectList: {},
                 versionListLoading: false,
                 versionListDisabled: true,
                 formLoading: false,
@@ -211,6 +234,8 @@
                     }
                 },
                 layout: [],
+                outputsData: [],
+                outputsVarList: {},
                 formData: {},
                 formType: 'vertical',
                 rules: {
@@ -255,6 +280,11 @@
                     this.basicInfo.version = this.configur.extras.bk_plugin_info.version
                     this.getFormInfo(this.basicInfo.version)
                     this.formData = this.configur.extras.bk_plugin_info.inputs
+                    // this.outputsData = Object.keys(this.configur.extras.bk_plugin_info.inputs.properties).map(item => {
+                    //     console.log(item)
+                    //     return this.configur.extras.bk_plugin_info.inputs.properties[item]
+                    // })
+                    // console.log(this.outputsData)
                 }
             },
             async getRelatedFields () {
@@ -266,6 +296,22 @@
                 this.$store.dispatch('apiRemote/get_related_fields', params).then(res => {
                     this.stateList = res.data
                 })
+            },
+            onChangeChecked (value, path, schema) {
+                console.log(value, this.schema)
+                if (!value) {
+                    this.formData[path] = ''
+                    this.hookSelectList[path] = ''
+                }
+            },
+            changeConstant (value, path, schema) {
+                this.hookSelectList[path] = '${' + value + '}'
+                this.formData[path] = this.hookSelectList[path]
+                this.formKey = new Date().getTime()
+                console.log(this.hookSelectList)
+            },
+            onchangeOutputCheck (value, props) {
+                this.outputsVarList[props.$index] = value
             },
             // 计算处理人类型需要排除的类型
             getExcludeRoleTypeList () {
@@ -290,20 +336,11 @@
                 }
                 this.excludeProcessor = [...['EMPTY', 'API'], ...excludeProcessor]
             },
-            changeFormItem (newValue, oldValue) {
-                Object.keys(newValue).map(item => {
-                    this.hookedVarList[item] = false
-                    if (newValue[item] !== oldValue[item]) {
-                        if (newValue[item].endsWith('{{')) {
-                            this.hookedVarList[item] = true
-                        }
-                    }
-                })
-            },
             handleVarClick (item, path) {
                 this.formData[path] = '{{' + item.key + '}}'
                 this.$set(this.hookedVarList, path, false)
                 this.formKey = new Date().getTime()
+                const data = Object.assign({}, this.formData)
             },
             onSelectplugin (value) {
                 this.schema = {}
@@ -330,6 +367,13 @@
                     const params = { plugin_code: this.basicInfo.plugin, plugin_version: value }
                     this.$store.dispatch('bkPlugin/getPluginDetail', params).then(res => {
                         this.schema = res.data.inputs
+                        Object.keys(this.schema.properties).map(item => {
+                            this.$set(this.hookSelectList, item, '')
+                        })
+                        this.outputsData = res.data.outputs.properties
+                        Object.keys(res.data.outputs.properties).map(item => {
+                            this.$set(this.outputsVarList, item, false)
+                        })
                     })
                 } catch (e) {
                     console.log(e)
@@ -349,7 +393,6 @@
             submit () {
                 const { value: processors, type: processors_type } = this.$refs.processors.getValue()
                 const bk_plugin_info = { plugin_code: this.basicInfo.plugin, version: this.basicInfo.version, inputs: this.formData, context: {} }
-                console.log()
                 if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
                     this.checkStatus.processors = true
                     return
@@ -425,8 +468,21 @@
             /deep/ .bk-schema-form-group {
                 overflow: unset !important;
             }
+            /deep/ .bk-form-content {
+                display: flex;
+                align-items: center;
+                .bk-form-control {
+                    width: 70%;
+                }
+                .select-check {
+                    margin: 0 auto;
+                }
+                .select-custom {
+                    width: 150px;
+                }
+            }
             .var-select {
-                width: 492px;
+                width: 200px;
                 height: 230px;
                 position: absolute;
                 border-radius: 4px;
