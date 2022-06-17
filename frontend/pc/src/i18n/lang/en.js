@@ -2620,5 +2620,9 @@ export const m = {
     '版本': 'Version',
     '执行蓝鲸插件需要填写的参数信息，可以使用 {{ 来使用流程内的变量': 'Parameter information that needs to be filled in to execute the blue whale plug-in, you can use {{ to use the variables in the process',
     '蓝鲸插件执行之后的输出，可以通过勾选的方式作为引用变量在后面的节点使用': 'The output after the execution of the blue whale plugin can be used as a reference variable in the following nodes by checking it',
-    '输出参数': 'Output parameters'
+    '输出参数': 'Output parameters',
+    '长度必须大于 20': 'Length must be greater than 20',
+    '值不能为空': 'value cannot be empty',
+    '不能使用保留字符': 'Cannot use reserved characters',
+    '必须是数字': 'must be a number'
 }
