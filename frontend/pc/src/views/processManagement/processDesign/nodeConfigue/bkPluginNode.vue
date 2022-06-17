@@ -24,8 +24,8 @@
                         :disabled="false"
                         @selected="onSelectplugin">
                         <bk-option v-for="plugin in pluginList"
-                            :key="plugin.id"
-                            :id="plugin.id"
+                            :key="plugin.code"
+                            :id="plugin.code"
                             :name="plugin.name">
                         </bk-option>
                     </bk-select>
@@ -44,9 +44,9 @@
                         :disabled="versionListDisabled"
                         @selected="getFormInfo">
                         <bk-option v-for="version in versionList"
-                            :key="version.id"
-                            :id="version.id"
-                            :name="version.name">
+                            :key="version"
+                            :id="version"
+                            :name="version">
                         </bk-option>
                     </bk-select>
                 </bk-form-item>
@@ -95,7 +95,7 @@
                 <template #suffix="{ path }">
                     <div v-if="hookedVarList[path]" class="var-select">
                         <ul style="width: 100%; height: 100%">
-                            <li v-for="varItem in stateList" :key="varItem.key" @click.prevent="handleVarClick(varItem, path)">{{ varItem.name }}</li>
+                            <li v-for="varItem in stateList" :key="varItem.key" @click.prevent="handleVarClick(varItem, path)">{{ varItem.name}}({{varItem.key}})</li>
                         </ul>
                     </div>
                 </template>
@@ -189,7 +189,7 @@
                     nodeName: [newRequiredRule()],
                     plugin: [newRequiredRule()],
                     version: [newRequiredRule()]
-                   
+
                 },
                 checkStatus: {
                     delivers: false,
@@ -203,23 +203,11 @@
                 formKey: '',
                 hookedVarList: {},
                 stateList: [
-                    { name: '1', key: '1' },
-                    { name: '2', key: '2' }
                 ], // 引用变量
                 // 这是个测试的schema
                 schema: {
                     type: 'object',
                     properties: {
-                        items: {
-                            title: '标题',
-                            type: 'string',
-                            default: '这是一个初始值'
-                        },
-                        items1: {
-                            title: '标题1',
-                            type: 'string',
-                            default: '这是一个初始值1'
-                        }
                     }
                 },
                 layout: [],
@@ -244,6 +232,7 @@
         },
         mounted () {
             this.initData()
+            this.getRelatedFields()
             // 初始变量下拉选择的状态
             Object.keys(this.schema.properties).map(item => {
                 this.$set(this.hookedVarList, item, false)
@@ -251,6 +240,32 @@
         },
         methods: {
             async initData () {
+                this.basicInfo.nodeName = this.configur.name
+                this.processorsInfo = {
+                    type: this.configur.processors_type,
+                    value: this.configur.processors
+                }
+                this.$store.dispatch('bkPlugin/getPluginList').then(res => {
+                    this.pluginList = res.data.plugins
+                    this.getExcludeRoleTypeList()
+                })
+                if (Object.keys(this.configur.extras).length !== 0) {
+                    this.basicInfo.plugin = this.configur.extras.bk_plugin_info.plugin_code
+                    this.onSelectplugin(this.basicInfo.plugin)
+                    this.basicInfo.version = this.configur.extras.bk_plugin_info.version
+                    this.getFormInfo(this.basicInfo.version)
+                    this.formData = this.configur.extras.bk_plugin_info.inputs
+                }
+            },
+            async getRelatedFields () {
+                const params = {
+                    workflow: this.flowInfo.id,
+                    state: this.configur.id,
+                    field: ''
+                }
+                this.$store.dispatch('apiRemote/get_related_fields', params).then(res => {
+                    this.stateList = res.data
+                })
             },
             // 计算处理人类型需要排除的类型
             getExcludeRoleTypeList () {
@@ -286,25 +301,36 @@
                 })
             },
             handleVarClick (item, path) {
-                console.log(path)
+                this.formData[path] = '{{' + item.key + '}}'
                 this.$set(this.hookedVarList, path, false)
                 this.formKey = new Date().getTime()
             },
-            onSelectplugin () {
+            onSelectplugin (value) {
+                this.schema = {}
+                this.formData = {}
                 this.versionListLoading = true
                 this.basicInfo.version = ''
                 try {
-                    //
+                    const params = { plugin_code: value }
+                    this.$store.dispatch('bkPlugin/getPluginMeta', params).then(res => {
+                        this.versionList = res.data.versions
+                        this.versionListDisabled = false
+                    })
                 } catch (e) {
                     console.log(e)
                 } finally {
                     this.versionListLoading = false
                 }
             },
-            getFormInfo () {
+            getFormInfo: function (value) {
+                this.schema = {}
+                this.formData = {}
                 this.formLoading = true
                 try {
-                    //
+                    const params = { plugin_code: this.basicInfo.plugin, plugin_version: value }
+                    this.$store.dispatch('bkPlugin/getPluginDetail', params).then(res => {
+                        this.schema = res.data.inputs
+                    })
                 } catch (e) {
                     console.log(e)
                 } finally {
@@ -321,12 +347,41 @@
                 this.$parent.closeConfigur()
             },
             submit () {
+                const { value: processors, type: processors_type } = this.$refs.processors.getValue()
+                const bk_plugin_info = { plugin_code: this.basicInfo.plugin, version: this.basicInfo.version, inputs: this.formData, context: {} }
+                console.log()
                 if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
                     this.checkStatus.processors = true
                     return
                 }
                 const valid = this.$refs.bkForm.validateForm()
-                console.log(valid)
+                if (!valid) {
+                    return
+                }
+                const params = {
+                    name: this.basicInfo.nodeName,
+                    processors: processors || '',
+                    processors_type: processors_type || '',
+                    type: 'BK-PLUGIN',
+                    is_draft: false,
+                    extras: {
+                        bk_plugin_info: bk_plugin_info
+                    },
+                    variables: { outputs: [] },
+                    workflow: this.configur.workflow
+                }
+                const stateId = this.configur.id
+                this.$store.dispatch('cdeploy/putWebHook', { params, stateId }).then((res) => {
+                    this.$bkMessage({
+                        message: this.$t(`m.treeinfo["保存成功"]`),
+                        theme: 'success'
+                    })
+                    this.$parent.closeConfigur()
+                }, e => {
+                    console.log(e)
+                }).finally(() => {
+                    this.secondClick = false
+                })
             }
         }
     }
@@ -371,28 +426,26 @@
                 overflow: unset !important;
             }
             .var-select {
-                z-index: 999;
-                background: #fff;
-                width: 99%;
+                width: 492px;
+                height: 230px;
                 position: absolute;
-                top: 38px;
-                left: 5px;
-                min-height: 50px;
-                max-height: 150px;
-                overflow: auto;
-                font-size: 12px;
-                padding: 5px;
-                box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.4);
-                border: 1px soild #dcdee5;
+                border-radius: 4px;
+                background: #fff;
+                font-size: 14px;
+                border: 1px solid #c4c6cc;
+                top: 35px;
+                left: 71px;
+                z-index: 2000;
+                overflow-y: auto;
                 @include scroller;
                 ul {
+                    padding: 5px;
                     li {
-                        width: 100%;
-                        line-height: 20px;
-                        height: 20px;
-                        padding: 0 10px;
+                        height: 30px;
+                        cursor: pointer;
+                        color: #75777f;
                         &:hover {
-                            background-color: #eaf3ff;
+                            background-color: #e1ecff;
                             color: #3a84ff;
                         }
                     }
