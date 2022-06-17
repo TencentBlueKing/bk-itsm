@@ -94,7 +94,7 @@
                         <bk-select :disabled="!hookVarList[pipeline.id]" style="width: 200px;"
                             ext-cls="select-custom"
                             searchable
-                            :value="pipelineData[pipeline.id].replace(/^\$\{/, '').replace(/\}$/, '') || ''"
+                            :value="hookSelectList[pipeline.id].replace(/^\$\{/, '').replace(/\}$/, '') || ''"
                             @selected="changeConstant($event, pipeline)">
                             <bk-option v-for="option in stateList"
                                 :key="option.id"
@@ -264,7 +264,7 @@
                         this.getExcludeRoleTypeList()
                         this.configur.extras.devops_info.constants.forEach(item => {
                             this.$set(this.hookVarList, item.key, item.checked)
-                            this.$set(this.hookSelectList, item.key, item.value)
+                            this.$set(this.hookSelectList, item.key, item.checked ? item.value : '')
                         })
                     }
                 })
@@ -285,10 +285,12 @@
             onChangeChecked (value, pipeline) {
                 if (!value) {
                     this.pipelineData[pipeline.id] = pipeline.defaultValue
+                    this.hookSelectList[pipeline.id] = ''
                 }
             },
             changeConstant (value, pipeline) {
                 this.pipelineData[pipeline.id] = '${' + value + '}'
+                this.hookSelectList[pipeline.id] = value
             },
             // 计算处理人类型需要排除的类型
             getExcludeRoleTypeList () {
@@ -433,6 +435,7 @@
             display: none;
         }
         /deep/ .common-section-card-body {
+            width: 100%;
             padding: 20px;
         }
         /deep/ .bk-form-width {
