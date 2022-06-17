@@ -27,7 +27,13 @@ class Command(BaseCommand):
             return
 
         print("[bk-itsm]call fetch_apigw_public_key")
-        call_command("fetch_apigw_public_key")
+        try:
+            call_command("fetch_apigw_public_key")
+        except Exception:
+            print(
+                "[bk-itsm]this env has not bk-itsm esb api,skip fetch_apigw_public_key "
+            )
+            traceback.print_exc()
 
         print("[bk-itsm]call fetch_esb_public_key")
         try:
