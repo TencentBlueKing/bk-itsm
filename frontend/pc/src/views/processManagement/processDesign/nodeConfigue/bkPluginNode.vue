@@ -66,7 +66,7 @@
             </bk-form>
             <div class="bk-params-title">
                 <p>{{ $t(`m.treeinfo['输入参数']`) }}:</p>
-                <p>{{ $t(`m['执行蓝鲸插件需要填写的参数信息，可以使用 {{ 来使用流程内的变量']`) }}</p>
+                <p>{{ $t(`m['执行蓝鲸插件需要填写的参数信息']`) }}</p>
             </div>
             <BkRenderForm
                 class="bk-form-plugin"
@@ -114,9 +114,14 @@
                 <bk-table
                     :data="outputsData">
                     <bk-table-column label="名称" prop="title"></bk-table-column>
+                    <bk-table-column label="key">
+                        <template slot-scope="props">
+                            <p>{{props.$index}}</p>
+                        </template>
+                    </bk-table-column>
                     <bk-table-column label="设置为引用变量">
                         <template slot-scope="props">
-                            <bk-checkbox @change="onchangeOutputCheck($event, props)"></bk-checkbox>
+                            <bk-checkbox @change="onchangeOutputCheck($event, props)" v-model="outputsVarList[props.$index]"></bk-checkbox>
                         </template>
                     </bk-table-column>
                 </bk-table>
@@ -278,12 +283,12 @@
                     this.basicInfo.plugin = this.configur.extras.bk_plugin_info.plugin_code
                     this.onSelectplugin(this.basicInfo.plugin)
                     this.basicInfo.version = this.configur.extras.bk_plugin_info.version
-                    this.getFormInfo(this.basicInfo.version)
+                    this.getFormInfo(this.basicInfo.version, true)
                     this.formData = this.configur.extras.bk_plugin_info.inputs
-                    // this.outputsData = Object.keys(this.configur.extras.bk_plugin_info.inputs.properties).map(item => {
-                    //     console.log(item)
-                    //     return this.configur.extras.bk_plugin_info.inputs.properties[item]
-                    // })
+                    const outputs_var_list = this.configur.extras.outputs_var_list || {}
+                    Object.keys(outputs_var_list).map(item => {
+                        this.$set(this.outputsVarList, item, outputs_var_list[item])
+                    })
                     // console.log(this.outputsData)
                 }
             },
@@ -340,7 +345,6 @@
                 this.formData[path] = '{{' + item.key + '}}'
                 this.$set(this.hookedVarList, path, false)
                 this.formKey = new Date().getTime()
-                const data = Object.assign({}, this.formData)
             },
             onSelectplugin (value) {
                 this.schema = {}
@@ -359,7 +363,7 @@
                     this.versionListLoading = false
                 }
             },
-            getFormInfo: function (value) {
+            async getFormInfo (value, init = false) {
                 this.schema = {}
                 this.formData = {}
                 this.formLoading = true
@@ -371,9 +375,9 @@
                             this.$set(this.hookSelectList, item, '')
                         })
                         this.outputsData = res.data.outputs.properties
-                        Object.keys(res.data.outputs.properties).map(item => {
-                            this.$set(this.outputsVarList, item, false)
-                        })
+                        if (!init) {
+                            this.outputsVarList = {}
+                        }
                     })
                 } catch (e) {
                     console.log(e)
@@ -393,6 +397,22 @@
             submit () {
                 const { value: processors, type: processors_type } = this.$refs.processors.getValue()
                 const bk_plugin_info = { plugin_code: this.basicInfo.plugin, version: this.basicInfo.version, inputs: this.formData, context: {} }
+                const outputs = []
+
+                for (const item in this.outputsData) {
+                    if (!this.outputsVarList[item]) {
+                        continue
+                    }
+                    if (this.outputsVarList[item]) {
+                        outputs.push({
+                            name: this.outputsData[item].title,
+                            ref_path: 'resp.outputs.' + item,
+                            source: 'global',
+                            type: 'STRING'
+                        })
+                    }
+                }
+
                 if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
                     this.checkStatus.processors = true
                     return
@@ -408,9 +428,10 @@
                     type: 'BK-PLUGIN',
                     is_draft: false,
                     extras: {
-                        bk_plugin_info: bk_plugin_info
+                        bk_plugin_info: bk_plugin_info,
+                        outputs_var_list: this.outputsVarList
                     },
-                    variables: { outputs: [] },
+                    variables: { outputs: outputs },
                     workflow: this.configur.workflow
                 }
                 const stateId = this.configur.id
