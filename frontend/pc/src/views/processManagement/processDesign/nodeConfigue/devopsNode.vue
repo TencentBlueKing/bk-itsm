@@ -373,7 +373,8 @@
                             'value': this.pipelineData[item],
                             'name': item,
                             'key': item,
-                            'checked': this.hookVarList[item]
+                            'checked': this.hookVarList[item],
+                            'type': this.hookSelectList[item] !== '' ? 'variable' : 'custom'
                         }
                     })
                     const { value: processors, type: processors_type } = this.$refs.processors.getValue()
