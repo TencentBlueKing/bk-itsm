@@ -339,7 +339,6 @@
                     this.pipelineData = {}
                     this.pipelineFormList = res[0].data.properties
                     res[0].data.properties.forEach(item => {
-                        console.log(item)
                         if (init) item.defaultValue = this.configur.extras.devops_info.constants.filter(ite => ite.name === item.id)[0].value
                         this.$set(this.pipelineData, item.id, this.hookVarList[item.id] ? '${' + item.defaultValue + '}' : item.defaultValue)
                         this.pipelineRules[item.id] = [{
