@@ -199,6 +199,7 @@ class BkPluginService(ItsmBaseService):
         client = PluginServiceApiClient(plugin_code=plugin_code)
 
         try:
+            extras["context"]["executor"] = ticket.creator
             result, resp = client.invoke(version=version, data=extras)
         except Exception as e:
             err_message = "bk_plugin_info 请求失败, error={}".format(e)
@@ -254,7 +255,7 @@ class BkPluginService(ItsmBaseService):
         elif state == self.FAILED:
             # 失败, 退出
             err_message = "bk_plugin_info 执行失败，state == 5， message = {}".format(
-                resp.get("message")
+                resp.get("err")
             )
             self.do_exit_plugins(
                 ticket,
