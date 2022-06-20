@@ -868,3 +868,6 @@ except Exception:
 OPEN_VOICE_NOTICE = (
     True if os.getenv("BKAPP_OPEN_VOICE_NOTICE", "false").lower() == "true" else False
 )
+
+# 蓝鲸插件授权过滤 APP
+PLUGIN_DISTRIBUTOR_NAME = os.getenv("BKAPP_PLUGIN_DISTRIBUTOR_NAME", APP_CODE)
