@@ -256,7 +256,6 @@
                         this.basicInfo.businessId = res.data.filter(item => item.project_name === this.configur.extras.devops_info.project_id.name)[0].englishName
                         this.onSelectBusiness()
                         this.basicInfo.pipelineId = this.configur.extras.devops_info.pipeline_id.value
-                        this.getPipelineInfo(1)
                         this.processorsInfo = {
                             type: this.configur.processors_type,
                             value: this.configur.processors
@@ -266,6 +265,7 @@
                             this.$set(this.hookVarList, item.key, item.checked)
                             this.$set(this.hookSelectList, item.key, item.checked ? item.value : '')
                         })
+                        this.getPipelineInfo(1)
                     }
                 })
             },
@@ -339,8 +339,9 @@
                     this.pipelineData = {}
                     this.pipelineFormList = res[0].data.properties
                     res[0].data.properties.forEach(item => {
+                        console.log(item)
                         if (init) item.defaultValue = this.configur.extras.devops_info.constants.filter(ite => ite.name === item.id)[0].value
-                        this.$set(this.pipelineData, item.id, item.defaultValue)
+                        this.$set(this.pipelineData, item.id, this.hookVarList[item.id] ? '${' + item.defaultValue + '}' : item.defaultValue)
                         this.pipelineRules[item.id] = [{
                             required: item.required,
                             message: i18n.t('m.treeinfo["字段必填"]'),
@@ -370,7 +371,7 @@
                     const pipelineData = this.pipelineList.filter(item => item.pipelineId === this.basicInfo.pipelineId)[0]
                     const constants = Object.keys(this.pipelineData).map(item => {
                         return {
-                            'value': this.pipelineData[item],
+                            'value': this.pipelineData[item].slice(2, this.pipelineData[item].length - 1),
                             'name': item,
                             'key': item,
                             'checked': this.hookVarList[item],
