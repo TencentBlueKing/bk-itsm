@@ -388,6 +388,11 @@
                     const params = { plugin_code: this.basicInfo.plugin, plugin_version: value }
                     this.$store.dispatch('bkPlugin/getPluginDetail', params).then(res => {
                         this.schema = res.data.inputs
+                        Object.keys(this.schema.properties).map(item => {
+                            if (this.schema.properties[item].type === 'integer') {
+                                this.schema.properties[item].type = 'string'
+                            }
+                        })
                         if (Object.keys(res.data.outputs.properties).length !== 0) {
                             this.outputsData = Object.keys(res.data.outputs.properties).map(item => {
                                 const items = {
