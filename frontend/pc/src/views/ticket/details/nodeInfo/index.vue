@@ -111,6 +111,11 @@
                         :api-info="item.api_info"
                         :node-info="item">
                     </web-hook-info>
+                    <bk-plugin-info
+                        v-else-if="item.type === 'BK-PLUGIN'"
+                        :api-info="item.api_info"
+                        :node-info="item">
+                    </bk-plugin-info>
                     <sopsNodeInfo
                         v-else
                         :api-info="item.api_info"
@@ -143,6 +148,7 @@
     import signNodeInfo from './signNodeInfo'
     import approvalNodeInfo from './approvalNodeInfo'
     import webHookInfo from './webHookInfo.vue'
+    import bkPluginInfo from './bkPluginInfo.vue'
     import { errorHandler } from '@/utils/errorHandler'
 
     export default {
@@ -155,7 +161,8 @@
             signNodeInfo,
             approvalNodeInfo,
             devopsNodeInfo,
-            webHookInfo
+            webHookInfo,
+            bkPluginInfo
         },
         props: {
             readOnly: Boolean,

@@ -68,7 +68,7 @@
                 <p>{{ $t(`m.treeinfo['输入参数']`) }}:</p>
                 <p>{{ $t(`m['执行蓝鲸插件需要填写的参数信息']`) }}</p>
             </div>
-            <template v-if="Object.keys(schema.properties || {}).length !== 0">
+            <template v-if="Object.keys(schema).length !== 0">
                 <BkRenderForm
                     class="bk-form-plugin"
                     v-model="formData"
@@ -233,11 +233,7 @@
                 stateList: [
                 ], // 引用变量
                 // 这是个测试的schema
-                schema: {
-                    type: 'object',
-                    properties: {
-                    }
-                },
+                schema: {},
                 layout: [],
                 outputsData: [],
                 outputsVarList: {},
