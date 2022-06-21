@@ -111,7 +111,9 @@ class PluginServiceApiClient:
         return {"result": True, "message": None, "data": result}
 
     @staticmethod
-    def get_plugin_list(search_term=None, limit=100, offset=0):
+    def get_plugin_list(
+        search_term=None, limit=100, offset=0, distributor_code_name=None
+    ):
         """获取插件服务列表"""
         # 如果不启动插件服务，直接返回空列表
         if not env.USE_PLUGIN_SERVICE == "1":
@@ -121,7 +123,11 @@ class PluginServiceApiClient:
                 "data": {"count": 0, "plugins": []},
             }
         result = PluginServiceApiClient.get_paas_plugin_info(
-            search_term=search_term, environment="prod", limit=limit, offset=offset
+            search_term=search_term,
+            environment="prod",
+            limit=limit,
+            offset=offset,
+            distributor_code_name=distributor_code_name,
         )
         if result.get("result") is False:
             return result
@@ -216,7 +222,12 @@ class PluginServiceApiClient:
     @staticmethod
     @json_response_decoder
     def get_paas_plugin_info(
-        plugin_code=None, environment=None, limit=100, offset=0, search_term=None
+        plugin_code=None,
+        environment=None,
+        limit=100,
+        offset=0,
+        search_term=None,
+        distributor_code_name=None,
     ):
         """可支持通过PaaS平台请求获取插件服务列表或插件详情"""
         url, params = PluginServiceApiClient._prepare_paas_api_request(
@@ -228,6 +239,8 @@ class PluginServiceApiClient:
             params.update({"limit": limit, "offset": offset, "has_deployed": True})
             if search_term:
                 params.update({"search_term": search_term})
+            if distributor_code_name:
+                params.update({"distributor_code_name": distributor_code_name})
         return PluginServiceApiClient._request_api_and_error_retry(
             url, method="get", params=params
         )

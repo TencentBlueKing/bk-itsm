@@ -95,12 +95,12 @@
                             @change="onChangeChecked($event, path ,schemaField)">
                         </bk-checkbox>
                         <bk-select :disabled="!hookVarList[path]" style="width: 200px;"
-                            :value="hookSelectList[path].replace(/^\$\{/, '').replace(/\}$/, '')"
+                            :value="( hookSelectList[path] || '' ).replace(/^\{\{/, '').replace(/\}\}/, '')"
                             ext-cls="select-custom"
                             searchable
                             @selected="changeConstant($event, path ,schemaField)">
                             <bk-option v-for="option in stateList"
-                                :key="option.id"
+                                :key="option.key"
                                 :id="option.key"
                                 :name="option.name">
                             </bk-option>
@@ -229,6 +229,7 @@
                 },
                 formKey: '',
                 hookedVarList: {},
+                initForm: {},
                 stateList: [
                 ], // 引用变量
                 // 这是个测试的schema
@@ -279,7 +280,8 @@
                     this.basicInfo.plugin = this.configur.extras.bk_plugin_info.plugin_code
                     this.onSelectplugin(this.basicInfo.plugin)
                     this.basicInfo.version = this.configur.extras.bk_plugin_info.version
-                    this.getFormInfo(this.basicInfo.version, true)
+                    this.initForm = true
+                    this.getFormInfo(this.basicInfo.version)
                     this.formData = this.configur.extras.bk_plugin_info.inputs
                     this.primarySchema = this.configur.extras.bk_plugin_info.inputs
                     this.schema = this.primarySchema
@@ -290,6 +292,10 @@
                     })
                     Object.keys(input_var_list).map(item => {
                         this.$set(this.hookVarList, item, input_var_list[item])
+                        if (input_var_list[item]) {
+                            this.hookSelectList[item] = this.formData[item]
+                        }
+                        console.log(this.hookSelectList)
                     })
                 }
             },
@@ -304,7 +310,6 @@
                 })
             },
             onChangeChecked (value, path, schema) {
-                console.log(this.schema)
                 const data = Object.assign({}, this.formData)
                 if (value) {
                     if (schema.type === 'integer') {
@@ -317,14 +322,13 @@
                 if (!value) {
                     this.hookSelectList[path] = ''
                 }
-                console.log(this.schema)
                 this.formKey = new Date().getTime()
             },
             changeConstant (value, path, schema) {
                 if (schema.type === 'integer') {
                     schema.type = 'string'
                 }
-                this.hookSelectList[path] = '${' + value + '}'
+                this.hookSelectList[path] = '{{' + value + '}}'
                 this.formData[path] = this.hookSelectList[path]
                 Object.assign(schema, { 'ui:component': { name: 'bk-input', props: { disabled: true, value: this.hookSelectList[path] } } })
                 this.formKey = new Date().getTime()
@@ -342,11 +346,6 @@
                 } else {
                     excludeProcessor = ['OPEN']
                 }
-                // 是否使用权限中心角色
-                // if (!this.flowInfo.is_iam_used) {
-                //     excludeProcessor.push('IAM')
-                // }
-                // 处理场景如果不是'DISTRIBUTE_THEN_PROCESS' || 'DISTRIBUTE_THEN_CLAIM'，则去掉派单人指定
                 if (this.configur.distribute_type !== 'DISTRIBUTE_THEN_PROCESS' && this.configur.distribute_type !== 'DISTRIBUTE_THEN_CLAIM') {
                     excludeProcessor.push('BY_ASSIGNOR')
                 }
@@ -377,7 +376,7 @@
                     this.versionListLoading = false
                 }
             },
-            async getFormInfo (value, init = false) {
+            async getFormInfo (value) {
                 this.schema = {}
                 this.formData = {}
                 this.formLoading = true
@@ -385,9 +384,6 @@
                     const params = { plugin_code: this.basicInfo.plugin, plugin_version: value }
                     this.$store.dispatch('bkPlugin/getPluginDetail', params).then(res => {
                         this.schema = res.data.inputs
-                        Object.keys(this.schema.properties).map(item => {
-                            this.$set(this.hookSelectList, item, '')
-                        })
                         if (Object.keys(res.data.outputs.properties).length !== 0) {
                             this.outputsData = Object.keys(res.data.outputs.properties).map(item => {
                                 const items = {
@@ -399,9 +395,12 @@
                         } else {
                             this.outputsData = []
                         }
-                        if (!init) {
+                        if (!this.initForm) {
                             this.outputsVarList = {}
+                            this.hookSelectList = {}
+                            this.hookVarList = {}
                         }
+                        this.initForm = false
                     })
                 } catch (e) {
                     console.log(e)
@@ -423,7 +422,6 @@
                 const bk_plugin_info = { plugin_code: this.basicInfo.plugin, version: this.basicInfo.version, inputs: this.formData, context: {} }
                 const outputs = []
                 this.outputsData.forEach(item => {
-                    console.log(item)
                     if (!this.outputsVarList[item.key]) {
                         return
                     }
@@ -440,9 +438,11 @@
                     this.checkStatus.processors = true
                     return
                 }
-                const valid = this.$refs.bkForm.validateForm()
-                if (!valid) {
-                    return
+                if (this.$refs.bkForm) {
+                    const valid = this.$refs.bkForm.validateForm()
+                    if (!valid) {
+                        return
+                    }
                 }
                 const params = {
                     name: this.basicInfo.nodeName,

@@ -21,6 +21,7 @@ from rest_framework.response import Response
 from itsm.plugin_service import env
 from itsm.plugin_service.conf import PLUGIN_LOGGER
 from itsm.plugin_service.api_decorators import inject_plugin_client, validate_params
+from itsm.plugin_service.env import PLUGIN_DISTRIBUTOR_NAME
 from itsm.plugin_service.exceptions import PluginServiceException
 from itsm.plugin_service.plugin_client import PluginServiceApiClient
 from itsm.plugin_service.serializers import (
@@ -54,7 +55,10 @@ def get_plugin_list(request: Request):
     limit = request.validated_data.get("limit")
     offset = request.validated_data.get("offset")
     result = PluginServiceApiClient.get_plugin_list(
-        search_term=search_term, limit=limit, offset=offset
+        search_term=search_term,
+        limit=limit,
+        offset=offset,
+        distributor_code_name=PLUGIN_DISTRIBUTOR_NAME,
     )
     return JsonResponse(result)
 
