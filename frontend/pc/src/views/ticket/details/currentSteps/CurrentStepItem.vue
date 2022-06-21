@@ -133,6 +133,14 @@
                             @reloadTicket="reloadTicket"
                             @onChangeHook="onChangeHook">
                         </sops-and-devops-task>
+                        <bkPluginTask
+                            v-if="nodeInfo.type === 'BK-PLUGIN'"
+                            :ticket-info="ticketInfo"
+                            :node-info="nodeInfo"
+                            :workflow="workflow"
+                            @reloadTicket="reloadTicket"
+                            @onChangeHook="onChangeHook">
+                        </bkPluginTask>
                         <!-- api 节点处理 -->
                         <api-node-handle-body
                             v-if="nodeInfo.type === 'TASK'"
@@ -246,6 +254,7 @@
 </template>
 
 <script>
+    import bkPluginTask from './nodetask/bkPlugintask.vue'
     import collapseTransition from '@/utils/collapse-transition.js'
     import fieldInfo from '@/views/managePage/billCom/fieldInfo.vue'
     import fieldsDone from '../components/fieldsDone.vue'
@@ -271,7 +280,8 @@
             TicketTriggerDialog,
             NodeDealDialog,
             NodeTaskList,
-            sopsAndDevopsTask
+            sopsAndDevopsTask,
+            bkPluginTask
         },
         mixins: [commonMix],
         inject: ['reload'],
