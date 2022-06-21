@@ -314,7 +314,7 @@ class WorkflowManager(Manager):
         content.update(is_draft=False)
         return self.create(**content)
 
-    def restore(self, data, operator="", for_migrate=False):
+    def restore(self, data, operator="", for_migrate=False, name=None):
         """WorkflowVersion->Workflow's record"""
         case_one = (
             data.get("is_builtin")
@@ -331,10 +331,10 @@ class WorkflowManager(Manager):
             )
             print("workflow exist, skip restore workflow {}".format(data.get("name")))
             return
-        return self.clone(data, operator, for_migrate)
+        return self.clone(data, operator, for_migrate, name)
 
     @transaction.atomic
-    def clone(self, data, operator="", for_migrate=False):
+    def clone(self, data, operator="", for_migrate=False, name=None):
         from django.db.models.signals import post_save
         from itsm.workflow.signals.handlers import init_after_workflow_created
         from itsm.workflow.models import (
@@ -391,6 +391,10 @@ class WorkflowManager(Manager):
             else "{name}-{version_number}".format(**data),
             version_number=create_version_number(),
         )
+
+        if name is not None:
+            data.update(name=name)
+
         old_workflow_id = data.pop("workflow_id")
         old_state_ids = list(states.keys())
         # 临时关闭post_save信号：init_after_workflow_created，恢复workflow
