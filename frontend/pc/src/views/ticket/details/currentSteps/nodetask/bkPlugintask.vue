@@ -109,14 +109,16 @@
             submit () {
                 this.$refs.form.validate().then(() => {
                     const params = {
-                        inputs: {},
-                        // context: {},
-                        // plugin_code: '',
-                        // version: '',
+                        inputs: {
+                            inputs: {},
+                            context: {},
+                            plugin_code: this.nodeInfo.contexts.build_params.plugin_code,
+                            version: this.nodeInfo.contexts.build_params.version
+                        },
                         state_id: this.nodeInfo.state_id
                     }
                     Object.keys(this.formData).map(item => {
-                        params.inputs[item] = this.formData[item]
+                        params.inputs.inputs[item] = this.formData[item]
                     })
                     this.retry(params)
                 })
