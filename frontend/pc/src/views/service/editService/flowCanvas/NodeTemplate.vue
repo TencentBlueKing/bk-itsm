@@ -147,9 +147,9 @@
                     { type: 'ROUTER', iconStyle: 'icon-icon-person' },
                     { type: 'TASK', iconStyle: 'icon-api-icon' },
                     { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
-                    { type: 'WEBHOOK', iconStyle: 'icon-webhook-2' },
+                    { type: 'WEBHOOK', iconStyle: 'icon-webhookjiedian' },
                     { type: 'TASK-DEVOPS', iconStyle: 'icon-devops-task-icon' },
-                    { type: 'BK-PLUGIN', iconStyle: 'icon-itsm-icon-three-five' },
+                    { type: 'BK-PLUGIN', iconStyle: 'icon-chajianjiedian' },
                     { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
                     { type: 'SIGN', iconStyle: 'icon-sign-node-white f18' }
                 ],
@@ -159,8 +159,8 @@
                     { type: 'TASK-SOPS', name: this.$t(`m.treeinfo["标准运维节点"]`), iconStyle: 'icon-task-icon' },
                     { type: 'TASK-DEVOPS', name: this.$t(`m["蓝盾节点"]`), iconStyle: 'icon-devops-task-icon' },
                     { type: 'SIGN', name: this.$t(`m.treeinfo['会签节点']`), iconStyle: 'icon-sign-node' },
-                    { type: 'WEBHOOK', name: this.$t(`m['WEBHOOK节点']`), iconStyle: 'icon-webhook-2' },
-                    { type: 'BK-PLUGIN', name: this.$t(`m['蓝鲸插件节点']`), iconStyle: 'icon-itsm-icon-three-five' },
+                    { type: 'WEBHOOK', name: this.$t(`m['WEBHOOK节点']`), iconStyle: 'icon-webhookjiedian' },
+                    { type: 'BK-PLUGIN', name: this.$t(`m['蓝鲸插件节点']`), iconStyle: 'icon-chajianjiedian' },
                     { type: 'APPROVAL', name: this.$t(`m.treeinfo['审批节点']`), iconStyle: 'icon-approval-node' },
                     { type: 'COVERAGE', name: this.$t(`m.treeinfo["汇聚网关"]`), iconStyle: 'icon-flow-branch' },
                     { type: 'ROUTER-P', name: this.$t(`m.treeinfo["并行网关"]`), iconStyle: 'icon-flow-convergence' },
@@ -355,5 +355,11 @@
 
     .bk-font-style {
         font-size: 24px;
+    }
+    .icon-webhookjiedian {
+        font-size: 34px;
+    }
+    .icon-chajianjiedian {
+        font-size: 34px;
     }
 </style>

@@ -134,7 +134,7 @@
                             @onChangeHook="onChangeHook">
                         </sops-and-devops-task>
                         <bkPluginTask
-                            v-if="nodeInfo.type === 'BK-PLUGIN'"
+                            v-if="nodeInfo.type === 'BK-PLUGIN' && nodeInfo.status === 'FAILED'"
                             :ticket-info="ticketInfo"
                             :node-info="nodeInfo"
                             :workflow="workflow"
@@ -426,12 +426,8 @@
                 if (this.nodeInfo.sla_task_status === 2 && this.nodeInfo.is_reply_need === true) {
                     return false
                 }
-                if (this.nodeInfo.type === 'TASK-SOPS' && this.nodeInfo.status === 'RUNNING') {
-                    return false
-                }
-                if (this.nodeInfo.type === 'TASK-DEVOPS' && this.nodeInfo.status === 'RUNNING') {
-                    return false
-                }
+                const nodeType = ['TASK-SOPS', 'TASK-DEVOPS', 'BK-PLUGIN', 'WEBHOOK']
+                if (nodeType.includes(this.nodeInfo.type) && this.nodeInfo.status === 'RUNNING') return false
                 return true
             }
         },
