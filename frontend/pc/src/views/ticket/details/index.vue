@@ -423,7 +423,7 @@
                     id: this.ticketId,
                     token: this.token || undefined
                 }
-                this.$store.dispatch('deployOrder/getNodeList', params).then(async res => {
+                this.$store.dispatch('deployOrder/getOnlyTicketNodeInfo', params).then(async res => {
                     const newNodeList = res.data
                     const oldNodeList = this.nodeList
                     const nodeStatusHasUpdate = newNodeList.some(node => {
@@ -464,7 +464,7 @@
                     id: this.ticketId,
                     token: this.token || undefined
                 }
-                return this.$store.dispatch('deployOrder/getNodeList', params).then((res) => {
+                return this.$store.dispatch('deployOrder/getOnlyTicketNodeInfo', params).then((res) => {
                     this.updateNodeList(res.data)
                 }).catch((res) => {
                     errorHandler(res, this)
