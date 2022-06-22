@@ -4,7 +4,7 @@ from rest_framework import serializers
 from django.utils.translation import ugettext as _
 
 from itsm.component.exceptions import ParamError
-from itsm.service.models import ServiceCatalog
+from itsm.service.models import ServiceCatalog, Service
 from itsm.service.serializers import ServiceSerializer
 from itsm.service.validators import key_validator
 from itsm.workflow.models import (
@@ -29,13 +29,26 @@ class OpenApiServiceSerializer(ServiceSerializer):
         max_length=LEN_LONG,
         validators=[key_validator],
     )
+    workflow_meta = serializers.JSONField(required=False)
 
     @transaction.atomic
     def create(self, validated_data):
         """创建后立即绑定"""
 
-        # 初始化一个流程
-        work_flow_instance = self.init_work_flow(validated_data)
+        if "workflow_meta" in validated_data:
+            if Workflow.objects.filter(
+                name=validated_data["workflow_meta"]["name"]
+            ).exists():
+                raise serializers.ValidationError(
+                    {str(_("参数校验失败")): _("系统中已存在同名流程，请尝试换个流程名称")}
+                )
+            work_flow_instance = Workflow.objects.restore(
+                validated_data["workflow_meta"],
+                name=validated_data["workflow_meta"]["name"],
+            )[0]
+        else:
+            # 初始化一个流程
+            work_flow_instance = self.init_work_flow(validated_data)
 
         # 创建一个新的流程版本
         version = work_flow_instance.create_version()
@@ -44,10 +57,15 @@ class OpenApiServiceSerializer(ServiceSerializer):
         validated_data["is_valid"] = False
         validated_data["key"] = "request"
 
+        validated_data.pop("workflow_meta")
+
         instance = super(ServiceSerializer, self).create(validated_data)
-        catalog_id = ServiceCatalog.objects.get(
-            key="{}_FUWUFANKUI".format(instance.project_key)
-        ).id
+        if validated_data["project_key"] != "0":
+            catalog_id = ServiceCatalog.objects.get(
+                key="{}_FUWUFANKUI".format(instance.project_key)
+            ).id
+        else:
+            catalog_id = ServiceCatalog.objects.get(key="FUWUFANKUI").id
         instance.bind_catalog(catalog_id, instance.project_key)
 
         return instance
@@ -57,6 +75,7 @@ class OpenApiServiceSerializer(ServiceSerializer):
             raise serializers.ValidationError(
                 {str(_("参数校验失败")): _("系统中已存在同名流程，请尝试换个流程名称")}
             )
+
         work_flow_instance = Workflow.objects.create(
             name=validated_data["name"],
             desc="",
@@ -73,6 +92,31 @@ class OpenApiServiceSerializer(ServiceSerializer):
             updated_by=validated_data["updated_by"],
         )
         return work_flow_instance
+
+    class Meta:
+        model = Service
+        fields = (
+            "id",
+            "key",
+            "name",
+            "desc",
+            "workflow",
+            "workflow_name",
+            "version_number",
+            "bounded_catalogs",
+            "bounded_relations",
+            "catalog_id",
+            "is_valid",
+            "display_type",
+            "display_role",
+            "owners",
+            "can_ticket_agency",
+            "sla",
+            "source",
+            "project_key",
+            "workflow_meta",
+        ) + model.DISPLAY_FIELDS
+        read_only_fields = model.DISPLAY_FIELDS
 
 
 class CustomFieldValidator(FieldValidator):
