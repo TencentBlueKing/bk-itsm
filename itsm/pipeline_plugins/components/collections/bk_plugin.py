@@ -180,7 +180,7 @@ class BkPluginService(ItsmBaseService):
 
         try:
             extras = self.build_params(bk_plugin_info, ticket)
-            self.update_info(current_node, build_params=extras)
+            self.update_info(current_node, build_params=copy.deepcopy(extras))
         except Exception as e:
             err_message = "bk_plugin_info 解析失败, error={}".format(e)
             self.do_exit_plugins(
