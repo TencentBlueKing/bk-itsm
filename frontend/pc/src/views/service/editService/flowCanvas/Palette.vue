@@ -48,7 +48,7 @@
         </li>
         <li v-bk-tooltips.right="$t(`m['WEBHOOK节点']`)">
             <div class="entry-item entry-gateway" data-type="WEBHOOK" style="margin: 12px 0 2px;">
-                <i class="bk-itsm-icon icon-webhook-2" style="font-size: 33px;"></i>
+                <i class="bk-itsm-icon icon-webhookjiedian plugin" style="font-size: 42px;"></i>
             </div>
         </li>
         <li v-bk-tooltips.right="$t(`m.treeinfo['标准运维节点']`)">
@@ -74,7 +74,7 @@
         </li>
         <li v-bk-tooltips.right="$t(`m['蓝鲸插件节点']`)">
             <div class="entry-item entry-gateway" data-type="BK-PLUGIN" style="margin: 12px 0 2px;">
-                <i class="bk-itsm-icon icon-itsm-icon-three-five" style="font-size: 26px;"></i>
+                <i class="bk-itsm-icon icon-chajianjiedian plugin" style="font-size: 42px"></i>
             </div>
         </li>
         <li v-bk-tooltips.right="$t(`m.treeinfo['并行网关']`)">
@@ -131,6 +131,12 @@
                 &:hover {
                     color: #3A84FF;
                 }
+            }
+            .plugin {
+                display: block;
+                margin-top: -8px;
+                margin-left: -4px;
+                font-size: 42px;
             }
         }
         .entry-item {

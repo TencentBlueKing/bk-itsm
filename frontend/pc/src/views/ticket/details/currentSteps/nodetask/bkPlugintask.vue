@@ -108,15 +108,16 @@
             },
             submit () {
                 this.$refs.form.validate().then(() => {
-                    console.log('sds')
                     const params = {
                         inputs: {},
+                        // context: {},
+                        // plugin_code: '',
+                        // version: '',
                         state_id: this.nodeInfo.state_id
                     }
                     Object.keys(this.formData).map(item => {
                         params.inputs[item] = this.formData[item]
                     })
-                    console.log(params)
                     this.retry(params)
                 })
             }
