@@ -792,7 +792,7 @@ class Status(Model):
         """是否在审批/派单/认领列表中"""
         return username in self.get_processors()
 
-    def get_sign_display_processors(self, operator):
+    def get_sign_display_processors(self):
         """获取会签节点处理人/角色显示名称"""
         display_name = ""
         if self.processors_type in ["GENERAL", "CMDB"]:
@@ -823,12 +823,6 @@ class Status(Model):
                 display_name = transform_username(users)
             else:
                 user_list = [user for user in users.split(",") if user]
-                if operator in user_list:
-                    operator_index = user_list.index(operator)
-                    user_list[0], user_list[operator_index] = (
-                        user_list[operator_index],
-                        user_list[0],
-                    )
                 display_name = transform_username(user_list)
 
         if self.processors_type == "ORGANIZATION":
