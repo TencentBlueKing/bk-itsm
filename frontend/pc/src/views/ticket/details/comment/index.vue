@@ -51,7 +51,7 @@
         <bk-button v-show="isShowEditor" class="submit" :theme="'primary'" @click="submit">{{ isEditEditor ? $t('m["发布"]') : $t('m["返回"]') }}</bk-button>
         <bk-divider></bk-divider>
         <div>{{ $t('m["全部评论"]') }}</div>
-        <ul v-bkloading="{ isLoading: commentLoading }" v-show="commentList.length !== 0" class="comment-list" :style="isShowEditor ? isReplyComment ? 'height: calc(100vh - 820px)': 'height: calc(100vh - 729px)' : 'height: calc(100vh - 647px)'">
+        <ul v-bkloading="{ isLoading: commentLoading }" v-show="commentList.length !== 0" class="comment-list">
             <li v-for="(item, index) in commentList" :key="index" :class="[{ 'twinkling': flash[item.id] }]">
                 <comment-item
                     :comment-list="commentList"
@@ -237,7 +237,8 @@
                 // 获取parent的评论下标
                 const curCommentIndex = this.commentList.indexOf(this.commentList.filter(item => item.id === curComment.parent)[0])
                 if (curCommentIndex !== -1) {
-                    const commentListDom = document.querySelector('.comment-list')
+                    const commentListDom = document.querySelector('.ticket-container-left')
+                    const baseInfoDom = document.querySelector('.base-info-content')
                     const heights = Array.from(commentListDom.childNodes).slice(0, curCommentIndex).map(item => {
                         return item.clientHeight
                     })
@@ -247,7 +248,7 @@
                         this.$set(this.flash, curComment.parent__id, false)
                         clearTimeout(timer)
                     }, 2000)
-                    commentListDom.scrollTop = sumHeight + 50
+                    commentListDom.scrollTop = sumHeight + 340 + baseInfoDom.offsetHeight
                 } else {
                     this.$emit('addTargetComment', curComment)
                 }
@@ -348,10 +349,7 @@
             }
         }
         .comment-list {
-            overflow: auto;
-            height: calc(100vh - 647px);
             @include scroller;
-            // min-height: 100px;
             li {
                 padding-top: 20px;
             }
