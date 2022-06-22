@@ -2620,5 +2620,6 @@ export const m = {
     '字段配置': 'Field config',
     '字段属性': 'Field properties',
     '为必选项!': 'Required!',
-    '必选项': 'Required'
+    '必选项': 'Required',
+    '此操作不可撤销，确定要删除吗？': 'This action is irreversible. Are you sure you want to delete it?'
 }
