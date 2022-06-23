@@ -116,6 +116,7 @@
     import { errorHandler } from '@/utils/errorHandler.js'
     import { deepClone } from '@/utils/util'
     import leftTicketContent from './leftTicketContent.vue'
+    import bus from '@/utils/bus'
 
     export default {
         name: 'TicketDetail',
@@ -215,6 +216,9 @@
                     this.curCommentLength = val.length
                 }
             },
+            '$route' (val) {
+                console.log(val)
+            },
             ticketInfo: {
                 handler (val) {
                     if (Object.keys(val).length !== 0) {
@@ -229,6 +233,25 @@
                 },
                 immediate: true
             }
+        },
+        created () {
+            bus.$on('getIsProcessStatus', data => {
+                const { id, step_id } = data.config.params
+                const params = {
+                    id,
+                    step_id
+                }
+                this.$store.dispatch('ticket/getTicktProcessStatus', { params }).then(res => {
+                    if (res.data.is_processor) {
+                        this.$bkInfo({
+                            type: 'warning',
+                            title: '已被处理'
+                        })
+                    } else {
+                        bus.$emit('processData', data)
+                    }
+                })
+            })
         },
         async mounted () {
             await this.initData()
@@ -459,10 +482,12 @@
                 this.loading.ticketLoading = true
                 const params = {
                     id: this.ticketId,
+                    step_id: this.$route.query.step_id || undefined,
                     token: this.token || undefined
                 }
 
                 await this.$store.dispatch('change/getOrderDetails', params).then((res) => {
+                    console.log(res)
                     this.ticketInfo = res.data
                 }).catch((res) => {
                     // 显示 404 页面
