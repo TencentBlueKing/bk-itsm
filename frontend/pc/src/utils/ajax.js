@@ -46,6 +46,24 @@ if (location.hash.indexOf('token') !== -1) {
     const token = location.hash.split('token=')[1].split('&')[0]
     sessionStorage.setItem('itsm_token', token)
 }
+bus.$on('processData', response => {
+    const permissions = response.data.permission
+    let isViewApply = false
+    let viewType = 'other'
+    if (permissions.actions.find(item => item.id === 'project_view')) {
+        viewType = 'project'
+        isViewApply = true
+    } else {
+        isViewApply = permissions.actions.some(item => {
+            return ['project_view', 'operational_data_view'].includes(item.id)
+        })
+    }
+    if (isViewApply) {
+        bus.$emit('togglePermissionApplyPage', true, viewType, permissions)
+    } else {
+        bus.$emit('showPermissionModal', permissions)
+    }
+})
 
 /**
  * request interceptor
@@ -101,21 +119,14 @@ instance.interceptors.response.use(response => {
                 bus.$emit('api-error:application-deployed')
                 break
             case 499:
-                const permissions = response.data.permission
-                let isViewApply = false
-                let viewType = 'other'
-                if (permissions.actions.find(item => item.id === 'project_view')) {
-                    viewType = 'project'
-                    isViewApply = true
+                if (response.config.url.match(/^(ticket\/receipts\/)*[0-9]*\/$/)) {
+                    if ('step_id' in response.config.params) {
+                        bus.$emit('getIsProcessStatus', response)
+                    } else {
+                        bus.$emit('processData', response)
+                    }
                 } else {
-                    isViewApply = permissions.actions.some(item => {
-                        return ['project_view', 'operational_data_view'].includes(item.id)
-                    })
-                }
-                if (isViewApply) {
-                    bus.$emit('togglePermissionApplyPage', true, viewType, permissions)
-                } else {
-                    bus.$emit('showPermissionModal', permissions)
+                    bus.$emit('processData', response)
                 }
                 break
         }
