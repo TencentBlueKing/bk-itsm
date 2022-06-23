@@ -214,6 +214,20 @@
                 if (val.length > 0) {
                     this.curCommentLength = val.length
                 }
+            },
+            ticketInfo: {
+                handler (val) {
+                    if (Object.keys(val).length !== 0) {
+                        const stepIdList = val.current_steps.map(item => item.id)
+                        if (stepIdList.length !== 0) {
+                            this.$router.replace({
+                                path: this.$route.path,
+                                query: Object.assign({}, this.$route.query, { step_id: stepIdList.toString() })
+                            })
+                        }
+                    }
+                },
+                immediate: true
             }
         },
         async mounted () {
