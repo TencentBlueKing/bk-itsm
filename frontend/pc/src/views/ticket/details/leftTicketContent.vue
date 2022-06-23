@@ -97,7 +97,6 @@
             <order-preview
                 v-if="isShow"
                 :basic-infomation="ticketInfo"
-                :node-list="nodeList"
                 :current-step-list="currentStepList"
                 @reloadTicket="reloadTicket">
             </order-preview>

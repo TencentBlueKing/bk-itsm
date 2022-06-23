@@ -1432,6 +1432,21 @@ class TicketModelViewSet(ModelViewSet):
         return self.states_response(ticket, request, detail=True)
 
     @action(detail=True, methods=["get"])
+    def states_status(self, request, *args, **kwargs):
+        # 返回所有节点的from_transition_id, state_id, status 字段
+
+        ticket = self.get_object()
+        transitions_map = ticket.pipeline_data.get("transitions_map", {})
+        if ticket.flow.engine_version == DEFAULT_ENGINE_VERSION:
+            status_list = ticket.node_status.values(
+                "id", "state_id", "status", "by_flow"
+            )
+            for status in status_list:
+                status["from_transition_id"] = transitions_map.get(status["by_flow"])
+
+        return Response(list(status_list))
+
+    @action(detail=True, methods=["get"])
     def transitions(self, request, *args, **kwargs):
         """
         单据流转经过的连线列表查询
