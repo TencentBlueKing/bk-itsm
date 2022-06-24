@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from rest_framework.routers import DefaultRouter
 
+from itsm.openapi.base_service.views.apigw import ApiGwViewSet
 from itsm.openapi.base_service.views.field import FieldViewSet
 from itsm.openapi.base_service.views.role import RoleTypeModelViewSet
 from itsm.openapi.base_service.views.service import ServiceViewSet
@@ -40,5 +41,6 @@ routers.register(r"state", StateViewSet, basename="state")
 routers.register(r"field", FieldViewSet, basename="field")
 routers.register(r"transition", TransitionViewSet, basename="transition")
 routers.register(r"role_type", RoleTypeModelViewSet, basename="role_type")
+routers.register(r"api_gateway", ApiGwViewSet, basename="api_gateway")
 
 urlpatterns = routers.urls
