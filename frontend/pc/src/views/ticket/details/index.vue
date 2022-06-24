@@ -254,22 +254,20 @@
         },
         created () {
             bus.$on('getIsProcessStatus', data => {
-                this.isShowDialog = true
-                this.noPermitResp = deepClone(data)
-                // const { id, step_id } = data.config.params
-                // const params = {
-                //     id,
-                //     step_id
-                // }
-                // this.$store.dispatch('ticket/getTicketProcessStatus', { params }).then(res => {
-                //     if (res.data.is_processor) {
-                //         this.processedUser = res.data.processed_user
-                //         this.isShowDialog = true
-                //         this.noPermitResp = deepClone(data)
-                //     } else {
-                //         bus.$emit('processData', data)
-                //     }
-                // })
+                const { id, step_id } = data.config.params
+                const params = {
+                    id,
+                    step_id
+                }
+                this.$store.dispatch('ticket/getTicketProcessStatus', { params }).then(res => {
+                    if (res.data.is_processor) {
+                        this.processedUser = res.data.processed_user
+                        this.isShowDialog = true
+                        this.noPermitResp = deepClone(data)
+                    } else {
+                        bus.$emit('processData', data)
+                    }
+                })
             })
         },
         async mounted () {
