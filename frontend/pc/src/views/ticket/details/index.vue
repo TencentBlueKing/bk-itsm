@@ -105,8 +105,8 @@
             theme="primary"
             :mask-close="false"
             header-position="left"
-            :ok-text="$t(`点击申请权限`)"
-            :cancel-text="$t(`回到首页`)"
+            :ok-text="$t(`m['点击申请权限']`)"
+            :cancel-text="$t(`m['回到首页']`)"
             :title="$t(`m.newCommon['提示']`)"
             @confirm="onDialogConfirm"
             @cancel="onDialogCancel">
@@ -655,9 +655,10 @@
                 bus.$emit('processData', this.noPermitResp)
             },
             onDialogCancel () {
-                this.$router.replace({
+                this.$router.push({
                     name: 'home'
                 })
+                location.reload()
             }
         }
     }
