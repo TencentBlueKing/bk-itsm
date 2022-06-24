@@ -344,6 +344,11 @@ DEFAULT_TABLE = [
         "一般审批流程基础模型",
         [FIELD_TITLE, FIELD_STATUS, FIELD_APPLY_CONTENT, FIELD_APPLY_REASON],
     ),
+    (
+        "简单",
+        "只有一个标题字段的基础模型",
+        [FIELD_TITLE],
+    ),
 ]
 TABLE = "TABLE"
 BASE_MODEL = "BASE-MODEL"
