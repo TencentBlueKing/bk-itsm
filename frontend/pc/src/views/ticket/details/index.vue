@@ -183,10 +183,6 @@
                 // 通知链接进入，但节点已被其他人处理提示
                 isShowNoticeDialog: false,
                 isShowDialog: false,
-                dialogConfig: {
-                    okText: '点击申请权限',
-                    cancelText: '回到首页'
-                },
                 noticeInfo: {
                     is_processed: false,
                     processed_user: ''
