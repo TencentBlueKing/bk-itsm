@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.db import transaction
+from django.db.models.signals import post_save
 from rest_framework import serializers
 from django.utils.translation import ugettext as _
 
 from itsm.component.exceptions import ParamError
+from itsm.component.utils.basic import TempDisableSignal
+from itsm.openapi.base_service.utils import WorkflowInitHandler
 from itsm.service.models import ServiceCatalog, Service
 from itsm.service.serializers import ServiceSerializer
 from itsm.service.validators import key_validator
@@ -14,12 +17,14 @@ from itsm.workflow.models import (
     Field,
     GlobalVariable,
     State,
+    Table,
 )
 from itsm.workflow.serializers import (
     FieldSerializer,
     AuthModelSerializer,
     FieldValidator,
 )
+from itsm.workflow.signals.handlers import init_after_workflow_created
 
 
 class OpenApiServiceSerializer(ServiceSerializer):
@@ -36,16 +41,28 @@ class OpenApiServiceSerializer(ServiceSerializer):
         """创建后立即绑定"""
 
         if "workflow_meta" in validated_data:
-            if Workflow.objects.filter(
-                name=validated_data["workflow_meta"]["name"]
-            ).exists():
+            workflow_meta = validated_data.pop("workflow_meta")
+            if Workflow.objects.filter(name=workflow_meta["name"]).exists():
                 raise serializers.ValidationError(
                     {str(_("参数校验失败")): _("系统中已存在同名流程，请尝试换个流程名称")}
                 )
-            work_flow_instance = Workflow.objects.restore(
-                validated_data["workflow_meta"],
-                name=validated_data["workflow_meta"]["name"],
-            )[0]
+            with TempDisableSignal(post_save, init_after_workflow_created, Workflow):
+                work_flow_instance = Workflow.objects.create(
+                    name=workflow_meta["name"],
+                    desc="",
+                    flow_type="other",
+                    notify_freq="0",
+                    is_biz_needed=False,
+                    is_iam_used=False,
+                    is_enabled=True,
+                    is_draft=False,
+                    table_id=self.get_simple_table_id(),
+                    owners="",
+                    engine_version=DEFAULT_ENGINE_VERSION,
+                    creator=validated_data["creator"],
+                    updated_by=validated_data["updated_by"],
+                )
+                WorkflowInitHandler(work_flow_instance, workflow_meta).init_workflow()
         else:
             # 初始化一个流程
             work_flow_instance = self.init_work_flow(validated_data)
@@ -57,8 +74,6 @@ class OpenApiServiceSerializer(ServiceSerializer):
         validated_data["is_valid"] = False
         validated_data["key"] = "request"
 
-        validated_data.pop("workflow_meta")
-
         instance = super(ServiceSerializer, self).create(validated_data)
         if validated_data["project_key"] != "0":
             catalog_id = ServiceCatalog.objects.get(
@@ -69,6 +84,12 @@ class OpenApiServiceSerializer(ServiceSerializer):
         instance.bind_catalog(catalog_id, instance.project_key)
 
         return instance
+
+    def get_simple_table_id(self):
+        try:
+            return Table.objects.get(name="简单", is_builtin=True).id
+        except Table.DoesNotExist:
+            return 1
 
     def init_work_flow(self, validated_data):
         if Workflow.objects.filter(name=validated_data["name"]).exists():
