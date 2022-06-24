@@ -68,53 +68,56 @@
                 <p>{{ $t(`m.treeinfo['输入参数']`) }}:</p>
                 <p>{{ $t(`m['执行蓝鲸插件需要填写的参数信息']`) }}</p>
             </div>
-            <template v-if="Object.keys(schema).length !== 0">
-                <BkRenderForm
-                    class="bk-form-plugin"
-                    v-model="formData"
-                    ref="bkForm"
-                    :schema="schema"
-                    :layout="layout"
-                    :rules="rules"
-                    :form-type="formType"
-                    :context="{
-                        ...context,
-                        rules: {}
-                    }"
-                    :http-adapter="{
-                        responseParse: {
-                            labelKey: 'name',
-                            valueKey: 'id'
-                        }
-                    }"
-                    :key="formKey">
-                    <template #suffix="{ path, schema: schemaField }">
-                        <bk-checkbox
-                            ext-cls="select-check"
-                            v-model="hookVarList[path]"
-                            @change="onChangeChecked($event, path ,schemaField)">
-                        </bk-checkbox>
-                        <bk-select :disabled="!hookVarList[path]" style="width: 200px;"
-                            :value="( hookSelectList[path] || '' ).replace(/^\{\{/, '').replace(/\}\}/, '')"
-                            ext-cls="select-custom"
-                            searchable
-                            @selected="changeConstant($event, path ,schemaField)">
-                            <bk-option v-for="option in stateList"
-                                :key="option.key"
-                                :id="option.key"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                    </template>
-                </BkRenderForm>
-            </template>
-            <no-data v-else></no-data>
+            <div v-bkloading="{ isLoading: isHasSchma }">
+                <template v-if="Object.keys(schema).length !== 0 && Object.keys(schema.properties).length !== 0">
+                    <BkRenderForm
+                        class="bk-form-plugin"
+                        v-model="formData"
+                        ref="bkForm"
+                        :schema="schema"
+                        :layout="layout"
+                        :rules="rules"
+                        :form-type="formType"
+                        :context="{
+                            ...context,
+                            rules: {}
+                        }"
+                        :http-adapter="{
+                            responseParse: {
+                                labelKey: 'name',
+                                valueKey: 'id'
+                            }
+                        }"
+                        :key="formKey">
+                        <template #suffix="{ path, schema: schemaField }">
+                            <bk-checkbox
+                                ext-cls="select-check"
+                                v-model="hookVarList[path]"
+                                @change="onChangeChecked($event, path ,schemaField)">
+                            </bk-checkbox>
+                            <bk-select :disabled="!hookVarList[path]" style="width: 200px;"
+                                :value="( hookSelectList[path] || '' ).replace(/^\{\{/, '').replace(/\}\}/, '')"
+                                ext-cls="select-custom"
+                                searchable
+                                @selected="changeConstant($event, path ,schemaField)">
+                                <bk-option v-for="option in stateList"
+                                    :key="option.key"
+                                    :id="option.key"
+                                    :name="option.name">
+                                </bk-option>
+                            </bk-select>
+                        </template>
+                    </BkRenderForm>
+                </template>
+                <no-data v-else></no-data>
+            </div>
             <div class="bk-params-title">
                 <p>{{ $t(`m['输出参数']`) }}:</p>
                 <p>{{ $t(`m['蓝鲸插件执行之后的输出，可以通过勾选的方式作为引用变量在后面的节点使用']`) }}</p>
             </div>
             <div style="padding: 20px">
                 <bk-table
+                    v-bkloading="{ isLoading: isHasSchma }"
                     :data="outputsData">
                     <bk-table-column label="名称" prop="title"></bk-table-column>
                     <bk-table-column label="key" prop="key"></bk-table-column>
@@ -255,7 +258,34 @@
                 }
             }
         },
+        computed: {
+            isHasSchma () {
+                return Object.keys(this.schema).length === 0 && this.formLoading
+            }
+        },
         watch: {
+            basicInfo: {
+                handler (val) {
+                    if (val.plugin === '') {
+                        val.version = ''
+                        this.versionList = []
+                        this.schema = {}
+                        this.outputsData = []
+                        this.formLoading = false
+                        this.versionListDisabled = true
+                    } else {
+                        this.versionListDisabled = false
+                    }
+                    if (val.version === '') {
+                        this.schema = {}
+                        this.outputsData = []
+                        this.formLoading = false
+                    } else {
+                        this.formLoading = true
+                    }
+                },
+                deep: true
+            }
         },
         mounted () {
             this.initData()
@@ -295,7 +325,6 @@
                         if (input_var_list[item]) {
                             this.hookSelectList[item] = this.formData[item]
                         }
-                        console.log(this.hookSelectList)
                     })
                 }
             },
@@ -364,11 +393,11 @@
                 this.formData = {}
                 this.versionListLoading = true
                 this.basicInfo.version = ''
+                this.formLoading = false
                 try {
                     const params = { plugin_code: value }
                     this.$store.dispatch('bkPlugin/getPluginMeta', params).then(res => {
                         this.versionList = res.data.versions
-                        this.versionListDisabled = false
                     })
                 } catch (e) {
                     console.log(e)
@@ -376,10 +405,9 @@
                     this.versionListLoading = false
                 }
             },
-            async getFormInfo (value) {
+            getFormInfo (value) {
                 this.schema = {}
                 this.formData = {}
-                this.formLoading = true
                 try {
                     const params = { plugin_code: this.basicInfo.plugin, plugin_version: value }
                     this.$store.dispatch('bkPlugin/getPluginDetail', params).then(res => {
@@ -409,8 +437,6 @@
                     })
                 } catch (e) {
                     console.log(e)
-                } finally {
-                    this.formLoading = false
                 }
             },
             handleHook () {
