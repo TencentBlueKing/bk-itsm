@@ -121,7 +121,11 @@ instance.interceptors.response.use(response => {
             case 499:
                 if (response.config.url.match(/^(ticket\/receipts\/)*[0-9]*\/$/)) {
                     if ('step_id' in response.config.params) {
-                        bus.$emit('getIsProcessStatus', response)
+                        if (response.config.params['step_id']) {
+                            bus.$emit('getIsProcessStatus', response)
+                        } else {
+                            bus.$emit('processData', response)
+                        }
                     } else {
                         bus.$emit('processData', response)
                     }
