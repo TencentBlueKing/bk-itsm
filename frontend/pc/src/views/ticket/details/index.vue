@@ -31,7 +31,7 @@
                 :ticket-trigger-list="ticketTriggerList"
                 @reloadTicket="reloadTicket">
             </ticket-header>
-            
+
             <div class="ticket-container">
                 <div class="ticket-container-left">
                     <!-- 基础信息/工单预览 -->
@@ -99,7 +99,18 @@
             header-position="left"
             :title="$t(`m.newCommon['提示']`)"
             @confirm="onNoticeConfirm">
-            {{$t(`m.newCommon['您要处理的节点已被']`)}} {{ noticeInfo.processed_user }} {{$t(`m.newCommon['处理完成，可在流转日志中查看详情。']`)}}
+            {{$t(`m.newCommon['您要处理的节点已被']`)}} {{ processedUser }} {{$t(`m.newCommon['处理完成，可在流转日志中查看详情。']`)}}
+        </bk-dialog>
+        <bk-dialog v-model="isShowDialog"
+            theme="primary"
+            :mask-close="false"
+            header-position="left"
+            :ok-text="$t(`点击申请权限`)"
+            :cancel-text="$t(`回到首页`)"
+            :title="$t(`m.newCommon['提示']`)"
+            @confirm="onDialogConfirm"
+            @cancel="onDialogCancel">
+            {{$t(`m.newCommon['您要处理的节点已被']`)}} {{ processedUser }} {{$t(`m.newCommon['处理完成，可在流转日志中查看详情。']`)}}
         </bk-dialog>
     </div>
 </template>
@@ -148,11 +159,13 @@
                 commentCount: 0,
                 isShowSla: true,
                 showRightTabs: true,
+                processedUser: '',
                 commentLoading: false,
                 ticketTimer: null, // 单据详情轮询器
                 containerLeftWidth: 0,
                 ticketId: '',
                 ticketErrorMessage: '',
+                noPermitResp: {},
                 // 移动布局信息
                 dragLine: {
                     base: 0,
@@ -169,6 +182,11 @@
                 },
                 // 通知链接进入，但节点已被其他人处理提示
                 isShowNoticeDialog: false,
+                isShowDialog: false,
+                dialogConfig: {
+                    okText: '点击申请权限',
+                    cancelText: '回到首页'
+                },
                 noticeInfo: {
                     is_processed: false,
                     processed_user: ''
@@ -236,21 +254,22 @@
         },
         created () {
             bus.$on('getIsProcessStatus', data => {
-                const { id, step_id } = data.config.params
-                const params = {
-                    id,
-                    step_id
-                }
-                this.$store.dispatch('ticket/getTicktProcessStatus', { params }).then(res => {
-                    if (res.data.is_processor) {
-                        this.$bkInfo({
-                            type: 'warning',
-                            title: '已被处理'
-                        })
-                    } else {
-                        bus.$emit('processData', data)
-                    }
-                })
+                this.isShowDialog = true
+                this.noPermitResp = deepClone(data)
+                // const { id, step_id } = data.config.params
+                // const params = {
+                //     id,
+                //     step_id
+                // }
+                // this.$store.dispatch('ticket/getTicketProcessStatus', { params }).then(res => {
+                //     if (res.data.is_processor) {
+                //         this.processedUser = res.data.processed_user
+                //         this.isShowDialog = true
+                //         this.noPermitResp = deepClone(data)
+                //     } else {
+                //         bus.$emit('processData', data)
+                //     }
+                // })
             })
         },
         async mounted () {
@@ -619,6 +638,7 @@
                 }).then(res => {
                     if (res.data && res.data.is_processed) {
                         this.noticeInfo = res.data
+                        this.processedUser = this.noticeInfo.processed_user
                         this.isShowNoticeDialog = true
                     } else {
                         // 删除 url cache_key
@@ -635,6 +655,14 @@
                 this.$router.replace({
                     name: this.$route.name,
                     query
+                })
+            },
+            onDialogConfirm () {
+                bus.$emit('processData', this.noPermitResp)
+            },
+            onDialogCancel () {
+                this.$router.replace({
+                    name: 'home'
                 })
             }
         }
