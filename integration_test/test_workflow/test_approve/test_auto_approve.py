@@ -3,7 +3,7 @@ import time
 
 from django.test import override_settings
 
-from integration_test.test_workflow.test_approve.base import BaseTestCase
+from integration_test.test_workflow.base import BaseTestCase
 from integration_test.test_workflow.test_approve.data.auto_approve import (
     AUTO_APPROVE_DATA,
 )
@@ -17,9 +17,8 @@ class AutoApproveTestCase(BaseTestCase):
     def test(self):
         data = AUTO_APPROVE_DATA
         service = self.import_service(data)
-        rsp = self.create_ticket(service)
+        ticket_id = self.create_ticket(service)
         time.sleep(3)
-        ticket_id = rsp.data["data"]["id"]
 
         ticket_info = self.get_ticket_info(ticket_id)
         current_steps = ticket_info["data"]["current_steps"]
