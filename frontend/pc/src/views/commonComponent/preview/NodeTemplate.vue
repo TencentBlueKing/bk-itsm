@@ -113,8 +113,8 @@
                     { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
                     { type: 'TASK-DEVOPS', iconStyle: 'icon-devops-task-icon' },
                     { type: 'SIGN', iconStyle: 'icon-sign-node-white' },
-                    { type: 'WEBHOOK', iconStyle: 'icon-webhookjiedian' },
-                    { type: 'BK-PLUGIN', iconStyle: 'icon-itsm-icon-three-five' },
+                    { type: 'WEBHOOK', iconStyle: 'icon-webhook-icon' },
+                    { type: 'BK-PLUGIN', iconStyle: 'icon-chajian-icon' },
                     { type: 'APPROVAL', iconStyle: 'icon-approval-node' }
                 ]
             }
