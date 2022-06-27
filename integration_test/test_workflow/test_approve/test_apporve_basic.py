@@ -4,7 +4,7 @@ import time
 
 from django.test import override_settings
 
-from integration_test.test_workflow.test_approve.base import BaseTestCase
+from integration_test.test_workflow.base import BaseTestCase
 from integration_test.test_workflow.test_approve.data.approve import APPROVE_DATA
 from itsm.workflow.models import State
 
@@ -15,10 +15,8 @@ class ApproveBasicTest(BaseTestCase):
         data = APPROVE_DATA
 
         service = self.import_service(data)
-        rsp = self.create_ticket(service)
+        ticket_id = self.create_ticket(service)
         time.sleep(5)
-
-        ticket_id = rsp.data["data"]["id"]
 
         # 校验初次审批之后的单据详情是否符合预期
         ticket_info = self.get_ticket_info(ticket_id)

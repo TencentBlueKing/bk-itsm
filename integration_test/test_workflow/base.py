@@ -63,7 +63,9 @@ class BaseTestCase(TestCase):
         )
 
         self.assertEqual(rsp.data["result"], True)
-        return rsp
+
+        ticket_id = rsp.data["data"]["id"]
+        return ticket_id
 
     def get_ticket_info(self, ticket_id):
         url = "/api/ticket/receipts/{}/".format(ticket_id)
