@@ -36,7 +36,7 @@ from django.http import FileResponse
 from django.test import TestCase, override_settings
 
 from itsm.tests.service.params import CREATE_SERVICE_DATA, CONFIGS, IMPORT_SERVICE_DATA
-from itsm.workflow.models import WorkflowVersion, Workflow
+from itsm.workflow.models import WorkflowVersion, Workflow, Table
 from itsm.service.models import Service, FavoriteService
 
 
@@ -132,7 +132,9 @@ class ServiceTest(TestCase):
             "/api/service/projects/" "{}/import_from_template/".format(service_id)
         )
 
-        resp = self.client.post(import_from_template_url, {"table_id": 8})
+        table_id = Table.objects.get(name="审批").id
+
+        resp = self.client.post(import_from_template_url, {"table_id": table_id})
 
         self.assertEqual(resp.data["result"], True)
         self.assertEqual(resp.data["code"], "OK")
@@ -144,11 +146,7 @@ class ServiceTest(TestCase):
 
         # 判断字段是否成功导入
         fields = version.get_first_state_fields()
-        self.assertEqual(fields[0]["name"], "标题")
-        self.assertEqual(fields[1]["name"], "申请类型")
-        self.assertEqual(fields[2]["name"], "组织")
-        self.assertEqual(fields[3]["name"], "申请内容")
-        self.assertEqual(fields[4]["name"], "申请理由")
+        self.assertEqual(len(fields), 3)
 
         service = Service.objects.get(id=service_id)
         service.workflow = version
@@ -181,11 +179,7 @@ class ServiceTest(TestCase):
 
         # 判断字段是否成功导入
         fields = version.get_first_state_fields()
-        self.assertEqual(fields[0]["name"], "标题")
-        self.assertEqual(fields[1]["name"], "申请类型")
-        self.assertEqual(fields[2]["name"], "组织")
-        self.assertEqual(fields[3]["name"], "申请内容")
-        self.assertEqual(fields[4]["name"], "申请理由")
+        self.assertEqual(len(fields), 3)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
