@@ -866,3 +866,9 @@ url("scss/icon/fonts/commonicon.eot?#iefix") format("embedded-opentype");
 .icon-webhookjiedian:before {
 	content: "\e226";
 }
+.icon-webhook-icon:before {
+	content: "\e227";
+}
+.icon-chajian-icon:before {
+	content: "\e228";
+}

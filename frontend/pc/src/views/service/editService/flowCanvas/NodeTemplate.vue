@@ -49,7 +49,7 @@
                         :class="{ 'bk-is-draft': (node.nodeInfo && node.nodeInfo.is_draft) }"
                         @click.stop="openconfigu">
                         <i class="bk-itsm-icon" :class="item.iconStyle" v-if="item.type !== 'TASK'"></i>
-                        <span v-else style="font-size: 11px; font-weight: bold;">API</span>
+                        <span v-else style="font-size: 11px; font-weight: bold; display: block">API</span>
                     </span>
                     <span class="bk-more-word" :title="(node.name || $t(`m.treeinfo['新增节点']`))">{{node.name || $t(`m.treeinfo['新增节点']`)}}</span>
                     <i class="bk-itsm-icon icon-edit-bold"></i>
@@ -147,9 +147,9 @@
                     { type: 'ROUTER', iconStyle: 'icon-icon-person' },
                     { type: 'TASK', iconStyle: 'icon-api-icon' },
                     { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
-                    { type: 'WEBHOOK', iconStyle: 'icon-webhookjiedian' },
+                    { type: 'WEBHOOK', iconStyle: 'icon-webhook-icon' },
                     { type: 'TASK-DEVOPS', iconStyle: 'icon-devops-task-icon' },
-                    { type: 'BK-PLUGIN', iconStyle: 'icon-chajianjiedian' },
+                    { type: 'BK-PLUGIN', iconStyle: 'icon-chajian-icon' },
                     { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
                     { type: 'SIGN', iconStyle: 'icon-sign-node-white f18' }
                 ],
