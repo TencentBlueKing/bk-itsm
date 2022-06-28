@@ -38,22 +38,25 @@ class BaseTestCase(TestCase):
         )
         self.assertEqual(rsp.data["result"], True)
 
-    def create_ticket(self, service):
+    def create_ticket(self, service, fields=None):
         service_id = service.id
         catalog_id = service.catalog_id
+
+        default_fields = [
+            {
+                "type": "STRING",
+                "id": 1,
+                "key": "title",
+                "value": "test_ticket",
+                "choice": [],
+            }
+        ]
+
         params = {
             "catalog_id": catalog_id,
             "service_id": service_id,
             "service_type": "request",
-            "fields": [
-                {
-                    "type": "STRING",
-                    "id": 1,
-                    "key": "title",
-                    "value": "test_ticket",
-                    "choice": [],
-                }
-            ],
+            "fields": default_fields if fields is None else fields,
             "creator": "admin",
             "attention": True,
         }
@@ -109,6 +112,20 @@ class BaseTestCase(TestCase):
         url = "/api/ticket/receipts/{}/proceed/".format(ticket_id)
         # 处理单据
         data = {"state_id": state_id, "fields": fields}
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
+        self.assertEqual(rsp.data["result"], True)
+
+    def retry_node(self, ticket_id, data):
+        url = "/api/ticket/receipts/{}/retry/".format(ticket_id)
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
+        self.assertEqual(rsp.data["result"], True)
+
+    def ignore(self, ticket_id, data):
+        url = "/api/ticket/receipts/{}/ignore/".format(ticket_id)
         rsp = self.client.post(
             path=url, data=json.dumps(data), content_type="application/json"
         )
