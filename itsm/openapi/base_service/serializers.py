@@ -172,3 +172,7 @@ class BatchSaveFieldSerializer(FieldSerializer):
     def to_representation(self, instance):
         data = super(serializers.ModelSerializer, self).to_representation(instance)
         return data
+
+
+class ApiGwSerializer(serializers.Serializer):
+    pass
