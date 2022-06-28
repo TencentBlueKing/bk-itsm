@@ -43,7 +43,7 @@ class WebhookTestCase(BaseTestCase):
 
     def build_create_fields(self):
         COMPONENT_SYSTEM_HOST = os.environ.get(
-            "COMPONENT_SYSTEM_HOST", settings.BK_PAAS_INNER_HOST
+            "BK_COMPONENT_API_URL", settings.BK_PAAS_INNER_HOST
         )
 
         fields = [
@@ -90,7 +90,7 @@ class WebhookTestCase(BaseTestCase):
         fields = self.build_create_fields()
 
         COMPONENT_SYSTEM_HOST = os.environ.get(
-            "COMPONENT_SYSTEM_HOST", settings.BK_PAAS_INNER_HOST
+            "BK_COMPONENT_API_URL", settings.BK_PAAS_INNER_HOST
         )
 
         ticket_id = self.create_ticket(service, fields)
