@@ -29,6 +29,10 @@
                             :name="plugin.name">
                         </bk-option>
                     </bk-select>
+                    <div class="tip" v-if="pluginTip">
+                        <i class="bk-itsm-icon icon-itsm-icon-four-one"></i>
+                        <p v-text="pluginTip"></p>
+                    </div>
                 </bk-form-item>
                 <bk-form-item
                     data-test-id="devops-select-pipeline"
@@ -69,7 +73,7 @@
                 <p>{{ $t(`m['执行蓝鲸插件需要填写的参数信息']`) }}</p>
             </div>
             <div v-bkloading="{ isLoading: isHasSchma }">
-                <template v-if="Object.keys(schema).length !== 0 && Object.keys(schema.properties).length !== 0">
+                <template v-if="Object.keys(schema || {}).length !== 0">
                     <BkRenderForm
                         class="bk-form-plugin"
                         v-model="formData"
@@ -255,7 +259,8 @@
                     projectId: this.$route.query.project_id,
                     baseURL: '',
                     pod_name: 'test_pod_name'
-                }
+                },
+                pluginTip: ''
             }
         },
         computed: {
@@ -268,6 +273,7 @@
                 handler (val) {
                     if (val.plugin === '') {
                         val.version = ''
+                        this.pluginTip = ''
                         this.versionList = []
                         this.schema = {}
                         this.outputsData = []
@@ -297,6 +303,7 @@
         },
         methods: {
             async initData () {
+                this.isLoading = true
                 this.basicInfo.nodeName = this.configur.name
                 this.processorsInfo = {
                     type: this.configur.processors_type,
@@ -327,6 +334,7 @@
                         }
                     })
                 }
+                this.isLoading = false
             },
             async getRelatedFields () {
                 const params = {
@@ -389,6 +397,7 @@
                 this.formKey = new Date().getTime()
             },
             onSelectplugin (value) {
+                this.pluginTip = ''
                 this.schema = {}
                 this.formData = {}
                 this.versionListLoading = true
@@ -397,6 +406,7 @@
                 try {
                     const params = { plugin_code: value }
                     this.$store.dispatch('bkPlugin/getPluginMeta', params).then(res => {
+                        this.pluginTip = res.data.description
                         this.versionList = res.data.versions
                     })
                 } catch (e) {
@@ -411,7 +421,7 @@
                 try {
                     const params = { plugin_code: this.basicInfo.plugin, plugin_version: value }
                     this.$store.dispatch('bkPlugin/getPluginDetail', params).then(res => {
-                        this.schema = res.data.inputs
+                        this.schema = res.data.inputs || {}
                         Object.keys(this.schema.properties).map(item => {
                             if (this.schema.properties[item].type === 'integer') {
                                 this.schema.properties[item].type = 'string'
@@ -438,12 +448,6 @@
                 } catch (e) {
                     console.log(e)
                 }
-            },
-            handleHook () {
-                console.log(arguments)
-            },
-            onSelectVar () {
-
             },
             closeNode () {
                 this.$parent.closeConfigur()
@@ -592,6 +596,16 @@
     }
     .bk-form-width {
         width: 448px;
+        .tip {
+            display: flex;
+            height: 20px;
+            align-items: center;
+            font-size: 10px;
+            color: #929397;
+            p {
+                margin-left: 5px;
+            }
+        }
     }
     .bk-form-display {
         float: left;
