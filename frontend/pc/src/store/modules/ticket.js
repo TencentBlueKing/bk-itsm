@@ -42,7 +42,7 @@ export default {
         setHasTicketNodeOptAuth (state, value) {
             state.hasTicketNodeOptAuth = value
         }
-        
+
     },
     actions: {
         getTriggerStatus ({ commit, state, dispatch }, id) {
@@ -111,7 +111,7 @@ export default {
         getDevopsBuildStatus({ commit, state, dispatch }, params) {
             return ajax.get('gateway/devops/get_user_pipeline_build_status/', { params }).then(response => {
                 let res = response.data
-                
+
                 return res
             })
         },
@@ -169,5 +169,10 @@ export default {
             const id = params
             return ajax.get(`ticket/comments/${id}/`).then(response => response.data)
         },
+        // 获取是否单据处理人
+        getTicketProcessStatus ({ commit, state, dispatch }, { params }) {
+            const { id, step_id } = params
+            return ajax.get(`ticket/receipts/${id}/is_processor/?step_id=${step_id}`).then(response => response.data)
+        }
     }
 }

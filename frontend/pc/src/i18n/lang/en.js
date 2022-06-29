@@ -2621,5 +2621,7 @@ export const m = {
     '字段属性': 'Field properties',
     '为必选项!': 'Required!',
     '必选项': 'Required',
-    '此操作不可撤销，确定要删除吗？': 'This action is irreversible. Are you sure you want to delete it?'
+    '此操作不可撤销，确定要删除吗？': 'This action is irreversible. Are you sure you want to delete it?',
+    '点击申请权限': 'Apply Permission',
+    '回到首页': 'Back to Home'
 }
