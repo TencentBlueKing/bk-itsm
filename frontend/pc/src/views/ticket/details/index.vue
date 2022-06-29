@@ -230,9 +230,6 @@
                     this.curCommentLength = val.length
                 }
             },
-            '$route' (val) {
-                console.log(val)
-            },
             ticketInfo: {
                 handler (val) {
                     if (Object.keys(val).length !== 0) {
@@ -500,7 +497,6 @@
                 }
 
                 await this.$store.dispatch('change/getOrderDetails', params).then((res) => {
-                    console.log(res)
                     this.ticketInfo = res.data
                 }).catch((res) => {
                     // 显示 404 页面
