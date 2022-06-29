@@ -247,6 +247,7 @@
         },
         created () {
             bus.$on('getIsProcessStatus', data => {
+                this.noPermitResp = deepClone(data)
                 const { id, step_id } = data.config.params
                 const params = {
                     id,
@@ -256,9 +257,8 @@
                     if (res.data.is_processor) {
                         this.processedUser = res.data.processed_user
                         this.isShowDialog = true
-                        this.noPermitResp = deepClone(data)
                     } else {
-                        bus.$emit('processData', data)
+                        bus.$emit('processData', this.noPermitResp)
                     }
                 })
             })
