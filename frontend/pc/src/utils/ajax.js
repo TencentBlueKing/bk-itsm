@@ -152,7 +152,7 @@ instance.interceptors.response.use(
     }
 
     if (response.request.responseURL.includes('/api/plugin_service/')) {
-        return response
+      return response;
     }
 
     if (response.data.code !== 'OK' && response.data.code !== 0) {

@@ -45,7 +45,7 @@
             'bk-is-draft': node.nodeInfo.is_draft,
             'bk-is-success': node.nodeInfo.statusInfo === 'FINISHED',
             'bk-is-error': node.nodeInfo.statusInfo === 'TERMINATED' || node.nodeInfo.statusInfo === 'FAILED',
-            'bk-is-preview': node.nodeInfo.statusInfo === 'WAIT',
+            'bk-is-preview': node.nodeInfo.statusInfo === 'WAIT'
           }">
           <i class="bk-itsm-icon" :class="item.iconStyle" v-if="item.type !== 'TASK'"></i>
           <span v-else style="font-size: 12px; font-weight: bold">API</span>
@@ -57,7 +57,7 @@
             'bk-word-success': node.nodeInfo.statusInfo === 'FINISHED',
             'bk-word-error': node.nodeInfo.statusInfo === 'TERMINATED' || node.nodeInfo.statusInfo === 'FAILED',
             'bk-word-preview': node.nodeInfo.statusInfo === 'WAIT',
-            'bk-word-normal': normalColor,
+            'bk-word-normal': normalColor
           }">
           {{ node.name || $t(`m.treeinfo["新增节点"]`) }}</span
         >
@@ -66,7 +66,7 @@
             class="bk-icon-status"
             :class="{
               'bk-icon-success': node.nodeInfo.statusInfo === 'FINISHED',
-              'bk-icon-error': node.nodeInfo.statusInfo === 'TERMINATED' || node.nodeInfo.statusInfo === 'FAILED',
+              'bk-icon-error': node.nodeInfo.statusInfo === 'TERMINATED' || node.nodeInfo.statusInfo === 'FAILED'
             }">
             <i
               class="bk-icon icon-check-1"
@@ -97,64 +97,64 @@
   </div>
 </template>
 <script>
-export default {
-  name: "NodeTemplate",
-  props: {
-    node: {
-      type: Object,
-      default() {
-        return {};
+  export default {
+    name: 'NodeTemplate',
+    props: {
+      node: {
+        type: Object,
+        default() {
+          return {};
+        },
+      },
+      previewInfo: {
+        type: Object,
+        default() {
+          return {};
+        },
+      },
+      normalColor: {
+        type: Boolean,
+        default: false,
       },
     },
-    previewInfo: {
-      type: Object,
-      default() {
-        return {};
+    data() {
+      return {
+        moveFlag: false,
+        typeList: [
+          { type: 'NORMAL', iconStyle: 'icon-icon-person' },
+          { type: 'ROUTER', iconStyle: 'icon-icon-person' },
+          { type: 'TASK', iconStyle: 'icon-api-icon' },
+          { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
+          { type: 'TASK-DEVOPS', iconStyle: 'icon-devops-task-icon' },
+          { type: 'SIGN', iconStyle: 'icon-sign-node-white' },
+          { type: 'WEBHOOK', iconStyle: 'icon-webhook-icon' },
+          { type: 'BK-PLUGIN', iconStyle: 'icon-chajian-icon' },
+          { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
+        ],
+      };
+    },
+    mounted() {},
+    methods: {
+      movdeDoneFn() {
+        this.moveFlag = false;
       },
-    },
-    normalColor: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  data() {
-    return {
-      moveFlag: false,
-      typeList: [
-        { type: "NORMAL", iconStyle: "icon-icon-person" },
-        { type: "ROUTER", iconStyle: "icon-icon-person" },
-        { type: "TASK", iconStyle: "icon-api-icon" },
-        { type: "TASK-SOPS", iconStyle: "icon-task-node" },
-        { type: "TASK-DEVOPS", iconStyle: "icon-devops-task-icon" },
-        { type: "SIGN", iconStyle: "icon-sign-node-white" },
-        { type: "WEBHOOK", iconStyle: "icon-webhook-icon" },
-        { type: "BK-PLUGIN", iconStyle: "icon-chajian-icon" },
-        { type: "APPROVAL", iconStyle: "icon-approval-node" },
-      ],
-    };
-  },
-  mounted() {},
-  methods: {
-    movdeDoneFn() {
-      this.moveFlag = false;
-    },
-    moveFn() {
-      this.moveFlag = true;
-    },
-    onNodeClick(node, event) {
-      if (!this.moveFlag) {
-        // 对于开始，结束，网关，汇聚不弹出信息
-        if (node.type === "START" || node.type === "END" || node.type === "ROUTER-P" || node.type === "COVERAGE") {
-          return;
+      moveFn() {
+        this.moveFlag = true;
+      },
+      onNodeClick(node) {
+        if (!this.moveFlag) {
+          // 对于开始，结束，网关，汇聚不弹出信息
+          if (node.type === 'START' || node.type === 'END' || node.type === 'ROUTER-P' || node.type === 'COVERAGE') {
+            return;
+          }
+          this.$emit('clickNodeInfo', node);
+        } else {
+          this.$emit('submitNodeValue', node);
         }
-        this.$emit("clickNodeInfo", node);
-      } else {
-        this.$emit("submitNodeValue", node);
-      }
-      this.moveFlag = false;
+        this.moveFlag = false;
+      },
     },
-  },
-};
+  };
 </script>
 <style lang="scss" scoped>
 @import "./nodeTemplate.scss";
