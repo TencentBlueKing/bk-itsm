@@ -40,13 +40,13 @@ export default {
       });
     },
     update({ commit, state, dispatch }, params) {
-      return ajax.put("service/change/change_type/records/" + params.id, params).then((response) => {
+      return ajax.put(`service/change/change_type/records/${params.id}`, params).then((response) => {
         const res = response.data;
         return res;
       });
     },
     delete({ commit, state, dispatch }, id) {
-      return ajax.delete("service/change/change_type/records/" + id).then((response) => {
+      return ajax.delete(`service/change/change_type/records/${id}`).then((response) => {
         const res = response.data;
         return res;
       });

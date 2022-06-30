@@ -59,8 +59,8 @@ export default {
   actions: {
     getProjectInfo({ commit }, params) {
       //  目前项目在 ITSM 是虚拟的，所以暂时默认为 0
-      const project_id = 0;
-      return ajax.get(`/project/projects/${project_id}/info/`, params).then((response) => {
+      const projectId = 0;
+      return ajax.get(`/project/projects/${projectId}/info/`, params).then((response) => {
         // const res = response.data
         // commit('setProjectInfo', res.data)
         return response.data;
@@ -116,8 +116,8 @@ export default {
     },
     // 拖拽排序指定项目下的tab
     moveProjectTab({ commit }, params) {
-      const { tab_id } = params;
-      return ajax.post(`project/tabs/${tab_id}/move/`, params).then((response) => response.data);
+      const { tab_id: tabId } = params;
+      return ajax.post(`project/tabs/${tabId}/move/`, params).then((response) => response.data);
     },
     // 获取项目tab列表
     getProjectTabList({ commit }, params) {

@@ -56,13 +56,13 @@ export default {
       });
     },
     updateSla({ commit, state, dispatch }, params) {
-      return ajax.put("service/slas/" + params.id + "/", params).then((response) => {
+      return ajax.put(`service/slas/${params.id}/`, params).then((response) => {
         const res = response.data;
         return res;
       });
     },
     deleteSla({ commit, state, dispatch }, id) {
-      return ajax.delete("service/slas/" + id + "/").then((response) => {
+      return ajax.delete(`service/slas/${id}`).then((response) => {
         const res = response.data;
         return res;
       });

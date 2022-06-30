@@ -55,7 +55,7 @@ export default {
     //     })
     // }
     getEvaluation({ commit, state, dispatch }, params) {
-      return ajax.get("ticket/comments/" + params.id + "/", { params }).then((response) => {
+      return ajax.get(`ticket/comments/${params.id}/`, { params }).then((response) => {
         const res = response.data;
         return res;
       });

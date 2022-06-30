@@ -40,13 +40,13 @@ export default {
       });
     },
     update({ commit, state, dispatch }, params) {
-      return ajax.put("role/users/" + params.id + "/", params).then((response) => {
+      return ajax.put(`role/users/${params.id}/`, params).then((response) => {
         const res = response.data;
         return res;
       });
     },
     delete({ commit, state, dispatch }, id) {
-      return ajax.delete("role/users/" + id).then((response) => {
+      return ajax.delete(`role/users/${id}`).then((response) => {
         const res = response.data;
         return res;
       });

@@ -170,8 +170,8 @@ export default {
     },
     // 获取是否单据处理人
     getTicketProcessStatus({ commit, state, dispatch }, { params }) {
-      const { id, step_id } = params;
-      return ajax.get(`ticket/receipts/${id}/is_processor/?step_id=${step_id}`).then((response) => response.data);
+      const { id, step_id: stepId } = params;
+      return ajax.get(`ticket/receipts/${id}/is_processor/?step_id=${stepId}`).then((response) => response.data);
     },
   },
 };

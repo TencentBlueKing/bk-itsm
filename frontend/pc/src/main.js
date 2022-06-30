@@ -121,7 +121,7 @@ Vue.component("app-exception", Exception);
 Vue.component("arrows-left-icon", ArrowsLeftIcon);
 
 // 国际化
-let localeCookie = cookie.parse(document.cookie).blueking_language || "zh-cn";
+const localeCookie = cookie.parse(document.cookie).blueking_language || "zh-cn";
 // magicbox 组件国际化
 if (localeCookie === "en") {
   locale.use(lang.enUS);
@@ -136,7 +136,7 @@ store.commit("setLanguage", localeCookie);
 // Vue.use(bkMagic)
 Vue.use(bkMagic, {
   i18n: function (path, options) {
-    let value = i18n.t(path, options);
+    const value = i18n.t(path, options);
     if (value !== null && value !== undefined) {
       return value;
     }

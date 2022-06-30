@@ -29,7 +29,7 @@ export default {
   actions: {
     clean_cache({ commit, state, dispatch }, params) {
       return ajax.post("misc/clean_cache/", params).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },

@@ -40,13 +40,13 @@ export default {
       });
     },
     update({ commit, state, dispatch }, params) {
-      return ajax.put("service/event/event_type/records/" + params.id, params).then((response) => {
+      return ajax.put(`service/event/event_type/records/${params.id}`, params).then((response) => {
         const res = response.data;
         return res;
       });
     },
     delete({ commit, state, dispatch }, id) {
-      return ajax.delete("service/event/event_type/records/" + id).then((response) => {
+      return ajax.delete(`service/event/event_type/records/${id}`).then((response) => {
         const res = response.data;
         return res;
       });
@@ -70,13 +70,13 @@ export default {
       });
     },
     updateSla({ commit, state, dispatch }, params) {
-      return ajax.put("service/event/sla/records/" + params.id, params).then((response) => {
+      return ajax.put(`service/event/sla/records/${params.id}`, params).then((response) => {
         const res = response.data;
         return res;
       });
     },
     deleteSla({ commit, state, dispatch }, id) {
-      return ajax.delete("service/event/sla/records/" + id).then((response) => {
+      return ajax.delete(`service/event/sla/records/${id}`).then((response) => {
         const res = response.data;
         return res;
       });

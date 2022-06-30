@@ -192,7 +192,7 @@ module.exports = {
     'vue/block-spacing': ['error', 'always'],
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/brace-style.md
-    'vue/brace-style': ['error', '1tbs', { 'allowSingleLine': false }],
+    'vue/brace-style': ['error', '1tbs', { allowSingleLine: false }],
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/camelcase.md
     // 后端数据字段经常不是驼峰，所以不限制 properties，也不限制解构
@@ -375,7 +375,18 @@ module.exports = {
         'data',
         'computed',
         'watch',
-        // LIFECYCLE_HOOKS: ['beforeCreate', 'created', 'beforeMount', 'mounted', 'beforeUpdate', 'updated', 'activated', 'deactivated', 'beforeDestroy', 'destroyed']
+        // LIFECYCLE_HOOKS: [
+        //   'beforeCreate',
+        //   'created',
+        //   'beforeMount',
+        //   'mounted',
+        //   'beforeUpdate',
+        //   'updated',
+        //   'activated',
+        //   'deactivated',
+        //   'beforeDestroy',
+        //   'destroyed'
+        // ]
         'LIFECYCLE_HOOKS',
         'methods',
         ['template', 'render'],

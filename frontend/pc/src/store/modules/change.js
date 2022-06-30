@@ -54,7 +54,7 @@ export default {
       });
     },
     getOrderDetails({ commit, state, dispatch }, params) {
-      return ajax.get("ticket/receipts/" + params.id + "/", { params: params }).then((response) => {
+      return ajax.get(`ticket/receipts/${params.id}/`, { params: params }).then((response) => {
         const res = response.data;
         return res;
       });
