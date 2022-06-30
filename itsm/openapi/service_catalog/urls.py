@@ -23,21 +23,14 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from itertools import chain
+from rest_framework.routers import DefaultRouter
 
-from itsm.openapi.service.urls import urlpatterns as service_urlpatterns
-from itsm.openapi.ticket.urls import urlpatterns as ticket_urlpatterns
-from itsm.openapi.workflow.urls import urlpatterns as workflow_urlpatterns
-from itsm.openapi.devops_plugin.urls import urlpatterns as devops_plugin_urlpatterns
-from itsm.openapi.service_catalog.urls import urlpatterns as service_catalog_urlpatterns
+from itsm.openapi.service_catalog.views import ServiceCatalogViewSet
 
-# 公共URL配置
-urlpatterns = list(
-    chain(
-        service_urlpatterns,
-        ticket_urlpatterns,
-        workflow_urlpatterns,
-        devops_plugin_urlpatterns,
-        service_catalog_urlpatterns,
-    )
+routers = DefaultRouter(trailing_slash=True)
+
+routers.register(
+    r"service_catalog", ServiceCatalogViewSet, basename="open_api_service_catalog"
 )
+
+urlpatterns = routers.urls
