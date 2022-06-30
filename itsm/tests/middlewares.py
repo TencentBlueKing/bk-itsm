@@ -33,12 +33,14 @@ class OverrideMiddleware(MiddlewareMixin):
 
         request.user = Base()
         request.source = "WEB"
-        request.user.username = 'admin'
+        request.user.username = "admin"
         request.user.is_superuser = True
         request.user.is_authenticated = True
         request.user.is_active = True
         request.permission_exempt = True
-        request.META.update({'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+        request.META.update({"HTTP_X_REQUESTED_WITH": "XMLHttpRequest"})
+
+        request.jwt = {}
 
 
 class OverrideTestMiddleware(MiddlewareMixin):
@@ -47,9 +49,11 @@ class OverrideTestMiddleware(MiddlewareMixin):
             pass
 
         request.user = Base()
-        request.user.username = 'test'
+        request.user.username = "test"
         request.user.is_superuser = True
         request.user.is_authenticated = True
         request.user.is_active = True
         request.permission_exempt = True
-        request.META.update({'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+        request.META.update({"HTTP_X_REQUESTED_WITH": "XMLHttpRequest"})
+
+        request.jwt = {}

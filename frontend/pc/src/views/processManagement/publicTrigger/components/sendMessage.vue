@@ -21,112 +21,117 @@
   -->
 
 <template>
-  <div class="bk-send-message">
-    <bk-tab :active="activeName" @tab-change="changPanel" v-if="show">
-      <bk-tab-panel
-        v-for="(panel, index) in itemInfo.sub_components"
-        v-bind="panel"
-        :key="index"
-        :test-posi-id="panel.key">
-        <template slot="label">
-          <bk-checkbox style="float: left; margin: 0px 8px 0 0;"
-            :true-value="trueStatus"
-            :false-value="falseStatus"
-            v-model="panel.checked">
-          </bk-checkbox>
-          <i class="bk-icon" :class="[panel.icon]"></i>
-          <span class="panel-name">{{panel.label}}</span>
-        </template>
-        <!-- <div v-for="(subPanel, subIndex) in itemInfo.sub_components"
+    <div class="bk-send-message">
+        <bk-tab :active="activeName" @tab-change="changPanel" v-if="show">
+            <bk-tab-panel
+                v-for="(panel, index) in itemInfo.sub_components"
+                v-bind="panel"
+                :key="index"
+                :test-posi-id="panel.key">
+                <template slot="label">
+                    <bk-checkbox style="float: left; margin: 0px 8px 0 0;"
+                        :true-value="trueStatus"
+                        :false-value="falseStatus"
+                        v-model="panel.checked">
+                    </bk-checkbox>
+                    <i class="bk-icon" :class="[panel.icon]"></i>
+                    <span class="panel-name">{{panel.label}}</span>
+                </template>
+                <!-- <div v-for="(subPanel, subIndex) in itemInfo.sub_components"
                     :key="subIndex"
                     v-if="activeName === subPanel.name"> -->
-        <div v-for="(field, fieldIndex) in panel.field_schema"
-          :key="field.key"
-          class="mb20"
-          :test-posi-id="field.key">
-          <bk-form-item
-            :label="field.name"
-            :required="field.required"
-            :key="index"
-            :desc="field.tips">
-            <change-conductor
-              :index="index"
-              :item-info="field"
-              :origin="'message'"
-              @change-panel-status="changePanelStatus(panel, fieldIndex)">
-            </change-conductor>
-          </bk-form-item>
-        </div>
-        <!-- </div> -->
-      </bk-tab-panel>
-    </bk-tab>
-  </div>
+                <div v-for="(field, fieldIndex) in panel.field_schema"
+                    :key="field.key"
+                    class="mb20"
+                    :test-posi-id="field.key">
+                    <bk-form-item
+                        :label="field.name"
+                        :required="field.required"
+                        :key="index"
+                        :desc="field.tips">
+                        <change-conductor
+                            :index="index"
+                            :item-info="field"
+                            :origin="'message'"
+                            :is-show-var="isShowVar"
+                            @change-panel-status="changePanelStatus(panel, fieldIndex)">
+                        </change-conductor>
+                    </bk-form-item>
+                </div>
+                <!-- </div> -->
+            </bk-tab-panel>
+        </bk-tab>
+    </div>
 </template>
 <script>
-  import changeConductor from './changeConductor.vue';
+    import changeConductor from './changeConductor.vue'
 
-  export default {
-    name: 'sendMessage',
-    components: {
-      changeConductor,
-    },
-    props: {
-      itemInfo: {
-        type: Object,
-        default() {
-          return {};
+    export default {
+        name: 'sendMessage',
+        components: {
+            changeConductor
         },
-      },
-    },
-    data() {
-      return {
-        trueStatus: true,
-        falseStatus: false,
-        activeName: 'send_email_message',
-        show: true,
-      };
-    },
-    computed: {
-    },
-    created() {
-      this.itemInfo.sub_components.forEach(item => {
-        this.$set(item, 'checked', (item.checked || false));
-        if (item.checked) {
-          this.activeName = item.name;
+        props: {
+            itemInfo: {
+                type: Object,
+                default () {
+                    return {}
+                }
+            },
+            isShowVar: {
+                type: Boolean,
+                default: () => true
+            }
+        },
+        data () {
+            return {
+                trueStatus: true,
+                falseStatus: false,
+                activeName: 'send_email_message',
+                show: true
+            }
+        },
+        computed: {
+        },
+        created () {
+            this.itemInfo.sub_components.forEach(item => {
+                this.$set(item, 'checked', (item.checked || false))
+                if (item.checked) {
+                    this.activeName = item.name
+                }
+                this.$set(item, 'label', item.name)
+                this.$set(item, 'icon', '')
+                switch (item.key) {
+                    case 'send_email_message':
+                        item.icon = 'icon-email'
+                        break
+                    case 'send_sms_message':
+                        item.icon = 'icon-mobile'
+                        break
+                    case 'send_wechat_message':
+                        item.icon = 'icon-weixin'
+                        break
+                }
+                // item.name = item.key
+            })
+        },
+        mounted () {
+        },
+        methods: {
+            changPanel (name) {
+                this.activeName = name
+            },
+            changePanelStatus (panel, pIndex) {
+                console.log(panel, pIndex)
+                // this.show = false
+                // this.$nextTick(() => {
+                //     panel.checked = true
+                //     this.itemInfo.sub_components.splice(pIndex, 1)
+                //     this.show = true
+                // })
+            }
         }
-        this.$set(item, 'label', item.name);
-        this.$set(item, 'icon', '');
-        switch (item.key) {
-          case 'send_email_message':
-            item.icon = 'icon-email';
-            break;
-          case 'send_sms_message':
-            item.icon = 'icon-mobile';
-            break;
-          case 'send_wechat_message':
-            item.icon = 'icon-weixin';
-            break;
-        }
-        // item.name = item.key
-      });
-    },
-    mounted() {
-    },
-    methods: {
-      changPanel(name) {
-        this.activeName = name;
-      },
-      changePanelStatus(panel, pIndex) {
-        console.log(panel, pIndex);
-        // this.show = false
-        // this.$nextTick(() => {
-        //     panel.checked = true
-        //     this.itemInfo.sub_components.splice(pIndex, 1)
-        //     this.show = true
-        // })
-      },
-    },
-  };
+    }
 </script>
 
 <style lang='scss' scoped>

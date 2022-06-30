@@ -328,9 +328,16 @@
               arrow: 'Right',
               id: fromNode.id,
             },
-            target: {
-              arrow: 'Left',
-              id: this.valueInfo.node.id,
+            // 删除线条
+            clickDelete (node) {
+                const _this = this
+                this.$bkInfo({
+                    type: 'warning',
+                    title: this.$t(`m['此操作不可撤销，确定要删除吗？']`),
+                    confirmFn () {
+                        _this.$emit('openDelete', node)
+                    }
+                })
             },
             lineInfo: res.data,
           };

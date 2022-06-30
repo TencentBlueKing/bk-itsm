@@ -92,26 +92,73 @@
             </ServiceForm>
           </div>
         </div>
-      </section>
-    </div>
-    <div v-show="crtForm" class="drag-line" @mousedown="handleDragLine"></div>
-    <div v-show="crtForm" class="edit-service-field">
-      <div class="edit-service-title">{{$t(`m['字段属性']`) }}</div>
-      <div class="edit-service-forms">
-        <template v-for="form in ticketNodeForm">
-          <form-edit-item
-            v-if="form.id === crtForm"
-            :key="form.id"
-            :fields="ticketNodeForm"
-            :form="form"
-            :workflow-id="serviceInfo.workflow_id"
-            :node-id="createTicketNodeId"
-            @onEditCancel="onEditCancel"
-            @getAddFieldStatus="getAddFieldStatus"
-            @onEditConfirm="onEditConfirm">
-          </form-edit-item>
-        </template>
-      </div>
+        <bk-dialog
+            width="800"
+            :value="isCreateService"
+            :mask-close="false"
+            :title="$t(`m['创建服务']`)"
+            :auto-close="false"
+            @confirm="onBasicFormSubmit"
+            @cancel="onBasicFormCancel">
+            <bk-form
+                ref="basicForm"
+                form-type="vertical"
+                :label-width="300"
+                class="basic-form"
+                :rules="rules"
+                :model="formData">
+                <bk-form-item
+                    data-test-id="service-input-serviceName"
+                    :label="$t(`m.newCommon['服务名称']`)"
+                    :required="true"
+                    property="name"
+                    error-display-type="normal">
+                    <bk-input v-model="formData.name" :maxlength="120" :show-word-limit="true"></bk-input>
+                </bk-form-item>
+                <bk-form-item
+                    :label="$t(`m.serviceConfig['服务描述']`)"
+                    property="desc">
+                    <bk-input v-model="formData.desc" type="textarea" :row="3" :maxlength="100"></bk-input>
+                </bk-form-item>
+                <bk-form-item
+                    data-test-id="service-select-serviceDirectory"
+                    :label="$t(`m.tickets['所属目录']`)"
+                    :required="true"
+                    property="catalog_id"
+                    error-display-type="normal">
+                    <select-tree
+                        v-model="formData.catalog_id"
+                        :list="dirList"
+                        ext-cls="bk-form-width">
+                    </select-tree>
+                </bk-form-item>
+                <bk-form-item
+                    data-test-id="service-select-serviceType"
+                    :label="$t(`m.serviceConfig['服务类型']`)"
+                    :required="true"
+                    property="key"
+                    error-display-type="normal">
+                    <bk-select v-model="formData.key"
+                        :placeholder="$t(`m.serviceConfig['请选择服务类型']`)"
+                        :clearable="false"
+                        searchable
+                        :font-size="'medium'">
+                        <bk-option v-for="option in serviceTypeList"
+                            :key="option.key"
+                            :id="option.key"
+                            :name="option.name">
+                        </bk-option>
+                    </bk-select>
+                </bk-form-item>
+            </bk-form>
+        </bk-dialog>
+        <!-- 选择服务模板 -->
+        <choose-service-template-dialog
+            :is-show.sync="isShowChooseSerTempDialog"
+            :create-info="currCreateFormWay"
+            :service-id="serviceId"
+            @updateServiceSource="updateServiceSource">
+        </choose-service-template-dialog>
     </div>
     <bk-dialog
       width="800"

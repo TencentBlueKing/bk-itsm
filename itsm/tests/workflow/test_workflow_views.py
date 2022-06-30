@@ -138,7 +138,7 @@ class StateViewTest(TestCase):
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         self.assertEqual(rsp.data["result"], True)
-        self.assertIsInstance(rsp.data["data"], dict)
+        self.assertIsInstance(rsp.data["data"], list)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_sign_variables(self):

@@ -159,6 +159,7 @@ from itsm.component.utils.client_backend_query import (
     get_user_leader,
     get_user_departments,
     get_bk_users,
+    get_bk_business,
 )
 from itsm.sla_engine.constants import (
     RUNNING as SLA_RUNNING,
@@ -791,19 +792,30 @@ class Status(Model):
         """是否在审批/派单/认领列表中"""
         return username in self.get_processors()
 
-    def get_sign_display_processors(self, operator):
+    def get_sign_display_processors(self):
         """获取会签节点处理人/角色显示名称"""
         display_name = ""
         if self.processors_type in ["GENERAL", "CMDB"]:
             role_ids = list_by_separator(self.processors)
-            role_name_list = list(
-                UserRole.objects.filter(id__in=role_ids).values_list("name", "members")
-            )
-            role_name_members_list = [
-                "{}({})".format(role_name[0], role_name[1].strip(","))
-                for role_name in role_name_list
-            ]
-            display_name = ",".join(role_name_members_list)
+            roles = UserRole.objects.filter(id__in=role_ids)
+            role_name_list = list(roles.values_list("name", "members"))
+            if self.processors_type == "CMDB":
+                if self.bk_biz_id == DEFAULT_BK_BIZ_ID:
+                    return []
+
+                cmdb_users = get_bk_business(
+                    self.bk_biz_id, role_type=[role.role_key for role in roles]
+                )
+                display_name = "{}({})".format(
+                    "CMDB业务公用角色", ",".join(list_by_separator(cmdb_users))
+                )
+
+            if self.processors_type == "GENERAL":
+                role_name_members_list = [
+                    "{}({})".format(role_name[0], role_name[1].strip(","))
+                    for role_name in role_name_list
+                ]
+                display_name = ",".join(role_name_members_list)
 
         if self.processors_type == "PERSON":
             users = self.get_processor_in_sign_state()
@@ -811,12 +823,6 @@ class Status(Model):
                 display_name = transform_username(users)
             else:
                 user_list = [user for user in users.split(",") if user]
-                if operator in user_list:
-                    operator_index = user_list.index(operator)
-                    user_list[0], user_list[operator_index] = (
-                        user_list[operator_index],
-                        user_list[0],
-                    )
                 display_name = transform_username(user_list)
 
         if self.processors_type == "ORGANIZATION":

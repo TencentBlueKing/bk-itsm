@@ -22,6 +22,8 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import copy
+
 import jsonfield
 from django.db import models, transaction
 
@@ -34,6 +36,7 @@ from itsm.component.constants import (
     PUBLIC_PROJECT_PROJECT_KEY,
     EMPTY_DICT,
     FIRST_ORDER,
+    CATALOG,
 )
 from itsm.iadmin.contants import PROJECT_SETTING
 from itsm.project.models.base import Model
@@ -151,6 +154,28 @@ class Project(Model):
                 desc="全局公共项目，用于存放公共字段",
                 creator="admin",
             )
+        except BaseException as error:
+            print("init_default_project error， error is {}".format(error))
+
+    @classmethod
+    def init_lesscode_project(cls):
+
+        if Project.objects.filter(key="lesscode").exists():
+            return
+        try:
+            project = Project.objects.create(
+                key="lesscode", name="Lesscode", desc="蓝鲸低代码项目", creator="admin"
+            )
+            catalogs = copy.deepcopy(CATALOG)
+            for catalog in catalogs:
+                catalog["key"] = "{}_{}".format(project.key, catalog["key"])
+                catalog["parent_key"] = "{}_{}".format(
+                    project.key, catalog["parent_key"]
+                )
+            project.init_service_catalogs(catalogs)
+            project.init_project_settings()
+            project.init_project_sla()
+            project.init_custom_notify_template()
         except BaseException as error:
             print("init_default_project error， error is {}".format(error))
 

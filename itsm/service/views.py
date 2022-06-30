@@ -520,6 +520,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
 
         field_ids = []
         state = self.get_state_by_service(to_service)
+        old_fields = state.fields
         for field in table.tag_data()["fields"]:
             field.pop("id")
             field.pop("project_key", None)
@@ -533,11 +534,22 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
         state.fields = field_ids
         state.save()
 
+        Field.objects.filter(id__in=old_fields).delete()
+
     def copy_fields_from_service(self, from_service, to_service):
         field_ids = []
         state = self.get_state_by_service(to_service)
         from_service_fields = from_service.workflow.get_first_state_fields()
+
+        old_fields = state.fields
+
         for field in from_service_fields:
+            workflow_id = to_service.workflow.workflow_id
+            if field["key"] == "bk_biz_id":
+                workflow = Workflow.objects.get(id=workflow_id)
+                workflow.is_biz_needed = True
+                workflow.save()
+
             field.pop("id")
             field.pop("project_key", None)
             field["workflow_id"] = to_service.workflow.workflow_id
@@ -547,6 +559,8 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
 
         state.fields = field_ids
         state.save()
+
+        Field.objects.filter(id__in=old_fields).delete()
 
     @action(detail=True, methods=["post"])
     def sla_validate(self, request, *args, **kwargs):

@@ -21,274 +21,276 @@
   -->
 
 <template>
-  <div class="wang-editor-template">
-    <ul v-show="isShowSelect" class="select-pattern">
-      <li v-for="(item, index) in selectPatternList" :key="index" @click="postComment(item.type)">
-        <i :class="item.icon"></i>
-        <span>{{ item.name}}</span>
-        <p>{{ item.docs }}</p>
-      </li>
-    </ul>
-    <!-- 回复评论 -->
-    <div v-if="isReplyComment" class="reply-comment">
-      <div class="reply-title">
-        <i class="bk-itsm-icon icon-yinyong"></i>
-        <span class="quote-creator">{{ $t('m["回复"]') }} {{ replyContent.creator }} {{ $t('m["的评论"]') }} :</span>
-        <span class="repeal-reply" @click="repealReply">{{ $t('m["取消回复"]') }}</span>
-      </div>
-      <div class="reply-content">
-        <div v-html="replyContent.content"></div>
-      </div>
+    <div class="wang-editor-template">
+        <ul v-show="isShowSelect" class="select-pattern">
+            <li v-for="(item, index) in selectPatternList" :key="index" @click="postComment(item.type)">
+                <i :class="item.icon"></i>
+                <span>{{ item.name}}</span>
+                <p>{{ item.docs }}</p>
+            </li>
+        </ul>
+        <!-- 回复评论 -->
+        <div v-if="isReplyComment" class="reply-comment">
+            <div class="reply-title">
+                <i class="bk-itsm-icon icon-yinyong"></i>
+                <span class="quote-creator">{{ $t('m["回复"]') }} {{ replyContent.creator }} {{ $t('m["的评论"]') }} :</span>
+                <span class="repeal-reply" @click="repealReply">{{ $t('m["取消回复"]') }}</span>
+            </div>
+            <div class="reply-content">
+                <div v-html="replyContent.content"></div>
+            </div>
+        </div>
+        <editor
+            v-if="isShowEditor"
+            ref="editorAdd"
+            :editor-id="'editor1'"
+            :comment-type="commentType"
+            @postComment="postComment"
+            @changebuttonStatus="changebuttonStatus">
+        </editor>
+        <bk-button v-show="isShowEditor" class="submit" :theme="'primary'" @click="submit">{{ isEditEditor ? $t('m["发布"]') : $t('m["返回"]') }}</bk-button>
+        <bk-divider></bk-divider>
+        <div>{{ $t('m["全部评论"]') }}</div>
+        <ul v-bkloading="{ isLoading: commentLoading }" v-show="commentList.length !== 0" class="comment-list">
+            <li v-for="(item, index) in commentList" :key="index" :class="[{ 'twinkling': flash[item.id] }]">
+                <comment-item
+                    :comment-list="commentList"
+                    :cur-comment="item"
+                    @replyComment="replyComment"
+                    @refreshComment="refreshComment"
+                    @jumpTargetComment="jumpTargetComment"
+                    @editComment="editComment">
+                </comment-item>
+            </li>
+            <li class="page-over">
+                <div v-bkloading="{ isLoading: moreLoading }"></div>
+                <span v-if="isPageOver">{{ $t('m["评论已经加载完了"]') }}</span>
+            </li>
+        </ul>
+        <div v-if="commentList.length === 0" class="no-comment">
+            <img :src="imgUrl">
+            <p>{{ $t('m["当前暂无评论，快去评论吧！"]') }}</p>
+        </div>
+        <bk-dialog
+            v-model="isEdit"
+            :title="editType === 'edit' ? $t(`m['编辑评论']`) : $t(`m['回复评论']`)"
+            width="800"
+            theme="primary"
+            :mask-close="false"
+            @confirm="submitEdit">
+            <editor ref="editorEdit"
+                :editor-id="'editor2'"
+                :comment-type-reply="commentType">
+            </editor>
+        </bk-dialog>
     </div>
-    <editor
-      v-if="isShowEditor"
-      ref="editorAdd"
-      :editor-id="'editor1'"
-      :comment-type="commentType"
-      @postComment="postComment"
-      @changebuttonStatus="changebuttonStatus">
-    </editor>
-    <bk-button v-show="isShowEditor" class="submit" :theme="'primary'" @click="submit">{{ isEditEditor ? $t('m["发布"]') : $t('m["返回"]') }}</bk-button>
-    <bk-divider></bk-divider>
-    <div>{{ $t('m["全部评论"]') }}</div>
-    <ul v-bkloading="{ isLoading: commentLoading }" v-show="commentList.length !== 0" class="comment-list" :style="isShowEditor ? isReplyComment ? 'height: calc(100vh - 820px)': 'height: calc(100vh - 729px)' : 'height: calc(100vh - 647px)'">
-      <li v-for="(item, index) in commentList" :key="index" :class="[{ 'twinkling': flash[item.id] }]">
-        <comment-item
-          :comment-list="commentList"
-          :cur-comment="item"
-          @replyComment="replyComment"
-          @refreshComment="refreshComment"
-          @jumpTargetComment="jumpTargetComment"
-          @editComment="editComment">
-        </comment-item>
-      </li>
-      <li class="page-over">
-        <div v-bkloading="{ isLoading: moreLoading }"></div>
-        <span v-if="isPageOver">{{ $t('m["评论已经加载完了"]') }}</span>
-      </li>
-    </ul>
-    <div v-if="commentList.length === 0" class="no-comment">
-      <img :src="imgUrl">
-      <p>{{ $t('m["当前暂无评论，快去评论吧！"]') }}</p>
-    </div>
-    <bk-dialog
-      v-model="isEdit"
-      :title="editType === 'edit' ? $t(`m['编辑评论']`) : $t(`m['回复评论']`)"
-      width="800"
-      theme="primary"
-      :mask-close="false"
-      @confirm="submitEdit">
-      <editor ref="editorEdit"
-        :editor-id="'editor2'"
-        :comment-type-reply="commentType">
-      </editor>
-    </bk-dialog>
-  </div>
 </template>
 <script>
-  import editor from './editor.vue';
-  import commentItem from './commentItem.vue';
-  export default {
-    name: 'ticketComment',
-    components: {
-      commentItem,
-      editor,
-    },
-    props: {
-      commentId: [Number, String],
-      commentList: Array,
-      ticketInfo: Object,
-      ticketId: [Number, String],
-      commentLoading: Boolean,
-      moreLoading: Boolean,
-      isPageOver: Boolean,
-      hasNodeOptAuth: Boolean,
-      isShowBasicInfo: Boolean,
-      stepActiveTab: String,
-    },
-    data() {
-      return {
-        curCommentId: '',
-        commentListDom: '',
-        commentType: '', // 评论类型
-        isShowSelect: true,
-        isShowEditor: false, // 打开富文本
-        isEditEditor: false, // 是否编辑文本
-        selectPatternList: [
-          {
-            type: 'INSIDE',
-            icon: 'bk-itsm-icon icon-suoding common-color',
-            name: this.$t('m[\'内部评论\']'),
-            docs: this.$t('m[\'仅单据相关人员可发布的评论\']'),
-          },
-          {
-            type: 'PUBLIC',
-            icon: 'bk-itsm-icon icon-jiesuo common-color',
-            name: this.$t('m[\'外部评论\']'),
-            docs: this.$t('m[\'发布的评论所有人可见\']'),
-          },
-        ],
-        // commentList: [],
-        editType: '',
-        isEdit: false,
-        flash: {},
-        imgUrl: require('@/images/box.png'),
-        isReplyComment: false,
-        replyCommnetId: '',
-        replyContent: {
-          creator: '',
-          content: '',
+    import editor from './editor.vue'
+    import commentItem from './commentItem.vue'
+    export default {
+        name: 'ticketComment',
+        components: {
+            commentItem,
+            editor
         },
-        commentDomHeight: '',
-        isShowCommentScroll: false,
-        basicInDomHeight: 54, // 基本信息初始高度
-      };
-    },
-    watch: {
-      stepActiveTab(val) {
-        if (val === 'allComments') {
-          this.getCommentHeight();
-        }
-      },
-    },
-    mounted() {
-      this.commentListDom = document.querySelector('.comment-list');
-      this.getBasicHeight();
-    },
-    methods: {
-      getCommentHeight() {
-        const commentDom = document.querySelector('.wang-editor-template');
-        this.commentDomHeight = commentDom.clientHeight;
-        this.isShowCommentScroll = commentDom.clientHeight > 500;
-      },
-      getBasicHeight() {
-        const basicDom = document.querySelector('.base-info-content');
-        this.basicInDomHeight = basicDom.clientHeight;
-      },
-      editComment(curComment, type) {
-        const _this = this.$refs.editorEdit.editor;
-        _this.txt.clear();
-        this.editType = type;
-        this.curCommentId = curComment.id;
-        if (type === 'edit') _this.txt.html(curComment.content);
-        // 新增回复评论的类型取决于父级类型
-        this.commentType = curComment.remark_type;
-        this.isEdit = true;
-      },
-      replyComment(curComment) {
-        this.replyCommnetId = curComment.id;
-        this.isReplyComment = true;
-        this.commentType = curComment.remark_type;
-        this.postComment(curComment.remark_type);
-        this.replyContent.creator = curComment.creator;
-        this.replyContent.content = curComment.content;
-        this.commentListDom.scrollTop = 0;
-      },
-      repealReply() {
-        this.replyCommnetId = '';
-        this.isReplyComment = false;
-        this.isShowSelect = true;
-        this.isShowEditor = false;
-      },
-      changebuttonStatus(val) {
-        this.isEditEditor = val;
-      },
-      submitEdit() {
-        const _this = this.$refs.editorEdit.editor;
-        const text = _this.txt.html();
-        this.editorEditData = '';
-        _this.txt.clear();
-        let url = '';
-        const params = {
-          content: text,
-          users: [],
-          remark_type: this.commentType,
-        };
-        if (this.editType === 'edit') {
-          params.id = this.curCommentId;
-          url = 'ticket/updateTicketComment';
-        } else {
-          params.ticket_id = this.ticketId;
-          params.parent__id = this.curCommentId;
-          url = 'ticket/addTicketComment';
-        }
-        this.$store.dispatch(url, params).then(() => {
-          this.refreshComment();
-          this.commentListDom.scrollTop = 0;
-        });
-      },
-      refreshComment() {
-        this.isEditEditor = false;
-        this.$emit('refreshComment');
-      },
-      postComment(type) {
-        if (!(this.hasNodeOptAuth && this.ticketInfo.updated_by.split(',').includes(window.username)) && type === 'INSIDE') {
-          this.$bkMessage({
-            message: this.$t('m["你当前无法发表内部评论"]'),
-            theme: 'warning ',
-          });
-          return;
-        }
-        this.commentType = type;
-        this.isShowSelect = false;
-        this.isShowEditor = true;
-      },
-      jumpTargetComment(curComment) {
-        // 获取parent的评论下标
-        const curCommentIndex = this.commentList.indexOf(this.commentList.filter(item => item.id === curComment.parent)[0]);
-        if (curCommentIndex !== -1) {
-          const commentListDom = document.querySelector('.comment-list');
-          const heights = Array.from(commentListDom.childNodes).slice(0, curCommentIndex)
-            .map(item => item.clientHeight);
-          const sumHeight = heights.reduce((pre, cur) => pre + cur);
-          this.$set(this.flash, curComment.parent__id, true);
-          const timer = setTimeout(() => {
-            this.$set(this.flash, curComment.parent__id, false);
-            clearTimeout(timer);
-          }, 2000);
-          commentListDom.scrollTop = sumHeight + 50;
-        } else {
-          this.$emit('addTargetComment', curComment);
-        }
-      },
-      submit() {
-        // 评论内容
-        if (!this.isEditEditor) {
-          this.repealReply();
-          return;
-        }
-        this.isShowEditor = false;
-        this.isReplyComment = false;
-        if (this.$refs.editorAdd) {
-          const _this = this.$refs.editorAdd.editor;
-          const text = _this.txt.html();
-          this.editorData = '';
-          this.isShowSelect = true;
-          _this.txt.clear();
-          const params = {
-            content: text,
-            ticket_id: this.ticketId,
-            parent__id: this.replyCommnetId || this.commentId,
-            remark_type: this.commentType,
-            users: [],
-          };
-          if (text) {
-            try {
-              this.$store.dispatch('ticket/addTicketComment', params).then(() => {
-                this.replyCommnetId = '';
-                this.refreshComment();
-                this.commentListDom.scrollTop = 0;
-              });
-            } catch (e) {
-              console.log(e);
-            } finally {
-              this.isReplyComment = false;
+        props: {
+            commentId: [Number, String],
+            commentList: Array,
+            ticketInfo: Object,
+            ticketId: [Number, String],
+            commentLoading: Boolean,
+            moreLoading: Boolean,
+            isPageOver: Boolean,
+            hasNodeOptAuth: Boolean,
+            isShowBasicInfo: Boolean,
+            stepActiveTab: String
+        },
+        data () {
+            return {
+                curCommentId: '',
+                commentListDom: '',
+                commentType: '', // 评论类型
+                isShowSelect: true,
+                isShowEditor: false, // 打开富文本
+                isEditEditor: false, // 是否编辑文本
+                selectPatternList: [
+                    {
+                        type: 'INSIDE',
+                        icon: 'bk-itsm-icon icon-suoding common-color',
+                        name: this.$t(`m['内部评论']`),
+                        docs: this.$t(`m['仅单据相关人员可发布的评论']`)
+                    },
+                    {
+                        type: 'PUBLIC',
+                        icon: 'bk-itsm-icon icon-jiesuo common-color',
+                        name: this.$t(`m['外部评论']`),
+                        docs: this.$t(`m['发布的评论所有人可见']`)
+                    }
+                ],
+                // commentList: [],
+                editType: '',
+                isEdit: false,
+                flash: {},
+                imgUrl: require('@/images/box.png'),
+                isReplyComment: false,
+                replyCommnetId: '',
+                replyContent: {
+                    creator: '',
+                    content: ''
+                },
+                commentDomHeight: '',
+                isShowCommentScroll: false,
+                basicInDomHeight: 54 // 基本信息初始高度
             }
-          }
+        },
+        watch: {
+            stepActiveTab (val) {
+                if (val === 'allComments') {
+                    this.getCommentHeight()
+                }
+            }
+        },
+        mounted () {
+            this.commentListDom = document.querySelector('.comment-list')
+            this.getBasicHeight()
+        },
+        methods: {
+            getCommentHeight () {
+                const commentDom = document.querySelector('.wang-editor-template')
+                this.commentDomHeight = commentDom.clientHeight
+                this.isShowCommentScroll = commentDom.clientHeight > 500
+            },
+            getBasicHeight () {
+                const basicDom = document.querySelector('.base-info-content')
+                this.basicInDomHeight = basicDom.clientHeight
+            },
+            editComment (curComment, type) {
+                const _this = this.$refs.editorEdit.editor
+                _this.txt.clear()
+                this.editType = type
+                this.curCommentId = curComment.id
+                if (type === 'edit') _this.txt.html(curComment.content)
+                // 新增回复评论的类型取决于父级类型
+                this.commentType = curComment.remark_type
+                this.isEdit = true
+            },
+            replyComment (curComment) {
+                this.replyCommnetId = curComment.id
+                this.isReplyComment = true
+                this.commentType = curComment.remark_type
+                this.postComment(curComment.remark_type)
+                this.replyContent.creator = curComment.creator
+                this.replyContent.content = curComment.content
+                this.commentListDom.scrollTop = 0
+            },
+            repealReply () {
+                this.replyCommnetId = ''
+                this.isReplyComment = false
+                this.isShowSelect = true
+                this.isShowEditor = false
+            },
+            changebuttonStatus (val) {
+                this.isEditEditor = val
+            },
+            submitEdit () {
+                const _this = this.$refs.editorEdit.editor
+                const text = _this.txt.html()
+                this.editorEditData = ''
+                _this.txt.clear()
+                let url = ''
+                const params = {
+                    content: text,
+                    users: [],
+                    remark_type: this.commentType
+                }
+                if (this.editType === 'edit') {
+                    params.id = this.curCommentId
+                    url = 'ticket/updateTicketComment'
+                } else {
+                    params.ticket_id = this.ticketId
+                    params.parent__id = this.curCommentId
+                    url = 'ticket/addTicketComment'
+                }
+                this.$store.dispatch(url, params).then(res => {
+                    this.refreshComment()
+                    this.commentListDom.scrollTop = 0
+                })
+            },
+            refreshComment () {
+                this.isEditEditor = false
+                this.$emit('refreshComment')
+            },
+            postComment (type) {
+                if (!(this.hasNodeOptAuth && this.ticketInfo.updated_by.split(',').includes(window.username)) && type === 'INSIDE') {
+                    this.$bkMessage({
+                        message: this.$t('m["你当前无法发表内部评论"]'),
+                        theme: 'warning '
+                    })
+                    return
+                }
+                this.commentType = type
+                this.isShowSelect = false
+                this.isShowEditor = true
+            },
+            jumpTargetComment (curComment) {
+                // 获取parent的评论下标
+                const curCommentIndex = this.commentList.indexOf(this.commentList.filter(item => item.id === curComment.parent)[0])
+                if (curCommentIndex !== -1) {
+                    const commentListDom = document.querySelector('.ticket-container-left')
+                    const baseInfoDom = document.querySelector('.base-info-content')
+                    const heights = Array.from(commentListDom.childNodes).slice(0, curCommentIndex).map(item => {
+                        return item.clientHeight
+                    })
+                    const sumHeight = heights.reduce((pre, cur) => pre + cur)
+                    this.$set(this.flash, curComment.parent__id, true)
+                    const timer = setTimeout(() => {
+                        this.$set(this.flash, curComment.parent__id, false)
+                        clearTimeout(timer)
+                    }, 2000)
+                    commentListDom.scrollTop = sumHeight + 340 + baseInfoDom.offsetHeight
+                } else {
+                    this.$emit('addTargetComment', curComment)
+                }
+            },
+            submit () {
+                // 评论内容
+                if (!this.isEditEditor) {
+                    this.repealReply()
+                    return
+                }
+                this.isShowEditor = false
+                this.isReplyComment = false
+                if (this.$refs.editorAdd) {
+                    const _this = this.$refs.editorAdd.editor
+                    const text = _this.txt.html()
+                    this.editorData = ''
+                    this.isShowSelect = true
+                    _this.txt.clear()
+                    const params = {
+                        content: text,
+                        ticket_id: this.ticketId,
+                        parent__id: this.replyCommnetId || this.commentId,
+                        remark_type: this.commentType,
+                        users: []
+                    }
+                    if (text) {
+                        try {
+                            this.$store.dispatch('ticket/addTicketComment', params).then(res => {
+                                this.replyCommnetId = ''
+                                this.refreshComment()
+                                this.commentListDom.scrollTop = 0
+                            })
+                        } catch (e) {
+                            console.log(e)
+                        } finally {
+                            this.isReplyComment = false
+                        }
+                    }
+                }
+            }
         }
-      },
-    },
-  };
+    }
 </script>
 <style scoped lang="scss">
     @import '../../../../scss/mixins/scroller.scss';
@@ -347,10 +349,7 @@
             }
         }
         .comment-list {
-            overflow: auto;
-            height: calc(100vh - 647px);
             @include scroller;
-            // min-height: 100px;
             li {
                 padding-top: 20px;
             }
