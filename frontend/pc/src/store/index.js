@@ -187,10 +187,10 @@ export default new Vuex.Store({
         return this.$t(`m.wiki["不能为空"]`);
       }
       // 长度校验
-      const typelist;
-      const islength;
-      const minlength;
-      const maxlength;
+      let typelist;
+      let islength;
+      let minlength;
+      let maxlength;
       // type eg: 'Metacharacter_1$length^150_chinse'
       if (type) {
         typelist = type.toString().split("_");
