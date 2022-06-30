@@ -494,7 +494,7 @@
           workflow: this.configur.workflow,
         };
         const stateId = this.configur.id;
-        this.$store.dispatch('cdeploy/putWebHook', { params, stateId }).then((res) => {
+        this.$store.dispatch('cdeploy/putWebHook', { params, stateId }).then(() => {
           this.$bkMessage({
             message: this.$t('m[\'保存成功\']'),
             theme: 'success',
