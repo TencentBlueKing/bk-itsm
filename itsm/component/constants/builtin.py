@@ -462,6 +462,8 @@ BUILTIN_IAM_SERVICES = [
     },
 ]
 
+BKBASE_CATALOG_KEY = "LANJINGJICHUPINGTAI"
+
 BUILTIN_BKBASE_SERVICES = [
     {
         "name": "创建资源组",
@@ -470,7 +472,7 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
     {
         "name": "资源组扩容",
@@ -479,7 +481,7 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
     {
         "name": "项目申请资源组",
@@ -488,7 +490,7 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
     {
         "name": "项目申请业务数据",
@@ -497,7 +499,7 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
     {
         "name": "申请角色权限",
@@ -506,7 +508,7 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
     {
         "name": "离线计算补算",
@@ -515,7 +517,7 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
     {
         "name": "第三方应用授权申请",
@@ -524,7 +526,7 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
     {
         "name": "TDM数据源接入",
@@ -533,7 +535,7 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
 ]
 
