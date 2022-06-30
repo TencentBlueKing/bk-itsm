@@ -87,9 +87,9 @@
         <!-- 富文本 -->
         <div v-else-if="item.type === 'RICHTEXT'" class="bk-fields-done-item">
             <span v-if="isShowName" class="bk-li-left" style="float: initial;" :title="item.name">{{item.name}}</span>
-            <span class="bk-li-right bk-fields-richtext tui-editor-contents"
-                v-html="item.value">
-            </span>
+            <div class="bk-li-right bk-fields-richtext tui-editor-contents"
+                v-html="item.value" :title="item.value.replace(/<[^>]+>/g, '')">
+            </div>
         </div>
         <!-- 多行文本展现出后台保存的内容格式 -->
         <div v-else-if="item.type === 'TEXT'" class="bk-fields-done-item">
@@ -242,7 +242,7 @@
             }
             if (this.item.type === 'RICHTEXT') {
                 // 这里可以兼容之前创建的 a 标签没加 _blank 的 value,显示时加上
-                this.item.value = appendTargetAttrToHtml(this.item.value)
+                this.item.value = appendTargetAttrToHtml(this.item.value).replace(/<p>/g, '<p class="rich-text">')
             }
         },
         methods: {
@@ -364,6 +364,15 @@
             }
             .bk-member-edit {
                 margin-left: 30px;
+            }
+            .bk-fields-richtext {
+                font-size: 14px;
+                /deep/ .rich-text {
+                    margin: 5px 0;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
             }
         }
     }

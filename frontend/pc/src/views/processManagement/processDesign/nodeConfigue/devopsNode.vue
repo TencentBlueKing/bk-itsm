@@ -82,9 +82,26 @@
                         :rules="pipelineRules[pipeline.id]"
                         :required="pipeline.required">
                         <bk-input
+                            :disabled="hookVarList[pipeline.id]"
                             v-model="pipelineData[pipeline.id]"
                             :clearable="true">
                         </bk-input>
+                        <bk-checkbox
+                            ext-cls="select-check"
+                            v-model="hookVarList[pipeline.id]"
+                            @change="onChangeChecked($event, pipeline)">
+                        </bk-checkbox>
+                        <bk-select :disabled="!hookVarList[pipeline.id]" style="width: 200px;"
+                            ext-cls="select-custom"
+                            searchable
+                            :value="hookSelectList[pipeline.id].replace(/^\$\{/, '').replace(/\}$/, '') || ''"
+                            @selected="changeConstant($event, pipeline)">
+                            <bk-option v-for="option in stateList"
+                                :key="option.id"
+                                :id="option.key"
+                                :name="option.name">
+                            </bk-option>
+                        </bk-select>
                     </bk-form-item>
                 </bk-form>
                 <span class="setion-title-icon" @click.stop="showPipelineStages = !showPipelineStages">
@@ -185,6 +202,8 @@
                 pipelineDisabled: true,
                 pipelineLoading: false,
                 constants: [],
+                hookVarList: {},
+                hookSelectList: {},
                 pipelineFormList: [],
                 pipelineData: {}, // 流水线参数
                 pipeFormLoading: false,
@@ -205,7 +224,8 @@
                 processorsInfo: {
                     type: '',
                     value: ''
-                }
+                },
+                stateList: []
             }
         },
         watch: {
@@ -225,6 +245,7 @@
         },
         mounted () {
             this.initData()
+            this.getRelatedFields()
         },
         methods: {
             async initData () {
@@ -235,14 +256,41 @@
                         this.basicInfo.businessId = res.data.filter(item => item.project_name === this.configur.extras.devops_info.project_id.name)[0].englishName
                         this.onSelectBusiness()
                         this.basicInfo.pipelineId = this.configur.extras.devops_info.pipeline_id.value
-                        this.getPipelineInfo(1)
                         this.processorsInfo = {
                             type: this.configur.processors_type,
                             value: this.configur.processors
                         }
                         this.getExcludeRoleTypeList()
+                        this.configur.extras.devops_info.constants.forEach(item => {
+                            this.$set(this.hookVarList, item.key, item.checked)
+                            this.$set(this.hookSelectList, item.key, item.checked ? item.value : '')
+                        })
+                        this.getPipelineInfo(1)
                     }
                 })
+            },
+            async getRelatedFields () {
+                const params = {
+                    workflow: this.flowInfo.id,
+                    state: this.configur.id,
+                    field: ''
+                }
+                await this.$store.dispatch('apiRemote/get_related_fields', params).then(res => {
+                    this.stateList = res.data
+                }).catch(res => {
+                    errorHandler(res, this)
+                }).finally(() => {
+                })
+            },
+            onChangeChecked (value, pipeline) {
+                if (!value) {
+                    this.pipelineData[pipeline.id] = pipeline.defaultValue
+                    this.hookSelectList[pipeline.id] = ''
+                }
+            },
+            changeConstant (value, pipeline) {
+                this.pipelineData[pipeline.id] = '${' + value + '}'
+                this.hookSelectList[pipeline.id] = value
             },
             // 计算处理人类型需要排除的类型
             getExcludeRoleTypeList () {
@@ -292,7 +340,7 @@
                     this.pipelineFormList = res[0].data.properties
                     res[0].data.properties.forEach(item => {
                         if (init) item.defaultValue = this.configur.extras.devops_info.constants.filter(ite => ite.name === item.id)[0].value
-                        this.$set(this.pipelineData, item.id, item.defaultValue)
+                        this.$set(this.pipelineData, item.id, this.hookVarList[item.id] ? '${' + item.defaultValue + '}' : item.defaultValue)
                         this.pipelineRules[item.id] = [{
                             required: item.required,
                             message: i18n.t('m.treeinfo["字段必填"]'),
@@ -322,9 +370,11 @@
                     const pipelineData = this.pipelineList.filter(item => item.pipelineId === this.basicInfo.pipelineId)[0]
                     const constants = Object.keys(this.pipelineData).map(item => {
                         return {
-                            'value': this.pipelineData[item],
+                            'value': this.pipelineData[item].slice(2, this.pipelineData[item].length - 1),
                             'name': item,
-                            'key': item
+                            'key': item,
+                            'checked': this.hookVarList[item],
+                            'type': this.hookSelectList[item] !== '' ? 'variable' : 'custom'
                         }
                     })
                     const { value: processors, type: processors_type } = this.$refs.processors.getValue()
@@ -386,6 +436,7 @@
             display: none;
         }
         /deep/ .common-section-card-body {
+            width: 100%;
             padding: 20px;
         }
         /deep/ .bk-form-width {
@@ -420,5 +471,15 @@
     }
     .pipelineForm {
         margin-bottom: 10px;
+        /deep/ .bk-form-content {
+            display: flex;
+            align-items: center;
+            .bk-form-control {
+                width: 70%;
+            }
+            .select-check {
+                margin: 0 auto;
+            }
+        }
     }
 </style>

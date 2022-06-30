@@ -352,7 +352,7 @@
                             <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeFile"></i>
                         </div>
                     </template>
-                    <p v-if="isCheckImport" class="import-error-tip">{{ errorName }}为必选项!</p>
+                    <p v-if="isCheckImport" class="import-error-tip">{{ errorName + $t(`m['为必选项!']`) }}</p>
                 </bk-form>
             </bk-dialog>
         </div>

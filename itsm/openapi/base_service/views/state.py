@@ -126,3 +126,23 @@ class StateViewSet(BaseWorkflowElementViewSet):
             state_type=state.type,
         )
         return Response(self.serializer_class(state, many=False).data)
+
+    @action(detail=True, methods=["get"])
+    @custom_apigw_required
+    def get_approve_states(self, request, *args, **kwargs):
+        instance = self.get_object()
+        states = instance.get_approve_states()
+        return Response(states)
+
+    @action(detail=True, methods=["get"])
+    @custom_apigw_required
+    def group_variables(self, request, *args, **kwargs):
+        state = self.get_object()
+
+        # 默认先把field和全局的变量都获取出来
+        resource_type = request.GET.get("resource_type", "both")
+        exclude_self = request.GET.get("exclude_self", False)
+        data = state.get_valid_inputs_by_group(
+            exclude_self=exclude_self, resource_type=resource_type, scope="state"
+        )
+        return Response(data)
