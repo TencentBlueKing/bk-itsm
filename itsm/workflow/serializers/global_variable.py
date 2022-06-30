@@ -52,7 +52,34 @@ class GlobalVariableSerializer(serializers.ModelSerializer):
         # 统一格式
         if data.get("meta", {}).get("type"):
             data["type"] = data["meta"]["type"]
-        data["choice"] = data["meta"]["choice"] if data.get("meta", {}).get("choice") else []
+        data["choice"] = (
+            data["meta"]["choice"] if data.get("meta", {}).get("choice") else []
+        )
+        data["source"] = "global"
+        data["source_uri"] = ""
+        data["source_type"] = ""
+        return data
+
+
+class GlobalVariableGroupSerializer(GlobalVariableSerializer):
+    def to_representation(self, instance):
+
+        data = super(GlobalVariableSerializer, self).to_representation(instance)
+        try:
+            state_name = State.objects.get(id=instance.state_id).name
+            state_name = state_name if state_name else _("当前节点")
+            data.update(name="%s(%s)" % (data["name"], state_name))
+        except State.DoesNotExist:
+            state_name = _("当前节点")
+            data.update(name="%s(%s)" % (data["name"], state_name))
+
+        # 统一格式
+        if data.get("meta", {}).get("type"):
+            data["type"] = data["meta"]["type"]
+        data["choice"] = (
+            data["meta"]["choice"] if data.get("meta", {}).get("choice") else []
+        )
+        data["state"] = state_name
         data["source"] = "global"
         data["source_uri"] = ""
         data["source_type"] = ""

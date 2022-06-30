@@ -113,6 +113,9 @@ class TicketPermissionValidate(permissions.BasePermission):
         if view.action == "get_ticket_output":
             return True
 
+        if view.action == "is_processor":
+            return True
+
         # 查看权限校验
         if request.method in permissions.SAFE_METHODS:
 

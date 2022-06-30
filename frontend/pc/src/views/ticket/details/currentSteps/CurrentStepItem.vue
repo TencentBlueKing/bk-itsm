@@ -105,6 +105,25 @@
                     <!-- 状态 icon, API 节点和标准运维节点才显示 -->
                     <task-status :status="nodeInfo.status"></task-status>
                 </p>
+                <span class="right-float">
+                    <!-- 响应按钮 -->
+                    <bk-button
+                        v-if="nodeInfo.is_reply_need"
+                        class="bk-sla-respons mr10"
+                        :disabled="nodeInfo.is_replied"
+                        :icon="nodeInfo.is_replied ? 'bk-icon icon-check-1' : ''"
+                        :loading="replyBtnLoading"
+                        @click="replyAssignDeliver()">
+                        {{ $t(`m['响应']`)}}
+                    </bk-button>
+                    <span class="full-screen-wrap">
+                        <i v-if="!isFullScreen" class="bk-itsm-icon icon-order-open" @click.stop="openFullScreen(nodeInfo)"></i>
+                        <span v-else class="exit-full-screen" @click.stop="onCloseFullScreen">
+                            <i class="bk-itsm-icon icon-order-close"></i>
+                            <span class="exit-text">{{$t(`m.common['退出全屏']`)}}</span>
+                        </span>
+                    </span>
+                </span>
             </div>
             <collapse-transition v-if="!readOnly">
                 <div class="bk-node-form" v-show="unfold">
@@ -242,7 +261,7 @@
                 <div class="bk-processor-span" style="background: none;">{{ tipsProcessorsInfo.extend }}</div>
             </div>
         </div>
-        <ticket-trigger-dialog ref="triggerDialog" @init-info="successFn"></ticket-trigger-dialog>
+        <ticket-trigger-dialog ref="triggerDialog" :item="triggerInfo" @init-info="reloadTicket"></ticket-trigger-dialog>
         <node-deal-dialog
             :node-info="nodeInfo"
             :submitting="submitting"
@@ -341,6 +360,7 @@
                 unfold: false, // 是否展开
                 isFullScreen: false,
                 submitting: false,
+                isDropdownShow: false,
                 ignoreOperations: ['SUSPEND', 'TERMINATE'],
                 validatePopInfo: {
                     openShow: false,
@@ -365,7 +385,9 @@
                     color: '',
                     isTimeOut: false
                 },
-                workflow: ''
+                workflow: '',
+                // 触发器
+                triggerInfo: {}
             }
         },
         computed: {
@@ -552,7 +574,6 @@
                 }
             },
             submitFormAjax (submitFormData) {
-                console.log(submitFormData)
                 const id = this.nodeInfo.ticket_id
                 // 终止
                 if (this.openFormInfo.btnInfo.key === 'TERMINATE') {
@@ -626,7 +647,6 @@
                     }
                     this.submitAjax('newAssignDeliver', params, id)
                 }
-                console.log(this.openFormInfo.btnInfo.key)
                 if (this.openFormInfo.btnInfo.key === 'EXCEPTION_DISTRIBUTE') {
                     const params = {
                         state_id: this.nodeInfo.state_id,
@@ -702,7 +722,120 @@
                 this.openFormInfo.isShow = false
             },
             openTriggerDialog (trigger) {
-                this.$refs.triggerDialog.openDialog(trigger)
+                const context = {}
+                this.nodeInfo.fields.forEach((item) => {
+                    context[item.key] = item.val
+                })
+                const getTriggerParams = this.$store.dispatch('trigger/getTriggerParams', { params: { context: context }, id: trigger.id })
+                const getResponseList = this.$store.dispatch('trigger/getResponseList')
+                Promise.all([getTriggerParams, getResponseList]).then(res => {
+                    const curTrigger = res[0].data
+                    this.triggerInfo = res[1].data.find(item => item.name === trigger.component_name)
+                    if (this.triggerInfo.key === 'api') {
+                        const wayInfo = {
+                            contentStatus: false,
+                            isLoading: false,
+                            key: 'api',
+                            wayInfo: this.triggerInfo
+                        }
+                        this.triggerInfo = wayInfo
+                        this.triggerInfo.wayInfo.field_schema.forEach(schema => {
+                            const cur = curTrigger.find(item => item.key === schema.key)
+                            if (schema.key === 'api_source') {
+                                this.$set(schema, 'systemId', '')
+                                this.$set(schema, 'apiId', '')
+                                this.$set(schema, 'value', cur.value)
+                            } else {
+                                this.$set(schema, 'apiContent', {})
+                                this.$set(schema, 'value', cur.value)
+                            }
+                        })
+                    } else {
+                        this.triggerInfo.field_schema.forEach(schema => {
+                            const cur = curTrigger.find(item => item.key === schema.key)
+                            let valueInfo = cur.value || ''
+                            if (schema.type === 'MEMBERS' || schema.type === 'MULTI_MEMBERS') {
+                                valueInfo = []
+                                if (schema.value) {
+                                    schema.value.forEach(schemaValue => {
+                                        if (schemaValue.value) {
+                                            const itemValue = {
+                                                key: schemaValue.value.member_type,
+                                                value: schemaValue.value.members,
+                                                secondLevelList: [],
+                                                isLoading: false
+                                            }
+                                            valueInfo.push(itemValue)
+                                        }
+                                    })
+                                } else {
+                                    const itemValue = {
+                                        key: cur.value[0].value.member_type,
+                                        value: cur.value[0].value.members,
+                                        secondLevelList: [],
+                                        isLoading: false
+                                    }
+                                    valueInfo.push(itemValue)
+                                }
+                            }
+                            this.$set(schema, 'value', valueInfo)
+                            // 对于发通知的数据格式
+                            if (schema.type === 'SUBCOMPONENT' && schema.sub_components && schema.sub_components.length) {
+                                schema.sub_components.forEach(subComponent => {
+                                    subComponent.field_schema.forEach(subField => {
+                                        const cur = curTrigger[0].sub_components.find(item => item.key === subComponent.key)
+                                        let subFieldValue = subField.value || ''
+                                        if (cur) {
+                                            const subCur = cur.params.find(ite => ite.key === subField.key)
+                                            subFieldValue = subCur.value
+                                        }
+                                        if (subField.type === 'MEMBERS' || subField.type === 'MULTI_MEMBERS') {
+                                            if (cur) {
+                                                subComponent.checked = true
+                                                const subCur = cur.params.find(ite => ite.key === subField.key)
+                                                if (Array.isArray(subField.value)) {
+                                                    subField.value.forEach(schemaValue => {
+                                                        const itemValue = {
+                                                            key: schemaValue.value.member_type,
+                                                            value: schemaValue.value.members,
+                                                            secondLevelList: [],
+                                                            isLoading: false
+                                                        }
+                                                        subFieldValue.push(itemValue)
+                                                    })
+                                                } else {
+                                                    subFieldValue = []
+                                                    subCur.value.forEach(item => {
+                                                        subFieldValue.push(
+                                                            {
+                                                                key: item.value.member_type,
+                                                                value: item.value.members,
+                                                                secondLevelList: [],
+                                                                isLoading: false
+                                                            }
+                                                        )
+                                                    })
+                                                }
+                                            } else {
+                                                subFieldValue = [
+                                                    {
+                                                        key: '',
+                                                        value: '',
+                                                        secondLevelList: [],
+                                                        isLoading: false
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                        this.$set(subField, 'value', subFieldValue)
+                                    })
+                                })
+                            }
+                        })
+                    }
+                }).finally(() => {
+                    this.$refs.triggerDialog.openDialog(trigger)
+                })
             },
             // 提交按钮 loading 状态
             isBtnLoading (item) {
@@ -824,7 +957,7 @@
 
                 .node-title-processor{
                     display: inline-block;
-                    max-width: 80%;
+                    max-width: 76%;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
@@ -856,7 +989,7 @@
                 .icon-angle-down {
                     font-size: 22px;
                 }
-                
+
             }
             .sla-time-info {
                 height: 32px;
@@ -902,7 +1035,7 @@
                     }
                 }
             }
-            
+
             .bk-node-cursor {
                 cursor: pointer;
             }

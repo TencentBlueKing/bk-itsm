@@ -1624,6 +1624,25 @@ class TicketModelViewSet(ModelViewSet):
         ticket = self.get_object()
         return Response(FieldSerializer(ticket.table_fields(), many=True).data)
 
+    @action(detail=True, methods=["get"])
+    def is_processor(self, request, *args, **kwargs):
+        ticket = self.get_object()
+        step_id = request.query_params.get("step_id", None)
+        processed_user = ""
+        is_processor = False
+        if step_id:
+            step_ids = step_id.split(",")
+            status_list = ticket.node_status.filter(id__in=step_ids)
+            for status in status_list:
+                if request.user.username in status.get_processors():
+                    is_processor = True
+                    processed_user = status.processed_user
+                    break
+
+        return Response(
+            {"is_processor": is_processor, "processed_user": processed_user}
+        )
+
     @action(detail=True, methods=["post"])
     def edit_field(self, request, *args, **kwargs):
         """单个修改字段值"""

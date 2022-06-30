@@ -443,8 +443,6 @@ class StateViewSet(BaseWorkflowElementViewSet):
         )
 
         # 非提单节点可引用单据属性（提单节点提交前，尚未创建工单）
-        if not state.is_first_state:
-            valid_inputs["系统变量"] = TICKET_GLOBAL_VARIABLES
         return Response(valid_inputs)
 
     @action(detail=True, methods=["get"])

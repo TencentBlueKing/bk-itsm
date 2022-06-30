@@ -103,7 +103,7 @@
                 <bk-button
                     class="mr10"
                     @click="onCancel">
-                    {{ $t('m.common["取消"]') }}
+                    {{ $t('m["取消"]') }}
                 </bk-button>
             </template>
             <slot name="button-extend">

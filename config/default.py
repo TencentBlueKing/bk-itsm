@@ -39,8 +39,8 @@ from config import (
     PROJECT_ROOT,
     BK_PAAS_HOST,
     BK_PAAS_INNER_HOST,
+    RUN_VER,
 )
-
 
 # 标准运维页面服务地址
 SITE_URL_SOPS = "/o/bk_sops/"
@@ -68,7 +68,6 @@ INSTALLED_APPS += (
     "django_signal_valve",
     # itsm
     "itsm.gateway",
-    "itsm.helper",
     "itsm.role",
     "itsm.pipeline_plugins",
     "itsm.ticket",
@@ -86,6 +85,7 @@ INSTALLED_APPS += (
     "data_migration",
     # 'silk',
     "mptt",
+    "apigw_manager.apigw",
     "django_mptt_admin",
     "django_extensions",
     "rest_framework",
@@ -106,6 +106,13 @@ INSTALLED_APPS += (
     "blueapps.opentelemetry.instrument_app",
     "itsm.plugin_service",
 )
+
+INSTALLED_APPS = ("itsm.helper",) + INSTALLED_APPS
+
+AUTHENTICATION_BACKENDS += ("apigw_manager.apigw.authentication.UserModelBackend",)
+
+IS_PAAS_V3 = int(os.getenv("BKPAAS_MAJOR_VERSION", False)) == 3
+IS_OPEN_V3 = IS_PAAS_V3 and RUN_VER == "open"
 
 # IAM 开启开关
 USE_IAM = True if os.getenv("USE_IAM", "true").lower() == "true" else False
@@ -154,7 +161,9 @@ MIDDLEWARE = (
     # enable nginx http-auth
     # 'itsm.component.misc_middlewares.NginxAuthProxy',
     "itsm.component.misc_middlewares.InstrumentProfilerMiddleware",
-    # 'pyinstrument.middleware.ProfilerMiddleware',
+    "apigw_manager.apigw.authentication.ApiGatewayJWTGenericMiddleware",  # JWT 认证
+    "apigw_manager.apigw.authentication.ApiGatewayJWTAppMiddleware",  # JWT 透传的应用信息
+    "apigw_manager.apigw.authentication.ApiGatewayJWTUserMiddleware",  # JWT 透传的用户信息
 )
 
 # 所有环境的日志级别可以在这里配置
@@ -864,10 +873,14 @@ try:
 except Exception:
     AUTO_APPROVE_TIME = 20
 
-
 OPEN_VOICE_NOTICE = (
     True if os.getenv("BKAPP_OPEN_VOICE_NOTICE", "false").lower() == "true" else False
 )
+
+# apigw的配置
+BK_APIGW_NAME = os.getenv("BK_APIGW_NAME", "bk-itsm")
+# APIGW 访问地址
+BK_API_URL_TMPL = os.getenv("BK_API_URL_TMPL")
 
 # 蓝鲸插件授权过滤 APP
 PLUGIN_DISTRIBUTOR_NAME = os.getenv("BKAPP_PLUGIN_DISTRIBUTOR_NAME", APP_CODE)

@@ -31,6 +31,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
+from itsm.component.constants import LESSCODE_PROJECT_KEY
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.constants.iam import ACTIONS
 from itsm.auth_iam.utils import IamRequest
@@ -41,6 +42,7 @@ from itsm.project.models import (
     ProjectSettings,
     UserProjectAccessRecord,
     CostomTab,
+    PUBLIC_PROJECT_PROJECT_KEY,
 )
 from itsm.project.serializers import (
     ProjectSerializer,
@@ -52,7 +54,9 @@ from itsm.project.serializers import (
 
 class ProjectViewSet(component_viewsets.AuthModelViewSet):
     serializer_class = ProjectSerializer
-    queryset = Project.objects.filter(~Q(key="public"), is_deleted=False)
+    queryset = Project.objects.filter(
+        ~Q(key__in=[PUBLIC_PROJECT_PROJECT_KEY, LESSCODE_PROJECT_KEY]), is_deleted=False
+    )
 
     filter_fields = {
         "name": ["exact", "contains", "startswith", "icontains"],
