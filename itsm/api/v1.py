@@ -67,4 +67,6 @@ urlpatterns = [
     url(r"^project/", include("itsm.project.urls")),
     # 人员选择器
     url(r"^c/compapi/v2/usermanage/fs_list_users/$", get_batch_users),
+    # 蓝鲸插件服务
+    url(r"^plugin_service/", include("itsm.plugin_service.urls")),
 ]

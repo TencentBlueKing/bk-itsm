@@ -21,78 +21,83 @@
   -->
 
 <template>
-  <ul>
-    <li v-bk-tooltips.right="$t(`m.treeinfo['开始节点']`)">
-      <div class="entry-item entry-start"
-        data-type="START">
-        {{ $t('m.treeinfo["开始"]') }}
-      </div>
-      <div class="entry-disabled"></div>
-    </li>
-    <li v-bk-tooltips.right="$t(`m.treeinfo['结束节点']`)">
-      <div class="entry-item"
-        data-type="END">
-        {{ $t('m.treeinfo["结束"]') }}
-      </div>
-      <div class="entry-disabled"></div>
-    </li>
-    <li v-bk-tooltips.right="$t(`m.treeinfo['手动节点']`)">
-      <div class="entry-item entry-gateway" data-type="NORMAL" style="margin: 10px 0 0;">
-        <i class="bk-itsm-icon icon-icon-artificial" style="font-size: 26px;"></i>
-      </div>
-    </li>
-    <li v-bk-tooltips.right="$t(`m.treeinfo['API节点']`)">
-      <div class="entry-item entry-gateway" data-type="TASK" style="margin: 12px 0 2px;">
-        <i class="bk-itsm-icon icon-api-node" style="font-size: 26px;"></i>
-      </div>
-    </li>
-    <li v-bk-tooltips.right="$t(`m['WEBHOOK节点']`)">
-      <div class="entry-item entry-gateway" data-type="WEBHOOK" style="margin: 12px 0 2px;">
-        <i class="bk-itsm-icon icon-webhook-2" style="font-size: 33px;"></i>
-      </div>
-    </li>
-    <li v-bk-tooltips.right="$t(`m.treeinfo['标准运维节点']`)">
-      <div class="entry-item entry-gateway" data-type="TASK-SOPS" style="margin: 12px 0 2px;">
-        <i class="bk-itsm-icon icon-task-icon" style="font-size: 26px;"></i>
-      </div>
-    </li>
-    <li v-bk-tooltips.right="$t(`m['蓝盾节点']`)">
-      <div class="entry-item entry-gateway" data-type="TASK-DEVOPS" style="margin: 12px 0 2px;">
-        <i class="bk-itsm-icon icon-devops-task-icon" style="font-size: 26px;"></i>
-      </div>
-      <div v-if="devsopDisable === 'open'" class="entry-disabled" v-bk-tooltips.right="$t(`m['暂未开放']`)"></div>
-    </li>
-    <!-- <li v-bk-tooltips.right="$t(`m.treeinfo['会签节点']`)">
+    <ul>
+        <li v-bk-tooltips.right="$t(`m.treeinfo['开始节点']`)">
+            <div class="entry-item entry-start"
+                data-type="START">
+                {{ $t('m.treeinfo["开始"]') }}
+            </div>
+            <div class="entry-disabled"></div>
+        </li>
+        <li v-bk-tooltips.right="$t(`m.treeinfo['结束节点']`)">
+            <div class="entry-item"
+                data-type="END">
+                {{ $t('m.treeinfo["结束"]') }}
+            </div>
+            <div class="entry-disabled"></div>
+        </li>
+        <li v-bk-tooltips.right="$t(`m.treeinfo['手动节点']`)">
+            <div class="entry-item entry-gateway" data-type="NORMAL" style="margin: 10px 0 0;">
+                <i class="bk-itsm-icon icon-icon-artificial" style="font-size: 26px;"></i>
+            </div>
+        </li>
+        <li v-bk-tooltips.right="$t(`m.treeinfo['API节点']`)">
+            <div class="entry-item entry-gateway" data-type="TASK" style="margin: 12px 0 2px;">
+                <i class="bk-itsm-icon icon-api-node" style="font-size: 26px;"></i>
+            </div>
+        </li>
+        <li v-bk-tooltips.right="$t(`m['WEBHOOK节点']`)">
+            <div class="entry-item entry-gateway" data-type="WEBHOOK" style="margin: 12px 0 2px;">
+                <i class="bk-itsm-icon icon-webhookjiedian plugin" style="font-size: 42px;"></i>
+            </div>
+        </li>
+        <li v-bk-tooltips.right="$t(`m.treeinfo['标准运维节点']`)">
+            <div class="entry-item entry-gateway" data-type="TASK-SOPS" style="margin: 12px 0 2px;">
+                <i class="bk-itsm-icon icon-task-icon" style="font-size: 26px;"></i>
+            </div>
+        </li>
+        <li v-bk-tooltips.right="$t(`m['蓝盾节点']`)">
+            <div class="entry-item entry-gateway" data-type="TASK-DEVOPS" style="margin: 12px 0 2px;">
+                <i class="bk-itsm-icon icon-devops-task-icon" style="font-size: 26px;"></i>
+            </div>
+            <div v-if="devsopDisable === 'open'" class="entry-disabled" v-bk-tooltips.right="$t(`m['暂未开放']`)"></div>
+        </li>
+        <!-- <li v-bk-tooltips.right="$t(`m.treeinfo['会签节点']`)">
             <div class="entry-item entry-gateway" data-type="SIGN" style="margin: 12px 0 2px;">
                 <i class="bk-itsm-icon icon-sign-node" style="font-size: 26px;"></i>
             </div>
         </li> -->
-    <li v-bk-tooltips.right="$t(`m.treeinfo['审批节点']`)">
-      <div class="entry-item entry-gateway" data-type="APPROVAL" style="margin: 12px 0 2px;">
-        <i class="bk-itsm-icon icon-approval-node" style="font-size: 26px;"></i>
-      </div>
-    </li>
-    <li v-bk-tooltips.right="$t(`m.treeinfo['并行网关']`)">
-      <div class="entry-item entry-gateway" data-type="ROUTER-P">
-        <i class="bk-itsm-icon icon-flow-convergence"></i>
-      </div>
-    </li>
-    <li v-bk-tooltips.right="$t(`m.treeinfo['汇聚网关']`)">
-      <div class="entry-item entry-gateway" data-type="COVERAGE">
-        <i class="bk-itsm-icon icon-flow-branch"></i>
-      </div>
-    </li>
-  </ul>
+        <li v-bk-tooltips.right="$t(`m.treeinfo['审批节点']`)">
+            <div class="entry-item entry-gateway" data-type="APPROVAL" style="margin: 12px 0 2px;">
+                <i class="bk-itsm-icon icon-approval-node" style="font-size: 26px;"></i>
+            </div>
+        </li>
+        <li v-bk-tooltips.right="$t(`m['蓝鲸插件节点']`)">
+            <div class="entry-item entry-gateway" data-type="BK-PLUGIN" style="margin: 12px 0 2px;">
+                <i class="bk-itsm-icon icon-chajianjiedian plugin" style="font-size: 42px"></i>
+            </div>
+        </li>
+        <li v-bk-tooltips.right="$t(`m.treeinfo['并行网关']`)">
+            <div class="entry-item entry-gateway" data-type="ROUTER-P">
+                <i class="bk-itsm-icon icon-flow-convergence"></i>
+            </div>
+        </li>
+        <li v-bk-tooltips.right="$t(`m.treeinfo['汇聚网关']`)">
+            <div class="entry-item entry-gateway" data-type="COVERAGE">
+                <i class="bk-itsm-icon icon-flow-branch"></i>
+            </div>
+        </li>
+    </ul>
 </template>
 <script>
-  export default {
-    name: 'Palette',
-    data() {
-      return {
-        devsopDisable: window.RUN_VER,
-      };
-    },
-  };
+    export default {
+        name: 'Palette',
+        data () {
+            return {
+                devsopDisable: window.RUN_VER
+            }
+        }
+    }
 </script>
 <style lang="scss" scoped>
     .disable {
@@ -126,6 +131,12 @@
                 &:hover {
                     color: #3A84FF;
                 }
+            }
+            .plugin {
+                display: block;
+                margin-top: -8px;
+                margin-left: -4px;
+                font-size: 42px;
             }
         }
         .entry-item {

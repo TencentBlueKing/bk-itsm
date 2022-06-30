@@ -60,6 +60,8 @@ import ticketStatus from "./modules/ticketStatus";
 import taskTemplate from "./modules/taskTemplate";
 import taskExecute from "./modules/taskExecute";
 
+import bkPlugin from "./modules/bkPlugin";
+
 // 组件升级统一请求
 import user from "./newModules/user";
 // 新增功能
@@ -115,6 +117,7 @@ export default new Vuex.Store({
     project,
     // new
     ticket,
+    bkPlugin,
   },
   // 公共 store
   state: {
@@ -208,11 +211,9 @@ export default new Vuex.Store({
         });
         if (islength) {
           if (minlength && data.length < minlength) {
-            // eslint-disable-next-line
             return this.$t("m.wiki['长度应大于']") + `${minlength}`;
           }
           if (maxlength && data.length > maxlength) {
-            // eslint-disable-next-line
             return this.$t("m.wiki['长度应小于']") + `${minlength}`;
           }
           // 默认不超过255
@@ -429,7 +430,7 @@ export default new Vuex.Store({
     // 通过部门 id 获取部门信息
     getDepartmentInfo({ commit, state, dispatch }, params) {
       return ajax.get(`gateway/usermanage/get_department_info/`, { params: params }).then((response) => {
-        const res = response.data;
+        let res = response.data;
         return res;
       });
     },

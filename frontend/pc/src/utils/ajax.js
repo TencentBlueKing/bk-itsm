@@ -151,6 +151,10 @@ instance.interceptors.response.use(
       };
     }
 
+    if (response.request.responseURL.includes('/api/plugin_service/')) {
+        return response
+    }
+
     if (response.data.code !== 'OK' && response.data.code !== 0) {
       if (response.data.message) {
         response.data.msg = response.data.message;
