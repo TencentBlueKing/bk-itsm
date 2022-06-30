@@ -208,9 +208,11 @@ export default new Vuex.Store({
         });
         if (islength) {
           if (minlength && data.length < minlength) {
+            // eslint-disable-next-line
             return this.$t("m.wiki['长度应大于']") + `${minlength}`;
           }
           if (maxlength && data.length > maxlength) {
+            // eslint-disable-next-line
             return this.$t("m.wiki['长度应小于']") + `${minlength}`;
           }
           // 默认不超过255

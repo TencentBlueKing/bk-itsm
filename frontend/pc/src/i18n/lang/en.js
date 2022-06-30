@@ -1045,7 +1045,7 @@ export const m = {
     分: 'm ',
     秒: 's ',
     '新建母子单：': 'New Parent-Child：',
-    '可以通过母子单的创建，将一些需要进行相同处理操作的同类单据进行关联。一个母单可以关联多个子单，一个子单只能关联到一个母单。一旦关联，子单将冻结操作，子单的状态将全部跟随母单更新。': 'You can connect same type tickets together by creating parent-child tickets,when you need to handle them with same operation\.One parent ticket could be connected to many child tickets, but one child can be connected to one parent only \.Once connected, you cannot update the child ticket. The status will be updated fellowed with the parent.',
+    '可以通过母子单的创建，将一些需要进行相同处理操作的同类单据进行关联。一个母单可以关联多个子单，一个子单只能关联到一个母单。一旦关联，子单将冻结操作，子单的状态将全部跟随母单更新。': 'You can connect same type tickets together by creating parent-child tickets,when you need to handle them with same operation.One parent ticket could be connected to many child tickets, but one child can be connected to one parent only .Once connected, you cannot update the child ticket. The status will be updated fellowed with the parent.',
     '选择关联操作:': 'Operation Type',
     '关联到母单（该单为子单）': 'Connect to the parent',
     '选择我的子单（该单为母单）': 'Select the child-tickets',

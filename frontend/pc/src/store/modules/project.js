@@ -121,9 +121,9 @@ export default {
     },
     // 获取项目tab列表
     getProjectTabList({ commit }, params) {
-      const { page_size, page, ordering } = params;
+      const { page_size: pageSize, page, ordering } = params;
       return ajax
-        .post(`ticket/receipts/get_filter_tickets/?page_size=${page_size}&page=${page}&ordering=${ordering}`, params)
+        .post(`ticket/receipts/get_filter_tickets/?page_size=${pageSize}&page=${page}&ordering=${ordering}`, params)
         .then((response) => response.data);
     },
     getAction({ commit }, params) {
