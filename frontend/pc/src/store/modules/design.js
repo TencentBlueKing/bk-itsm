@@ -20,9 +20,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import Vue from 'vue'
-import ajax from '../../utils/ajax'
-import bus from '../../utils/bus'
+import Vue from "vue";
+import ajax from "../../utils/ajax";
+import bus from "../../utils/bus";
 
 export default {
   namespaced: true,
@@ -30,58 +30,58 @@ export default {
     // 流程信息
     processInfo: {},
     requestStatus: false,
-    show: '567'
+    show: "567",
   },
   mutations: {
     // 改变流程信息
     changeInfo(state, value) {
-      state.processInfo = value
+      state.processInfo = value;
     },
     // 检测进入页面是否需要请求数据
     changeRequest(state) {
-      state.requestStatus = !state.requestStatus
+      state.requestStatus = !state.requestStatus;
     },
     requestInfo(state, value) {
-      state.processInfo.request = value
+      state.processInfo.request = value;
     },
     // 测试方法
     change(state, value) {
-      state.show = value
-    }
+      state.show = value;
+    },
   },
   actions: {
     // 获取流程设计表
     getList({ commit, state, dispatch }, { params }) {
-      return ajax.get(`workflow/templates/?${params}`).then(response => {
-        let res = response.data
-        return res
-      })
+      return ajax.get(`workflow/templates/?${params}`).then((response) => {
+        const res = response.data;
+        return res;
+      });
     },
     // 删除流程设计表数据
     deleteDesign({ commit, state, dispatch }, { params }) {
-      return ajax.delete(`workflow/templates/${params}/`).then(response => {
-        let res = response.data
-        return res
-      })
+      return ajax.delete(`workflow/templates/${params}/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
     },
     // 流程步骤一
     // 获取某个节点信息
     getFlowDetail({ commit, state, dispatch }, { params }) {
-      return ajax.get(`workflow/templates/${params}/`).then(response => {
-        let res = response.data
-        return res
-      })
+      return ajax.get(`workflow/templates/${params}/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
     },
     // 获取事件类型数据
     getEventList({ commit, state, dispatch }, { params }) {
-      return ajax.get(`service/event/${params}/`).then(response => {
-        let res = response.data
-        return res
-      })
+      return ajax.get(`service/event/${params}/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
     },
     // 测试
     changeValue({ commit, state, dispatch }, { value }) {
-      state.show = value
-    }
-  }
-}
+      state.show = value;
+    },
+  },
+};

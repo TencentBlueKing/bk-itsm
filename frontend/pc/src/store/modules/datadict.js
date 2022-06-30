@@ -29,46 +29,46 @@ export default {
   actions: {
     get_data_by_key({ commit, state, dispatch }, params) {
       return ajax.get(`service/datadicts/get_data_by_key/`, { params: params }).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },
     list({ commit, state, dispatch }, params) {
       return ajax.get(`service/datadicts/`, { params: params }).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },
     create({ commit, state, dispatch }, params) {
       delete params["parent_name"];
       return ajax.post(`service/datadicts/`, params).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },
     delete({ commit, state, dispatch }, id) {
       return ajax.delete(`service/datadicts/${id}/`).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },
     batchDelete({ commit, state, dispatch }, params) {
       return ajax.post(`service/datadicts/batch_delete/`, params).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },
     update({ commit, state, dispatch }, params) {
-      let id = params.id;
+      const id = params.id;
       return ajax.put(`service/datadicts/${id}/`, params).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },
     // prc数据
     getPrcData({ commit, state, dispatch }) {
       return ajax.get(`postman/rpc_api/`).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },

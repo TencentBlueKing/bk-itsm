@@ -29,25 +29,25 @@ export default {
   actions: {
     getChangeTypeList({ commit, state, dispatch }, params) {
       return ajax.get("service/change/change_type/records/", { params: params }).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },
     submit({ commit, state, dispatch }, params) {
       return ajax.post("service/change/change_type/records/", params).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },
     update({ commit, state, dispatch }, params) {
       return ajax.put("service/change/change_type/records/" + params.id, params).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },
     delete({ commit, state, dispatch }, id) {
       return ajax.delete("service/change/change_type/records/" + id).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },

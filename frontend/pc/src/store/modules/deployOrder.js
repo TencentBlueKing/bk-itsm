@@ -180,7 +180,7 @@ export default {
     // 通过通知url进入，获取节点是否已处理信息
     getTicketNoticeInfo({ commit, state, dispatch }, { params }) {
       return ajax.get(`ticket/receipts/operate_check/`, { params }).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },

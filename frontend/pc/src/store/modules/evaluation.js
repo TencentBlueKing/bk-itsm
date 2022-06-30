@@ -20,7 +20,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
   namespaced: true,
@@ -29,36 +29,36 @@ export default {
   actions: {
     // 提交满意度评价
     postEvaluation({ commit, state, dispatch }, { params, id }) {
-      return ajax.put(`ticket/comments/${id}/`, params).then(response => {
-        let res = response.data
-        return res
-      })
+      return ajax.put(`ticket/comments/${id}/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
     },
     // 短信提交
     sendTelephone({ commit, state, dispatch }, { params, id }) {
-      return ajax.post(`ticket/receipts/${id}/send_sms/`, params).then(response => {
-        let res = response.data
-        return res
-      })
+      return ajax.post(`ticket/receipts/${id}/send_sms/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
     },
     sendEmail({ commit, state, dispatch }, { params, id }) {
-      return ajax.post(`ticket/receipts/${id}/send_email/`, params).then(response => {
-        let res = response.data
-        return res
-      })
+      return ajax.post(`ticket/receipts/${id}/send_email/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
     },
     // 获取满意度评价
     // getOnePrint ({commit, state, dispatch}, id) {
     //     return ajax.get(`${window.site}` + 'ticket/receipts/' + id.id + '/print_ticket/').then(response => {
-    //         let res = response.data
+    //         const res = response.data
     //         return res
     //     })
     // }
     getEvaluation({ commit, state, dispatch }, params) {
-      return ajax.get('ticket/comments/' + params.id + '/', { params }).then(response => {
-        let res = response.data
-        return res
-      })
-    }
-  }
-}
+      return ajax.get("ticket/comments/" + params.id + "/", { params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};

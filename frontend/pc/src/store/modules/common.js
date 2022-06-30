@@ -79,27 +79,27 @@ export default {
     // 获取发送途径接口
     getTheWay({ commit, state, dispatch }) {
       return ajax.get(`ticket/receipts/get_global_choices/`).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },
     // 获取节点配置信息
     getConfigurInfo({ commit, state, dispatch }) {
       return ajax.get(`workflow/templates/get_global_choices/`).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },
     getManagePermission({ commitm }) {
       return ajax.get(`/iam/permission/platform_permission/`).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },
     // 获取项目资源的权限结构树
     getPermissionMeta({ commit, state, dispatch }) {
       return ajax.get(`/iam/permission/meta/`).then((response) => {
-        let res = response.data;
+        const res = response.data;
         commit("setPermissionMeta", res.data);
         return res;
       });
@@ -107,7 +107,7 @@ export default {
     // 获取权限中心跳转链接
     getIamUrl({ commit }, data) {
       return ajax.post(`/iam/permission/query_apply_permission_url/`, data).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },
@@ -118,7 +118,7 @@ export default {
           baseURL: `${window.SITE_URL}core/`,
         })
         .then((response) => {
-          let res = response.data;
+          const res = response.data;
           return res;
         });
     },

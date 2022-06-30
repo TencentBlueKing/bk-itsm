@@ -20,7 +20,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
   namespaced: true,
@@ -29,34 +29,34 @@ export default {
   actions: {
     // 获取公共字段列表
     get_template_common_fields({ commit, state, dispatch }, params) {
-      return ajax.get(`workflow/template_fields/mix_list/`, { params: params }).then(response => {
-        let res = response.data
-        return res
-      })
+      return ajax.get(`workflow/template_fields/mix_list/`, { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
     },
     get_template_fields({ commit, state, dispatch }, params) {
-      return ajax.get(`workflow/template_fields/`, { params: params }).then(response => {
-        let res = response.data
-        return res
-      })
+      return ajax.get(`workflow/template_fields/`, { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
     },
     add_template_fields({ commit, state, dispatch }, { params }) {
-      return ajax.post(`workflow/template_fields/`, params).then(response => {
-        let res = response.data
-        return res
-      })
+      return ajax.post(`workflow/template_fields/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
     },
     update_template_fields({ commit, state, dispatch }, { params, id }) {
-      return ajax.put(`workflow/template_fields/${id}/`, params).then(response => {
-        let res = response.data
-        return res
-      })
+      return ajax.put(`workflow/template_fields/${id}/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
     },
     delet_template_fields({ commit, state, dispatch }, params) {
-      return ajax.delete(`workflow/template_fields/${params.id}/`).then(response => {
-        let res = response.data
-        return res
-      })
-    }
-  }
-}
+      return ajax.delete(`workflow/template_fields/${params.id}/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};

@@ -276,7 +276,7 @@ export default {
     // 重新提单，获取参数信息
     getCreateTicektParams({ commit, state, dispatch }, { id }) {
       return ajax.get(`ticket/receipts/${id}/ticket_base_info/`).then((response) => {
-        let res = response.data;
+        const res = response.data;
         return res;
       });
     },

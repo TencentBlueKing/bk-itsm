@@ -85,13 +85,13 @@ module.exports = {
     // 'brace-style': ['error', '1tbs', {'allowSingleLine': false}],
 
     // https://eslint.org/docs/rules/camelcase
-    'camelcase': 'off',
+    camelcase: 'off',
 
     // 缩进使用 2 个空格，并且 switch 语句中的 Case 需要缩进
     // https://eslint.org/docs/rules/indent
-    'indent': ['error', 2, {
-      'SwitchCase': 1,
-      'flatTernaryExpressions': true
+    indent: ['error', 2, {
+      SwitchCase: 1,
+      flatTernaryExpressions: true
     }],
 
     // 数组的括号内的前后禁止有空格
@@ -111,7 +111,7 @@ module.exports = {
 
     // 禁止空语句（可在空语句写注释避免），允许空的 catch 语句
     // https://eslint.org/docs/rules/no-empty
-    'no-empty': ['error', { 'allowEmptyCatch': true }],
+    'no-empty': ['error', { allowEmptyCatch: true }],
 
     // 禁止在语句末尾使用分号
     // https://eslint.org/docs/rules/semi
@@ -142,20 +142,20 @@ module.exports = {
     // 禁止行尾有空格
     // https://eslint.org/docs/rules/no-trailing-spaces
     'no-trailing-spaces': ['error', {
-      'skipBlankLines': true // 允许在空行使用空白符
+      skipBlankLines: true // 允许在空行使用空白符
     }],
 
     // 注释的斜线或 * 后必须有空格
     // https://eslint.org/docs/rules/spaced-comment
     'spaced-comment': ['error', 'always', {
-      'line': {
-        'markers': ['*package', '!', '/', ',', '=']
+      line: {
+        markers: ['*package', '!', '/', ',', '=']
       },
-      'block': {
+      block: {
         // 前后空格是否平衡
-        'balanced': false,
-        'markers': ['*package', '!', ',', ':', '::', 'flow-include'],
-        'exceptions': ['*']
+        balanced: false,
+        markers: ['*package', '!', ',', ':', '::', 'flow-include'],
+        exceptions: ['*']
       }
     }],
 
@@ -179,7 +179,7 @@ module.exports = {
     'vue/array-bracket-spacing': ['error', 'never'],
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/arrow-spacing.md
-    'vue/arrow-spacing': ['error', { 'before': true, 'after': true }],
+    'vue/arrow-spacing': ['error', { before: true, after: true }],
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/attribute-hyphenation.md
     'vue/attribute-hyphenation': ['error', 'always'],
@@ -196,7 +196,7 @@ module.exports = {
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/camelcase.md
     // 后端数据字段经常不是驼峰，所以不限制 properties，也不限制解构
-    'vue/camelcase': ['error', { 'properties': 'never', 'ignoreDestructuring': true }],
+    'vue/camelcase': ['error', { properties: 'never', ignoreDestructuring: true }],
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/comma-dangle.md
     // 禁止使用拖尾逗号，如 {demo: 'test',}
@@ -216,7 +216,7 @@ module.exports = {
     // 'vue/dot-location': ['error', 'property'],
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/eqeqeq.md
-    'vue/eqeqeq': ['error', 'always', { 'null': 'ignore' }],
+    'vue/eqeqeq': ['error', 'always', { null: 'ignore' }],
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/html-closing-bracket-newline.md
     // 单行写法不需要换行，多行需要，不限制
@@ -224,9 +224,9 @@ module.exports = {
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/html-closing-bracket-spacing.md
     'vue/html-closing-bracket-spacing': ['error', {
-      'startTag': 'never',
-      'endTag': 'never',
-      'selfClosingTag': 'always'
+      startTag: 'never',
+      endTag: 'never',
+      selfClosingTag: 'always'
     }],
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/html-end-tags.md
@@ -234,11 +234,11 @@ module.exports = {
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/html-indent.md
     'vue/html-indent': ['error', 2, {
-      'attribute': 1,
-      'baseIndent': 1,
-      'closeBracket': 0,
-      'alignAttributesVertically': false,
-      'ignores': []
+      attribute: 1,
+      baseIndent: 1,
+      closeBracket: 0,
+      alignAttributesVertically: false,
+      ignores: []
     }],
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/html-quotes.md
@@ -253,7 +253,7 @@ module.exports = {
     'vue/jsx-uses-vars': 1,
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/key-spacing.md
-    'vue/key-spacing': ['error', { 'beforeColon': false, 'afterColon': true }],
+    'vue/key-spacing': ['error', { beforeColon: false, afterColon: true }],
 
     // 关键字周围空格一致性，在关键字前后保留空格，如 if () else {}
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/keyword-spacing.md
@@ -360,7 +360,7 @@ module.exports = {
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/order-in-components.md
     // 官方推荐顺序
     'vue/order-in-components': ['error', {
-      'order': [
+      order: [
         'el',
         'name',
         'parent',
@@ -425,8 +425,8 @@ module.exports = {
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/script-indent.md
     'vue/script-indent': ['error', 2, {
-      'baseIndent': 1,
-      'switchCase': 1
+      baseIndent: 1,
+      switchCase: 1
     }],
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/singleline-html-element-content-newline.md
@@ -439,7 +439,7 @@ module.exports = {
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/space-unary-ops.md
     // new, delete, typeof, void, yield 等后面必须有空格，一元操作符 -, +, --, ++, !, !! 禁止有空格
-    'vue/space-unary-ops': ['error', { 'words': true, 'nonwords': false }],
+    'vue/space-unary-ops': ['error', { words: true, nonwords: false }],
 
     // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/this-in-template.md
     // 不允许在 template 中使用 this

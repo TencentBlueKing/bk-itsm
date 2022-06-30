@@ -20,7 +20,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
   namespaced: true,
@@ -28,10 +28,10 @@ export default {
   mutations: {},
   actions: {
     clean_cache({ commit, state, dispatch }, params) {
-      return ajax.post('misc/clean_cache/', params).then(response => {
-        let res = response.data
-        return res
-      })
-    }
-  }
-}
+      return ajax.post("misc/clean_cache/", params).then((response) => {
+        let res = response.data;
+        return res;
+      });
+    },
+  },
+};

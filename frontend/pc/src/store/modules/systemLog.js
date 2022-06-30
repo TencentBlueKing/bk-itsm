@@ -20,7 +20,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
   namespaced: true,
@@ -28,18 +28,16 @@ export default {
   mutations: {},
   actions: {
     list({ commit, state, dispatch }, params) {
-      return ajax.get(`tracker/records/`, { params: params })
-        .then(response => {
-          let res = response.data
-          return res
-        })
+      return ajax.get(`tracker/records/`, { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
     },
     retrive({ commit, state, dispatch }, id) {
-      return ajax.get(`tracker/records/${id}/`)
-        .then(response => {
-          let res = response.data
-          return res
-        })
-    }
-  }
-}
+      return ajax.get(`tracker/records/${id}/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};

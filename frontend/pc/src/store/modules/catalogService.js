@@ -20,7 +20,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
   namespaced: true,
@@ -28,22 +28,19 @@ export default {
   mutations: {},
   actions: {
     removeServices({ commit, state, dispatch }, params) {
-      return ajax.post(`service/catalog_services/remove_services/`, params)
-        .then(response => {
-          return response.data
-        })
+      return ajax.post(`service/catalog_services/remove_services/`, params).then((response) => {
+        return response.data;
+      });
     },
     addServices({ commit, state, dispatch }, params) {
-      return ajax.post(`service/catalog_services/add_services/`, params)
-        .then(response => {
-          return response.data
-        })
+      return ajax.post(`service/catalog_services/add_services/`, params).then((response) => {
+        return response.data;
+      });
     },
     getServices({ commit, state, dispatch }, params) {
-      return ajax.get(`service/catalog_services/get_services/`, { params: params })
-        .then(response => {
-          return response.data
-        })
-    }
-  }
-}
+      return ajax.get(`service/catalog_services/get_services/`, { params: params }).then((response) => {
+        return response.data;
+      });
+    },
+  },
+};
