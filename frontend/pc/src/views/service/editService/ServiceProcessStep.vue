@@ -145,7 +145,8 @@
                     'TASK': this.$t(`m["任务节点"]`),
                     'APPROVAL': this.$t(`m["审批节点"]`),
                     'SIGN': this.$t(`m["会签节点"]`),
-                    'WEBHOOK': this.$t(`m["WEBHOOK节点"]`)
+                    'WEBHOOK': this.$t(`m["WEBHOOK节点"]`),
+                    'BK-PLUGIN': this.$t(`m["蓝鲸插件节点"]`)
                 }
                 return nodoTypeList[this.configur.type]
             }
