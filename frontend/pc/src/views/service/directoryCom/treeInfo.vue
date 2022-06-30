@@ -28,52 +28,69 @@
           <span>{{ $t(`m['服务目录']`) }}</span>
           <i class="bk-itsm-icon icon-jia-2" @click="openAdd('root')"></i>
         </div>
-        <!-- 新增条目 -->
-        <bk-dialog
-            width="480"
-            :value.sync="addDirectory.show"
-            :title="addDirectory.title"
-            :mask-close="false"
-            :auto-close="false"
-            @confirm="submitAdd"
-            @cancel="toggleDialog">
-            <bk-form
-                :label-width="200"
-                form-type="vertical"
-                :model="addDirectory.formInfo"
-                :rules="rules"
-                ref="dynamicForm">
-                <bk-form-item
-                    v-if="addDirectory.formInfo.parent__id !== 1"
-                    :label="$t(`m.serviceConfig['父级目录']`)"
-                    :required="true">
-                    <bk-input disabled
-                        v-model.trim="addDirectory.formInfo.parent___name">
-                    </bk-input>
-                </bk-form-item>
-                <bk-form-item
-                    :label="$t(`m.serviceConfig['目录名称']`)"
-                    :required="true"
-                    error-display-type="normal"
-                    :property="'name'">
-                    <bk-input v-model.trim="addDirectory.formInfo.name"
-                        :maxlength="120"
-                        :show-word-limit="true"
-                        :placeholder="$t(`m.serviceConfig['请输入目录名称']`)">
-                    </bk-input>
-                </bk-form-item>
-                <bk-form-item
-                    :label="$t(`m.serviceConfig['目录描述']`)">
-                    <bk-input
-                        :placeholder="$t(`m.serviceConfig['请输入目录描述']`)"
-                        :type="'textarea'"
-                        :rows="3"
-                        :maxlength="255"
-                        v-model="addDirectory.formInfo.desc">
-                    </bk-input>
-                </bk-form-item>
-            </bk-form>
-        </bk-dialog>
+        <div class="bk-tree-search">
+          <bk-input
+            class="bk-tree-input"
+            data-test-id="directory-input-search"
+            :placeholder="$t(`m.serviceConfig['请输入搜索关键字']`)"
+            :clearable="true"
+            :right-icon="'bk-icon icon-search'"
+            v-model="searchWord"
+            @enter="searchInfo"
+            @clear="clearInfo">
+          </bk-input>
+        </div>
+      </div>
+      <div class="bk-tree-div" id="treeOther">
+        <div ref="treeTree">
+          <tree
+            ref="tree5"
+            class="bk-tree-class"
+            :data="treeList"
+            :node-key="'id'"
+            :has-border="true"
+            @on-click="nodeClick"
+            @on-expanded="nodeExpand"
+            @on-icon="iconNode"
+            @on-drag-node="onDragNode">
+          </tree>
+        </div>
+        <div class="bk-tree-more" ref="treeOperat" v-show="showMore">
+          <ul>
+            <li
+              data-test-id="directoty-li-addCatalogue"
+              v-cursor="{ active: !hasPermission(['catalog_create'], $store.state.project.projectAuthActions), zIndex: 3001 }"
+              :title="$t(`m.serviceConfig['新增']`)"
+              :class="{
+                'bk-disabled-add': String(treeInfo.node.level) === '3',
+                'text-permission-disable': !hasPermission(['catalog_create'], $store.state.project.projectAuthActions)
+              }"
+              @click="openAdd">
+              <span>{{ $t('m.serviceConfig["新增"]') }}</span>
+            </li>
+            <li
+              data-test-id="directoty-li-editCatalogue"
+              v-cursor="{ active: !hasPermission(['catalog_edit'], $store.state.project.projectAuthActions) }"
+              :title="$t(`m.serviceConfig['编辑']`)"
+              :class="{
+                'text-permission-disable': !hasPermission(['catalog_edit'], $store.state.project.projectAuthActions)
+              }"
+              @click="openUpdate">
+              <span>{{ $t('m.serviceConfig["编辑"]') }}</span>
+            </li>
+            <li
+              data-test-id="directoty-li-delCatalogue"
+              v-cursor="{ active: !hasPermission(['catalog_delete'], $store.state.project.projectAuthActions) }"
+              :title="$t(`m.serviceConfig['删除']`)"
+              :class="{
+                'text-permission-disable': !hasPermission(['catalog_delete'], $store.state.project.projectAuthActions)
+              }"
+              @click="openDelete">
+              <span>{{ $t('m.serviceConfig["删除"]') }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
     <!-- 新增条目 -->
     <bk-dialog
@@ -81,6 +98,7 @@
       :value.sync="addDirectory.show"
       :title="addDirectory.title"
       :mask-close="false"
+      :auto-close="false"
       @confirm="submitAdd"
       @cancel="toggleDialog">
       <bk-form
@@ -186,13 +204,13 @@
         this.$store.dispatch('serviceCatalog/getTreeData', {
           show_deleted: true,
           project_key: this.$store.state.project.id,
-        }).then((res) => {
+        }).then(res => {
           this.treeList = res.data;
           this.getTreeParentId(res.data, this.$route.query.catalog_id);
           if (!this.firstStatus) {
             this.treeInfo.node = this.treeList[0];
           }
-          this.treeList.forEach((item) => {
+          this.treeList.forEach(item => {
             this.recordCheckFn(item);
             if (!this.firstStatus) {
               this.$set(item, 'selected', true);
@@ -200,7 +218,7 @@
           });
           this.firstStatus = true;
           if (this.treeInfo.node.id) {
-            this.treeList.forEach((item) => {
+            this.treeList.forEach(item => {
               this.getNodeTree(item);
             });
           }
@@ -208,7 +226,7 @@
             this.treeList[0].selected = false;
           }
         })
-          .catch((res) => {
+          .catch(res => {
             errorHandler(res, this);
           })
           .finally(() => {
@@ -220,7 +238,7 @@
         for (let i = 0; i < list.length; i++) {
           const node = list[i];
           if (node.id === id) {
-            node.route.forEach((item) => {
+            node.route.forEach(item => {
               this.parentIds.push(item.id);
             });
           } else {
@@ -239,7 +257,7 @@
       iconNode(node) {
         this.treeInfo.node = node.node;
         this.$store.commit('serviceCatalog/changeTreeOperat', true);
-        const { treeOperat } = this.$refs;
+        const treeOperat = this.$refs.treeOperat;
         if (window.innerHeight - 108 <= node.event.pageY) {
           treeOperat.style.top = `${node.event.pageY - 240}px`;
         } else {
@@ -271,7 +289,7 @@
         }
       },
       recordCheckFn(tree) {
-        this.expandIdList.forEach((selectItem) => {
+        this.expandIdList.forEach(selectItem => {
           if (selectItem === tree.id) {
             tree.expanded = true;
           }
@@ -282,7 +300,7 @@
         if (tree.children === null || (tree.children && !tree.children.length)) {
           return;
         }
-        tree.children.forEach((item) => {
+        tree.children.forEach(item => {
           this.recordCheckFn(item);
         });
       },
@@ -297,7 +315,7 @@
         if (tree.children === null || (tree.children && !tree.children.length)) {
           return;
         }
-        tree.children.forEach((item) => {
+        tree.children.forEach(item => {
           if (item.parent_id === tree.id && this.$route.query.catalog_id === item.id) {
             this.$set(tree, 'expanded', true);
           }
@@ -315,18 +333,14 @@
       // 新增目录
       openAdd(catalog) {
         if (!this.hasPermission(['catalog_create'], this.$store.state.project.projectAuthActions)) {
-          const { projectInfo } = this.$store.state.project;
+          const projectInfo = this.$store.state.project.projectInfo;
           const resourceData = {
             project: [{
               id: projectInfo.key,
               name: projectInfo.name,
             }],
           };
-          this.applyForPermission(
-            ['catalog_create'],
-            this.$store.state.project.projectAuthActions,
-            resourceData
-          );
+          this.applyForPermission(['catalog_create'], this.$store.state.project.projectAuthActions, resourceData);
           return;
         }
         if (String(this.treeInfo.node.level) === '3') {
@@ -376,7 +390,7 @@
               this.toggleDialog();
               // 确认保存后清空节点数据
             })
-              .catch((res) => {
+              .catch(res => {
                 errorHandler(res, this);
               })
               .finally(() => {
@@ -398,7 +412,7 @@
               // 确认保存后清空节点数据
               // this.treeInfo.node = {}
             })
-              .catch((res) => {
+              .catch(res => {
                 errorHandler(res, this);
               })
               .finally(() => {
@@ -412,18 +426,14 @@
       // 编辑目录
       openUpdate() {
         if (!this.hasPermission(['catalog_edit'], this.$store.state.project.projectAuthActions)) {
-          const { projectInfo } = this.$store.state.project;
+          const projectInfo = this.$store.state.project.projectInfo;
           const resourceData = {
             project: [{
               id: projectInfo.key,
               name: projectInfo.name,
             }],
           };
-          this.applyForPermission(
-            ['catalog_edit'],
-            this.$store.state.project.projectAuthActions,
-            resourceData
-          );
+          this.applyForPermission(['catalog_edit'], this.$store.state.project.projectAuthActions, resourceData);
           return;
         }
         if (!this.treeInfo.node.id) {
@@ -447,18 +457,14 @@
       // 删除
       openDelete() {
         if (!this.hasPermission(['catalog_delete'], this.$store.state.project.projectAuthActions)) {
-          const { projectInfo } = this.$store.state.project;
+          const projectInfo = this.$store.state.project.projectInfo;
           const resourceData = {
             project: [{
               id: projectInfo.key,
               name: projectInfo.name,
             }],
           };
-          this.applyForPermission(
-            ['catalog_delete'],
-            this.$store.state.project.projectAuthActions,
-            resourceData
-          );
+          this.applyForPermission(['catalog_delete'], this.$store.state.project.projectAuthActions, resourceData);
           return;
         }
         if (!this.treeInfo.node.id) {
@@ -492,7 +498,7 @@
               this.getTreeList();
               this.firstStatus = false;
             })
-              .catch((res) => {
+              .catch(res => {
                 errorHandler(res, this);
               })
               .finally(() => {
@@ -512,11 +518,11 @@
         const params = {
           new_order: arguments[0].currentParent.children.map(item => item.id),
         };
-        const { id } = arguments[0].dragNode;
+        const id = arguments[0].dragNode.id;
         this.$store.dispatch('serviceCatalog/moveNode', { params, id }).then(() => {
           // ...
         })
-          .catch((res) => {
+          .catch(res => {
             errorHandler(res, this);
           })
           .finally(() => {

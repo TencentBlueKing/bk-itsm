@@ -147,44 +147,13 @@
                           @click="operateExpression(group, 'del', eIndex, gIndex, expression)"></i>
                       </div>
                     </bk-form-item>
-                </template>
-                <bk-form-item :label="$t(`m.treeinfo['自动处理']`)" :required="true">
-                    <bk-checkbox
-                        :true-value="true"
-                        :false-value="false"
-                        v-model="formInfo.is_allow_skip">
-                        {{$t(`m['节点处理人为空时，直接跳过且不视为异常']`) }}
-                    </bk-checkbox>
-                </bk-form-item>
-            </bk-form>
-            <field-config
-                ref="field"
-                :is-show-title="true"
-                :flow-info="flowInfo"
-                :configur="configur">
-            </field-config>
-            <common-trigger-list :origin="'state'"
-                :node-type="configur.type"
-                :source-id="flowInfo.id"
-                :sender="configur.id"
-                :table="flowInfo.table">
-            </common-trigger-list>
-            <div class="bk-node-btn">
-                <bk-button :theme="'primary'"
-                    data-test-id="approve-button-submit"
-                    :title="$t(`m.treeinfo['确定']`)"
-                    :loading="secondClick"
-                    class="mr10"
-                    @click="submitNode">
-                    {{$t(`m.treeinfo['确定']`)}}
-                </bk-button>
-                <bk-button :theme="'default'"
-                    data-test-id="approve-button-close"
-                    :title="$t(`m.treeinfo['取消']`)"
-                    class="mr10"
-                    @click="closeNode">
-                    {{$t(`m.treeinfo['取消']`)}}
-                </bk-button>
+                    <i class="bk-icon icon-close bk-delete-group"
+                      @click="operateGroup('del', gIndex)"></i>
+                  </bk-form>
+                </div>
+              </div>
+              <p class="bk-add-group" data-test-id="approve-condtion-addGroup" @click="operateGroup"><i class="bk-itsm-icon icon-add-new mr5"></i>
+                {{$t(`m.treeinfo['添加“或”条件组']`)}}</p>
             </div>
           </template>
         </bk-form-item>
@@ -263,7 +232,7 @@
             :true-value="true"
             :false-value="false"
             v-model="formInfo.is_allow_skip">
-            节点处理人为空时，直接跳过且不视为异常
+            {{$t(`m['节点处理人为空时，直接跳过且不视为异常']`) }}
           </bk-checkbox>
         </bk-form-item>
       </bk-form>
@@ -300,6 +269,7 @@
   </div>
 </template>
 <script>
+  import dealPerson from './components/dealPerson.vue';
   import fieldConfig from './components/fieldConfig.vue';
   import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
   import BasicCard from '@/components/common/layout/BasicCard.vue';
@@ -308,6 +278,7 @@
     name: 'ApprovalNode',
     components: {
       BasicCard,
+      dealPerson,
       fieldConfig,
       commonTriggerList,
     },
