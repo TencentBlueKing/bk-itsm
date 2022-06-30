@@ -53,6 +53,20 @@ export default {
                 return res
             })
         },
+        // 仅在单据内获取单据节点状态列表
+        getOnlyTicketNodeInfo ({ commit, state, dispatch }, params) {
+            return ajax.get(`ticket/receipts/${params.id}/details_states/`, { params }).then(response => {
+                const res = response.data
+                return res
+            })
+        },
+        // 仅在单据内获取单据节点状态列表
+        getOnlyStateStatus ({ commit, state, dispatch }, { params, id }) {
+            return ajax.get(`ticket/receipts/${id}/states_status/`, { params: params }).then(response => {
+                const res = response.data
+                return res
+            })
+        },
         // 获取节点字段列表
         getTicketNodeInfo ({ commit, state, dispatch }, { params, id }) {
             return ajax.get(`ticket/receipts/${id}/states/`, { params: params }).then(response => {

@@ -60,6 +60,8 @@ import ticketStatus from './modules/ticketStatus'
 import taskTemplate from './modules/taskTemplate'
 import taskExecute from './modules/taskExecute'
 
+import bkPlugin from './modules/bkPlugin'
+
 // 组件升级统一请求
 import user from './newModules/user'
 // 新增功能
@@ -114,7 +116,8 @@ export default new Vuex.Store({
         taskExecute,
         project,
         // new
-        ticket
+        ticket,
+        bkPlugin
     },
     // 公共 store
     state: {

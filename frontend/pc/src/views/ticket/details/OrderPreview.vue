@@ -109,12 +109,6 @@
                     return {}
                 }
             },
-            nodeList: {
-                type: Array,
-                default () {
-                    return []
-                }
-            },
             currentStepList: {
                 type: Array,
                 default () {
@@ -133,6 +127,7 @@
                 clickSecond: false,
                 addList: [],
                 lineList: [],
+                nodeList: [],
                 isDataLoading: true,
                 fullStatus: false,
                 previewInfo: {
@@ -161,6 +156,7 @@
         mounted () {
             this.getFlowInfo()
             // 轮询单据详情的数据
+            this.getStateStatus()
             clearInterval(this.$store.state.deployOrder.intervalInfo.lines)
             this.$store.state.deployOrder.intervalInfo.lines = setInterval(() => {
                 this.intervalLines()
@@ -194,6 +190,15 @@
                     console.log(res)
                 }).finally(() => {
                     this.isDataLoading = false
+                })
+            },
+            // 获取流程节点状态信息
+            getStateStatus () {
+                const ticketId = this.basicInfomation.id
+                this.$store.dispatch('deployOrder/getOnlyStateStatus', { params: {}, id: ticketId }).then((res) => {
+                    this.nodeList = res.data
+                }).catch((res) => {
+                    errorHandler(res, this)
                 })
             },
             /**

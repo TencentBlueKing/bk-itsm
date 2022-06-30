@@ -152,6 +152,14 @@
                             @reloadTicket="reloadTicket"
                             @onChangeHook="onChangeHook">
                         </sops-and-devops-task>
+                        <bkPluginTask
+                            v-if="nodeInfo.type === 'BK-PLUGIN' && nodeInfo.status === 'FAILED'"
+                            :ticket-info="ticketInfo"
+                            :node-info="nodeInfo"
+                            :workflow="workflow"
+                            @reloadTicket="reloadTicket"
+                            @onChangeHook="onChangeHook">
+                        </bkPluginTask>
                         <!-- api 节点处理 -->
                         <api-node-handle-body
                             v-if="nodeInfo.type === 'TASK'"
@@ -265,6 +273,7 @@
 </template>
 
 <script>
+    import bkPluginTask from './nodetask/bkPlugintask.vue'
     import collapseTransition from '@/utils/collapse-transition.js'
     import fieldInfo from '@/views/managePage/billCom/fieldInfo.vue'
     import fieldsDone from '../components/fieldsDone.vue'
@@ -290,7 +299,8 @@
             TicketTriggerDialog,
             NodeDealDialog,
             NodeTaskList,
-            sopsAndDevopsTask
+            sopsAndDevopsTask,
+            bkPluginTask
         },
         mixins: [commonMix],
         inject: ['reload'],
@@ -438,12 +448,8 @@
                 if (this.nodeInfo.sla_task_status === 2 && this.nodeInfo.is_reply_need === true) {
                     return false
                 }
-                if (this.nodeInfo.type === 'TASK-SOPS' && this.nodeInfo.status === 'RUNNING') {
-                    return false
-                }
-                if (this.nodeInfo.type === 'TASK-DEVOPS' && this.nodeInfo.status === 'RUNNING') {
-                    return false
-                }
+                const nodeType = ['TASK-SOPS', 'TASK-DEVOPS', 'BK-PLUGIN', 'WEBHOOK']
+                if (nodeType.includes(this.nodeInfo.type) && this.nodeInfo.status === 'RUNNING') return false
                 return true
             }
         },

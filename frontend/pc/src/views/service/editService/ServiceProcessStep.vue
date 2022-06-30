@@ -71,6 +71,12 @@
                     :configur="configur"
                     @closeConfigur="closeConfigur">
                 </approval-node>
+                <bk-plugin-node
+                    v-if="configur.type === 'BK-PLUGIN'"
+                    :flow-info="flowInfo"
+                    :configur="configur"
+                    @closeConfigur="closeConfigur">
+                </bk-plugin-node>
                 <web-hook-node
                     v-if="configur.type === 'WEBHOOK'"
                     :flow-info="flowInfo"
@@ -93,6 +99,7 @@
     import devopsNode from '@/views/processManagement/processDesign/nodeConfigue/devopsNode.vue'
     import ApprovalNode from '@/views/processManagement/processDesign/nodeConfigue/ApprovalNode.vue'
     import webHookNode from '@/views/processManagement/processDesign/nodeConfigue/webHookNode.vue'
+    import bkPluginNode from '@/views/processManagement/processDesign/nodeConfigue/bkPluginNode.vue'
 
     export default {
         name: 'ServiceProcessStep',
@@ -104,6 +111,7 @@
             signNode,
             ApprovalNode,
             devopsNode,
+            bkPluginNode,
             webHookNode
         },
         props: {
@@ -137,7 +145,8 @@
                     'TASK': this.$t(`m["任务节点"]`),
                     'APPROVAL': this.$t(`m["审批节点"]`),
                     'SIGN': this.$t(`m["会签节点"]`),
-                    'WEBHOOK': this.$t(`m["WEBHOOK节点"]`)
+                    'WEBHOOK': this.$t(`m["WEBHOOK节点"]`),
+                    'BK-PLUGIN': this.$t(`m["蓝鲸插件节点"]`)
                 }
                 return nodoTypeList[this.configur.type]
             }
