@@ -27,7 +27,7 @@ def grant(app_code, resource_names, stage):
     }
     path_params = {"api_name": BK_APIGW_NAME}
     try:
-        result = client.api.grant_permissions(params=params, path_params=path_params)
+        result = client.api.grant_permissions(data=params, path_params=path_params)
     except Exception:
         return False
     return result["result"]
