@@ -2624,5 +2624,6 @@ export const m = {
     '长度必须大于 20': 'Length must be greater than 20',
     '值不能为空': 'value cannot be empty',
     '不能使用保留字符': 'Cannot use reserved characters',
-    '必须是数字': 'must be a number'
+    '必须是数字': 'must be a number',
+    '是必填项！': 'is required !'
 }
