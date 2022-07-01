@@ -147,7 +147,7 @@
                             item.type = 'primary'
                             item.showMore = false
                             item.filled = true
-                            item.color = 'blue'
+                            item.color = 'green'
                             this.list.push(JSON.parse(JSON.stringify(item)))
                         }
                     })
@@ -178,7 +178,8 @@
                         tag: `【${item.name}】` + this.$t(`m["正在进行中"]`) + ', ' + this.$t(`m["当前处理人"]`) + item.processors || '--',
                         ticket: this.ticketInfo.id,
                         ticket_id: this.ticketInfo.id,
-                        type: 'primary'
+                        type: 'primary',
+                        color: 'blue'
                     }
                     if (item.status === 'RUNNING' && this.list.findIndex(item => item.id === processor.id) === -1) {
                         this.list.push(processor)
@@ -245,6 +246,16 @@
         .bk-timeline-dot {
             padding-bottom: 10px;
         }
+    }
+}
+/deep/ .bk-timeline .bk-timeline-item-primary {
+    &::before {
+        border: 2px solid #40c024;
+    }
+}
+/deep/ .bk-timeline .bk-timeline-item-primary:last-child {
+    &::before {
+        border: 2px solid #3a84ff;
     }
 }
 .process-detail {
