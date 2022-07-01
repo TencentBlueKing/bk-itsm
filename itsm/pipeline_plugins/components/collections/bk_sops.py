@@ -68,7 +68,6 @@ class BkOpsService(ItsmBaseService):
             "__raw": True,
         }
 
-        print(constants)
         return params
 
     def update_info(self, current_node, sops_result, **kwargs):

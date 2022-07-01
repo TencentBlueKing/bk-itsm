@@ -138,6 +138,7 @@ from itsm.component.constants import (
     LEN_XX_LONG,
     TASK_DEVOPS_STATE,
     WEBHOOK_STATE,
+    BK_PLUGIN_STATE,
 )
 from itsm.component.constants.trigger import (
     CREATE_TICKET,
@@ -1121,7 +1122,13 @@ class Status(Model):
     def is_stopped(self):
         """结束/终止/失败"""
         stop_status = copy.deepcopy(self.STOPPED_STATUS)
-        if self.type in [TASK_STATE, TASK_SOPS_STATE, TASK_DEVOPS_STATE, WEBHOOK_STATE]:
+        if self.type in [
+            TASK_STATE,
+            TASK_SOPS_STATE,
+            TASK_DEVOPS_STATE,
+            WEBHOOK_STATE,
+            BK_PLUGIN_STATE,
+        ]:
             stop_status.pop()
         return self.status in stop_status
 
@@ -3108,7 +3115,13 @@ class Ticket(Model, BaseTicket):
             action_type = (
                 SYSTEM_OPERATE
                 if state.type
-                in [TASK_STATE, TASK_SOPS_STATE, TASK_DEVOPS_STATE, WEBHOOK_STATE]
+                in [
+                    TASK_STATE,
+                    TASK_SOPS_STATE,
+                    TASK_DEVOPS_STATE,
+                    WEBHOOK_STATE,
+                    BK_PLUGIN_STATE,
+                ]
                 else TRANSITION_OPERATE
             )
 

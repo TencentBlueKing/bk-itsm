@@ -2618,10 +2618,20 @@ export const m = {
     '节点处理人为空时，直接跳过且不视为异常': 'When the node handler is empty, it is skipped directly and is not regarded as an exception',
     '当审批节点的审批人为申请人时，自动通过': 'When the approver of the approval node is the applicant, it is automatically passed',
     '字段配置': 'Field config',
-    '字段属性': 'Field properties',
     '为必选项!': 'Required!',
     '必选项': 'Required',
     '此操作不可撤销，确定要删除吗？': 'This action is irreversible. Are you sure you want to delete it?',
     '点击申请权限': 'Apply Permission',
-    '回到首页': 'Back to Home'
+    '回到首页': 'Back to Home',
+    '字段属性': 'Field properties',
+    '蓝鲸插件节点': 'BK-PLUGIN',
+    '第三方插件': 'Third-party plugins',
+    '版本': 'Version',
+    '执行蓝鲸插件需要填写的参数信息，可以使用 {{ 来使用流程内的变量': 'Parameter information that needs to be filled in to execute the blue whale plug-in, you can use {{ to use the variables in the process',
+    '蓝鲸插件执行之后的输出，可以通过勾选的方式作为引用变量在后面的节点使用': 'The output after the execution of the blue whale plugin can be used as a reference variable in the following nodes by checking it',
+    '输出参数': 'Output parameters',
+    '长度必须大于 20': 'Length must be greater than 20',
+    '值不能为空': 'value cannot be empty',
+    '不能使用保留字符': 'Cannot use reserved characters',
+    '必须是数字': 'must be a number'
 }

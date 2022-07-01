@@ -1366,13 +1366,7 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response()
 
-    @action(detail=True, methods=["get"])
-    def states(self, request, *args, **kwargs):
-        """
-        单据节点查询
-        参数：state_id，可选，若为空则返回所有当前状态
-        """
-        ticket = self.get_object()
+    def states_response(self, ticket, request, detail=False):
         state_id = request.query_params.get("state_id")
 
         if ticket.flow.engine_version == DEFAULT_ENGINE_VERSION:
@@ -1385,6 +1379,12 @@ class TicketModelViewSet(ModelViewSet):
                     raise StateNotFoundError("state_id=%s" % state_id)
 
             many = not state_id
+
+            if many and detail:
+                status = status.filter(
+                    ~Q(status__in=["FINISHED", "TERMINATED"])
+                    | Q(state_id=ticket.first_state_id)
+                )
             show_all_fields = many or status.status != "FINISHED"
             ticket_status = StatusSerializer(
                 status,
@@ -1412,6 +1412,39 @@ class TicketModelViewSet(ModelViewSet):
                 list(ticket.flow.states.values()), many=True, context={"ticket": ticket}
             ).data
         )
+
+    @action(detail=True, methods=["get"])
+    def states(self, request, *args, **kwargs):
+        """
+        单据节点查询
+        参数：state_id，可选，若为空则返回所有当前状态
+        """
+        ticket = self.get_object()
+        return self.states_response(ticket, request)
+
+    @action(detail=True, methods=["get"])
+    def details_states(self, request, *args, **kwargs):
+        """
+        单据节点查询只返回部分字段
+        参数：state_id，可选，若为空则返回所有当前状态
+        """
+        ticket = self.get_object()
+        return self.states_response(ticket, request, detail=True)
+
+    @action(detail=True, methods=["get"])
+    def states_status(self, request, *args, **kwargs):
+        # 返回所有节点的from_transition_id, state_id, status 字段
+
+        ticket = self.get_object()
+        transitions_map = ticket.pipeline_data.get("transitions_map", {})
+        if ticket.flow.engine_version == DEFAULT_ENGINE_VERSION:
+            status_list = ticket.node_status.values(
+                "id", "state_id", "status", "by_flow"
+            )
+            for status in status_list:
+                status["from_transition_id"] = transitions_map.get(status["by_flow"])
+
+        return Response(list(status_list))
 
     @action(detail=True, methods=["get"])
     def transitions(self, request, *args, **kwargs):

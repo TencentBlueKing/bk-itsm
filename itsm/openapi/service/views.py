@@ -225,7 +225,10 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
             data["workflow_id"] = version.id
             if Service.validate_service_name(data["name"]):
                 raise ServiceInsertError(_("导入失败，服务名称已经存在"))
+
+            catalog_id = data.pop("catalog_id", None)
             service = Service.objects.create(**data)
+            service.bind_catalog(catalog_id, service.project_key)
         return Response(
             self.serializer_class(service, context=self.get_serializer_context()).data
         )
