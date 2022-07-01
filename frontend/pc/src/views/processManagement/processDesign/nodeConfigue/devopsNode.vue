@@ -94,7 +94,7 @@
                         <bk-select :disabled="!hookVarList[pipeline.id]" style="width: 200px;"
                             ext-cls="select-custom"
                             searchable
-                            :value="hookSelectList[pipeline.id].replace(/^\$\{/, '').replace(/\}$/, '') || ''"
+                            :value="getHookListValue(pipeline.id)"
                             @selected="changeConstant($event, pipeline)">
                             <bk-option v-for="option in stateList"
                                 :key="option.id"
@@ -121,7 +121,7 @@
                 :sender="configur.id"
                 :table="flowInfo.table">
             </common-trigger-list>
-            
+
             <div class="mt20" style="font-size: 0">
                 <bk-button :theme="'primary'"
                     data-test-id="devops-button-submit"
@@ -213,7 +213,7 @@
                     nodeName: [newRequiredRule()],
                     businessId: [newRequiredRule()],
                     pipelineId: [newRequiredRule()]
-                   
+
                 },
                 pipelineRules: {},
                 checkStatus: {
@@ -315,6 +315,12 @@
                 }
                 this.excludeProcessor = [...['EMPTY', 'API'], ...excludeProcessor]
             },
+            getHookListValue (pipeline_id) {
+                if (!this.hookSelectList[pipeline_id]) {
+                    return ''
+                }
+                return this.hookSelectList[pipeline_id].replace(/^\$\{/, '').replace(/\}$/, '') || ''
+            },
             // 选择项目获取流水线
             onSelectBusiness () {
                 this.pipelineLoading = true
@@ -331,6 +337,10 @@
             },
             // 获取流水线信息
             getPipelineInfo (init) {
+                if (!init) {
+                    this.hookSelectList = {}
+                    this.hookVarList = {}
+                }
                 this.pipeFormLoading = true
                 Promise.all([
                     this.$store.dispatch('ticket/getDevopsPipelineStartInfo', { 'project_id': this.basicInfo.businessId, 'pipeline_id': this.basicInfo.pipelineId }),
@@ -357,6 +367,12 @@
             closeNode () {
                 this.$parent.closeConfigur()
             },
+            getConstantValue (item) {
+                if (this.hookSelectList[item] !== '') {
+                    return this.pipelineData[item].slice(2, this.pipelineData[item].length - 1)
+                }
+                return this.pipelineData[item]
+            },
             submit () {
                 if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
                     this.checkStatus.processors = true
@@ -370,7 +386,7 @@
                     const pipelineData = this.pipelineList.filter(item => item.pipelineId === this.basicInfo.pipelineId)[0]
                     const constants = Object.keys(this.pipelineData).map(item => {
                         return {
-                            'value': this.pipelineData[item].slice(2, this.pipelineData[item].length - 1),
+                            'value': this.getConstantValue(item),
                             'name': item,
                             'key': item,
                             'checked': this.hookVarList[item],
