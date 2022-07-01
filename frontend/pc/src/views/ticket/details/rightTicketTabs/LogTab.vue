@@ -146,9 +146,12 @@
                             item.tag = item.message
                             item.type = 'primary'
                             item.showMore = false
+                            item.filled = true
+                            item.color = 'blue'
                             this.list.push(JSON.parse(JSON.stringify(item)))
                         }
                     })
+                    this.getCurrentProcess()
                 }).catch((res) => {
                     errorHandler(res, this)
                 }).finally(() => {
@@ -156,7 +159,7 @@
                 })
             },
             getCurrentProcess () {
-                this.nodeList.forEach(item => {
+                this.nodeList.forEach((item, index) => {
                     const processor = {
                         action: '',
                         // content: this.ticketInfo.current_processors || '--',
@@ -165,7 +168,7 @@
                         form_data: [],
                         from_state_name: item.name || '',
                         from_state_type: '',
-                        id: -1,
+                        id: -index,
                         message: this.$t(`m["正在进行中"]`) + '  ' + item.processors,
                         operate_at: item.update_at,
                         operator: item.processors,
@@ -177,7 +180,7 @@
                         ticket_id: this.ticketInfo.id,
                         type: 'primary'
                     }
-                    if (item.status === 'RUNNING') {
+                    if (item.status === 'RUNNING' && this.list.findIndex(item => item.id === processor.id) === -1) {
                         this.list.push(processor)
                     }
                 })
