@@ -112,6 +112,7 @@
                             </bk-select>
                         </template>
                     </BkRenderForm>
+                    <p v-if="errorList.length !== 0" class="errorTip"><i class="bk-itsm-icon icon-itsm-icon-square-one"></i>{{ $t(`m['字段']`) + errorList.toString() + $t(`m['是必填项！']`) }}</p>
                 </template>
                 <no-data v-else></no-data>
             </div>
@@ -260,7 +261,8 @@
                     baseURL: '',
                     pod_name: 'test_pod_name'
                 },
-                pluginTip: ''
+                pluginTip: '',
+                errorList: []
             }
         },
         computed: {
@@ -453,57 +455,74 @@
                 this.$parent.closeConfigur()
             },
             submit () {
-                const { value: processors, type: processors_type } = this.$refs.processors.getValue()
-                const bk_plugin_info = { plugin_code: this.basicInfo.plugin, version: this.basicInfo.version, inputs: this.formData, context: {} }
-                const outputs = []
-                this.outputsData.forEach(item => {
-                    if (!this.outputsVarList[item.key]) {
-                        return
-                    }
-                    if (this.outputsVarList[item.key]) {
-                        outputs.push({
-                            name: item.title,
-                            ref_path: 'resp.outputs.' + item.key,
-                            source: 'global',
-                            type: 'STRING'
-                        })
-                    }
-                })
-                if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
-                    this.checkStatus.processors = true
-                    return
-                }
-                if (this.$refs.bkForm) {
-                    const valid = this.$refs.bkForm.validateForm()
-                    if (!valid) {
-                        return
-                    }
-                }
-                const params = {
-                    name: this.basicInfo.nodeName,
-                    processors: processors || '',
-                    processors_type: processors_type || '',
-                    type: 'BK-PLUGIN',
-                    is_draft: false,
-                    extras: {
-                        bk_plugin_info: bk_plugin_info,
-                        outputs_var_list: this.outputsVarList,
-                        input_var_list: this.hookVarList
-                    },
-                    variables: { outputs: outputs },
-                    workflow: this.configur.workflow
-                }
-                const stateId = this.configur.id
-                this.$store.dispatch('cdeploy/putWebHook', { params, stateId }).then((res) => {
-                    this.$bkMessage({
-                        message: this.$t(`m['保存成功']`),
-                        theme: 'success'
+                this.$refs.basicInfo.validate().then(() => {
+                    this.errorList = []
+                    const isRequired = this.schema.required || []
+                    const state = Object.keys(this.$refs.bkForm.value).map(item => {
+                        if (isRequired.includes(item)) {
+                            if (this.$refs.bkForm.value[item] === '' || this.$refs.bkForm.value[item].length === 0) {
+                                if (!this.errorList.includes(item)) this.errorList.push(item)
+                                return false
+                            }
+                            return true
+                        }
+                        return true
                     })
-                    this.$parent.closeConfigur()
-                }, e => {
-                    console.log(e)
-                }).finally(() => {
-                    this.secondClick = false
+                    if (!state.every(item => item)) {
+                        return
+                    }
+                    const { value: processors, type: processors_type } = this.$refs.processors.getValue()
+                    const bk_plugin_info = { plugin_code: this.basicInfo.plugin, version: this.basicInfo.version, inputs: this.formData, context: {} }
+                    const outputs = []
+                    this.outputsData.forEach(item => {
+                        if (!this.outputsVarList[item.key]) {
+                            return
+                        }
+                        if (this.outputsVarList[item.key]) {
+                            outputs.push({
+                                name: item.title,
+                                ref_path: 'resp.outputs.' + item.key,
+                                source: 'global',
+                                type: 'STRING'
+                            })
+                        }
+                    })
+                    if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
+                        this.checkStatus.processors = true
+                        return
+                    }
+                    if (this.$refs.bkForm) {
+                        const valid = this.$refs.bkForm.validateForm()
+                        if (!valid) {
+                            return
+                        }
+                    }
+                    const params = {
+                        name: this.basicInfo.nodeName,
+                        processors: processors || '',
+                        processors_type: processors_type || '',
+                        type: 'BK-PLUGIN',
+                        is_draft: false,
+                        extras: {
+                            bk_plugin_info: bk_plugin_info,
+                            outputs_var_list: this.outputsVarList,
+                            input_var_list: this.hookVarList
+                        },
+                        variables: { outputs: outputs },
+                        workflow: this.configur.workflow
+                    }
+                    const stateId = this.configur.id
+                    this.$store.dispatch('cdeploy/putWebHook', { params, stateId }).then((res) => {
+                        this.$bkMessage({
+                            message: this.$t(`m['保存成功']`),
+                            theme: 'success'
+                        })
+                        this.$parent.closeConfigur()
+                    }, e => {
+                        console.log(e)
+                    }).finally(() => {
+                        this.secondClick = false
+                    })
                 })
             }
         }
@@ -610,5 +629,9 @@
     .bk-form-display {
         float: left;
         margin-right: 10px;
+    }
+    .errorTip {
+        color: red;
+        font-size: 12px;
     }
 </style>
