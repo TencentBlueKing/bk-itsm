@@ -87,6 +87,9 @@
                         :key="index"
                         @click.stop="addNormal(node, item)" :title="item.name">
                         <i class="bk-itsm-icon"
+                            :style="{
+                                'display': nodeDisabled === 'open' && (item.type === 'TASK-DEVOPS' || item.type === 'BK-PLUGIN')
+                                    ? 'none' : 'inline-block' }"
                             :class="[
                                 item.iconStyle,
                                 { 'bk-font-style': [
@@ -166,7 +169,8 @@
                     { type: 'ROUTER-P', name: this.$t(`m.treeinfo["并行网关"]`), iconStyle: 'icon-flow-convergence' },
                     { type: 'COPY', name: this.$t(`m.treeinfo["复制节点"]`), iconStyle: 'icon-copy-new' }
                 ],
-                currentNode: {}
+                currentNode: {},
+                nodeDisabled: window.RUN_VER
             }
         },
         mounted () {
