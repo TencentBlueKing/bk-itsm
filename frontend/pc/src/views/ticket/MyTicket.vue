@@ -424,6 +424,9 @@
             openFunction () {
                 return this.$store.state.openFunction
             },
+            projectSwitch: function () {
+                return this.$store.state.project.projectSwitch
+            },
             currTabSettingCache () {
                 return this.$store.state.ticket.settingCache[this.activePanel]
             },
@@ -461,7 +464,7 @@
                 // 我的待办去掉处理人，我的申请单去掉提单人,优先级（SLA_SWITCH）
                 const columnList = COLUMN_LIST.filter(column => {
                     if ((this.activePanel === 'created' && column.id === 'creator')
-                        || (!this.openFunction.SLA_SWITCH && column.id === 'priority')) {
+                        || (!(this.projectSwitch.SLA_SWITCH || this.openFunction.SLA_SWITCH) && column.id === 'priority')) {
                         return false
                     }
                     return true

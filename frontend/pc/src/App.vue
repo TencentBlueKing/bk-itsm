@@ -167,7 +167,8 @@
                 const configurInfo = this.loadConfigurInfo()
                 const theWay = this.loadTheWay()
                 const systemSettings = this.loadSystemSettings()
-                Promise.all([configurInfo, theWay, systemSettings]).then(async () => {
+                const projectSetting = this.loadProjectSettings()
+                Promise.all([configurInfo, theWay, systemSettings, projectSetting]).then(async () => {
                     await this.handleCheckPagePermission()
                     this.loading = false
                 })
@@ -217,6 +218,20 @@
                     this.$store.commit('changeOpenFunction', tempObj)
                 }).catch((res) => {
                     errorHandler(res, this)
+                })
+            },
+            // 加载项目功能配置
+            loadProjectSettings () {
+                return this.$store.dispatch('project/getProjectSettings', { project_key: this.$route.query.project_id }).then(res => {
+                    const tempObj = {}
+                    const skipList = ['IS_ORGANIZATION', 'WIKI_SWITCH', 'TASK_SWITCH']
+                    const result = res.data.filter(item => !skipList.includes(item.key))
+                    result.forEach(item => {
+                        if (item.key !== 'SERVICE_SWITCH') {
+                            tempObj[item.key] = item.value === 'on'
+                        }
+                    })
+                    this.$store.commit('project/setprojectSwitch', tempObj)
                 })
             },
             // 获取节点配置字段信息
