@@ -286,6 +286,8 @@
                 if (!value) {
                     this.pipelineData[pipeline.id] = pipeline.defaultValue
                     this.hookSelectList[pipeline.id] = ''
+                } else {
+                    this.pipelineData[pipeline.id] = ''
                 }
             },
             changeConstant (value, pipeline) {
@@ -368,7 +370,7 @@
                 this.$parent.closeConfigur()
             },
             getConstantValue (item) {
-                if (this.hookSelectList[item] !== '') {
+                if (this.hookVarList[item]) {
                     return this.pipelineData[item].slice(2, this.pipelineData[item].length - 1)
                 }
                 return this.pipelineData[item]
@@ -390,7 +392,7 @@
                             'name': item,
                             'key': item,
                             'checked': this.hookVarList[item],
-                            'type': this.hookSelectList[item] !== '' ? 'variable' : 'custom'
+                            'type': this.hookVarList[item] ? 'variable' : 'custom'
                         }
                     })
                     const { value: processors, type: processors_type } = this.$refs.processors.getValue()
