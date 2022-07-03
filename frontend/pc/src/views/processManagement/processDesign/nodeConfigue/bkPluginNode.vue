@@ -230,7 +230,7 @@
                     delivers: false,
                     processors: false
                 },
-                excludeProcessor: [],
+                excludeProcessor: ['EMPTY'],
                 processorsInfo: {
                     type: '',
                     value: ''
