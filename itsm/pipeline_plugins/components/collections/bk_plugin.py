@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import copy
+import json
 import logging
 
 import jmespath
@@ -84,6 +85,8 @@ class BkPluginService(ItsmBaseService):
         resp = {"resp": resp}
         for variable in variables:
             value = jmespath.search(variable["ref_path"], resp)
+            if isinstance(value, bool):
+                value = json.dumps(value)
             if TicketGlobalVariable.objects.filter(
                 ticket_id=ticket_id, key=variable["key"]
             ).exists():
