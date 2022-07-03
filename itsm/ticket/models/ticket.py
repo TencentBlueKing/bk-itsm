@@ -3054,7 +3054,7 @@ class Ticket(Model, BaseTicket):
             )
 
         defaults = {
-            "bk_biz_id": self.bk_biz_id,
+            "bk_biz_id": self.bk_biz_id or DEFAULT_BK_BIZ_ID,
             "status": status,
             "tag": getattr(state, "tag", DEFAULT_STRING),
             "name": state.name,
