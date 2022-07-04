@@ -47,17 +47,23 @@
         methods: {
             init () {
                 if ('inputs' in this.nodeInfo.contexts.build_params) {
-                    this.constantList = Object.keys(this.nodeInfo.contexts.build_params.inputs).map(item => {
-                        this.$set(this.formData, item, this.nodeInfo.contexts.build_params.inputs[item])
-                        this.$set(this.rules, item, [{
-                            required: true,
-                            message: i18n.t('m.treeinfo["字段必填"]'),
-                            trigger: 'blur'
-                        }])
-                        return {
-                            name: item,
-                            key: item
-                        }
+                    const params = {
+                        plugin_code: this.nodeInfo.contexts.build_params.plugin_code,
+                        plugin_version: this.nodeInfo.contexts.build_params.version
+                    }
+                    this.$store.dispatch('bkPlugin/getPluginDetail', params).then((res) => {
+                        this.constantList = Object.keys(this.nodeInfo.contexts.build_params.inputs).map(item => {
+                            this.$set(this.formData, item, this.nodeInfo.contexts.build_params.inputs[item])
+                            this.$set(this.rules, item, [{
+                                required: true,
+                                message: i18n.t('m.treeinfo["字段必填"]'),
+                                trigger: 'blur'
+                            }])
+                            return {
+                                name: res.data.inputs.properties[item].title,
+                                key: item
+                            }
+                        })
                     })
                 }
             },

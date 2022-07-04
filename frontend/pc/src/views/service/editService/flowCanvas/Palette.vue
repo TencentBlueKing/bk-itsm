@@ -56,11 +56,10 @@
                 <i class="bk-itsm-icon icon-task-icon" style="font-size: 26px;"></i>
             </div>
         </li>
-        <li v-bk-tooltips.right="$t(`m['蓝盾节点']`)">
+        <li v-if="nodeDisabled === 'open'" v-bk-tooltips.right="$t(`m['蓝盾节点']`)">
             <div class="entry-item entry-gateway" data-type="TASK-DEVOPS" style="margin: 12px 0 2px;">
                 <i class="bk-itsm-icon icon-devops-task-icon" style="font-size: 26px;"></i>
             </div>
-            <div v-if="devsopDisable === 'open'" class="entry-disabled" v-bk-tooltips.right="$t(`m['暂未开放']`)"></div>
         </li>
         <!-- <li v-bk-tooltips.right="$t(`m.treeinfo['会签节点']`)">
             <div class="entry-item entry-gateway" data-type="SIGN" style="margin: 12px 0 2px;">
@@ -72,7 +71,7 @@
                 <i class="bk-itsm-icon icon-approval-node" style="font-size: 26px;"></i>
             </div>
         </li>
-        <li v-bk-tooltips.right="$t(`m['蓝鲸插件节点']`)">
+        <li v-if="nodeDisabled === 'open'" v-bk-tooltips.right="$t(`m['蓝鲸插件节点']`)">
             <div class="entry-item entry-gateway" data-type="BK-PLUGIN" style="margin: 12px 0 2px;">
                 <i class="bk-itsm-icon icon-chajianjiedian plugin" style="font-size: 42px"></i>
             </div>
@@ -94,7 +93,7 @@
         name: 'Palette',
         data () {
             return {
-                devsopDisable: window.RUN_VER
+                nodeDisabled: window.RUN_VER
             }
         }
     }
