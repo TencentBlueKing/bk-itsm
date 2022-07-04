@@ -86,7 +86,8 @@ module.exports = {
 
     // https://eslint.org/docs/rules/camelcase
     camelcase: 'off',
-
+    // windows 不强制执行一致的换行样式
+    'linebreak-style': ['error', 'windows'],
     // 缩进使用 2 个空格，并且 switch 语句中的 Case 需要缩进
     // https://eslint.org/docs/rules/indent
     indent: ['error', 2, {
