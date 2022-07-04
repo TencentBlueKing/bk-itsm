@@ -229,6 +229,24 @@ def get_department_users(request):
 
 
 @cache_page(CACHE_5MIN, cache="default")
+def get_department_users_count(request):
+    """获取某个部门下的人员数量"""
+    try:
+        department_id = request.GET.get("id")
+        # 只拉取第一页的数据，拿到用户数
+        params = {
+            "id": department_id,
+            "recursive": "true",
+            "detail": True,
+            "page_size": 1,
+        }
+        res = client_backend.usermanage.list_department_profiles(params)
+    except ComponentCallError as e:
+        return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_USERS").json()
+    return Success({"count": res["count"]}).json()
+
+
+@cache_page(CACHE_5MIN, cache="default")
 def get_department_info(request):
     """获取部门详情"""
     try:
