@@ -10,7 +10,7 @@ from itsm.workflow.models import Notify, settings, Project
 from itsm.workflow.utils import init_notify_type_choice
 
 
-@periodic_task(run_every=(crontab(hour="*/1")), ignore_result=True)
+@periodic_task(run_every=(crontab(hour="*/1", minute=0)), ignore_result=True)
 @share_lock()
 def check_and_update_notify_type():
     choice = init_notify_type_choice()
