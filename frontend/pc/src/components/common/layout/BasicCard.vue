@@ -21,71 +21,71 @@
   -->
 
 <template>
-    <div class="basic-card-wrap">
-        <div
-            v-if="showFoldTitle"
-            class="more-configuration mb20" @click="showMore = !showMore">
-            <i v-if="!showMore" class="bk-icon icon-down-shape"></i>
-            <i v-else class="bk-icon icon-up-shape"></i>
-            <span>{{ foldTitle }}</span>
-        </div>
-        <collapse-transition>
-            <div class="common-section-card-block" v-if="showMore">
-                <label class="common-section-card-label">
-                    {{ cardLabel }}
-                    <p v-if="cardDesc" class="common-section-card-desc">{{ cardDesc }}</p>
-                </label>
-                <div class="common-section-card-body">
-                    <slot />
-                </div>
-            </div>
-        </collapse-transition>
+  <div class="basic-card-wrap">
+    <div
+      v-if="showFoldTitle"
+      class="more-configuration mb20" @click="showMore = !showMore">
+      <i v-if="!showMore" class="bk-icon icon-down-shape"></i>
+      <i v-else class="bk-icon icon-up-shape"></i>
+      <span>{{ foldTitle }}</span>
     </div>
+    <collapse-transition>
+      <div class="common-section-card-block" v-if="showMore">
+        <label class="common-section-card-label">
+          {{ cardLabel }}
+          <p v-if="cardDesc" class="common-section-card-desc">{{ cardDesc }}</p>
+        </label>
+        <div class="common-section-card-body">
+          <slot />
+        </div>
+      </div>
+    </collapse-transition>
+  </div>
 </template>
 
 <script>
-    import collapseTransition from '@/utils/collapse-transition.js'
-    export default {
-        name: 'BasicCard',
-        components: {
-            collapseTransition
+  import collapseTransition from '@/utils/collapse-transition.js';
+  export default {
+    name: 'BasicCard',
+    components: {
+      collapseTransition,
+    },
+    props: {
+      showFoldTitle: {
+        type: Boolean,
+        default: false,
+      },
+      foldTitle: {
+        type: String,
+        default: '',
+      },
+      firstUnfold: {
+        type: Boolean,
+        default: true,
+      },
+      cardLabel: {
+        type: String,
+        default: '',
+      },
+      cardDesc: {
+        type: String,
+        default: '',
+      },
+    },
+    data() {
+      return {
+        showMore: true,
+      };
+    },
+    watch: {
+      isFold: {
+        handler() {
+          this.showMore = this.firstUnfold;
         },
-        props: {
-            showFoldTitle: {
-                type: Boolean,
-                default: false
-            },
-            foldTitle: {
-                type: String,
-                default: ''
-            },
-            firstUnfold: {
-                type: Boolean,
-                default: true
-            },
-            cardLabel: {
-                type: String,
-                default: ''
-            },
-            cardDesc: {
-                type: String,
-                default: ''
-            }
-        },
-        data () {
-            return {
-                showMore: true
-            }
-        },
-        watch: {
-            isFold: {
-                handler () {
-                    this.showMore = this.firstUnfold
-                },
-                immediate: true
-            }
-        }
-    }
+        immediate: true,
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 @import '~@/scss/common-section-card.scss';

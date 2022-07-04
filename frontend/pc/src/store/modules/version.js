@@ -20,36 +20,36 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
-    namespaced: true,
-    state: {},
-    mutations: {},
-    actions: {
-        // 获取日志列表详情
-        version_logs ({ commit, state, dispatch }) {
-            return ajax.get('iadmin/version_logs/').then(response => {
-                return response
-            })
-        },
-        // 获取日志列表
-        version_list ({ commit, state, dispatch }) {
-            return ajax.get('iadmin/versions/').then(response => {
-                return response
-            })
-        },
-        // 获取更新日志
-        updateHistory ({ commit, state, dispatch }) {
-            return ajax.get('iadmin/migrate_logs/').then(response => {
-                return response
-            })
-        },
-        // 一键升级
-        oneKeymigrate ({ commit, state, dispatch }, params) {
-            return ajax.post(`iadmin/migrate_logs/`, params).then(response => {
-                return response
-            })
-        }
-    }
-}
+  namespaced: true,
+  state: {},
+  mutations: {},
+  actions: {
+    // 获取日志列表详情
+    version_logs({ commit, state, dispatch }) {
+      return ajax.get("iadmin/version_logs/").then((response) => {
+        return response;
+      });
+    },
+    // 获取日志列表
+    version_list({ commit, state, dispatch }) {
+      return ajax.get("iadmin/versions/").then((response) => {
+        return response;
+      });
+    },
+    // 获取更新日志
+    updateHistory({ commit, state, dispatch }) {
+      return ajax.get("iadmin/migrate_logs/").then((response) => {
+        return response;
+      });
+    },
+    // 一键升级
+    oneKeymigrate({ commit, state, dispatch }, params) {
+      return ajax.post(`iadmin/migrate_logs/`, params).then((response) => {
+        return response;
+      });
+    },
+  },
+};

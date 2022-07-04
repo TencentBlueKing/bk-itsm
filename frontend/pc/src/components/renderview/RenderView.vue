@@ -21,73 +21,73 @@
   -->
 
 <template>
-    <div class="render-view" style="margin-left: 10px;">
-        <div
-            v-for="(form, index) in formData"
-            :key="index + new Date()"
-            class="view-item-wrap">
-            <ViewItem
-                :top-index="index"
-                :is-top="true"
-                :scheme="getScheme(form)"
-                :form="form">
-            </ViewItem>
-        </div>
+  <div class="render-view" style="margin-left: 10px;">
+    <div
+      v-for="(form, index) in formData"
+      :key="index + new Date()"
+      class="view-item-wrap">
+      <ViewItem
+        :top-index="index"
+        :is-top="true"
+        :scheme="getScheme(form)"
+        :form="form">
+      </ViewItem>
     </div>
+  </div>
 </template>
 <script>
-    import ViewItem from './ViewItem'
-    
-    export default {
-        name: 'RenderView',
-        components: {
-            ViewItem
-        },
-        props: {
-            formData: {
-                type: Array,
-                default: () => ([])
-            },
-            context: {
-                type: Object,
-                default: () => ({})
-            }
-        },
-        provide () {
-            return {
-                getContext: () => this.context
-            }
-        },
-        data () {
-            return {
-                isRootRenderView: null,
-                value: {}
-            }
-        },
-        created () {
-            this.initRenderView()
-        },
-        methods: {
-            getScheme (form) {
-                if (this.context.schemes[form.scheme]) {
-                    return this.context.schemes[form.scheme]
-                }
-                return {}
-            },
-            initRenderView () {
-                let vueTag = this
-                let findParent = false
-                while (!findParent && vueTag.$parent) {
-                    if (vueTag.$parent.$options._componentTag === 'render-view') {
-                        findParent = true
-                    } else {
-                        vueTag = vueTag.$parent
-                    }
-                }
-                this.isRootRenderView = !findParent
-            }
+  import ViewItem from './ViewItem';
+
+  export default {
+    name: 'RenderView',
+    components: {
+      ViewItem,
+    },
+    props: {
+      formData: {
+        type: Array,
+        default: () => ([]),
+      },
+      context: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    provide() {
+      return {
+        getContext: () => this.context,
+      };
+    },
+    data() {
+      return {
+        isRootRenderView: null,
+        value: {},
+      };
+    },
+    created() {
+      this.initRenderView();
+    },
+    methods: {
+      getScheme(form) {
+        if (this.context.schemes[form.scheme]) {
+          return this.context.schemes[form.scheme];
         }
-    }
+        return {};
+      },
+      initRenderView() {
+        let vueTag = this;
+        let findParent = false;
+        while (!findParent && vueTag.$parent) {
+          if (vueTag.$parent.$options._componentTag === 'render-view') {
+            findParent = true;
+          } else {
+            vueTag = vueTag.$parent;
+          }
+        }
+        this.isRootRenderView = !findParent;
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

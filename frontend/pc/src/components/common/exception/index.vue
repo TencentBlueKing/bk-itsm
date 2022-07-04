@@ -21,32 +21,32 @@
   -->
 
 <template>
-    <div class="bk-exception bk-exception-center" v-show="show">
-        <img :src="image">
-        <h2 class="exception-text">{{message}}</h2>
-    </div>
+  <div class="bk-exception bk-exception-center" v-show="show">
+    <img :src="image">
+    <h2 class="exception-text">{{message}}</h2>
+  </div>
 </template>
 
 <script>
-    import img500 from '../../../images/500.png'
+  import img500 from '../../../images/500.png';
 
-    export default {
-        name: 'app-exception',
-        data () {
-            const message = this.$t('m.wiki["应用正在部署"]')
-            const image = img500
-            return {
-                show: false,
-                message: message,
-                image: image
-            }
-        },
-        created () {
-            setTimeout(() => {
-                this.show = true
-            }, this.delay)
-        }
-    }
+  export default {
+    name: 'app-exception',
+    data() {
+      const message = this.$t('m.wiki["应用正在部署"]');
+      const image = img500;
+      return {
+        show: false,
+        message,
+        image,
+      };
+    },
+    created() {
+      setTimeout(() => {
+        this.show = true;
+      }, this.delay);
+    },
+  };
 </script>
 
 <style lang="scss">

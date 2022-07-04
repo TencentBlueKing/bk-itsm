@@ -21,53 +21,53 @@
   -->
 
 <template>
-    <bk-sideslider
-        :is-show.sync="isShow"
-        :quick-close="true"
-        :title="title"
-        :width="width"
-        ext-cls="ui-sideslider">
-        <div slot="content">
-            <render-view
-                :form-data="formData"
-                :context="context">
-            </render-view>
-        </div>
-    </bk-sideslider>
+  <bk-sideslider
+    :is-show.sync="isShow"
+    :quick-close="true"
+    :title="title"
+    :width="width"
+    ext-cls="ui-sideslider">
+    <div slot="content">
+      <render-view
+        :form-data="formData"
+        :context="context">
+      </render-view>
+    </div>
+  </bk-sideslider>
 </template>
 
 <script>
-    export default {
-        name: 'Sideslider',
-        components: {
-            RenderView: () => import('../RenderView')
-        },
-        props: {
-            title: {
-                type: String,
-                default: ''
-            },
-            formData: {
-                type: Array,
-                default: () => ([])
-            },
-            context: {
-                type: Object,
-                default: () => ({
-                    schemes: {}
-                })
-            },
-            width: {
-                type: [String, Number],
-                default: 800
-            }
-        },
-        data () {
-            return {
-                isShow: true
-            }
-        }
-    }
+  export default {
+    name: 'Sideslider',
+    components: {
+      RenderView: () => import('../RenderView'),
+    },
+    props: {
+      title: {
+        type: String,
+        default: '',
+      },
+      formData: {
+        type: Array,
+        default: () => ([]),
+      },
+      context: {
+        type: Object,
+        default: () => ({
+          schemes: {},
+        }),
+      },
+      width: {
+        type: [String, Number],
+        default: 800,
+      },
+    },
+    data() {
+      return {
+        isShow: true,
+      };
+    },
+  };
 </script>
 
 <style lang="scss">

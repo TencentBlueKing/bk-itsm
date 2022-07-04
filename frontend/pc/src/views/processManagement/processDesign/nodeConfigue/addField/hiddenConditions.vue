@@ -21,307 +21,310 @@
   -->
 
 <template>
-    <div class="bk-hidden-conditions" @click="checkStatus = false" v-bkloading="{ isLoading: isLoading }">
-        <div class="bk-form-content" style="margin-left: 0">
-            <p class="bk-form-p">{{$t(`m.treeinfo['条件组间关系']`)}}</p>
-            <bk-radio-group v-model="conditionType">
-                <bk-radio :value="'and'" :ext-cls="'mr20'">{{$t(`m.treeinfo['且']`)}}</bk-radio>
-                <bk-radio :value="'or'">{{$t(`m.treeinfo['或']`)}}</bk-radio>
-            </bk-radio-group>
-        </div>
-        <p class="bk-error-msg" v-if="checkStatus">{{$t(`m.treeinfo['关系名称，关系表达式，关系值不能为空']`)}}</p>
-        <i class="bk-icon icon-close"
-            @click="clearCondition"></i>
-        <div class="bk-between-form"
-            :class="{ 'mt20': nodeIndex }"
-            v-for="(node, nodeIndex) in listInfo"
-            :key="nodeIndex">
-            <bk-select style="width: 182px; float: left; margin-right: 10px;"
-                v-model="node.key"
-                searchable
-                @selected="changeName(...arguments, node)">
-                <bk-option v-for="option in fieldList"
-                    :key="option.key"
-                    :id="option.key"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-            <bk-select style="width: 120px; float: left; margin-right: 10px;"
-                v-model="node.condition"
-                searchable>
-                <bk-option v-for="option in node.betweenList"
-                    :key="option.typeName"
-                    :id="option.typeName"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-            <!-- 判断父元素的类型 来觉得第三个框的样式 -->
-            <template
-                v-if="node.type === 'SELECT' || node.type === 'MULTISELECT' || node.type === 'RADIO' || node.type === 'CHECKBOX' || node.type === 'MEMBERS' || node.type === 'TREESELECT'">
-                <template v-if="node.choiceList.length">
-                    <bk-select :ext-cls="'bk-form-style'"
-                        v-model="node.value"
-                        searchable
-                        :multiple="node.multiSelect">
-                        <bk-option v-for="option in node.choiceList"
-                            :key="option.key"
-                            :id="option.key"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </template>
-                <template v-else>
-                    <bk-input :ext-cls="'bk-form-style'"
-                        :type="node.type === 'INT' ? 'number' : 'text'"
-                        :placeholder="$t(`m.treeinfo['请输入关系值']`)"
-                        v-model="node.value">
-                    </bk-input>
-                </template>
-            </template>
-            <template v-else-if="node.type === 'DATE' || node.type === 'DATETIME'">
-                <bk-date-picker
-                    :ext-cls="'bk-form-style'"
-                    :type="node.type === 'DATETIME' ? 'datetime' : 'date'"
-                    v-model="node.value">
-                </bk-date-picker>
-            </template>
-            <template v-else>
-                <bk-input :ext-cls="'bk-form-style'"
-                    :type="node.type === 'INT' ? 'number' : 'text'"
-                    :placeholder="$t(`m.treeinfo['请输入关系值']`)"
-                    v-model="node.value">
-                </bk-input>
-            </template>
-            <div class="bk-between-operat">
-                <i class="bk-itsm-icon icon-flow-add" @click="addNode(node, nodeIndex)"></i>
-                <i class="bk-itsm-icon icon-flow-reduce"
-                    :class="{ 'bk-no-delete': listInfo.length === 1 }"
-                    @click="deleteNode(node, nodeIndex)"></i>
-            </div>
-        </div>
+  <div class="bk-hidden-conditions" @click="checkStatus = false" v-bkloading="{ isLoading: isLoading }">
+    <div class="bk-form-content" style="margin-left: 0">
+      <p class="bk-form-p">{{$t(`m.treeinfo['条件组间关系']`)}}</p>
+      <bk-radio-group v-model="conditionType">
+        <bk-radio :value="'and'" :ext-cls="'mr20'">{{$t(`m.treeinfo['且']`)}}</bk-radio>
+        <bk-radio :value="'or'">{{$t(`m.treeinfo['或']`)}}</bk-radio>
+      </bk-radio-group>
     </div>
+    <p class="bk-error-msg" v-if="checkStatus">{{$t(`m.treeinfo['关系名称，关系表达式，关系值不能为空']`)}}</p>
+    <i class="bk-icon icon-close"
+      @click="clearCondition"></i>
+    <div class="bk-between-form"
+      :class="{ 'mt20': nodeIndex }"
+      v-for="(node, nodeIndex) in listInfo"
+      :key="nodeIndex">
+      <bk-select style="width: 182px; float: left; margin-right: 10px;"
+        v-model="node.key"
+        searchable
+        @selected="changeName(...arguments, node)">
+        <bk-option v-for="option in fieldList"
+          :key="option.key"
+          :id="option.key"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+      <bk-select style="width: 120px; float: left; margin-right: 10px;"
+        v-model="node.condition"
+        searchable>
+        <bk-option v-for="option in node.betweenList"
+          :key="option.typeName"
+          :id="option.typeName"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+      <!-- 判断父元素的类型 来觉得第三个框的样式 -->
+      <template
+        v-if="node.type === 'SELECT' || node.type === 'MULTISELECT' || node.type === 'RADIO' || node.type === 'CHECKBOX' || node.type === 'MEMBERS' || node.type === 'TREESELECT'">
+        <template v-if="node.choiceList.length">
+          <bk-select :ext-cls="'bk-form-style'"
+            v-model="node.value"
+            searchable
+            :multiple="node.multiSelect">
+            <bk-option v-for="option in node.choiceList"
+              :key="option.key"
+              :id="option.key"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+        </template>
+        <template v-else>
+          <bk-input :ext-cls="'bk-form-style'"
+            :type="node.type === 'INT' ? 'number' : 'text'"
+            :placeholder="$t(`m.treeinfo['请输入关系值']`)"
+            v-model="node.value">
+          </bk-input>
+        </template>
+      </template>
+      <template v-else-if="node.type === 'DATE' || node.type === 'DATETIME'">
+        <bk-date-picker
+          :ext-cls="'bk-form-style'"
+          :type="node.type === 'DATETIME' ? 'datetime' : 'date'"
+          v-model="node.value">
+        </bk-date-picker>
+      </template>
+      <template v-else>
+        <bk-input :ext-cls="'bk-form-style'"
+          :type="node.type === 'INT' ? 'number' : 'text'"
+          :placeholder="$t(`m.treeinfo['请输入关系值']`)"
+          v-model="node.value">
+        </bk-input>
+      </template>
+      <div class="bk-between-operat">
+        <i class="bk-itsm-icon icon-flow-add" @click="addNode(node, nodeIndex)"></i>
+        <i class="bk-itsm-icon icon-flow-reduce"
+          :class="{ 'bk-no-delete': listInfo.length === 1 }"
+          @click="deleteNode(node, nodeIndex)"></i>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
-    import { errorHandler } from '../../../../../utils/errorHandler.js'
-    import apiFieldsWatch from '../../../../commonMix/api_fields_watch.js'
+  import { errorHandler } from '../../../../../utils/errorHandler.js';
+  import apiFieldsWatch from '../../../../commonMix/api_fields_watch.js';
 
-    export default {
-        name: 'hiddenConditions',
-        mixins: [apiFieldsWatch],
-        props: {
-            workflow: {
-                type: [String, Number],
-                default () {
-                    return ''
-                }
-            },
-            state: {
-                type: [String, Number],
-                default () {
-                    return ''
-                }
-            },
-            formInfo: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            },
-            templateStage: {
-                type: String,
-                default: ''
-            },
-            templateInfo: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            },
-            addOrigin: {
-                type: Object,
-                default () {
-                    return {
-                        isOther: false,
-                        addOriginInfo: {}
-                    }
-                }
-            }
+  export default {
+    name: 'hiddenConditions',
+    mixins: [apiFieldsWatch],
+    props: {
+      workflow: {
+        type: [String, Number],
+        default() {
+          return '';
         },
-        data () {
-            return {
-                isLoading: false,
-                listInfo: [],
-                conditionType: 'and',
-                fieldList: [],
-                checkStatus: false
-            }
+      },
+      state: {
+        type: [String, Number],
+        default() {
+          return '';
         },
-        computed: {
-            globalChoise () {
-                return this.$store.state.common.configurInfo
-            }
+      },
+      formInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        mounted () {
-            this.getFrontNodesList()
+      },
+      templateStage: {
+        type: String,
+        default: '',
+      },
+      templateInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        methods: {
-            getFrontNodesList () {
-                if (!this.state && !this.templateInfo.id) {
-                    return
-                }
-                let url = ''
-                const params = {}
-                if (this.state) {
-                    url = 'apiRemote/get_related_fields'
-                    params.workflow = this.workflow
-                    params.state = this.state
-                }
-                if (this.templateInfo.id) {
-                    url = 'taskTemplate/getFrontFieldsList'
-                    params.id = this.templateInfo.id
-                    params.stage = this.templateStage
-                }
-                this.isLoading = true
-                this.$store.dispatch(url, params).then(res => {
-                    this.frontNodesList = res.data
-                    this.initData()
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isLoading = false
-                })
-            },
-            initData () {
-                // 初始化listInfo的数据
-                this.listInfo = []
-                if (this.formInfo.show_conditions.expressions && this.formInfo.show_conditions.expressions.length) {
-                    this.formInfo.show_conditions.expressions.forEach(item => {
-                        this.frontNodesList.forEach(node => {
-                            if (node.key === item.key) {
-                                const nodeStatus = (node.type === 'MULTISELECT' || node.type === 'CHECKBOX' || node.type === 'MEMBERS' || node.type === 'TREESELECT')
-                                const betweenList = this.checkBetweenList(node.type)
-                                this.listInfo.push({
-                                    condition: item.condition,
-                                    key: item.key,
-                                    value: nodeStatus ? item.value.split(',') : item.value,
-                                    choiceList: node.choice,
-                                    type: item.type,
-                                    multiSelect: nodeStatus,
-                                    betweenList: betweenList
-                                })
-                            }
-                        })
-                    })
-                    this.conditionType = this.formInfo.show_conditions.type
-                } else {
-                    this.listInfo = [
-                        {
-                            condition: '',
-                            key: '',
-                            value: '',
-                            choiceList: '',
-                            type: 'STRING',
-                            multiSelect: false,
-                            betweenList: this.checkBetweenList('STRING')
-                        }
-                    ]
-                    this.conditionType = 'and'
-                }
-                // 初始化fieldList数据
-                this.fieldList = []
-                this.frontNodesList.forEach(item => {
-                    // 去除掉当前的字段，字段类型为CUSTOMTABLE，FILE，RICHTEXT，TABLE，DATETIMERANGE，MEMBERS
-                    const exceptList = ['CUSTOMTABLE', 'FILE', 'RICHTEXT', 'TABLE', 'DATETIMERANGE', 'MEMBERS']
-                    if (item.key !== this.formInfo.key && !exceptList.some(node => node === item.type)) {
-                        this.fieldList.push(item)
-                    }
-                })
-                this.fieldList.forEach(item => {
-                    if (item.source_type === 'RPC') {
-                        this.getRpcData(item)
-                    }
-                })
-                this.isNecessaryToWatch({ 'fields': this.fieldList }, 'workflow')
-            },
-            getRpcData (item) {
-                this.$store.dispatch('apiRemote/getRpcData', item).then(res => {
-                    item.choice = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                })
-            },
-            checkBetweenList (typeValue) {
-                const listOne = ['MULTISELECT', 'CHECKBOX', 'MEMBERS', 'TREESELECT']
-                const listTwo = ['DATE', 'DATETIME', 'DATETIMERANGE', 'INT']
-                let betweenList = []
-                if (listOne.some(type => type === typeValue)) {
-                    betweenList = this.globalChoise.methods.filter(methods => (methods.typeName === 'issuperset' || methods.typeName === 'notissuperset'))
-                } else if (listTwo.some(type => type === typeValue)) {
-                    betweenList = this.globalChoise.methods.filter(methods => (methods.typeName !== 'issuperset' && methods.typeName !== 'notissuperset'))
-                } else {
-                    betweenList = this.globalChoise.methods.filter(methods => (methods.typeName === '==' || methods.typeName === '!='))
-                }
-                return betweenList
-            },
-            clearCondition () {
-                this.listInfo = [
-                    {
-                        condition: '',
-                        key: '',
-                        value: '',
-                        choiceList: '',
-                        type: 'STRING',
-                        multiSelect: false,
-                        betweenList: this.checkBetweenList('STRING')
-                    }
-                ]
-            },
-            changeName (...value) {
-                const checkItem = this.fieldList.filter(item => item.key === value[0])[0]
-                const nodeStatus = (checkItem.type === 'MULTISELECT' || checkItem.type === 'CHECKBOX' || checkItem.type === 'MEMBERS' || checkItem.type === 'TREESELECT')
-                const betweenList = this.checkBetweenList(checkItem.type)
-                value[2].type = checkItem.type
-                value[2].value = nodeStatus ? [] : ''
-                value[2].betweenList = betweenList
-                value[2].condition = ''
-                if (checkItem.type === 'SELECT' || checkItem.type === 'MULTISELECT' || checkItem.type === 'RADIO' || checkItem.type === 'CHECKBOX' || checkItem.type === 'MEMBERS' || checkItem.type === 'TREESELECT') {
-                    value[2].choiceList = []
-                    checkItem.choice.forEach(node => {
-                        value[2].choiceList.push({
-                            key: node.key,
-                            name: node.name
-                        })
-                    })
-                    value[2].multiSelect = nodeStatus
-                } else {
-                    value[2].choiceList = ''
-                }
-            },
-            // 新增字段条件组
-            addNode (node, index) {
-                const value = {
-                    condition: '',
-                    key: '',
-                    value: '',
-                    choiceList: '',
-                    type: 'STRING',
-                    multiSelect: false,
-                    betweenList: this.checkBetweenList('STRING')
-                }
-                this.listInfo.splice(index + 1, 0, value)
-            },
-            deleteNode (node, index) {
-                if (this.listInfo.length === 1) {
-                    return
-                }
-                this.listInfo.splice(index, 1)
-            },
-            checkList () {
-                this.checkStatus = this.listInfo.some(item => (!item.key || !item.condition || (Array.isArray(item.value) ? !item.value.length : !item.value)))
-                return this.checkStatus
-            }
+      },
+      addOrigin: {
+        type: Object,
+        default() {
+          return {
+            isOther: false,
+            addOriginInfo: {},
+          };
+        },
+      },
+    },
+    data() {
+      return {
+        isLoading: false,
+        listInfo: [],
+        conditionType: 'and',
+        fieldList: [],
+        checkStatus: false,
+      };
+    },
+    computed: {
+      globalChoise() {
+        return this.$store.state.common.configurInfo;
+      },
+    },
+    mounted() {
+      this.getFrontNodesList();
+    },
+    methods: {
+      getFrontNodesList() {
+        if (!this.state && !this.templateInfo.id) {
+          return;
         }
-    }
+        let url = '';
+        const params = {};
+        if (this.state) {
+          url = 'apiRemote/get_related_fields';
+          params.workflow = this.workflow;
+          params.state = this.state;
+        }
+        if (this.templateInfo.id) {
+          url = 'taskTemplate/getFrontFieldsList';
+          params.id = this.templateInfo.id;
+          params.stage = this.templateStage;
+        }
+        this.isLoading = true;
+        this.$store.dispatch(url, params).then((res) => {
+          this.frontNodesList = res.data;
+          this.initData();
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isLoading = false;
+          });
+      },
+      initData() {
+        // 初始化listInfo的数据
+        this.listInfo = [];
+        if (this.formInfo.show_conditions.expressions && this.formInfo.show_conditions.expressions.length) {
+          this.formInfo.show_conditions.expressions.forEach((item) => {
+            this.frontNodesList.forEach((node) => {
+              if (node.key === item.key) {
+                const nodeStatus = (node.type === 'MULTISELECT' || node.type === 'CHECKBOX' || node.type === 'MEMBERS' || node.type === 'TREESELECT');
+                const betweenList = this.checkBetweenList(node.type);
+                this.listInfo.push({
+                  condition: item.condition,
+                  key: item.key,
+                  value: nodeStatus ? item.value.split(',') : item.value,
+                  choiceList: node.choice,
+                  type: item.type,
+                  multiSelect: nodeStatus,
+                  betweenList,
+                });
+              }
+            });
+          });
+          this.conditionType = this.formInfo.show_conditions.type;
+        } else {
+          this.listInfo = [
+            {
+              condition: '',
+              key: '',
+              value: '',
+              choiceList: '',
+              type: 'STRING',
+              multiSelect: false,
+              betweenList: this.checkBetweenList('STRING'),
+            },
+          ];
+          this.conditionType = 'and';
+        }
+        // 初始化fieldList数据
+        this.fieldList = [];
+        this.frontNodesList.forEach((item) => {
+          // 去除掉当前的字段，字段类型为CUSTOMTABLE，FILE，RICHTEXT，TABLE，DATETIMERANGE，MEMBERS
+          const exceptList = ['CUSTOMTABLE', 'FILE', 'RICHTEXT', 'TABLE', 'DATETIMERANGE', 'MEMBERS'];
+          if (item.key !== this.formInfo.key && !exceptList.some(node => node === item.type)) {
+            this.fieldList.push(item);
+          }
+        });
+        this.fieldList.forEach((item) => {
+          if (item.source_type === 'RPC') {
+            this.getRpcData(item);
+          }
+        });
+        this.isNecessaryToWatch({ fields: this.fieldList }, 'workflow');
+      },
+      getRpcData(item) {
+        this.$store.dispatch('apiRemote/getRpcData', item).then((res) => {
+          item.choice = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      checkBetweenList(typeValue) {
+        const listOne = ['MULTISELECT', 'CHECKBOX', 'MEMBERS', 'TREESELECT'];
+        const listTwo = ['DATE', 'DATETIME', 'DATETIMERANGE', 'INT'];
+        let betweenList = [];
+        if (listOne.some(type => type === typeValue)) {
+          betweenList = this.globalChoise.methods.filter(methods => (methods.typeName === 'issuperset' || methods.typeName === 'notissuperset'));
+        } else if (listTwo.some(type => type === typeValue)) {
+          betweenList = this.globalChoise.methods.filter(methods => (methods.typeName !== 'issuperset' && methods.typeName !== 'notissuperset'));
+        } else {
+          betweenList = this.globalChoise.methods.filter(methods => (methods.typeName === '==' || methods.typeName === '!='));
+        }
+        return betweenList;
+      },
+      clearCondition() {
+        this.listInfo = [
+          {
+            condition: '',
+            key: '',
+            value: '',
+            choiceList: '',
+            type: 'STRING',
+            multiSelect: false,
+            betweenList: this.checkBetweenList('STRING'),
+          },
+        ];
+      },
+      changeName(...value) {
+        const checkItem = this.fieldList.filter(item => item.key === value[0])[0];
+        const nodeStatus = (checkItem.type === 'MULTISELECT' || checkItem.type === 'CHECKBOX' || checkItem.type === 'MEMBERS' || checkItem.type === 'TREESELECT');
+        const betweenList = this.checkBetweenList(checkItem.type);
+        value[2].type = checkItem.type;
+        value[2].value = nodeStatus ? [] : '';
+        value[2].betweenList = betweenList;
+        value[2].condition = '';
+        if (checkItem.type === 'SELECT' || checkItem.type === 'MULTISELECT' || checkItem.type === 'RADIO' || checkItem.type === 'CHECKBOX' || checkItem.type === 'MEMBERS' || checkItem.type === 'TREESELECT') {
+          value[2].choiceList = [];
+          checkItem.choice.forEach((node) => {
+            value[2].choiceList.push({
+              key: node.key,
+              name: node.name,
+            });
+          });
+          value[2].multiSelect = nodeStatus;
+        } else {
+          value[2].choiceList = '';
+        }
+      },
+      // 新增字段条件组
+      addNode(node, index) {
+        const value = {
+          condition: '',
+          key: '',
+          value: '',
+          choiceList: '',
+          type: 'STRING',
+          multiSelect: false,
+          betweenList: this.checkBetweenList('STRING'),
+        };
+        this.listInfo.splice(index + 1, 0, value);
+      },
+      deleteNode(node, index) {
+        if (this.listInfo.length === 1) {
+          return;
+        }
+        this.listInfo.splice(index, 1);
+      },
+      checkList() {
+        this.checkStatus = this.listInfo.some(item => (!item.key || !item.condition || (Array.isArray(item.value) ? !item.value.length : !item.value)));
+        return this.checkStatus;
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

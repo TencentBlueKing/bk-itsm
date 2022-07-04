@@ -21,135 +21,138 @@
   -->
 
 <template>
-    <div class="devops-preview" :class="{ 'full-screen': isFullScreen }">
-        <header class="devops-header">
-            <i v-if="!isFullScreen" class="bk-itsm-icon icon-order-open" @click.stop="openFullScreen()"></i>
-            <span v-else class="exit-full-screen" @click.stop="onCloseFullScreen">
-                <i class="bk-itsm-icon icon-order-close"></i>
-                <span class="exit-text">{{$t(`m.common['退出全屏']`)}}</span>
-            </span>
-        </header>
-        <section class="devops-preview-wrap">
-            <div class="devops-preview-body">
-                <div class="stage" v-for="(stage, sIndex) in stages" :key="stage.id">
-                    <span class="stage-connect-line"></span>
-                    <h4 class="stage-name">{{ stage.name }}</h4>
-                    <ul class="containers" v-for="(container, cIndex) in stage.containers" :key="container.id">
-                        <svg
-                            v-if="sIndex !== 0"
-                            xmlns="http://www.w3.org/2000/svg"
-                            xmlns:xlink="http://www.w3.org/1999/xlink"
-                            width="60"
-                            :style="getSvgStyle(stage, cIndex)"
-                            :height="cIndex === 0 ? 70 : (stage.containers[cIndex - 1].elements.length + 1) * 56"
-                            class="container-connect-line left">
-                            <path :d="getPath(stage, cIndex)"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            xmlns:xlink="http://www.w3.org/1999/xlink"
-                            width="60"
-                            :style="getSvgStyle(stage, cIndex)"
-                            :height="cIndex === 0 ? 70 : (stage.containers[cIndex - 1].elements.length + 1) * 56"
-                            class="container-connect-line">
-                            <path :d="getPath(stage, cIndex)"></path>
-                        </svg>
-                        <li class="element container-title">
-                            {{ container.name }}
-                            <span v-if="sIndex !== 0" class="semicircle"></span>
-                            <span v-if="sIndex !== 0" class="triangle"></span>
-                        </li>
-                        <li v-for="element in container.elements"
-                            :key="element.id"
-                            :class="['element', { 'not-execute': !isElementCanExecute(element) }]">
-                            {{ element.name }}
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div v-if="loading" class="loading">
-                <i class="bk-itsm-icon icon-icon-loading"></i>
-                <span>{{ $t(`m.tickets['预览正在加载中']`) }}</span>
-            </div>
-        </section>
-    </div>
+  <div class="devops-preview" :class="{ 'full-screen': isFullScreen }">
+    <header class="devops-header">
+      <i v-if="!isFullScreen" class="bk-itsm-icon icon-order-open" @click.stop="openFullScreen()"></i>
+      <span v-else class="exit-full-screen" @click.stop="onCloseFullScreen">
+        <i class="bk-itsm-icon icon-order-close"></i>
+        <span class="exit-text">{{$t(`m.common['退出全屏']`)}}</span>
+      </span>
+    </header>
+    <section class="devops-preview-wrap">
+      <div class="devops-preview-body">
+        <div class="stage" v-for="(stage, sIndex) in stages" :key="stage.id">
+          <span class="stage-connect-line"></span>
+          <h4 class="stage-name">{{ stage.name }}</h4>
+          <ul class="containers" v-for="(container, cIndex) in stage.containers" :key="container.id">
+            <svg
+              v-if="sIndex !== 0"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              width="60"
+              :style="getSvgStyle(stage, cIndex)"
+              :height="cIndex === 0 ? 70 : (stage.containers[cIndex - 1].elements.length + 1) * 56"
+              class="container-connect-line left">
+              <path :d="getPath(stage, cIndex)"></path>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              width="60"
+              :style="getSvgStyle(stage, cIndex)"
+              :height="cIndex === 0 ? 70 : (stage.containers[cIndex - 1].elements.length + 1) * 56"
+              class="container-connect-line">
+              <path :d="getPath(stage, cIndex)"></path>
+            </svg>
+            <li class="element container-title">
+              {{ container.name }}
+              <span v-if="sIndex !== 0" class="semicircle"></span>
+              <span v-if="sIndex !== 0" class="triangle"></span>
+            </li>
+            <li v-for="element in container.elements"
+              :key="element.id"
+              :class="['element', { 'not-execute': !isElementCanExecute(element) }]">
+              {{ element.name }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div v-if="loading" class="loading">
+        <i class="bk-itsm-icon icon-icon-loading"></i>
+        <span>{{ $t(`m.tickets['预览正在加载中']`) }}</span>
+      </div>
+    </section>
+  </div>
 </template>
 
 <script>
 
-    export default {
-        name: 'DevopsPreview',
-        components: {},
-        props: {
-            stages: {
-                type: Array,
-                default: () => ([])
-            },
-            loading: {
-                type: Boolean,
-                default: false
-            }
-        },
-        data () {
-            return {
-                isFullScreen: false
-            }
-        },
-        methods: {
-            // 当前操作节点打开全屏
-            openFullScreen () {
-                this.isFullScreen = true
-                this.$bkMessage({
-                    message: this.$t(`m.common["按 ESC 键退出全屏"]`)
-                })
-                document.addEventListener('keydown', this.handlerKeyDown)
-            },
-            // 关闭全屏
-            onCloseFullScreen () {
-                this.isFullScreen = false
-            },
-            // 关闭全屏 - esc
-            handlerKeyDown (event) {
-                if (event.keyCode === 27) {
-                    this.onCloseFullScreen()
-                    document.removeEventListener('keydown', this.handlerKeyDown)
-                }
-            },
-            getPath (stage, index) {
-                if (index === 0) {
-                    return 'M 60 2 L 55 2 Q 50 2 50 7 L 50 60 Q 50 62 45 62 L 0 62'
-                }
-                const height = (stage.containers[index - 1].elements.length + 1) * 56
-                return `M 50 2 L 50 ${height - 10} Q 50 ${height - 5} 45 ${height - 5} L 0 ${height - 5}`
-            },
-            getSvgStyle (stage, index) {
-                if (index === 0) {
-                    return ''
-                }
-                const height = (stage.containers[index - 1].elements.length + 1) * 56
-                const top = height - 27
-                return top ? `top: ${-top}px;` : ''
-            },
-            isElementCanExecute (element) {
-                if (!element.additionalOptions || !element.additionalOptions.runCondition) {
-                    return true
-                }
-                const { runCondition, customVariables, enable } = element.additionalOptions
-                if (!enable) {
-                    return false
-                }
-                switch (runCondition) {
-                    case 'CUSTOM_VARIABLE_MATCH':
-                        const allVarCheck = customVariables.every(varible => !!varible.value)
-                        return allVarCheck
-                    case 'CUSTOM_VARIABLE_MATCH_NOT_RUN':
-                        const allVarCheck2 = customVariables.every(varible => !!varible.value)
-                        return !allVarCheck2
-                    default:
-                        return true
-                }
-            }
+  export default {
+    name: 'DevopsPreview',
+    components: {},
+    props: {
+      stages: {
+        type: Array,
+        default: () => ([]),
+      },
+      loading: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        isFullScreen: false,
+      };
+    },
+    methods: {
+      // 当前操作节点打开全屏
+      openFullScreen() {
+        this.isFullScreen = true;
+        this.$bkMessage({
+          message: this.$t('m.common["按 ESC 键退出全屏"]'),
+        });
+        document.addEventListener('keydown', this.handlerKeyDown);
+      },
+      // 关闭全屏
+      onCloseFullScreen() {
+        this.isFullScreen = false;
+      },
+      // 关闭全屏 - esc
+      handlerKeyDown(event) {
+        if (event.keyCode === 27) {
+          this.onCloseFullScreen();
+          document.removeEventListener('keydown', this.handlerKeyDown);
         }
-    }
+      },
+      getPath(stage, index) {
+        if (index === 0) {
+          return 'M 60 2 L 55 2 Q 50 2 50 7 L 50 60 Q 50 62 45 62 L 0 62';
+        }
+        const height = (stage.containers[index - 1].elements.length + 1) * 56;
+        return `M 50 2 L 50 ${height - 10} Q 50 ${height - 5} 45 ${height - 5} L 0 ${height - 5}`;
+      },
+      getSvgStyle(stage, index) {
+        if (index === 0) {
+          return '';
+        }
+        const height = (stage.containers[index - 1].elements.length + 1) * 56;
+        const top = height - 27;
+        return top ? `top: ${-top}px;` : '';
+      },
+      isElementCanExecute(element) {
+        if (!element.additionalOptions || !element.additionalOptions.runCondition) {
+          return true;
+        }
+        const { runCondition, customVariables, enable } = element.additionalOptions;
+        if (!enable) {
+          return false;
+        }
+        switch (runCondition) {
+          case 'CUSTOM_VARIABLE_MATCH': {
+            const allVarCheck = customVariables.every(varible => !!varible.value);
+            return allVarCheck;
+          }
+          case 'CUSTOM_VARIABLE_MATCH_NOT_RUN': {
+            const allVarCheck2 = customVariables.every(varible => !!varible.value);
+            return !allVarCheck2;
+          }
+          default: {
+            return true;
+          }
+        }
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 @import '../../scss/animation/rotation.scss';

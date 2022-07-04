@@ -20,76 +20,76 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-const Index = () => import('../../views/manage/index.vue')
+const Index = () => import('../../views/manage/index.vue');
 // const PublicService = () => import('../../views/manage/service.vue')
-const PublicFields = () => import('../../views/manage/fields.vue')
-const PublicAPI = () => import('../../views/manage/api.vue')
-const NotifySetting = () => import('../../views/processManagement/notice/noticeConfigure.vue')
-const TaskTpl = () => import('../../views/processManagement/taskTemplate/index.vue')
-const SlaPriority = () => import('../../views/slaManager/priority.vue')
+const PublicFields = () => import('../../views/manage/fields.vue');
+const PublicAPI = () => import('../../views/manage/api.vue');
+const NotifySetting = () => import('../../views/processManagement/notice/noticeConfigure.vue');
+const TaskTpl = () => import('../../views/processManagement/taskTemplate/index.vue');
+const SlaPriority = () => import('../../views/slaManager/priority.vue');
 // 单据状态管理
-const TicketStatus = () => import('../../views/slaManager/ticketStatus.vue')
-const GlobalSetting = () => import('../../views/manage/globalSetting.vue')
+const TicketStatus = () => import('../../views/slaManager/ticketStatus.vue');
+const GlobalSetting = () => import('../../views/manage/globalSetting.vue');
 
 // const basicModule = () => import('../../views/processManagement/basicModule/index.vue')
 // const dataDictionary = () => import('../../views/systemConfig/dataDictionary.vue')
 
 export default [
-    {
-        path: '/manage',
-        name: 'ManageIndex',
-        component: Index,
-        children: [
-            // {
-            //     path: 'public_service',
-            //     name: 'publicService',
-            //     component: PublicService
-            // },
-            {
-                path: 'public_fields',
-                name: 'publicFields',
-                component: PublicFields
-            },
-            {
-                path: 'public_api',
-                name: 'publicAPI',
-                component: PublicAPI
-            },
-            {
-                path: 'task_tpl',
-                name: 'taskTpl',
-                component: TaskTpl
-            },
-            {
-                path: 'notify_setting',
-                name: 'notifySetting',
-                component: NotifySetting
-            },
-            {
-                path: 'sla_priority',
-                name: 'slaPriority',
-                component: SlaPriority
-            },
-            {
-                path: 'ticket_status',
-                name: 'ticketStatus',
-                component: TicketStatus
-            },
-            {
-                path: 'global_setting',
-                name: 'globalSetting',
-                component: GlobalSetting
-            }
-            // {
-            //     path: 'basic_module',
-            //     name: 'basicModule',
-            //     component: basicModule
-            // },
-            // {
-            //     path: 'data_dictionary',
-            //     name: 'dataDictionary',
-            //     component: dataDictionary
-            // }
-        ]
-    }
-]
+  {
+    path: '/manage',
+    name: 'ManageIndex',
+    component: Index,
+    children: [
+      // {
+      //     path: 'public_service',
+      //     name: 'publicService',
+      //     component: PublicService
+      // },
+      {
+        path: 'public_fields',
+        name: 'publicFields',
+        component: PublicFields,
+      },
+      {
+        path: 'public_api',
+        name: 'publicAPI',
+        component: PublicAPI,
+      },
+      {
+        path: 'task_tpl',
+        name: 'taskTpl',
+        component: TaskTpl,
+      },
+      {
+        path: 'notify_setting',
+        name: 'notifySetting',
+        component: NotifySetting,
+      },
+      {
+        path: 'sla_priority',
+        name: 'slaPriority',
+        component: SlaPriority,
+      },
+      {
+        path: 'ticket_status',
+        name: 'ticketStatus',
+        component: TicketStatus,
+      },
+      {
+        path: 'global_setting',
+        name: 'globalSetting',
+        component: GlobalSetting,
+      },
+      // {
+      //     path: 'basic_module',
+      //     name: 'basicModule',
+      //     component: basicModule
+      // },
+      // {
+      //     path: 'data_dictionary',
+      //     name: 'dataDictionary',
+      //     component: dataDictionary
+      // }
+    ],
+  },
+];

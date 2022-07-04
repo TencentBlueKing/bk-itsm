@@ -21,92 +21,94 @@
   -->
 
 <template>
-    <div class="trigger-handle">
-        <div class="left-content">
-            <span class="handle-title mr10">{{ title }}</span>
-            <task-status v-if="showStatus" ext-cls="mr30" :status="taskInfo.status" type="block"></task-status>
-            <bk-dropdown-menu
-                v-if="triggerList.length" @show="dropdownShow = true" @hide="dropdownShow = false">
-                <bk-button slot="dropdown-trigger" :loading="gettingTriggers">
-                    <span>{{ $t('m.newCommon["更多操作"]') }}</span>
-                    <i :class="['bk-icon icon-angle-down',{ 'icon-flip': dropdownShow }]"></i>
-                </bk-button>
-                <ul slot="dropdown-content" class="bk-dropdown-list trigger-ul">
-                    <li v-for="(trigger, tIndex) in triggerList" :key="tIndex">
-                        <a href="javascript:;" @click="openTriggerDialog(trigger)">{{trigger.display_name}}</a>
-                    </li>
-                </ul>
-            </bk-dropdown-menu>
-        </div>
-        <div class="right-content">
-            <slot name="right-content"></slot>
-        </div>
-        <ticket-trigger-dialog ref="triggerDialog" @init-info="refreshTicket"></ticket-trigger-dialog>
+  <div class="trigger-handle">
+    <div class="left-content">
+      <span class="handle-title mr10">{{ title }}</span>
+      <task-status v-if="showStatus" ext-cls="mr30" :status="taskInfo.status" type="block"></task-status>
+      <bk-dropdown-menu
+        v-if="triggerList.length" @show="dropdownShow = true" @hide="dropdownShow = false">
+        <bk-button slot="dropdown-trigger" :loading="gettingTriggers">
+          <span>{{ $t('m.newCommon["更多操作"]') }}</span>
+          <i :class="['bk-icon icon-angle-down',{ 'icon-flip': dropdownShow }]"></i>
+        </bk-button>
+        <ul slot="dropdown-content" class="bk-dropdown-list trigger-ul">
+          <li v-for="(trigger, tIndex) in triggerList" :key="tIndex">
+            <a href="javascript:;" @click="openTriggerDialog(trigger)">{{trigger.display_name}}</a>
+          </li>
+        </ul>
+      </bk-dropdown-menu>
     </div>
+    <div class="right-content">
+      <slot name="right-content"></slot>
+    </div>
+    <ticket-trigger-dialog ref="triggerDialog" @init-info="refreshTicket"></ticket-trigger-dialog>
+  </div>
 </template>
 
 <script>
-    import TicketTriggerDialog from '@/components/ticket/TicketTriggerDialog.vue'
-    import { errorHandler } from '@/utils/errorHandler'
-    import taskStatus from '../currentSteps/nodetask/TaskStatus.vue'
+  import TicketTriggerDialog from '@/components/ticket/TicketTriggerDialog.vue';
+  import { errorHandler } from '@/utils/errorHandler';
+  import taskStatus from '../currentSteps/nodetask/TaskStatus.vue';
 
-    export default {
-        name: 'taskHandleTrigger',
-        components: {
-            TicketTriggerDialog,
-            taskStatus
+  export default {
+    name: 'taskHandleTrigger',
+    components: {
+      TicketTriggerDialog,
+      taskStatus,
+    },
+    inject: ['reloadTicket'],
+    props: {
+      taskInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        inject: ['reloadTicket'],
-        props: {
-            taskInfo: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            },
-            title: {
-                type: String,
-                default: ''
-            },
-            showStatus: {
-                type: Boolean,
-                default: false
-            }
-        },
-        data () {
-            return {
-                dropdownShow: false,
-                gettingTriggers: true,
-                triggerList: []
-            }
-        },
-        mounted () {
-            this.getHandleList()
-        },
-        methods: {
-            getHandleList () {
-                const params = {
-                    source_id: this.taskInfo.id,
-                    source_type: 'task',
-                    operate_type: 'MANUAL'
-                }
-                this.$store.dispatch('trigger/getTaskHandleTriggers', params).then(res => {
-                    this.triggerList = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.gettingTriggers = false
-                })
-            },
-            openTriggerDialog (trigger) {
-                this.$refs.triggerDialog.openDialog(trigger)
-            },
-            refreshTicket () {
-                this.$emit('close-slider')
-                this.reloadTicket()
-            }
-        }
-    }
+      },
+      title: {
+        type: String,
+        default: '',
+      },
+      showStatus: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        dropdownShow: false,
+        gettingTriggers: true,
+        triggerList: [],
+      };
+    },
+    mounted() {
+      this.getHandleList();
+    },
+    methods: {
+      getHandleList() {
+        const params = {
+          source_id: this.taskInfo.id,
+          source_type: 'task',
+          operate_type: 'MANUAL',
+        };
+        this.$store.dispatch('trigger/getTaskHandleTriggers', params).then((res) => {
+          this.triggerList = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.gettingTriggers = false;
+          });
+      },
+      openTriggerDialog(trigger) {
+        this.$refs.triggerDialog.openDialog(trigger);
+      },
+      refreshTicket() {
+        this.$emit('close-slider');
+        this.reloadTicket();
+      },
+    },
+  };
 </script>
 
 <style scoped lang='scss'>

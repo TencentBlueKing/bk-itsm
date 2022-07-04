@@ -21,126 +21,194 @@
   -->
 
 <template>
-    <!-- 满意度评价 -->
-    <div class="bk-satisfact-info" v-bkloading="{ isLoading: loading }">
-        <template v-if="!(ticketInfo.is_commented || ticketInfo.can_comment)" class="bk-satisfact-mask">
-            <p v-if="ticketInfo.current_status === 'REVOKED'" style="margin-bottom: 10px">{{ $t('m.tickets["单据已撤销，无需评价。"]') }}</p>
-            <p v-else style="margin-bottom: 10px">{{$t('m.newCommon["单据处理未完成或没有评价权限，不能评价！"]')}}</p>
+  <!-- 满意度评价 -->
+  <div class="bk-satisfact-info" v-bkloading="{ isLoading: loading }">
+    <template
+      v-if="!(ticketInfo.is_commented || ticketInfo.can_comment)"
+      class="bk-satisfact-mask"
+    >
+      <p
+        v-if="ticketInfo.current_status === 'REVOKED'"
+        style="margin-bottom: 10px"
+      >
+        {{ $t('m.tickets["单据已撤销，无需评价。"]') }}
+      </p>
+      <p v-else style="margin-bottom: 10px">
+        {{
+          $t(
+            'm.newCommon["单据处理未完成或没有评价权限，不能评价！"]'
+          )
+        }}
+      </p>
+    </template>
+    <template v-else>
+      <!-- 发送评价内容 -->
+      <evaluation-ticket-content
+        v-if="
+          !satisfactInfo.stars &&
+            !satisfactInfo.has_invited &&
+            !loading
+        "
+        :satisfact-info="satisfactInfo"
+        :ticket-info="ticketInfo"
+        @submitSuccess="getEvaluation"
+      >
+      </evaluation-ticket-content>
+      <!-- 已评价显示 -->
+      <template v-else>
+        <template v-if="satisfactInfo.stars">
+          <div class="bk-evaluation-cus">
+            <span class="bk-evaluation-label-cus">{{
+              $t('m.newCommon["状态"]')
+            }}</span>
+            <span style="float: left">{{
+              $t('m.newCommon["："]')
+            }}</span>
+            <pre class="bk-evaluation-content">{{
+                            $t('m.newCommon["已评价"]')
+            }}</pre>
+          </div>
+          <div class="bk-evaluation-cus">
+            <div class="bk-evaluation-done">
+              <span class="bk-evaluation-label-cus">{{
+                $t('m.newCommon["星级"]')
+              }}</span>
+              <span style="float: left">{{
+                $t('m.newCommon["："]')
+              }}</span>
+              <span class="label-new-content">
+                <label
+                  class="bk-form-radio"
+                  v-for="(node, index) in scoreList"
+                  :key="index"
+                  style="padding: 0"
+                >
+                  <img
+                    src="@/images/evaluate/starblank.svg"
+                    alt="starfill"
+                    v-if="index >= satisfactInfo.stars"
+                    width="16px"
+                  />
+                  <img
+                    src="@/images/evaluate/starfill.svg"
+                    alt="starblank"
+                    v-else
+                    width="16px"
+                  />
+                </label>
+                <span v-if="satisfactInfo.stars > 0">
+                  {{
+                    scoreList[satisfactInfo.stars - 1].name
+                  }}
+                </span>
+              </span>
+            </div>
+          </div>
+          <div class="bk-evaluation-cus">
+            <span class="bk-evaluation-label-cus">{{
+              $t('m.newCommon["评论"]')
+            }}</span>
+            <span style="float: left">{{
+              $t('m.newCommon["："]')
+            }}</span>
+            <pre class="bk-evaluation-content">{{
+                            satisfactInfo.comments ||
+                            $t('m.newCommon["这个朋友很懒，什么也没留下"]')
+            }}</pre>
+          </div>
+          <div class="bk-evaluation-cus">
+            <span class="bk-evaluation-label-cus">{{
+              $t('m.newCommon["评价人"]')
+            }}</span>
+            <span style="float: left">{{
+              $t('m.newCommon["："]')
+            }}</span>
+            <span class="bk-evaluation-content">{{
+              satisfactInfo.creator || "--"
+            }}</span>
+          </div>
+          <div class="bk-evaluation-cus">
+            <span class="bk-evaluation-label-cus">{{
+              $t('m.newCommon["评价时间"]')
+            }}</span>
+            <span style="float: left">{{
+              $t('m.newCommon["："]')
+            }}</span>
+            <span class="bk-evaluation-content">{{
+              satisfactInfo.update_at || "--"
+            }}</span>
+          </div>
         </template>
         <template v-else>
-            <!-- 发送评价内容 -->
-            <evaluation-ticket-content
-                v-if="!satisfactInfo.stars && !satisfactInfo.has_invited && !loading"
-                :satisfact-info="satisfactInfo"
-                :ticket-info="ticketInfo"
-                @submitSuccess="getEvaluation">
-            </evaluation-ticket-content>
-            <!-- 已评价显示 -->
-            <template v-else>
-                <template v-if="satisfactInfo.stars">
-                    <div class="bk-evaluation-cus">
-                        <span class="bk-evaluation-label-cus">{{$t('m.newCommon["状态"]')}}</span>
-                        <span style="float: left">{{$t('m.newCommon["："]')}}</span>
-                        <pre class="bk-evaluation-content">{{$t('m.newCommon["已评价"]')}}</pre>
-                    </div>
-                    <div class="bk-evaluation-cus">
-                        <div class="bk-evaluation-done">
-                            <span class="bk-evaluation-label-cus">{{$t('m.newCommon["星级"]')}}</span>
-                            <span style="float: left">{{$t('m.newCommon["："]')}}</span>
-                            <span class="label-new-content">
-                                <label
-                                    class="bk-form-radio"
-                                    v-for="(node, index) in scoreList"
-                                    :key="index"
-                                    style="padding: 0;">
-                                    <img src="@/images/evaluate/starblank.svg" alt="starfill"
-                                        v-if="index >= satisfactInfo.stars" width="16px" />
-                                    <img src="@/images/evaluate/starfill.svg" alt="starblank" v-else width="16px">
-                                </label>
-                                <span v-if="satisfactInfo.stars > 0">
-                                    {{ scoreList[satisfactInfo.stars - 1].name }}
-                                </span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="bk-evaluation-cus">
-                        <span class="bk-evaluation-label-cus">{{$t('m.newCommon["评论"]')}}</span>
-                        <span style="float: left">{{$t('m.newCommon["："]')}}</span>
-                        <pre class="bk-evaluation-content">{{satisfactInfo.comments || $t('m.newCommon["这个朋友很懒，什么也没留下"]')}}</pre>
-                    </div>
-                    <div class="bk-evaluation-cus">
-                        <span class="bk-evaluation-label-cus">{{$t('m.newCommon["评价人"]')}}</span>
-                        <span style="float: left">{{$t('m.newCommon["："]')}}</span>
-                        <span class="bk-evaluation-content">{{satisfactInfo.creator || '--'}}</span>
-                    </div>
-                    <div class="bk-evaluation-cus">
-                        <span class="bk-evaluation-label-cus">{{$t('m.newCommon["评价时间"]')}}</span>
-                        <span style="float: left">{{$t('m.newCommon["："]')}}</span>
-                        <span class="bk-evaluation-content">{{satisfactInfo.update_at || '--'}}</span>
-                    </div>
-                </template>
-                <template v-else>
-                    <div class="bk-satis-info" style="margin-top: 10px;">
-                        <span>
-                            {{$t('m.newCommon["你已发送过满意度评价短信给"]')}}
-                            <span style="padding: 0 10px; color: #3c96ff;">{{satisfactInfo.has_invited || '--'}}</span>
-                        </span>
-                    </div>
-                </template>
-            </template>
+          <div class="bk-satis-info" style="margin-top: 10px">
+            <span>
+              {{
+                $t('m.newCommon["你已发送过满意度评价短信给"]')
+              }}
+              <span style="padding: 0 10px; color: #3c96ff">{{
+                satisfactInfo.has_invited || "--"
+              }}</span>
+            </span>
+          </div>
         </template>
-    </div>
+      </template>
+    </template>
+  </div>
 </template>
 
 <script>
-    import EvaluationTicketContent from '@/components/ticket/evaluation/EvaluationTicketContent.vue'
-    import { errorHandler } from '@/utils/errorHandler.js'
-    import { SCORE_LIST } from '@/constants/ticket'
+  import EvaluationTicketContent from '@/components/ticket/evaluation/EvaluationTicketContent.vue';
+  import { errorHandler } from '@/utils/errorHandler.js';
+  import { SCORE_LIST } from '@/constants/ticket';
 
-    export default {
-        name: 'CommentTab',
-        components: {
-            EvaluationTicketContent
-        },
-        props: {
-            ticketInfo: {
-                type: Object,
-                default: () => ({})
-            }
-        },
-        data () {
-            return {
-                loading: false,
-                picked: 'One',
-                satisfactInfo: {},
-                scoreList: SCORE_LIST
-            }
-        },
-        mounted () {
-            this.getEvaluation()
-        },
-        methods: {
-            // 获取评论
-            async getEvaluation () {
-                this.loading = true
-                const params = {
-                    id: this.ticketInfo.comment_id
-                }
-                if (this.$route.query.token) {
-                    params.token = this.$route.query.token
-                }
-                await this.$store.dispatch('evaluation/getEvaluation', params).then((res) => {
-                    this.satisfactInfo = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.loading = false
-                })
-            }
+  export default {
+    name: 'CommentTab',
+    components: {
+      EvaluationTicketContent,
+    },
+    props: {
+      ticketInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    data() {
+      return {
+        loading: false,
+        picked: 'One',
+        satisfactInfo: {},
+        scoreList: SCORE_LIST,
+      };
+    },
+    mounted() {
+      this.getEvaluation();
+    },
+    methods: {
+      // 获取评论
+      async getEvaluation() {
+        this.loading = true;
+        const params = {
+          id: this.ticketInfo.comment_id,
+        };
+        if (this.$route.query.token) {
+          params.token = this.$route.query.token;
         }
-    }
+        await this.$store
+          .dispatch('evaluation/getEvaluation', params)
+          .then((res) => {
+            this.satisfactInfo = res.data;
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      },
+    },
+  };
 </script>
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 /* 满意度 */
 .bk-satisfact-info {
     position: relative;
@@ -151,7 +219,7 @@
         position: absolute;
         width: 100%;
         height: 100%;
-        background: #DCDEE5;
+        background: #dcdee5;
     }
 
     .bk-lable-info {
@@ -173,7 +241,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
     }
 
     .bk-evaluation-done {

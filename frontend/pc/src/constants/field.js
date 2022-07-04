@@ -20,9 +20,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-export const CUSTOM_FORM_DEFAULT_VALUE = (() => {
-    return JSON.stringify({
-        schemes: {},
-        form_data: []
-    }, null, 4)
-})()
+export const CUSTOM_FORM_DEFAULT_VALUE = (() => JSON.stringify({
+  schemes: {},
+  form_data: [],
+}, null, 4))();

@@ -21,73 +21,73 @@
   -->
 
 <template>
-    <div class="chart-card">
-        <div class="card-header">
-            <h4>
-                {{ title }}
-                <i v-if="desc" class="bk-icon icon-info" v-bk-tooltips="{
-                    content: desc,
-                    placement: 'top',
-                    theme: 'light'
-                }">
-                </i>
-            </h4>
-            <div class="search-wrap" v-if="showSearch">
-                <bk-input
-                    right-icon="bk-icon icon-search"
-                    :placeholder="placeholder"
-                    :value="searchStr"
-                    :clearable="true"
-                    @change="onSearch">
-                </bk-input>
-            </div>
-        </div>
-        <div class="card-content" v-bkloading="{ isLoading: loading, opacity: 1 }">
-            <slot></slot>
-        </div>
+  <div class="chart-card">
+    <div class="card-header">
+      <h4>
+        {{ title }}
+        <i v-if="desc" class="bk-icon icon-info" v-bk-tooltips="{
+          content: desc,
+          placement: 'top',
+          theme: 'light'
+        }">
+        </i>
+      </h4>
+      <div class="search-wrap" v-if="showSearch">
+        <bk-input
+          right-icon="bk-icon icon-search"
+          :placeholder="placeholder"
+          :value="searchStr"
+          :clearable="true"
+          @change="onSearch">
+        </bk-input>
+      </div>
     </div>
+    <div class="card-content" v-bkloading="{ isLoading: loading, opacity: 1 }">
+      <slot></slot>
+    </div>
+  </div>
 </template>
 <script>
-    import debounce from 'lodash/debounce'
+  import debounce from 'lodash/debounce';
 
-    export default {
-        name: 'ChartCard',
-        props: {
-            title: {
-                type: String,
-                default: ''
-            },
-            desc: {
-                type: String,
-                default: ''
-            },
-            showSearch: {
-                type: Boolean,
-                default: false
-            },
-            placeholder: {
-                type: String,
-                default: ''
-            },
-            loading: {
-                type: Boolean,
-                default: false
-            }
-        },
-        data () {
-            return {
-                searchStr: ''
-            }
-        },
-        created () {
-            this.onSearch = debounce(this.searchHandler, 500)
-        },
-        methods: {
-            searchHandler (val) {
-                this.$emit('search', val)
-            }
-        }
-    }
+  export default {
+    name: 'ChartCard',
+    props: {
+      title: {
+        type: String,
+        default: '',
+      },
+      desc: {
+        type: String,
+        default: '',
+      },
+      showSearch: {
+        type: Boolean,
+        default: false,
+      },
+      placeholder: {
+        type: String,
+        default: '',
+      },
+      loading: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        searchStr: '',
+      };
+    },
+    created() {
+      this.onSearch = debounce(this.searchHandler, 500);
+    },
+    methods: {
+      searchHandler(val) {
+        this.$emit('search', val);
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .chart-card {

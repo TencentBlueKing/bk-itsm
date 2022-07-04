@@ -21,39 +21,39 @@
   -->
 
 <template>
-    <div class="nav">
-        <div class="nav-title">
-            <arrows-left-icon v-if="showIcon" @click="goBack"></arrows-left-icon>
-            <span class="title-name">{{ titleName }}</span>
-            <div class="step">
-                <slot name="step"></slot>
-            </div>
-        </div>
-        <div class="nav-tab">
-            <slot name="tab"></slot>
-        </div>
+  <div class="nav">
+    <div class="nav-title">
+      <arrows-left-icon v-if="showIcon" @click="goBack"></arrows-left-icon>
+      <span class="title-name">{{ titleName }}</span>
+      <div class="step">
+        <slot name="step"></slot>
+      </div>
     </div>
+    <div class="nav-tab">
+      <slot name="tab"></slot>
+    </div>
+  </div>
 </template>
 
 <script>
-    export default {
-        name: 'navTitle',
-        props: {
-            showIcon: {
-                type: Boolean,
-                default: false
-            },
-            titleName: {
-                type: String,
-                default: '--'
-            }
-        },
-        methods: {
-            goBack () {
-                this.$emit('goBack')
-            }
-        }
-    }
+  export default {
+    name: 'navTitle',
+    props: {
+      showIcon: {
+        type: Boolean,
+        default: false,
+      },
+      titleName: {
+        type: String,
+        default: '--',
+      },
+    },
+    methods: {
+      goBack() {
+        this.$emit('goBack');
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
@@ -91,5 +91,5 @@
             margin: 0 auto;
         }
     }
-    
+
 </style>
