@@ -148,7 +148,9 @@ class WebHookService(ItsmBaseService):
     def update_variables(self, resp, ticket_id, state_id, variables):
         resp = {"resp": resp}
         for variable in variables:
-            value = json.dumps(jmespath.search(variable["ref_path"], resp))
+            value = jmespath.search(variable["ref_path"], resp)
+            if isinstance(value, bool):
+                value = json.dumps(value)
             if TicketGlobalVariable.objects.filter(
                 ticket_id=ticket_id, key=variable["key"]
             ).exists():
