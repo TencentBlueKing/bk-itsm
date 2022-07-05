@@ -21,28 +21,28 @@
   -->
 
 <template>
-    <div class="no-data">
-        <img :src="imgUrl">
-        <p>
-            {{ text || $t('m.treeinfo["暂无数据"]') }}
-        </p>
-    </div>
+  <div class="no-data">
+    <img :src="imgUrl">
+    <p>
+      {{ text || $t('m.treeinfo["暂无数据"]') }}
+    </p>
+  </div>
 </template>
 
 <script>
-    export default {
-        name: 'NoData',
-        props: {
-            text: {
-                type: String
-            }
-        },
-        data () {
-            return {
-                imgUrl: require('@/images/box.png')
-            }
-        }
-    }
+  export default {
+    name: 'NoData',
+    props: {
+      text: {
+        type: String,
+      },
+    },
+    data() {
+      return {
+        imgUrl: require('@/images/box.png'),
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

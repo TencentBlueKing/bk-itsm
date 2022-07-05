@@ -21,63 +21,62 @@
   -->
 
 <template>
-    <div class="summary-card">
-        <div class="icon-wrap">
-            <slot name="icon">
-                <i class="bk-icon icon-order"></i>
-            </slot>
-        </div>
-        <div class="summary-data-wrap">
-            <div class="title">{{ title }}</div>
-            <div class="data-detail">
-                <div class="total-num">{{ cardData.total }}</div>
-                <div class="week-data">
-                    <div class="week-data-detail">
-                        <span class="week-item">
-                            {{ $t(`m.operation['上周']`) }}
-                            <span class="week-num">{{cardData.week.last_week_count}}</span>
-                        </span>
-                        <span class="week-item">
-                            {{ $t(`m.operation['本周']`) }}
-                            <span class="week-num">{{cardData.week.this_week_count}}</span>
-                        </span>
-                    </div>
-                    <div class="week-detail-ratio" :class="ratioCls">
-                        <span class="ratio-icon">
-                            <i class="bk-icon icon-arrows-right"></i>
-                        </span>
-                        <span class="ratio-value">{{ cardData.week.ratio }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="summary-card">
+    <div class="icon-wrap">
+      <slot name="icon">
+        <i class="bk-icon icon-order"></i>
+      </slot>
     </div>
+    <div class="summary-data-wrap">
+      <div class="title">{{ title }}</div>
+      <div class="data-detail">
+        <div class="total-num">{{ cardData.total }}</div>
+        <div class="week-data">
+          <div class="week-data-detail">
+            <span class="week-item">
+              {{ $t(`m.operation['上周']`) }}
+              <span class="week-num">{{cardData.week.last_week_count}}</span>
+            </span>
+            <span class="week-item">
+              {{ $t(`m.operation['本周']`) }}
+              <span class="week-num">{{cardData.week.this_week_count}}</span>
+            </span>
+          </div>
+          <div class="week-detail-ratio" :class="ratioCls">
+            <span class="ratio-icon">
+              <i class="bk-icon icon-arrows-right"></i>
+            </span>
+            <span class="ratio-value">{{ cardData.week.ratio }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
-    export default {
-        name: 'SummaryCard',
-        props: {
-            title: {
-                type: String,
-                default: ''
-            },
-            cardData: {
-                type: Object,
-                default: () => ({})
-            }
-        },
-        computed: {
-            ratioCls () {
-                if (this.cardData.week.this_week_count === this.cardData.week.last_week_count) {
-                    return 'ratio-equal'
-                } else if (this.cardData.week.this_week_count > this.cardData.week.last_week_count) {
-                    return 'ratio-up'
-                } else {
-                    return 'ratio-down'
-                }
-            }
+  export default {
+    name: 'SummaryCard',
+    props: {
+      title: {
+        type: String,
+        default: '',
+      },
+      cardData: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    computed: {
+      ratioCls() {
+        if (this.cardData.week.this_week_count === this.cardData.week.last_week_count) {
+          return 'ratio-equal';
+        } if (this.cardData.week.this_week_count > this.cardData.week.last_week_count) {
+          return 'ratio-up';
         }
-    }
+        return 'ratio-down';
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .summary-card {

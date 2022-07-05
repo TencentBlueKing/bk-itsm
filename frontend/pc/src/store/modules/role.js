@@ -20,48 +20,48 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
-    namespaced: true,
-    state: {},
-    mutations: {},
-    actions: {
-        getRoleTypeList ({ commit, state, dispatch }, params) {
-            return ajax.get(`${window.site}` + 'role/types/', { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        getChoices ({ commit, state, dispatch }) {
-            return ajax.get(`${window.site}` + 'role/users/extra/get_global_choices').then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        getRoleList ({ commit, state, dispatch }, params) {
-            return ajax.get(`${window.site}` + 'role/users/', { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        submit ({ commit, state, dispatch }, params) {
-            return ajax.post(`${window.site}` + 'role/users/', params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        update ({ commit, state, dispatch }, params) {
-            return ajax.put(`${window.site}` + 'role/users/' + params.id + '/', params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        delete ({ commit, state, dispatch }, id) {
-            return ajax.delete(`${window.site}` + 'role/users/' + id).then(response => {
-                let res = response.data
-                return res
-            })
-        }
-    }
-}
+  namespaced: true,
+  state: {},
+  mutations: {},
+  actions: {
+    getRoleTypeList({ commit, state, dispatch }, params) {
+      return ajax.get(`${window.site}role/types/`, { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    getChoices({ commit, state, dispatch }) {
+      return ajax.get(`${window.site}role/users/extra/get_global_choices`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    getRoleList({ commit, state, dispatch }, params) {
+      return ajax.get(`${window.site}role/users/`, { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    submit({ commit, state, dispatch }, params) {
+      return ajax.post(`${window.site}role/users/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    update({ commit, state, dispatch }, params) {
+      return ajax.put(`${window.site}role/users/${params.id}/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    delete({ commit, state, dispatch }, id) {
+      return ajax.delete(`${window.site}role/users/${id}`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};

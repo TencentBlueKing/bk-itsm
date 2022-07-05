@@ -21,19 +21,19 @@
   -->
 
 <template>
-    <div class="public-trigger-page">
-        <public-trigger :project-id="$store.state.project.id"></public-trigger>
-    </div>
+  <div class="public-trigger-page">
+    <public-trigger :project-id="$store.state.project.id"></public-trigger>
+  </div>
 </template>
 <script>
-    import PublicTrigger from '../processManagement/publicTrigger/index'
+  import PublicTrigger from '../processManagement/publicTrigger/index';
 
-    export default {
-        name: 'Trigger',
-        components: {
-            PublicTrigger
-        }
-    }
+  export default {
+    name: 'Trigger',
+    components: {
+      PublicTrigger,
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .public-trigger-page {

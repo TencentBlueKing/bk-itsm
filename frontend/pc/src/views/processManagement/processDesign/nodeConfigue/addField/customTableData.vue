@@ -21,97 +21,97 @@
   -->
 
 <template>
-    <div class="bk-customtable-data">
-        <div class="bk-custom-line"
-            :class="{ 'mb10': itemIndex !== customTableInfo.list.length - 1 }"
-            v-for="(item, itemIndex) in customTableInfo.list"
-            :key="itemIndex">
-            <bk-input :ext-cls="'bk-custom-input'"
-                :clearable="true"
-                :placeholder="$t(`m.treeinfo['请输入名称']`)"
-                v-model="item.name">
-            </bk-input>
-            <bk-checkbox style="float: left; margin-right: 10px; line-height: 32px;"
-                :true-value="trueStatus"
-                :false-value="falseStatus"
-                v-model="item.required">
-                {{ $t(`m.treeinfo['必填']`) }}
-            </bk-checkbox>
-            <bk-select :ext-cls="'bk-custom-small'"
-                v-model="item.display"
-                :clearable="false"
-                searchable>
-                <bk-option v-for="option in typeList"
-                    :key="option.id"
-                    :id="option.id"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-            <textarea style="width: 180px; min-height: 32px;"
-                class="bk-form-textarea bk-textarea-tanble"
-                :placeholder="$t(`m.treeinfo['请输入，Enter分隔']`)"
-                :disabled="item.display !== 'select' && item.display !== 'multiselect'"
-                v-model.trim="item.choice">
+  <div class="bk-customtable-data">
+    <div class="bk-custom-line"
+      :class="{ 'mb10': itemIndex !== customTableInfo.list.length - 1 }"
+      v-for="(item, itemIndex) in customTableInfo.list"
+      :key="itemIndex">
+      <bk-input :ext-cls="'bk-custom-input'"
+        :clearable="true"
+        :placeholder="$t(`m.treeinfo['请输入名称']`)"
+        v-model="item.name">
+      </bk-input>
+      <bk-checkbox style="float: left; margin-right: 10px; line-height: 32px;"
+        :true-value="trueStatus"
+        :false-value="falseStatus"
+        v-model="item.required">
+        {{ $t(`m.treeinfo['必填']`) }}
+      </bk-checkbox>
+      <bk-select :ext-cls="'bk-custom-small'"
+        v-model="item.display"
+        :clearable="false"
+        searchable>
+        <bk-option v-for="option in typeList"
+          :key="option.id"
+          :id="option.id"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+      <textarea style="width: 180px; min-height: 32px;"
+        class="bk-form-textarea bk-textarea-tanble"
+        :placeholder="$t(`m.treeinfo['请输入，Enter分隔']`)"
+        :disabled="item.display !== 'select' && item.display !== 'multiselect'"
+        v-model.trim="item.choice">
             </textarea>
-            <div class="bk-custom-icon">
-                <i class="bk-itsm-icon icon-flow-add" @click="addTableData(item, itemIndex)"></i>
-                <i class="bk-itsm-icon icon-flow-reduce"
-                    :class="{ 'bk-no-delete': customTableInfo.list.length === 1 }"
-                    @click="reduceTableData(item, itemIndex)"></i>
-            </div>
-        </div>
+      <div class="bk-custom-icon">
+        <i class="bk-itsm-icon icon-flow-add" @click="addTableData(item, itemIndex)"></i>
+        <i class="bk-itsm-icon icon-flow-reduce"
+          :class="{ 'bk-no-delete': customTableInfo.list.length === 1 }"
+          @click="reduceTableData(item, itemIndex)"></i>
+      </div>
     </div>
+  </div>
 </template>
 <script>
-    export default {
-        name: 'customTableData',
-        props: {
-            customTableInfo: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            }
+  export default {
+    name: 'customTableData',
+    props: {
+      customTableInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        data () {
-            return {
-                typeList: [
-                    { id: 'input', name: this.$t(`m.treeinfo["输入框"]`) },
-                    { id: 'select', name: this.$t(`m.treeinfo["单选框"]`) },
-                    { id: 'multiselect', name: this.$t(`m.treeinfo["多选框"]`) },
-                    { id: 'datetime', name: this.$t(`m.treeinfo["时间"]`) },
-                    { id: 'date', name: this.$t(`m.treeinfo["日期"]`) }
-                ],
-                trueStatus: true,
-                falseStatus: false
-            }
-        },
-        computed: {
-            globalChoise () {
-                return this.$store.state.common.configurInfo
-            }
-        },
-        mounted () {
-            
-        },
-        methods: {
-            addTableData (item, index) {
-                const valueInfo = {
-                    name: '',
-                    display: 'input',
-                    choice: '',
-                    required: false
-                }
-                this.customTableInfo.list.splice(index + 1, 0, valueInfo)
-            },
-            reduceTableData (item, index) {
-                if (this.customTableInfo.list.length === 1) {
-                    return
-                }
-                this.customTableInfo.list.splice(index, 1)
-            }
+      },
+    },
+    data() {
+      return {
+        typeList: [
+          { id: 'input', name: this.$t('m.treeinfo["输入框"]') },
+          { id: 'select', name: this.$t('m.treeinfo["单选框"]') },
+          { id: 'multiselect', name: this.$t('m.treeinfo["多选框"]') },
+          { id: 'datetime', name: this.$t('m.treeinfo["时间"]') },
+          { id: 'date', name: this.$t('m.treeinfo["日期"]') },
+        ],
+        trueStatus: true,
+        falseStatus: false,
+      };
+    },
+    computed: {
+      globalChoise() {
+        return this.$store.state.common.configurInfo;
+      },
+    },
+    mounted() {
+
+    },
+    methods: {
+      addTableData(item, index) {
+        const valueInfo = {
+          name: '',
+          display: 'input',
+          choice: '',
+          required: false,
+        };
+        this.customTableInfo.list.splice(index + 1, 0, valueInfo);
+      },
+      reduceTableData(item, index) {
+        if (this.customTableInfo.list.length === 1) {
+          return;
         }
-    }
+        this.customTableInfo.list.splice(index, 1);
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

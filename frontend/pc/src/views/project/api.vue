@@ -21,17 +21,17 @@
   -->
 
 <template>
-    <div class="project-api-page">
-        <public-api :project-id="$store.state.project.id" title="API"></public-api>
-    </div>
+  <div class="project-api-page">
+    <public-api :project-id="$store.state.project.id" title="API"></public-api>
+  </div>
 </template>
 <script>
-    import PublicApi from '../processManagement/apiConfigure/index.vue'
+  import PublicApi from '../processManagement/apiConfigure/index.vue';
 
-    export default {
-        name: 'APIS',
-        components: {
-            PublicApi
-        }
-    }
+  export default {
+    name: 'APIS',
+    components: {
+      PublicApi,
+    },
+  };
 </script>

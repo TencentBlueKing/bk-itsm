@@ -21,44 +21,44 @@
   -->
 
 <template>
-    <div class="tools-wrapper" v-if="fullStatus">
-        <div class="tool-item" data-test-id="tools-warpper-ZoomIn" @click="onZoomIn" :title="$t(`m.treeinfo['放大']`)">
-            <i class="bk-itsm-icon icon-order-add icon-cus"></i>
-        </div>
-        <div class="tool-item" data-test-id="tools-warpper-ZoomOut" @click="onZoomOut" :title="$t(`m.treeinfo['缩小']`)">
-            <i class="bk-itsm-icon icon-order-reduce icon-cus"></i>
-        </div>
-        <!-- <div class="tool-item" @click="onResetPosition">
+  <div class="tools-wrapper" v-if="fullStatus">
+    <div class="tool-item" data-test-id="tools-warpper-ZoomIn" @click="onZoomIn" :title="$t(`m.treeinfo['放大']`)">
+      <i class="bk-itsm-icon icon-order-add icon-cus"></i>
+    </div>
+    <div class="tool-item" data-test-id="tools-warpper-ZoomOut" @click="onZoomOut" :title="$t(`m.treeinfo['缩小']`)">
+      <i class="bk-itsm-icon icon-order-reduce icon-cus"></i>
+    </div>
+    <!-- <div class="tool-item" @click="onResetPosition">
             <i class="bk-itsm-icon icon-flow-restore"></i>
         </div> -->
-    </div>
+  </div>
 </template>
 <script>
-    export default {
-        name: 'toolPanel',
-        props: {
-            fullStatus: {
-                type: Boolean,
-                default () {
-                    return false
-                }
-            }
+  export default {
+    name: 'toolPanel',
+    props: {
+      fullStatus: {
+        type: Boolean,
+        default() {
+          return false;
         },
-        data () {
-            return {}
-        },
-        methods: {
-            onZoomIn () {
-                this.$emit('onZoomIn')
-            },
-            onZoomOut () {
-                this.$emit('onZoomOut')
-            },
-            onResetPosition () {
-                this.$emit('onResetPosition')
-            }
-        }
-    }
+      },
+    },
+    data() {
+      return {};
+    },
+    methods: {
+      onZoomIn() {
+        this.$emit('onZoomIn');
+      },
+      onZoomOut() {
+        this.$emit('onZoomOut');
+      },
+      onResetPosition() {
+        this.$emit('onResetPosition');
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .tools-wrapper {

@@ -20,9 +20,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import i18n from '@/i18n/index.js'
+import i18n from '@/i18n/index.js';
 export const TASK_TEMPLATE_TYPES = [
-    { name: i18n.t(`m.tickets['蓝盾任务']`), type: 'DEVOPS' },
-    { name: i18n.t(`m.task['标准运维任务']`), type: 'SOPS' },
-    { name: i18n.t(`m.task['普通任务']`), type: 'NORMAL' }
-]
+  { name: i18n.t('m.tickets[\'蓝盾任务\']'), type: 'DEVOPS' },
+  { name: i18n.t('m.task[\'标准运维任务\']'), type: 'SOPS' },
+  { name: i18n.t('m.task[\'普通任务\']'), type: 'NORMAL' },
+];

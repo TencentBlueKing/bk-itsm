@@ -21,20 +21,20 @@
   -->
 
 <template>
-    <div class="my-created-ticket-page">
-        <nav-title :title-name="$t(`m['我发起的']`)"></nav-title>
-        <created-list from="myCreatedTicket"></created-list>
-    </div>
+  <div class="my-created-ticket-page">
+    <nav-title :title-name="$t(`m['我发起的']`)"></nav-title>
+    <created-list from="myCreatedTicket"></created-list>
+  </div>
 </template>
 <script>
-    import NavTitle from '@/components/common/layout/NavTitle'
-    import CreatedList from '../ticket/CreatedList'
+  import NavTitle from '@/components/common/layout/NavTitle';
+  import CreatedList from '../ticket/CreatedList';
 
-    export default {
-        name: 'MyCreatedTicket',
-        components: {
-            NavTitle,
-            CreatedList
-        }
-    }
+  export default {
+    name: 'MyCreatedTicket',
+    components: {
+      NavTitle,
+      CreatedList,
+    },
+  };
 </script>

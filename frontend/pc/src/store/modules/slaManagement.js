@@ -20,69 +20,69 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
-    namespaced: true,
-    state: {},
-    mutations: {},
-    actions: {
-        // 优先级管理
-        // 获取优先级列表
-        getPriorityList ({ commit, state, dispatch }, { params }) {
-            return ajax.post(`sla/matrixs/matrix_of_service_type/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 保存Sla优先级
-        submitPriority ({ commit, state, dispatch }, { params }) {
-            return ajax.put(`sla/matrixs/batch_update/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 服务协议管理
-        // 获取服务协议列表
-        getProtocolsList ({ commit, state, dispatch }, { params }) {
-            return ajax.get(`sla/protocols/`, { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 获取服务优先级列表
-        getPriority ({ commit, state, dispatch }, { params }) {
-            return ajax.get(`service/dictdatas/`, { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 新增一个服务协议
-        addProtocol ({ commit, state, dispatch }, { params }) {
-            return ajax.post(`sla/protocols/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 修改一个服务协议
-        putProtocol ({ commit, state, dispatch }, { params, id }) {
-            return ajax.put(`sla/protocols/${id}/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 删除一个服务协议
-        deleteProtocol ({ commit, state, dispatch }, id) {
-            return ajax.delete(`sla/protocols/${id}/`).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        getNoticeTemplate ({ commit, state, dispatch }, params) {
-            return ajax.get(`sla/protocols/sla_notify_templates/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        }
-    }
-}
+  namespaced: true,
+  state: {},
+  mutations: {},
+  actions: {
+    // 优先级管理
+    // 获取优先级列表
+    getPriorityList({ commit, state, dispatch }, { params }) {
+      return ajax.post(`sla/matrixs/matrix_of_service_type/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 保存Sla优先级
+    submitPriority({ commit, state, dispatch }, { params }) {
+      return ajax.put(`sla/matrixs/batch_update/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 服务协议管理
+    // 获取服务协议列表
+    getProtocolsList({ commit, state, dispatch }, { params }) {
+      return ajax.get(`sla/protocols/`, { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 获取服务优先级列表
+    getPriority({ commit, state, dispatch }, { params }) {
+      return ajax.get(`service/dictdatas/`, { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 新增一个服务协议
+    addProtocol({ commit, state, dispatch }, { params }) {
+      return ajax.post(`sla/protocols/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 修改一个服务协议
+    putProtocol({ commit, state, dispatch }, { params, id }) {
+      return ajax.put(`sla/protocols/${id}/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 删除一个服务协议
+    deleteProtocol({ commit, state, dispatch }, id) {
+      return ajax.delete(`sla/protocols/${id}/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    getNoticeTemplate({ commit, state, dispatch }, params) {
+      return ajax.get(`sla/protocols/sla_notify_templates/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};

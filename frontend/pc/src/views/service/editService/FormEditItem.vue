@@ -21,53 +21,53 @@
   -->
 
 <template>
-    <div ref="formEditItem" class="form-edit-item">
-        <add-field
-            ref="addField"
-            form-align="horizontal"
-            :change-info="formData"
-            :workflow="workflowId"
-            :state="nodeId"
-            :auto-selected-type="false"
-            @onConfirm="onConfirmClick"
-            @getAddFieldStatus="getAddFieldStatus"
-            @onCancel="$emit('onEditCancel')">
-        </add-field>
-    </div>
+  <div ref="formEditItem" class="form-edit-item">
+    <add-field
+      ref="addField"
+      form-align="horizontal"
+      :change-info="formData"
+      :workflow="workflowId"
+      :state="nodeId"
+      :auto-selected-type="false"
+      @onConfirm="onConfirmClick"
+      @getAddFieldStatus="getAddFieldStatus"
+      @onCancel="$emit('onEditCancel')">
+    </add-field>
+  </div>
 </template>
 <script>
-    import AddField from '../../processManagement/processDesign/nodeConfigue/addField'
-    import { deepClone } from '../../../utils/util.js'
+  import AddField from '../../processManagement/processDesign/nodeConfigue/addField';
+  import { deepClone } from '../../../utils/util.js';
 
-    export default {
-        name: 'FormEditItem',
-        components: {
-            AddField
-        },
-        props: {
-            form: Object,
-            workflowId: Number,
-            nodeId: Number
-        },
-        data () {
-            const formData = deepClone(this.form)
-            return {
-                formData
-            }
-        },
-        mounted () {
-            this.$refs.formEditItem.scrollIntoView({ block: 'center' })
-        },
-        methods: {
-            onConfirmClick (form) {
-                this.$emit('onEditConfirm', deepClone(form))
-            },
-            getAddFieldStatus (status) {
-                // console.log(arguments)
-                this.$emit('getAddFieldStatus', status)
-            }
-        }
-    }
+  export default {
+    name: 'FormEditItem',
+    components: {
+      AddField,
+    },
+    props: {
+      form: Object,
+      workflowId: Number,
+      nodeId: Number,
+    },
+    data() {
+      const formData = deepClone(this.form);
+      return {
+        formData,
+      };
+    },
+    mounted() {
+      this.$refs.formEditItem.scrollIntoView({ block: 'center' });
+    },
+    methods: {
+      onConfirmClick(form) {
+        this.$emit('onEditConfirm', deepClone(form));
+      },
+      getAddFieldStatus(status) {
+        // console.log(arguments)
+        this.$emit('getAddFieldStatus', status);
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .form-edit-item {

@@ -21,114 +21,114 @@
  */
 
 export const CUSTOM_FORM_TEMPLATE = {
-    config: {
-        mode: 'sideslider' // combine
+  config: {
+    mode: 'sideslider', // combine
+  },
+  schemes: {
+    base_text_scheme: {
+      type: 'text',
+      attrs: {
+        styles: {
+          label: ['border'],
+          value: ['highlight', 'border'],
+        },
+        desc: '通用描述文字',
+      },
     },
-    schemes: {
-        base_text_scheme: {
-            type: 'text',
-            attrs: {
-                styles: {
-                    label: ['border'],
-                    value: ['highlight', 'border']
-                },
-                desc: '通用描述文字'
-            }
+    table_text_scheme: {
+      type: 'text',
+      attrs: {
+        styles: {
+          label: ['border'],
+          value: ['highlight', 'border'],
         },
-        table_text_scheme: {
-            type: 'text',
-            attrs: {
-                styles: {
-                    label: ['border'],
-                    value: ['highlight', 'border']
-                }
-            }
-        },
-        base_table_scheme: {
-            type: 'table',
-            attrs: {
-                column: [
-                    {
-                        name: '操作',
-                        type: 'text',
-                        key: 'column1'
-                    },
-                    {
-                        name: '关联相关内容',
-                        key: 'column2',
-                        scheme: 'table_text_scheme',
-                        attrs: {
-                        }
-                    },
-                    {
-                        name: '申请期限',
-                        type: 'text',
-                        key: 'column3',
-                        attrs: {
-                            sort: true
-                        }
-                    }
-                ]
-            }
-        },
-        sub_table_scheme: {
-            type: 'table',
-            attrs: {
-                column: [
-                    {
-                        name: '关联内容-类型',
-                        key: 'column1',
-                        scheme: 'base_text_scheme'
-                    },
-                    {
-                        name: '类型值',
-                        key: 'column2',
-                        scheme: 'table_text_scheme'
-                    }
-                ]
-            }
-        },
-        sub2_table_scheme: {
-            type: 'table',
-            attrs: {
-                column: [
-                    {
-                        name: '主机',
-                        key: 'column1',
-                        scheme: 'base_text_scheme'
-                    }
-                ]
-            }
-        }
+      },
     },
-    form_data: [
-        {
-            label: '业务：',
+    base_table_scheme: {
+      type: 'table',
+      attrs: {
+        column: [
+          {
+            name: '操作',
+            type: 'text',
+            key: 'column1',
+          },
+          {
+            name: '关联相关内容',
+            key: 'column2',
+            scheme: 'table_text_scheme',
+            attrs: {
+            },
+          },
+          {
+            name: '申请期限',
+            type: 'text',
+            key: 'column3',
+            attrs: {
+              sort: true,
+            },
+          },
+        ],
+      },
+    },
+    sub_table_scheme: {
+      type: 'table',
+      attrs: {
+        column: [
+          {
+            name: '关联内容-类型',
+            key: 'column1',
             scheme: 'base_text_scheme',
-            value: '蓝鲸',
-            desc: '覆盖 scheme 中通用描述文字',
-            children: [
-                {
-                    label: '子业务1：',
-                    scheme: 'base_text_scheme',
-                    value: 'test1'
-                },
-                {
-                    label: '子业务2：',
-                    scheme: 'base_text_scheme',
-                    value: 'test2'
-                }
-            ]
+          },
+          {
+            name: '类型值',
+            key: 'column2',
+            scheme: 'table_text_scheme',
+          },
+        ],
+      },
+    },
+    sub2_table_scheme: {
+      type: 'table',
+      attrs: {
+        column: [
+          {
+            name: '主机',
+            key: 'column1',
+            scheme: 'base_text_scheme',
+          },
+        ],
+      },
+    },
+  },
+  form_data: [
+    {
+      label: '业务：',
+      scheme: 'base_text_scheme',
+      value: '蓝鲸',
+      desc: '覆盖 scheme 中通用描述文字',
+      children: [
+        {
+          label: '子业务1：',
+          scheme: 'base_text_scheme',
+          value: 'test1',
         },
         {
-            label: '提单人：',
-            scheme: 'base_text_scheme',
-            value: ''
+          label: '子业务2：',
+          scheme: 'base_text_scheme',
+          value: 'test2',
         },
-        {
-            label: '提单时间：',
-            scheme: 'base_text_scheme',
-            value: ''
-        }
-    ]
-}
+      ],
+    },
+    {
+      label: '提单人：',
+      scheme: 'base_text_scheme',
+      value: '',
+    },
+    {
+      label: '提单时间：',
+      scheme: 'base_text_scheme',
+      value: '',
+    },
+  ],
+};

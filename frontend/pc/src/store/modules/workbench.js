@@ -20,46 +20,46 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
-    namespaced: true,
-    state: {},
-    mutations: {},
-    actions: {
-        // 工单状态分布
-        getTicketStatusDistribution ({ commit, state, dispatch }, params) {
-            return ajax.get('ticket/receipts/get_my_ticket_status/', { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 工单统计
-        getTicketTotal ({ commit, state, dispatch }, params) {
-            return ajax.get('ticket/receipts/get_my_deal_tickets/', { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 单据处理总耗时
-        getTicketHandleTime ({ commit, state, dispatch }, params) {
-            return ajax.get('ticket/logs/get_my_deal_time/', { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        getProcessorInfo ({ commit, state, dispatch }, id) {
-            return ajax.get(`ticket/current_steps/${id}/`).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 批量处理单据
-        batchApproval ({ commit, state, dispatch }, params) {
-            return ajax.post(`ticket/receipts/batch_approval/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        }
-    }
-}
+  namespaced: true,
+  state: {},
+  mutations: {},
+  actions: {
+    // 工单状态分布
+    getTicketStatusDistribution({ commit, state, dispatch }, params) {
+      return ajax.get("ticket/receipts/get_my_ticket_status/", { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 工单统计
+    getTicketTotal({ commit, state, dispatch }, params) {
+      return ajax.get("ticket/receipts/get_my_deal_tickets/", { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 单据处理总耗时
+    getTicketHandleTime({ commit, state, dispatch }, params) {
+      return ajax.get("ticket/logs/get_my_deal_time/", { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    getProcessorInfo({ commit, state, dispatch }, id) {
+      return ajax.get(`ticket/current_steps/${id}/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 批量处理单据
+    batchApproval({ commit, state, dispatch }, params) {
+      return ajax.post(`ticket/receipts/batch_approval/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};

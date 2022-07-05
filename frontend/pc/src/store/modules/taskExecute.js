@@ -20,40 +20,40 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
-    namespaced: true,
-    state: {},
-    mutations: {},
-    actions: {
-        // 获取任务列表
-        getTaskList ({ commit, state, dispatch }, params) {
-            return ajax.get(`task/tasks/`, { params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 创建任务
-        createTask ({ commit, state, dispatch }, params) {
-            return ajax.post(`task/tasks/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 获取单个任务基础信息
-        getTaskDetail ({ commit, state, dispatch }, taskId) {
-            return ajax.get(`task/tasks/${taskId}/`).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 获取单个任务详细信息
-        getTaskFields ({ commit, state, dispatch }, {taskId, params}) {
-            return ajax.get(`task/tasks/${taskId}/fields/`, { params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-    }
-}
+  namespaced: true,
+  state: {},
+  mutations: {},
+  actions: {
+    // 获取任务列表
+    getTaskList({ commit, state, dispatch }, params) {
+      return ajax.get(`task/tasks/`, { params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 创建任务
+    createTask({ commit, state, dispatch }, params) {
+      return ajax.post(`task/tasks/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 获取单个任务基础信息
+    getTaskDetail({ commit, state, dispatch }, taskId) {
+      return ajax.get(`task/tasks/${taskId}/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 获取单个任务详细信息
+    getTaskFields({ commit, state, dispatch }, { taskId, params }) {
+      return ajax.get(`task/tasks/${taskId}/fields/`, { params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};

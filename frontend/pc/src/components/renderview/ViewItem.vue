@@ -21,117 +21,117 @@
   -->
 
 <template>
-    <div class="view-item">
-        <!-- 面包屑 -->
-        <div v-if="crumbsList.length > 1" class="bread-crumbs">
-            <span
-                v-for="(crumbs, index) in crumbsList"
-                :key="index"
-                class="crumbs-item"
-                @click.stop="onCrumbsClick(index)">
-                {{ crumbs.label }}
-            </span>
-        </div>
-        <component
-            v-if="crumbsList.length <= 1"
-            :is="componentType"
-            :form="form"
-            v-bind="getAttrs(form)">
-        </component>
-        <render-view
-            v-else
-            ref="childrenView"
-            :hidden-label="true"
-            :form-data="childrenViewConfig.form_data"
-            :context="getContext()">
-        </render-view>
+  <div class="view-item">
+    <!-- 面包屑 -->
+    <div v-if="crumbsList.length > 1" class="bread-crumbs">
+      <span
+        v-for="(crumbs, index) in crumbsList"
+        :key="index"
+        class="crumbs-item"
+        @click.stop="onCrumbsClick(index)">
+        {{ crumbs.label }}
+      </span>
     </div>
+    <component
+      v-if="crumbsList.length <= 1"
+      :is="componentType"
+      :form="form"
+      v-bind="getAttrs(form)">
+    </component>
+    <render-view
+      v-else
+      ref="childrenView"
+      :hidden-label="true"
+      :form-data="childrenViewConfig.form_data"
+      :context="getContext()">
+    </render-view>
+  </div>
 </template>
 <script>
-    import TagText from './tags/TagText.vue'
-    import TagTable from './tags/TagTable.vue'
-    import { deepClone } from '../../utils/util'
-    export default {
-        name: 'ViewItem',
-        components: {
-            TagText,
-            TagTable,
-            RenderView: () => import('./RenderView')
+  import TagText from './tags/TagText.vue';
+  import TagTable from './tags/TagTable.vue';
+  import { deepClone } from '../../utils/util';
+  export default {
+    name: 'ViewItem',
+    components: {
+      TagText,
+      TagTable,
+      RenderView: () => import('./RenderView'),
+    },
+    inject: ['getContext'],
+    props: {
+      scheme: {
+        type: Object,
+        default: () => ({}),
+      },
+      form: {
+        type: Object,
+        default: () => ({}),
+      },
+      isTop: {
+        type: Boolean,
+        default: false,
+      },
+      topIndex: {
+        type: Number,
+      },
+    },
+    data() {
+      return {
+        crumbsList: [],
+        childrenViewConfig: {
+          form_data: [],
         },
-        inject: ['getContext'],
-        props: {
-            scheme: {
-                type: Object,
-                default: () => ({})
-            },
-            form: {
-                type: Object,
-                default: () => ({})
-            },
-            isTop: {
-                type: Boolean,
-                default: false
-            },
-            topIndex: {
-                type: Number
-            }
-        },
-        data () {
-            return {
-                crumbsList: [],
-                childrenViewConfig: {
-                    form_data: []
-                }
-            }
-        },
-        computed: {
-            componentType () {
-                return `Tag` + this.scheme.type.replace(/^[a-z]/, item => item.toUpperCase())
-            },
-            currentDisplatCrumbs () {
-                return this.crumbsList[this.crumbsList.length - 1] || {
-                    label: '默认',
-                    form_data: []
-                }
-            }
-        },
-        created () {
-            this.appendCrumbsItem(this.form.label, this.form)
-        },
-        methods: {
-            getAttrs (form) {
-                return { ...this.scheme.attrs, ...form }
-            },
-            /**
-             * 追加面包屑项
-             * @param { String  } label 面包屑名
-             * @param { Array  } formData 渲染数据
-             */
-            appendCrumbsItem (label, formData) {
-                this.crumbsList.push({
-                    label: label,
-                    form_data: deepClone(formData)
-                })
-                this.updateChildViewConfig()
-            },
-            getScheme (form) {
-                const { schemes } = this.getContext()
-                if (schemes[form.scheme]) {
-                    return schemes[form.scheme]
-                }
-                return {}
-            },
-            onCrumbsClick (index) {
-                this.crumbsList = this.crumbsList.filter((item, i) => i <= index)
-                this.updateChildViewConfig()
-            },
-            updateChildViewConfig () {
-                this.childrenViewConfig = {
-                    form_data: deepClone(this.currentDisplatCrumbs.form_data)
-                }
-            }
+      };
+    },
+    computed: {
+      componentType() {
+        return `Tag${this.scheme.type.replace(/^[a-z]/, item => item.toUpperCase())}`;
+      },
+      currentDisplatCrumbs() {
+        return this.crumbsList[this.crumbsList.length - 1] || {
+          label: '默认',
+          form_data: [],
+        };
+      },
+    },
+    created() {
+      this.appendCrumbsItem(this.form.label, this.form);
+    },
+    methods: {
+      getAttrs(form) {
+        return { ...this.scheme.attrs, ...form };
+      },
+      /**
+       * 追加面包屑项
+       * @param { String  } label 面包屑名
+       * @param { Array  } formData 渲染数据
+       */
+      appendCrumbsItem(label, formData) {
+        this.crumbsList.push({
+          label,
+          form_data: deepClone(formData),
+        });
+        this.updateChildViewConfig();
+      },
+      getScheme(form) {
+        const { schemes } = this.getContext();
+        if (schemes[form.scheme]) {
+          return schemes[form.scheme];
         }
-    }
+        return {};
+      },
+      onCrumbsClick(index) {
+        this.crumbsList = this.crumbsList.filter((item, i) => i <= index);
+        this.updateChildViewConfig();
+      },
+      updateChildViewConfig() {
+        this.childrenViewConfig = {
+          form_data: deepClone(this.currentDisplatCrumbs.form_data),
+        };
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

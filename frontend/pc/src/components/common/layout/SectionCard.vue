@@ -21,46 +21,46 @@
   -->
 
 <template>
-    <section class="common-card-block">
-        <label class="common-card-label" :style="{ width: applyLabelWidth }">
-            <slot name="label"></slot>
-            {{ label }}
-            <p class="common-card-desc">{{ desc }}</p>
-        </label>
-        <div class="common-card-body">
-            <slot></slot>
-        </div>
-    </section>
+  <section class="common-card-block">
+    <label class="common-card-label" :style="{ width: applyLabelWidth }">
+      <slot name="label"></slot>
+      {{ label }}
+      <p class="common-card-desc">{{ desc }}</p>
+    </label>
+    <div class="common-card-body">
+      <slot></slot>
+    </div>
+  </section>
 </template>
 
 <script>
 
-    export default {
-        name: 'SectionCard',
-        props: {
-            label: {
-                type: String,
-                default: ''
-            },
-            desc: {
-                type: String,
-                default: ''
-            },
-            labelWidth: {
-                type: [String, Number],
-                default: ''
-            }
-        },
-        computed: {
-            applyLabelWidth () {
-                const w = this.labelWidth
-                if (typeof w === 'number') {
-                    return w + 'px'
-                }
-                return w
-            }
+  export default {
+    name: 'SectionCard',
+    props: {
+      label: {
+        type: String,
+        default: '',
+      },
+      desc: {
+        type: String,
+        default: '',
+      },
+      labelWidth: {
+        type: [String, Number],
+        default: '',
+      },
+    },
+    computed: {
+      applyLabelWidth() {
+        const w = this.labelWidth;
+        if (typeof w === 'number') {
+          return `${w}px`;
         }
-    }
+        return w;
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 .common-card-block {

@@ -21,73 +21,73 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" class="bk-form-int" :desc="item.tips" desc-type="icon">
-            <bk-input :class="{ 'bk-border-error': item.checkValue }"
-                :clearable="true"
-                type="number"
-                :disabled="(item.is_readonly && !isCurrent) || disabled"
-                v-model.number="item.val"
-                @focus="item.checkValue = false">
-            </bk-input>
-            <template v-if="item.checkValue">
-                <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-                <p class="bk-task-error" v-else-if="!isErrMessage">{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-                <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["已超出最大值!"]')}}</p>
-            </template>
-        </bk-form-item>
-    </div>
+  <div v-if="item.showFeild">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" class="bk-form-int" :desc="item.tips" desc-type="icon">
+      <bk-input :class="{ 'bk-border-error': item.checkValue }"
+        :clearable="true"
+        type="number"
+        :disabled="(item.is_readonly && !isCurrent) || disabled"
+        v-model.number="item.val"
+        @focus="item.checkValue = false">
+      </bk-input>
+      <template v-if="item.checkValue">
+        <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+        <p class="bk-task-error" v-else-if="!isErrMessage">{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+        <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["已超出最大值!"]')}}</p>
+      </template>
+    </bk-form-item>
+  </div>
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js'
+  import mixins from '../../commonMix/field.js';
 
-    export default {
-        name: 'INT',
-        mixins: [mixins],
-        props: {
-            item: {
-                type: Object,
-                required: true,
-                default: () => {
-                }
-            },
-            fields: {
-                type: Array,
-                default () {
-                    return []
-                }
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false
-            },
-            disabled: {
-                type: Boolean,
-                default: false
-            }
+  export default {
+    name: 'INT',
+    mixins: [mixins],
+    props: {
+      item: {
+        type: Object,
+        required: true,
+        default: () => {
         },
-        data () {
-            return {
-                max: Number.MAX_SAFE_INTEGER,
-                isErrMessage: false
-            }
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
         },
-        watch: {
-            'item.val' (val) {
-                this.isErrMessage = val > this.max || false
-                this.conditionField(this.item, this.fields)
-            }
-        },
-        mounted () {
-            if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value
-            }
-        },
-        methods: {}
-    }
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        max: Number.MAX_SAFE_INTEGER,
+        isErrMessage: false,
+      };
+    },
+    watch: {
+      'item.val'(val) {
+        this.isErrMessage = val > this.max || false;
+        this.conditionField(this.item, this.fields);
+      },
+    },
+    mounted() {
+      if (this.item.value && !this.item.val) {
+        this.item.val = this.item.value;
+      }
+    },
+    methods: {},
+  };
 </script>
 
 <style lang='scss' scoped>
-    
+
 </style>

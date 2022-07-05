@@ -20,15 +20,15 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import { deepClone } from '@/utils/util'
+import { deepClone } from '@/utils/util';
 
 // TODO: 现有字段渲染公共方法梳理整合
-export const formattingData = (node) => {
-    
-}
-export const fieldFormatting = (valueList) => {
-    
-}
+// export const formattingData = (node) => {
+
+// }
+// export const fieldFormatting = (valueList) => {
+
+// }
 
 /**
  * 获取自定义表格每个单元格的显示值
@@ -36,49 +36,49 @@ export const fieldFormatting = (valueList) => {
  * @param {Object} row 行数据
  */
 export const getCustomTableDisplayValue = (column, row) => {
-    const val = deepClone(row[column.key])
-    if (column && (column.display === 'multiselect' || column.display === 'select')) {
-        const vals = typeof val === 'string' ? [val] : val
-        const names = vals.map(val => {
-            // 兼容脏数据，正常情况下自定义表格中select存的是 key,之前也有可能存的 name（流程打回时错误将key转name，直接保存）
-            const seletedOption = column.choice.find(oneChoice => oneChoice.key === val || oneChoice.name === val)
-            return seletedOption ? seletedOption.name : ''
-        })
-        return names.join(',')
-    }
-    return val
-}
+  const val = deepClone(row[column.key]);
+  if (column && (column.display === 'multiselect' || column.display === 'select')) {
+    const vals = typeof val === 'string' ? [val] : val;
+    const names = vals.map((val) => {
+      // 兼容脏数据，正常情况下自定义表格中select存的是 key,之前也有可能存的 name（流程打回时错误将key转name，直接保存）
+      const seletedOption = column.choice.find(oneChoice => oneChoice.key === val || oneChoice.name === val);
+      return seletedOption ? seletedOption.name : '';
+    });
+    return names.join(',');
+  }
+  return val;
+};
 
 // 单个字段
 export class Field {
-    constructor (type, defaultValueMap) {
-        this.prevId = '' // 前置节点 id
-        this.name = '' // 名称
-        this.type = type // 类型
-        this.regex = '' // 校验
-        this.regex_config = {
-            rule: {
-                expressions: [],
-                type: 'and'
-            }
-        }
-        this.customRegex = ''
-        this.source_type = ''
-        this.source_uri = ''
-        this.default_value = ''
-        this.layout = ''
-        this.validate = ''
-        this.desc = ''
-        this.is_tips = ''
-        this.tips = ''
-        this.show_type = ''
-        this.show_conditions = {}
-        this.setDefaultValue(defaultValueMap)
-    }
-    setDefaultValue (defaultValueMap) {
-        const self = this
-        Object.keys(defaultValueMap).forEach(key => {
-            self[key] = defaultValueMap[key]
-        })
-    }
+  constructor(type, defaultValueMap) {
+    this.prevId = ''; // 前置节点 id
+    this.name = ''; // 名称
+    this.type = type; // 类型
+    this.regex = ''; // 校验
+    this.regex_config = {
+      rule: {
+        expressions: [],
+        type: 'and',
+      },
+    };
+    this.customRegex = '';
+    this.source_type = '';
+    this.source_uri = '';
+    this.default_value = '';
+    this.layout = '';
+    this.validate = '';
+    this.desc = '';
+    this.is_tips = '';
+    this.tips = '';
+    this.show_type = '';
+    this.show_conditions = {};
+    this.setDefaultValue(defaultValueMap);
+  }
+  setDefaultValue(defaultValueMap) {
+    const self = this;
+    Object.keys(defaultValueMap).forEach((key) => {
+      self[key] = defaultValueMap[key];
+    });
+  }
 }

@@ -20,36 +20,36 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
-    namespaced: true,
-    actions: {
-        // 通用角色
-        submit ({ commit, state, dispatch }, params) {
-            return ajax.post('role/users/', params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 管理员列表
-        getRoleList ({ commit, state, dispatch }, params) {
-            return ajax.get('role/users/', { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        update ({ commit, state, dispatch }, params) {
-            return ajax.put('role/users/' + params.id + '/', params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        delete ({ commit, state, dispatch }, id) {
-            return ajax.delete('role/users/' + id).then(response => {
-                let res = response.data
-                return res
-            })
-        }
-    }
-}
+  namespaced: true,
+  actions: {
+    // 通用角色
+    submit({ commit, state, dispatch }, params) {
+      return ajax.post("role/users/", params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 管理员列表
+    getRoleList({ commit, state, dispatch }, params) {
+      return ajax.get("role/users/", { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    update({ commit, state, dispatch }, params) {
+      return ajax.put(`role/users/${params.id}/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    delete({ commit, state, dispatch }, id) {
+      return ajax.delete(`role/users/${id}`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};

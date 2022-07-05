@@ -21,90 +21,90 @@
   -->
 
 <template>
-    <div class="tag-table">
-        <label v-if="!hiddenLabel" class="table-label">{{ label }}</label>
-        <bk-table
-            ref="tagTable"
-            :data="form.value"
-            :border="true">
-            <bk-table-column
-                v-for="(item) in column"
-                :key="item.key"
-                :label="item.name"
-                :prop="item.key">
-                <template slot-scope="scope">
-                    <ViewItem
-                        :scheme="getScheme(item, scope.row[item.key])"
-                        :form="scope.row[item.key]">
-                    </ViewItem>
-                </template>
-            </bk-table-column>
-        </bk-table>
-    </div>
+  <div class="tag-table">
+    <label v-if="!hiddenLabel" class="table-label">{{ label }}</label>
+    <bk-table
+      ref="tagTable"
+      :data="form.value"
+      :border="true">
+      <bk-table-column
+        v-for="(item) in column"
+        :key="item.key"
+        :label="item.name"
+        :prop="item.key">
+        <template slot-scope="scope">
+          <ViewItem
+            :scheme="getScheme(item, scope.row[item.key])"
+            :form="scope.row[item.key]">
+          </ViewItem>
+        </template>
+      </bk-table-column>
+    </bk-table>
+  </div>
 </template>
 
 <script>
-    import { getFormMixins } from '../formMixins'
-    const tableAttrs = {
-        column: {
-            type: Array,
-            default: () => ([
-                {
-                    name: '操作',
-                    type: 'text',
-                    key: 'column1'
-                },
-                {
-                    name: '关联相关内容',
-                    key: 'column2',
-                    scheme: 'table_text_scheme',
-                    attrs: {
-                    }
-                },
-                {
-                    name: '申请期限',
-                    type: 'text',
-                    key: 'column3',
-                    attrs: {
-                        sort: true
-                    }
-                }
-            ])
+  import { getFormMixins } from '../formMixins';
+  const tableAttrs = {
+    column: {
+      type: Array,
+      default: () => ([
+        {
+          name: '操作',
+          type: 'text',
+          key: 'column1',
         },
-        value: {
-            type: Array,
-            default: () => ([])
-        }
-    }
-    export default {
-        name: 'TagTable',
-        components: {
-            ViewItem: () => import('../ViewItem.vue')
+        {
+          name: '关联相关内容',
+          key: 'column2',
+          scheme: 'table_text_scheme',
+          attrs: {
+          },
         },
-        mixins: [getFormMixins(tableAttrs)],
-        methods: {
-            /**
-             * scheme 优先级：from.scheme > item.scheme > item.type
-             */
-            getScheme (item, form) {
-                const { schemes } = this.getContext()
-                if (form && form.scheme && schemes[form.scheme]) {
-                    return schemes[form.scheme]
-                }
-                if (item.scheme) {
-                    return schemes[item.scheme]
-                }
-                if (form && form.type) {
-                    return {
-                        type: form.type
-                    }
-                }
-                return {
-                    type: item.type
-                }
-            }
+        {
+          name: '申请期限',
+          type: 'text',
+          key: 'column3',
+          attrs: {
+            sort: true,
+          },
+        },
+      ]),
+    },
+    value: {
+      type: Array,
+      default: () => ([]),
+    },
+  };
+  export default {
+    name: 'TagTable',
+    components: {
+      ViewItem: () => import('../ViewItem.vue'),
+    },
+    mixins: [getFormMixins(tableAttrs)],
+    methods: {
+      /**
+       * scheme 优先级：from.scheme > item.scheme > item.type
+       */
+      getScheme(item, form) {
+        const { schemes } = this.getContext();
+        if (form && form.scheme && schemes[form.scheme]) {
+          return schemes[form.scheme];
         }
-    }
+        if (item.scheme) {
+          return schemes[item.scheme];
+        }
+        if (form && form.type) {
+          return {
+            type: form.type,
+          };
+        }
+        return {
+          type: item.type,
+        };
+      },
+    },
+  };
 </script>
 <style lang="scss">
 .tag-data-table {

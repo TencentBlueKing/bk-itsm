@@ -21,65 +21,65 @@
   -->
 
 <template>
-    <ul>
-        <li v-bk-tooltips.right="$t(`m.treeinfo['开始节点']`)">
-            <div class="entry-item entry-start"
-                data-type="START">
-                {{ $t('m.treeinfo["开始"]') }}
-            </div>
-            <div class="entry-disabled"></div>
-        </li>
-        <li v-bk-tooltips.right="$t(`m.treeinfo['结束节点']`)">
-            <div class="entry-item"
-                data-type="END">
-                {{ $t('m.treeinfo["结束"]') }}
-            </div>
-            <div class="entry-disabled"></div>
-        </li>
-        <li v-bk-tooltips.right="$t(`m.treeinfo['手动节点']`)">
-            <div class="entry-item entry-gateway" data-type="NORMAL" style="margin: 10px 0 0;">
-                <i class="bk-itsm-icon icon-icon-artificial" style="font-size: 26px;"></i>
-            </div>
-        </li>
-        <li v-bk-tooltips.right="$t(`m.treeinfo['API节点']`)">
-            <div class="entry-item entry-gateway" data-type="TASK" style="margin: 12px 0 2px;">
-                <i class="bk-itsm-icon icon-api-node" style="font-size: 26px;"></i>
-            </div>
-        </li>
-        <li v-bk-tooltips.right="$t(`m.treeinfo['标准运维节点']`)">
-            <div class="entry-item entry-gateway" data-type="TASK-SOPS" style="margin: 12px 0 2px;">
-                <i class="bk-itsm-icon icon-task-icon" style="font-size: 26px;"></i>
-            </div>
-        </li>
-        <li v-bk-tooltips.right="$t(`m.treeinfo['会签节点']`)">
-            <div class="entry-item entry-gateway" data-type="SIGN" style="margin: 12px 0 2px;">
-                <i class="bk-itsm-icon icon-sign-node" style="font-size: 26px;"></i>
-            </div>
-        </li>
-        <li v-bk-tooltips.right="$t(`m.treeinfo['审批节点']`)">
-            <div class="entry-item entry-gateway" data-type="APPROVAL" style="margin: 12px 0 2px;">
-                <i class="bk-itsm-icon icon-approval-node" style="font-size: 26px;"></i>
-            </div>
-        </li>
-        <li v-bk-tooltips.right="$t(`m.treeinfo['并行网关']`)">
-            <div class="entry-item entry-gateway" data-type="ROUTER-P">
-                <i class="bk-itsm-icon icon-flow-convergence"></i>
-            </div>
-        </li>
-        <li v-bk-tooltips.right="$t(`m.treeinfo['汇聚网关']`)">
-            <div class="entry-item entry-gateway" data-type="COVERAGE">
-                <i class="bk-itsm-icon icon-flow-branch"></i>
-            </div>
-        </li>
-    </ul>
+  <ul>
+    <li v-bk-tooltips.right="$t(`m.treeinfo['开始节点']`)">
+      <div class="entry-item entry-start"
+        data-type="START">
+        {{ $t('m.treeinfo["开始"]') }}
+      </div>
+      <div class="entry-disabled"></div>
+    </li>
+    <li v-bk-tooltips.right="$t(`m.treeinfo['结束节点']`)">
+      <div class="entry-item"
+        data-type="END">
+        {{ $t('m.treeinfo["结束"]') }}
+      </div>
+      <div class="entry-disabled"></div>
+    </li>
+    <li v-bk-tooltips.right="$t(`m.treeinfo['手动节点']`)">
+      <div class="entry-item entry-gateway" data-type="NORMAL" style="margin: 10px 0 0;">
+        <i class="bk-itsm-icon icon-icon-artificial" style="font-size: 26px;"></i>
+      </div>
+    </li>
+    <li v-bk-tooltips.right="$t(`m.treeinfo['API节点']`)">
+      <div class="entry-item entry-gateway" data-type="TASK" style="margin: 12px 0 2px;">
+        <i class="bk-itsm-icon icon-api-node" style="font-size: 26px;"></i>
+      </div>
+    </li>
+    <li v-bk-tooltips.right="$t(`m.treeinfo['标准运维节点']`)">
+      <div class="entry-item entry-gateway" data-type="TASK-SOPS" style="margin: 12px 0 2px;">
+        <i class="bk-itsm-icon icon-task-icon" style="font-size: 26px;"></i>
+      </div>
+    </li>
+    <li v-bk-tooltips.right="$t(`m.treeinfo['会签节点']`)">
+      <div class="entry-item entry-gateway" data-type="SIGN" style="margin: 12px 0 2px;">
+        <i class="bk-itsm-icon icon-sign-node" style="font-size: 26px;"></i>
+      </div>
+    </li>
+    <li v-bk-tooltips.right="$t(`m.treeinfo['审批节点']`)">
+      <div class="entry-item entry-gateway" data-type="APPROVAL" style="margin: 12px 0 2px;">
+        <i class="bk-itsm-icon icon-approval-node" style="font-size: 26px;"></i>
+      </div>
+    </li>
+    <li v-bk-tooltips.right="$t(`m.treeinfo['并行网关']`)">
+      <div class="entry-item entry-gateway" data-type="ROUTER-P">
+        <i class="bk-itsm-icon icon-flow-convergence"></i>
+      </div>
+    </li>
+    <li v-bk-tooltips.right="$t(`m.treeinfo['汇聚网关']`)">
+      <div class="entry-item entry-gateway" data-type="COVERAGE">
+        <i class="bk-itsm-icon icon-flow-branch"></i>
+      </div>
+    </li>
+  </ul>
 </template>
 <script>
-    export default {
-        name: 'Palette',
-        mounted () {
-            // this.$emit('registerPaletteEvent')
-        }
-    }
+  export default {
+    name: 'Palette',
+    mounted() {
+      // this.$emit('registerPaletteEvent')
+    },
+  };
 </script>
 <style lang="scss" scoped>
     ul {
