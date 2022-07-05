@@ -109,7 +109,7 @@ INSTALLED_APPS += (
 
 INSTALLED_APPS = ("itsm.helper",) + INSTALLED_APPS
 
-AUTHENTICATION_BACKENDS += ("apigw_manager.apigw.authentication.UserModelBackend",)
+AUTHENTICATION_BACKENDS += ("itsm.openapi.authentication.backend.CustomUserBackend",)
 
 IS_PAAS_V3 = int(os.getenv("BKPAAS_MAJOR_VERSION", False)) == 3
 IS_OPEN_V3 = IS_PAAS_V3 and RUN_VER == "open"
