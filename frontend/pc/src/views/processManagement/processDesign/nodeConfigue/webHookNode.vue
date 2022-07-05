@@ -386,7 +386,7 @@
             item.source = 'global';
             item.type = 'string';
           });
-          // auth
+          // auth test
           const auth_params = {
             auth_type: authRadio !== 'None' ? authRadio : '',
             auth_config: {},
