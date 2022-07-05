@@ -339,7 +339,7 @@
           this.pipelineLoading = false;
         }
       },
-      // 获取流水线信息
+      // 获取流水线信息 test
       getPipelineInfo(init) {
         if (!init) {
           this.hookSelectList = {};
