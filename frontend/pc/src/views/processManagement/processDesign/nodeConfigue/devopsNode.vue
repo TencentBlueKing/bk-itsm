@@ -495,6 +495,9 @@
                 outputs,
               },
             },
+            variables: {
+              outputs,
+            },
             processors: processors || '',
             processors_type,
             is_draft: false,
