@@ -16,6 +16,7 @@
           required>
           <bk-input v-model="formData.name"></bk-input>
         </bk-form-item>
+        <desc-info v-model="formData.desc"></desc-info>
         <bk-form-item
           v-if="isStatus"
           data-test-id="devops-component-processor"
@@ -149,6 +150,7 @@
 </template>
 
 <script>
+  import descInfo from './components/descInfo.vue';
   import requestConfig from './components/requestConfig.vue';
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import dealPerson from './components/dealPerson.vue';
@@ -160,6 +162,7 @@
       dealPerson,
       commonTriggerList,
       requestConfig,
+      descInfo,
     },
     props: {
       // 流程信息
@@ -204,6 +207,7 @@
         requestOptions: ['GET', 'POST'],
         formData: {
           name: '',
+          desc: 'sssssssssss',
           url: '',
           success_exp: '',
         },

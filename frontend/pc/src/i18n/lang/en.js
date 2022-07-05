@@ -2635,4 +2635,5 @@ export const m = {
   不能使用保留字符: 'Cannot use reserved characters',
   必须是数字: 'must be a number',
   '是必填项！': 'is required !',
+  点击修改: 'Click to modify',
 };
