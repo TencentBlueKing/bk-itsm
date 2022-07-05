@@ -2706,5 +2706,7 @@ export const m = {
   不能使用保留字符: '不能使用保留字符',
   必须是数字: '必须是数字',
   '是必填项！': '是必填项！',
+  输出变量: '输出变量',
+  '如何获取蓝盾流水线变量? 可以在bash插件中使用 setEnv "hello" "world" 或者在 Python 插件中 使用 set_env("hello", "world") ，具体的使用方法请参考蓝盾指引。': '如何获取蓝盾流水线变量? 可以在bash插件中使用 setEnv "hello" "world" 或者在 Python 插件中 使用 set_env("hello", "world") ，具体的使用方法请参考蓝盾指引。',
 
 };
