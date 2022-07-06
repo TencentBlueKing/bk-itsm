@@ -10,6 +10,7 @@
           :property="'nodeName'">
           <bk-input :clearable="true" v-model="basicInfo.nodeName"></bk-input>
         </bk-form-item>
+        <desc-info v-model="basicInfo.desc"></desc-info>
         <bk-form-item
           data-test-id="devops-select-project"
           :label="$t(`m['项目']`)"
@@ -143,6 +144,7 @@
   </div>
 </template>
 <script>
+  import descInfo from './components/descInfo.vue';
   import dealPerson from './components/dealPerson.vue';
   import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
   import BasicCard from '@/components/common/layout/BasicCard.vue';
@@ -165,6 +167,7 @@
       DevopsPreview,
       NoData,
       dealPerson,
+      descInfo,
     },
     props: {
       // 流程信息
@@ -193,6 +196,7 @@
         isLoading: false,
         basicInfo: {
           nodeName: '',
+          desc: '',
           businessId: '',
           pipelineId: '',
           processors: [],
@@ -253,6 +257,7 @@
           this.businessList = res.data;
           if (this.configur && !this.configur.is_draft) {
             this.basicInfo.nodeName = this.configur.name;
+            this.basicInfo.desc = this.configur.desc;
             this.basicInfo.businessId = res.data.filter(item => item.project_name === this.configur.extras.devops_info.project_id.name)[0].englishName;
             this.onSelectBusiness();
             this.basicInfo.pipelineId = this.configur.extras.devops_info.pipeline_id.value;
@@ -420,6 +425,7 @@
             is_draft: false,
             is_terminable: false,
             name: this.basicInfo.nodeName,
+            desc: this.basicInfo.desc,
             type: 'TASK-DEVOPS',
             workflow: this.configur.workflow,
           };

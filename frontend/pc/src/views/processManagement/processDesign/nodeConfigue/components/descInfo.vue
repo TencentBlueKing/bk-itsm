@@ -29,14 +29,15 @@
       behavior="simplicity"
       :maxlength="64"
       :placeholder="$t(`m.systemConfig['请输入描述']`)"
+      type="textarea"
       v-model="desc"
       @blur.self="change">
     </bk-input>
-    <p v-else style="font-size: 12px; color: #63656e">
+    <div v-else style="font-size: 12px; color: #63656e; width: 450px; word-wrap:break-word;line-height: 16px;">
       {{desc}}
       <i style="font-size: 16px" class="bk-itsm-icon icon-edit-bold edit-icon"></i>
       <span style="color: #3a84ff" @click="edit">{{ $t(`m['点击修改']`) }}</span>
-    </p>
+    </div>
   </bk-form-item>
 </template>
 
@@ -55,6 +56,11 @@
         desc: this.value,
       };
     },
+    watch: {
+      value(val) {
+        this.desc = val;
+      },
+    },
     mounted() {
     },
     methods: {
@@ -72,5 +78,11 @@
   };
 </script>
 <style lang='scss' scoped>
-
+/deep/ .bk-textarea-wrapper {
+  height: 70px;
+  .bk-form-textarea {
+    height: 100%;
+    min-height: unset;
+  }
+}
 </style>

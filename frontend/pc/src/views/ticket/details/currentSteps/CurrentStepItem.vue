@@ -105,6 +105,7 @@
           <!-- 状态 icon, API 节点和标准运维节点才显示 -->
           <task-status :status="nodeInfo.status"></task-status>
         </p>
+        <p class="bk-node-desc">{{nodeInfo.desc}}</p>
         <span class="right-float">
           <!-- 响应按钮 -->
           <bk-button
@@ -943,6 +944,13 @@
                 overflow: auto;
                 z-index: 500;
                 background: #ffffff;
+            }
+            .bk-node-desc {
+              margin: 15px 24px;
+              background-color: #ffffff;
+              color: #737987;
+              padding: 0;
+              word-wrap:break-word;
             }
             .bk-node-title {
                 margin: 17px 10px;
