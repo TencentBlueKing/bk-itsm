@@ -30,6 +30,7 @@
             maxlength="120">
           </bk-input>
         </bk-form-item>
+        <desc-info v-model="formInfo.desc"></desc-info>
         <bk-form-item data-test-id="autoNode-select-apiInterface" :label="$t(`m.treeinfo['API接口']`)" :required="true">
           <bk-select :ext-cls="'bk-form-width bk-form-display'"
             v-model="formInfo.api_info.remote_system_id"
@@ -171,6 +172,7 @@
   </div>
 </template>
 <script>
+  import descInfo from './components/descInfo.vue';
   import getParam from './addField/getParam.vue';
   import postParam from './addField/postParam.vue';
   import responseDataNode from './autoComponents/responseDataNode.vue';
@@ -193,6 +195,7 @@
       commonTriggerList,
       dealPerson,
       BasicCard,
+      descInfo,
     },
     mixins: [mixins],
     props: {
@@ -258,6 +261,7 @@
         formInfo: {
           workflow: '',
           name: '',
+          desc: '',
           type: 'TASK',
           api_info: {
             remote_system_id: '',
@@ -344,6 +348,7 @@
         await this.flowInfo;
         // 节点名称
         this.formInfo.name = this.configur.name;
+        this.formInfo.desc = this.configur.desc;
         this.getRelatedFields();
         this.getExcludeRoleTypeList();
         // 处理人

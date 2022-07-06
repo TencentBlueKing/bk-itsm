@@ -153,6 +153,7 @@
         params.is_terminable = false;
         // 基本信息
         params.name = basicInfo.name;
+        params.desc = basicInfo.desc;
         params.tag = basicInfo.tag;
         params.distribute_type = basicInfo.distribute_type;
         params.assignors_type = basicInfo.assignors_type;

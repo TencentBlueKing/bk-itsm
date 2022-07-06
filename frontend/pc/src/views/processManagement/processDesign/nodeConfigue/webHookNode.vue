@@ -16,6 +16,7 @@
           required>
           <bk-input v-model="formData.name"></bk-input>
         </bk-form-item>
+        <desc-info v-model="formData.desc"></desc-info>
         <bk-form-item
           v-if="isStatus"
           data-test-id="devops-component-processor"
@@ -149,6 +150,7 @@
 </template>
 
 <script>
+  import descInfo from './components/descInfo.vue';
   import requestConfig from './components/requestConfig.vue';
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import dealPerson from './components/dealPerson.vue';
@@ -160,6 +162,7 @@
       dealPerson,
       commonTriggerList,
       requestConfig,
+      descInfo,
     },
     props: {
       // 流程信息
@@ -204,6 +207,7 @@
         requestOptions: ['GET', 'POST'],
         formData: {
           name: '',
+          desc: '',
           url: '',
           success_exp: '',
         },
@@ -249,7 +253,7 @@
           delivers: false,
           processors: false,
         },
-        excludeProcessor: [],
+        excludeProcessor: ['OPEN'],
         isShowUrlVariable: false,
         filterParams: '',
         stateList: [],
@@ -291,13 +295,15 @@
     methods: {
       getWebHookDetail() {
         if (this.isStatus) {
+          console.log(this.configur);
           if (Object.keys(this.configur.extras).length !== 0) {
             const { url, success_exp, method } = this.configur.extras.webhook_info;
             this.formData.name = this.configur.name;
+            this.formData.desc = this.configur.desc;
             this.formData.success_exp = success_exp;
             this.formData.url = url;
             this.curEq = method;
-    
+            console.log(this.formData);
             this.processorsInfo.type = this.configur.processors_type;
             this.processorsInfo.value = this.configur.processors;
     
@@ -386,7 +392,7 @@
             item.source = 'global';
             item.type = 'string';
           });
-          // auth test
+          // auth
           const auth_params = {
             auth_type: authRadio !== 'None' ? authRadio : '',
             auth_config: {},
@@ -418,6 +424,7 @@
           };
           const params = {
             name: this.formData.name,
+            desc: this.formData.desc,
             processors: processors || '',
             processors_type: processors_type || '',
             type: 'WEBHOOK',

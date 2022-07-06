@@ -39,6 +39,7 @@
             maxlength="120">
           </bk-input>
         </bk-form-item>
+        <desc-info v-model="formInfo.desc"></desc-info>
         <bk-form-item
           data-test-id="approveNode-input-nodeLabel"
           :label="$t(`m.treeinfo['节点标签：']`)"
@@ -269,6 +270,7 @@
   </div>
 </template>
 <script>
+  import descInfo from './components/descInfo.vue';
   import dealPerson from './components/dealPerson.vue';
   import fieldConfig from './components/fieldConfig.vue';
   import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
@@ -281,6 +283,7 @@
       dealPerson,
       fieldConfig,
       commonTriggerList,
+      descInfo,
     },
     props: {
       // 流程信息
@@ -393,6 +396,7 @@
         ticketKeyLoading: false,
         formInfo: {
           name: '',
+          desc: '',
           tag: '',
           ticket_type: '',
           ticket_key: '',
@@ -459,6 +463,7 @@
         this.processType = 'multi';
         // name
         this.formInfo.name = this.configur.name;
+        this.formInfo.desc = this.configur.desc;
         // 节点标签
         this.formInfo.tag = this.configur.tag || '';
         this.formInfo.is_multi = this.configur.is_multi === true;
@@ -591,6 +596,7 @@
           };
           // 基本信息
           params.name = this.formInfo.name;
+          params.desc = this.formInfo.desc;
           params.is_sequential = this.formInfo.is_sequential;
           params.processors_type = '';
           params.processors = '';

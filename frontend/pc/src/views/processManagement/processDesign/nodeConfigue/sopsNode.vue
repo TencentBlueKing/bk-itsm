@@ -36,6 +36,7 @@
             maxlength="120">
           </bk-input>
         </bk-form-item>
+        <desc-info v-model="basicsFormData.desc"></desc-info>
         <bk-form-item
           data-test-id="sopsNode-select-processType"
           error-display-type="normal"
@@ -176,6 +177,7 @@
   </div>
 </template>
 <script>
+  import descInfo from './components/descInfo.vue';
   import dealPerson from './components/dealPerson.vue';
   import NoData from '../../../../components/common/NoData.vue';
   import sopsGetParam from './components/sopsGetParam.vue';
@@ -192,6 +194,7 @@
       commonTriggerList,
       NoData,
       dealPerson,
+      descInfo,
     },
     props: {
       // 流程信息
@@ -223,6 +226,7 @@
         constantDefaultValue: {},
         basicsFormData: {
           name: '',
+          desc: '',
           templateId: '',
           projectId: '',
           planId: [],
@@ -341,6 +345,7 @@
         if (userProjectList) this.projectList = userProjectList.data;
         if (Object.keys(this.configur.extras).length !== 0) {
           this.basicsFormData.name = this.configur.name;
+          this.basicsFormData.desc = this.configur.desc;
           // 流程类型
           this.basicsFormData.processType = this.configur.extras.sops_info.template_source;
           // 跳过执行任务ID
@@ -646,6 +651,7 @@
               is_draft: false,
               is_terminable: false,
               name: this.basicsFormData.name,
+              desc: this.basicsFormData.desc,
               type: 'TASK-SOPS',
               workflow: this.configur.workflow,
             };
