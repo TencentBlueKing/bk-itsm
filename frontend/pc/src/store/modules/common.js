@@ -111,6 +111,13 @@ export default {
         return res;
       });
     },
+    // 获取组织机构人员数量
+    getOrganizationNumber({ commit, state, dispatch }, id) {
+      return ajax.post(`gateway/usermanage/get_department_users_count/?id=${id}`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
     // 获取页面 footer
     getPageFooter({ commit, state, dispatch }) {
       return ajax
