@@ -596,7 +596,7 @@
           };
           // 基本信息
           params.name = this.formInfo.name;
-          params.desc = this.formInfo.desc;
+          params.desc = this.formInfo.desc || undefined;
           params.is_sequential = this.formInfo.is_sequential;
           params.processors_type = '';
           params.processors = '';

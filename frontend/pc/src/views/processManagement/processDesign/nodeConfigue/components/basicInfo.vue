@@ -397,7 +397,7 @@
         this.checkBasic();
         const basicForm = {};
         basicForm.name = this.formInfo.name;
-        basicForm.desc = this.formInfo.desc;
+        basicForm.desc = this.formInfo.desc || undefined;
         this.checkStatus.name = !this.formInfo.name;
         basicForm.tag = this.formInfo.tag;
         basicForm.distribute_type = this.formInfo.distribute_type;

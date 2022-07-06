@@ -504,7 +504,7 @@
           }
           const params = {
             name: this.basicInfo.nodeName,
-            desc: this.basicInfo.desc,
+            desc: this.basicInfo.desc || undefined,
             processors: processors || '',
             processors_type: processors_type || '',
             type: 'BK-PLUGIN',

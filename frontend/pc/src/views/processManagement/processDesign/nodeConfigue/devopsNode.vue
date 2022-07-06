@@ -425,7 +425,7 @@
             is_draft: false,
             is_terminable: false,
             name: this.basicInfo.nodeName,
-            desc: this.basicInfo.desc,
+            desc: this.basicInfo.desc || undefined,
             type: 'TASK-DEVOPS',
             workflow: this.configur.workflow,
           };

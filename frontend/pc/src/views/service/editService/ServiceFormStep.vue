@@ -103,7 +103,7 @@
           <bk-form
             ref="basicForm"
             form-type="vertical"
-            :label-width="300"
+            label-width="300"
             class="basic-form"
             :rules="rules"
             :model="formData">
