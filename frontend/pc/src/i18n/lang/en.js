@@ -2635,4 +2635,7 @@ export const m = {
   不能使用保留字符: 'Cannot use reserved characters',
   必须是数字: 'must be a number',
   '是必填项！': 'is required !',
+  当前组织架构下共有员工: 'There are total employees under the current organizational structure',
+  '，如果开启了消息通知，会导致': ', if message notification is turned on, it will cause',
+  '人都会收到单据代办通知，是否继续？如有疑问请咨询ITSM系统管理员。': 'Everyone will receive a notice of document agency. Do you want to continue? If in doubt, consult your ITSM system administrator.',
 };
