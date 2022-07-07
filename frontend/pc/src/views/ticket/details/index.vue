@@ -277,6 +277,8 @@
         this.hasNodeOptAuth = this.$refs.leftTicketContent.currentStepList.some(item => item.can_operate);
         this.$store.commit('ticket/setHasTicketNodeOptAuth', this.hasNodeOptAuth);
       }
+      // 判断是否历史处理人
+      this.hasNodeOptAuth = this.ticketInfo.updated_by.split(',').includes(window.username);
       if (this.ticketInfo && this.ticketInfo.auth_actions) {
         // 当前节点有权限不显示异常分派
         this.isShowAssgin = this.ticketInfo.auth_actions.includes('ticket_management') && !this.hasNodeOptAuth;
