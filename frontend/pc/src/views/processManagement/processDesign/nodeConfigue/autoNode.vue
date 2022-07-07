@@ -406,6 +406,7 @@
         params.is_draft = false;
         params.processors_type = '';
         params.processors = '';
+        params.desc = this.formInfo.desc || undefined;
         // 处理人为空校验
         if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
           this.checkStatus.processors = true;

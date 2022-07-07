@@ -651,7 +651,7 @@
               is_draft: false,
               is_terminable: false,
               name: this.basicsFormData.name,
-              desc: this.basicsFormData.desc,
+              desc: this.basicsFormData.desc || undefined,
               type: 'TASK-SOPS',
               workflow: this.configur.workflow,
             };

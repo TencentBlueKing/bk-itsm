@@ -424,7 +424,7 @@
           };
           const params = {
             name: this.formData.name,
-            desc: this.formData.desc,
+            desc: this.formData.desc || undefined,
             processors: processors || '',
             processors_type: processors_type || '',
             type: 'WEBHOOK',

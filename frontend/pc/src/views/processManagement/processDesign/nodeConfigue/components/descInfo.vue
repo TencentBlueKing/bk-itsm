@@ -34,6 +34,7 @@
       @blur.self="change">
     </bk-input>
     <div v-else style="font-size: 12px; color: #63656e; width: 450px; word-wrap:break-word;line-height: 16px;">
+      <span v-if="!value">{{ $t(`m['当前节点未设置节点描述']`) }}</span>
       {{desc}}
       <i style="font-size: 16px" class="bk-itsm-icon icon-edit-bold edit-icon"></i>
       <span style="color: #3a84ff" @click="edit">{{ $t(`m['点击修改']`) }}</span>

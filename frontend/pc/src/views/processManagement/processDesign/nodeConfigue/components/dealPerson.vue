@@ -87,7 +87,13 @@
       :mask-close="false"
       @cancel="cancelSelect">
       <i class="bk-itsm-icon icon-itsm-icon-mark-eight organization-tip"></i>
-      <p v-text="organizationTip.message"></p>
+      <p>
+        <span>{{$t('m["当前组织架构下共有员工"]')}}</span>
+        <span style="color:red">{{organizationTip.count}}</span>
+        <span>{{$t('m["人，如果开启了消息通知，会导致"]')}}</span>
+        <span style="color:red">{{organizationTip.count}}</span>
+        <span>{{$t('m["人都会收到单据代办通知，是否继续？如有疑问请咨询ITSM系统管理员。"]')}}</span>
+      </p>
     </bk-dialog>
   </div>
 </template>
@@ -162,7 +168,7 @@
         noSecondTypeList: ['EMPTY', 'OPEN', 'STARTER', 'BY_ASSIGNOR', 'STARTER_LEADER'],
         organizationTip: {
           show: false,
-          message: '',
+          count: '',
         },
       };
     },
@@ -287,10 +293,9 @@
       },
       async getOrganizationNumber(id) {
         const res = await this.$store.dispatch('common/getOrganizationNumber', id);
-        const message = this.$t('m["当前组织架构下共有员工"]') + res.data.count + this.$t('m["，如果开启了消息通知，会导致"]') + res.data.count + this.$t('m["人都会收到单据代办通知，是否继续？如有疑问请咨询ITSM系统管理员。"]');
         // 单个组织超过100人时提醒
         if (res.data.count > 100) {
-          this.organizationTip.message = message;
+          this.organizationTip.count = res.data.count;
           this.organizationTip.show = true;
         }
       },
