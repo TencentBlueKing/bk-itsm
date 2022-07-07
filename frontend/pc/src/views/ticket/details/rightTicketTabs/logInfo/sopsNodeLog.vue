@@ -21,35 +21,35 @@
   -->
 
 <template>
-    <div class="bk-page bk-auto-node-basic">
-        <p class="bk-header-bold">{{ $t('m.newCommon["任务参数"]') }}</p>
-        <div>
-            <div class="bk-param">
-                <get-param
-                    ref="getParam"
-                    :is-static="true"
-                    :is-static-data="sopsInfo">
-                </get-param>
-            </div>
-        </div>
+  <div class="bk-page bk-auto-node-basic">
+    <p class="bk-header-bold">{{ $t('m.newCommon["任务参数"]') }}</p>
+    <div>
+      <div class="bk-param">
+        <get-param
+          ref="getParam"
+          :is-static="true"
+          :is-static-data="sopsInfo">
+        </get-param>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
-    import getParam from '@/views/processManagement/processDesign/nodeConfigue/components/sopsGetParam.vue'
+  import getParam from '@/views/processManagement/processDesign/nodeConfigue/components/sopsGetParam.vue';
 
-    export default {
-        name: 'sopsNodeLog',
-        components: {
-            getParam
-        },
-        props: {
-            sopsInfo: {
-                type: Array,
-                default: () => ({})
-            }
-        }
-    }
+  export default {
+    name: 'sopsNodeLog',
+    components: {
+      getParam,
+    },
+    props: {
+      sopsInfo: {
+        type: Array,
+        default: () => ({}),
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

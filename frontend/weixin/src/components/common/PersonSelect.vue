@@ -64,12 +64,12 @@
       </div>
       <footer class="select-footer">
         <span v-if="!showSelectedPerson" @click="showSelectedPerson = true">
-          {{ $t(`m['已选：']`) }}
+          已选：
           <span class="color-blue">{{ selected.length }}</span>
           <van-icon class="unfold-icon" name="arrow-up" />
         </span>
         <span v-else @click="showSelectedPerson = false">
-          {{ $t(`m['收起']`) }}
+          收起
           <van-icon class="unfold-icon" name="arrow-down" />
         </span>
         <van-button type="primary" class="confirm-button" @click="onClose">确定</van-button>

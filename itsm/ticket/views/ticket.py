@@ -1043,6 +1043,38 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response(ActionSerializer(action_query_set, many=True).data)
 
+    @action(detail=True, methods=["get"])
+    def trigger_actions_group(self, request, *args, **kwargs):
+        """获取工单对应的触发器响应事件"""
+        instance = self.get_object()
+        # 所有的内容
+        task_ids = Task.objects.filter(ticket_id=instance.id).values_list("id")
+        action_query_set = Action.objects.filter(
+            Q(Q(source_id=instance.id) & Q(source_type=SOURCE_TICKET))
+            | Q(Q(source_id__in=task_ids) & Q(source_type=SOURCE_TASK))
+        ).exclude(status=ACTION_STATUS_CREATED)
+        actions = ActionSerializer(action_query_set, many=True).data
+        # 分组
+        ticket_actions = {}
+        state_actions = {}
+        state_map = {}
+        for item in actions:
+            if item["signal_type"] == "STATE":
+                state_actions.setdefault(item["sender"], []).append(item)
+            if item["signal_type"] == "FLOW":
+                ticket_actions.setdefault(item["sender"], []).append(item)
+
+        for state_id in state_actions.keys():
+            state_map[state_id] = instance.state(state_id)["name"]
+
+        return Response(
+            {
+                "state": state_actions,
+                "ticket_actions": ticket_actions,
+                "state_map": state_map,
+            }
+        )
+
     @action(detail=True, methods=["post"])
     def terminate(self, request, *args, **kwargs):
         """单据终止"""
@@ -1366,13 +1398,7 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response()
 
-    @action(detail=True, methods=["get"])
-    def states(self, request, *args, **kwargs):
-        """
-        单据节点查询
-        参数：state_id，可选，若为空则返回所有当前状态
-        """
-        ticket = self.get_object()
+    def states_response(self, ticket, request, detail=False):
         state_id = request.query_params.get("state_id")
 
         if ticket.flow.engine_version == DEFAULT_ENGINE_VERSION:
@@ -1385,6 +1411,12 @@ class TicketModelViewSet(ModelViewSet):
                     raise StateNotFoundError("state_id=%s" % state_id)
 
             many = not state_id
+
+            if many and detail:
+                status = status.filter(
+                    ~Q(status__in=["FINISHED", "TERMINATED"])
+                    | Q(state_id=ticket.first_state_id)
+                )
             show_all_fields = many or status.status != "FINISHED"
             ticket_status = StatusSerializer(
                 status,
@@ -1412,6 +1444,39 @@ class TicketModelViewSet(ModelViewSet):
                 list(ticket.flow.states.values()), many=True, context={"ticket": ticket}
             ).data
         )
+
+    @action(detail=True, methods=["get"])
+    def states(self, request, *args, **kwargs):
+        """
+        单据节点查询
+        参数：state_id，可选，若为空则返回所有当前状态
+        """
+        ticket = self.get_object()
+        return self.states_response(ticket, request)
+
+    @action(detail=True, methods=["get"])
+    def details_states(self, request, *args, **kwargs):
+        """
+        单据节点查询只返回部分字段
+        参数：state_id，可选，若为空则返回所有当前状态
+        """
+        ticket = self.get_object()
+        return self.states_response(ticket, request, detail=True)
+
+    @action(detail=True, methods=["get"])
+    def states_status(self, request, *args, **kwargs):
+        # 返回所有节点的from_transition_id, state_id, status 字段
+
+        ticket = self.get_object()
+        transitions_map = ticket.pipeline_data.get("transitions_map", {})
+        if ticket.flow.engine_version == DEFAULT_ENGINE_VERSION:
+            status_list = ticket.node_status.values(
+                "id", "state_id", "status", "by_flow"
+            )
+            for status in status_list:
+                status["from_transition_id"] = transitions_map.get(status["by_flow"])
+
+        return Response(list(status_list))
 
     @action(detail=True, methods=["get"])
     def transitions(self, request, *args, **kwargs):

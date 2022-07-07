@@ -32,7 +32,11 @@ from django.db.models.query import QuerySet
 from django.utils.translation import ugettext as _
 
 from common.log import logger
-from itsm.component.constants import BUILTIN_SYSDICT_LIST, DEFAULT_ENGINE_VERSION
+from itsm.component.constants import (
+    BUILTIN_SYSDICT_LIST,
+    DEFAULT_ENGINE_VERSION,
+    BKBASE_CATALOG_KEY,
+)
 from itsm.component.constants import BUILTIN_SERVICES, OPEN, DEFAULT_PROJECT_PROJECT_KEY
 from itsm.component.db import managers
 from itsm.component.utils.basic import dotted_name
@@ -115,7 +119,22 @@ class ServiceManager(managers.Manager):
     def init_bkbase_services(self):
         from itsm.workflow.models import Workflow
         from itsm.component.constants import BUILTIN_BKBASE_SERVICES
+        from itsm.service.models import ServiceCatalog
 
+        def create_service_catalog():
+            bk_base_catalog = ServiceCatalog.objects.filter(
+                name="蓝鲸基础平台", project_key="0"
+            ).first()
+            if bk_base_catalog is not None:
+                print("蓝鲸基础平台 已存在, catalog_id = {}".format(bk_base_catalog))
+                return bk_base_catalog.id
+            root_catalog = ServiceCatalog.objects.get(key="root", project_key="0")
+            new_catalog = root_catalog.create_catalog(
+                name="蓝鲸基础平台", key=BKBASE_CATALOG_KEY, parent=root_catalog
+            )
+            return new_catalog.id
+
+        bk_base_catalog_id = create_service_catalog()
         for builtin_service in BUILTIN_BKBASE_SERVICES:
             original_workflow = Workflow.objects.filter(
                 name=builtin_service["flow_name"]
@@ -136,8 +155,10 @@ class ServiceManager(managers.Manager):
                     obj.display_role = dotted_name(
                         builtin_service.get("display_role", "")
                     )
-                    obj.bind_catalog_by_key(builtin_service["bind"])
+                    obj.bind_catalog(catalog_id=bk_base_catalog_id)
                     obj.save()
+            else:
+                obj.bind_catalog(catalog_id=bk_base_catalog_id)
 
     def insert_services(self, services, catalog=None):
         from itsm.workflow.models import Workflow

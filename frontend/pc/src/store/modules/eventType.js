@@ -20,80 +20,80 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
-    namespaced: true,
-    state: {},
-    mutations: {},
-    actions: {
-        getEventTypeList ({ commit, state, dispatch }, params) {
-            return ajax.get('service/event/event_type/records/', { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        submit ({ commit, state, dispatch }, params) {
-            return ajax.post('service/event/event_type/records/', params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        update ({ commit, state, dispatch }, params) {
-            return ajax.put('service/event/event_type/records/' + params.id, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        delete ({ commit, state, dispatch }, id) {
-            return ajax.delete('service/event/event_type/records/' + id).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        getPlatTypeList ({ commit, state, dispatch }, params) {
-            return ajax.get('service/event/plat_type/records/', { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        getSlaList ({ commit, state, dispatch }, params) {
-            return ajax.get('service/event/sla/records/', { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        submitSla ({ commit, state, dispatch }, params) {
-            return ajax.post('service/event/sla/records/', params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        updateSla ({ commit, state, dispatch }, params) {
-            return ajax.put('service/event/sla/records/' + params.id, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        deleteSla ({ commit, state, dispatch }, id) {
-            return ajax.delete('service/event/sla/records/' + id).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 获取业务系统
-        getAppList ({ commit, state, dispatch }) {
-            return ajax.get('gateway/cmdb/get_app_list/').then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 获取发送途径接口
-        getTheWay ({ commit, state, dispatch }) {
-            return ajax.get('ticket/receipts/get_global_choices/').then(response => {
-                let res = response.data
-                return res
-            })
-        }
-    }
-}
+  namespaced: true,
+  state: {},
+  mutations: {},
+  actions: {
+    getEventTypeList({ commit, state, dispatch }, params) {
+      return ajax.get("service/event/event_type/records/", { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    submit({ commit, state, dispatch }, params) {
+      return ajax.post("service/event/event_type/records/", params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    update({ commit, state, dispatch }, params) {
+      return ajax.put(`service/event/event_type/records/${params.id}`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    delete({ commit, state, dispatch }, id) {
+      return ajax.delete(`service/event/event_type/records/${id}`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    getPlatTypeList({ commit, state, dispatch }, params) {
+      return ajax.get("service/event/plat_type/records/", { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    getSlaList({ commit, state, dispatch }, params) {
+      return ajax.get("service/event/sla/records/", { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    submitSla({ commit, state, dispatch }, params) {
+      return ajax.post("service/event/sla/records/", params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    updateSla({ commit, state, dispatch }, params) {
+      return ajax.put(`service/event/sla/records/${params.id}`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    deleteSla({ commit, state, dispatch }, id) {
+      return ajax.delete(`service/event/sla/records/${id}`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 获取业务系统
+    getAppList({ commit, state, dispatch }) {
+      return ajax.get("gateway/cmdb/get_app_list/").then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 获取发送途径接口
+    getTheWay({ commit, state, dispatch }) {
+      return ajax.get("ticket/receipts/get_global_choices/").then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};

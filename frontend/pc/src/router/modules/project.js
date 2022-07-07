@@ -20,143 +20,143 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-const ProjectHome = () => import('../../views/project/index.vue')
-const ProjectList = () => import('../../views/project/list.vue')
-const ProjectGuide = () => import('../../views/project/guide.vue')
-const ProjectTicket = () => import('../../views/project/ticket.vue')
-const ProjectService = () => import('../../views/service/index.vue')
-const ProjectServiceList = () => import('../../views/service/serviceList.vue')
-const ProjectServiceEdit = () => import('../../views/service/editService/index.vue')
-const ProjectServiceSla = () => import('../../views/service/sla/index.vue')
-const ServiceDirectory = () => import('../../views/service/directory.vue')
-const Field = () => import('../../views/project/fields.vue')
-const Role = () => import('../../views/project/role.vue')
-const Trigger = () => import('../../views/project/trigger.vue')
-const Notice = () => import('../../views/project/notice.vue')
-const API = () => import('../../views/project/api.vue')
-const SlaManage = () => import('../../views/slaManager/slaManager.vue')
-const SlaAgreement = () => import('../../views/slaManager/agreement.vue')
+const ProjectHome = () => import('../../views/project/index.vue');
+const ProjectList = () => import('../../views/project/list.vue');
+const ProjectGuide = () => import('../../views/project/guide.vue');
+const ProjectTicket = () => import('../../views/project/ticket.vue');
+const ProjectService = () => import('../../views/service/index.vue');
+const ProjectServiceList = () => import('../../views/service/serviceList.vue');
+const ProjectServiceEdit = () => import('../../views/service/editService/index.vue');
+const ProjectServiceSla = () => import('../../views/service/sla/index.vue');
+const ServiceDirectory = () => import('../../views/service/directory.vue');
+const Field = () => import('../../views/project/fields.vue');
+const Role = () => import('../../views/project/role.vue');
+const Trigger = () => import('../../views/project/trigger.vue');
+const Notice = () => import('../../views/project/notice.vue');
+const API = () => import('../../views/project/api.vue');
+const SlaManage = () => import('../../views/slaManager/slaManager.vue');
+const SlaAgreement = () => import('../../views/slaManager/agreement.vue');
 
-const ProjectOperationData = () => import('../../views/operation/index.vue')
-const ProjectOperationHome = () => import('../../views/operation/home.vue')
-const ProjectOperationService = () => import('../../views/operation/service.vue')
+const ProjectOperationData = () => import('../../views/operation/index.vue');
+const ProjectOperationHome = () => import('../../views/operation/home.vue');
+const ProjectOperationService = () => import('../../views/operation/service.vue');
 
 export default [
-    {
-        path: '/project_list',
-        name: 'ProjectList',
-        component: ProjectList
-    },
-    
-    {
-        path: '/project_guide',
-        name: 'ProjectGuide',
-        component: ProjectGuide
-    },
-    {
-        path: '/project_empty',
-        name: 'ProjectEmpty',
-        component: ProjectList
-    },
-    {
-        path: '/project',
-        name: 'projectHome',
-        component: ProjectHome,
+  {
+    path: '/project_list',
+    name: 'ProjectList',
+    component: ProjectList,
+  },
+
+  {
+    path: '/project_guide',
+    name: 'ProjectGuide',
+    component: ProjectGuide,
+  },
+  {
+    path: '/project_empty',
+    name: 'ProjectEmpty',
+    component: ProjectList,
+  },
+  {
+    path: '/project',
+    name: 'projectHome',
+    component: ProjectHome,
+    children: [
+      {
+        path: 'ticket',
+        name: 'projectTicket',
+        component: ProjectTicket,
+      },
+      // {
+      //     path: 'service',
+      //     name: 'serviceList',
+      //     component: ProjectService
+      // },
+      {
+        path: 'service',
+        name: 'projectService',
+        component: ProjectService,
         children: [
-            {
-                path: 'ticket',
-                name: 'projectTicket',
-                component: ProjectTicket
-            },
-            // {
-            //     path: 'service',
-            //     name: 'serviceList',
-            //     component: ProjectService
-            // },
-            {
-                path: 'service',
-                name: 'projectService',
-                component: ProjectService,
-                children: [
-                    {
-                        path: 'list',
-                        name: 'projectServiceList',
-                        component: ProjectServiceList
-                    },
-                    {
-                        path: ':type(new|edit)/:step(basic|process|setting)',
-                        name: 'projectServiceEdit',
-                        component: ProjectServiceEdit,
-                        props: (route) => ({
-                            serviceId: route.query.serviceId,
-                            type: route.params.type,
-                            step: route.params.step
-                        })
-                    },
-                    {
-                        path: 'sla/:id',
-                        name: 'projectServiceSla',
-                        component: ProjectServiceSla
-                    }
-                ]
-            },
-            {
-                path: 'service_directory',
-                name: 'serviceDirectory',
-                component: ServiceDirectory
-            },
-            {
-                path: 'roles',
-                name: 'projectRoles',
-                component: Role
-            },
-            {
-                path: 'trigger',
-                name: 'projectTrigger',
-                component: Trigger
-            },
-            {
-                path: 'notice',
-                name: 'projectNotice',
-                component: Notice
-            },
-            {
-                path: 'fields',
-                name: 'projectFields',
-                component: Field
-            },
-            {
-                path: 'api',
-                name: 'projectApi',
-                component: API
-            },
-            {
-                path: 'sla_manage',
-                name: 'slaManage',
-                component: SlaManage
-            },
-            {
-                path: 'sla_agreement',
-                name: 'slaAgreement',
-                component: SlaAgreement
-            },
-            {
-                path: 'projectOperation',
-                name: 'projectAnalysisData',
-                component: ProjectOperationData,
-                children: [
-                    {
-                        path: 'home',
-                        name: 'projectOperationHome',
-                        component: ProjectOperationHome
-                    },
-                    {
-                        path: 'service',
-                        name: 'projectOperationService',
-                        component: ProjectOperationService
-                    }
-                ]
-            }
-        ]
-    }
-]
+          {
+            path: 'list',
+            name: 'projectServiceList',
+            component: ProjectServiceList,
+          },
+          {
+            path: ':type(new|edit)/:step(basic|process|setting)',
+            name: 'projectServiceEdit',
+            component: ProjectServiceEdit,
+            props: route => ({
+              serviceId: route.query.serviceId,
+              type: route.params.type,
+              step: route.params.step,
+            }),
+          },
+          {
+            path: 'sla/:id',
+            name: 'projectServiceSla',
+            component: ProjectServiceSla,
+          },
+        ],
+      },
+      {
+        path: 'service_directory',
+        name: 'serviceDirectory',
+        component: ServiceDirectory,
+      },
+      {
+        path: 'roles',
+        name: 'projectRoles',
+        component: Role,
+      },
+      {
+        path: 'trigger',
+        name: 'projectTrigger',
+        component: Trigger,
+      },
+      {
+        path: 'notice',
+        name: 'projectNotice',
+        component: Notice,
+      },
+      {
+        path: 'fields',
+        name: 'projectFields',
+        component: Field,
+      },
+      {
+        path: 'api',
+        name: 'projectApi',
+        component: API,
+      },
+      {
+        path: 'sla_manage',
+        name: 'slaManage',
+        component: SlaManage,
+      },
+      {
+        path: 'sla_agreement',
+        name: 'slaAgreement',
+        component: SlaAgreement,
+      },
+      {
+        path: 'projectOperation',
+        name: 'projectAnalysisData',
+        component: ProjectOperationData,
+        children: [
+          {
+            path: 'home',
+            name: 'projectOperationHome',
+            component: ProjectOperationHome,
+          },
+          {
+            path: 'service',
+            name: 'projectOperationService',
+            component: ProjectOperationService,
+          },
+        ],
+      },
+    ],
+  },
+];

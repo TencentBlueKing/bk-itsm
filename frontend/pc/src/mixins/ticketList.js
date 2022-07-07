@@ -20,84 +20,88 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import { errorHandler } from '@/utils/errorHandler'
-import { deepClone } from '@/utils/util'
+import { errorHandler } from '@/utils/errorHandler';
+import { deepClone } from '@/utils/util';
 
 const ticketListMixins = {
-    methods: {
-        /**
+  methods: {
+    /**
          * 异步加载列表中的某些字段信息
          * @param {Array} originList 单据列表
-         * @param {Array} exclude 排除字段（不需要去加载的字段）
          */
-        __asyncReplaceTicketListAttr (originList, exclude = []) {
-            if (originList.length === 0) {
-                return
-            }
-            this.__getTicketsProcessors(originList)
-            this.__getTicketsCreator(originList)
-            this.__getTicketscanOperate(originList)
-        },
-        // 异步获取单据处理人
-        __getTicketsProcessors (originList) {
-            const copyList = deepClone(originList)
-            originList.forEach(ticket => {
-                this.$set(ticket, 'current_processors', '加载中...')
-            })
-            const ids = copyList.map(ticket => ticket.id)
-            this.$store.dispatch('ticket/getTicketsProcessors', { ids: ids.toString() }).then((res) => {
-                if (res.result && res.data) {
-                    originList.forEach((ticket, index) => {
-                        const replaceValue = res.data.hasOwnProperty(ticket.id)
-                            ? res.data[ticket.id]
-                            : copyList[index].current_processors
-                        this.$set(ticket, 'current_processors', replaceValue)
-                    })
-                }
-            }).catch(res => {
-                errorHandler(res, this)
-            })
-        },
-        // 异步获取提单人
-        __getTicketsCreator (originList) {
-            const copyList = deepClone(originList)
-            originList.forEach(ticket => {
-                this.$set(ticket, 'creator', '加载中...')
-            })
-            const ids = copyList.map(ticket => ticket.id)
-            this.$store.dispatch('ticket/getTicketsCreator', { ids: ids.toString() }).then((res) => {
-                if (res.result && res.data) {
-                    originList.forEach((ticket, index) => {
-                        const replaceValue = res.data.hasOwnProperty(copyList[index].creator)
-                            ? res.data[copyList[index].creator]
-                            : copyList[index].creator
-                        this.$set(ticket, 'creator', replaceValue)
-                    })
-                }
-            }).catch(res => {
-                errorHandler(res, this)
-            })
-        },
-        // 异步获取单据 can_operate
-        __getTicketscanOperate (originList) {
-            const copyList = deepClone(originList)
-            originList.forEach(ticket => {
-                // 开始是都不能操作
-                this.$set(ticket, 'can_operate', false)
-            })
-            const ids = copyList.map(ticket => ticket.id)
-            this.$store.dispatch('ticket/getTicketscanOperate', { ids: ids.toString() }).then((res) => {
-                if (res.result && res.data) {
-                    originList.forEach((ticket, index) => {
-                        const replaceValue = res.data.hasOwnProperty(ticket.id) ? res.data[ticket.id] : false
-                        this.$set(ticket, 'can_operate', replaceValue)
-                    })
-                }
-            }).catch(res => {
-                errorHandler(res, this)
-            })
+    //  @param {Array} exclude 排除字段（不需要去加载的字段）
+    __asyncReplaceTicketListAttr(originList) {
+      if (originList.length === 0) {
+        return;
+      }
+      this.__getTicketsProcessors(originList);
+      this.__getTicketsCreator(originList);
+      this.__getTicketscanOperate(originList);
+    },
+    // 异步获取单据处理人
+    __getTicketsProcessors(originList) {
+      const copyList = deepClone(originList);
+      originList.forEach((ticket) => {
+        this.$set(ticket, 'current_processors', '加载中...');
+      });
+      const ids = copyList.map(ticket => ticket.id);
+      this.$store.dispatch('ticket/getTicketsProcessors', { ids: ids.toString() }).then((res) => {
+        if (res.result && res.data) {
+          originList.forEach((ticket, index) => {
+            const replaceValue = Object.prototype.hasOwnProperty.call(res.data, ticket.id)
+              ? res.data[ticket.id]
+              : copyList[index].current_processors;
+            this.$set(ticket, 'current_processors', replaceValue);
+          });
         }
-    }
-}
+      })
+        .catch((res) => {
+          errorHandler(res, this);
+        });
+    },
+    // 异步获取提单人
+    __getTicketsCreator(originList) {
+      const copyList = deepClone(originList);
+      originList.forEach((ticket) => {
+        this.$set(ticket, 'creator', '加载中...');
+      });
+      const ids = copyList.map(ticket => ticket.id);
+      this.$store.dispatch('ticket/getTicketsCreator', { ids: ids.toString() }).then((res) => {
+        if (res.result && res.data) {
+          originList.forEach((ticket, index) => {
+            const replaceValue = Object.prototype.hasOwnProperty.call(res.data, copyList[index].creator)
+              ? res.data[copyList[index].creator]
+              : copyList[index].creator;
+            this.$set(ticket, 'creator', replaceValue);
+          });
+        }
+      })
+        .catch((res) => {
+          errorHandler(res, this);
+        });
+    },
+    // 异步获取单据 can_operate
+    __getTicketscanOperate(originList) {
+      const copyList = deepClone(originList);
+      originList.forEach((ticket) => {
+        // 开始是都不能操作
+        this.$set(ticket, 'can_operate', false);
+      });
+      const ids = copyList.map(ticket => ticket.id);
+      this.$store.dispatch('ticket/getTicketscanOperate', { ids: ids.toString() }).then((res) => {
+        if (res.result && res.data) {
+          originList.forEach((ticket) => {
+            const replaceValue = Object.prototype.hasOwnProperty.call(res.data, ticket.id)
+              ? res.data[ticket.id] : false;
+            this.$set(ticket, 'can_operate', replaceValue);
+          });
+        }
+      })
+        .catch((res) => {
+          errorHandler(res, this);
+        });
+    },
+  },
+};
 
-export default ticketListMixins
+export default ticketListMixins;

@@ -20,10 +20,10 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-export default function isCrossOriginIFrame () {
-    try {
-        return !window.top.location.hostname
-    } catch (e) {
-        return true
-    }
+export default function isCrossOriginIFrame() {
+  try {
+    return !window.top.location.hostname;
+  } catch (e) {
+    return true;
+  }
 }

@@ -104,11 +104,12 @@ INSTALLED_APPS += (
     # 'monitors',
     "itsm.monitor",
     "blueapps.opentelemetry.instrument_app",
+    "itsm.plugin_service",
 )
 
 INSTALLED_APPS = ("itsm.helper",) + INSTALLED_APPS
 
-AUTHENTICATION_BACKENDS += ("apigw_manager.apigw.authentication.UserModelBackend",)
+AUTHENTICATION_BACKENDS += ("itsm.openapi.authentication.backend.CustomUserBackend",)
 
 IS_PAAS_V3 = int(os.getenv("BKPAAS_MAJOR_VERSION", False)) == 3
 IS_OPEN_V3 = IS_PAAS_V3 and RUN_VER == "open"
@@ -880,3 +881,6 @@ OPEN_VOICE_NOTICE = (
 BK_APIGW_NAME = os.getenv("BK_APIGW_NAME", "bk-itsm")
 # APIGW 访问地址
 BK_API_URL_TMPL = os.getenv("BK_API_URL_TMPL")
+
+# 蓝鲸插件授权过滤 APP
+PLUGIN_DISTRIBUTOR_NAME = os.getenv("BKAPP_PLUGIN_DISTRIBUTOR_NAME", APP_CODE)

@@ -21,129 +21,130 @@
   -->
 
 <template>
-    <div class="bk-sign-node-content" v-bkloading="{ isLoading: getLogFlag }">
-        <div class="bk-log-flow">
-            <template v-if="logs.length">
-                <time-line :line-list="logs" :parent="'sign'">
-                    <template v-slot:header="{ item }">
-                        <div class="bk-timeline-user-header">
-                            <span class="bk-inline-block bk-default-width"
-                                v-bk-tooltips.top="item.message">{{ item.message}}</span>
-                            <span class="bk-inline-block button" v-if="item.tag !== 'processors'">
-                                <span class="bk-inline-block isOn auto" @click="item.showMore = !item.showMore"
-                                    v-if="!item.showMore">{{ $t('m.newCommon["展开"]') }}
-                                    <i class="bk-icon icon-angle-down bk-selector-icon ml5"></i>
-                                </span>
-                                <span class="bk-inline-block isOff auto" @click="item.showMore = !item.showMore" v-else>{{ $t('m.newCommon["收起"]') }}<i class="bk-icon icon-angle-up bk-selector-icon ml5"></i>
-                                </span>
-                            </span>
-                        </div>
-                    </template>
-                    <template v-slot:content="{ item }">
-                        <div class="bk-timeline-user-content">
-                            <div v-if="item.showMore" class="bk-area-show-back">
-                                <!-- 静态展示 -->
-                                <template v-for="(ite, inde) in item.form_data">
-                                    <fields-done
-                                        :key="inde"
-                                        :item="ite"
-                                        origin="log"
-                                    ></fields-done>
-                                </template>
-                            </div>
-                            <div class="bk-timeline-user-footer">
-                                {{ item.operate_at }}
-                            </div>
-                        </div>
-                    </template>
-                </time-line>
-            </template>
-            <template v-else>
-                <p class="no-data">{{$t(`m.newCommon['暂无信息']`)}}</p>
-            </template>
-        </div>
+  <div class="bk-sign-node-content" v-bkloading="{ isLoading: getLogFlag }">
+    <div class="bk-log-flow">
+      <template v-if="logs.length">
+        <time-line :line-list="logs" :parent="'sign'">
+          <template v-slot:header="{ item }">
+            <div class="bk-timeline-user-header">
+              <span class="bk-inline-block bk-default-width"
+                v-bk-tooltips.top="item.message">{{ item.message}}</span>
+              <span class="bk-inline-block button" v-if="item.tag !== 'processors'">
+                <span class="bk-inline-block isOn auto" @click="item.showMore = !item.showMore"
+                  v-if="!item.showMore">{{ $t('m.newCommon["展开"]') }}
+                  <i class="bk-icon icon-angle-down bk-selector-icon ml5"></i>
+                </span>
+                <span class="bk-inline-block isOff auto" @click="item.showMore = !item.showMore" v-else>{{ $t('m.newCommon["收起"]') }}<i class="bk-icon icon-angle-up bk-selector-icon ml5"></i>
+                </span>
+              </span>
+            </div>
+          </template>
+          <template v-slot:content="{ item }">
+            <div class="bk-timeline-user-content">
+              <div v-if="item.showMore" class="bk-area-show-back">
+                <!-- 静态展示 -->
+                <template v-for="(ite, inde) in item.form_data">
+                  <fields-done
+                    :key="inde"
+                    :item="ite"
+                    origin="log"
+                  ></fields-done>
+                </template>
+              </div>
+              <div class="bk-timeline-user-footer">
+                {{ item.operate_at }}
+              </div>
+            </div>
+          </template>
+        </time-line>
+      </template>
+      <template v-else>
+        <p class="no-data">{{$t(`m.newCommon['暂无信息']`)}}</p>
+      </template>
     </div>
+  </div>
 </template>
 
 <script>
-    import timeLine from '../components/timeLine'
-    import fieldsDone from '../components/fieldsDone'
-    import { errorHandler } from '@/utils/errorHandler'
-    export default {
-        name: 'signNodeInfo',
-        components: {
-            timeLine,
-            fieldsDone
+  import timeLine from '../components/timeLine';
+  import fieldsDone from '../components/fieldsDone';
+  import { errorHandler } from '@/utils/errorHandler';
+  export default {
+    name: 'signNodeInfo',
+    components: {
+      timeLine,
+      fieldsDone,
+    },
+    props: {
+      nodeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            nodeInfo: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            }
-        },
-        data () {
-            return {
-                logs: {},
-                getLogFlag: false
-            }
-        },
-        async mounted () {
-            await this.nodeInfo
-            await this.initData()
-        },
-        methods: {
-            async initData () {
-                this.getLogFlag = true
-                await this.getLogs()
-                const waitProcessors = []
-                this.nodeInfo.tasks.forEach(processor => {
-                    if (processor.status === 'WAIT') {
-                        waitProcessors.push(processor.processor)
-                    }
-                })
-                const tempLog = {
-                    message: waitProcessors.length + this.$t(`m.newCommon['人待处理']`),
-                    operate_at: this.getFormatDate(),
-                    tag: 'processors'
-                }
-                tempLog.message += waitProcessors.length ? this.$t(`m.newCommon['：']`) + waitProcessors.join(',') : ''
-                this.logs.unshift(tempLog)
-                this.getLogFlag = false
-            },
-            getFormatDate () {
-                const date = new Date()
-                let month = date.getMonth() + 1
-                let strDate = date.getDate()
-                if (month >= 1 && month <= 9) {
-                    month = '0' + month
-                }
-                if (strDate >= 0 && strDate <= 9) {
-                    strDate = '0' + strDate
-                }
-                const currentDate = date.getFullYear() + '-' + month + '-' + strDate
-                    + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
-                return currentDate
-            },
-            async getLogs () {
-                const params = {
-                    ticket: this.nodeInfo.ticket_id,
-                    status: this.nodeInfo.id,
-                    type: 'SIGN'
-                }
-                await this.$store.dispatch('apiRemote/get_sign_logs', params).then(res => {
-                    res.data.forEach(item => {
-                        this.$set(item, 'showMore', false)
-                    })
-                    this.logs = res.data
-                    this.logs.reverse()
-                }).catch(res => {
-                    errorHandler(res, this)
-                })
-            }
+      },
+    },
+    data() {
+      return {
+        logs: {},
+        getLogFlag: false,
+      };
+    },
+    async mounted() {
+      await this.nodeInfo;
+      await this.initData();
+    },
+    methods: {
+      async initData() {
+        this.getLogFlag = true;
+        await this.getLogs();
+        const waitProcessors = [];
+        this.nodeInfo.tasks.forEach((processor) => {
+          if (processor.status === 'WAIT') {
+            waitProcessors.push(processor.processor);
+          }
+        });
+        const tempLog = {
+          message: waitProcessors.length + this.$t('m.newCommon[\'人待处理\']'),
+          operate_at: this.getFormatDate(),
+          tag: 'processors',
+        };
+        tempLog.message += waitProcessors.length ? this.$t('m.newCommon[\'：\']') + waitProcessors.join(',') : '';
+        this.logs.unshift(tempLog);
+        this.getLogFlag = false;
+      },
+      getFormatDate() {
+        const date = new Date();
+        let month = date.getMonth() + 1;
+        let strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+          month = `0${month}`;
         }
-    }
+        if (strDate >= 0 && strDate <= 9) {
+          strDate = `0${strDate}`;
+        }
+        const currentDate = `${date.getFullYear()}-${month}-${strDate
+        } ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+        return currentDate;
+      },
+      async getLogs() {
+        const params = {
+          ticket: this.nodeInfo.ticket_id,
+          status: this.nodeInfo.id,
+          type: 'SIGN',
+        };
+        await this.$store.dispatch('apiRemote/get_sign_logs', params).then((res) => {
+          res.data.forEach((item) => {
+            this.$set(item, 'showMore', false);
+          });
+          this.logs = res.data;
+          this.logs.reverse();
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+    },
+  };
 </script>
 
 <style scoped lang='scss'>

@@ -21,36 +21,36 @@
   -->
 
 <template>
-    <div class="bk-page bk-auto-node-basic">
-        <p class="bk-header-bold">{{ $t('m.newCommon["任务参数"]') }}</p>
-        <div>
-            <div class="bk-param">
-                <bk-table
-                    :data="nodeInfo"
-                    :ext-cls="'bk-editor-table'">
-                    <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="name"></bk-table-column>
-                    <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="400">
-                        <template slot-scope="props">
-                            <span>{{props.row.value || '--'}}</span>
-                        </template>
-                    </bk-table-column>
-                </bk-table>
-            </div>
-        </div>
+  <div class="bk-page bk-auto-node-basic">
+    <p class="bk-header-bold">{{ $t('m.newCommon["任务参数"]') }}</p>
+    <div>
+      <div class="bk-param">
+        <bk-table
+          :data="nodeInfo"
+          :ext-cls="'bk-editor-table'">
+          <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="name"></bk-table-column>
+          <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="400">
+            <template slot-scope="props">
+              <span>{{props.row.value || '--'}}</span>
+            </template>
+          </bk-table-column>
+        </bk-table>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
 
-    export default {
-        name: 'devopsNodeLog',
-        props: {
-            nodeInfo: {
-                type: Array,
-                default: () => ({})
-            }
-        }
-    }
+  export default {
+    name: 'devopsNodeLog',
+    props: {
+      nodeInfo: {
+        type: Array,
+        default: () => ({}),
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

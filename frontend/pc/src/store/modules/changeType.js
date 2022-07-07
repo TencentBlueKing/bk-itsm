@@ -20,36 +20,36 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
-    namespaced: true,
-    state: {},
-    mutations: {},
-    actions: {
-        getChangeTypeList ({ commit, state, dispatch }, params) {
-            return ajax.get('service/change/change_type/records/', { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        submit ({ commit, state, dispatch }, params) {
-            return ajax.post('service/change/change_type/records/', params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        update ({ commit, state, dispatch }, params) {
-            return ajax.put('service/change/change_type/records/' + params.id, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        delete ({ commit, state, dispatch }, id) {
-            return ajax.delete('service/change/change_type/records/' + id).then(response => {
-                let res = response.data
-                return res
-            })
-        }
-    }
-}
+  namespaced: true,
+  state: {},
+  mutations: {},
+  actions: {
+    getChangeTypeList({ commit, state, dispatch }, params) {
+      return ajax.get("service/change/change_type/records/", { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    submit({ commit, state, dispatch }, params) {
+      return ajax.post("service/change/change_type/records/", params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    update({ commit, state, dispatch }, params) {
+      return ajax.put(`service/change/change_type/records/${params.id}`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    delete({ commit, state, dispatch }, id) {
+      return ajax.delete(`service/change/change_type/records/${id}`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};

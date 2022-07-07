@@ -40,14 +40,17 @@ from itsm.component.constants import (
     LEN_MIDDLE,
     LEN_NORMAL,
     LEN_SHORT,
-    NOTIFY_TYPE_CHOICES,
     PUBLIC_PROJECT_PROJECT_KEY,
 )
 from itsm.component.db import managers
 from itsm.component.fields import IOField
 from itsm.component.utils.basic import now
-from itsm.iadmin.contants import ACTION_CHOICES, DEFAULT_SETTINGS, NOTIFY_TEMPLATE,\
-    GENERAL_NOTIFY_TEMPLATE_LIST
+from itsm.iadmin.contants import (
+    ACTION_CHOICES,
+    DEFAULT_SETTINGS,
+    NOTIFY_TEMPLATE,
+    GENERAL_NOTIFY_TEMPLATE_LIST,
+)
 
 # 匹配版本
 VERSION_PATTERN = re.compile(r".*:(.*)].*")
@@ -161,6 +164,7 @@ class CustomNotice(models.Model):
     def init_project_template(cls, project_key):
         # 1.获取第三方通知方式
         from itsm.workflow.utils import get_third_party_notify_type
+
         third_party_notify_type_list = get_third_party_notify_type()
         # 2.初始化第三方通知方式模版
         third_party_notify_template_list = []
@@ -169,8 +173,8 @@ class CustomNotice(models.Model):
             for template in general_notify_template:
                 template[3] = notify_type
             third_party_notify_template_list.extend(general_notify_template)
-        
-        for template in NOTIFY_TEMPLATE+third_party_notify_template_list:
+
+        for template in NOTIFY_TEMPLATE + third_party_notify_template_list:
             try:
                 CustomNotice.objects.get(
                     action=template[2],
@@ -223,6 +227,9 @@ class CustomNotice(models.Model):
         )
 
         for project_key in project_keys:
+            # 公共项目不参与初始化通知模板
+            if project_key == PUBLIC_PROJECT_PROJECT_KEY:
+                continue
             cls.init_project_template(project_key=project_key)
 
 

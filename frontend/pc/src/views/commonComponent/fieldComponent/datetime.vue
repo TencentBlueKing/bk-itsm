@@ -21,77 +21,77 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
-            <bk-date-picker :class="{ 'bk-border-error': item.checkValue }"
-                v-model="item.val"
-                :type="'datetime'"
-                :disabled="(item.is_readonly && !isCurrent) || disabled"
-                :placeholder="$t(`m.newCommon['选择日期时间']`)"
-                @open-change="item.checkValue = false">
-            </bk-date-picker>
-            <template v-if="item.checkValue">
-                <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-                <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-            </template>
-        </bk-form-item>
-    </div>
+  <div v-if="item.showFeild">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
+      <bk-date-picker :class="{ 'bk-border-error': item.checkValue }"
+        v-model="item.val"
+        :type="'datetime'"
+        :disabled="(item.is_readonly && !isCurrent) || disabled"
+        :placeholder="$t(`m.newCommon['选择日期时间']`)"
+        @open-change="item.checkValue = false">
+      </bk-date-picker>
+      <template v-if="item.checkValue">
+        <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+        <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+      </template>
+    </bk-form-item>
+  </div>
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js'
-    export default {
-        name: 'DATETIME',
-        mixins: [mixins],
-        props: {
-            item: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            },
-            fields: {
-                type: Array,
-                default () {
-                    return []
-                }
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false
-            },
-            disabled: {
-                type: Boolean,
-                default: false
-            }
+  import mixins from '../../commonMix/field.js';
+  export default {
+    name: 'DATETIME',
+    mixins: [mixins],
+    props: {
+      item: {
+        type: Object,
+        default() {
+          return {};
         },
-        data () {
-            return {
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
+        },
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
 
-            }
-        },
-        watch: {
-            'item.val' () {
-                this.conditionField(this.item, this.fields)
-            }
-        },
-        mounted () {
-            this.conditionField(this.item, this.fields)
-            if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value
-            }
-            if (!this.item.val) {
-                const currTime = new Date()
-                this.item.val = currTime
-                this.item.value = currTime
-            }
-        },
-        methods: {
-            
-        }
-    }
+      };
+    },
+    watch: {
+      'item.val'() {
+        this.conditionField(this.item, this.fields);
+      },
+    },
+    mounted() {
+      this.conditionField(this.item, this.fields);
+      if (this.item.value && !this.item.val) {
+        this.item.val = this.item.value;
+      }
+      if (!this.item.val) {
+        const currTime = new Date();
+        this.item.val = currTime;
+        this.item.value = currTime;
+      }
+    },
+    methods: {
+
+    },
+  };
 </script>
 
 <style lang='scss' scoped>
-    
+
 </style>

@@ -21,71 +21,73 @@
   -->
 
 <template>
-    <div class="versionLog">
-        <bk-table
-            v-bkloading="{ isLoading: isDataLoading }"
-            :data="versionData"
-            :size="'small'">
-            <bk-table-column :label="$t(`m.home['旧版本']`)" prop="version_from"></bk-table-column>
-            <bk-table-column :label="$t(`m.home['新版本']`)" prop="version_to"></bk-table-column>
-            <bk-table-column :label="$t(`m.home['升级人']`)" prop="operator"></bk-table-column>
-            <bk-table-column :label="$t(`m.home['时间']`)" prop="create_at"></bk-table-column>
-            <bk-table-column :label="$t(`m.home['备注']`)" prop="note"></bk-table-column>
-        </bk-table>
-        <div style="margin-top: 20px">
-            <bk-button
-                theme="default"
-                :title="$t(`m.home['取消']`)"
-                class="mr10"
-                @click="versionLogData.show = false">
-                {{ $t('m.home["取消"]') }}
-            </bk-button>
-        </div>
+  <div class="versionLog">
+    <bk-table
+      v-bkloading="{ isLoading: isDataLoading }"
+      :data="versionData"
+      :size="'small'">
+      <bk-table-column :label="$t(`m.home['旧版本']`)" prop="version_from"></bk-table-column>
+      <bk-table-column :label="$t(`m.home['新版本']`)" prop="version_to"></bk-table-column>
+      <bk-table-column :label="$t(`m.home['升级人']`)" prop="operator"></bk-table-column>
+      <bk-table-column :label="$t(`m.home['时间']`)" prop="create_at"></bk-table-column>
+      <bk-table-column :label="$t(`m.home['备注']`)" prop="note"></bk-table-column>
+    </bk-table>
+    <div style="margin-top: 20px">
+      <bk-button
+        theme="default"
+        :title="$t(`m.home['取消']`)"
+        class="mr10"
+        @click="versionLogData.show = false">
+        {{ $t('m.home["取消"]') }}
+      </bk-button>
     </div>
+  </div>
 </template>
 
 <script>
-    import { errorHandler } from '../../../utils/errorHandler'
-    export default {
-        name: 'versionLog',
-        props: {
-            versionLogData: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            }
+  import { errorHandler } from '../../../utils/errorHandler';
+  export default {
+    name: 'versionLog',
+    props: {
+      versionLogData: {
+        type: Object,
+        default() {
+          return {};
         },
-        data () {
-            return {
-                versionData: [],
-                isDataLoading: false
+      },
+    },
+    data() {
+      return {
+        versionData: [],
+        isDataLoading: false,
+      };
+    },
+    mounted() {
+      this.getHistory();
+    },
+    methods: {
+      getHistory() {
+        this.isDataLoading = true;
+        this.$store.dispatch('version/updateHistory').then((res) => {
+          this.versionData = res.data.data;
+          this.versionData.forEach((item) => {
+            if (item.version_from) {
+              item.version_from = `V${item.version_from}`;
             }
-        },
-        mounted () {
-            this.getHistory()
-        },
-        methods: {
-            getHistory () {
-                this.isDataLoading = true
-                this.$store.dispatch('version/updateHistory').then((res) => {
-                    this.versionData = res.data.data
-                    this.versionData.forEach((item) => {
-                        if (item.version_from) {
-                            item.version_from = `V${item.version_from}`
-                        }
-                        if (item.version_to) {
-                            item.version_to = `V${item.version_to}`
-                        }
-                    })
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
-                })
+            if (item.version_to) {
+              item.version_to = `V${item.version_to}`;
             }
-        }
-    }
+          });
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isDataLoading = false;
+          });
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

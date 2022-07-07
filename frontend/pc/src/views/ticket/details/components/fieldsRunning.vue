@@ -21,215 +21,212 @@
   -->
 
 <template>
-    <div class="bk-fields-running">
-        <div class="bk-field-contain" :key="routerKey">
-            <component
-                ref="temp"
-                :is="'CW-' + item.type"
-                :item="item"
-                :fields="fields"
-                :is-current="true"></component>
-        </div>
-        <div class="bk-save-cancel" :class="{ 'bk-save-margin': marginTypeList.some(type => type === item.type) }">
-            <span class="bk-save-cancel-item" @click="save(item)">{{$t(`m.systemConfig["保存"]`)}}</span>
-            <span class="bk-save-cancel-split">|</span>
-            <span class="bk-save-cancel-item" @click="cancel(item)">{{$t(`m.wiki['取消']`)}}</span>
-        </div>
+  <div class="bk-fields-running">
+    <div class="bk-field-contain" :key="routerKey">
+      <component
+        ref="temp"
+        :is="'CW-' + item.type"
+        :item="item"
+        :fields="fields"
+        :is-current="true"></component>
     </div>
+    <div class="bk-save-cancel" :class="{ 'bk-save-margin': marginTypeList.some(type => type === item.type) }">
+      <span class="bk-save-cancel-item" @click="save(item)">{{$t(`m.systemConfig["保存"]`)}}</span>
+      <span class="bk-save-cancel-split">|</span>
+      <span class="bk-save-cancel-item" @click="cancel(item)">{{$t(`m.wiki['取消']`)}}</span>
+    </div>
+  </div>
 </template>
 <script>
-    import commonMix from '../../../commonMix/common.js'
-    import string from '../../../commonComponent/fieldComponent/string.vue'
-    import link from '../../../commonComponent/fieldComponent/link'
-    import int from '../../../commonComponent/fieldComponent/int.vue'
-    import text from '../../../commonComponent/fieldComponent/text.vue'
-    import checkbox from '../../../commonComponent/fieldComponent/checkbox.vue'
-    import radio from '../../../commonComponent/fieldComponent/radio.vue'
-    import select from '../../../commonComponent/fieldComponent/select.vue'
-    import inputSelect from '../../../commonComponent/fieldComponent/inputSelect'
-    import multiselect from '../../../commonComponent/fieldComponent/multiselect.vue'
-    import date from '../../../commonComponent/fieldComponent/date.vue'
-    import datetime from '../../../commonComponent/fieldComponent/datetime.vue'
-    import member from '../../../commonComponent/fieldComponent/member.vue'
-    import members from '../../../commonComponent/fieldComponent/members.vue'
-    import table from '../../../commonComponent/fieldComponent/table.vue'
-    import customtable from '../../../commonComponent/fieldComponent/customtable.vue'
-    import editor from '../../../commonComponent/fieldComponent/editor.vue'
-    import tree from '../../../commonComponent/fieldComponent/tree.vue'
-    import file from '../../../commonComponent/fieldComponent/file.vue'
-    import cascade from '../../../commonComponent/fieldComponent/cascade.vue'
-    import { errorHandler } from '@/utils/errorHandler.js'
+  import commonMix from '../../../commonMix/common.js';
+  import string from '../../../commonComponent/fieldComponent/string.vue';
+  import link from '../../../commonComponent/fieldComponent/link';
+  import int from '../../../commonComponent/fieldComponent/int.vue';
+  import text from '../../../commonComponent/fieldComponent/text.vue';
+  import checkbox from '../../../commonComponent/fieldComponent/checkbox.vue';
+  import radio from '../../../commonComponent/fieldComponent/radio.vue';
+  import select from '../../../commonComponent/fieldComponent/select.vue';
+  import inputSelect from '../../../commonComponent/fieldComponent/inputSelect';
+  import multiselect from '../../../commonComponent/fieldComponent/multiselect.vue';
+  import date from '../../../commonComponent/fieldComponent/date.vue';
+  import datetime from '../../../commonComponent/fieldComponent/datetime.vue';
+  import member from '../../../commonComponent/fieldComponent/member.vue';
+  import members from '../../../commonComponent/fieldComponent/members.vue';
+  import table from '../../../commonComponent/fieldComponent/table.vue';
+  import customtable from '../../../commonComponent/fieldComponent/customtable.vue';
+  import editor from '../../../commonComponent/fieldComponent/editor.vue';
+  import tree from '../../../commonComponent/fieldComponent/tree.vue';
+  import file from '../../../commonComponent/fieldComponent/file.vue';
+  import cascade from '../../../commonComponent/fieldComponent/cascade.vue';
+  import { errorHandler } from '@/utils/errorHandler.js';
 
-    export default {
-        name: 'fieldsRunning',
-        inject: ['reloadTicket'],
-        components: {
-            'CW-STRING': string,
-            'CW-LINK': link,
-            'CW-INT': int,
-            'CW-TEXT': text,
-            'CW-CHECKBOX': checkbox,
-            'CW-RADIO': radio,
-            'CW-SELECT': select,
-            'CW-INPUTSELECT': inputSelect,
-            'CW-MULTISELECT': multiselect,
-            'CW-DATE': date,
-            'CW-DATETIME': datetime,
-            'CW-MEMBER': member,
-            'CW-MEMBERS': members,
-            'CW-TABLE': table,
-            'CW-CUSTOMTABLE': customtable,
-            'CW-RICHTEXT': editor,
-            'CW-TREESELECT': tree,
-            'CW-FILE': file,
-            'CW-CASCADE': cascade
+  export default {
+    name: 'fieldsRunning',
+    inject: ['reloadTicket'],
+    components: {
+      'CW-STRING': string,
+      'CW-LINK': link,
+      'CW-INT': int,
+      'CW-TEXT': text,
+      'CW-CHECKBOX': checkbox,
+      'CW-RADIO': radio,
+      'CW-SELECT': select,
+      'CW-INPUTSELECT': inputSelect,
+      'CW-MULTISELECT': multiselect,
+      'CW-DATE': date,
+      'CW-DATETIME': datetime,
+      'CW-MEMBER': member,
+      'CW-MEMBERS': members,
+      'CW-TABLE': table,
+      'CW-CUSTOMTABLE': customtable,
+      'CW-RICHTEXT': editor,
+      'CW-TREESELECT': tree,
+      'CW-FILE': file,
+      'CW-CASCADE': cascade,
+    },
+    mixins: [commonMix],
+    props: {
+      basicInfomation: {
+        type: Object,
+        default() {
+          return {};
         },
-        mixins: [commonMix],
-        props: {
-            basicInfomation: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            },
-            fields: {
-                type: Array,
-                default () {
-                    return []
-                }
-            },
-            item: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            }
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
         },
-        data () {
-            return {
-                showMore: false,
-                showInfo: true,
-                fieldList: [
-                    {
-                        isEdit: false,
-                        name: 1,
-                        content: 'qwsqw'
-                    },
-                    {
-                        isEdit: false,
-                        name: 2,
-                        content: 'qw1q1qsqw'
-                    }
-                ],
-                routerKey: +new Date(),
-                secondClick: false,
-                rotate: false,
-                marginTypeList: ['TABLE', 'CUSTOMTABLE', 'FILE', 'RICHTEXT']
-            }
+      },
+      item: {
+        type: Object,
+        default() {
+          return {};
         },
-        computed: {
-            profile: function () {
-                if (!this.basicInfomation) {
-                    return
-                }
-                return {
-                    name: this.basicInfomation.profile.name,
-                    phone: this.basicInfomation.profile.phone,
-                    department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : []
-                }
-            }
-        },
-        mounted () {
-            this.$set(this.item, 'isEdit', true)
-            this.$nextTick(
-                () => {
-                    this.reloadCurPage()
-                }
-            )
-            this.$forceUpdate()
-        },
-        methods: {
-            freshBtn (item, changeFields) {
-                this.rotate = !this.rotate
-                this.freshApi(item, changeFields, 'field')
-            },
-            freshRpc (item) {
-                this.$store.dispatch('apiRemote/getRpcData', item).then(res => {
-                    item.choice = res.data
-                    item.val = ''
-                }).catch(res => {
-                    errorHandler(res, this)
-                })
-            },
-            // 修改至结束状态弹窗事件
-            submitTemplate () {
-                const id = this.basicInfomation.id
-                this.fieldFormatting([this.item])
-                const params = {
-                    field: {
-                        id: this.item.id,
-                        key: this.item.key,
-                        value: this.item.value,
-                        type: this.item.type
-                    }
-                }
-                if (this.secondClick) {
-                    return
-                }
-                this.secondClick = true
-                this.$store.dispatch('basicModule/edit_field', { params, id }).then((res) => {
-                    this.$bkMessage({
-                        message: this.$t(`m.systemConfig["修改成功"]`),
-                        theme: 'success'
-                    })
-                    this.reloadTicket()
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
-                    this.toDone()
-                })
-            },
-            reloadCurPage () {
-                this.routerKey = +new Date()
-            },
-            cancel () {
-                this.fields.forEach(
-                    ite => {
-                        ite['isEdit'] = false
-                    }
-                )
-                this.$set(this.item, 'isEdit', false)
-            },
-            async save () {
-                if (this.item.key === 'current_status') {
-                    const temp = this.item.choice.filter(ite => {
-                        return ite.key === this.item.val
-                    })[0]
-                    if (temp.is_over === 'True') {
-                        this.$bkInfo({
-                            type: 'warning',
-                            title: this.$t(`m.systemConfig["确认保存？"]`),
-                            subTitle: this.$t(`m.systemConfig["状态修改为【"]`) + temp.name + this.$t(`m.systemConfig["】将导致整个单据结束"]`),
-                            confirmFn: () => {
-                                this.submitTemplate()
-                                // 仅修改单据状态后刷新整个单据
-                                this.reloadTicket()
-                            }
-                        })
-                    } else {
-                        this.submitTemplate()
-                    }
-                } else {
-                    this.submitTemplate()
-                }
-            },
-            async toDone () {
-                await this.$set(this.item, 'isEdit', false)
-                // await this.partUpdate()
-            }
+      },
+    },
+    data() {
+      return {
+        showMore: false,
+        showInfo: true,
+        fieldList: [
+          {
+            isEdit: false,
+            name: 1,
+            content: 'qwsqw',
+          },
+          {
+            isEdit: false,
+            name: 2,
+            content: 'qw1q1qsqw',
+          },
+        ],
+        routerKey: +new Date(),
+        secondClick: false,
+        rotate: false,
+        marginTypeList: ['TABLE', 'CUSTOMTABLE', 'FILE', 'RICHTEXT'],
+      };
+    },
+    computed: {
+      profile() {
+        if (!this.basicInfomation) {
+          return;
         }
-    }
+        return {
+          name: this.basicInfomation.profile.name,
+          phone: this.basicInfomation.profile.phone,
+          department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : [],
+        };
+      },
+    },
+    mounted() {
+      this.$set(this.item, 'isEdit', true);
+      this.$nextTick(() => {
+        this.reloadCurPage();
+      });
+      this.$forceUpdate();
+    },
+    methods: {
+      freshBtn(item, changeFields) {
+        this.rotate = !this.rotate;
+        this.freshApi(item, changeFields, 'field');
+      },
+      freshRpc(item) {
+        this.$store.dispatch('apiRemote/getRpcData', item).then((res) => {
+          item.choice = res.data;
+          item.val = '';
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      // 修改至结束状态弹窗事件
+      submitTemplate() {
+        const { id } = this.basicInfomation;
+        this.fieldFormatting([this.item]);
+        const params = {
+          field: {
+            id: this.item.id,
+            key: this.item.key,
+            value: this.item.value,
+            type: this.item.type,
+          },
+        };
+        if (this.secondClick) {
+          return;
+        }
+        this.secondClick = true;
+        this.$store.dispatch('basicModule/edit_field', { params, id }).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.systemConfig["修改成功"]'),
+            theme: 'success',
+          });
+          this.reloadTicket();
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.secondClick = false;
+            this.toDone();
+          });
+      },
+      reloadCurPage() {
+        this.routerKey = +new Date();
+      },
+      cancel() {
+        this.fields.forEach((ite) => {
+          ite.isEdit = false;
+        });
+        this.$set(this.item, 'isEdit', false);
+      },
+      async save() {
+        if (this.item.key === 'current_status') {
+          const temp = this.item.choice.filter(ite => ite.key === this.item.val)[0];
+          if (temp.is_over === 'True') {
+            this.$bkInfo({
+              type: 'warning',
+              title: this.$t('m.systemConfig["确认保存？"]'),
+              subTitle: this.$t('m.systemConfig["状态修改为【"]') + temp.name + this.$t('m.systemConfig["】将导致整个单据结束"]'),
+              confirmFn: () => {
+                this.submitTemplate();
+                // 仅修改单据状态后刷新整个单据
+                this.reloadTicket();
+              },
+            });
+          } else {
+            this.submitTemplate();
+          }
+        } else {
+          this.submitTemplate();
+        }
+      },
+      async toDone() {
+        await this.$set(this.item, 'isEdit', false);
+        // await this.partUpdate()
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
     @import '../../../../scss/mixins/clearfix.scss';

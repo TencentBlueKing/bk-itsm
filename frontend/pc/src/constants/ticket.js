@@ -20,24 +20,24 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import i18n from '../i18n/index'
+import i18n from '../i18n/index';
 
 // 满意度评价等级表
-export const SCORE_LIST = (() => {
-    return window.run_site === 'bmw'
-        ? [
-            { id: 1, name: i18n.t('m.newCommon["1分(非常不满意)"]'), type: 'scoreRadio' },
-            { id: 2, name: i18n.t('m.newCommon["2分(不满意)"]'), type: 'scoreRadio' },
-            { id: 3, name: i18n.t('m.newCommon["3分(一般不满意)"]'), type: 'scoreRadio' },
-            { id: 4, name: i18n.t('m.newCommon["4分(一般满意)"]'), type: 'scoreRadio' },
-            { id: 5, name: i18n.t('m.newCommon["5分(满意)"]'), type: 'scoreRadio' },
-            { id: 6, name: i18n.t('m.newCommon["6分(非常满意)"]'), type: 'scoreRadio' }
-        ]
-        : [
-            { id: 1, name: i18n.t('m.newCommon["1分(非常不满意)"]'), type: 'scoreRadio' },
-            { id: 2, name: i18n.t('m.newCommon["2分(不满意)"]'), type: 'scoreRadio' },
-            { id: 3, name: i18n.t('m.newCommon["3分(一般)"]'), type: 'scoreRadio' },
-            { id: 4, name: i18n.t('m.newCommon["4分(满意)"]'), type: 'scoreRadio' },
-            { id: 5, name: i18n.t('m.newCommon["5分(非常满意)"]'), type: 'scoreRadio' }
-        ]
-})()
+/* eslint-disable */
+export const SCORE_LIST = (() => window.run_site === 'bmw'
+    ? [
+        { id: 1, name: i18n.t('m.newCommon["1分(非常不满意)"]'), type: 'scoreRadio' },
+        { id: 2, name: i18n.t('m.newCommon["2分(不满意)"]'), type: 'scoreRadio' },
+        { id: 3, name: i18n.t('m.newCommon["3分(一般不满意)"]'), type: 'scoreRadio' },
+        { id: 4, name: i18n.t('m.newCommon["4分(一般满意)"]'), type: 'scoreRadio' },
+        { id: 5, name: i18n.t('m.newCommon["5分(满意)"]'), type: 'scoreRadio' },
+        { id: 6, name: i18n.t('m.newCommon["6分(非常满意)"]'), type: 'scoreRadio' },
+    ]
+    : [
+        { id: 1, name: i18n.t('m.newCommon["1分(非常不满意)"]'), type: 'scoreRadio' },
+        { id: 2, name: i18n.t('m.newCommon["2分(不满意)"]'), type: 'scoreRadio' },
+        { id: 3, name: i18n.t('m.newCommon["3分(一般)"]'), type: 'scoreRadio' },
+        { id: 4, name: i18n.t('m.newCommon["4分(满意)"]'), type: 'scoreRadio' },
+        { id: 5, name: i18n.t('m.newCommon["5分(非常满意)"]'), type: 'scoreRadio' },
+    ])();
+/* eslint-disable */

@@ -29,6 +29,7 @@ from itsm.openapi.service.urls import urlpatterns as service_urlpatterns
 from itsm.openapi.ticket.urls import urlpatterns as ticket_urlpatterns
 from itsm.openapi.workflow.urls import urlpatterns as workflow_urlpatterns
 from itsm.openapi.devops_plugin.urls import urlpatterns as devops_plugin_urlpatterns
+from itsm.openapi.service_catalog.urls import urlpatterns as service_catalog_urlpatterns
 
 # 公共URL配置
 urlpatterns = list(
@@ -37,5 +38,6 @@ urlpatterns = list(
         ticket_urlpatterns,
         workflow_urlpatterns,
         devops_plugin_urlpatterns,
+        service_catalog_urlpatterns,
     )
 )

@@ -21,61 +21,61 @@
  */
 
 export const COMMON_ATTRS = {
-    label: {
-        type: String,
-        required: false
-    },
-    hiddenLabel: {
-        type: Boolean,
-        default: false
-    },
-    form: {
-        type: Object,
-        default: () => ({})
-    },
-    children: {
-        type: [String, Array],
-        required: false
-    },
-    desc: {
-        type: String,
-        required: false
+  label: {
+    type: String,
+    required: false,
+  },
+  hiddenLabel: {
+    type: Boolean,
+    default: false,
+  },
+  form: {
+    type: Object,
+    default: () => ({}),
+  },
+  children: {
+    type: [String, Array],
+    required: false,
+  },
+  desc: {
+    type: String,
+    required: false,
+  },
+};
+export function getFormMixins(attrs) {
+  const privateProps = {}; // 继承属性
+  for (const key in attrs) {
+    if (key !== 'value') {
+      privateProps[key] = attrs[key];
     }
-}
-export function getFormMixins (attrs) {
-    const privateProps = {} // 继承属性
-    for (const key in attrs) {
-        if (key !== 'value') {
-            privateProps[key] = attrs[key]
-        }
-    }
-    return {
-        props: {
-            ...COMMON_ATTRS,
-            ...privateProps
-        },
-        inject: ['getContext'],
-        data () {
-            return {
-                value: this.$attrs['value'] ? this.$attrs['value'] : attrs['value'].default
-            }
-        },
-        methods: {
-            /**
+  }
+  return {
+    props: {
+      ...COMMON_ATTRS,
+      ...privateProps,
+    },
+    inject: ['getContext'],
+    data() {
+      return {
+        value: this.$attrs.value ? this.$attrs.value : attrs.value.default,
+      };
+    },
+    methods: {
+      /**
              * 获取最顶层 ViewItem 组件实例
              */
-            getTopViewItem () {
-                let vueTag = this
-                let isTop = false
-                while (!isTop) {
-                    if (vueTag.$parent && vueTag.$parent.isRootRenderView) {
-                        isTop = true
-                    } else {
-                        vueTag = vueTag.$parent
-                    }
-                }
-                return vueTag
-            }
+      getTopViewItem() {
+        let vueTag = this;
+        let isTop = false;
+        while (!isTop) {
+          if (vueTag.$parent && vueTag.$parent.isRootRenderView) {
+            isTop = true;
+          } else {
+            vueTag = vueTag.$parent;
+          }
         }
-    }
+        return vueTag;
+      },
+    },
+  };
 }

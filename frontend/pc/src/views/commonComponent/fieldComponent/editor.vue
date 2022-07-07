@@ -21,50 +21,50 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" style="font-size: 0" desc-type="icon">
-            <rich-text-editor
-                v-model="item.val"
-                :full-title="item.name"
-                :id="item.key"
-                :is-preview="disabled">
-            </rich-text-editor>
-            <template v-if="item.checkValue">
-                <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-                <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-            </template>
-        </bk-form-item>
-    </div>
+  <div v-if="item.showFeild">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" style="font-size: 0" desc-type="icon">
+      <rich-text-editor
+        v-model="item.val"
+        :full-title="item.name"
+        :id="item.key"
+        :is-preview="disabled">
+      </rich-text-editor>
+      <template v-if="item.checkValue">
+        <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+        <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+      </template>
+    </bk-form-item>
+  </div>
 </template>
 
 <script>
-    import RichTextEditor from '../../../components/form/richTextEditor/richTextEditor.vue'
-    export default {
-        name: 'RICHTEXT',
-        components: {
-            RichTextEditor
-        },
-        props: {
-            item: {
-                type: Object,
-                required: true,
-                default: () => {}
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false
-            },
-            disabled: {
-                type: Boolean,
-                default: false
-            }
-        },
-        mounted: function () {
-            if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value
-            }
-        }
-    }
+  import RichTextEditor from '../../../components/form/richTextEditor/richTextEditor.vue';
+  export default {
+    name: 'RICHTEXT',
+    components: {
+      RichTextEditor,
+    },
+    props: {
+      item: {
+        type: Object,
+        required: true,
+        default: () => {},
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    mounted() {
+      if (this.item.value && !this.item.val) {
+        this.item.val = this.item.value;
+      }
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

@@ -21,268 +21,274 @@
   -->
 
 <template>
-    <div class="bk-trigger-condition">
-        <div class="bk-condition-name"><span>{{$t(`m.trigger['触发条件']`)}}</span></div>
-        <div class="bk-condition-content" @click="triggerRules.checkStatus = false">
-            <ul class="bk-content-step">
-                <li class="bk-content-li" v-for="(item, index) in triggerRules.list" :key="index">
-                    <ul class="bk-content-item" :class="{ 'bk-more-margin': item.itemList.length !== 1 }">
-                        <li class="bk-content-item-li"
-                            :class="{ 'bk-none-margin': item.itemList.length - 1 === nodeIndex }"
-                            v-for="(node, nodeIndex) in item.itemList"
-                            :key="nodeIndex">
-                            <template v-if="item.itemList.length !== 1">
-                                <div class="bk-content-type"
-                                    v-if="nodeIndex !== item.itemList.length - 1"
-                                    @click="changeBetween(item)">
-                                    <span>{{ item.type === 'all' ? $t(`m.trigger['且']`) : $t(`m.trigger['或']`) }}</span>
-                                    <i class="bk-icon icon-down-shape"></i>
-                                </div>
-                                <!-- 线条 -->
-                                <div class="bk-item-line"></div>
-                                <div class="bk-item-line-none bk-item-none" v-if="nodeIndex === 0"></div>
-                                <div class="bk-item-line-none bk-item-none-bottom" v-if="nodeIndex === item.itemList.length - 1"></div>
-                            </template>
-                            <!-- 内容 -->
-                            <bk-select style="width: 190px;"
-                                :ext-cls="'bk-item-float'"
-                                v-model="node.key"
-                                :clearable="false"
-                                searchable
-                                @change="changeContent(node)">
-                                <bk-option v-for="option in keyList"
-                                    :key="option.key"
-                                    :id="option.key"
-                                    :name="option.name">
-                                </bk-option>
-                            </bk-select>
-                            <bk-select style="width: 140px;"
-                                :ext-cls="'bk-item-float'"
-                                v-model="node.condition"
-                                :clearable="false"
-                                searchable
-                                @selected="changeCondition(node)">
-                                <bk-option v-for="option in node.conditionList"
-                                    :key="option.name"
-                                    :id="option.name"
-                                    :name="option.label">
-                                </bk-option>
-                            </bk-select>
-                            <template v-if="node.conditionType !== 'none'">
-                                <trigger-field style="width: 170px; float: left; margin-right: 8px;"
-                                    :item="node">
-                                </trigger-field>
-                            </template>
-                            <!-- 新增和删除 -->
-                            <div class="bk-between-operat">
-                                <i class="bk-itsm-icon icon-flow-add" @click="addLine(item, node, nodeIndex)"></i>
-                                <i class="bk-itsm-icon icon-flow-reduce"
-                                    :class="{ 'bk-no-delete': item.itemList.length === 1 }"
-                                    @click="deleteLine(item, node, nodeIndex)"></i>
-                            </div>
-                        </li>
-                    </ul>
-                    <!-- 删除 -->
-                    <i class="bk-icon icon-close-circle-shape"
-                        :class="{ 'bk-no-delete': triggerRules.list.length === 1 }"
-                        @click="deleteGroup(item, index)"></i>
-                    <!-- 且或关系 -->
-                    <div class="bk-content-type" @click="handleBetween">
-                        <span>{{ triggerRules.type === 'all' ? $t(`m.trigger['且']`) : $t(`m.trigger['或']`) }}</span>
-                        <i class="bk-icon icon-down-shape"></i>
-                    </div>
-                    <!-- 最外层线条 -->
-                    <div class="bk-item-line"></div>
-                    <div class="bk-item-line-none bk-item-none" v-if="index === 0"></div>
-                    <!-- 内层线条 -->
-                    <div class="bk-content-line" v-if="item.itemList.length !== 1"></div>
-                </li>
-                <li class="bk-content-add">
-                    <span @click="addGroup">
-                        <i class="bk-icon icon-plus-circle mr5"></i><span>{{$t(`m.trigger['添加']`)}}</span>
-                    </span>
-                    <div class="bk-item-line"></div>
-                    <div class="bk-item-line-none" :class="{ 'bk-item-over-line': triggerRules.checkStatus }"></div>
-                </li>
-            </ul>
-            <div class="bk-content-line"></div>
-            <p class="bk-error-info" v-if="triggerRules.checkStatus">{{$t(`m.trigger['请填写完整的触发条件']`)}}</p>
-        </div>
+  <div class="bk-trigger-condition">
+    <div class="bk-condition-name"><span>{{$t(`m.trigger['触发条件']`)}}</span></div>
+    <div class="bk-condition-content" @click="triggerRules.checkStatus = false">
+      <ul class="bk-content-step">
+        <li class="bk-content-li" v-for="(item, index) in triggerRules.list" :key="index">
+          <ul class="bk-content-item" :class="{ 'bk-more-margin': item.itemList.length !== 1 }">
+            <li class="bk-content-item-li"
+              :class="{ 'bk-none-margin': item.itemList.length - 1 === nodeIndex }"
+              v-for="(node, nodeIndex) in item.itemList"
+              :key="nodeIndex">
+              <template v-if="item.itemList.length !== 1">
+                <div class="bk-content-type"
+                  v-if="nodeIndex !== item.itemList.length - 1"
+                  @click="changeBetween(item)">
+                  <span>{{ item.type === 'all' ? $t(`m.trigger['且']`) : $t(`m.trigger['或']`) }}</span>
+                  <i class="bk-icon icon-down-shape"></i>
+                </div>
+                <!-- 线条 -->
+                <div class="bk-item-line"></div>
+                <div class="bk-item-line-none bk-item-none" v-if="nodeIndex === 0"></div>
+                <div class="bk-item-line-none bk-item-none-bottom" v-if="nodeIndex === item.itemList.length - 1"></div>
+              </template>
+              <!-- 内容 -->
+              <bk-select style="width: 190px;"
+                :ext-cls="'bk-item-float'"
+                v-model="node.key"
+                :clearable="false"
+                searchable
+                @change="changeContent(node)">
+                <bk-option v-for="option in keyList"
+                  :key="option.key"
+                  :id="option.key"
+                  :name="option.name">
+                </bk-option>
+              </bk-select>
+              <bk-select style="width: 140px;"
+                :ext-cls="'bk-item-float'"
+                v-model="node.condition"
+                :clearable="false"
+                searchable
+                @selected="changeCondition(node)">
+                <bk-option v-for="option in node.conditionList"
+                  :key="option.name"
+                  :id="option.name"
+                  :name="option.label">
+                </bk-option>
+              </bk-select>
+              <template v-if="node.conditionType !== 'none'">
+                <trigger-field style="width: 170px; float: left; margin-right: 8px;"
+                  :item="node">
+                </trigger-field>
+              </template>
+              <!-- 新增和删除 -->
+              <div class="bk-between-operat">
+                <i class="bk-itsm-icon icon-flow-add" @click="addLine(item, node, nodeIndex)"></i>
+                <i class="bk-itsm-icon icon-flow-reduce"
+                  :class="{ 'bk-no-delete': item.itemList.length === 1 }"
+                  @click="deleteLine(item, node, nodeIndex)"></i>
+              </div>
+            </li>
+          </ul>
+          <!-- 删除 -->
+          <i class="bk-icon icon-close-circle-shape"
+            :class="{ 'bk-no-delete': triggerRules.list.length === 1 }"
+            @click="deleteGroup(item, index)"></i>
+          <!-- 且或关系 -->
+          <div class="bk-content-type" @click="handleBetween">
+            <span>{{ triggerRules.type === 'all' ? $t(`m.trigger['且']`) : $t(`m.trigger['或']`) }}</span>
+            <i class="bk-icon icon-down-shape"></i>
+          </div>
+          <!-- 最外层线条 -->
+          <div class="bk-item-line"></div>
+          <div class="bk-item-line-none bk-item-none" v-if="index === 0"></div>
+          <!-- 内层线条 -->
+          <div class="bk-content-line" v-if="item.itemList.length !== 1"></div>
+        </li>
+        <li class="bk-content-add">
+          <span @click="addGroup">
+            <i class="bk-icon icon-plus-circle mr5"></i><span>{{$t(`m.trigger['添加']`)}}</span>
+          </span>
+          <div class="bk-item-line"></div>
+          <div class="bk-item-line-none" :class="{ 'bk-item-over-line': triggerRules.checkStatus }"></div>
+        </li>
+      </ul>
+      <div class="bk-content-line"></div>
+      <p class="bk-error-info" v-if="triggerRules.checkStatus">{{$t(`m.trigger['请填写完整的触发条件']`)}}</p>
     </div>
+  </div>
 </template>
 <script>
-    import triggerField from '../common/triggerField.vue'
-    import { mapState } from 'vuex'
-    import { errorHandler } from '../../../../utils/errorHandler'
+  import triggerField from '../common/triggerField.vue';
+  import { mapState } from 'vuex';
+  import { errorHandler } from '../../../../utils/errorHandler';
 
-    export default {
-        name: 'triggerCondition',
-        components: {
-            triggerField
+  export default {
+    name: 'triggerCondition',
+    components: {
+      triggerField,
+    },
+    props: {
+      triggerRules: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            triggerRules: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            }
-        },
-        data () {
-            return {
-                // 下拉选框
-                keyList: []
-            }
-        },
-        computed: {
-            globalChoise () {
-                return this.$store.state.common.configurInfo
-            },
-            ...mapState('trigger', {
-                triggerVariables: state => state.triggerVariables
-            })
-        },
-        mounted () {
-            this.keyList = this.triggerVariables
-            // 初始化内置触发条件检查参数
-            this.$set(this.triggerRules, 'checkStatus', false)
-        },
-        methods: {
-            // 新增和删除行
-            addLine (item, node, nodeIndex) {
-                item.itemList.splice(nodeIndex + 1, 0, {
-                    condition: '',
-                    key: '',
-                    value: '',
-                    conditionList: [],
-                    type: 'STRING'
-                })
-            },
-            deleteLine (item, node, nodeIndex) {
-                if (item.itemList.length === 1) {
-                    return
-                }
-                item.itemList.splice(nodeIndex, 1)
-            },
-            // 切换关系
-            changeBetween (item) {
-                item.type = item.type === 'all' ? 'any' : 'all'
-            },
-            handleBetween () {
-                this.triggerRules.type = this.triggerRules.type === 'all' ? 'any' : 'all'
-            },
-            // 添加和删除触发条件组
-            addGroup () {
-                this.triggerRules.list.push({
-                    type: 'all',
-                    itemList: [
-                        {
-                            key: '',
-                            condition: '',
-                            value: '',
-                            conditionList: [],
-                            type: 'STRING'
-                        }
-                    ]
-                })
-            },
-            deleteGroup (item, index) {
-                if (this.triggerRules.list.length === 1) {
-                    return
-                }
-                this.triggerRules.list.splice(index, 1)
-            },
-            // 切换选项内容，匹配不同的表达式
-            changeContent (node) {
-                // 获取选中的项
-                const checkItem = this.keyList.filter(item => item.key === node.key)[0]
-                // 字母小写
-                const lowerType = checkItem.type.toLowerCase()
-                node.conditionList = this.globalChoise.trigger_methods[lowerType]
-                this.getConditionList(checkItem, node)
-                node.condition = ''
-                this.$set(node, 'conditionType', '')
-                node.type = checkItem.type
-                const multiType = ['MEMBERS', 'MEMBER', 'MULTI_MEMBERS', 'MULTISELECT', 'CHECKBOX']
-                node.value = multiType.some(item => item === node.type) ? [] : ''
-            },
-            changeCondition (node) {
-                // 获取选中的项
-                const checkItem = node.conditionList.filter(item => item.name === node.condition)[0]
-                this.$set(node, 'conditionType', checkItem.input_type)
-            },
-            // 根据条件的不同，填充不同的conditionList数据
-            getConditionList (checkItem, node) {
-                const typeList = ['SELECT', 'RADIO', 'MULTISELECT', 'CHECKBOX']
-                if (typeList.some(item => item === checkItem.type)) {
-                    // 数据字典
-                    this.$set(node, 'loading', true)
-                    this.$set(node, 'options', [])
-                    if (checkItem.source_type === 'DATADICT') {
-                        this.$store.dispatch('datadict/get_data_by_key', {
-                            key: checkItem.source_uri,
-                            field_key: checkItem.key
-                        }).then(res => {
-                            node.options = res.data.map(ite => {
-                                const temp = {
-                                    key: ite.key,
-                                    name: ite.name
-                                }
-                                return temp
-                            })
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            node.loading = false
-                        })
-                    } else if (checkItem.source_type === 'API') {
-                        this.$store.dispatch('apiRemote/get_data_workflow', {
-                            kv_relation: checkItem.kv_relation,
-                            api_instance_id: checkItem.api_instance_id
-                        }).then(res => {
-                            node.options = res.data.map(ite => {
-                                const temp = {
-                                    key: ite.key,
-                                    name: ite.name
-                                }
-                                return temp
-                            })
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            node.loading = false
-                        })
-                    } else if (checkItem.source_type === 'RPC') {
-                        this.$store.dispatch('apiRemote/getRpcData', {
-                            meta: checkItem.meta,
-                            source_uri: checkItem.source_uri
-                        }).then(res => {
-                            node.options = res.data.map(ite => {
-                                const temp = {
-                                    key: ite.key,
-                                    name: ite.name
-                                }
-                                return temp
-                            })
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            node.loading = false
-                        })
-                    } else {
-                        node.options = checkItem.choice.map(ite => {
-                            const temp = {
-                                key: ite.key,
-                                name: ite.name
-                            }
-                            return temp
-                        })
-                        node.loading = false
-                    }
-                }
-            }
+      },
+    },
+    data() {
+      return {
+        // 下拉选框
+        keyList: [],
+      };
+    },
+    computed: {
+      globalChoise() {
+        return this.$store.state.common.configurInfo;
+      },
+      ...mapState('trigger', {
+        triggerVariables: state => state.triggerVariables,
+      }),
+    },
+    mounted() {
+      this.keyList = this.triggerVariables;
+      // 初始化内置触发条件检查参数
+      this.$set(this.triggerRules, 'checkStatus', false);
+    },
+    methods: {
+      // 新增和删除行
+      addLine(item, node, nodeIndex) {
+        item.itemList.splice(nodeIndex + 1, 0, {
+          condition: '',
+          key: '',
+          value: '',
+          conditionList: [],
+          type: 'STRING',
+        });
+      },
+      deleteLine(item, node, nodeIndex) {
+        if (item.itemList.length === 1) {
+          return;
         }
-    }
+        item.itemList.splice(nodeIndex, 1);
+      },
+      // 切换关系
+      changeBetween(item) {
+        item.type = item.type === 'all' ? 'any' : 'all';
+      },
+      handleBetween() {
+        this.triggerRules.type = this.triggerRules.type === 'all' ? 'any' : 'all';
+      },
+      // 添加和删除触发条件组
+      addGroup() {
+        this.triggerRules.list.push({
+          type: 'all',
+          itemList: [
+            {
+              key: '',
+              condition: '',
+              value: '',
+              conditionList: [],
+              type: 'STRING',
+            },
+          ],
+        });
+      },
+      deleteGroup(item, index) {
+        if (this.triggerRules.list.length === 1) {
+          return;
+        }
+        this.triggerRules.list.splice(index, 1);
+      },
+      // 切换选项内容，匹配不同的表达式
+      changeContent(node) {
+        // 获取选中的项
+        const checkItem = this.keyList.filter(item => item.key === node.key)[0];
+        // 字母小写
+        const lowerType = checkItem.type.toLowerCase();
+        node.conditionList = this.globalChoise.trigger_methods[lowerType];
+        this.getConditionList(checkItem, node);
+        node.condition = '';
+        this.$set(node, 'conditionType', '');
+        node.type = checkItem.type;
+        const multiType = ['MEMBERS', 'MEMBER', 'MULTI_MEMBERS', 'MULTISELECT', 'CHECKBOX'];
+        node.value = multiType.some(item => item === node.type) ? [] : '';
+      },
+      changeCondition(node) {
+        // 获取选中的项
+        const checkItem = node.conditionList.filter(item => item.name === node.condition)[0];
+        this.$set(node, 'conditionType', checkItem.input_type);
+      },
+      // 根据条件的不同，填充不同的conditionList数据
+      getConditionList(checkItem, node) {
+        const typeList = ['SELECT', 'RADIO', 'MULTISELECT', 'CHECKBOX'];
+        if (typeList.some(item => item === checkItem.type)) {
+          // 数据字典
+          this.$set(node, 'loading', true);
+          this.$set(node, 'options', []);
+          if (checkItem.source_type === 'DATADICT') {
+            this.$store.dispatch('datadict/get_data_by_key', {
+              key: checkItem.source_uri,
+              field_key: checkItem.key,
+            }).then((res) => {
+              node.options = res.data.map((ite) => {
+                const temp = {
+                  key: ite.key,
+                  name: ite.name,
+                };
+                return temp;
+              });
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {
+                node.loading = false;
+              });
+          } else if (checkItem.source_type === 'API') {
+            this.$store.dispatch('apiRemote/get_data_workflow', {
+              kv_relation: checkItem.kv_relation,
+              api_instance_id: checkItem.api_instance_id,
+            }).then((res) => {
+              node.options = res.data.map((ite) => {
+                const temp = {
+                  key: ite.key,
+                  name: ite.name,
+                };
+                return temp;
+              });
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {
+                node.loading = false;
+              });
+          } else if (checkItem.source_type === 'RPC') {
+            this.$store.dispatch('apiRemote/getRpcData', {
+              meta: checkItem.meta,
+              source_uri: checkItem.source_uri,
+            }).then((res) => {
+              node.options = res.data.map((ite) => {
+                const temp = {
+                  key: ite.key,
+                  name: ite.name,
+                };
+                return temp;
+              });
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {
+                node.loading = false;
+              });
+          } else {
+            node.options = checkItem.choice.map((ite) => {
+              const temp = {
+                key: ite.key,
+                name: ite.name,
+              };
+              return temp;
+            });
+            node.loading = false;
+          }
+        }
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

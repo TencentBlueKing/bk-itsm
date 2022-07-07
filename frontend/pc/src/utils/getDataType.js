@@ -20,7 +20,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-export function checkDataType (data) {
-    const typeString = Object.prototype.toString.call(data)
-    return typeString.slice(8, -1)
+export function checkDataType(data) {
+  const typeString = Object.prototype.toString.call(data);
+  return typeString.slice(8, -1);
 }

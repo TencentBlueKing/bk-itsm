@@ -20,78 +20,72 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
-    namespaced: true,
-    state: {},
-    mutations: {},
-    actions: {
-        list ({ commit, state, dispatch }, params) {
-            return ajax.get(`workflow/versions/`, { params: params })
-                .then(response => {
-                    const res = response.data
-                    return res
-                })
-        },
-        restore ({ commit, state, dispatch }, id) {
-            return ajax.post(`workflow/versions/${id}/restore/`)
-                .then(response => {
-                    const res = response.data
-                    return res
-                })
-        },
-        create ({ commit, state, dispatch }, params) {
-            return ajax.post(`workflow/versions/`, params)
-                .then(response => {
-                    const res = response.data
-                    return res
-                })
-        },
-        batchDelete ({ commit, state, dispatch }, params) {
-            return ajax.post(`workflow/versions/batch_delete/`, params)
-                .then(response => {
-                    const res = response.data
-                    return res
-                })
-        },
-        delete ({ commit, state, dispatch }, id) {
-            return ajax.delete(`workflow/versions/${id}/`)
-                .then(response => {
-                    const res = response.data
-                    return res
-                })
-        },
-        update ({ commit, state, dispatch }, params) {
-            const id = params.id;
-            ['id'].forEach(attr => delete params[attr])
-            return ajax.put(`workflow/versions/${id}/`, params)
-                .then(response => {
-                    const res = response.data
-                    return res
-                })
-        },
-        // 获取版本流程
-        getVersionFlow ({ commit, state, dispatch }, { id }) {
-            return ajax.get(`workflow/versions/${id}/master/`).then(response => {
-                const res = response.data
-                return res
-            })
-        },
-        // 获取版本流程
-        getTransitionLines ({ commit, state, dispatch }, params) {
-            const id = params.id;
-            ['id'].forEach(attr => delete params[attr])
-            return ajax.post(`workflow/versions/${id}/transition_lines/`, params).then(response => {
-                const res = response.data
-                return res
-            })
-        },
-        getVersionLine ({ commit, state, dispatch }, params) {
-            return ajax.get(`workflow/versions/${params}/transitions/?page_size=1000`).then(response => {
-                const res = response.data
-                return res
-            })
-        }
-    }
-}
+  namespaced: true,
+  state: {},
+  mutations: {},
+  actions: {
+    list({ commit, state, dispatch }, params) {
+      return ajax.get(`workflow/versions/`, { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    restore({ commit, state, dispatch }, id) {
+      return ajax.post(`workflow/versions/${id}/restore/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    create({ commit, state, dispatch }, params) {
+      return ajax.post(`workflow/versions/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    batchDelete({ commit, state, dispatch }, params) {
+      return ajax.post(`workflow/versions/batch_delete/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    delete({ commit, state, dispatch }, id) {
+      return ajax.delete(`workflow/versions/${id}/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    update({ commit, state, dispatch }, params) {
+      const id = params.id;
+      ["id"].forEach((attr) => delete params[attr]);
+      return ajax.put(`workflow/versions/${id}/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 获取版本流程
+    getVersionFlow({ commit, state, dispatch }, { id }) {
+      return ajax.get(`workflow/versions/${id}/master/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 获取版本流程
+    getTransitionLines({ commit, state, dispatch }, params) {
+      const id = params.id;
+      ["id"].forEach((attr) => delete params[attr]);
+      return ajax.post(`workflow/versions/${id}/transition_lines/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    getVersionLine({ commit, state, dispatch }, params) {
+      return ajax.get(`workflow/versions/${params}/transitions/?page_size=1000`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};

@@ -20,19 +20,17 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
-    namespaced: true,
-    state: {
-        deleteOpen: {}
+  namespaced: true,
+  state: {
+    deleteOpen: {},
+  },
+  mutations: {
+    changeDelete(state, value) {
+      state.deleteOpen = value;
     },
-    mutations: {
-        changeDelete (state, value) {
-            state.deleteOpen = value
-        }
-    },
-    actions: {
-        
-    }
-}
+  },
+  actions: {},
+};

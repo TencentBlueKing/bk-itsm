@@ -21,85 +21,85 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
-            <p style="color: #c4c6cc;" class="mt5 mb0 f12" slot="tip" v-if="item.type === 'CUSTOM-FORM'">{{$t('m["当前字段为自定义表单"]')}}</p>
-            <render-view
-                :form-data="formData"
-                :context="context">
-            </render-view>
-        </bk-form-item>
-        <template v-if="item.checkValue">
-            <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-            <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-        </template>
-    </div>
+  <div v-if="item.showFeild">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
+      <p style="color: #c4c6cc;" class="mt5 mb0 f12" slot="tip" v-if="item.type === 'CUSTOM-FORM'">{{$t('m["当前字段为自定义表单"]')}}</p>
+      <render-view
+        :form-data="formData"
+        :context="context">
+      </render-view>
+    </bk-form-item>
+    <template v-if="item.checkValue">
+      <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+      <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+    </template>
+  </div>
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js'
-    import RenderView from '../../../components/renderview/RenderView'
+  import mixins from '../../commonMix/field.js';
+  import RenderView from '../../../components/renderview/RenderView';
 
-    export default {
-        name: 'CUSTOM-FORM',
-        components: {
-            RenderView
+  export default {
+    name: 'CUSTOM-FORM',
+    components: {
+      RenderView,
+    },
+    mixins: [mixins],
+    props: {
+      item: {
+        type: Object,
+        default: () => {
         },
-        mixins: [mixins],
-        props: {
-            item: {
-                type: Object,
-                default: () => {
-                }
-            },
-            fields: {
-                type: Array,
-                default () {
-                    return []
-                }
-            }
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
         },
-        data () {
-            return {
-                formData: [],
-                context: {},
-                errMessage: ''
-            }
+      },
+    },
+    data() {
+      return {
+        formData: [],
+        context: {},
+        errMessage: '',
+      };
+    },
+    watch: {
+      'item.val': {
+        handler() {
+          this.conditionField(this.item, this.fields);
+          this.initRenderView();
         },
-        watch: {
-            'item.val': {
-                handler () {
-                    this.conditionField(this.item, this.fields)
-                    this.initRenderView()
-                },
-                immediate: true
-                
-            }
-        },
-        mounted () {
-            if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value
-            }
-        },
-        methods: {
-            initRenderView () {
-                this.errMessage = ''
-                try {
-                    const data = typeof this.item.val === 'string' ? JSON.parse(this.item.val) : this.item.val
-                    const { form_data: formData, schemes, config } = data
-                    // 渲染表单
-                    this.formData = formData
-                    this.context = {
-                        schemes,
-                        config
-                    }
-                } catch (err) {
-                    this.errMessage = err
-                    this.formData = []
-                }
-            }
+        immediate: true,
+
+      },
+    },
+    mounted() {
+      if (this.item.value && !this.item.val) {
+        this.item.val = this.item.value;
+      }
+    },
+    methods: {
+      initRenderView() {
+        this.errMessage = '';
+        try {
+          const data = typeof this.item.val === 'string' ? JSON.parse(this.item.val) : this.item.val;
+          const { form_data: formData, schemes, config } = data;
+          // 渲染表单
+          this.formData = formData;
+          this.context = {
+            schemes,
+            config,
+          };
+        } catch (err) {
+          this.errMessage = err;
+          this.formData = [];
         }
-    }
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

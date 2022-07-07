@@ -21,72 +21,72 @@
   -->
 
 <template>
-    <ul class="child-node">
-        <li class="vue-tree-item" v-for="(item, index) in treeDataList" :key="index">
-            <div :class="['tree-node',{ 'down': item.showChildren,'set-frist-pLeft': treeIndex + 1 === 1,'active': item.checkInfo }]"
-                :style="pLeft" @click="toggle(item)">
-                <i v-if="!item.showChildren"
-                    class="bk-icon icon-right-shape"
-                    :class="{ 'bk-padding': !item.has_children }"
-                    @click.stop="toggleChildren(item)"></i>
-                <i v-else
-                    class="bk-icon icon-down-shape"
-                    :class="{ 'bk-padding': !item.has_children }"
-                    @click.stop="toggleChildren(item)"></i>
-                <!-- 文件icon -->
-                <i class="bk-icon icon-folder-open-shape"></i>
-                <span class="name-text" :title="item.name">{{item.name}}</span>
-                <!-- 选中 -->
-                <i v-if="item.checkInfo"
-                    class="bk-icon icon-check-1"
-                    style="float: right; margin-top: 11px;"></i>
-            </div>
-            <collapse-transition>
-                <template v-if="item.showChildren && item.children">
-                    <Tree
-                        :tree-data-list="item.children"
-                        :tree-index="treeIndex + 1"
-                        @toggle="toggle"
-                        @toggleChildren="toggleChildren">
-                    </Tree>
-                </template>
-            </collapse-transition>
-        </li>
-    </ul>
+  <ul class="child-node">
+    <li class="vue-tree-item" v-for="(item, index) in treeDataList" :key="index">
+      <div :class="['tree-node',{ 'down': item.showChildren,'set-frist-pLeft': treeIndex + 1 === 1,'active': item.checkInfo }]"
+        :style="pLeft" @click="toggle(item)">
+        <i v-if="!item.showChildren"
+          class="bk-icon icon-right-shape"
+          :class="{ 'bk-padding': !item.has_children }"
+          @click.stop="toggleChildren(item)"></i>
+        <i v-else
+          class="bk-icon icon-down-shape"
+          :class="{ 'bk-padding': !item.has_children }"
+          @click.stop="toggleChildren(item)"></i>
+        <!-- 文件icon -->
+        <i class="bk-icon icon-folder-open-shape"></i>
+        <span class="name-text" :title="item.name">{{item.name}}</span>
+        <!-- 选中 -->
+        <i v-if="item.checkInfo"
+          class="bk-icon icon-check-1"
+          style="float: right; margin-top: 11px;"></i>
+      </div>
+      <collapse-transition>
+        <template v-if="item.showChildren && item.children">
+          <Tree
+            :tree-data-list="item.children"
+            :tree-index="treeIndex + 1"
+            @toggle="toggle"
+            @toggleChildren="toggleChildren">
+          </Tree>
+        </template>
+      </collapse-transition>
+    </li>
+  </ul>
 </template>
 <script>
-    import collapseTransition from '../../../utils/collapse-transition'
-    export default {
-        name: 'Tree',
-        components: {
-            collapseTransition
-        },
-        props: {
-            treeDataList: {
-                type: Array,
-                default: []
-            },
-            treeIndex: {
-                type: Number,
-                default: 0
-            }
-        },
-        data () {
-            return {
-                pLeft: `padding-left:${15 * (this.treeIndex + 1)}px; padding-right: 10px;`
-            }
-        },
-        methods: {
-            // 展开子级
-            toggleChildren (item) {
-                this.$emit('toggleChildren', item)
-            },
-            // 选中
-            toggle (item) {
-                this.$emit('toggle', item)
-            }
-        }
-    }
+  import collapseTransition from '../../../utils/collapse-transition';
+  export default {
+    name: 'Tree',
+    components: {
+      collapseTransition,
+    },
+    props: {
+      treeDataList: {
+        type: Array,
+        default: [],
+      },
+      treeIndex: {
+        type: Number,
+        default: 0,
+      },
+    },
+    data() {
+      return {
+        pLeft: `padding-left:${15 * (this.treeIndex + 1)}px; padding-right: 10px;`,
+      };
+    },
+    methods: {
+      // 展开子级
+      toggleChildren(item) {
+        this.$emit('toggleChildren', item);
+      },
+      // 选中
+      toggle(item) {
+        this.$emit('toggle', item);
+      },
+    },
+  };
 </script>
 
 <style  lang="scss" scoped>

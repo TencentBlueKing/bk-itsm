@@ -21,111 +21,111 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
-            <bk-table :data="item.val"
-                :size="'small'">
-                <template v-for="title in item.choice">
-                    <bk-table-column :label="title.name" :key="title.key">
-                        <template slot-scope="props">
-                            <bk-input :clearable="true" v-model="props.row[title.key]" :disabled="disabled"></bk-input>
-                        </template>
-                    </bk-table-column>
-                </template>
-                <bk-table-column :label="$t(`m.user['操作']`)" width="150">
-                    <template slot-scope="props">
-                        <bk-button theme="primary" :disabled="disabled" text @click="addOne">
-                            {{ $t('m.newCommon["添加"]') }}
-                        </bk-button>
-                        <bk-button theme="primary" :disabled="disabled" text @click="deleteOne(props)">
-                            {{ $t('m.newCommon["删除"]') }}
-                        </bk-button>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-            <template v-if="item.checkValue">
-                <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-                <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+  <div v-if="item.showFeild">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
+      <bk-table :data="item.val"
+        :size="'small'">
+        <template v-for="title in item.choice">
+          <bk-table-column :label="title.name" :key="title.key">
+            <template slot-scope="props">
+              <bk-input :clearable="true" v-model="props.row[title.key]" :disabled="disabled"></bk-input>
             </template>
-        </bk-form-item>
-    </div>
+          </bk-table-column>
+        </template>
+        <bk-table-column :label="$t(`m.user['操作']`)" width="150">
+          <template slot-scope="props">
+            <bk-button theme="primary" :disabled="disabled" text @click="addOne">
+              {{ $t('m.newCommon["添加"]') }}
+            </bk-button>
+            <bk-button theme="primary" :disabled="disabled" text @click="deleteOne(props)">
+              {{ $t('m.newCommon["删除"]') }}
+            </bk-button>
+          </template>
+        </bk-table-column>
+      </bk-table>
+      <template v-if="item.checkValue">
+        <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+        <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+      </template>
+    </bk-form-item>
+  </div>
 </template>
 
 <script>
-    export default {
-        name: 'TABLE',
-        props: {
-            item: {
-                type: Object,
-                required: true,
-                default: () => {
-                }
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false
-            },
-            disabled: {
-                type: Boolean,
-                default: false
-            }
+  export default {
+    name: 'TABLE',
+    props: {
+      item: {
+        type: Object,
+        required: true,
+        default: () => {
         },
-        data () {
-            return {}
-        },
-        watch: {
-            'item.val' () {
-                if (this.item.val === '') {
-                    this.item.val = []
-                    const obj = {}
-                    for (let i = 0; i < this.item.choice.length; i++) {
-                        const key = this.item.choice[i].key
-                        obj[key] = ''
-                    }
-                    this.item.val.push(obj)
-                }
-                if (typeof this.$parent.refresh === 'function') {
-                    this.$parent.refresh()
-                }
-            }
-        },
-        created () {
-            if (this.item.val === '' || (Array.isArray(this.item.val) && !this.item.val.length)) {
-                this.item.val = []
-                const obj = {}
-                for (let i = 0; i < this.item.choice.length; i++) {
-                    const key = this.item.choice[i].key
-                    obj[key] = ''
-                }
-                this.item.val.push(obj)
-            }
-        },
-        methods: {
-            addOne () {
-                const obj = {}
-                for (let i = 0; i < this.item.choice.length; i++) {
-                    const key = this.item.choice[i].key
-                    obj[key] = ''
-                }
-                this.item.val.push(obj)
-            },
-            deleteOne (props) {
-                if (this.item.val.length === 1) {
-                    this.$bkMessage({
-                        message: '默认行不能删除',
-                        theme: 'warning'
-                    })
-                } else {
-                    this.$bkInfo({
-                        title: '确认要删除此条数据？',
-                        confirmFn: () => {
-                            this.item.val.splice(props.$index, 1)
-                        }
-                    })
-                }
-            }
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {};
+    },
+    watch: {
+      'item.val'() {
+        if (this.item.val === '') {
+          this.item.val = [];
+          const obj = {};
+          for (let i = 0; i < this.item.choice.length; i++) {
+            const { key } = this.item.choice[i];
+            obj[key] = '';
+          }
+          this.item.val.push(obj);
         }
-    }
+        if (typeof this.$parent.refresh === 'function') {
+          this.$parent.refresh();
+        }
+      },
+    },
+    created() {
+      if (this.item.val === '' || (Array.isArray(this.item.val) && !this.item.val.length)) {
+        this.item.val = [];
+        const obj = {};
+        for (let i = 0; i < this.item.choice.length; i++) {
+          const { key } = this.item.choice[i];
+          obj[key] = '';
+        }
+        this.item.val.push(obj);
+      }
+    },
+    methods: {
+      addOne() {
+        const obj = {};
+        for (let i = 0; i < this.item.choice.length; i++) {
+          const { key } = this.item.choice[i];
+          obj[key] = '';
+        }
+        this.item.val.push(obj);
+      },
+      deleteOne(props) {
+        if (this.item.val.length === 1) {
+          this.$bkMessage({
+            message: '默认行不能删除',
+            theme: 'warning',
+          });
+        } else {
+          this.$bkInfo({
+            title: '确认要删除此条数据？',
+            confirmFn: () => {
+              this.item.val.splice(props.$index, 1);
+            },
+          });
+        }
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>
