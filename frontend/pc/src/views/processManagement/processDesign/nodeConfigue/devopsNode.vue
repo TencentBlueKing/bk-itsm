@@ -512,8 +512,6 @@
             type: 'TASK-DEVOPS',
             workflow: this.configur.workflow,
           };
-          console.log(params);
-          debugger;
           const stateId = this.configur.id;
           this.$store.dispatch('cdeploy/putDevopsInfo', { params, stateId }).then(() => {
             this.$bkMessage({
