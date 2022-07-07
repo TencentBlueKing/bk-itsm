@@ -22,6 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import json
 import logging
 
 import jmespath
@@ -156,6 +157,8 @@ class BkDevOpsService(ItsmBaseService):
         resp = resp["variables"]
         for variable in variables:
             value = jmespath.search(variable["ref_path"], resp)
+            if isinstance(value, bool):
+                value = json.dumps(value)
             if TicketGlobalVariable.objects.filter(
                 ticket_id=ticket_id, key=variable["key"]
             ).exists():
