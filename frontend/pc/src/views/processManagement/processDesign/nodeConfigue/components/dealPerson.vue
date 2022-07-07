@@ -81,6 +81,20 @@
       </template>
     </div>
     <p class="bk-error-info" v-if="showError">{{ requiredMsg || $t(`m.treeinfo['处理人不能为空']`) }}</p>
+    <bk-dialog v-model="organizationTip.show"
+      theme="primary"
+      footer-position="center"
+      :mask-close="false"
+      @cancel="cancelSelect">
+      <i class="bk-itsm-icon icon-itsm-icon-mark-eight organization-tip"></i>
+      <p>
+        <span>{{$t('m["当前组织架构下共有员工"]')}}</span>
+        <span style="color:red">{{organizationTip.count}}</span>
+        <span>{{$t('m["人，如果开启了消息通知，会导致"]')}}</span>
+        <span style="color:red">{{organizationTip.count}}</span>
+        <span>{{$t('m["人都会收到单据代办通知，是否继续？如有疑问请咨询ITSM系统管理员。"]')}}</span>
+      </p>
+    </bk-dialog>
   </div>
 </template>
 <script>
@@ -152,6 +166,10 @@
         frontMemberField: [],
         secondLevelRange: {},
         noSecondTypeList: ['EMPTY', 'OPEN', 'STARTER', 'BY_ASSIGNOR', 'STARTER_LEADER'],
+        organizationTip: {
+          show: false,
+          count: '',
+        },
       };
     },
     computed: {
@@ -161,6 +179,14 @@
       },
     },
     watch: {
+      'formData.levelSecond': {
+        handler(val) {
+          if (this.formData.levelOne === 'ORGANIZATION' && !!val) {
+            this.getOrganizationNumber(val);
+          }
+        },
+        deep: true,
+      },
       value: {
         handler(newVal, oldVal) {
           if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
@@ -265,7 +291,19 @@
           this.secondListFn(type);
         }
       },
-      onFirstLevelChange(type) {
+      async getOrganizationNumber(id) {
+        const res = await this.$store.dispatch('common/getOrganizationNumber', id);
+        // 单个组织超过100人时提醒
+        if (res.data.count > 100) {
+          this.organizationTip.count = res.data.count;
+          this.organizationTip.show = true;
+        }
+      },
+      cancelSelect() {
+        this.formData.levelOne = 'PERSON';
+        this.formData.levelSecond = [];
+      },
+      async onFirstLevelChange(type) {
         // 清空二级数据
         this.$set(this.formData, 'levelSecond', []);
         this.setDeaultSecondLeve(type);
@@ -400,7 +438,19 @@
 
 <style lang='scss' scoped>
     @import '../../../../../scss/mixins/clearfix.scss';
-
+    .organization-tip {
+      width: 40px;
+      height: 40px;
+      background-color: #ff9c01;
+      display: block;
+      margin: 0px auto 10px;
+      border-radius: 50%;
+      line-height: 40px;
+      &::before {
+        font-size: 40px;
+        color: #ffe8c3;
+      }
+    }
     .bk-form-width {
         float: left;
         width: 330px;

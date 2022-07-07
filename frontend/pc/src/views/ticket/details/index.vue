@@ -333,9 +333,15 @@
       async getComments(page, page_size) {
         this.commentLoading = true;
         const commentList = [];
+        const is_history_processor = this.ticketInfo.updated_by.split(',').includes(window.username);
+        const current_processors = [];
+        this.ticketInfo.current_processors.split(',').forEach((item) => {
+          current_processors.push(item.split('(')[0]);
+        });
+        const is_current_processor = current_processors.includes(window.username);
         const commmentRes = await this.$store.dispatch('ticket/getTicketAllComments', {
           ticket_id: this.ticketId,
-          show_type: this.ticketInfo.updated_by.split(',').includes(window.username) ? 'ALL' : 'PUBLIC',
+          show_type: (is_current_processor || is_history_processor) ? 'ALL' : 'PUBLIC',
           page,
           page_size,
         });

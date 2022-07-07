@@ -222,7 +222,14 @@
         this.$emit('refreshComment');
       },
       postComment(type) {
-        if (!(this.hasNodeOptAuth && this.ticketInfo.updated_by.split(',').includes(window.username)) && type === 'INSIDE') {
+        const is_history_processor = this.ticketInfo.updated_by.split(',').includes(window.username);
+        const current_processors = [];
+        this.ticketInfo.current_processors.split(',').forEach((item) => {
+          current_processors.push(item.split('(')[0]);
+        });
+        const is_current_processor = current_processors.includes(window.username);
+        // 内部评论的条件为，拥有单据处理权限，并且是历史处理人或者是当前处理人
+        if (!(this.hasNodeOptAuth && (is_history_processor || is_current_processor)) && type === 'INSIDE') {
           this.$bkMessage({
             message: this.$t('m["你当前无法发表内部评论"]'),
             theme: 'warning ',

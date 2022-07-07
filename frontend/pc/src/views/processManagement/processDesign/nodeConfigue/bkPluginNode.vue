@@ -11,6 +11,7 @@
           :property="'nodeName'">
           <bk-input :clearable="true" v-model="basicInfo.nodeName"></bk-input>
         </bk-form-item>
+        <desc-info v-model="basicInfo.desc"></desc-info>
         <bk-form-item
           data-test-id="devops-select-project"
           :label="$t(`m['第三方插件']`)"
@@ -159,6 +160,7 @@
   </div>
 </template>
 <script>
+  import descInfo from './components/descInfo.vue';
   import createForm from '@tencent/bkui-form/dist/bkui-form-umd';
   import dealPerson from './components/dealPerson.vue';
   import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
@@ -181,6 +183,7 @@
       NoData,
       dealPerson,
       BkRenderForm,
+      descInfo,
     },
     props: {
       // 流程信息
@@ -209,6 +212,7 @@
         isLoading: false,
         basicInfo: {
           nodeName: '',
+          desc: '',
           plugin: '',
           version: '',
           processors: [],
@@ -307,6 +311,7 @@
       async initData() {
         this.isLoading = true;
         this.basicInfo.nodeName = this.configur.name;
+        this.basicInfo.desc = this.configur.desc;
         this.processorsInfo = {
           type: this.configur.processors_type,
           value: this.configur.processors,
@@ -499,6 +504,7 @@
           }
           const params = {
             name: this.basicInfo.nodeName,
+            desc: this.basicInfo.desc || undefined,
             processors: processors || '',
             processors_type: processors_type || '',
             type: 'BK-PLUGIN',

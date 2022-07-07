@@ -37,6 +37,7 @@
           maxlength="120">
         </bk-input>
       </bk-form-item>
+      <desc-info v-model="formInfo.desc"></desc-info>
       <bk-form-item :label="$t(`m.treeinfo['节点标签：']`)" :required="true">
         <bk-select :ext-cls="'bk-form-width'"
           v-model="formInfo.tag"
@@ -146,6 +147,7 @@
   </div>
 </template>
 <script>
+  import descInfo from './descInfo.vue';
   import dealPerson from './dealPerson.vue';
   import commonMix from '../../../../commonMix/common.js';
   import { errorHandler } from '../../../../../utils/errorHandler';
@@ -154,6 +156,7 @@
     name: 'basicInfo',
     components: {
       dealPerson,
+      descInfo,
     },
     mixins: [commonMix],
     props: {
@@ -187,6 +190,7 @@
         // 数据变量
         formInfo: {
           name: '',
+          desc: '',
           tag: '',
           distribute_type: '',
           ticket_key: '',
@@ -286,6 +290,8 @@
         });
         // 节点名称
         this.formInfo.name = this.nodeInfo.name;
+        // 节点描述
+        this.formInfo.desc = this.nodeInfo.desc;
         // 节点标签
         this.formInfo.tag = this.nodeInfo.tag || '';
         // 处理场景
@@ -391,6 +397,7 @@
         this.checkBasic();
         const basicForm = {};
         basicForm.name = this.formInfo.name;
+        basicForm.desc = this.formInfo.desc || undefined;
         this.checkStatus.name = !this.formInfo.name;
         basicForm.tag = this.formInfo.tag;
         basicForm.distribute_type = this.formInfo.distribute_type;
