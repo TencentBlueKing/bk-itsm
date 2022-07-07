@@ -21,62 +21,62 @@
   -->
 
 <template>
-    <div class="bk-template-node">
-        <div v-if="node.type === 'START'" class="startpoint">
-            {{ $t('m.treeinfo["开始"]') }}
-        </div>
-        <div v-if="node.type === 'END'" class="endpoint">
-            {{ $t('m.treeinfo["结束"]') }}
-        </div>
-        <!-- 手动节点 -->
-        <template v-for="(item, index) in typeList">
-            <template v-if="node.type === item.type">
-                <div class="common-node" :class="{ 'common-auto': item.type === 'TASK' }" :key="index">
-                    <span class="common-auto-icon" :class="{ 'bk-is-draft': (node.nodeInfo && node.nodeInfo.is_draft) }">
-                        <i class="bk-itsm-icon" :class="item.iconStyle" v-if="item.type !== 'TASK'"></i>
-                        <span v-else style="font-size: 12px; font-weight: bold;">API</span>
-                    </span>
-                    <span class="bk-more-word">{{node.name || $t(`m.treeinfo["新增节点"]`)}}</span>
-                </div>
-            </template>
-        </template>
-        <!-- 网关节点 -->
-        <div v-if="node.type === 'ROUTER-P'" class="common-branch">
-            <i class="bk-itsm-icon icon-flow-convergence"></i>
-        </div>
-        <!-- 汇聚节点 -->
-        <div v-if="node.type === 'COVERAGE'" class="common-branch">
-            <i class="bk-itsm-icon icon-flow-branch"></i>
-        </div>
+  <div class="bk-template-node">
+    <div v-if="node.type === 'START'" class="startpoint">
+      {{ $t('m.treeinfo["开始"]') }}
     </div>
+    <div v-if="node.type === 'END'" class="endpoint">
+      {{ $t('m.treeinfo["结束"]') }}
+    </div>
+    <!-- 手动节点 -->
+    <template v-for="(item, index) in typeList">
+      <template v-if="node.type === item.type">
+        <div class="common-node" :class="{ 'common-auto': item.type === 'TASK' }" :key="index">
+          <span class="common-auto-icon" :class="{ 'bk-is-draft': (node.nodeInfo && node.nodeInfo.is_draft) }">
+            <i class="bk-itsm-icon" :class="item.iconStyle" v-if="item.type !== 'TASK'"></i>
+            <span v-else style="font-size: 12px; font-weight: bold;">API</span>
+          </span>
+          <span class="bk-more-word">{{node.name || $t(`m.treeinfo["新增节点"]`)}}</span>
+        </div>
+      </template>
+    </template>
+    <!-- 网关节点 -->
+    <div v-if="node.type === 'ROUTER-P'" class="common-branch">
+      <i class="bk-itsm-icon icon-flow-convergence"></i>
+    </div>
+    <!-- 汇聚节点 -->
+    <div v-if="node.type === 'COVERAGE'" class="common-branch">
+      <i class="bk-itsm-icon icon-flow-branch"></i>
+    </div>
+  </div>
 </template>
 <script>
-    export default {
-        name: 'templateNode',
-        props: {
-            node: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            }
+  export default {
+    name: 'templateNode',
+    props: {
+      node: {
+        type: Object,
+        default() {
+          return {};
         },
-        data () {
-            return {
-                typeList: [
-                    { type: 'NORMAL', iconStyle: 'icon-icon-person' },
-                    { type: 'ROUTER', iconStyle: 'icon-icon-person' },
-                    { type: 'TASK', iconStyle: 'icon-api-icon' },
-                    { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
-                    { type: 'SIGN', iconStyle: 'icon-sign-node-white' },
-                    { type: 'APPROVAL', iconStyle: 'icon-approval-node' }
-                ]
-            }
-        },
-        methods: {
+      },
+    },
+    data() {
+      return {
+        typeList: [
+          { type: 'NORMAL', iconStyle: 'icon-icon-person' },
+          { type: 'ROUTER', iconStyle: 'icon-icon-person' },
+          { type: 'TASK', iconStyle: 'icon-api-icon' },
+          { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
+          { type: 'SIGN', iconStyle: 'icon-sign-node-white' },
+          { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
+        ],
+      };
+    },
+    methods: {
 
-        }
-    }
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

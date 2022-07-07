@@ -21,159 +21,163 @@
   -->
 
 <template>
-    <!-- 单号 -->
-    <div class="sn-content">
-        <router-link
-            class="table-link"
-            target="_blank"
-            :to="{ name: 'TicketDetail', query: { id: row.id, from: fromRouter, project_id: row.project_key } }">
-            {{ row.sn }}
-        </router-link>
-        <!-- 母子单 -->
-        <bk-popover
-            v-if="row.related_type && openFunction.CHILD_TICKET_SWITCH"
-            placement="top"
-            :theme="'light'"
-            :on-show="getInheritTicket">
-            <i class="bk-itsm-icon icon-it-new-inherit"></i>
-            <div slot="content">
-                <template v-if="!inheritLoading">
-                    <!-- 母单 -->
-                    <template v-if="parent && parent.id">
-                        <p class="inherit-title">{{ $t('m.newCommon["母子单"]') }}(1)</p>
-                        <p :class="[{ 'no-auth': !parent.can_view }]">
-                            <router-link
-                                v-cursor="{ active: !parent.can_view }"
-                                class="table-link auto-width"
-                                target="_blank"
-                                :to="{ name: 'TicketDetail', query: { id: parent.id, from: fromRouter, project_id: parent.project_key } }">
-                                <span class="sn-id">{{ parent.sn }}</span>
-                                <span class="inherit-link">{{ parent.title }}</span>
-                            </router-link>
-                        </p>
-                    </template>
-                    <!-- 子单 -->
-                    <template v-if="children && children.length">
-                        <p class="inherit-title">{{ $t('m.newCommon["母子单"]') }}({{ children.length }})</p>
-                        <p v-for="(child, index) in children" :key="index" :class="[{ 'no-auth': !child.can_view }]">
-                            <router-link
-                                class="table-link auto-width"
-                                target="_blank"
-                                v-cursor="{ active: !child.can_view }"
-                                :to="{ name: 'TicketDetail', query: { id: child.id, from: fromRouter, project_id: child.project_key } }">
-                                <span class="sn-id">{{ child.sn }}</span>
-                                <span class="inherit-link">{{child.title}}</span>
-                            </router-link>
-                        </p>
-                    </template>
-                </template>
-                <template v-else>
-                    {{ $t(`m.manageCommon["加载中..."]`) }}
-                </template>
-            </div>
-        </bk-popover>
-        <!-- 关联单 -->
-        <bk-popover
-            v-if="row.has_relationships"
-            placement="top"
-            :theme="'light'"
-            :on-show="getAssociatedTickets">
-            <i class="bk-itsm-icon icon-it-new-associate"></i>
-            <div slot="content">
-                <template v-if="!associateLoading">
-                    <div v-if="associates">
-                        <p class="inherit-title">{{$t('m.newCommon["关联单"]')}}({{associates.length}})</p>
-                        <p v-for="(ite,index) in associates" :key="index" :class="[{ 'no-auth': !ite.can_view }]">
-                            <router-link
-                                v-cursor="{ active: !ite.can_view }"
-                                class="table-link auto-width"
-                                target="_blank"
-                                :to="{ name: 'TicketDetail', query: { id: ite.id, from: fromRouter, project_id: ite.project_key } }">
-                                <span class="sn-id">{{ ite.sn }}</span>
-                                <span class="inherit-link">{{ite.title}}</span>
-                            </router-link>
-                        </p>
-                    </div>
-                </template>
-                <template v-else>
-                    {{$t(`m.manageCommon["加载中..."]`)}}
-                </template>
-            </div>
-        </bk-popover>
-    </div>
+  <!-- 单号 -->
+  <div class="sn-content">
+    <router-link
+      class="table-link"
+      target="_blank"
+      :to="{ name: 'TicketDetail', query: { id: row.id, from: fromRouter, project_id: row.project_key } }">
+      {{ row.sn }}
+    </router-link>
+    <!-- 母子单 -->
+    <bk-popover
+      v-if="row.related_type && openFunction.CHILD_TICKET_SWITCH"
+      placement="top"
+      :theme="'light'"
+      :on-show="getInheritTicket">
+      <i class="bk-itsm-icon icon-it-new-inherit"></i>
+      <div slot="content">
+        <template v-if="!inheritLoading">
+          <!-- 母单 -->
+          <template v-if="parent && parent.id">
+            <p class="inherit-title">{{ $t('m.newCommon["母子单"]') }}(1)</p>
+            <p :class="[{ 'no-auth': !parent.can_view }]">
+              <router-link
+                v-cursor="{ active: !parent.can_view }"
+                class="table-link auto-width"
+                target="_blank"
+                :to="{ name: 'TicketDetail', query: { id: parent.id, from: fromRouter, project_id: parent.project_key } }">
+                <span class="sn-id">{{ parent.sn }}</span>
+                <span class="inherit-link">{{ parent.title }}</span>
+              </router-link>
+            </p>
+          </template>
+          <!-- 子单 -->
+          <template v-if="children && children.length">
+            <p class="inherit-title">{{ $t('m.newCommon["母子单"]') }}({{ children.length }})</p>
+            <p v-for="(child, index) in children" :key="index" :class="[{ 'no-auth': !child.can_view }]">
+              <router-link
+                class="table-link auto-width"
+                target="_blank"
+                v-cursor="{ active: !child.can_view }"
+                :to="{ name: 'TicketDetail', query: { id: child.id, from: fromRouter, project_id: child.project_key } }">
+                <span class="sn-id">{{ child.sn }}</span>
+                <span class="inherit-link">{{child.title}}</span>
+              </router-link>
+            </p>
+          </template>
+        </template>
+        <template v-else>
+          {{ $t(`m.manageCommon["加载中..."]`) }}
+        </template>
+      </div>
+    </bk-popover>
+    <!-- 关联单 -->
+    <bk-popover
+      v-if="row.has_relationships"
+      placement="top"
+      :theme="'light'"
+      :on-show="getAssociatedTickets">
+      <i class="bk-itsm-icon icon-it-new-associate"></i>
+      <div slot="content">
+        <template v-if="!associateLoading">
+          <div v-if="associates">
+            <p class="inherit-title">{{$t('m.newCommon["关联单"]')}}({{associates.length}})</p>
+            <p v-for="(ite,index) in associates" :key="index" :class="[{ 'no-auth': !ite.can_view }]">
+              <router-link
+                v-cursor="{ active: !ite.can_view }"
+                class="table-link auto-width"
+                target="_blank"
+                :to="{ name: 'TicketDetail', query: { id: ite.id, from: fromRouter, project_id: ite.project_key } }">
+                <span class="sn-id">{{ ite.sn }}</span>
+                <span class="inherit-link">{{ite.title}}</span>
+              </router-link>
+            </p>
+          </div>
+        </template>
+        <template v-else>
+          {{$t(`m.manageCommon["加载中..."]`)}}
+        </template>
+      </div>
+    </bk-popover>
+  </div>
 </template>
 
 <script>
-    import { errorHandler } from '../../../utils/errorHandler'
-    export default {
-        name: 'ColumnSn',
-        props: {
-            row: {
-                type: Object,
-                default: () => ({})
-            },
-            from: {
-                type: String,
-                default: ''
-            }
-        },
-        data () {
-            return {
-                fromRouter: this.from || this.$route.name,
-                parent: {},
-                children: [],
-                associates: [], // 关联单
-                inheritLoading: false,
-                associateLoading: false
-            }
-        },
-        computed: {
-            openFunction () {
-                return this.$store.state.openFunction
-            }
-        },
-        methods: {
-            // 获取母子单
-            getInheritTicket () {
-                if (this.parent.id || this.children.length) {
-                    return
-                }
-                this.inheritLoading = true
-                const params = {
-                    id: this.row.id
-                }
-                this.$store.dispatch('change/getInheritState', params).then(res => {
-                    if (res.data.related_type === 'slave') {
-                        this.parent = JSON.parse(JSON.stringify(res.data.master_slave_tickets[0]))
-                    } else {
-                        this.children = res.data.master_slave_tickets
-                    }
-                }).catch(res => {
-                    errorHandler(res)
-                }).finally(() => {
-                    this.inheritLoading = false
-                })
-            },
-            // 获取关联单
-            getAssociatedTickets () {
-                if (this.associates.length) {
-                    return
-                }
-                this.associateLoading = true
-                const params = {
-                    id: this.row.id
-                }
-                this.$store.dispatch('deployOrder/getAssociatedTickets', params).then((res) => {
-                    this.associates = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.associateLoading = false
-                })
-            }
-
+  import { errorHandler } from '../../../utils/errorHandler';
+  export default {
+    name: 'ColumnSn',
+    props: {
+      row: {
+        type: Object,
+        default: () => ({}),
+      },
+      from: {
+        type: String,
+        default: '',
+      },
+    },
+    data() {
+      return {
+        fromRouter: this.from || this.$route.name,
+        parent: {},
+        children: [],
+        associates: [], // 关联单
+        inheritLoading: false,
+        associateLoading: false,
+      };
+    },
+    computed: {
+      openFunction() {
+        return this.$store.state.openFunction;
+      },
+    },
+    methods: {
+      // 获取母子单
+      getInheritTicket() {
+        if (this.parent.id || this.children.length) {
+          return;
         }
-    }
+        this.inheritLoading = true;
+        const params = {
+          id: this.row.id,
+        };
+        this.$store.dispatch('change/getInheritState', params).then((res) => {
+          if (res.data.related_type === 'slave') {
+            this.parent = JSON.parse(JSON.stringify(res.data.master_slave_tickets[0]));
+          } else {
+            this.children = res.data.master_slave_tickets;
+          }
+        })
+          .catch((res) => {
+            errorHandler(res);
+          })
+          .finally(() => {
+            this.inheritLoading = false;
+          });
+      },
+      // 获取关联单
+      getAssociatedTickets() {
+        if (this.associates.length) {
+          return;
+        }
+        this.associateLoading = true;
+        const params = {
+          id: this.row.id,
+        };
+        this.$store.dispatch('deployOrder/getAssociatedTickets', params).then((res) => {
+          this.associates = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.associateLoading = false;
+          });
+      },
+
+    },
+  };
 </script>
 <style lang='scss' scoped>
 .table-link {

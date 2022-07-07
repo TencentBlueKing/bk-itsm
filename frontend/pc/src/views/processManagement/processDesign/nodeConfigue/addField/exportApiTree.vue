@@ -21,99 +21,99 @@
   -->
 
 <template>
-    <ul class="child-node">
-        <template v-if="treeDataList.length">
-            <li class="vue-tree-item" v-for="(item, index) in treeDataList" :key="index">
-                <div v-if="(!isKeyValue && item.children && item.children.length) || (isKeyValue)"
-                    :class="['tree-node',{ 'down': item.showChildren,'set-frist-pLeft': treeIndex + 1 === 1,'active': item.checkInfo }]"
-                    :style="pLeft" @click.stop="toggle(item)">
-                    <i v-if="(!item.showChildren) && (item.type === 'object')"
-                        class="bk-icon icon-right-shape"
-                        :class="{ 'bk-padding': !item.has_children }"
-                        @click.stop="toggleChildren(item)"></i>
-                    <i v-if="(item.showChildren) && (item.type === 'object')"
-                        class="bk-icon icon-down-shape"
-                        :class="{ 'bk-padding': !item.has_children }"
-                        @click.stop="toggleChildren(item)"></i>
-                    <!-- 文件icon -->
-                    <i class="bk-icon icon-folder-open-shape"></i>
-                    <span class="name-text" :title="item.name">{{item.name}}</span>
-                    <!-- 选中 -->
-                    <i v-if="item.checkInfo"
-                        class="bk-icon icon-check-1"
-                        style="float: right; margin-top: 11px;"></i>
-                </div>
-                <collapse-transition>
-                    <template v-if="item.type === 'object' && item.showChildren && item.children">
-                        <exportTree
-                            :tree-data-list="item.children"
-                            :tree-index="treeIndex + 1"
-                            @selectItem="selectItem"
-                            :is-key-value="isKeyValue"
-                            @toggle="toggle"
-                            @toggleChildren="toggleChildren">
-                        </exportTree>
-                    </template>
-                </collapse-transition>
-            </li>
-        </template>
-        <template v-else>
-            <li class="vue-tree-item" v-if="!isKeyValue">
-                <div class="tree-node set-frist-pLeft">
-                    <span class="name-text">{{$t(`m.deployPage["暂无数据"]`)}}</span>
-                </div>
-            </li>
-        </template>
+  <ul class="child-node">
+    <template v-if="treeDataList.length">
+      <li class="vue-tree-item" v-for="(item, index) in treeDataList" :key="index">
+        <div v-if="(!isKeyValue && item.children && item.children.length) || (isKeyValue)"
+          :class="['tree-node',{ 'down': item.showChildren,'set-frist-pLeft': treeIndex + 1 === 1,'active': item.checkInfo }]"
+          :style="pLeft" @click.stop="toggle(item)">
+          <i v-if="(!item.showChildren) && (item.type === 'object')"
+            class="bk-icon icon-right-shape"
+            :class="{ 'bk-padding': !item.has_children }"
+            @click.stop="toggleChildren(item)"></i>
+          <i v-if="(item.showChildren) && (item.type === 'object')"
+            class="bk-icon icon-down-shape"
+            :class="{ 'bk-padding': !item.has_children }"
+            @click.stop="toggleChildren(item)"></i>
+          <!-- 文件icon -->
+          <i class="bk-icon icon-folder-open-shape"></i>
+          <span class="name-text" :title="item.name">{{item.name}}</span>
+          <!-- 选中 -->
+          <i v-if="item.checkInfo"
+            class="bk-icon icon-check-1"
+            style="float: right; margin-top: 11px;"></i>
+        </div>
+        <collapse-transition>
+          <template v-if="item.type === 'object' && item.showChildren && item.children">
+            <exportTree
+              :tree-data-list="item.children"
+              :tree-index="treeIndex + 1"
+              @selectItem="selectItem"
+              :is-key-value="isKeyValue"
+              @toggle="toggle"
+              @toggleChildren="toggleChildren">
+            </exportTree>
+          </template>
+        </collapse-transition>
+      </li>
+    </template>
+    <template v-else>
+      <li class="vue-tree-item" v-if="!isKeyValue">
+        <div class="tree-node set-frist-pLeft">
+          <span class="name-text">{{$t(`m.deployPage["暂无数据"]`)}}</span>
+        </div>
+      </li>
+    </template>
 
-    </ul>
+  </ul>
 </template>
 <script>
-    import collapseTransition from '@/utils/collapse-transition.js'
+  import collapseTransition from '@/utils/collapse-transition.js';
 
-    export default {
-        name: 'exportTree',
-        components: {
-            collapseTransition
+  export default {
+    name: 'exportTree',
+    components: {
+      collapseTransition,
+    },
+    props: {
+      treeDataList: {
+        type: Array,
+        default() {
+          return [];
         },
-        props: {
-            treeDataList: {
-                type: Array,
-                default () {
-                    return []
-                }
-            },
-            treeIndex: {
-                type: Number,
-                default: 0
-            },
-            isKeyValue: {
-                type: Number,
-                default: 0
-            }
-        },
-        data () {
-            return {
-                pLeft: `padding-left:${25 * (this.treeIndex + 1)}px; padding-right: 10px;`
-            }
-        },
-        methods: {
-            // 展开子级
-            toggleChildren (item) {
-                this.$emit('toggleChildren', item)
-            },
-            toggle (item) {
-                this.$emit('toggle', item, this.isKeyValue)
-            },
-            // 复选框勾选的数据
-            checkItem (item) {
-                this.$emit('selectItem', item)
-            },
-            // 组件内调用组件，需要抛出数据两次
-            selectItem (item) {
-                this.$emit('selectItem', item)
-            }
-        }
-    }
+      },
+      treeIndex: {
+        type: Number,
+        default: 0,
+      },
+      isKeyValue: {
+        type: Number,
+        default: 0,
+      },
+    },
+    data() {
+      return {
+        pLeft: `padding-left:${25 * (this.treeIndex + 1)}px; padding-right: 10px;`,
+      };
+    },
+    methods: {
+      // 展开子级
+      toggleChildren(item) {
+        this.$emit('toggleChildren', item);
+      },
+      toggle(item) {
+        this.$emit('toggle', item, this.isKeyValue);
+      },
+      // 复选框勾选的数据
+      checkItem(item) {
+        this.$emit('selectItem', item);
+      },
+      // 组件内调用组件，需要抛出数据两次
+      selectItem(item) {
+        this.$emit('selectItem', item);
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

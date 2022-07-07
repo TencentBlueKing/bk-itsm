@@ -21,381 +21,486 @@
   -->
 
 <template>
-    <header class="ticket-header">
-        <arrows-left-icon @click="onBackClick"></arrows-left-icon>
-        <span
-            :style="{ backgroundColor: headerInfo.statusColor }"
-            :title="ticketInfo.current_status_display"
-            class="ticket-status">
-            {{ localeCookie ? ticketInfo.current_status : ticketInfo.current_status_display}}
-        </span>
-        <span class="ticket-status comments-info"
-            v-if="ticketInfo.is_commented || ticketInfo.can_commen">
-            <span v-if="ticketInfo.is_commented">{{ $t('m.newCommon["已评价"]') }}</span>
-            <span v-if="ticketInfo.can_comment">{{ $t('m.newCommon["待评论"]') }}</span>
-        </span>
-        <!-- 关注 -->
-        <span class="bk-operation-focus">
-            <bk-popover :content="!hasAttention ? $t(`m.manageCommon['关注单据']`) : $t(`m.manageCommon['取消关注']`)"
-                :interactive="false"
-                placement="top">
-                <i
-                    :class="['bk-itsm-icon', !hasAttention ? 'icon-rate' : 'icon-favorite']"
-                    @click="onAttention">
-                </i>
-            </bk-popover>
-        </span>
-        <!-- SN单号 -->
-        <span class="ticket-sn mr10">{{ ticketInfo.sn }}</span>
-        <!-- 标题 -->
-        <span
-            class="ticket-title"
-            :title="ticketInfo.title">
-            {{ ticketInfo.title || '--'}}
-        </span>
-        <div class="operation-group">
-            <!-- 刷新 -->
-            <bk-button
-                data-test-id="ticket_button_refreshTicketDetail"
-                size="small"
-                class="mr10 operation-refresh"
-                :class="{ 'rotate': rotate, 'not-rotate': !rotate }"
-                icon="icon-refresh"
-                theme="default"
-                @click="onRefreshBtnClick">
-                {{ $t(`m.newCommon["刷新"]`) }}
-            </bk-button>
-            <bk-popover :content="$t(`m.tickets['单据当前不能被撤回']`)" :disabled="ticketInfo.can_withdraw">
-                <bk-button
-                    data-test-id="ticket_button_removeTicket"
-                    size="small"
-                    class="mr10"
-                    theme="default"
-                    :disabled="!ticketInfo.can_withdraw"
-                    @click="onTicketBtnClick('widthdraw')">
-                    {{ $t(`m.newCommon["撤单"]`) }}
-                </bk-button>
-            </bk-popover>
-            <bk-popover :content="disabledText" :disabled="ticketInfo.can_supervise">
-                <bk-button
-                    data-test-id="ticket_button_superviseTicket"
-                    size="small"
-                    class="mr10"
-                    theme="default"
-                    :disabled="!ticketInfo.can_supervise"
-                    @click="onTicketBtnClick('supervise')">
-                    {{ $t(`m.newCommon["督办"]`) }}
-                </bk-button>
-            </bk-popover>
-            <bk-popover :content="getDisabledContentText(ticketInfo.is_commented)" :disabled="!(ticketInfo.is_commented || !ticketInfo.can_comment)">
-                <bk-button
-                    data-test-id="ticket_button_appraiseTicket"
-                    v-if="Number(ticketInfo.comment_id) !== -1"
-                    size="small"
-                    class="mr10"
-                    theme="default"
-                    :disabled="ticketInfo.is_commented || !ticketInfo.can_comment || ticketInfo.comment_id === -1"
-                    @click="onTicketBtnClick('comment')">
-                    {{ $t(`m.newCommon["评价"]`) }}
-                </bk-button>
-            </bk-popover>
-            <bk-dropdown-menu
-                ref="dropdown"
-                :align="'right'"
-                :font-size="'medium'"
-                class="bk-dropdown-menu-cus mr10"
-                @show="isDropdownShow = true"
-                @hide="isDropdownShow = false">
-                <div class="dropdown-trigger-btn" slot="dropdown-trigger" style="width:auto;">
-                    <span>{{$t(`m.newCommon['更多操作']`)}}</span>
-                    <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
-                </div>
-                <ul class="bk-dropdown-list-cus" slot="dropdown-content">
-                    <li>
-                        <bk-button
-                            data-test-id="ticket_button_ticketPrint"
-                            class="bk-dropdown-list-btn"
-                            theme="default"
-                            :text="true"
-                            @click="onTicketBtnClick('print')">
-                            {{ $t(`m.newCommon["打印"]`) }}
-                        </bk-button>
-                    </li>
-                    <li>
-                        <bk-popover :content="disabledText"
-                            :disabled="ticketInfo.can_operate && ticketInfo.current_status !== 'SUSPENDED'"
-                            placement="left-end">
-                            <bk-button
-                                data-test-id="ticket_button_ticketPending"
-                                class="bk-dropdown-list-btn"
-                                theme="default"
-                                :text="true"
-                                :disabled="!(ticketInfo.can_operate && ticketInfo.current_status !== 'SUSPENDED')"
-                                @click="onTicketBtnClick('suspend')">
-                                {{ $t(`m.newCommon["挂起"]`) }}
-                            </bk-button>
-                        </bk-popover>
-                    </li>
-                    <li>
-                        <bk-popover :content="disabledText"
-                            :disabled="ticketInfo.can_operate && ticketInfo.current_status === 'SUSPENDED'"
-                            placement="left-end">
-                            <bk-button
-                                data-test-id="ticket_button_ticketRecover"
-                                class="bk-dropdown-list-btn"
-                                :text="true"
-                                :disabled="!(ticketInfo.can_operate && ticketInfo.current_status === 'SUSPENDED')"
-                                @click="onTicketBtnClick('restore')">
-                                {{ $t(`m.newCommon["恢复"]`) }}
-                            </bk-button>
-                        </bk-popover>
-                    </li>
-                    <li>
-                        <bk-popover :content="disabledText"
-                            :disabled="ticketInfo.can_close"
-                            placement="left-end">
-                            <bk-button
-                                data-test-id="ticket_button_ticketClose"
-                                class="bk-dropdown-list-btn"
-                                :text="true"
-                                :disabled="!ticketInfo.can_close"
-                                @click="onTicketBtnClick('close')">
-                                {{ $t(`m.newCommon["关单"]`) }}
-                            </bk-button>
-                        </bk-popover>
-                    </li>
-                    <!-- 触发器列表 -->
-                    <li v-for="(ticketTrigger, index) in ticketTriggerList"
-                        :key="index">
-                        <bk-popover :content="disabledText"
-                            :disabled="ticketInfo.can_operate"
-                            placement="left-end">
-                            <bk-button
-                                data-test-id="ticket_button_trigger"
-                                class="bk-dropdown-list-btn"
-                                :text="true"
-                                :disabled="!ticketInfo.can_operate"
-                                @click="onTicketBtnClick('trigger', ticketTrigger)">
-                                {{ ticketTrigger.display_name }}
-                            </bk-button>
-                        </bk-popover>
-                    </li>
-                </ul>
-            </bk-dropdown-menu>
+  <header class="ticket-header">
+    <arrows-left-icon @click="onBackClick"></arrows-left-icon>
+    <span
+      :style="{ backgroundColor: headerInfo.statusColor }"
+      :title="ticketInfo.current_status_display"
+      class="ticket-status"
+    >
+      {{
+        localeCookie
+          ? ticketInfo.current_status
+          : ticketInfo.current_status_display
+      }}
+    </span>
+    <span
+      class="ticket-status comments-info"
+      v-if="ticketInfo.is_commented || ticketInfo.can_commen"
+    >
+      <span v-if="ticketInfo.is_commented">{{
+        $t('m.newCommon["已评价"]')
+      }}</span>
+      <span v-if="ticketInfo.can_comment">{{
+        $t('m.newCommon["待评论"]')
+      }}</span>
+    </span>
+    <!-- 关注 -->
+    <span class="bk-operation-focus">
+      <bk-popover
+        :content="
+          !hasAttention
+            ? $t(`m.manageCommon['关注单据']`)
+            : $t(`m.manageCommon['取消关注']`)
+        "
+        :interactive="false"
+        placement="top"
+      >
+        <i
+          :class="[
+            'bk-itsm-icon',
+            !hasAttention ? 'icon-rate' : 'icon-favorite'
+          ]"
+          @click="onAttention"
+        >
+        </i>
+      </bk-popover>
+    </span>
+    <!-- SN单号 -->
+    <span class="ticket-sn mr10">{{ ticketInfo.sn }}</span>
+    <!-- 标题 -->
+    <span class="ticket-title" :title="ticketInfo.title">
+      {{ ticketInfo.title || "--" }}
+    </span>
+    <div class="operation-group">
+      <!-- 刷新 -->
+      <bk-button
+        data-test-id="ticket_button_refreshTicketDetail"
+        size="small"
+        class="mr10 operation-refresh"
+        :class="{ rotate: rotate, 'not-rotate': !rotate }"
+        icon="icon-refresh"
+        theme="default"
+        @click="onRefreshBtnClick"
+      >
+        {{ $t(`m.newCommon["刷新"]`) }}
+      </bk-button>
+      <bk-popover
+        :content="$t(`m.tickets['单据当前不能被撤回']`)"
+        :disabled="ticketInfo.can_withdraw"
+      >
+        <bk-button
+          data-test-id="ticket_button_removeTicket"
+          size="small"
+          class="mr10"
+          theme="default"
+          :disabled="!ticketInfo.can_withdraw"
+          @click="onTicketBtnClick('widthdraw')"
+        >
+          {{ $t(`m.newCommon["撤单"]`) }}
+        </bk-button>
+      </bk-popover>
+      <bk-popover
+        :content="disabledText"
+        :disabled="ticketInfo.can_supervise"
+      >
+        <bk-button
+          data-test-id="ticket_button_superviseTicket"
+          size="small"
+          class="mr10"
+          theme="default"
+          :disabled="!ticketInfo.can_supervise"
+          @click="onTicketBtnClick('supervise')"
+        >
+          {{ $t(`m.newCommon["督办"]`) }}
+        </bk-button>
+      </bk-popover>
+      <bk-popover
+        :content="getDisabledContentText(ticketInfo.is_commented)"
+        :disabled="
+          !(ticketInfo.is_commented || !ticketInfo.can_comment)
+        "
+      >
+        <bk-button
+          data-test-id="ticket_button_appraiseTicket"
+          v-if="Number(ticketInfo.comment_id) !== -1"
+          size="small"
+          class="mr10"
+          theme="default"
+          :disabled="
+            ticketInfo.is_commented ||
+              !ticketInfo.can_comment ||
+              ticketInfo.comment_id === -1
+          "
+          @click="onTicketBtnClick('comment')"
+        >
+          {{ $t(`m.newCommon["评价"]`) }}
+        </bk-button>
+      </bk-popover>
+      <bk-dropdown-menu
+        ref="dropdown"
+        :align="'right'"
+        :font-size="'medium'"
+        class="bk-dropdown-menu-cus mr10"
+        @show="isDropdownShow = true"
+        @hide="isDropdownShow = false"
+      >
+        <div
+          class="dropdown-trigger-btn"
+          slot="dropdown-trigger"
+          style="width: auto"
+        >
+          <span>{{ $t(`m.newCommon['更多操作']`) }}</span>
+          <i
+            :class="[
+              'bk-icon icon-angle-down',
+              { 'icon-flip': isDropdownShow }
+            ]"
+          ></i>
         </div>
-        <!-- 单据触发器 dialog -->
-        <ticket-trigger-dialog
-            ref="ticketTriggerDialog"
-            @init-info="triggerSuccessCallback">
-        </ticket-trigger-dialog>
-        <!-- 评价弹窗 -->
-        <evaluation-ticket-modal
-            ref="evaluationModal"
-            :ticket-info="ticketInfo"
-            @submitSuccess="evaluationSubmitSuccess">
-        </evaluation-ticket-modal>
-        <!-- suspend|close|restore -->
-        <step-submit-dialog
-            ref="ticketOperate"
-            :ticket-info="ticketInfo"
-            :ticket-operate-type="ticketOperateType"
-            @submitSuccess="reloadTicket">
-        </step-submit-dialog>
-    </header>
+        <ul class="bk-dropdown-list-cus" slot="dropdown-content">
+          <li>
+            <bk-button
+              data-test-id="ticket_button_ticketPrint"
+              class="bk-dropdown-list-btn"
+              theme="default"
+              :text="true"
+              @click="onTicketBtnClick('print')"
+            >
+              {{ $t(`m.newCommon["打印"]`) }}
+            </bk-button>
+          </li>
+          <li>
+            <bk-popover
+              :content="disabledText"
+              :disabled="
+                ticketInfo.can_operate &&
+                  ticketInfo.current_status !== 'SUSPENDED'
+              "
+              placement="left-end"
+            >
+              <bk-button
+                data-test-id="ticket_button_ticketPending"
+                class="bk-dropdown-list-btn"
+                theme="default"
+                :text="true"
+                :disabled="
+                  !(
+                    ticketInfo.can_operate &&
+                    ticketInfo.current_status !==
+                    'SUSPENDED'
+                  )
+                "
+                @click="onTicketBtnClick('suspend')"
+              >
+                {{ $t(`m.newCommon["挂起"]`) }}
+              </bk-button>
+            </bk-popover>
+          </li>
+          <li>
+            <bk-popover
+              :content="disabledText"
+              :disabled="
+                ticketInfo.can_operate &&
+                  ticketInfo.current_status === 'SUSPENDED'
+              "
+              placement="left-end"
+            >
+              <bk-button
+                data-test-id="ticket_button_ticketRecover"
+                class="bk-dropdown-list-btn"
+                :text="true"
+                :disabled="
+                  !(
+                    ticketInfo.can_operate &&
+                    ticketInfo.current_status ===
+                    'SUSPENDED'
+                  )
+                "
+                @click="onTicketBtnClick('restore')"
+              >
+                {{ $t(`m.newCommon["恢复"]`) }}
+              </bk-button>
+            </bk-popover>
+          </li>
+          <li>
+            <bk-popover
+              :content="disabledText"
+              :disabled="ticketInfo.can_close"
+              placement="left-end"
+            >
+              <bk-button
+                data-test-id="ticket_button_ticketClose"
+                class="bk-dropdown-list-btn"
+                :text="true"
+                :disabled="!ticketInfo.can_close"
+                @click="onTicketBtnClick('close')"
+              >
+                {{ $t(`m.newCommon["关单"]`) }}
+              </bk-button>
+            </bk-popover>
+          </li>
+          <!-- 触发器列表 -->
+          <li
+            v-for="(ticketTrigger, index) in ticketTriggerList"
+            :key="index"
+          >
+            <bk-popover
+              :content="disabledText"
+              :disabled="ticketInfo.can_operate"
+              placement="left-end"
+            >
+              <bk-button
+                data-test-id="ticket_button_trigger"
+                class="bk-dropdown-list-btn"
+                :text="true"
+                :disabled="!ticketInfo.can_operate"
+                @click="
+                  onTicketBtnClick('trigger', ticketTrigger)
+                "
+              >
+                {{ ticketTrigger.display_name }}
+              </bk-button>
+            </bk-popover>
+          </li>
+        </ul>
+      </bk-dropdown-menu>
+    </div>
+    <!-- 单据触发器 dialog -->
+    <ticket-trigger-dialog
+      ref="ticketTriggerDialog"
+      @init-info="triggerSuccessCallback"
+    >
+    </ticket-trigger-dialog>
+    <!-- 评价弹窗 -->
+    <evaluation-ticket-modal
+      ref="evaluationModal"
+      :ticket-info="ticketInfo"
+      @submitSuccess="evaluationSubmitSuccess"
+    >
+    </evaluation-ticket-modal>
+    <!-- suspend|close|restore -->
+    <step-submit-dialog
+      ref="ticketOperate"
+      :ticket-info="ticketInfo"
+      :ticket-operate-type="ticketOperateType"
+      @submitSuccess="reloadTicket"
+    >
+    </step-submit-dialog>
+  </header>
 </template>
 
 <script>
-    import TicketTriggerDialog from '@/components/ticket/TicketTriggerDialog.vue'
-    import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue'
-    import StepSubmitDialog from './StepSubmitDialog.vue'
-    import { errorHandler } from '@/utils/errorHandler'
-    import cookie from 'cookie'
+  import TicketTriggerDialog from '@/components/ticket/TicketTriggerDialog.vue';
+  import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue';
+  import StepSubmitDialog from './StepSubmitDialog.vue';
+  import { errorHandler } from '@/utils/errorHandler';
+  import cookie from 'cookie';
 
-    export default {
-        name: 'TicketHeader',
-        components: {
-            StepSubmitDialog,
-            TicketTriggerDialog,
-            EvaluationTicketModal
-        },
-        props: {
-            ticketInfo: {
-                type: Object,
-                default: () => ({})
-            },
-            headerInfo: {
-                type: Object,
-                default: () => ({})
-            },
-            ticketTriggerList: {
-                type: Array,
-                default: () => ({})
+  export default {
+    name: 'TicketHeader',
+    components: {
+      StepSubmitDialog,
+      TicketTriggerDialog,
+      EvaluationTicketModal,
+    },
+    props: {
+      ticketInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      headerInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      ticketTriggerList: {
+        type: Array,
+        default: () => ({}),
+      },
+    },
+    data() {
+      return {
+        isSubmitting: false,
+        hasAttention: false,
+        rotate: false,
+        isDropdownShow: false,
+        disabledText: this.$t('m.newCommon["暂无权限或单据已结束"]'),
+        ticketOperateType: '',
+        localeCookie: false,
+      };
+    },
+    mounted() {
+      this.initData();
+      this.localeCookie =            cookie.parse(document.cookie).blueking_language !== 'zh-cn';
+    },
+    methods: {
+      initData() {
+        this.hasAttention = this.ticketInfo.followers
+          ? this.ticketInfo.followers.some(name => name === window.username)
+          : false;
+      },
+      // 关注
+      onAttention() {
+        const { id } = this.ticketInfo;
+        const params = {
+          attention: !this.hasAttention,
+        };
+        const bkMessage = this.hasAttention
+          ? this.$t('m.manageCommon[\'取消关注成功~\']')
+          : this.$t('m.manageCommon[\'添加关注成功~\']');
+        this.$store
+          .dispatch('deployOrder/setAttention', { params, id })
+          .then(() => {
+            this.$bkMessage({
+              message: bkMessage,
+              theme: 'success',
+              ellipsisLine: 0,
+            });
+            this.hasAttention = !this.hasAttention;
+          })
+          .catch((res) => {
+            this.$bkMessage({
+              message: res.data.msg,
+              theme: 'error',
+              ellipsisLine: 0,
+            });
+          });
+      },
+      // 单据操作按钮点击
+      onTicketBtnClick(type, item) {
+        this.$refs.dropdown.hide();
+
+        switch (type) {
+          case 'print': {
+            const { href } = this.$router.resolve({
+              path: `/printOrder?ticket_id=${this.ticketInfo.id}`,
+            });
+            window.open(href, '_blank');
+            break;
+          }
+          case 'trigger':
+            {
+              this.openTriggerDialog(item);
             }
-        },
-        data () {
-            return {
-                isSubmitting: false,
-                hasAttention: false,
-                rotate: false,
-                isDropdownShow: false,
-                disabledText: this.$t(`m.newCommon["暂无权限或单据已结束"]`),
-                ticketOperateType: '',
-                localeCookie: false
+            break;
+          case 'comment':
+            {
+              this.$refs.evaluationModal.show();
             }
-        },
-        mounted () {
-            this.initData()
-            this.localeCookie = cookie.parse(document.cookie).blueking_language !== 'zh-cn'
-        },
-        methods: {
-            initData () {
-                this.hasAttention = this.ticketInfo.followers ? this.ticketInfo.followers.some(name => name === window.username) : false
-            },
-            // 关注
-            onAttention () {
-                const id = this.ticketInfo.id
-                const params = {
-                    attention: !this.hasAttention
-                }
-                const bkMessage = this.hasAttention ? this.$t(`m.manageCommon['取消关注成功~']`) : this.$t(`m.manageCommon['添加关注成功~']`)
-                this.$store.dispatch('deployOrder/setAttention', { params, id }).then((res) => {
-                    this.$bkMessage({
-                        message: bkMessage,
-                        theme: 'success',
-                        ellipsisLine: 0
-                    })
-                    this.hasAttention = !this.hasAttention
-                }).catch((res) => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error',
-                        ellipsisLine: 0
-                    })
-                })
-            },
-            // 单据操作按钮点击
-            onTicketBtnClick (type, item) {
-                this.$refs.dropdown.hide()
-                
-                switch (type) {
-                    case 'print':
-                        const { href } = this.$router.resolve({
-                            path: `/printOrder?ticket_id=${this.ticketInfo.id}`
-                        })
-                        window.open(href, '_blank')
-                        break
-                    case 'trigger':
-                        this.openTriggerDialog(item)
-                        break
-                    case 'comment':
-                        this.$refs.evaluationModal.show()
-                        break
-                    default:
-                        this.ticketOperatingHandler(type)
-                }
-            },
-            // 单据操作
-            ticketOperatingHandler (type) {
-                // 督办,撤单
-                if (type === 'widthdraw' || type === 'supervise') {
-                    this.confirmOperating(type)
-                }
-                if (type === 'suspend' || type === 'close' || type === 'restore') {
-                    this.ticketOperateType = type
-                    this.$nextTick(() => {
-                        this.$refs.ticketOperate.openCel()
-                    })
-                }
-            },
-            // 二次确认操作
-            confirmOperating (type) {
-                const infoMap = {
-                    'widthdraw': {
-                        title: this.$t(`m.newCommon["确认撤销此单据？"]`),
-                        instructions: this.$t(`m.newCommon["撤销后，您仍然可以在“我的申请单”中查看单据信息。"]`),
-                        dispatchAcationPath: 'deployOrder/widthdrawOrder',
-                        successText: this.$t(`m.newCommon["撤单成功"]`),
-                        params: {
-                            state_id: this.ticketInfo.id
-                        }
-                    },
-                    'supervise': {
-                        title: this.$t(`m.newCommon["确认督办该节点？"]`),
-                        instructions: this.$t(`m.newCommon["执行督办操作后，将发送信息至处理人。"]`),
-                        dispatchAcationPath: 'change/submitSupervise',
-                        successText: this.$t(`m.newCommon["督办成功"]`),
-                        params: {}
-                    }
-                }
-                this.$bkInfo({
-                    type: 'warning',
-                    title: infoMap[type].title,
-                    subTitle: infoMap[type].instructions,
-                    confirmFn: () => {
-                        this.submitOperating(type, infoMap)
-                    }
-                })
-            },
-            // 提交操作
-            submitOperating (type, infoMap) {
-                this.isSubmitting = true
-                const id = this.ticketInfo.id
-                const { dispatchAcationPath, params, successText } = infoMap[type]
-                this.$store.dispatch(dispatchAcationPath, { params, id }).then((res) => {
-                    this.$bkMessage({
-                        message: successText,
-                        theme: 'success'
-                    })
-                    this.reloadTicket()
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isSubmitting = false
-                })
-            },
-            // 单据手动触发器
-            openTriggerDialog (trigger) {
-                this.$refs.ticketTriggerDialog.openDialog(trigger)
-            },
-            reloadTicket () {
-                this.$emit('reloadTicket')
-            },
-            triggerSuccessCallback () {
-                this.reloadTicket()
-            },
-            onRefreshBtnClick () {
-                this.rotate = !this.rotate
-                setTimeout(() => {
-                    this.reloadTicket()
-                }, 500)
-            },
-            evaluationSubmitSuccess () {
-                this.reloadTicket()
-            },
-            getDisabledContentText (isCommented) {
-                return isCommented ? this.$t('m.newCommon["已评价"]') : this.$t('m.newCommon["单据处理未完成或没有评价权限，不能评价！"]')
-            },
-            onBackClick () {
-                const from = this.$route.query.from || ''
-                if (from === 'projectTicket' || from === '') {
-                    this.$router.push({
-                        name: 'projectTicket',
-                        query: {
-                            project_id: this.$route.query.project_id
-                        }
-                    })
-                } else if (from === 'created') {
-                    this.$router.push({
-                        name: 'myCreatedTicket'
-                    })
-                } else {
-                    this.$router.push({
-                        name: from
-                    })
-                }
-            }
+            break;
+          default: {
+            this.ticketOperatingHandler(type);
+          }
         }
-    }
+      },
+      // 单据操作
+      ticketOperatingHandler(type) {
+        // 督办,撤单
+        if (type === 'widthdraw' || type === 'supervise') {
+          this.confirmOperating(type);
+        }
+        if (type === 'suspend' || type === 'close' || type === 'restore') {
+          this.ticketOperateType = type;
+          this.$nextTick(() => {
+            this.$refs.ticketOperate.openCel();
+          });
+        }
+      },
+      // 二次确认操作
+      confirmOperating(type) {
+        const infoMap = {
+          widthdraw: {
+            title: this.$t('m.newCommon["确认撤销此单据？"]'),
+            instructions: this.$t('m.newCommon["撤销后，您仍然可以在“我的申请单”中查看单据信息。"]'),
+            dispatchAcationPath: 'deployOrder/widthdrawOrder',
+            successText: this.$t('m.newCommon["撤单成功"]'),
+            params: {
+              state_id: this.ticketInfo.id,
+            },
+          },
+          supervise: {
+            title: this.$t('m.newCommon["确认督办该节点？"]'),
+            instructions: this.$t('m.newCommon["执行督办操作后，将发送信息至处理人。"]'),
+            dispatchAcationPath: 'change/submitSupervise',
+            successText: this.$t('m.newCommon["督办成功"]'),
+            params: {},
+          },
+        };
+        this.$bkInfo({
+          type: 'warning',
+          title: infoMap[type].title,
+          subTitle: infoMap[type].instructions,
+          confirmFn: () => {
+            this.submitOperating(type, infoMap);
+          },
+        });
+      },
+      // 提交操作
+      submitOperating(type, infoMap) {
+        this.isSubmitting = true;
+        const { id } = this.ticketInfo;
+        const { dispatchAcationPath, params, successText } = infoMap[type];
+        this.$store
+          .dispatch(dispatchAcationPath, { params, id })
+          .then(() => {
+            this.$bkMessage({
+              message: successText,
+              theme: 'success',
+            });
+            this.reloadTicket();
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isSubmitting = false;
+          });
+      },
+      // 单据手动触发器
+      openTriggerDialog(trigger) {
+        this.$refs.ticketTriggerDialog.openDialog(trigger);
+      },
+      reloadTicket() {
+        this.$emit('reloadTicket');
+      },
+      triggerSuccessCallback() {
+        this.reloadTicket();
+      },
+      onRefreshBtnClick() {
+        this.rotate = !this.rotate;
+        setTimeout(() => {
+          this.reloadTicket();
+        }, 500);
+      },
+      evaluationSubmitSuccess() {
+        this.reloadTicket();
+      },
+      getDisabledContentText(isCommented) {
+        return isCommented
+          ? this.$t('m.newCommon["已评价"]')
+          : this.$t('m.newCommon["单据处理未完成或没有评价权限，不能评价！"]');
+      },
+      onBackClick() {
+        const from = this.$route.query.from || '';
+        if (from === 'projectTicket' || from === '') {
+          this.$router.push({
+            name: 'projectTicket',
+            query: {
+              project_id: this.$route.query.project_id,
+            },
+          });
+        } else if (from === 'created') {
+          this.$router.push({
+            name: 'myCreatedTicket',
+          });
+        } else {
+          this.$router.push({
+            name: from,
+          });
+        }
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
@@ -404,7 +509,7 @@
     align-items: center;
     padding: 0 19px 0 14px;
     height: 50px;
-    box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.1);
+    box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
     background: #ffffff;
     .ticket-status {
         margin-right: 10px;
@@ -434,7 +539,7 @@
             &:hover {
                 color: #ffb848;
                 &::before {
-                    content: "\E1F1"
+                    content: "\E1F1";
                 }
             }
         }
@@ -466,13 +571,13 @@
                 font-size: 14px;
                 vertical-align: 1px;
             }
-            &.rotate{
-                /deep/ .icon-refresh{
+            &.rotate {
+                /deep/ .icon-refresh {
                     transform: rotate(360deg);
                 }
             }
-            &.not-rotate{
-                /deep/ .icon-refresh{
+            &.not-rotate {
+                /deep/ .icon-refresh {
                     transform: rotate(0);
                 }
             }
@@ -487,7 +592,7 @@
             font-size: 12px;
             border-radius: 2px;
             padding: 0 15px;
-            color: #63656E;
+            color: #63656e;
         }
         .dropdown-trigger-btn.bk-icon {
             font-size: 16px;
@@ -503,24 +608,24 @@
             /deep/ .bk-dropdown-content {
                 overflow: visible;
             }
-        .bk-dropdown-list-cus {
-            max-height: 400px;
-            li {
-                padding: 4px 18px;
-                .bk-dropdown-list-btn {
-                    width: 100%;
-                    font-size: 12px;
-                    text-align: left;
-                    &:not(.is-disabled) {
-                        color: #63656E;
-                        &:hover {
-                            color: #3a84ff;
+            .bk-dropdown-list-cus {
+                max-height: 400px;
+                li {
+                    padding: 4px 18px;
+                    .bk-dropdown-list-btn {
+                        width: 100%;
+                        font-size: 12px;
+                        text-align: left;
+                        &:not(.is-disabled) {
+                            color: #63656e;
+                            &:hover {
+                                color: #3a84ff;
+                            }
                         }
                     }
                 }
             }
         }
-    }
     }
 }
 </style>

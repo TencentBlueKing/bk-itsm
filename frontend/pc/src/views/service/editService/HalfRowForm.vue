@@ -21,8 +21,8 @@
   -->
 
 <template>
-    <div class="half-row-form">
-        <!-- <form-edit-item
+  <div class="half-row-form">
+    <!-- <form-edit-item
             v-if="isEdit"
             :fields="fields"
             :form="editForm"
@@ -31,99 +31,99 @@
             @onEditCancel="$emit('onEditCancel')"
             @onEditConfirm="$emit('onEditConfirm', $event)">
         </form-edit-item> -->
-        <div class="row-form-view">
-            <template v-for="(group, index) in localForms">
-                <draggable
-                    class="form-drag-wrap"
-                    handle=".view-form"
-                    :data-rowindex="rowIndex"
-                    :value="group"
-                    :key="index"
-                    :group="{
-                        name: 'view-form',
-                        put: halfRowFormPut
-                    }"
-                    @add="$emit('onHalfRowDragToHalfRow', $event)">
-                    <div class="half-form-item" v-for="item in group" :key="item.id" :data-id="item.id">
-                        <form-view-item
-                            :fields="fields"
-                            :form="item"
-                            :add-field-status="addFieldStatus"
-                            :crt-form="crtForm"
-                            @onFormEditClick="$emit('onFormEditClick', $event)"
-                            @onFormCloneClick="$emit('onFormCloneClick', $event)"
-                            @onFormDeleteClick="$emit('onFormDeleteClick', $event)">
-                            <div class="view-form" slot="draggable">
-                                <i class="bk-itsm-icon icon-move-new"></i>
-                            </div>
-                        </form-view-item>
-                    </div>
-                </draggable>
-            </template>
-        </div>
+    <div class="row-form-view">
+      <template v-for="(group, index) in localForms">
+        <draggable
+          class="form-drag-wrap"
+          handle=".view-form"
+          :data-rowindex="rowIndex"
+          :value="group"
+          :key="index"
+          :group="{
+            name: 'view-form',
+            put: halfRowFormPut
+          }"
+          @add="$emit('onHalfRowDragToHalfRow', $event)">
+          <div class="half-form-item" v-for="item in group" :key="item.id" :data-id="item.id">
+            <form-view-item
+              :fields="fields"
+              :form="item"
+              :add-field-status="addFieldStatus"
+              :crt-form="crtForm"
+              @onFormEditClick="$emit('onFormEditClick', $event)"
+              @onFormCloneClick="$emit('onFormCloneClick', $event)"
+              @onFormDeleteClick="$emit('onFormDeleteClick', $event)">
+              <div class="view-form" slot="draggable">
+                <i class="bk-itsm-icon icon-move-new"></i>
+              </div>
+            </form-view-item>
+          </div>
+        </draggable>
+      </template>
     </div>
+  </div>
 </template>
 <script>
-    import draggable from 'vuedraggable'
-    // import FormEditItem from './FormEditItem'
-    import FormViewItem from './FormViewItem'
+  import draggable from 'vuedraggable';
+  // import FormEditItem from './FormEditItem'
+  import FormViewItem from './FormViewItem';
 
-    export default {
-        name: 'HalfRowForm',
-        components: {
-            draggable,
-            // FormEditItem,
-            FormViewItem
-        },
-        props: {
-            rowIndex: Number,
-            workflowId: Number,
-            nodeId: Number,
-            fields: Array, // 原始字段列表
-            rowForms: { // 半行表单数组
-                type: Array,
-                default: () => ([])
-            },
-            crtForm: {
-                type: [String, Number],
-                default: ''
-            },
-            addFieldStatus: Boolean
-        },
-        data () {
-            return {
-                isEdit: this.checkEdit(),
-                localForms: this.getLocalForms(this.rowForms)
-            }
-        },
-        computed: {
-            editForm () {
-                if (this.isEdit) {
-                    return this.rowForms.find(item => item && item.id === this.crtForm)
-                }
-                return null
-            }
-        },
-        watch: {
-            rowForms (val) {
-                this.localForms = this.getLocalForms(val)
-            },
-            crtForm (val) {
-                this.isEdit = val !== '' ? this.checkEdit() : false
-            }
-        },
-        methods: {
-            getLocalForms (forms) {
-                return forms.map(item => item === undefined ? [] : [item])
-            },
-            checkEdit () {
-                return this.rowForms.find(item => item && item.id === this.crtForm)
-            },
-            halfRowFormPut (to, from) {
-                return to.el.children.length === 0
-            }
+  export default {
+    name: 'HalfRowForm',
+    components: {
+      draggable,
+      // FormEditItem,
+      FormViewItem,
+    },
+    props: {
+      rowIndex: Number,
+      workflowId: Number,
+      nodeId: Number,
+      fields: Array, // 原始字段列表
+      rowForms: { // 半行表单数组
+        type: Array,
+        default: () => ([]),
+      },
+      crtForm: {
+        type: [String, Number],
+        default: '',
+      },
+      addFieldStatus: Boolean,
+    },
+    data() {
+      return {
+        isEdit: this.checkEdit(),
+        localForms: this.getLocalForms(this.rowForms),
+      };
+    },
+    computed: {
+      editForm() {
+        if (this.isEdit) {
+          return this.rowForms.find(item => item && item.id === this.crtForm);
         }
-    }
+        return null;
+      },
+    },
+    watch: {
+      rowForms(val) {
+        this.localForms = this.getLocalForms(val);
+      },
+      crtForm(val) {
+        this.isEdit = val !== '' ? this.checkEdit() : false;
+      },
+    },
+    methods: {
+      getLocalForms(forms) {
+        return forms.map(item => item === undefined ? [] : [item]);
+      },
+      checkEdit() {
+        return this.rowForms.find(item => item && item.id === this.crtForm);
+      },
+      halfRowFormPut(to) {
+        return to.el.children.length === 0;
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .click-status {

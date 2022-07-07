@@ -21,101 +21,99 @@
   -->
 
 <template>
-    <div class="bk-sops-node-content">
-        <div class="bk-page bk-auto-node-basic">
-            <p class="bk-header-bold">{{ $t('m.newCommon["基本信息"]') }}</p>
-            <div class="bk-main bk-flex">
-                <div class="bk-node-name">
-                    <span>{{ $t('m.newCommon["节点名称"]') }} : </span>
-                    <span>{{nodeInfo.name || '--'}}</span>
-                </div>
-            </div>
+  <div class="bk-sops-node-content">
+    <div class="bk-page bk-auto-node-basic">
+      <p class="bk-header-bold">{{ $t('m.newCommon["基本信息"]') }}</p>
+      <div class="bk-main bk-flex">
+        <div class="bk-node-name">
+          <span>{{ $t('m.newCommon["节点名称"]') }} : </span>
+          <span>{{nodeInfo.name || '--'}}</span>
         </div>
-        <div class="bk-page bk-auto-node-basic">
-            <p class="bk-header-bold">{{ $t('m.newCommon["任务参数"]') }}</p>
-            <div>
-                <div class="bk-param">
-                    <bk-table
-                        v-if="true"
-                        :data="tableData"
-                        :ext-cls="'bk-editor-table'">
-                        <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="name"></bk-table-column>
-                        <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="400">
-                            <template slot-scope="props">
-                                <span>{{props.row.value || '--'}}</span>
-                            </template>
-                        </bk-table-column>
-                    </bk-table>
-                </div>
-            </div>
-        </div>
-        <div class="bk-page bk-auto-node-basic">
-            <p class="bk-header-bold">{{ $t('m.taskTemplate["执行详情"]') }}</p>
-            <div>
-                <p class="bk-partition">
-                    <b class="bk-base-label">{{ $t('m.taskTemplate["执行状态："]') }}</b>
-                    <span
-                        :class="{
-                            'statusShow': true,
-                            'statusSuccess': status === 'SUCCESS',
-                            'statusRunning': status === 'RUNNING',
-                            'statusFailed': status === 'FAILED' }">
-                        {{status || '--'}}</span>
-                </p>
-                <p class="bk-partition">
-                    <b class="bk-base-label">{{ $t('m.common["开始时间："]') }}</b>
-                    <span>{{nodeInfo.create_at}}</span>
-                </p>
-                <p class="bk-partition">
-                    <b class="bk-base-label">{{ $t('m.common["结束时间："]') }}</b>
-                    <span>{{ nodeInfo.end_at || $t('m.taskTemplate["尚未结束"]') }}
-                    </span>
-                </p>
-                <div class="bk-partition errorDiv">
-                    <b class="bk-base-label">{{ $t('m.taskTemplate["错误信息："]') }}</b>
-                </div>
-                <div class="langError">{{nodeInfo.error_message || '--'}}</div>
-            </div>
-        </div>
+      </div>
     </div>
+    <div class="bk-page bk-auto-node-basic">
+      <p class="bk-header-bold">{{ $t('m.newCommon["任务参数"]') }}</p>
+      <div>
+        <div class="bk-param">
+          <bk-table
+            v-if="true"
+            :data="tableData"
+            :ext-cls="'bk-editor-table'">
+            <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="name"></bk-table-column>
+            <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="400">
+              <template slot-scope="props">
+                <span>{{props.row.value || '--'}}</span>
+              </template>
+            </bk-table-column>
+          </bk-table>
+        </div>
+      </div>
+    </div>
+    <div class="bk-page bk-auto-node-basic">
+      <p class="bk-header-bold">{{ $t('m.taskTemplate["执行详情"]') }}</p>
+      <div>
+        <p class="bk-partition">
+          <b class="bk-base-label">{{ $t('m.taskTemplate["执行状态："]') }}</b>
+          <span
+            :class="{
+              'statusShow': true,
+              'statusSuccess': status === 'SUCCESS',
+              'statusRunning': status === 'RUNNING',
+              'statusFailed': status === 'FAILED' }">
+            {{status || '--'}}</span>
+        </p>
+        <p class="bk-partition">
+          <b class="bk-base-label">{{ $t('m.common["开始时间："]') }}</b>
+          <span>{{nodeInfo.create_at}}</span>
+        </p>
+        <p class="bk-partition">
+          <b class="bk-base-label">{{ $t('m.common["结束时间："]') }}</b>
+          <span>{{ nodeInfo.end_at || $t('m.taskTemplate["尚未结束"]') }}
+          </span>
+        </p>
+        <div class="bk-partition errorDiv">
+          <b class="bk-base-label">{{ $t('m.taskTemplate["错误信息："]') }}</b>
+        </div>
+        <div class="langError">{{nodeInfo.error_message || '--'}}</div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-    export default {
-        name: 'bkPluginInfo',
-        props: {
-            nodeInfo: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            },
-            // 自动节点信息
-            apiInfo: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            }
+  export default {
+    name: 'bkPluginInfo',
+    props: {
+      nodeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        data () {
-            return {
-                status: '',
-                tableData: []
-            }
+      },
+      // 自动节点信息
+      apiInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        mounted () {
-            this.status = this.nodeInfo.status
-            if ('inputs' in this.nodeInfo.contexts.build_params) {
-                this.tableData = Object.keys(this.nodeInfo.contexts.build_params.inputs).map(item => {
-                    return {
-                        name: item,
-                        value: this.nodeInfo.contexts.build_params.inputs[item]
-                    }
-                })
-            }
-        }
-    }
+      },
+    },
+    data() {
+      return {
+        status: '',
+        tableData: [],
+      };
+    },
+    mounted() {
+      this.status = this.nodeInfo.status;
+      if ('inputs' in this.nodeInfo.contexts.build_params) {
+        this.tableData = Object.keys(this.nodeInfo.contexts.build_params.inputs).map(item => ({
+          name: item,
+          value: this.nodeInfo.contexts.build_params.inputs[item],
+        }));
+      }
+    },
+  };
 </script>
 
 <style scoped lang='scss'>

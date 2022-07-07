@@ -21,157 +21,158 @@
   -->
 
 <template>
-    <div class="bk-table-fields">
-        <template v-if="openFunction.FIRST_STATE_SWITCH">
-            <span class="bk-field-tip">{{ $t(`m['提单节点字段信息：']`)}}</span>
-            <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
-                <template v-for="(item, index) in firstStateFields">
-                    <div v-if="item.showFeild"
-                        :key="index"
-                        class="bk-field-line">
-                        <fields-done
-                            :item="item"
-                            :basic-info-type="basicInfoType"
-                            :fields="firstStateFields"
-                            :basic-infomation="basicInfomation">
-                        </fields-done>
-                    </div>
-                </template>
-            </bk-form>
+  <div class="bk-table-fields">
+    <template v-if="openFunction.FIRST_STATE_SWITCH">
+      <span class="bk-field-tip">{{ $t(`m['提单节点字段信息：']`)}}</span>
+      <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
+        <template v-for="(item, index) in firstStateFields">
+          <div v-if="item.showFeild"
+            :key="index"
+            class="bk-field-line">
+            <fields-done
+              :item="item"
+              :basic-info-type="basicInfoType"
+              :fields="firstStateFields"
+              :basic-infomation="basicInfomation">
+            </fields-done>
+          </div>
         </template>
-        <!-- <div class="split-line" v-if="openFunction.TABLE_FIELDS_SWITCH && openFunction.FIRST_STATE_SWITCH"></div> -->
-        <template v-if="openFunction.TABLE_FIELDS_SWITCH">
-            <span class="bk-field-tip">{{ $t(`m['基础字段信息：']`)}}</span>
-            <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
-                <div v-for="(item, index) in tableFields"
-                    :key="index"
-                    :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }">
-                    <!-- 静态展示 -->
-                    <template v-if="!item.isEdit">
-                        <fields-done
-                            :item="item"
-                            :basic-info-type="basicInfoType"
-                            :fields="basicInfomation.table_fields"
-                            :basic-infomation="basicInfomation">
-                        </fields-done>
-                    </template>
-                    <!-- 编辑状态 -->
-                    <template v-else>
-                        <fields-running
-                            :item="item"
-                            :fields="basicInfomation.table_fields"
-                            :basic-infomation="basicInfomation">
-                        </fields-running>
-                    </template>
-                </div>
-            </bk-form>
-        </template>
-    </div>
+      </bk-form>
+    </template>
+    <!-- <div class="split-line" v-if="openFunction.TABLE_FIELDS_SWITCH && openFunction.FIRST_STATE_SWITCH"></div> -->
+    <template v-if="openFunction.TABLE_FIELDS_SWITCH">
+      <span class="bk-field-tip">{{ $t(`m['基础字段信息：']`)}}</span>
+      <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
+        <div v-for="(item, index) in tableFields"
+          :key="index"
+          :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }">
+          <!-- 静态展示 -->
+          <template v-if="!item.isEdit">
+            <fields-done
+              :item="item"
+              :basic-info-type="basicInfoType"
+              :fields="basicInfomation.table_fields"
+              :basic-infomation="basicInfomation">
+            </fields-done>
+          </template>
+          <!-- 编辑状态 -->
+          <template v-else>
+            <fields-running
+              :item="item"
+              :fields="basicInfomation.table_fields"
+              :basic-infomation="basicInfomation">
+            </fields-running>
+          </template>
+        </div>
+      </bk-form>
+    </template>
+  </div>
 </template>
 <script>
-    import fieldsDone from './fieldsDone.vue'
-    import fieldsRunning from './fieldsRunning.vue'
-    import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js'
-    export default {
-        name: 'tableFields',
-        components: {
-            fieldsDone,
-            fieldsRunning
+  import fieldsDone from './fieldsDone.vue';
+  import fieldsRunning from './fieldsRunning.vue';
+  import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
+  export default {
+    name: 'tableFields',
+    components: {
+      fieldsDone,
+      fieldsRunning,
+    },
+    mixins: [apiFieldsWatch],
+    props: {
+      basicInfomation: {
+        type: Object,
+        default() {
+          return {
+            table_fields: [],
+          };
         },
-        mixins: [apiFieldsWatch],
-        props: {
-            basicInfomation: {
-                type: Object,
-                default () {
-                    return {
-                        table_fields: []
-                    }
-                }
-            },
-            firstStateFields: {
-                type: Array,
-                default () {
-                    return []
-                }
-            }
+      },
+      firstStateFields: {
+        type: Array,
+        default() {
+          return [];
         },
-        data () {
-            return {
-                showMore: false,
-                showInfo: true,
-                fieldList: [],
-                basicInfoType: ['STRING', 'TEXT', 'SELECT', 'INT', 'DATE', 'MULTISELECT', 'MEMBER']
-            }
-        },
-        computed: {
-            profile: function () {
-                if (!this.basicInfomation) {
-                    return
-                }
-                return {
-                    name: this.basicInfomation.profile.name,
-                    phone: this.basicInfomation.profile.phone,
-                    department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : []
-                }
-            },
-            openFunction: function () {
-                return this.$store.state.openFunction
-            },
-            tableFields () {
-                const list = []
-                const fields = this.basicInfomation.table_fields
-                fields.forEach(ite => {
-                    if (!this.basicInfoType.includes(ite.type)) {
-                        list.push(ite)
-                    } else {
-                        list.unshift(ite)
-                    }
-                })
-                return list
-            }
-        },
-        watch: {
-            'basicInfomation.table_fields' (newVal) {
-                this.initData()
-            }
-        },
-        mouted () {
-            this.initData()
-        },
-        methods: {
-            initData () {
-                this.basicInfomation.table_fields.forEach(item => {
-                    this.$set(item, 'isEdit', false)
-                    this.$set(item, 'service', this.basicInfomation.service_type)
-                    this.$set(item, 'val', (item.value || ''))
-                    this.$set(item, 'showFeild', true)
-                    if (item.key === 'current_status') {
-                        this.$set(item, 'ticket_status', this.basicInfomation.current_status)
-                    }
-                })
-                this.isNecessaryToWatch({ fields: this.basicInfomation.table_fields })
-                this.basicInfomation.table_fields.forEach(item => {
-                    if ((item.type === 'TABLE' || item.type === 'CUSTOMTABLE') && !item.value) {
-                        item.value = []
-                    }
-                })
-            },
-            // 处理人栏显示处理
-            processtrans (item) {
-                switch (item.current_status) {
-                    case 'DISTRIBUTING':
-                        return item.current_assignors
-                    case 'DISTRIBUTING-RECEIVING':
-                        return (Array.from(new Set([...item.current_processors.split(','), ...item.current_assignors.split(',')])).join().replace(/(^,*)|(,$)/g, ''))
-                    default :
-                        return item.current_processors || '--'
-                }
-            },
-            changeShow () {
-                this.showMore = !this.showMore
-            }
+      },
+    },
+    data() {
+      return {
+        showMore: false,
+        showInfo: true,
+        fieldList: [],
+        basicInfoType: ['STRING', 'TEXT', 'SELECT', 'INT', 'DATE', 'MULTISELECT', 'MEMBER'],
+      };
+    },
+    computed: {
+      profile() {
+        if (!this.basicInfomation) {
+          return;
         }
-    }
+        return {
+          name: this.basicInfomation.profile.name,
+          phone: this.basicInfomation.profile.phone,
+          department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : [],
+        };
+      },
+      openFunction() {
+        return this.$store.state.openFunction;
+      },
+      tableFields() {
+        const list = [];
+        const fields = this.basicInfomation.table_fields;
+        fields.forEach((ite) => {
+          if (!this.basicInfoType.includes(ite.type)) {
+            list.push(ite);
+          } else {
+            list.unshift(ite);
+          }
+        });
+        return list;
+      },
+    },
+    watch: {
+      'basicInfomation.table_fields'() {
+        this.initData();
+      },
+    },
+    mouted() {
+      this.initData();
+    },
+    methods: {
+      initData() {
+        this.basicInfomation.table_fields.forEach((item) => {
+          this.$set(item, 'isEdit', false);
+          this.$set(item, 'service', this.basicInfomation.service_type);
+          this.$set(item, 'val', (item.value || ''));
+          this.$set(item, 'showFeild', true);
+          if (item.key === 'current_status') {
+            this.$set(item, 'ticket_status', this.basicInfomation.current_status);
+          }
+        });
+        this.isNecessaryToWatch({ fields: this.basicInfomation.table_fields });
+        this.basicInfomation.table_fields.forEach((item) => {
+          if ((item.type === 'TABLE' || item.type === 'CUSTOMTABLE') && !item.value) {
+            item.value = [];
+          }
+        });
+      },
+      // 处理人栏显示处理
+      processtrans(item) {
+        switch (item.current_status) {
+          case 'DISTRIBUTING':
+            return item.current_assignors;
+          case 'DISTRIBUTING-RECEIVING':
+            return (Array.from(new Set([...item.current_processors.split(','), ...item.current_assignors.split(',')])).join()
+              .replace(/(^,*)|(,$)/g, ''));
+          default :
+            return item.current_processors || '--';
+        }
+      },
+      changeShow() {
+        this.showMore = !this.showMore;
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
     @import '../../../../scss/mixins/clearfix.scss';

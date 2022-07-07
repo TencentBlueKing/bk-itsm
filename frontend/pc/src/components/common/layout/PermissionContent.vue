@@ -21,87 +21,87 @@
   -->
 
 <template>
-    <div class="permission-content">
-        <div class="permission-header">
-            <span class="title-icon">
-                <img :src="lock" alt="permission-lock" class="lock-img" />
-            </span>
-            <h3>{{$t(`m.common['该操作需要以下权限']`)}}</h3>
-        </div>
-        <table class="permission-table table-header">
-            <thead>
-                <tr>
-                    <th width="20%">{{$t(`m.common['系统']`)}}</th>
-                    <th width="30%">{{$t(`m.common['需要申请的权限']`)}}</th>
-                    <th width="50%">{{$t(`m.common['关联的资源实例']`)}}</th>
-                </tr>
-            </thead>
-        </table>
-        <div class="table-content">
-            <table class="permission-table">
-                <tbody>
-                    <template v-if="permissionData.actions && permissionData.actions.length > 0">
-                        <tr v-for="(action, index) in permissionData.actions" :key="index">
-                            <td width="20%">{{permissionData.system_name}}</td>
-                            <td width="30%">{{action.name}}</td>
-                            <td width="50%">
-                                <p
-                                    class="resource-type-item"
-                                    v-for="(reItem, reIndex) in getResource(action.related_resource_types)"
-                                    :key="reIndex">
-                                    {{reItem}}
-                                </p>
-                            </td>
-                        </tr>
-                    </template>
-                    <tr v-else>
-                        <td class="no-data" colspan="3">{{$t(`m.common['无数据']`)}}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+  <div class="permission-content">
+    <div class="permission-header">
+      <span class="title-icon">
+        <img :src="lock" alt="permission-lock" class="lock-img" />
+      </span>
+      <h3>{{$t(`m.common['该操作需要以下权限']`)}}</h3>
     </div>
+    <table class="permission-table table-header">
+      <thead>
+        <tr>
+          <th width="20%">{{$t(`m.common['系统']`)}}</th>
+          <th width="30%">{{$t(`m.common['需要申请的权限']`)}}</th>
+          <th width="50%">{{$t(`m.common['关联的资源实例']`)}}</th>
+        </tr>
+      </thead>
+    </table>
+    <div class="table-content">
+      <table class="permission-table">
+        <tbody>
+          <template v-if="permissionData.actions && permissionData.actions.length > 0">
+            <tr v-for="(action, index) in permissionData.actions" :key="index">
+              <td width="20%">{{permissionData.system_name}}</td>
+              <td width="30%">{{action.name}}</td>
+              <td width="50%">
+                <p
+                  class="resource-type-item"
+                  v-for="(reItem, reIndex) in getResource(action.related_resource_types)"
+                  :key="reIndex">
+                  {{reItem}}
+                </p>
+              </td>
+            </tr>
+          </template>
+          <tr v-else>
+            <td class="no-data" colspan="3">{{$t(`m.common['无数据']`)}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </template>
 <script>
-    export default {
-        name: 'PermissionContent',
-        props: {
-            permissionData: {
-                type: Object,
-                default: {}
-            }
+  export default {
+    name: 'PermissionContent',
+    props: {
+      permissionData: {
+        type: Object,
+        default: {},
+      },
+    },
+    data() {
+      return {
+        lock: require('../../../images/lock-radius.svg'),
+        // 返回499code 关联的实例对象取type
+        resource_label: {
+          task_template: this.$t('m.common[\'任务模板\']'),
+          public_api: this.$t('m.common[\'公共API\']'),
+          service: this.$t('m.common[\'服务\']'),
         },
-        data () {
-            return {
-                lock: require('../../../images/lock-radius.svg'),
-                // 返回499code 关联的实例对象取type
-                resource_label: {
-                    'task_template': this.$t(`m.common['任务模板']`),
-                    'public_api': this.$t(`m.common['公共API']`),
-                    'service': this.$t(`m.common['服务']`)
-                }
-            }
-        },
-        methods: {
-            getResource (resoures) {
-                if (resoures.length === 0) {
-                    return ['--']
-                }
-
-                const data = []
-                resoures.forEach(resource => {
-                    if (resource.instances.length > 0) {
-                        resource.instances.forEach(instanceItem => {
-                            instanceItem.forEach(item => {
-                                data.push(`${item.type_name === null ? this.resource_label[item.type] : item.type_name}：${item.name}`)
-                            })
-                        })
-                    }
-                })
-                return data
-            }
+      };
+    },
+    methods: {
+      getResource(resoures) {
+        if (resoures.length === 0) {
+          return ['--'];
         }
-    }
+
+        const data = [];
+        resoures.forEach((resource) => {
+          if (resource.instances.length > 0) {
+            resource.instances.forEach((instanceItem) => {
+              instanceItem.forEach((item) => {
+                data.push(`${item.type_name === null ? this.resource_label[item.type] : item.type_name}：${item.name}`);
+              });
+            });
+          }
+        });
+        return data;
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .permission-content {
@@ -172,5 +172,5 @@
             margin-left: 7px;
         }
     }
-    
+
 </style>

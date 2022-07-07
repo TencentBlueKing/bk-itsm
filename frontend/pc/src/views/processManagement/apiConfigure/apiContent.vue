@@ -21,149 +21,149 @@
   -->
 
 <template>
-    <div class="bk-api-content">
-        <div class="is-title-back">
-            <p class="bk-come-back" @click="backTab">
-                <arrows-left-icon></arrows-left-icon>
-                <template>{{ backName }}</template>
-            </p>
-        </div>
-        <div class="itsm-page-content">
-            <div class="bk-api-ul">
-                <ul>
-                    <li v-for="(item, index) in titleList"
-                        :key="index"
-                        :class="{ 'bk-api-check': checkIndex === index }"
-                        @click="changTitle(item, index)">
-                        <span>{{item.name}}</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="bk-api-info">
-                <api-basic
-                    :api-detail-info="apiDetailInfo"
-                    v-if="checkIndex === 0">
-                </api-basic>
-                <api-editor
-                    :api-detail-info-common="apiDetailInfoCommon"
-                    :tree-list="treeList"
-                    :path-list="pathList"
-                    :is-builtin-id-list="isBuiltinIdList"
-                    v-if="checkIndex === 1">
-                </api-editor>
-                <api-run
-                    :api-detail-info-common="apiDetailInfoCommon"
-                    v-if="checkIndex === 2">
-                </api-run>
-            </div>
-        </div>
+  <div class="bk-api-content">
+    <div class="is-title-back">
+      <p class="bk-come-back" @click="backTab">
+        <arrows-left-icon></arrows-left-icon>
+        <template>{{ backName }}</template>
+      </p>
     </div>
+    <div class="itsm-page-content">
+      <div class="bk-api-ul">
+        <ul>
+          <li v-for="(item, index) in titleList"
+            :key="index"
+            :class="{ 'bk-api-check': checkIndex === index }"
+            @click="changTitle(item, index)">
+            <span>{{item.name}}</span>
+          </li>
+        </ul>
+      </div>
+      <div class="bk-api-info">
+        <api-basic
+          :api-detail-info="apiDetailInfo"
+          v-if="checkIndex === 0">
+        </api-basic>
+        <api-editor
+          :api-detail-info-common="apiDetailInfoCommon"
+          :tree-list="treeList"
+          :path-list="pathList"
+          :is-builtin-id-list="isBuiltinIdList"
+          v-if="checkIndex === 1">
+        </api-editor>
+        <api-run
+          :api-detail-info-common="apiDetailInfoCommon"
+          v-if="checkIndex === 2">
+        </api-run>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-    import apiBasic from './components/apiBasic.vue'
-    import apiEditor from './components/apiEditor.vue'
-    import apiRun from './components/apiRun.vue'
+  import apiBasic from './components/apiBasic.vue';
+  import apiEditor from './components/apiEditor.vue';
+  import apiRun from './components/apiRun.vue';
 
-    export default {
-        name: 'apiContent',
-        components: {
-            apiBasic,
-            apiEditor,
-            apiRun
+  export default {
+    name: 'apiContent',
+    components: {
+      apiBasic,
+      apiEditor,
+      apiRun,
+    },
+    props: {
+      apiDetailInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            apiDetailInfo: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            },
-            treeList: {
-                type: Array,
-                default () {
-                    return []
-                }
-            },
-            pathList: {
-                type: Array,
-                default () {
-                    return []
-                }
-            },
-            isBuiltinIdList: {
-                type: Array,
-                default () {
-                    return []
-                }
-            },
-            secondLevelInfo: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            }
+      },
+      treeList: {
+        type: Array,
+        default() {
+          return [];
         },
-        data () {
-            return {
-                apiDetailInfoCommon: this.apiDetailInfo,
-                // tag
-                titleList: [
-                    { name: this.$t(`m.systemConfig["预览"]`) },
-                    { name: this.$t(`m.systemConfig["编辑"]`) },
-                    { name: this.$t(`m.systemConfig["运行"]`) }
-                ],
-                checkIndex: 1
-            }
+      },
+      pathList: {
+        type: Array,
+        default() {
+          return [];
         },
-        computed: {
-            backName () {
-                return this.secondLevelInfo.name
-            }
+      },
+      isBuiltinIdList: {
+        type: Array,
+        default() {
+          return [];
         },
-        watch: {
-            apiDetailInfo (newVal, oldVal) {
-                this.apiDetailInfoCommon = JSON.parse(JSON.stringify(newVal))
-                this.initData()
-            }
+      },
+      secondLevelInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        mounted () {
-            this.initData()
-        },
-        methods: {
-            backTab () {
-                this.$parent.displayInfo['level_1'] = {}
-            },
-            changTitle (item, index) {
-                this.checkIndex = index
-            },
-            initData () {
-                if (this.apiDetailInfoCommon.req_headers) {
-                    if (!this.apiDetailInfoCommon.req_headers.length) {
-                        this.apiDetailInfoCommon.req_headers = [
-                            {
-                                name: '',
-                                value: '',
-                                sample: '',
-                                desc: ''
-                            }
-                        ]
-                    }
-                    if (!this.apiDetailInfoCommon.req_params.length) {
-                        this.apiDetailInfoCommon.req_params = [
-                            {
-                                name: '',
-                                is_necessary: 0,
-                                sample: '',
-                                desc: '',
-                                value: ''
-                            }
-                        ]
-                    }
-                }
-            }
+      },
+    },
+    data() {
+      return {
+        apiDetailInfoCommon: this.apiDetailInfo,
+        // tag
+        titleList: [
+          { name: this.$t('m.systemConfig["预览"]') },
+          { name: this.$t('m.systemConfig["编辑"]') },
+          { name: this.$t('m.systemConfig["运行"]') },
+        ],
+        checkIndex: 1,
+      };
+    },
+    computed: {
+      backName() {
+        return this.secondLevelInfo.name;
+      },
+    },
+    watch: {
+      apiDetailInfo(newVal) {
+        this.apiDetailInfoCommon = JSON.parse(JSON.stringify(newVal));
+        this.initData();
+      },
+    },
+    mounted() {
+      this.initData();
+    },
+    methods: {
+      backTab() {
+        this.$parent.displayInfo.level_1 = {};
+      },
+      changTitle(item, index) {
+        this.checkIndex = index;
+      },
+      initData() {
+        if (this.apiDetailInfoCommon.req_headers) {
+          if (!this.apiDetailInfoCommon.req_headers.length) {
+            this.apiDetailInfoCommon.req_headers = [
+              {
+                name: '',
+                value: '',
+                sample: '',
+                desc: '',
+              },
+            ];
+          }
+          if (!this.apiDetailInfoCommon.req_params.length) {
+            this.apiDetailInfoCommon.req_params = [
+              {
+                name: '',
+                is_necessary: 0,
+                sample: '',
+                desc: '',
+                value: '',
+              },
+            ];
+          }
         }
-    }
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

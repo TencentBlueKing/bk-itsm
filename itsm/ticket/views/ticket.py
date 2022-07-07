@@ -1043,6 +1043,38 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response(ActionSerializer(action_query_set, many=True).data)
 
+    @action(detail=True, methods=["get"])
+    def trigger_actions_group(self, request, *args, **kwargs):
+        """获取工单对应的触发器响应事件"""
+        instance = self.get_object()
+        # 所有的内容
+        task_ids = Task.objects.filter(ticket_id=instance.id).values_list("id")
+        action_query_set = Action.objects.filter(
+            Q(Q(source_id=instance.id) & Q(source_type=SOURCE_TICKET))
+            | Q(Q(source_id__in=task_ids) & Q(source_type=SOURCE_TASK))
+        ).exclude(status=ACTION_STATUS_CREATED)
+        actions = ActionSerializer(action_query_set, many=True).data
+        # 分组
+        ticket_actions = {}
+        state_actions = {}
+        state_map = {}
+        for item in actions:
+            if item["signal_type"] == "STATE":
+                state_actions.setdefault(item["sender"], []).append(item)
+            if item["signal_type"] == "FLOW":
+                ticket_actions.setdefault(item["sender"], []).append(item)
+
+        for state_id in state_actions.keys():
+            state_map[state_id] = instance.state(state_id)["name"]
+
+        return Response(
+            {
+                "state": state_actions,
+                "ticket_actions": ticket_actions,
+                "state_map": state_map,
+            }
+        )
+
     @action(detail=True, methods=["post"])
     def terminate(self, request, *args, **kwargs):
         """单据终止"""

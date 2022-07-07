@@ -21,14 +21,14 @@
   -->
 
 <template>
-    <div class="operation-data-page">
-        <router-view></router-view>
-    </div>
+  <div class="operation-data-page">
+    <router-view></router-view>
+  </div>
 </template>
 <script>
-    export default {
-        name: 'OperationData'
-    }
+  export default {
+    name: 'OperationData',
+  };
 </script>
 <style lang="scss" scoped>
     .operation-data-page {

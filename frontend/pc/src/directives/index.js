@@ -20,94 +20,94 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import Vue from 'vue'
-import './cursor.js'
+import Vue from 'vue';
+import './cursor.js';
 // 自定义 外点击/触发
 Vue.directive('clickOut', {
-    bind: async function (el, binding) {
-        let cascaderFunction = ''
-        const documentHandler = await async function (e) {
-            if (!el.contains(e.target)) {
-                if (!cascaderFunction) {
-                    cascaderFunction = binding.value
-                } else {
-                    await binding.value()
-                    await document.removeEventListener('click', documentHandler)
-                }
-            } else {
-                // ...
-            }
+  async bind(el, binding) {
+    let cascaderFunction = '';
+    const documentHandler = await async function (e) {
+      if (!el.contains(e.target)) {
+        if (!cascaderFunction) {
+          cascaderFunction = binding.value;
+        } else {
+          await binding.value();
+          await document.removeEventListener('click', documentHandler);
         }
-        await document.addEventListener('click', documentHandler)
-    },
-    inserted: function (el, binding, vnode) {
-    },
-    update: async function (el, binding, vnode, oldVnode) {
-        let cascaderFunction = ''
-        const documentHandler = await async function (e) {
-            if (!el.contains(e.target)) {
-                if (!cascaderFunction) {
-                    cascaderFunction = binding.value
-                } else {
-                    await binding.value()
-                    await document.removeEventListener('click', documentHandler)
-                }
-            } else {
-                // ...
-            }
+      } else {
+        // ...
+      }
+    };
+    await document.addEventListener('click', documentHandler);
+  },
+  inserted() {
+  },
+  async update(el, binding) {
+    let cascaderFunction = '';
+    const documentHandler = await async function (e) {
+      if (!el.contains(e.target)) {
+        if (!cascaderFunction) {
+          cascaderFunction = binding.value;
+        } else {
+          await binding.value();
+          await document.removeEventListener('click', documentHandler);
         }
-        await document.addEventListener('click', documentHandler)
-    }
-})
+      } else {
+        // ...
+      }
+    };
+    await document.addEventListener('click', documentHandler);
+  },
+});
 // 绑定值为True时 --》 html元素获取焦点
 Vue.directive('focus', {
-    update: function (el, { value }) {
-        if (value) {
-            el.focus()
-        }
+  update(el, { value }) {
+    if (value) {
+      el.focus();
     }
-})
+  },
+});
 // 添加自定义锚点 自动滚动到锚点 ??
 Vue.directive('anchor', {
-    bind: function (el, binding, vnode) {
-        // 自定义属性：
-        binding.value.el = el
-    },
-    update: function (el, binding, vnode, oldVnode) {
-    },
-    componentUpdated: function (el, binding, vnode, oldVnode) {
-    }
-})
+  bind(el, binding) {
+    // 自定义属性：
+    binding.value.el = el;
+  },
+  update() {
+  },
+  componentUpdated() {
+  },
+});
 // 记录光标 index, 配合 u utils 方法使用
 Vue.directive('cursorIndex', {
-    bind: (el, binding) => {
-        const dom = el.querySelector('textarea,input')
-        if (dom) {
-            const handlerFocus = (e) => {
-                sessionStorage.removeItem('cursorIndex')
-            }
-            const handlerBlur = (e) => {
-                const recordJson = {
-                    name: binding.value,
-                    start: e.target.selectionStart,
-                    end: e.target.selectionEnd
-                }
-                sessionStorage.setItem('cursorIndex', JSON.stringify(recordJson))
-            }
-            dom.addEventListener('focus', handlerFocus, false)
-            dom.addEventListener('blur', handlerBlur, false)
-        }
+  bind: (el, binding) => {
+    const dom = el.querySelector('textarea,input');
+    if (dom) {
+      const handlerFocus = () => {
+        sessionStorage.removeItem('cursorIndex');
+      };
+      const handlerBlur = (e) => {
+        const recordJson = {
+          name: binding.value,
+          start: e.target.selectionStart,
+          end: e.target.selectionEnd,
+        };
+        sessionStorage.setItem('cursorIndex', JSON.stringify(recordJson));
+      };
+      dom.addEventListener('focus', handlerFocus, false);
+      dom.addEventListener('blur', handlerBlur, false);
     }
-})
+  },
+});
 
 // 自动聚焦
 Vue.directive('bk-focus', {
-    inserted: function (el) {
-        const dom = el.querySelector('textarea,input')
-        if (['textarea', 'input'].includes(el.tagName)) {
-            el.focus()
-        } else if (dom) {
-            dom.focus()
-        }
+  inserted(el) {
+    const dom = el.querySelector('textarea,input');
+    if (['textarea', 'input'].includes(el.tagName)) {
+      el.focus();
+    } else if (dom) {
+      dom.focus();
     }
-})
+  },
+});

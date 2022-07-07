@@ -20,19 +20,19 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-function isCrossOriginIFrame () {
-    try {
-        return !window.top.location.hostname
-    } catch (e) {
-        return true
-    }
+function isCrossOriginIFrame() {
+  try {
+    return !window.top.location.hostname;
+  } catch (e) {
+    return true;
+  }
 }
-const isCrossOrigin = isCrossOriginIFrame()
-export const topWindow = isCrossOrigin ? window : window.top
+const isCrossOrigin = isCrossOriginIFrame();
+export const topWindow = isCrossOrigin ? window : window.top;
 
 export const openOtherApp = {
-    'iam': function (url) {
-        const appCode = window.iam_code || 'bk_iam'
-        topWindow.BLUEKING.api.open_app_by_other(appCode, url)
-    }
-}
+  iam(url) {
+    const appCode = window.iam_code || 'bk_iam';
+    topWindow.BLUEKING.api.open_app_by_other(appCode, url);
+  },
+};

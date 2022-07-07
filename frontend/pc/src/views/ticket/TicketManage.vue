@@ -21,12 +21,12 @@
   -->
 
 <template>
-    <router-view></router-view>
+  <router-view></router-view>
 </template>
 <script>
-    export default {
-        name: 'TicketMange'
-    }
+  export default {
+    name: 'TicketMange',
+  };
 </script>
 <style lang="scss">
     @import '../../scss/mixins/scroller.scss';

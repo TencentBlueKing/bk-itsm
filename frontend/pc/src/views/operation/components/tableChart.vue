@@ -21,134 +21,134 @@
   -->
 
 <template>
-    <div class="table-chart">
-        <bk-table
-            :data="chartData"
-            :pagination="pagination"
-            :outer-border="false"
-            @sort-change="handleSortChange"
-            @page-change="handlePageChange">
-            <bk-table-column
-                v-for="col in columns"
-                :key="col.key"
-                :label="col.name"
-                :show-overflow-tooltip="col.key !== 'organization'"
-                :sortable="col.sort ? 'custom' : false"
-                :align="col.align || 'left'"
-                :prop="col.key"
-                :width="('width' in col) ? col.width : 'auto'">
-                <div
-                    slot-scope="props"
-                    :class="{ 'padding-right-adjust': col.align === 'right' && col.sort }">
-                    <div v-if="col.key === 'order'" class="order" :class="getOrderCls(props.$index)">
-                        <span class="order-num">{{ getRowOrder(props.$index) }}</span>
-                    </div>
-                    <template v-else-if="typeof col.format === 'function'">
-                        <span style="font-weigth: 700;">{{ col.format.call(this, props.row) }}</span>
-                    </template>
-                    <template v-else-if="col.key === 'organization' && props.row.organization_full">
-                        <span
-                            v-bk-tooltips="{
-                                content: props.row.organization_full,
-                                position: 'top',
-                                theme: 'light'
-                            }">
-                            {{ props.row.organization }}
-                        </span>
-                    </template>
-                    <template v-else>
-                        <span v-if="col.link" class="link" @click="handlerCellClick(col, props.row)">{{ props.row[col.key] }}</span>
-                        <span v-else>{{ props.row[col.key] }}</span>
-                    </template>
-                </div>
-            </bk-table-column>
-        </bk-table>
-    </div>
+  <div class="table-chart">
+    <bk-table
+      :data="chartData"
+      :pagination="pagination"
+      :outer-border="false"
+      @sort-change="handleSortChange"
+      @page-change="handlePageChange">
+      <bk-table-column
+        v-for="col in columns"
+        :key="col.key"
+        :label="col.name"
+        :show-overflow-tooltip="col.key !== 'organization'"
+        :sortable="col.sort ? 'custom' : false"
+        :align="col.align || 'left'"
+        :prop="col.key"
+        :width="('width' in col) ? col.width : 'auto'">
+        <div
+          slot-scope="props"
+          :class="{ 'padding-right-adjust': col.align === 'right' && col.sort }">
+          <div v-if="col.key === 'order'" class="order" :class="getOrderCls(props.$index)">
+            <span class="order-num">{{ getRowOrder(props.$index) }}</span>
+          </div>
+          <template v-else-if="typeof col.format === 'function'">
+            <span style="font-weigth: 700;">{{ col.format.call(this, props.row) }}</span>
+          </template>
+          <template v-else-if="col.key === 'organization' && props.row.organization_full">
+            <span
+              v-bk-tooltips="{
+                content: props.row.organization_full,
+                position: 'top',
+                theme: 'light'
+              }">
+              {{ props.row.organization }}
+            </span>
+          </template>
+          <template v-else>
+            <span v-if="col.link" class="link" @click="handlerCellClick(col, props.row)">{{ props.row[col.key] }}</span>
+            <span v-else>{{ props.row[col.key] }}</span>
+          </template>
+        </div>
+      </bk-table-column>
+    </bk-table>
+  </div>
 </template>
 <script>
-    export default {
-        name: 'TableChart',
-        props: {
-            title: {
-                type: String,
-                default: ''
-            },
-            desc: {
-                type: String,
-                default: ''
-            },
-            showSearchInput: {
-                type: Boolean,
-                default: false
-            },
-            showPagination: {
-                type: Boolean,
-                default: false
-            },
-            pagination: {
-                type: Object,
-                default () {
-                    return {
-                        current: 1,
-                        count: 0,
-                        limit: 10
-                    }
-                }
-            },
-            showTop3Color: {
-                type: Boolean,
-                default: true
-            },
-            columns: {
-                type: Array,
-                default: () => ([])
-            },
-            chartData: {
-                type: Array,
-                default: () => ([])
-            },
-            loading: {
-                type: Boolean,
-                default: false
-            }
+  export default {
+    name: 'TableChart',
+    props: {
+      title: {
+        type: String,
+        default: '',
+      },
+      desc: {
+        type: String,
+        default: '',
+      },
+      showSearchInput: {
+        type: Boolean,
+        default: false,
+      },
+      showPagination: {
+        type: Boolean,
+        default: false,
+      },
+      pagination: {
+        type: Object,
+        default() {
+          return {
+            current: 1,
+            count: 0,
+            limit: 10,
+          };
         },
-        methods: {
-            getRowOrder (index) {
-                return index + (this.pagination.current - 1) * this.pagination.limit + 1
-            },
-            getOrderCls (index) {
-                let cls = ''
-                if (this.pagination.current === 1 && index <= 2) {
-                    if (index === 0) {
-                        cls = 'first-order'
-                    } else if (index === 1) {
-                        cls = 'second-order'
-                    } else {
-                        cls = 'third-order'
-                    }
-                }
-                return cls
-            },
-            handleSortChange (data) {
-                const { prop, order } = data
-                let sortCondition
-                if (order === 'ascending') {
-                    sortCondition = prop
-                } else if (order === 'descending') {
-                    sortCondition = `-${prop}`
-                }
-                this.$emit('onOrderChange', sortCondition)
-            },
-            handlePageChange (page) {
-                this.$emit('onPageChange', page)
-            },
-            handlerCellClick (col, data) {
-                if (typeof col.handler === 'function') {
-                    col.handler.call(this, data)
-                }
-            }
+      },
+      showTop3Color: {
+        type: Boolean,
+        default: true,
+      },
+      columns: {
+        type: Array,
+        default: () => ([]),
+      },
+      chartData: {
+        type: Array,
+        default: () => ([]),
+      },
+      loading: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    methods: {
+      getRowOrder(index) {
+        return index + (this.pagination.current - 1) * this.pagination.limit + 1;
+      },
+      getOrderCls(index) {
+        let cls = '';
+        if (this.pagination.current === 1 && index <= 2) {
+          if (index === 0) {
+            cls = 'first-order';
+          } else if (index === 1) {
+            cls = 'second-order';
+          } else {
+            cls = 'third-order';
+          }
         }
-    }
+        return cls;
+      },
+      handleSortChange(data) {
+        const { prop, order } = data;
+        let sortCondition;
+        if (order === 'ascending') {
+          sortCondition = prop;
+        } else if (order === 'descending') {
+          sortCondition = `-${prop}`;
+        }
+        this.$emit('onOrderChange', sortCondition);
+      },
+      handlePageChange(page) {
+        this.$emit('onPageChange', page);
+      },
+      handlerCellClick(col, data) {
+        if (typeof col.handler === 'function') {
+          col.handler.call(this, data);
+        }
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .order {

@@ -20,128 +20,151 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import './public-path'
-import Vue from 'vue'
+import "./public-path";
+import Vue from "vue";
 // import Vuex from 'vuex'
-import cookie from 'cookie'
-import $ from 'jquery'
-import * as monaco from 'monaco-editor'
+import cookie from "cookie";
+import $ from "jquery";
+import * as monaco from "monaco-editor";
 // magicBox引入及国际化
-import bkMagic, { locale, lang } from 'bk-magic-vue'
-import 'bk-magic-vue/dist/bk-magic-vue.min.css'
-import { Input, InputNumber, Select, Radio, RadioGroup, RadioButton, Checkbox,
-    CheckboxGroup, Button, Option, OptionGroup, Table, TableColumn,
-    DatePicker, TimePicker, TimeSelect, Upload, Tree, Loading,
-    Container, Row, Col, Pagination, Tooltip, Cascader } from 'element-ui'
-import enLocale from 'element-ui/lib/locale/lang/en'
-import zhLocale from 'element-ui/lib/locale/lang/zh-CN'
-import locales from 'element-ui/lib/locale'
+import bkMagic, { locale, lang } from "bk-magic-vue";
+import "bk-magic-vue/dist/bk-magic-vue.min.css";
+import {
+  Input,
+  InputNumber,
+  Select,
+  Radio,
+  RadioGroup,
+  RadioButton,
+  Checkbox,
+  CheckboxGroup,
+  Button,
+  Option,
+  OptionGroup,
+  Table,
+  TableColumn,
+  DatePicker,
+  TimePicker,
+  TimeSelect,
+  Upload,
+  Tree,
+  Loading,
+  Container,
+  Row,
+  Col,
+  Pagination,
+  Tooltip,
+  Cascader,
+} from "element-ui";
+import enLocale from "element-ui/lib/locale/lang/en";
+import zhLocale from "element-ui/lib/locale/lang/zh-CN";
+import locales from "element-ui/lib/locale";
 // view components
-import App from './App'
+import App from "./App";
 // components
-import router from './router'
-import Exception from './components/common/exception'
-import ArrowsLeftIcon from './components/common/layout/ArrowsLeftIcon'
-import './utils/login.js'
-import i18n from './i18n/index.js'
-import store from './store'
+import router from "./router";
+import Exception from "./components/common/exception";
+import ArrowsLeftIcon from "./components/common/layout/ArrowsLeftIcon";
+import "./utils/login.js";
+import i18n from "./i18n/index.js";
+import store from "./store";
 // 自定义指令
-import directives from './directives'
-Vue.use(directives)
-import vClickOutside from 'v-click-outside'
-Vue.use(vClickOutside)
+import directives from "./directives";
+Vue.use(directives);
+import vClickOutside from "v-click-outside";
+Vue.use(vClickOutside);
 
-window.$ = $
-window.monaco = monaco
+window.$ = $;
+window.monaco = monaco;
 
-Vue.use(bkMagic)
+Vue.use(bkMagic);
 
-Vue.use(Input)
-Vue.use(InputNumber)
-Vue.use(Select)
-Vue.use(Radio)
-Vue.use(RadioGroup)
-Vue.use(RadioButton)
-Vue.use(Checkbox)
-Vue.use(CheckboxGroup)
-Vue.use(Button)
-Vue.use(Option)
-Vue.use(OptionGroup)
-Vue.use(Table)
-Vue.use(TableColumn)
-Vue.use(DatePicker)
-Vue.use(TimeSelect)
-Vue.use(TimePicker)
-Vue.use(Upload)
-Vue.use(Tree)
-Vue.use(Loading.directive)
-Vue.use(Container)
-Vue.use(Row)
-Vue.use(Col)
-Vue.use(Pagination)
-Vue.use(Tooltip)
-Vue.use(Cascader)
+Vue.use(Input);
+Vue.use(InputNumber);
+Vue.use(Select);
+Vue.use(Radio);
+Vue.use(RadioGroup);
+Vue.use(RadioButton);
+Vue.use(Checkbox);
+Vue.use(CheckboxGroup);
+Vue.use(Button);
+Vue.use(Option);
+Vue.use(OptionGroup);
+Vue.use(Table);
+Vue.use(TableColumn);
+Vue.use(DatePicker);
+Vue.use(TimeSelect);
+Vue.use(TimePicker);
+Vue.use(Upload);
+Vue.use(Tree);
+Vue.use(Loading.directive);
+Vue.use(Container);
+Vue.use(Row);
+Vue.use(Col);
+Vue.use(Pagination);
+Vue.use(Tooltip);
+Vue.use(Cascader);
 
-const ace = require('brace')
-Vue.prototype.$ace = ace
-Vue.prototype.$cookie = cookie
-require('brace/mode/javascript')
-require('brace/mode/python')
-require('brace/mode/json')
-require('brace/mode/yaml')
-require('brace/theme/monokai')
-require('brace/theme/textmate')
-require('brace/theme/solarized_dark')
+const ace = require("brace");
+Vue.prototype.$ace = ace;
+Vue.prototype.$cookie = cookie;
+require("brace/mode/javascript");
+require("brace/mode/python");
+require("brace/mode/json");
+require("brace/mode/yaml");
+require("brace/theme/monokai");
+require("brace/theme/textmate");
+require("brace/theme/solarized_dark");
 
-Vue.use(renderForm)
-Vue.component('app-exception', Exception)
-Vue.component('arrows-left-icon', ArrowsLeftIcon)
+Vue.use(renderForm);
+Vue.component("app-exception", Exception);
+Vue.component("arrows-left-icon", ArrowsLeftIcon);
 
 // 国际化
-let localeCookie = cookie.parse(document.cookie).blueking_language || 'zh-cn'
+const localeCookie = cookie.parse(document.cookie).blueking_language || "zh-cn";
 // magicbox 组件国际化
-if (localeCookie === 'en') {
-    locale.use(lang.enUS)
-    locales.use(enLocale)
+if (localeCookie === "en") {
+  locale.use(lang.enUS);
+  locales.use(enLocale);
 } else {
-    locale.use(lang.zhCN)
-    locales.use(zhLocale)
+  locale.use(lang.zhCN);
+  locales.use(zhLocale);
 }
 
-store.commit('setLanguage', localeCookie)
+store.commit("setLanguage", localeCookie);
 
 // Vue.use(bkMagic)
 Vue.use(bkMagic, {
-    i18n: function (path, options) {
-        let value = i18n.t(path, options)
-        if (value !== null && value !== undefined) {
-            return value
-        }
-        return ''
+  i18n: function (path, options) {
+    const value = i18n.t(path, options);
+    if (value !== null && value !== undefined) {
+      return value;
     }
-})
+    return "";
+  },
+});
 
-locale.i18n((key, value) => i18n.t(key, value))
+locale.i18n((key, value) => i18n.t(key, value));
 
 if (window.TAM_PROJECT_ID) {
-    /* eslint-disable-next-line */
-    new Aegis({
-        id: window.TAM_PROJECT_ID,
-        uin: window.USERNAME,
-        reportApiSpeed: true,
-        reportAssetSpeed: true
-    })
+  /* eslint-disable-next-line */
+  new Aegis({
+    id: window.TAM_PROJECT_ID,
+    uin: window.USERNAME,
+    reportApiSpeed: true,
+    reportAssetSpeed: true,
+  });
 }
 
 const app = new Vue({
-  el: '#app',
+  el: "#app",
   i18n,
   router,
   store,
   components: {
-      App
+    App,
   },
-  template: '<App/>'
-})
+  template: "<App/>",
+});
 
-window.app = app
+window.app = app;

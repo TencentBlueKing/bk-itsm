@@ -21,108 +21,117 @@
   -->
 
 <template>
-    <div class="version-log-wrap">
-        <!-- 版本信息 -->
-        <div class="bk-version-shade"></div>
-        <div class="bk-itsm-version" v-bkloading="{ isLoading: loading }">
-            <!-- 版本号 -->
-            <div class="bk-version-left">
-                <div class="bk-version-blank"></div>
-                <div class="bk-version-number">
-                    <ul>
-                        <li v-for="(item, index) in versionList"
-                            :class="{ 'bk-border-bottom': (index === versionList.length - 1), 'bk-click': versionInfo.version === item.version }"
-                            :key="index"
-                            @click="changeVersion(item, index)">
-                            <p :class="{ 'bk-number-name': true,'bk-version-click-color': versionInfo.version === item.version }">
-                                <span>V{{item.version}}</span>
-                                <span class="bk-current-version"
-                                    v-if="item.is_latest === true">{{ $t('m.wiki["当前版本"]')}}</span>
-                            </p>
-                            <p :class="{ 'bk-number-time': true,'bk-version-click-color': versionInfo.version === item.version }">
-                                {{item.create_at}}</p>
-                            <div class="bk-version-click" v-if="versionInfo.version === item.version"></div>
-                        </li>
-                    </ul>
-                </div>
-                <!-- 版本日志 -->
-                <div class="bk-version-blank"></div>
-            </div>
-            <div class="bk-version-content">
-                <div class="bk-content-close" @click="$emit('close')">
-                    <i class="bk-icon icon-close" style="right: 6px;"></i>
-                </div>
-                <div class="bk-content-title">
-                    {{ $t('m.wiki["【"]')}}V{{versionInfo.version}}{{ $t('m.wiki["】版本更新明细"]')}}
-                </div>
-                <div class="bk-content-markdown" v-html="markdownText"></div>
-            </div>
+  <div class="version-log-wrap">
+    <!-- 版本信息 -->
+    <div class="bk-version-shade"></div>
+    <div class="bk-itsm-version" v-bkloading="{ isLoading: loading }">
+      <!-- 版本号 -->
+      <div class="bk-version-left">
+        <div class="bk-version-blank"></div>
+        <div class="bk-version-number">
+          <ul>
+            <li v-for="(item, index) in versionList"
+              :class="{
+                'bk-border-bottom': (index === versionList.length - 1),
+                'bk-click': versionInfo.version === item.version
+              }"
+              :key="index"
+              @click="changeVersion(item, index)">
+              <p :class="{
+                'bk-number-name': true,
+                'bk-version-click-color': versionInfo.version === item.version }">
+                <span>V{{item.version}}</span>
+                <span class="bk-current-version"
+                  v-if="item.is_latest === true">{{ $t('m.wiki["当前版本"]')}}</span>
+              </p>
+              <p :class="{
+                'bk-number-time': true,
+                'bk-version-click-color': versionInfo.version === item.version }">
+                {{item.create_at}}</p>
+              <div class="bk-version-click" v-if="versionInfo.version === item.version"></div>
+            </li>
+          </ul>
         </div>
+        <!-- 版本日志 -->
+        <div class="bk-version-blank"></div>
+      </div>
+      <div class="bk-version-content">
+        <div class="bk-content-close" @click="$emit('close')">
+          <i class="bk-icon icon-close" style="right: 6px;"></i>
+        </div>
+        <div class="bk-content-title">
+          {{ $t('m.wiki["【"]')}}V{{versionInfo.version}}{{ $t('m.wiki["】版本更新明细"]')}}
+        </div>
+        <div class="bk-content-markdown" v-html="markdownText"></div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
-    import { errorHandler } from '@/utils/errorHandler.js'
-    import _ from 'lodash'
+  import { errorHandler } from '@/utils/errorHandler.js';
+  import _ from 'lodash';
 
-    export default {
-        name: 'VersionLog',
-        data () {
-            return {
-                loading: false,
-                markdownText: '',
-                versionList: [],
-                versionInfo: {
-                    version: ''
-                }
-            }
+  export default {
+    name: 'VersionLog',
+    data() {
+      return {
+        loading: false,
+        markdownText: '',
+        versionList: [],
+        versionInfo: {
+          version: '',
         },
-        computed: {},
-        watch: {},
-        created () {
+      };
+    },
+    computed: {},
+    watch: {},
+    created() {
 
-        },
-        async mounted () {
-            await this.getVersionList()
-            this.initData()
-        },
-        methods: {
-            initData () {
-                if (this.versionList.length) {
-                    this.versionInfo = this.versionList[0]
-                    this.changeVersion(this.versionList[0])
-                }
-            },
-            async getVersionList () {
-                this.loading = true
-                return this.$store.dispatch('version/version_logs').then(res => {
-                    this.versionList = res.data.data
-                }).catch(res => {
-                    errorHandler(res.data.message, this)
-                }).finally(() => {
-                    this.loading = false
-                })
-            },
-            changeVersion (item) {
-                this.versionInfo = item
-                if (typeof this.versionInfo.log === 'string') {
-                    this.versionInfo.log = _.split(this.versionInfo.log, '\n')
-                }
-                this.markdownText = ''
-                this.markdownText = this.addSpan(this.versionInfo.log)
-            },
-            addSpan (log) {
-                let result = ''
-                log.forEach((item) => {
-                    const arrayStr = item.split('')
-                    arrayStr.splice(arrayStr.findIndex(str => str === '[' || str === '【'), 0, '<span>')
-                    arrayStr.splice(arrayStr.findIndex(str => str === ']' || str === '】') + 1, 0, '</span>')
-                    result += arrayStr.join('')
-                })
-                return result
-            }
+    },
+    async mounted() {
+      await this.getVersionList();
+      this.initData();
+    },
+    methods: {
+      initData() {
+        if (this.versionList.length) {
+          this.versionInfo = this.versionList[0];
+          this.changeVersion(this.versionList[0]);
         }
-    }
+      },
+      async getVersionList() {
+        this.loading = true;
+        return this.$store.dispatch('version/version_logs').then((res) => {
+          this.versionList = res.data.data;
+        })
+          .catch((res) => {
+            errorHandler(res.data.message, this);
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      },
+      changeVersion(item) {
+        this.versionInfo = item;
+        if (typeof this.versionInfo.log === 'string') {
+          this.versionInfo.log = _.split(this.versionInfo.log, '\n');
+        }
+        this.markdownText = '';
+        this.markdownText = this.addSpan(this.versionInfo.log);
+      },
+      addSpan(log) {
+        let result = '';
+        log.forEach((item) => {
+          const arrayStr = item.split('');
+          arrayStr.splice(arrayStr.findIndex(str => str === '[' || str === '【'), 0, '<span>');
+          arrayStr.splice(arrayStr.findIndex(str => str === ']' || str === '】') + 1, 0, '</span>');
+          result += arrayStr.join('');
+        });
+        return result;
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 @import '../../../scss/mixins/clearfix.scss';
