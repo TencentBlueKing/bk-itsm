@@ -281,7 +281,7 @@
       this.hasNodeOptAuth = this.ticketInfo.updated_by.split(',').includes(window.username);
       if (this.ticketInfo && this.ticketInfo.auth_actions) {
         // 当前节点有权限不显示异常分派
-        this.isShowAssgin = this.ticketInfo.auth_actions.includes('ticket_management') && !this.hasNodeOptAuth;
+        this.isShowAssgin = this.ticketInfo.auth_actions.includes('ticket_management');
       }
       this.$store.commit('project/setProjectId', this.ticketInfo.project_key);
     },
