@@ -21,46 +21,96 @@
   -->
 
 <template>
-  <div class="bk-task-history" v-bkloading="{ isLoading: loading }">
+  <div class="bk-task-history" v-bkloading="{ isLoading: loading }" :style="!isShowSla ? 'height: calc(100vh - 436px);' : 'height: calc(100vh - 320px);'">
     <div class="history-table">
-      <bk-table
-        :data="historyList"
-        :size="'small'"
-        @sort-change="orderingClick">
-        <bk-table-column :label="$t(`m.task['执行时间']`)" :sortable="'custom'">
-          <template slot-scope="props">
-            <span :title="props.row.end_time">
-              {{props.row.end_time || '--'}}
-            </span>
-          </template>
-        </bk-table-column>
-        <bk-table-column :label="$t(`m.task['响应动作']`)">
-          <template slot-scope="props">
-            <span
-              :title="props.row.display_name"
-              style="color: #3A84FF;cursor: pointer"
-              @click="openDetail(props.row)">
-              {{props.row.component_name || '--'}}
-            </span>
-          </template>
-        </bk-table-column>
-        <bk-table-column :label="$t(`m.task['执行状态']`)" :sortable="'custom'">
-          <template slot-scope="props">
-            <span class="bk-status-success"
-              :class="{ 'bk-status-failed': props.row.status === 'FAILED' }"
-              :title="props.row.status_name">
-              {{props.row.status_name || '--'}}
-            </span>
-          </template>
-        </bk-table-column>
-        <bk-table-column :label="$t(`m.task['操作人']`)">
-          <template slot-scope="props">
-            <span :title="props.row.operator_username">
-              {{props.row.operator_username || '--'}}
-            </span>
-          </template>
-        </bk-table-column>
-      </bk-table>
+      <bk-collapse v-model="activeName">
+        <bk-collapse-item name="ticket">
+          {{$t(`m['单据触发器']`)}}
+          <div slot="content" class="f13">
+            <bk-table
+              :data="ticketAction"
+              :size="'small'"
+              @sort-change="orderingClick">
+              <bk-table-column :label="$t(`m.task['执行时间']`)" :sortable="'custom'">
+                <template slot-scope="props">
+                  <span :title="props.row.end_time">
+                    {{props.row.end_time || '--'}}
+                  </span>
+                </template>
+              </bk-table-column>
+              <bk-table-column :label="$t(`m.task['响应动作']`)">
+                <template slot-scope="props">
+                  <span
+                    :title="props.row.display_name"
+                    style="color: #3A84FF;cursor: pointer"
+                    @click="openDetail(props.row)">
+                    {{props.row.component_name || '--'}}
+                  </span>
+                </template>
+              </bk-table-column>
+              <bk-table-column :label="$t(`m.task['执行状态']`)" :sortable="'custom'">
+                <template slot-scope="props">
+                  <span class="bk-status-success"
+                    :class="{ 'bk-status-failed': props.row.status === 'FAILED' }"
+                    :title="props.row.status_name">
+                    {{props.row.status_name || '--'}}
+                  </span>
+                </template>
+              </bk-table-column>
+              <bk-table-column :label="$t(`m.task['操作人']`)">
+                <template slot-scope="props">
+                  <span :title="props.row.operator_username">
+                    {{props.row.operator_username || '--'}}
+                  </span>
+                </template>
+              </bk-table-column>
+            </bk-table>
+          </div>
+        </bk-collapse-item>
+        <bk-collapse-item :name="item.name" v-for="item in nodeActions" :key="item.name">
+          {{$t(`m['节点']`) + '：' + item.name}}
+          <div slot="content" class="f13">
+            <bk-table
+              :data="item.actions"
+              :size="'small'"
+              @sort-change="orderingClick">
+              <bk-table-column :label="$t(`m.task['执行时间']`)" :sortable="'custom'">
+                <template slot-scope="props">
+                  <span :title="props.row.end_time">
+                    {{props.row.end_time || '--'}}
+                  </span>
+                </template>
+              </bk-table-column>
+              <bk-table-column :label="$t(`m.task['响应动作']`)">
+                <template slot-scope="props">
+                  <span
+                    :title="props.row.display_name"
+                    style="color: #3A84FF;cursor: pointer"
+                    @click="openDetail(props.row)">
+                    {{props.row.component_name || '--'}}
+                  </span>
+                </template>
+              </bk-table-column>
+              <bk-table-column :label="$t(`m.task['执行状态']`)" :sortable="'custom'">
+                <template slot-scope="props">
+                  <span class="bk-status-success"
+                    :class="{ 'bk-status-failed': props.row.status === 'FAILED' }"
+                    :title="props.row.status_name">
+                    {{props.row.status_name || '--'}}
+                  </span>
+                </template>
+              </bk-table-column>
+              <bk-table-column :label="$t(`m.task['操作人']`)">
+                <template slot-scope="props">
+                  <span :title="props.row.operator_username">
+                    {{props.row.operator_username || '--'}}
+                  </span>
+                </template>
+              </bk-table-column>
+            </bk-table>
+          </div>
+        </bk-collapse-item>
+      </bk-collapse>
     </div>
     <!-- 任务记录详情 -->
     <bk-sideslider
@@ -101,9 +151,11 @@
           return [];
         },
       },
+      isShowSla: Boolean,
     },
     data() {
       return {
+        activeName: ['ticket'], // 默认全部打开
         loading: false,
         historyList: [],
         historyDetail: {
@@ -113,6 +165,8 @@
           width: 660,
           id: '',
         },
+        ticketAction: [],
+        nodeActions: [],
       };
     },
     computed: {
@@ -136,8 +190,20 @@
         };
         this.loading = true;
         const { id } = this.basicInfomation;
-        this.$store.dispatch('trigger/getTicketHandleTriggers', { id, params }).then((res) => {
-          this.historyList = res.data.filter(item => item.status === 'FAILED' || item.status === 'SUCCEED');
+        this.$store.dispatch('trigger/getTicketTriggerRecord', { id, params }).then((res) => {
+          // this.historyList = res.data.filter(item => item.status === 'FAILED' || item.status === 'SUCCEED');
+          // 单据触发器
+          const ticketKey = Object.keys(res.data.ticket_actions).map(item => item);
+          this.ticketAction = res.data.ticket_actions[ticketKey].filter(item => item.status === 'FAILED' || item.status === 'SUCCEED');
+          // 节点触发器
+          const nodeIdMap = res.data.state_map;
+          this.nodeActions = Object.keys(res.data.state).map(state => {
+            this.activeName.push(nodeIdMap[state]);
+            return {
+              name: nodeIdMap[state],
+              actions: res.data.state[state],
+            };
+          });
         })
           .catch((res) => {
             errorHandler(res, this);
@@ -176,6 +242,7 @@
 <style scoped lang='scss'>
     .bk-task-history{
         .history-table{
+          padding-bottom: 20px;
         }
     }
     .bk-status-success{

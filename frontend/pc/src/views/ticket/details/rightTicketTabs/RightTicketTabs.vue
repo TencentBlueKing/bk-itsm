@@ -66,6 +66,7 @@
         >
           <task-history
             v-if="activeTab === 'triggerLog'"
+            :is-show-sla="isShowSla"
             :basic-infomation="ticketInfo"
             :node-list="nodeList"
           ></task-history>
@@ -152,12 +153,12 @@
         default: () => [],
       },
       hasNodeOptAuth: Boolean,
+      isShowSla: Boolean,
     },
     data() {
       return {
         activeTab: 'log',
         isUseSla: true,
-        isShowSla: true,
         isResponseTimeout: true,
         isDisposeTimeout: false,
         isNormal: false, // sla正常时间内
@@ -169,9 +170,6 @@
       }),
     },
     methods: {
-      handleClickShowSla() {
-        this.isShowSla = !this.isShowSla;
-      },
       // 跳转对应项目下sla
       viewSlaRule() {
         this.$router.push({

@@ -142,6 +142,13 @@ export default {
         return res;
       });
     },
+    // 获取单据触发器记录
+    getTicketTriggerRecord({ commit, state, dispatch }, { id, params }) {
+      return ajax.get(`ticket/receipts/${id}/trigger_actions_group/`, { params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
     // 获取单据手动触发器
     executeHandleTriggers({ commit, state, dispatch }, id) {
       return ajax.post(`trigger/actions/${id}/run/`).then((response) => {

@@ -80,6 +80,7 @@
           <right-ticket-tabs
             class="right-ticket-tabs"
             v-if="!loading.ticketLoading"
+            :is-show-sla="isShowSla"
             :ticket-info="ticketInfo"
             :has-node-opt-auth="hasNodeOptAuth"
             :node-list="nodeList"
