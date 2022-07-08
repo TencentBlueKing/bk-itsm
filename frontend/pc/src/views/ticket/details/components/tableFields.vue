@@ -45,7 +45,7 @@
       <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
         <div v-for="(item, index) in tableFields"
           :key="index"
-          :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }">
+          class="bk-field-line">
           <!-- 静态展示 -->
           <template v-if="!item.isEdit">
             <fields-done
