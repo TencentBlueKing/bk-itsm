@@ -28,12 +28,15 @@ from abc import abstractmethod
 from django.db import transaction
 from django.utils.translation import ugettext as _
 
-from itsm.component.constants import DEFAULT_PROJECT_PROJECT_KEY
-from itsm.component.exceptions import ResourceTypeNotFound, ProjectNotFound, NoMigratePermission
+from itsm.component.constants import DEFAULT_PROJECT_PROJECT_KEY, ADMIN_SUPERUSER_KEY
+from itsm.component.exceptions import ResourceTypeNotFound, ProjectNotFound, NoMigratePermission, \
+    RemoteSystemNotExist, TemplateFieldNotExist
+from itsm.postman.models import RemoteSystem
 from itsm.project.handler.utils import MigrateIamRequest
 from itsm.project.models import Project
 from itsm.service.models import Service, CatalogService, ServiceCatalog
 from itsm.ticket.models import Ticket, UserRole
+from itsm.workflow.models import TemplateField
 
 GRANT = "grant"
 REVOKE = "revoke"
@@ -115,9 +118,10 @@ class ServiceMigrationHandler(MigrationHandlerBase):
         actions = ["service_manage", "ticket_view"]
 
         # 鉴权，用户是否有该资源的service_manage权限，有的话才可以进行迁移
-        if not self.iam_auth(request, actions, ready_migrate_service, old_project_key):
-            raise NoMigratePermission(_("您当前没有权限迁移该服务，您在权限中心没有该服务的权限，service_name={}".
-                                        format(ready_migrate_service.name)))
+        if request.user.username not in UserRole.objects.get(role_key=ADMIN_SUPERUSER_KEY).members:
+            if not self.iam_auth(request, actions, ready_migrate_service, old_project_key):
+                raise NoMigratePermission(_("您当前没有权限迁移该服务，您在权限中心没有该服务的权限，service_name={}".
+                                            format(ready_migrate_service.name)))
 
         # 先回收权限
         self.grant_or_revoke_instance_permission(request, actions,
@@ -190,9 +194,9 @@ class UserGroupMigrationHandler(MigrationHandlerBase):
 
         if user_role is None:
             return
-
-        if not request.user.username == user_role.creator:
-            raise NoMigratePermission("权限迁移失败，请联系该用户组创建者进行迁移")
+        if request.user.username not in UserRole.objects.get(role_key=ADMIN_SUPERUSER_KEY).members:
+            if not request.user.username == user_role.creator:
+                raise NoMigratePermission("权限迁移失败，请联系该用户组创建者进行迁移")
         actions = ["user_group_view", "user_group_edit", "user_group_delete"]
         user_role.auth_resource = {"resource_type": "user_group", "resource_type_name": "用户组"}
         # 取消实例级别的授权
@@ -207,10 +211,58 @@ class UserGroupMigrationHandler(MigrationHandlerBase):
         self.grant_or_revoke_instance_permission(request, actions, user_role, GRANT)
 
 
+class ApiSystemMigrationHandler(MigrationHandlerBase):
+    resource_type = "api_system"
+
+    def handler(self, resource_id, old_project_key, new_project_key, request):
+
+        api_system = RemoteSystem.objects.filter(project_key=old_project_key,
+                                                 id=resource_id).first()
+
+        if not api_system:
+            raise RemoteSystemNotExist("API对接系统未找到")
+        if request.user.username not in UserRole.objects.get(role_key=ADMIN_SUPERUSER_KEY).members:
+            if not (request.user.username == api_system.creator or request.user.username in api_system.owners):
+                raise NoMigratePermission("权限迁移失败，请联系该API系统创建者或责任人进行迁移")
+        
+        with transaction.atomic():
+            api_system.project_key = new_project_key
+            api_system.save()
+
+
+class TemplateFieldMigrationHandler(MigrationHandlerBase):
+    resource_type = "template_field"
+
+    def handler(self, resource_id, old_project_key, new_project_key, request):
+
+        template_field = TemplateField.objects.filter(project_key=old_project_key,
+                                                      id=resource_id).first()
+
+        if not template_field:
+            raise TemplateFieldNotExist("字段未找到")
+        if request.user.username not in UserRole.objects.get(role_key=ADMIN_SUPERUSER_KEY).members:
+            if not request.user.username == template_field.creator:
+                raise NoMigratePermission("权限迁移失败，请联系该字段创建者进行迁移")
+
+        actions = ["field_view", "field_edit", "field_delete"]
+        template_field.auth_resource = {"resource_type": "field", "resource_type_name": "字段"}
+        # 取消实例级别的授权
+        self.grant_or_revoke_instance_permission(request, actions, template_field, REVOKE)
+
+        with transaction.atomic():
+            template_field.project_key = new_project_key
+            template_field.save()
+
+        template_field.auth_resource = {"resource_type": "field", "resource_type_name": "字段"}
+        self.grant_or_revoke_instance_permission(request, actions, template_field, GRANT)
+
+
 class MigrationHandlerDispatcher(object):
     MIGRATIONS_HANDLER_CLASS = [
         ServiceMigrationHandler,
         UserGroupMigrationHandler,
+        ApiSystemMigrationHandler,
+        TemplateFieldMigrationHandler
     ]
 
     # 保留映射变量，便于直接从 object_class 找到对象定义

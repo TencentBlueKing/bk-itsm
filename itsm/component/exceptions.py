@@ -40,7 +40,9 @@ class ServerError(Exception):
     def __init__(self, *args):
         self.code = self.ERROR_CODE
         self.code_int = self.ERROR_CODE_INT
-        self.message = "%s: %s" % (_(self.MESSAGE), args[0]) if args else _(self.MESSAGE)
+        self.message = (
+            "%s: %s" % (_(self.MESSAGE), args[0]) if args else _(self.MESSAGE)
+        )
         super(ServerError, self).__init__(*args)
 
     def __str__(self):
@@ -132,7 +134,11 @@ class ComponentCallError(ServerError):
         """组件错误信息格式化"""
         if args:
             res = args[0]
-            self.MESSAGE = "%s:%s(code=%s)" % (self.MESSAGE, res.get("message"), res.get("code"))
+            self.MESSAGE = "%s:%s(code=%s)" % (
+                self.MESSAGE,
+                res.get("message"),
+                res.get("code"),
+            )
             self.esb_message = res.get("message")
             super(ComponentCallError, self).__init__()
         else:
@@ -361,3 +367,15 @@ class DeliverOperateError(ServerError):
     MESSAGE = _("转派单异常")
     ERROR_CODE = "DELIVER_OPERATE_ERROR"
     ERROR_CODE_INT = 3900046
+
+
+class RemoteSystemNotExist(ServerError):
+    MESSAGE = _("API对接系统未找到")
+    ERROR_CODE = "REMOTE_SYSTEM_NOT_EXIST"
+    ERROR_CODE_INT = 3900047
+
+
+class TemplateFieldNotExist(ServerError):
+    MESSAGE = _("字段未找到")
+    ERROR_CODE = "REMOTE_SYSTEM_NOT_EXIST"
+    ERROR_CODE_INT = 3900048
