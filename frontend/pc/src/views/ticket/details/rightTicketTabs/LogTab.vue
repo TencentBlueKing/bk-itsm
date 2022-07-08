@@ -24,42 +24,26 @@
   <div class="log-list" v-bkloading="{ isLoading: loading }">
     <div class="ticket-process-content">
       <div class="ticket-process">
-        <i class="bk-itsm-icon icon-basic-info" @click="viewProcess">
-          {{ $t(`m["查看完整流程"]`) }}</i
-        >
+        <i class="bk-itsm-icon icon-basic-info" @click="viewProcess"> {{ $t(`m["查看完整流程"]`) }}</i>
       </div>
       <bk-timeline
         data-test-id="ticket_timeline_viewLog"
         ext-cls="log-time-line"
         :list="list"
-        @select="handleSelect"
-      ></bk-timeline>
+        @select="handleSelect"></bk-timeline>
       <div v-if="isShowComment" class="process-detail">
         <div class="process-content">
           <img :src="imgUrl" alt="单据结束" />
-          <template
-            v-if="
-              !ticketInfo.is_commented &&
-                ticketInfo.comment_id !== '-1'
-            "
-          >
+          <template v-if="!ticketInfo.is_commented && ticketInfo.comment_id !== '-1'">
             <p>{{ $t(`m["当前流程已结束，快去评价吧"]`) }}</p>
-            <span
-              class="appraise"
-              @click="$emit('ticketFinishAppraise')"
-            >{{ $t(`m["去评价"]`) }}</span
-            >
+            <span class="appraise" @click="$emit('ticketFinishAppraise')">{{ $t(`m["去评价"]`) }}</span>
           </template>
           <div v-else>
             {{ $t(`m["已完成评价"]`) }}
             <div class="comment-content">
               <div class="comment-content-item">
                 <span>{{ $t(`m["星级"]`) }}:</span>
-                <bk-rate
-                  style="margin-top: 3px"
-                  :rate="commentInfo.stars"
-                  :edit="false"
-                ></bk-rate>
+                <bk-rate style="margin-top: 3px" :rate="commentInfo.stars" :edit="false"></bk-rate>
               </div>
               <div class="comment-content-item">
                 <span>{{ $t(`m["评价人"]`) }}:</span>
@@ -71,14 +55,7 @@
               </div>
               <div class="comment-content-item">
                 <span>{{ $t(`m["评价内容"]`) }}:</span>
-                <p>
-                  {{
-                    commentInfo.comments ||
-                      $t(
-                        'm.newCommon["这个朋友很懒，什么也没留下"]'
-                      )
-                  }}
-                </p>
+                <p>{{ commentInfo.comments || $t('m.newCommon["这个朋友很懒，什么也没留下"]') }}</p>
               </div>
             </div>
           </div>
@@ -93,8 +70,7 @@
         () => {
           dispalyLogInfo = null;
         }
-      "
-    >
+      ">
     </ticket-log-detail>
   </div>
 </template>
@@ -128,13 +104,10 @@
     },
     computed: {
       isShowComment() {
-        return (
-          this.ticketInfo.is_over
-          && Number(this.ticketInfo.comment_id) !== -1
-        );
+        return this.ticketInfo.is_over && Number(this.ticketInfo.comment_id) !== -1;
       },
       ...mapState({
-        nodeList: state => state.deployOrder.nodeList,
+        nodeList: (state) => state.deployOrder.nodeList,
       }),
       token() {
         return this.$route.query.token;
@@ -155,7 +128,7 @@
     methods: {
       // 获取流转日志-操作日志
       getOperationLogList() {
-        const { id } = this.$route.query;
+        const id = this.$route.query.id;
         if (!id) {
           return;
         }
@@ -180,9 +153,13 @@
                 item.tag = item.message;
                 item.type = 'primary';
                 item.showMore = false;
+                item.filled = true;
+                delete item.type; // 删除原来的type 使用组件默认
+                item.color = 'green';
                 this.list.push(JSON.parse(JSON.stringify(item)));
               }
             });
+            this.getCurrentProcess();
           })
           .catch((res) => {
             errorHandler(res, this);
@@ -192,7 +169,7 @@
           });
       },
       getCurrentProcess() {
-        this.nodeList.forEach((item) => {
+        this.nodeList.forEach((item, index) => {
           const processor = {
             action: '',
             // content: this.ticketInfo.current_processors || '--',
@@ -201,10 +178,8 @@
             form_data: [],
             from_state_name: item.name || '',
             from_state_type: '',
-            id: -1,
-            message: `${this.$t('m["正在进行中"]')}  ${
-              item.processors
-            }`,
+            id: -index,
+            message: `${this.$t('m["正在进行中"]')}  ${item.processors}`,
             operate_at: item.update_at,
             operator: item.processors,
             processors: '',
@@ -216,21 +191,20 @@
             ticket: this.ticketInfo.id,
             ticket_id: this.ticketInfo.id,
             type: 'primary',
+            color: 'blue',
           };
-          if (item.status === 'RUNNING') {
+          if (item.status === 'RUNNING' && this.list.findIndex((item) => item.id === processor.id) === -1) {
             this.list.push(processor);
           }
         });
       },
       getTicktComment() {
         if (!this.ticketInfo.is_over || !this.isShowComment) return;
-        this.$store
-          .dispatch('ticket/getTicktComment', this.ticketInfo.comment_id)
-          .then((res) => {
-            if (Object.keys(res.data).length !== 0) {
-              this.commentInfo = res.data;
-            }
-          });
+        this.$store.dispatch('ticket/getTicktComment', this.ticketInfo.comment_id).then((res) => {
+          if (Object.keys(res.data).length !== 0) {
+            this.commentInfo = res.data;
+          }
+        });
       },
       handleSelect(item) {
         const copyItem = JSON.parse(JSON.stringify(item));
@@ -238,7 +212,7 @@
           form.val = form.value;
           this.conditionField(form, copyItem.form_data);
         });
-        copyItem.form_data = copyItem.form_data.filter(form => form.showFeild);
+        copyItem.form_data = copyItem.form_data.filter((form) => form.showFeild);
         this.dispalyLogInfo = copyItem;
       },
       viewProcess() {
@@ -254,97 +228,97 @@
 <style lang="scss" scoped>
 @import "../../../../scss/mixins/scroller.scss";
 .ticket-process {
-    margin-left: -5px;
-    cursor: pointer;
-    padding: 0px 0px 10px;
-    font-size: 12px;
-    color: #3a84ff;
+  margin-left: -5px;
+  cursor: pointer;
+  padding: 0px 0px 10px;
+  font-size: 12px;
+  color: #3a84ff;
 }
 .log-list {
-    width: 100%;
-    .ticket-process-content {
-        overflow: auto;
-        padding: 5px;
-        height: calc(100vh - 240px);
-        @include scroller;
-    }
+  width: 100%;
+  .ticket-process-content {
+    overflow: auto;
+    padding: 5px;
+    height: calc(100vh - 240px);
+    @include scroller;
+  }
 }
 .log-time-line {
-    /deep/ {
-        .bk-timeline-title,
-        .bk-timeline-content {
-            font-size: 12px;
-        }
-        .bk-timeline-title {
-            &:hover {
-                color: #3a84ff;
-            }
-        }
-        .bk-timeline-dot {
-            padding-bottom: 10px;
-        }
+  /deep/ {
+    .bk-timeline-title,
+    .bk-timeline-content {
+      font-size: 12px;
     }
+    .bk-timeline-title {
+      &:hover {
+        color: #3a84ff;
+      }
+    }
+    .bk-timeline-dot {
+      padding-bottom: 10px;
+    }
+  }
 }
 .process-detail {
-    .process-title {
-        width: 56px;
-        height: 22px;
-        font-size: 14px;
-        color: #63656e;
-        font-weight: 700;
+  .process-title {
+    width: 56px;
+    height: 22px;
+    font-size: 14px;
+    color: #63656e;
+    font-weight: 700;
+  }
+  .process-header {
+    margin-top: 11px;
+    font-size: 12px;
+    height: 24px;
+    line-height: 24px;
+    background: #f5f7fa;
+    border-radius: 2px;
+    color: #63656e;
+    i {
+      color: #c4c6cc;
     }
-    .process-header {
-        margin-top: 11px;
-        font-size: 12px;
-        height: 24px;
-        line-height: 24px;
-        background: #f5f7fa;
-        border-radius: 2px;
-        color: #63656e;
-        i {
-            color: #c4c6cc;
-        }
+  }
+  .process-content {
+    text-align: center;
+    font-size: 14px;
+    line-height: 22px;
+    img {
+      margin-top: 55px;
+      width: 110px;
+      height: 89px;
     }
-    .process-content {
-        text-align: center;
-        font-size: 14px;
-        line-height: 22px;
-        img {
-            margin-top: 55px;
-            width: 110px;
-            height: 89px;
+    p {
+      font-size: 14px;
+    }
+    .appraise {
+      color: #3a84ff;
+      cursor: pointer;
+    }
+    .hide-comment {
+      height: 0;
+    }
+    .comment-content {
+      width: 100%;
+      height: 250px;
+      .comment-content-item {
+        display: flex;
+        margin-top: 5px;
+        padding: 0 45px;
+        span {
+          width: 70px;
+          text-align: left;
         }
         p {
-            font-size: 14px;
+          text-align: left;
+          font-size: 12px;
+          flex: 1;
+          color: #9da0a9;
+          word-wrap: break-word;
+          word-break: break-all;
         }
-        .appraise {
-            color: #3a84ff;
-            cursor: pointer;
-        }
-        .hide-comment {
-            height: 0;
-        }
-        .comment-content {
-            width: 100%;
-            height: 250px;
-            .comment-content-item {
-                display: flex;
-                margin-top: 5px;
-                padding: 0 45px;
-                span {
-                    width: 70px;
-                    text-align: left;
-                }
-                p {
-                    text-align: left;
-                    font-size: 12px;
-                    flex: 1;
-                    color: #9da0a9;
-                    word-wrap: break-word;
-                    word-break: break-all;
-                }
-            }
-        }
+      }
     }
+  }
 }
 </style>
