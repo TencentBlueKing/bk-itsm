@@ -122,6 +122,7 @@
         <history-detail v-if="historyDetail.isShow"
           :history-id="historyDetail.id"
           :basic-infomation="basicInfomation"
+          :node-id-map="nodeIdMap"
           :node-list="nodeList">
         </history-detail>
       </div>
@@ -167,6 +168,7 @@
         },
         ticketAction: [],
         nodeActions: [],
+        nodeIdMap: {},
       };
     },
     computed: {
@@ -185,22 +187,19 @@
     methods: {
       getHistoryList() {
         // 获取单据手动触发器
-        const params = {
-          operate_type: 'all',
-        };
         this.loading = true;
         const { id } = this.basicInfomation;
-        this.$store.dispatch('trigger/getTicketTriggerRecord', { id, params }).then((res) => {
+        this.$store.dispatch('trigger/getTicketTriggerRecord', { id }).then((res) => {
           // this.historyList = res.data.filter(item => item.status === 'FAILED' || item.status === 'SUCCEED');
           // 单据触发器
           const ticketKey = Object.keys(res.data.ticket_actions).map(item => item);
           this.ticketAction = res.data.ticket_actions[ticketKey].filter(item => item.status === 'FAILED' || item.status === 'SUCCEED');
           // 节点触发器
-          const nodeIdMap = res.data.state_map;
+          this.nodeIdMap = res.data.state_map;
           this.nodeActions = Object.keys(res.data.state).map(state => {
-            this.activeName.push(nodeIdMap[state]);
+            this.activeName.push(this.nodeIdMap[state]);
             return {
-              name: nodeIdMap[state],
+              name: this.nodeIdMap[state],
               actions: res.data.state[state],
             };
           });
