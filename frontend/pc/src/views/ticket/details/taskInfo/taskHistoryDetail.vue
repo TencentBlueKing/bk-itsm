@@ -209,8 +209,8 @@
       },
       giveSignalInfo() {
         let senderName = '';
-        if (this.historyInfo.signal_type === 'STATE') {
-          senderName = this.nodeList.find(node => Number(node.state_id) === Number(this.historyInfo.sender)).name;
+        if (this.historyInfo.signal_type === 'STATE' && this.nodeList.find(node => Number(node.state_id) === Number(this.historyInfo.sender))) {
+          senderName = this.nodeList.find(node => Number(node.state_id) === Number(this.historyInfo.sender));
         } else {
           senderName = this.basicInfomation.title;
         }
