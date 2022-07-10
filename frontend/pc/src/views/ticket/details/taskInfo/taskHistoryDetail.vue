@@ -144,6 +144,12 @@
           return [];
         },
       },
+      nodeIdMap: {
+        type: Object,
+        default() {
+          return {};
+        },
+      },
     },
     data() {
       return {
@@ -196,7 +202,9 @@
               field.value = tempAllFields.find(item => item.key === field.value).name;
             }
             if (field.key === 'processors') {
-              field.value = JSON.parse(JSON.stringify(field.value)).members.replace(/^(\s|,)+|(\s|,)+$/g, '');
+              if (Object.prototype.hasOwnProperty.call(field.value, 'members')) {
+                field.value = JSON.parse(JSON.stringify(field.value)).members.replace(/^(\s|,)+|(\s|,)+$/g, '');
+              }
             }
           });
         })
@@ -210,7 +218,8 @@
       giveSignalInfo() {
         let senderName = '';
         if (this.historyInfo.signal_type === 'STATE') {
-          senderName = this.nodeList.find(node => Number(node.state_id) === Number(this.historyInfo.sender)).name;
+          // senderName = this.nodeList.find(node => Number(node.state_id) === Number(this.historyInfo.sender)).name;
+          senderName = this.nodeIdMap[this.historyInfo.sender];
         } else {
           senderName = this.basicInfomation.title;
         }

@@ -42,7 +42,7 @@
           </api-call>
         </template>
         <template v-else-if="item && item.key === 'modify_field'">
-          <modify-field :field-schema="item.field_schema"></modify-field>
+          <modify-field :field-schema="item"></modify-field>
         </template>
         <template v-else>
           <template v-for="(itemInfo, index) in item.field_schema">
@@ -90,6 +90,7 @@
 </template>
 <script>
   import { errorHandler } from '../../utils/errorHandler';
+  import modifyField from '../../views/processManagement/publicTrigger/components/modifyField.vue';
   import sendMessage from '../../views/processManagement/publicTrigger/components/sendMessage.vue';
   import apiCall from '../../views/processManagement/publicTrigger/components/apiCall.vue';
   import changeConductor from '../../views/processManagement/publicTrigger/components/changeConductor.vue';
@@ -99,6 +100,7 @@
       sendMessage,
       apiCall,
       changeConductor,
+      modifyField,
     },
     props: {
       item: {
