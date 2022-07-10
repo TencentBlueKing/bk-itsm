@@ -1055,14 +1055,14 @@ class TicketModelViewSet(ModelViewSet):
         ).exclude(status=ACTION_STATUS_CREATED)
         actions = ActionSerializer(action_query_set, many=True).data
         # 分组
-        ticket_actions = {}
+        ticket_actions = []
         state_actions = {}
         state_map = {}
         for item in actions:
             if item["signal_type"] == "STATE":
                 state_actions.setdefault(item["sender"], []).append(item)
             if item["signal_type"] == "FLOW":
-                ticket_actions.setdefault(item["sender"], []).append(item)
+                ticket_actions.append(item)
 
         for state_id in state_actions.keys():
             state_map[state_id] = instance.state(state_id)["name"]
