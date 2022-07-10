@@ -192,8 +192,7 @@
         this.$store.dispatch('trigger/getTicketTriggerRecord', { id }).then((res) => {
           // this.historyList = res.data.filter(item => item.status === 'FAILED' || item.status === 'SUCCEED');
           // 单据触发器
-          const ticketKey = Object.keys(res.data.ticket_actions).map(item => item);
-          this.ticketAction = res.data.ticket_actions[ticketKey].filter(item => item.status === 'FAILED' || item.status === 'SUCCEED');
+          this.ticketAction = res.data.ticket_actions.filter(item => item.status === 'FAILED' || item.status === 'SUCCEED');
           // 节点触发器
           this.nodeIdMap = res.data.state_map;
           this.nodeActions = Object.keys(res.data.state).map(state => {
