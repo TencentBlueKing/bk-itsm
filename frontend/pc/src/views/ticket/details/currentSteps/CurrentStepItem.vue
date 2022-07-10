@@ -226,6 +226,7 @@
                   </template>
                 </bk-button>
               </template>
+              <bk-button v-if="!nodeAutoPass() && isShowAssgin && (nodeInfo.type === 'APPROVAL' || nodeInfo.type === 'NORMAL')" @click="clickBtn({ can_operate: true, key: 'EXCEPTION_DISTRIBUTE' ,name: '异常分派' })">{{ $t(`m['异常分派']`) }}</bk-button>
             </template>
             <!-- 节点触发器 -->
             <bk-dropdown-menu
@@ -249,7 +250,6 @@
           </div>
         </div>
       </collapse-transition>
-      <bk-button v-if="isShowAssgin && (nodeInfo.type === 'APPROVAL' || nodeInfo.type === 'NORMAL')" style="margin-left: 14px" @click="clickBtn({ can_operate: true, key: 'EXCEPTION_DISTRIBUTE' ,name: '异常分派' })">{{ $t(`m['异常分派']`) }}</bk-button>
     </div>
     <!-- 处理人 tips 内容 -->
     <div id="processor-tips-content" class="bk-processor-content">

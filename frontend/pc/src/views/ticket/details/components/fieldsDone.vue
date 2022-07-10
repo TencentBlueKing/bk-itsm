@@ -301,7 +301,7 @@
     .bk-fields-done {
         width: 100%;
         color: #737987;
-
+        display: flex;
         .isOn {
             font-size: 22px;
             opacity: 0;
@@ -319,6 +319,9 @@
             max-width: calc(100% - 30px);
             overflow-wrap: break-word;
             display: flex;
+            .bk-form-content {
+              width: calc(100% - 130px);
+            }
 
             .bk-fields-done-edit {
                 display: inline-block;
