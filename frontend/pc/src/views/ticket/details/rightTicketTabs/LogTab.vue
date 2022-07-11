@@ -22,17 +22,15 @@
 
 <template>
   <div class="log-list" v-bkloading="{ isLoading: loading }">
-    <div :class="['ticket-process-content']">
+    <div class="ticket-process-content" :style="!isShowSla ? 'height: calc(100vh - 430px);' : 'height: calc(100vh - 310px);'">
       <div class="ticket-process">
         <i class="bk-itsm-icon icon-basic-info" @click="viewProcess"> {{ $t(`m["查看完整流程"]`) }}</i>
       </div>
-      <div class="time-line" :style="isShowComment ? 'height: calc(100vh - 550px);' : 'height: calc(100vh - 345px);'">
-        <bk-timeline
-          data-test-id="ticket_timeline_viewLog"
-          ext-cls="log-time-line"
-          :list="list"
-          @select="handleSelect"></bk-timeline>
-      </div>
+      <bk-timeline
+        data-test-id="ticket_timeline_viewLog"
+        ext-cls="log-time-line"
+        :list="list"
+        @select="handleSelect"></bk-timeline>
       <div v-if="isShowComment" class="process-detail">
         <div class="process-content">
           <img :src="imgUrl" alt="单据结束" />
@@ -91,6 +89,7 @@
     mixins: [fieldMix],
     props: {
       ticketInfo: Object,
+      isShowSla: Boolean,
     },
     data() {
       return {
@@ -123,6 +122,7 @@
       },
     },
     created() {
+      // console.log(this.isShowSla);
       this.getOperationLogList();
       this.getTicktComment();
     },
@@ -239,16 +239,11 @@
 .log-list {
   width: 100%;
   .ticket-process-content {
-    overflow: hidden;
-    padding: 5px;
-    @include scroller;
-  }
-  .time-line {
     overflow: auto;
     padding: 5px;
+    height: calc(100vh - 320px);
     @include scroller;
   }
-
 }
 .log-time-line {
   /deep/ {

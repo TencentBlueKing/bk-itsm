@@ -33,6 +33,7 @@
           v-if="activeTab === 'log'"
           :ticket-info="ticketInfo"
           :node="nodeList"
+          :is-show-sla="isShowSla"
           @ticketFinishAppraise="$emit('ticketFinishAppraise')"
           @viewProcess="viewProcess"
         >
