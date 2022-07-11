@@ -125,9 +125,9 @@
         <bk-table
           v-bkloading="{ isLoading: isHasSchma }"
           :data="outputsData">
-          <bk-table-column label="名称" prop="title"></bk-table-column>
+          <bk-table-column :label="$t(`m['名称']`)" prop="title"></bk-table-column>
           <bk-table-column label="key" prop="key"></bk-table-column>
-          <bk-table-column label="设置为引用变量">
+          <bk-table-column :label="$t(`m['设置为全局变量']`)">
             <template slot-scope="props">
               <bk-checkbox @change="onchangeOutputCheck($event, props)" v-model="outputsVarList[props.row.key]"></bk-checkbox>
             </template>

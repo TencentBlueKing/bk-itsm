@@ -2642,4 +2642,6 @@ export const m = {
   当前节点未设置节点描述: 'The node description is not set for the current node',
   单据触发器: 'Ticket Trigger',
   节点: 'Node',
+  名称: 'Name',
+  设置为全局变量: 'Set as global variable',
 };
