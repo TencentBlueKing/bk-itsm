@@ -252,6 +252,7 @@
       font-size: 12px;
     }
     .bk-timeline-title {
+      word-break: break-all;
       &:hover {
         color: #3a84ff;
       }
