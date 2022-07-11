@@ -226,7 +226,7 @@
                   </template>
                 </bk-button>
               </template>
-              <bk-button v-if="!nodeAutoPass() && isShowAssgin && (nodeInfo.type === 'APPROVAL' || nodeInfo.type === 'NORMAL')" @click="clickBtn({ can_operate: true, key: 'EXCEPTION_DISTRIBUTE' ,name: '异常分派' })">{{ $t(`m['异常分派']`) }}</bk-button>
+              <bk-button style="margin-right: 8px" v-if="!nodeAutoPass() && isShowAssgin && (nodeInfo.type === 'APPROVAL' || nodeInfo.type === 'NORMAL')" @click="clickBtn({ can_operate: true, key: 'EXCEPTION_DISTRIBUTE' ,name: '异常分派' })">{{ $t(`m['异常分派']`) }}</bk-button>
             </template>
             <!-- 节点触发器 -->
             <bk-dropdown-menu
