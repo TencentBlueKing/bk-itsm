@@ -31,18 +31,17 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from itsm.component.constants import LESSCODE_PROJECT_KEY
+from itsm.component.constants import DEFAULT_PROJECT_PROJECT_KEY
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.constants.iam import ACTIONS
 from itsm.auth_iam.utils import IamRequest
-from itsm.component.exceptions import ProjectSettingsNotFound, DeleteError
+from itsm.component.exceptions import DeleteError
 from itsm.project.handler.migration_handler import MigrationHandlerDispatcher
 from itsm.project.models import (
     Project,
     ProjectSettings,
     UserProjectAccessRecord,
     CostomTab,
-    PUBLIC_PROJECT_PROJECT_KEY,
 )
 from itsm.project.serializers import (
     ProjectSerializer,
@@ -54,9 +53,7 @@ from itsm.project.serializers import (
 
 class ProjectViewSet(component_viewsets.AuthModelViewSet):
     serializer_class = ProjectSerializer
-    queryset = Project.objects.filter(
-        ~Q(key__in=[PUBLIC_PROJECT_PROJECT_KEY, LESSCODE_PROJECT_KEY]), is_deleted=False
-    )
+    queryset = Project.objects.filter(~Q(key="public"), is_deleted=False)
 
     filter_fields = {
         "name": ["exact", "contains", "startswith", "icontains"],
@@ -114,24 +111,6 @@ class ProjectViewSet(component_viewsets.AuthModelViewSet):
 
         project_info["auth_actions"] = auth_actions
         return Response(project_info)
-
-    @action(detail=True, methods=["get"])
-    def project_settings(self, request, *args, **kwargs):
-        instance = self.get_object()
-        settings = ProjectSettings.objects.filter(project=instance)
-        project_serializer = ProjectSettingSerializer(instance=settings, many=True)
-        return Response(project_serializer.data)
-
-    @action(detail=True, methods=["post"])
-    def update_settings(self, request, *args, **kwargs):
-        ser = ProjectSettingSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        project_settings = ProjectSettings.objects.get(id=ser.validated_data["id"])
-        if project_settings is None:
-            raise ProjectSettingsNotFound()
-        project_settings.value = ser.validated_data["value"]
-        project_settings.save()
-        return Response()
 
     @action(detail=True, methods=["post"])
     def update_project_record(self, request, *args, **kwargs):
@@ -245,3 +224,19 @@ class CostomTabViewSet(component_viewsets.ModelViewSet):
         instance.order = new_order
         instance.save()
         return Response()
+
+
+class ProjectSettingsViewSet(component_viewsets.ModelViewSet):
+    queryset = ProjectSettings.objects.all()
+    serializer_class = ProjectSettingSerializer
+
+    def list(self, request, *args, **kwargs):
+        project_key = request.query_params.get(
+            "project_key", DEFAULT_PROJECT_PROJECT_KEY
+        )
+
+        queryset = self.filter_queryset(self.get_queryset()).filter(
+            project_id=project_key
+        )
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
