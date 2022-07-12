@@ -11,7 +11,7 @@ V2.6.1版本将代码目录中的blueapps抽离出来并进行了升级，较V2.
 ### 步骤：
 
 1. 部署V2.6.0的最新安装包
-2. 访问 `{ITSM_URL}/helper/db_fix_for_blueapps_after_2_6_0/`，执行兼容操作，具体操作会在后台任务中实现，具体结果请在celery日志中查看
+2. 访问 `{ITSM_URL}/helper/db_fix_for_blueapps_after_2_6_0/`，使用 admin 登录，执行兼容操作，具体操作会在后台任务中实现，具体结果请在celery日志中查看
 
 ![image](../../static/img/V2_6_0_to_V2_6_1_upgrade_guide_01.png)
 
