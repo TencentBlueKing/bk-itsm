@@ -260,7 +260,7 @@ def get_list_department_profiles(params, page_size=2000):
     return result
 
 
-def get_list_departments(params, page_size=2000):
+def get_list_departments(params, page_size=500):
     """
     分页拉取部门信息
 
