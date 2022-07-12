@@ -40,6 +40,14 @@ export default {
     projectInfo: {}, // 项目信息
     projectListLoading: false,
     projectList: [],
+    projectSwitch: {
+      FLOW_PREVIEW: false,
+      SLA_SWITCH: false,
+      TRIGGER_SWITCH: false,
+      TABLE_FIELDS_SWITCH: false,
+      FIRST_STATE_SWITCH: false,
+      SMS_COMMENT_SWITCH: false,
+    }
   },
   mutations: {
     setProjectId(state, value) {
@@ -54,6 +62,9 @@ export default {
     },
     setProjectList(state, value) {
       state.projectList = value;
+    },
+    setprojectSwitch (state, obj) {
+      state.projectSwitch = obj
     },
   },
   actions: {
@@ -142,5 +153,13 @@ export default {
     deleteProjectNotice({ commit }, id) {
       return ajax.delete(`iadmin/custom_notify_template/${id}/`).then((response) => response.data);
     },
+    // 获取项目下的settings
+    getProjectSettings ({ commit }, params) {
+      return ajax.get(`/project/project_settings/`, { params }).then(response => response.data)
+    },
+    updateProjectSettings ({ commit }, params) {
+      const { id } = params
+      return ajax.put(`/project/project_settings/${id}`, params).then(response => response.data)
+    }
   },
 };
