@@ -148,6 +148,11 @@
         type: String,
         default: '',
       },
+      // 展示组织架构超过100人提示dialog
+      showOverbook: {
+        type: Boolean,
+        default: false,
+      },
     },
     data() {
       return {
@@ -292,11 +297,13 @@
         }
       },
       async getOrganizationNumber(id) {
-        const res = await this.$store.dispatch('common/getOrganizationNumber', id);
-        // 单个组织超过100人时提醒
-        if (res.data.count > 100) {
-          this.organizationTip.count = res.data.count;
-          this.organizationTip.show = true;
+        if (this.showOverbook) {
+          const res = await this.$store.dispatch('common/getOrganizationNumber', id);
+          // 单个组织超过100人时提醒
+          if (res.data.count > 100) {
+            this.organizationTip.count = res.data.count;
+            this.organizationTip.show = true;
+          }
         }
       },
       cancelSelect() {
