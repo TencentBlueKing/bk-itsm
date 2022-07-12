@@ -62,6 +62,7 @@
           <div @click="checkStatus.processors = false">
             <deal-person
               ref="processors"
+              :show-overbook="true"
               :value="processorsInfo"
               :node-info="configur"
               :exclude-role-type-list="excludeProcessor">

@@ -64,6 +64,7 @@
             <deal-person
               ref="processors"
               :value="processorsInfo"
+              :show-overbook="true"
               :node-info="configur"
               :exclude-role-type-list="excludeRoleTypeList">
             </deal-person>

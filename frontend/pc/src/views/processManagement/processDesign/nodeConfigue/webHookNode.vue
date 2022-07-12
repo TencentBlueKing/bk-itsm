@@ -26,6 +26,7 @@
             <deal-person
               ref="processors"
               :value="processorsInfo"
+              :show-overbook="true"
               :node-info="configur"
               :exclude-role-type-list="excludeProcessor">
             </deal-person>
