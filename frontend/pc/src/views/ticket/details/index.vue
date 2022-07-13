@@ -265,6 +265,8 @@
       });
     },
     async mounted() {
+      let isCanOperate = false;
+      let isHistoryOperator = false;
       await this.initData();
       if (this.$route.query.cache_key) { // 通知链接进入
         this.getTicketNoticeInfo();
@@ -275,11 +277,12 @@
         this.leftTicketDom.addEventListener('scroll', this.handleTicketScroll);
       });
       if (this.$refs.leftTicketContent && this.$refs.leftTicketContent.currentStepList[0]) {
-        this.hasNodeOptAuth = this.$refs.leftTicketContent.currentStepList.some(item => item.can_operate);
-        this.$store.commit('ticket/setHasTicketNodeOptAuth', this.hasNodeOptAuth);
+        isCanOperate = this.$refs.leftTicketContent.currentStepList.some(item => item.can_operate);
       }
       // 判断是否历史处理人
-      this.hasNodeOptAuth = this.ticketInfo.updated_by.split(',').includes(window.username);
+      isHistoryOperator = this.ticketInfo.updated_by.split(',').includes(window.username);
+      this.hasNodeOptAuth = isCanOperate || isHistoryOperator;
+      this.$store.commit('ticket/setHasTicketNodeOptAuth', this.hasNodeOptAuth);
       if (this.ticketInfo && this.ticketInfo.auth_actions) {
         // 当前节点有权限不显示异常分派
         this.isShowAssgin = this.ticketInfo.auth_actions.includes('ticket_management');
