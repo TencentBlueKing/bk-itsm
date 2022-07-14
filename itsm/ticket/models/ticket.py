@@ -3935,9 +3935,9 @@ class Ticket(Model, BaseTicket):
             return ""
 
     def send_trigger_signal(self, signal, sender=None, context=None):
-        from itsm.iadmin.utils import is_trigger_switch_off
+        from itsm.iadmin.utils import is_trigger_switch_off_project
 
-        if is_trigger_switch_off():
+        if is_trigger_switch_off_project(self.project_key):
             # 如果触发器关闭的话，直接返回
             return
 
