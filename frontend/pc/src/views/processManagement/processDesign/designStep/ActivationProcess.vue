@@ -185,7 +185,7 @@
     </basic-card>
     <!-- 展开高级配置 -->
     <div
-      v-if="openFunction.TRIGGER_SWITCH || openFunction.TASK_SWITCH"
+      v-if="(projectSwitch.TRIGGER_SWITCH || openFunction.TRIGGER_SWITCH) || openFunction.TASK_SWITCH"
       class="more-configuration mt20" data-test-id="activationProcess-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
       <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
       <i v-else class="bk-icon icon-up-shape"></i>
@@ -198,7 +198,7 @@
             :card-label="$t(`m.newCommon['触发器']`)"
             :card-desc="$t(`m.taskTemplate['满足触发条件后要完成的特定动作']`)">
             <common-trigger-list
-              v-if="openFunction.TRIGGER_SWITCH"
+              v-if="projectSwitch.TRIGGER_SWITCH || openFunction.TRIGGER_SWITCH"
               :origin="'workflow'"
               :source-id="processId"
               :table="flowInfo.table">
@@ -350,6 +350,9 @@
     computed: {
       openFunction() {
         return this.$store.state.openFunction;
+      },
+      projectSwitch() {
+        return this.$store.state.project.projectSwitch;
       },
     },
     watch: {

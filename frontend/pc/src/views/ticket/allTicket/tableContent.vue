@@ -204,6 +204,9 @@
       currTabSettingCache() {
         return this.$store.state.ticket.settingCache[`all_${this.serviceType}`];
       },
+      projectSwitch() {
+        return this.$store.state.project.projectSwitch;
+      },
     },
     watch: {
       dataList: {
@@ -245,7 +248,7 @@
         }
         const list = allColumn.filter((column) => {
           // sla 开关关闭
-          if (!this.openFunction.SLA_SWITCH && column.id === 'priority') {
+          if (!(this.projectSwitch.SLA_SWITCH || this.openFunction.SLA_SWITCH) && column.id === 'priority') {
             return false;
           }
           return true;
