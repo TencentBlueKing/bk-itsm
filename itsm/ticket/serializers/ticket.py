@@ -909,14 +909,12 @@ class TicketSerializer(AuthModelSerializer):
             "resource_type": "service",
         }
 
-        apply_actions = ["ticket_management"]
+        apply_actions = ["ticket_management", "ticket_view"]
         auth_actions = iam_client.resource_multi_actions_allowed(
             apply_actions, [resource_info], project_key=instance.project_key
         )
-
-        data["auth_actions"] = []
-        if auth_actions.get("ticket_management"):
-            data["auth_actions"] = ["ticket_management"]
+        actions = [key for key, value in auth_actions.items() if value]
+        data["auth_actions"] = actions
 
         return data
 
