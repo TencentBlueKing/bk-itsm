@@ -89,7 +89,7 @@
                     <span class="status-color"
                         :title="props.row.color_hex"
                         :style="{ 'color': props.row.color_hex, 'border-color': props.row.color_hex }">
-                        {{props.row.name}}
+                        {{localeCookie ? props.row.name : props.row.flow_status}}
                     </span>
                 </template>
             </bk-table-column>
@@ -198,6 +198,7 @@
 <script>
     import { errorHandler } from '../../../utils/errorHandler.js'
     import commonMix from '../../commonMix/common.js'
+    import cookie from 'cookie'
 
     export default {
         name: 'firstStep',
@@ -338,7 +339,8 @@
                     placement: 'top'
                 },
                 showColorPicker: false,
-                rules: {}
+                rules: {},
+                localeCookie: false
             }
         },
         async mounted () {
@@ -346,6 +348,7 @@
             this.rules.name = this.checkCommonRules('name').name
             this.rules.desc = this.checkCommonRules('select').select
             this.rules.color_hex = this.checkCommonRules('color').color
+            this.localeCookie = cookie.parse(document.cookie).blueking_language === 'zh-cn'
         },
         methods: {
             // setting status color
@@ -442,6 +445,7 @@
                         }).finally(() => {
                             this.statusTable[this.isEdit.index].name = temp.name
                             this.statusTable[this.isEdit.index].desc = temp.desc
+                            this.statusTable[this.isEdit.index].color_hex = temp.color_hex
                             this.secondClick = false
                             this.showColorPicker = false
                             this.initAddTemp()
@@ -539,7 +543,7 @@
 
 <style scoped lang="scss">
     .status-color {
-        width: 60px;
+        width: 90px;
         padding: 2px 10px;
         display: inline-block;
         text-align: center;

@@ -21,20 +21,20 @@
   -->
 
 <template>
-    <div class="exception-box">
-        <img class="exception-img" src="../images/403.png" alt="">
-        <p class="exception-p">{{ $t('m.wiki["您没有权限访问"]') }}</p>
-    </div>
+  <div class="exception-box">
+    <img class="exception-img" src="../images/403.png" alt="">
+    <p class="exception-p">{{ $t('m.wiki["您没有权限访问"]') }}</p>
+  </div>
 </template>
 
 <script>
-    export default {
-        data () {
-            return {
+  export default {
+    data() {
+      return {
 
-            }
-        }
-    }
+      };
+    },
+  };
 </script>
 <style scoped lang="scss">
     .exception-box {

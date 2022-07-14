@@ -21,186 +21,187 @@
   -->
 
 <template>
-    <div class="line-chart" ref="lineChartWrap">
-        <div v-if="showTimeDimension" class="time-dimension-selector">
-            <bk-select
-                :clearable="false"
-                :value="dimension"
-                @selected="onSelectDimension">
-                <bk-option
-                    v-for="item in timeDimensions"
-                    :key="item.key"
-                    :id="item.key"
-                    :name="item.name">
-                </bk-option>
-            </bk-select>
-        </div>
-        <canvas class="line-chart" :height="height"></canvas>
+  <div class="line-chart" ref="lineChartWrap">
+    <div v-if="showTimeDimension" class="time-dimension-selector">
+      <bk-select
+        :clearable="false"
+        :value="dimension"
+        @selected="onSelectDimension">
+        <bk-option
+          v-for="item in timeDimensions"
+          :key="item.key"
+          :id="item.key"
+          :name="item.name">
+        </bk-option>
+      </bk-select>
     </div>
+    <canvas class="line-chart" :height="height"></canvas>
+  </div>
 </template>
 <script>
-    import Chart from '@blueking/bkcharts'
+  import Chart from '@blueking/bkcharts';
+  import i18n from '@/i18n/index.js';
 
-    export default {
-        name: 'LineChart',
-        props: {
-            title: {
-                type: String,
-                default: ''
+  export default {
+    name: 'LineChart',
+    props: {
+      title: {
+        type: String,
+        default: '',
+      },
+      desc: {
+        type: String,
+        default: '',
+      },
+      showTimeDimension: {
+        type: Boolean,
+        default: true,
+      },
+      timeDimensions: {
+        type: Array,
+        default() {
+          return [
+            {
+              key: 'days',
+              name: i18n.t('m[\'天\']'),
             },
-            desc: {
-                type: String,
-                default: ''
+            {
+              key: 'weeks',
+              name: i18n.t('m[\'周\']'),
             },
-            showTimeDimension: {
-                type: Boolean,
-                default: true
+            {
+              key: 'months',
+              name: i18n.t('m[\'月\']'),
             },
-            timeDimensions: {
-                type: Array,
-                default () {
-                    return [
-                        {
-                            key: 'days',
-                            name: '天'
-                        },
-                        {
-                            key: 'weeks',
-                            name: '周'
-                        },
-                        {
-                            key: 'months',
-                            name: '月'
-                        },
-                        {
-                            key: 'years',
-                            name: '年'
-                        }
-                    ]
-                }
+            {
+              key: 'years',
+              name: i18n.t('m[\'年\']'),
             },
-            dimension: {
-                type: String,
-                default: ''
-            },
-            min: {
-                type: Number,
-                default: 0
-            },
-            bgColor: {
-                type: String,
-                default: 'rgba(37,91,175,0.3)'
-            },
-            gradientColor: {
-                type: Array,
-                default: () => ([])
-            },
-            xAxisName: {
-                type: String,
-                default: ''
-            },
-            yAxisName: {
-                type: String,
-                default: ''
-            },
-            height: {
-                type: Number,
-                default: 320
-            },
-            chartData: {
-                type: Object,
-                default () {
-                    return {
-                        x: [],
-                        y: []
-                    }
-                }
-            },
-            loading: {
-                type: Boolean,
-                default: false
-            }
+          ];
         },
-        data () {
-            return {
-                chartInstance: null
-            }
+      },
+      dimension: {
+        type: String,
+        default: '',
+      },
+      min: {
+        type: Number,
+        default: 0,
+      },
+      bgColor: {
+        type: String,
+        default: 'rgba(37,91,175,0.3)',
+      },
+      gradientColor: {
+        type: Array,
+        default: () => ([]),
+      },
+      xAxisName: {
+        type: String,
+        default: '',
+      },
+      yAxisName: {
+        type: String,
+        default: '',
+      },
+      height: {
+        type: Number,
+        default: 320,
+      },
+      chartData: {
+        type: Object,
+        default() {
+          return {
+            x: [],
+            y: [],
+          };
         },
-        watch: {
-            loading (val) {
-                if (!val) {
-                    this.updateChart()
-                }
-            }
-        },
-        mounted () {
-            this.init()
-        },
-        methods: {
-            init () {
-                const ctx = this.$refs.lineChartWrap.querySelector('.line-chart').getContext('2d')
-                const { x, y } = this.chartData
-                let bgColor
-                if (this.gradientColor.length === 2) {
-                    const gradient = ctx.createLinearGradient(0, 320, 0, 0)
-                    gradient.addColorStop(0, this.gradientColor[0])
-                    gradient.addColorStop(1, this.gradientColor[1])
-                    bgColor = gradient
-                } else {
-                    bgColor = this.bgColor
-                }
-
-                this.chartInstance = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: x,
-                        datasets: [{
-                            data: y,
-                            fill: 'start',
-                            backgroundColor: bgColor,
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        maintainAspectRatio: false,
-                        // bezierCurve: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            x: {
-                                gridLines: {
-                                    display: false
-                                }
-                            },
-                            y: {
-                                gridLines: {
-                                    borderDash: [5, 3]
-                                },
-                                ticks: {
-                                    precision: 0
-                                },
-                                min: this.min
-                            }
-                        },
-                        crosshair: {
-                            enabled: true
-                        }
-                    }
-                })
-            },
-            updateChart () {
-                this.chartInstance.data.datasets[0].data = this.chartData.y
-                this.chartInstance.data.labels = this.chartData.x
-                this.chartInstance.update()
-            },
-            onSelectDimension (val) {
-                this.$emit('onDimensionChange', val)
-            }
+      },
+      loading: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        chartInstance: null,
+      };
+    },
+    watch: {
+      loading(val) {
+        if (!val) {
+          this.updateChart();
         }
-    }
+      },
+    },
+    mounted() {
+      this.init();
+    },
+    methods: {
+      init() {
+        const ctx = this.$refs.lineChartWrap.querySelector('.line-chart').getContext('2d');
+        const { x, y } = this.chartData;
+        let bgColor;
+        if (this.gradientColor.length === 2) {
+          const gradient = ctx.createLinearGradient(0, 320, 0, 0);
+          gradient.addColorStop(0, this.gradientColor[0]);
+          gradient.addColorStop(1, this.gradientColor[1]);
+          bgColor = gradient;
+        } else {
+          bgColor = this.bgColor;
+        }
+
+        this.chartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: x,
+            datasets: [{
+              data: y,
+              fill: 'start',
+              backgroundColor: bgColor,
+              borderWidth: 0,
+            }],
+          },
+          options: {
+            maintainAspectRatio: false,
+            // bezierCurve: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+            scales: {
+              x: {
+                gridLines: {
+                  display: false,
+                },
+              },
+              y: {
+                gridLines: {
+                  borderDash: [5, 3],
+                },
+                ticks: {
+                  precision: 0,
+                },
+                min: this.min,
+              },
+            },
+            crosshair: {
+              enabled: true,
+            },
+          },
+        });
+      },
+      updateChart() {
+        this.chartInstance.data.datasets[0].data = this.chartData.y;
+        this.chartInstance.data.labels = this.chartData.x;
+        this.chartInstance.update();
+      },
+      onSelectDimension(val) {
+        this.$emit('onDimensionChange', val);
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .line-chart {

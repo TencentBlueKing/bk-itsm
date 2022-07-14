@@ -21,72 +21,72 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form-item :label="item.name"
-            :required="item.validate_type === 'REQUIRE'"
-            :desc="item.tips"
-            :ext-cls="'bk-line-height'"
-            desc-type="icon">
-            <bk-radio-group v-model="item.val" @change="item.checkValue = false">
-                <template v-for="radio in item.choice">
-                    <bk-radio :disabled="disabled" :value="radio.key" :key="radio.key" :ext-cls="'mr20'">{{radio.name}}</bk-radio>
-                </template>
-            </bk-radio-group>
-            <template v-if="item.checkValue">
-                <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-                <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-            </template>
-        </bk-form-item>
-    </div>
+  <div v-if="item.showFeild">
+    <bk-form-item :label="item.name"
+      :required="item.validate_type === 'REQUIRE'"
+      :desc="item.tips"
+      :ext-cls="'bk-line-height'"
+      desc-type="icon">
+      <bk-radio-group v-model="item.val" @change="item.checkValue = false">
+        <template v-for="radio in item.choice">
+          <bk-radio :disabled="disabled" :value="radio.key" :key="radio.key" :ext-cls="'mr20'">{{radio.name}}</bk-radio>
+        </template>
+      </bk-radio-group>
+      <template v-if="item.checkValue">
+        <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+        <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+      </template>
+    </bk-form-item>
+  </div>
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js'
-    export default {
-        name: 'RADIO',
-        mixins: [mixins],
-        props: {
-            item: {
-                type: Object,
-                required: true,
-                default: () => {}
-            },
-            fields: {
-                type: Array,
-                default () {
-                    return []
-                }
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false
-            },
-            disabled: {
-                type: Boolean,
-                default: false
-            }
+  import mixins from '../../commonMix/field.js';
+  export default {
+    name: 'RADIO',
+    mixins: [mixins],
+    props: {
+      item: {
+        type: Object,
+        required: true,
+        default: () => {},
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
         },
-        data () {
-            return {}
-        },
-        watch: {
-            'item.val' () {
-                this.conditionField(this.item, this.fields)
-            }
-        },
-        async mounted () {
-            if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value
-            }
-            this.item.choice = await this.getFieldOptions(this.item)
-            const valueStatus = this.judgeValue(this.item.val, this.item.choice)
-            this.item.val = valueStatus ? this.item.val : ''
-            this.conditionField(this.item, this.fields)
-        },
-        methods: {
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {};
+    },
+    watch: {
+      'item.val'() {
+        this.conditionField(this.item, this.fields);
+      },
+    },
+    async mounted() {
+      if (this.item.value && !this.item.val) {
+        this.item.val = this.item.value;
+      }
+      this.item.choice = await this.getFieldOptions(this.item);
+      const valueStatus = this.judgeValue(this.item.val, this.item.choice);
+      this.item.val = valueStatus ? this.item.val : '';
+      this.conditionField(this.item, this.fields);
+    },
+    methods: {
 
-        }
-    }
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

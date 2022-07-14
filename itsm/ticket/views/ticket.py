@@ -81,6 +81,7 @@ from itsm.component.constants import (
     OPEN,
     GENERAL,
     ORGANIZATION,
+    FAST_APPROVAL_MESSAGE,
 )
 from itsm.component.constants.flow import EXPORT_SUPPORTED_TYPE
 from itsm.component.dlls.component import ComponentLibrary
@@ -707,10 +708,10 @@ class TicketModelViewSet(ModelViewSet):
             if not service_fields:
                 return []
 
-            started_states = [
-                service_inst.first_state_id
-                for service_inst in Service.objects.filter(id__in=service_fields.keys())
-            ]
+            # started_states = [
+            #     service_inst.first_state_id
+            #     for service_inst in Service.objects.filter(id__in=service_fields.keys())
+            # ]
 
             # 获取导出的所有字段内容 -- 当前的id如果较多，这里大量拉取，估计有点问题
             all_service_field_keys.append("bk_biz_id")
@@ -720,7 +721,7 @@ class TicketModelViewSet(ModelViewSet):
                         service_id__in=service_fields.keys()
                     ).values_list("id", flat=True),
                     type__in=EXPORT_SUPPORTED_TYPE,
-                    state_id__in=started_states,
+                    # state_id__in=started_states,
                     key__in=all_service_field_keys,
                 ),
                 many=True,
@@ -874,6 +875,8 @@ class TicketModelViewSet(ModelViewSet):
             request=request,
         )
         node_status = ticket.node_status.get(state_id=state_id)
+
+        # 单据审批新增事务控制
         if node_status.type in [SIGN_STATE, APPROVAL_STATE]:
             SignTask.objects.update_or_create(
                 status_id=node_status.id,
@@ -893,6 +896,7 @@ class TicketModelViewSet(ModelViewSet):
                 % (state_id, res.message)
             )
             ticket.node_status.filter(state_id=state_id).update(status=RUNNING)
+
         return Response(
             {
                 "code": ResponseCodeStatus.OK
@@ -1039,6 +1043,38 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response(ActionSerializer(action_query_set, many=True).data)
 
+    @action(detail=True, methods=["get"])
+    def trigger_actions_group(self, request, *args, **kwargs):
+        """获取工单对应的触发器响应事件"""
+        instance = self.get_object()
+        # 所有的内容
+        task_ids = Task.objects.filter(ticket_id=instance.id).values_list("id")
+        action_query_set = Action.objects.filter(
+            Q(Q(source_id=instance.id) & Q(source_type=SOURCE_TICKET))
+            | Q(Q(source_id__in=task_ids) & Q(source_type=SOURCE_TASK))
+        ).exclude(status=ACTION_STATUS_CREATED)
+        actions = ActionSerializer(action_query_set, many=True).data
+        # 分组
+        ticket_actions = []
+        state_actions = {}
+        state_map = {}
+        for item in actions:
+            if item["signal_type"] == "STATE":
+                state_actions.setdefault(item["sender"], []).append(item)
+            if item["signal_type"] == "FLOW":
+                ticket_actions.append(item)
+
+        for state_id in state_actions.keys():
+            state_map[state_id] = instance.state(state_id)["name"]
+
+        return Response(
+            {
+                "state": state_actions,
+                "ticket_actions": ticket_actions,
+                "state_map": state_map,
+            }
+        )
+
     @action(detail=True, methods=["post"])
     def terminate(self, request, *args, **kwargs):
         """单据终止"""
@@ -1081,7 +1117,19 @@ class TicketModelViewSet(ModelViewSet):
         message = request.data.get("message") or Template(SUPERVISE_MESSAGE).render(
             **{"title": ticket.title}
         )
+        # 构造快速审批通知信息
+        fast_approval_message = FAST_APPROVAL_MESSAGE.format(
+            **ticket.get_fast_approval_message_params()
+        )
         for step in ticket.current_steps:
+            # 快速审批通知
+            ticket.notify_fast_approval(
+                step["state_id"],
+                step["processors"],
+                fast_approval_message,
+                action=SUPERVISE_OPERATE,
+                kwargs=kwargs,
+            )
             ticket.notify(
                 state_id=step["state_id"],
                 receivers=step["processors"],
@@ -1350,13 +1398,7 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response()
 
-    @action(detail=True, methods=["get"])
-    def states(self, request, *args, **kwargs):
-        """
-        单据节点查询
-        参数：state_id，可选，若为空则返回所有当前状态
-        """
-        ticket = self.get_object()
+    def states_response(self, ticket, request, detail=False):
         state_id = request.query_params.get("state_id")
 
         if ticket.flow.engine_version == DEFAULT_ENGINE_VERSION:
@@ -1369,6 +1411,12 @@ class TicketModelViewSet(ModelViewSet):
                     raise StateNotFoundError("state_id=%s" % state_id)
 
             many = not state_id
+
+            if many and detail:
+                status = status.filter(
+                    ~Q(status__in=["FINISHED", "TERMINATED"])
+                    | Q(state_id=ticket.first_state_id)
+                )
             show_all_fields = many or status.status != "FINISHED"
             ticket_status = StatusSerializer(
                 status,
@@ -1396,6 +1444,39 @@ class TicketModelViewSet(ModelViewSet):
                 list(ticket.flow.states.values()), many=True, context={"ticket": ticket}
             ).data
         )
+
+    @action(detail=True, methods=["get"])
+    def states(self, request, *args, **kwargs):
+        """
+        单据节点查询
+        参数：state_id，可选，若为空则返回所有当前状态
+        """
+        ticket = self.get_object()
+        return self.states_response(ticket, request)
+
+    @action(detail=True, methods=["get"])
+    def details_states(self, request, *args, **kwargs):
+        """
+        单据节点查询只返回部分字段
+        参数：state_id，可选，若为空则返回所有当前状态
+        """
+        ticket = self.get_object()
+        return self.states_response(ticket, request, detail=True)
+
+    @action(detail=True, methods=["get"])
+    def states_status(self, request, *args, **kwargs):
+        # 返回所有节点的from_transition_id, state_id, status 字段
+
+        ticket = self.get_object()
+        transitions_map = ticket.pipeline_data.get("transitions_map", {})
+        if ticket.flow.engine_version == DEFAULT_ENGINE_VERSION:
+            status_list = ticket.node_status.values(
+                "id", "state_id", "status", "by_flow"
+            )
+            for status in status_list:
+                status["from_transition_id"] = transitions_map.get(status["by_flow"])
+
+        return Response(list(status_list))
 
     @action(detail=True, methods=["get"])
     def transitions(self, request, *args, **kwargs):
@@ -1574,6 +1655,25 @@ class TicketModelViewSet(ModelViewSet):
         """获取公共字段"""
         ticket = self.get_object()
         return Response(FieldSerializer(ticket.table_fields(), many=True).data)
+
+    @action(detail=True, methods=["get"])
+    def is_processor(self, request, *args, **kwargs):
+        ticket = self.get_object()
+        step_id = request.query_params.get("step_id", None)
+        processed_user = ""
+        is_processor = False
+        if step_id:
+            step_ids = step_id.split(",")
+            status_list = ticket.node_status.filter(id__in=step_ids)
+            for status in status_list:
+                if request.user.username in status.get_processors():
+                    is_processor = True
+                    processed_user = status.processed_user
+                    break
+
+        return Response(
+            {"is_processor": is_processor, "processed_user": processed_user}
+        )
 
     @action(detail=True, methods=["post"])
     def edit_field(self, request, *args, **kwargs):

@@ -20,25 +20,25 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import Vue from 'vue'
-import VueI18n from 'vue-i18n'
-import cookie from 'cookie'
-import { lang } from 'bk-magic-vue'
+import Vue from 'vue';
+import VueI18n from 'vue-i18n';
+import cookie from 'cookie';
+import { lang } from 'bk-magic-vue';
 // 国际化
-const zhI18n = require('./lang/zh')
-const enI18n = require('./lang/en')
-const localeCookie = cookie.parse(document.cookie).blueking_language || 'zh-cn'
-Vue.use(VueI18n)
+const zhI18n = require('./lang/zh');
+const enI18n = require('./lang/en');
+const localeCookie = cookie.parse(document.cookie).blueking_language || 'zh-cn';
+Vue.use(VueI18n);
 const i18n = new VueI18n({
-    // 语言标识
-    locale: localeCookie,
-    fallbackLocale: 'zh-cn',
-    messages: {
-        // 中文语言包
-        'zh-cn': Object.assign(lang.zhCN, zhI18n),
-        // 英文语言包
-        'en': Object.assign(lang.enUS, enI18n)
-    }
-})
+  // 语言标识
+  locale: localeCookie,
+  fallbackLocale: 'zh-cn',
+  messages: {
+    // 中文语言包
+    'zh-cn': Object.assign(lang.zhCN, zhI18n),
+    // 英文语言包
+    en: Object.assign(lang.enUS, enI18n),
+  },
+});
 
-export default i18n
+export default i18n;

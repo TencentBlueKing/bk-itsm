@@ -389,28 +389,43 @@ class State(Model):
 
         return valid_inputs
 
+    def variable_group(self, variable_data):
+        variable_dict = {}
+        for item in variable_data:
+            if item.get("state"):
+                if item["state"] in variable_dict:
+                    variable_dict[item["state"]]["fields"].append(item)
+                else:
+                    variable_dict.setdefault(item.get("state"), {})
+                    variable_dict[item["state"]].setdefault("state_name", item["state"])
+                    variable_dict[item["state"]].setdefault("fields", [])
+                    variable_dict[item["state"]]["fields"].append(item)
+                item.pop("state")
+        return variable_dict.values()
+
     def get_valid_inputs_by_group(
         self, exclude_self=False, resource_type="both", scope="transition"
     ):
+
         from itsm.workflow.serializers import (
-            GlobalVariableSerializer,
-            FieldVariablesSerializer,
+            GlobalVariableGroupSerializer,
+            FieldVariablesGroupSerializer,
         )
 
         exclude_states = [self.id] if exclude_self else []
         valid_states = self.get_valid_inputs_states(exclude_states)
-
         # 节点未设置任何连线时, 获取valid_states为空列表, 所以需要把self添加进去
         if not exclude_self and self not in valid_states:
             valid_states.append(self)
 
-        data = {}
+        valid_inputs = []
         if resource_type in ["both", "field"]:
             # 会签节点的字段属于单个任务, 不允许暴露到线条上配置
             scope_exclude_state_map = {
                 "transition": [SIGN_STATE, APPROVAL_STATE],
                 "state": [],
             }
+
             valid_fields = [
                 state.fields
                 for state in valid_states
@@ -420,31 +435,25 @@ class State(Model):
 
             field_queryset = Field.objects.filter(
                 id__in=valid_fields, type__in=SUPPORTED_TYPE, workflow=self.workflow
-            ).exclude(source="TABLE")
+            )
 
-            for field in field_queryset:
-                state_name = field.state.name if field.state.name else _("当前节点")
-                filed_data = FieldVariablesSerializer(field).data
-                filed_data["name"] = field.name
-                data.setdefault(state_name, []).append(filed_data)
-
-            for public_filed in self.workflow.public_table_fields:
-                public_filed_data = FieldVariablesSerializer(public_filed).data
-                public_filed_data["name"] = public_filed.name
-                data.setdefault("基础模型", []).append(public_filed_data)
+            field_variables = FieldVariablesGroupSerializer(
+                field_queryset, many=True
+            ).data
+            valid_inputs += field_variables
 
         if resource_type in ["both", "global"]:
             valid_state_ids = [s.id for s in valid_states]
             global_variables_queryset = GlobalVariable.objects.filter(
                 state_id__in=valid_state_ids, is_valid=True
             )
-            for global_variable in global_variables_queryset:
-                global_variable_filed_data = GlobalVariableSerializer(
-                    global_variable
-                ).data
-                global_variable_filed_data["name"] = global_variable.name
-                data.setdefault("全局变量", []).append(global_variable_filed_data)
-        return data
+
+            global_variable = GlobalVariableGroupSerializer(
+                global_variables_queryset, many=True
+            ).data
+            valid_inputs += global_variable
+        group_data = self.variable_group(valid_inputs)
+        return list(group_data)
 
     def add_variables(
         self,
@@ -566,3 +575,11 @@ class State(Model):
         节点的权限完全按照流程的管理权限
         """
         return self.workflow.auth_actions(username)
+
+    def get_approve_states(self):
+        states = self.get_valid_inputs_states(need_loop=False)
+        return [
+            {"id": state.id, "name": state.name}
+            for state in states
+            if state.type in [SIGN_STATE, APPROVAL_STATE]
+        ]

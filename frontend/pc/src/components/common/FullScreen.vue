@@ -21,55 +21,55 @@
   -->
 
 <template>
-    <div :class="{ 'full-screen-wrap': isFull }">
-        <div v-if="isFull" class="full-screen-header">
-            <span class="full-screen-title">{{ title }}</span>
-            <div class="full-exit-btn" @click.stop="onClose">
-                <i class="bk-itsm-icon icon-order-close"></i>
-                <span class="exit-text">{{$t(`m.common['退出全屏']`)}}</span>
-            </div>
-        </div>
-        <div class="full-screen-content">
-            <slot></slot>
-        </div>
+  <div :class="{ 'full-screen-wrap': isFull }">
+    <div v-if="isFull" class="full-screen-header">
+      <span class="full-screen-title">{{ title }}</span>
+      <div class="full-exit-btn" @click.stop="onClose">
+        <i class="bk-itsm-icon icon-order-close"></i>
+        <span class="exit-text">{{$t(`m.common['退出全屏']`)}}</span>
+      </div>
     </div>
+    <div class="full-screen-content">
+      <slot></slot>
+    </div>
+  </div>
 </template>
 
 <script>
-    export default {
-        name: 'FullScreen',
-        props: {
-            isFull: {
-                type: Boolean,
-                default: false
-            },
-            title: {
-                type: String,
-                default: ''
-            }
-        },
-        watch: {
-            isFull (val) {
-                if (val) {
-                    this.$bkMessage({
-                        message: this.$t(`m.common["按 ESC 键退出全屏"]`)
-                    })
-                    document.addEventListener('keydown', this.handlerKeyDown)
-                }
-            }
-        },
-        methods: {
-            onClose () {
-                this.$emit('onClose')
-            },
-            handlerKeyDown (event) {
-                if (event.keyCode === 27) {
-                    this.onClose()
-                    document.removeEventListener('keydown', this.handlerKeyDown)
-                }
-            }
+  export default {
+    name: 'FullScreen',
+    props: {
+      isFull: {
+        type: Boolean,
+        default: false,
+      },
+      title: {
+        type: String,
+        default: '',
+      },
+    },
+    watch: {
+      isFull(val) {
+        if (val) {
+          this.$bkMessage({
+            message: this.$t('m.common["按 ESC 键退出全屏"]'),
+          });
+          document.addEventListener('keydown', this.handlerKeyDown);
         }
-    }
+      },
+    },
+    methods: {
+      onClose() {
+        this.$emit('onClose');
+      },
+      handlerKeyDown(event) {
+        if (event.keyCode === 27) {
+          this.onClose();
+          document.removeEventListener('keydown', this.handlerKeyDown);
+        }
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

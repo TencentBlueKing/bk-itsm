@@ -20,99 +20,101 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
-    namespaced: true,
-    state: {},
-    mutations: {},
-    actions: {
-        getList ({ commit, state, dispatch }, params) {
-            return ajax.get(`service/slas/`, { params: params })
-                .then(response => {
-                    const res = response.data
-                    return res
-                })
-                .catch(error => {
-                    console.log(error)
-                })
-        },
-        getSlaLevel ({ commit, state, dispatch }, { params }) {
-            return ajax.get(`service/slas/get_level_choice/`, { params: params })
-                .then(response => {
-                    const res = response.data
-                    return res
-                })
-                .catch(error => {
-                    console.log(error)
-                })
-        },
-        submitSla ({ commit, state, dispatch }, params) {
-            return ajax.post('service/slas/', params).then(response => {
-                const res = response.data
-                return res
-            })
-        },
-        updateSla ({ commit, state, dispatch }, params) {
-            return ajax.put('service/slas/' + params.id + '/', params).then(response => {
-                const res = response.data
-                return res
-            })
-        },
-        deleteSla ({ commit, state, dispatch }, id) {
-            return ajax.delete('service/slas/' + id + '/').then(response => {
-                const res = response.data
-                return res
-            })
-        },
-        // 新增模型
-        saveSchedule ({ commit, state, dispatch }, params) {
-            return ajax.post('sla/schedules/', params).then(response => {
-                const res = response.data
-                return res
-            })
-        },
-        // 获取模型列表
-        getScheduleList ({ commit, state, dispatch }, params) {
-            return ajax.get('sla/schedules/', { params }).then(response => {
-                const res = response.data
-                return res
-            })
-        },
-        // 获取单据高亮设置
-        getTicketHighlight ({ commit, state, dispatch }) {
-            return ajax.get('sla/ticket_highlight/').then(response => {
-                const res = response.data
-                return res
-            })
-        },
-        // 获取单据高亮设置
-        updateTicketHighlight ({ commit, state, dispatch }, params) {
-            return ajax.put('sla/ticket_highlight/1/', params).then(response => {
-                const res = response.data
-                return res
-            })
-        },
-        // 删除模型
-        deleteSchedule ({ commit, state, dispatch }, id) {
-            return ajax.delete(`sla/schedules/${id}/`).then(response => {
-                const res = response.data
-                return res
-            })
-        },
-        // 更新模型
-        updateSchedule ({ commit, state, dispatch }, params) {
-            return ajax.put(`sla/schedules/${params.id}/`, params).then(response => {
-                const res = response.data
-                return res
-            })
-        },
-        // 校验流程版本是否支持 sla 协议
-        checkProcessCanUseSla ({ commit, state, dispatch }, id) {
-            return ajax.get(`/workflow/versions/${id}/sla_validate/`).then(response => {
-                const res = response.data
-                return res
-            })
-        }
-    }
-}
+  namespaced: true,
+  state: {},
+  mutations: {},
+  actions: {
+    getList({ commit, state, dispatch }, params) {
+      return ajax
+        .get(`service/slas/`, { params: params })
+        .then((response) => {
+          const res = response.data;
+          return res;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getSlaLevel({ commit, state, dispatch }, { params }) {
+      return ajax
+        .get(`service/slas/get_level_choice/`, { params: params })
+        .then((response) => {
+          const res = response.data;
+          return res;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    submitSla({ commit, state, dispatch }, params) {
+      return ajax.post("service/slas/", params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    updateSla({ commit, state, dispatch }, params) {
+      return ajax.put(`service/slas/${params.id}/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    deleteSla({ commit, state, dispatch }, id) {
+      return ajax.delete(`service/slas/${id}`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 新增模型
+    saveSchedule({ commit, state, dispatch }, params) {
+      return ajax.post("sla/schedules/", params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 获取模型列表
+    getScheduleList({ commit, state, dispatch }, params) {
+      return ajax.get("sla/schedules/", { params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 获取单据高亮设置
+    getTicketHighlight({ commit, state, dispatch }) {
+      return ajax.get("sla/ticket_highlight/").then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 获取单据高亮设置
+    updateTicketHighlight({ commit, state, dispatch }, params) {
+      return ajax.put("sla/ticket_highlight/1/", params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 删除模型
+    deleteSchedule({ commit, state, dispatch }, id) {
+      return ajax.delete(`sla/schedules/${id}/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 更新模型
+    updateSchedule({ commit, state, dispatch }, params) {
+      return ajax.put(`sla/schedules/${params.id}/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 校验流程版本是否支持 sla 协议
+    checkProcessCanUseSla({ commit, state, dispatch }, id) {
+      return ajax.get(`/workflow/versions/${id}/sla_validate/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};

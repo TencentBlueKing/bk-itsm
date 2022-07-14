@@ -41,7 +41,6 @@ from itsm.component.constants import (
     LEN_LONG,
     LEN_NORMAL,
     LEN_SHORT,
-    NOTIFY_TYPE_CHOICES,
     PROCESSOR_CHOICES,
     FIRST_ORDER,
 )
@@ -90,7 +89,12 @@ class TicketStateDraft(models.Model):
 class TicketComment(models.Model):
     """工单满意度表"""
 
-    SOURCE_CHOICE = [("WEB", "蓝鲸平台"), ("SMS", "短信邀请"), ("SYS", "系统自评")]
+    SOURCE_CHOICE = [
+        ("WEB", "蓝鲸平台"),
+        ("SMS", "短信邀请"),
+        ("SYS", "系统自评"),
+        ("API", "OPENAPI"),
+    ]
 
     ticket = models.OneToOneField(
         "ticket.Ticket",
@@ -168,9 +172,7 @@ class TicketCommentInvite(models.Model):
         related_name="invite",
         on_delete=models.CASCADE,
     )
-    notify_type = models.CharField(
-        _("通知方式"), max_length=LEN_SHORT, default="SMS", choices=NOTIFY_TYPE_CHOICES
-    )
+    notify_type = models.CharField(_("通知方式"), max_length=LEN_SHORT, default="SMS")
     receiver = models.CharField(_("联系人/联系方式"), max_length=LEN_NORMAL, default="")
     code = models.CharField(_("短码"), max_length=10, default="", unique=True)
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
@@ -227,9 +229,7 @@ class NotifyLogModel(models.Model):
     )
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
     message = models.TextField(_("通知信息"), default=EMPTY_STRING, null=True, blank=True)
-    notify_type = models.CharField(
-        _("通知方式"), max_length=LEN_SHORT, default="EMAIL", choices=NOTIFY_TYPE_CHOICES
-    )
+    notify_type = models.CharField(_("通知方式"), max_length=LEN_SHORT, default="EMAIL")
     is_deleted = models.BooleanField(_("是否软删除"), default=False, db_index=True)
 
     objects = managers.Manager()

@@ -21,104 +21,104 @@
   -->
 
 <template>
-    <div class="bk-task">
-        <ul v-if="showTask || showHistory || showArticle" class="bk-flow-head">
-            <li :class="{ 'bk-flow-check': checkInfo === 'task' }"
-                v-if="showTask"
-                @click="checkInfo = 'task'">
-                <span>{{$t(`m.task['任务列表']`)}}</span>
-            </li>
-            <li :class="{ 'bk-flow-check': checkInfo === 'taskHistory' }"
-                v-if="showHistory"
-                @click="checkInfo = 'taskHistory'">
-                <span>{{$t(`m.task['触发器记录']`)}}</span>
-            </li>
-            <li :class="{ 'bk-flow-check': checkInfo === 'slaRecord' }"
-                @click="checkInfo = 'slaRecord'">
-                <span>{{$t(`m.task['SLA记录']`)}}</span>
-            </li>
-            <li :class="{ 'bk-flow-check': checkInfo === 'article' }"
-                v-if="showArticle"
-                @click="checkInfo = 'article'">
-                <span>{{$t(`m.task['关联文章']`)}}</span>
-            </li>
-        </ul>
-        <div class="bk-task-content">
-            <div v-if="checkInfo === 'task'">
-                <task :basic-infomation="basicInfomation"
-                    :node-list="nodeList"
-                    @updateCurrentStep="updateCurrentStep">
-                </task>
-            </div>
-            <div v-if="checkInfo === 'taskHistory'">
-                <task-history :basic-infomation="basicInfomation" :node-list="nodeList"></task-history>
-            </div>
-            <div v-if="checkInfo === 'slaRecord'">
-                <sla-record :basic-infomation="basicInfomation" :node-list="nodeList"></sla-record>
-            </div>
-            <div v-if="checkInfo === 'article'"></div>
-        </div>
+  <div class="bk-task">
+    <ul v-if="showTask || showHistory || showArticle" class="bk-flow-head">
+      <li :class="{ 'bk-flow-check': checkInfo === 'task' }"
+        v-if="showTask"
+        @click="checkInfo = 'task'">
+        <span>{{$t(`m.task['任务列表']`)}}</span>
+      </li>
+      <li :class="{ 'bk-flow-check': checkInfo === 'taskHistory' }"
+        v-if="showHistory"
+        @click="checkInfo = 'taskHistory'">
+        <span>{{$t(`m.task['触发器记录']`)}}</span>
+      </li>
+      <li :class="{ 'bk-flow-check': checkInfo === 'slaRecord' }"
+        @click="checkInfo = 'slaRecord'">
+        <span>{{$t(`m.task['SLA记录']`)}}</span>
+      </li>
+      <li :class="{ 'bk-flow-check': checkInfo === 'article' }"
+        v-if="showArticle"
+        @click="checkInfo = 'article'">
+        <span>{{$t(`m.task['关联文章']`)}}</span>
+      </li>
+    </ul>
+    <div class="bk-task-content">
+      <div v-if="checkInfo === 'task'">
+        <task :basic-infomation="basicInfomation"
+          :node-list="nodeList"
+          @updateCurrentStep="updateCurrentStep">
+        </task>
+      </div>
+      <div v-if="checkInfo === 'taskHistory'">
+        <task-history :basic-infomation="basicInfomation" :node-list="nodeList"></task-history>
+      </div>
+      <div v-if="checkInfo === 'slaRecord'">
+        <sla-record :basic-infomation="basicInfomation" :node-list="nodeList"></sla-record>
+      </div>
+      <div v-if="checkInfo === 'article'"></div>
     </div>
+  </div>
 </template>
 
 <script>
-    import task from './task'
-    import taskHistory from './taskHistory'
-    import slaRecord from './slaRecord'
-    export default {
-        name: 'taskLog',
-        components: {
-            task,
-            taskHistory,
-            slaRecord
+  import task from './task';
+  import taskHistory from './taskHistory';
+  import slaRecord from './slaRecord';
+  export default {
+    name: 'taskLog',
+    components: {
+      task,
+      taskHistory,
+      slaRecord,
+    },
+    props: {
+      basicInfomation: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            basicInfomation: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            },
-            nodeList: {
-                type: Array,
-                default () {
-                    return []
-                }
-            },
-            openFunction: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            }
+      },
+      nodeList: {
+        type: Array,
+        default() {
+          return [];
         },
-        data () {
-            return {
-                checkInfo: '',
-                showArticle: '',
-                showTask: '',
-                showHistory: ''
-            }
+      },
+      openFunction: {
+        type: Object,
+        default() {
+          return {};
         },
-        mounted () {
-            this.showTask = this.openFunction.TASK_SWITCH && this.basicInfomation.task_schemas.length
-            this.showArticle = window.is_article_tag_show
-            this.showHistory = window.is_itsm_admin
-            this.checkInfo = 'slaRecord'
-            if (this.showTask) {
-                this.checkInfo = 'task'
-            } else if (this.showArticle) {
-                this.checkInfo = 'article'
-            } else if (this.showHistory) {
-                this.checkInfo = 'taskHistory'
-            }
-        },
-        methods: {
-            updateCurrentStep () {
-                this.$emit('updateCurrentStep')
-            }
-        }
-    }
+      },
+    },
+    data() {
+      return {
+        checkInfo: '',
+        showArticle: '',
+        showTask: '',
+        showHistory: '',
+      };
+    },
+    mounted() {
+      this.showTask = this.openFunction.TASK_SWITCH && this.basicInfomation.task_schemas.length;
+      this.showArticle = window.is_article_tag_show;
+      this.showHistory = window.is_itsm_admin;
+      this.checkInfo = 'slaRecord';
+      if (this.showTask) {
+        this.checkInfo = 'task';
+      } else if (this.showArticle) {
+        this.checkInfo = 'article';
+      } else if (this.showHistory) {
+        this.checkInfo = 'taskHistory';
+      }
+    },
+    methods: {
+      updateCurrentStep() {
+        this.$emit('updateCurrentStep');
+      },
+    },
+  };
 </script>
 
 <style scoped lang='scss'>

@@ -520,6 +520,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
 
         field_ids = []
         state = self.get_state_by_service(to_service)
+        old_fields = state.fields
         for field in table.tag_data()["fields"]:
             field.pop("id")
             field.pop("project_key", None)
@@ -533,11 +534,22 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
         state.fields = field_ids
         state.save()
 
+        Field.objects.filter(id__in=old_fields).delete()
+
     def copy_fields_from_service(self, from_service, to_service):
         field_ids = []
         state = self.get_state_by_service(to_service)
         from_service_fields = from_service.workflow.get_first_state_fields()
+
+        old_fields = state.fields
+
         for field in from_service_fields:
+            workflow_id = to_service.workflow.workflow_id
+            if field["key"] == "bk_biz_id":
+                workflow = Workflow.objects.get(id=workflow_id)
+                workflow.is_biz_needed = True
+                workflow.save()
+
             field.pop("id")
             field.pop("project_key", None)
             field["workflow_id"] = to_service.workflow.workflow_id
@@ -547,6 +559,8 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
 
         state.fields = field_ids
         state.save()
+
+        Field.objects.filter(id__in=old_fields).delete()
 
     @action(detail=True, methods=["post"])
     def sla_validate(self, request, *args, **kwargs):
@@ -649,12 +663,12 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
     @action(detail=False, methods=["post"])
     def imports(self, request, *args, **kwargs):
         data = json.loads(request.FILES.get("file").read())
+        project_key = request.data.get("project_key", data.get("project_key"))
+        data["project_key"] = project_key
         if isinstance(data, list):
             raise ParamError(_("2.5.9 版本之前的流程无法导入，请转换后在看，详情请看github"))
         ServiceImportSerializer(data=data).is_valid(raise_exception=True)
         catalog_id = request.data.get("catalog_id")
-        project_key = request.data.get("project_key", data.get("project_key"))
-        data["project_key"] = project_key
         service = Service.objects.clone(
             data, request.user.username, catalog_id=catalog_id
         )

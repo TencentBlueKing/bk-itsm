@@ -21,140 +21,140 @@
   -->
 
 <template>
-    <div class="bk-get-param">
-        <bk-table
-            :data="prcTable"
-            :size="'small'">
-            <bk-table-column :label="$t(`m.treeinfo['名称']`)" prop="name"></bk-table-column>
-            <bk-table-column :label="$t(`m.treeinfo['必选']`)">
-                <template slot-scope="props">
-                    {{ props.row.is_necessary ? $t(`m.treeinfo["是"]`) : $t(`m.treeinfo["否"]`) }}
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.treeinfo['备注']`)" width="150">
-                <template slot-scope="props">
-                    <span :title="props.row.desc">{{props.row.desc || '--'}}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="300">
-                <template slot-scope="props">
-                    <div style="width: 120px; position: absolute; top: 5px; left: 15px;">
-                        <bk-select v-model="props.row.source_type"
-                            :clearable="false"
-                            searchable>
-                            <bk-option v-for="option in sourceTypeList"
-                                :key="option.key"
-                                :id="option.key"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                    </div>
-                    <div v-if="props.row.source_type === 'CUSTOM'"
-                        style="width: 140px; position: absolute; top: 4px; right: 15px;">
-                        <bk-input :clearable="true"
-                            :placeholder="$t(`m.treeinfo['请输入参数值']`)"
-                            v-model="props.row.value">
-                        </bk-input>
-                    </div>
-                    <div v-else style="width: 140px; position: absolute; top: 4px; right: 15px;">
-                        <bk-select v-model="props.row.value_key"
-                            :clearable="false"
-                            searchable>
-                            <bk-option v-for="option in stateList"
-                                :key="option.key"
-                                :id="option.key"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                    </div>
-                </template>
-            </bk-table-column>
-        </bk-table>
-    </div>
+  <div class="bk-get-param">
+    <bk-table
+      :data="prcTable"
+      :size="'small'">
+      <bk-table-column :label="$t(`m.treeinfo['名称']`)" prop="name"></bk-table-column>
+      <bk-table-column :label="$t(`m.treeinfo['必选']`)">
+        <template slot-scope="props">
+          {{ props.row.is_necessary ? $t(`m.treeinfo["是"]`) : $t(`m.treeinfo["否"]`) }}
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.treeinfo['备注']`)" width="150">
+        <template slot-scope="props">
+          <span :title="props.row.desc">{{props.row.desc || '--'}}</span>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="300">
+        <template slot-scope="props">
+          <div style="width: 120px; position: absolute; top: 5px; left: 15px;">
+            <bk-select v-model="props.row.source_type"
+              :clearable="false"
+              searchable>
+              <bk-option v-for="option in sourceTypeList"
+                :key="option.key"
+                :id="option.key"
+                :name="option.name">
+              </bk-option>
+            </bk-select>
+          </div>
+          <div v-if="props.row.source_type === 'CUSTOM'"
+            style="width: 140px; position: absolute; top: 4px; right: 15px;">
+            <bk-input :clearable="true"
+              :placeholder="$t(`m.treeinfo['请输入参数值']`)"
+              v-model="props.row.value">
+            </bk-input>
+          </div>
+          <div v-else style="width: 140px; position: absolute; top: 4px; right: 15px;">
+            <bk-select v-model="props.row.value_key"
+              :clearable="false"
+              searchable>
+              <bk-option v-for="option in stateList"
+                :key="option.key"
+                :id="option.key"
+                :name="option.name">
+              </bk-option>
+            </bk-select>
+          </div>
+        </template>
+      </bk-table-column>
+    </bk-table>
+  </div>
 </template>
 
 <script>
-    export default {
-        name: 'getRpcParam',
-        components: {},
-        props: {
-            prcTable: {
-                type: Array,
-                default () {
-                    return []
-                }
-            },
-            changeInfo: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            },
-            stateList: {
-                type: Array,
-                default () {
-                    return []
-                }
-            },
-            formInfo: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            }
+  export default {
+    name: 'getRpcParam',
+    components: {},
+    props: {
+      prcTable: {
+        type: Array,
+        default() {
+          return [];
         },
-        data () {
-            return {
-                sourceTypeList: [
-                    {
-                        id: 1,
-                        key: 'CUSTOM',
-                        name: this.$t(`m.treeinfo["自定义"]`)
-                    },
-                    {
-                        id: 2,
-                        key: 'FIELDS',
-                        name: this.$t(`m.treeinfo["引用变量"]`)
-                    }
-                ]
-            }
+      },
+      changeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        computed: {},
-        watch: {
-            prcTable (newVal, oldVal) {
-                this.initData()
-            }
+      },
+      stateList: {
+        type: Array,
+        default() {
+          return [];
         },
-        async mounted () {
-            await this.changeInfo
-            this.initData()
+      },
+      formInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        methods: {
-            initData () {
-                this.prcTable.forEach(item => {
-                    this.$set(item, 'isCheck', false)
-                    this.$set(item, 'isSatisfied', false)
-                    this.$set(item, 'el', null)
-                    this.$set(item, 'source_type', 'CUSTOM')
-                    this.$set(item, 'value_key', '')
-                    // 赋值
-                    for (const key in this.changeInfo.meta) {
-                        if (item.name === key) {
-                            if (this.changeInfo.meta[key].indexOf('{params_') !== -1) {
-                                item['source_type'] = 'FIELDS'
-                                item['value_key'] = this.changeInfo.meta[key].split('${params_')[1].split('}')[0]
-                            } else {
-                                item['source_type'] = 'CUSTOM'
-                                item.value = this.changeInfo.meta[key]
-                            }
-                        }
-                    }
-                })
+      },
+    },
+    data() {
+      return {
+        sourceTypeList: [
+          {
+            id: 1,
+            key: 'CUSTOM',
+            name: this.$t('m.treeinfo["自定义"]'),
+          },
+          {
+            id: 2,
+            key: 'FIELDS',
+            name: this.$t('m.treeinfo["引用变量"]'),
+          },
+        ],
+      };
+    },
+    computed: {},
+    watch: {
+      prcTable() {
+        this.initData();
+      },
+    },
+    async mounted() {
+      await this.changeInfo;
+      this.initData();
+    },
+    methods: {
+      initData() {
+        this.prcTable.forEach((item) => {
+          this.$set(item, 'isCheck', false);
+          this.$set(item, 'isSatisfied', false);
+          this.$set(item, 'el', null);
+          this.$set(item, 'source_type', 'CUSTOM');
+          this.$set(item, 'value_key', '');
+          // 赋值
+          for (const key in this.changeInfo.meta) {
+            if (item.name === key) {
+              if (this.changeInfo.meta[key].indexOf('{params_') !== -1) {
+                item.source_type = 'FIELDS';
+                item.value_key = this.changeInfo.meta[key].split('${params_')[1].split('}')[0];
+              } else {
+                item.source_type = 'CUSTOM';
+                item.value = this.changeInfo.meta[key];
+              }
             }
-        }
-    }
+          }
+        });
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-    
+
 </style>

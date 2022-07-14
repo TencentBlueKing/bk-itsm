@@ -20,34 +20,34 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
-    namespaced: true,
-    state: {
-        fields: [],
-        statusList: [
-            { key: 'RUNNING', pk_value: '处理中' },
-            { key: 'FINISHED', pk_value: '已结束' }
-        ]
+  namespaced: true,
+  state: {
+    fields: [],
+    statusList: [
+      { key: "RUNNING", pk_value: "处理中" },
+      { key: "FINISHED", pk_value: "已结束" },
+    ],
+  },
+  mutations: {
+    setFields(state, list) {
+      state.fields = list;
     },
-    mutations: {
-        setFields (state, list) {
-            state.fields = list
-        }
+  },
+  actions: {
+    getList({ commit, state, dispatch }, params) {
+      return ajax.get("ticket/receipts/", { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
     },
-    actions: {
-        getList ({ commit, state, dispatch }, params) {
-            return ajax.get('ticket/receipts/', { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        submit ({ commit, state, dispatch }, params) {
-            return ajax.post('ticket/receipts/', params).then(response => {
-                let res = response.data
-                return res
-            })
-        }
-    }
-}
+    submit({ commit, state, dispatch }, params) {
+      return ajax.post("ticket/receipts/", params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};

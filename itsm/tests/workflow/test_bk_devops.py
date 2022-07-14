@@ -90,10 +90,12 @@ class PipelineTest(TestCase):
         CatalogService.objects.all().delete()
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    @mock.patch("itsm.pipeline_plugins.components.collections.bk_devops.Ticket")
+    @mock.patch(
+        "itsm.pipeline_plugins.components.collections.bk_devops.BkDevOpsService.prepare_build_params"
+    )
     @mock.patch("itsm.pipeline_plugins.components.collections.bk_devops.apigw_client")
-    def test_excute(self, patch_ticket, apigw_client):
-        patch_ticket.do_before_enter_state.return_value = None
+    @mock.patch("itsm.pipeline_plugins.components.collections.bk_devops.Ticket")
+    def test_execute(self, patch_ticket, apigw_client, patch_prepare_build_params):
         patch_ticket.state.return_value = {
             "extras": {
                 "devops_info": {
@@ -110,6 +112,13 @@ class PipelineTest(TestCase):
                 }
             }
         }
+        patch_prepare_build_params.return_value = {
+            "bkapp_code": " test",
+            "project_id": "test",
+            "pipeline_id": "p-216fafa1b9f44f2b95ed6bxxxxxxxxxx",
+        }
+        patch_ticket.do_before_enter_state.return_value = None
+        patch_ticket.update_state_before_enter = None
         patch_ticket.id.return_value = self.ticket_id
 
         apigw_client.devops.pipeline_build_start.return_value = {
@@ -131,8 +140,11 @@ class PipelineTest(TestCase):
         self.assertEqual(result, True)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch(
+        "itsm.pipeline_plugins.components.collections.bk_devops.BkDevOpsService.prepare_build_params"
+    )
     @mock.patch("itsm.pipeline_plugins.components.collections.bk_devops.Ticket")
-    def test_excute_failed(self, patch_ticket):
+    def test_excute_failed(self, patch_ticket, patch_prepare_build_params):
         patch_ticket.do_before_enter_state.return_value = None
         patch_ticket.state.return_value = {
             "extras": {
@@ -149,6 +161,11 @@ class PipelineTest(TestCase):
                     ],
                 }
             }
+        }
+        patch_prepare_build_params.return_value = {
+            "bkapp_code": " test",
+            "project_id": "test",
+            "pipeline_id": "p-216fafa1b9f44f2b95ed6bxxxxxxxxxx",
         }
         patch_ticket.id.return_value = self.ticket_id
         print("ticket_id:{}".format(self.ticket_id))

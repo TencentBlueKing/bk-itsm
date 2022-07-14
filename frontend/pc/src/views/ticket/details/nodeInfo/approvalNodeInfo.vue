@@ -21,39 +21,39 @@
   -->
 
 <template>
-    <div class="bk-approval-node-content">
-        <h3 class="bk-basic-h3">{{ $t('m.newCommon["节点信息"]') }}</h3>
-        <template v-for="(ite, inde) in nodeInfo.fields">
-            <fields-done
-                :key="inde"
-                :item="ite"
-                :origin="'notLog'">
-            </fields-done>
-        </template>
-    </div>
+  <div class="bk-approval-node-content">
+    <h3 class="bk-basic-h3">{{ $t('m.newCommon["节点信息"]') }}</h3>
+    <template v-for="(ite, inde) in nodeInfo.fields">
+      <fields-done
+        :key="inde"
+        :item="ite"
+        :origin="'notLog'">
+      </fields-done>
+    </template>
+  </div>
 </template>
 
 <script>
-    import fieldsDone from '../components/fieldsDone.vue'
+  import fieldsDone from '../components/fieldsDone.vue';
 
-    export default {
-        name: 'approvalNodeInfo',
-        components: {
-            fieldsDone
+  export default {
+    name: 'approvalNodeInfo',
+    components: {
+      fieldsDone,
+    },
+    props: {
+      nodeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            nodeInfo: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            }
-        },
-        data () {
-            return {
-            }
-        }
-    }
+      },
+    },
+    data() {
+      return {
+      };
+    },
+  };
 </script>
 
 <style scoped lang='scss'>

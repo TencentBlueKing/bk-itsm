@@ -20,9 +20,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import Vue from 'vue'
+import Vue from 'vue';
 
 // Use a bus for components communication,
 // see https://vuejs.org/v2/guide/components.html#Non-Parent-Child-Communication
-const bus = new Vue()
-export default bus
+const bus = new Vue();
+export default bus;

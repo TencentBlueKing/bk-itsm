@@ -72,7 +72,9 @@ BK_PAAS_HOST = os.environ.get("BKAPP_PAAS_HOST", "")
 RUN_VER = os.environ.get("RUN_VER", RUN_VER)
 OPEN_VER = "enterprise"
 APP_CODE = APP_ID = os.environ.get("APP_ID", APP_ID)
+BK_APP_CODE = APP_ID
 SECRET_KEY = APP_TOKEN = os.environ.get("APP_TOKEN", APP_TOKEN)
+BK_APP_SECRET = SECRET_KEY
 BK_URL = BK_PAAS_HOST = os.environ.get("BK_PAAS_HOST", "")
 BK_PAAS_INNER_HOST = os.environ.get("BK_PAAS_INNER_HOST", BK_PAAS_HOST)
 

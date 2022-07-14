@@ -59,7 +59,6 @@ from itsm.component.constants import (
     LAYOUT_CHOICES,
     METHOD_CHOICES,
     NOTIFY_RULE_CHOICES,
-    NOTIFY_TYPE_CHOICES,
     PROCESSOR_CHOICES,
     REGEX_CHOICES,
     SOPS_FIELD_MAP,
@@ -113,7 +112,7 @@ from itsm.workflow.permissions import (
     TemplateFieldPermissionValidate,
     TaskSchemaPermit,
 )
-from itsm.workflow.utils import translate_constant_2
+from itsm.workflow.utils import translate_constant_2, get_notify_type_choice
 from itsm.workflow.validators import (
     WorkflowPipelineValidator,
     add_fields_from_table_validate,
@@ -233,13 +232,15 @@ class WorkflowViewSet(
             "members": SelectMultipleType.get_display_operators(),
         }
 
+        notify_type_choice = get_notify_type_choice()
+
         return Response(
             {
                 "field_type": translate_constant_2(TYPE_CHOICES[:-1]),
                 "source_type": translate_constant_2(SOURCE_CHOICES),
                 "layout_type": translate_constant_2(LAYOUT_CHOICES),
                 "validate_type": translate_constant_2(VALIDATE_CHOICES),
-                "notify_type": translate_constant_2(NOTIFY_TYPE_CHOICES),
+                "notify_type": translate_constant_2(notify_type_choice),
                 "notify_rule_type": translate_constant_2(NOTIFY_RULE_CHOICES),
                 "state_type": translate_constant_2(STATE_TYPE_CHOICES),
                 "processor_type": translate_constant_2(PROCESSOR_CHOICES),
@@ -442,8 +443,6 @@ class StateViewSet(BaseWorkflowElementViewSet):
         )
 
         # 非提单节点可引用单据属性（提单节点提交前，尚未创建工单）
-        if not state.is_first_state:
-            valid_inputs["系统变量"] = TICKET_GLOBAL_VARIABLES
         return Response(valid_inputs)
 
     @action(detail=True, methods=["get"])

@@ -22,112 +22,114 @@
 
 <!--    1104 人员名片展示-->
 <template>
-    <bk-popover
-        placement="bottom"
-        ext-cls="bk-business-card"
-        class="business-popover"
-        :on-show="showMessage"
-        trigger="click"
-        theme="light">
-        <i class="bk-icon icon-id" v-if="memberVal" ref="icon"></i>
-        <div slot="content">
-            <ul ref="message" class="bk-member-message" v-bkloading="{ isLoading: localLoading }">
-                <li v-for="(member, memIndex) in memberList"
-                    :key="memIndex"
-                    style="margin-bottom: 10px; overflow: hidden;">
-                    <p class="bk-message-name">{{member.username}}</p>
-                    <p class="bk-member-other"
-                        v-for="(person, personIndex) in memberValList"
-                        :key="personIndex"
-                        :title="member[person.type]">
-                        <span class="bk-member-label">{{person.name}} {{$t(`m.newCommon["："]`)}}</span>
-                        <pre class="bk-member-value">{{member[person.type] || '--'}}</pre>
-                    </p>
-                </li>
-            </ul>
-        </div>
-    </bk-popover>
+  <bk-popover
+    placement="bottom"
+    ext-cls="bk-business-card"
+    class="business-popover"
+    :on-show="showMessage"
+    trigger="click"
+    theme="light">
+    <i class="bk-icon icon-id" v-if="memberVal" ref="icon"></i>
+    <div slot="content">
+      <ul ref="message" class="bk-member-message" v-bkloading="{ isLoading: localLoading }">
+        <li v-for="(member, memIndex) in memberList"
+          :key="memIndex"
+          style="margin-bottom: 10px; overflow: hidden;">
+          <p class="bk-message-name">{{member.username}}</p>
+          <p class="bk-member-other"
+            v-for="(person, personIndex) in memberValList"
+            :key="personIndex"
+            :title="member[person.type]">
+            <span class="bk-member-label">{{person.name}} {{$t(`m.newCommon["："]`)}}</span>
+            <pre class="bk-member-value">{{member[person.type] || '--'}}</pre>
+          </p>
+        </li>
+      </ul>
+    </div>
+  </bk-popover>
 </template>
 
 <script>
-    import { errorHandler } from '../../utils/errorHandler'
-    export default {
-        name: 'BusinessCard',
-        props: {
-            item: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            },
-            basicInfomation: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            }
+  import { errorHandler } from '../../utils/errorHandler';
+  export default {
+    name: 'BusinessCard',
+    props: {
+      item: {
+        type: Object,
+        default() {
+          return {};
         },
-        data () {
-            return {
-                memberList: [],
-                memberValList: [
-                    { type: 'display_name', name: this.$t(`m.newCommon["中文名"]`) },
-                    { type: 'email', name: this.$t(`m.newCommon["邮箱"]`) },
-                    // { type: 'phone', name: this.$t(`m.newCommon["手机"]`) }
-                    { type: 'departmentsDispName', name: this.$t(`m.newCommon["部门信息"]`) }
-                ],
-                showInfo: false,
-                localLoading: false
-            }
+      },
+      basicInfomation: {
+        type: Object,
+        default() {
+          return {};
         },
-        computed: {
-            memberVal () {
-                return this.basicInfomation.creator ? this.basicInfomation.creator : this.item.val
-            }
-        },
-        created () {
-            if (window.run_site !== 'bmw') {
-                this.memberValList.push({ type: 'qq', name: this.$t(`m.newCommon["QQ"]`) })
-                this.memberValList.push({ type: 'wx_userid', name: this.$t(`m.newCommon["微信"]`) })
-                this.memberValList.push({ type: 'time_zone', name: this.$t(`m.newCommon["时区"]`) })
-            }
-        },
-        methods: {
-            showMessage () {
-                if (!this.memberVal) {
-                    return
-                }
-                this.localLoading = true
-                const valList = this.memberVal.split(',')
-                const userIds = valList.map(name => name.replace(/\(.*\)$/, ''))
-                const params = {
-                    users: userIds.join(',')
-                }
-                this.$store.dispatch('getPersonInfo', params).then((res) => {
-                    if (res.data && res.data.length) {
-                        this.memberList = res.data
-                        this.memberList.forEach(info => {
-                            if (info.departments && info.departments.length) {
-                                const depName = info.departments.reduce((names, dep, index) => {
-                                    if (index) {
-                                        names += '\n'
-                                    }
-                                    names += dep.full_name
-                                    return names
-                                }, '')
-                                info.departmentsDispName = depName
-                            }
-                        })
-                        this.showInfo = true
-                    }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.localLoading = false
-                })
-            }
+      },
+    },
+    data() {
+      return {
+        memberList: [],
+        memberValList: [
+          { type: 'display_name', name: this.$t('m.newCommon["中文名"]') },
+          { type: 'email', name: this.$t('m.newCommon["邮箱"]') },
+          // { type: 'phone', name: this.$t(`m.newCommon["手机"]`) }
+          { type: 'departmentsDispName', name: this.$t('m.newCommon["部门信息"]') },
+        ],
+        showInfo: false,
+        localLoading: false,
+      };
+    },
+    computed: {
+      memberVal() {
+        return this.basicInfomation.creator ? this.basicInfomation.creator : this.item.val;
+      },
+    },
+    created() {
+      if (window.run_site !== 'bmw') {
+        this.memberValList.push({ type: 'qq', name: this.$t('m.newCommon["QQ"]') });
+        this.memberValList.push({ type: 'wx_userid', name: this.$t('m.newCommon["微信"]') });
+        this.memberValList.push({ type: 'time_zone', name: this.$t('m.newCommon["时区"]') });
+      }
+    },
+    methods: {
+      showMessage() {
+        if (!this.memberVal) {
+          return;
         }
-    }
+        this.localLoading = true;
+        const valList = this.memberVal.split(',');
+        const userIds = valList.map(name => name.replace(/\(.*\)$/, ''));
+        const params = {
+          users: userIds.join(','),
+        };
+        this.$store.dispatch('getPersonInfo', params).then((res) => {
+          if (res.data && res.data.length) {
+            this.memberList = res.data;
+            this.memberList.forEach((info) => {
+              if (info.departments && info.departments.length) {
+                const depName = info.departments.reduce((names, dep, index) => {
+                  if (index) {
+                    names += '\n';
+                  }
+                  names += dep.full_name;
+                  return names;
+                }, '');
+                info.departmentsDispName = depName;
+              }
+            });
+            this.showInfo = true;
+          }
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.localLoading = false;
+          });
+      },
+    },
+  };
 </script>
 
 <style scoped lang="scss">

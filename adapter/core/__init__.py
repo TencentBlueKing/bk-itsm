@@ -26,9 +26,11 @@ import importlib
 
 from django.conf import settings
 
-show_module = importlib.import_module("adapter.core.sites.{}.show".format(settings.RUN_VER))
+show_module = importlib.import_module(
+    "adapter.core.sites.{}.show".format(settings.RUN_VER)
+)
 
-TITLE = show_module.TITLE
-FOOTER = show_module.FOOTER
+TITLE = show_module.get_title
+FOOTER = show_module.get_footer
 DOC_URL = show_module.DOC_URL
 LOGIN_URL = show_module.LOGIN_URL

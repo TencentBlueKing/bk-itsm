@@ -21,104 +21,107 @@
   -->
 
 <template>
-    <bk-dialog
-        render-directive="if"
-        :width="635"
-        :value="isShow"
-        :mask-close="false"
-        :auto-close="false"
-        :title="$t(`m.manageCommon['审批']`)"
-        :loading="approvalConfirmBtnLoading"
-        @confirm="onApprovalConfirm"
-        @cancel="onApprovalCancel">
-        <bk-form ref="approvalForm" :model="formData" :rules="formRules">
-            <bk-form-item :label="$t(`m.managePage['审批结果']`)" :label-width="140">
-                <bk-radio-group v-if="approvalInfo.showAllOption"
-                    v-model="approvalInfo.result">
-                    <bk-radio :value="true" class="mr50">{{ $t(`m.managePage['通过']`) }}</bk-radio>
-                    <bk-radio :value="false">{{ $t(`m.manageCommon['拒绝']`) }}</bk-radio>
-                </bk-radio-group>
-                <span v-else
-                    :class="['result-tag', approvalInfo.result ? '' : 'reject']">
-                    {{ approvalInfo.result ? $t(`m.managePage['通过']`) : $t(`m.manageCommon['拒绝']`) }}
-                </span>
-            </bk-form-item>
-            
-            <bk-form-item :label="$t(`m.home['备注']`)" :label-width="140" :required="!approvalInfo.result" property="approvalNotice">
-                <bk-input type="textarea" :row="4" :maxlength="200" v-model="formData.approvalNotice"></bk-input>
-            </bk-form-item>
-        </bk-form>
-    </bk-dialog>
+  <bk-dialog
+    render-directive="if"
+    :width="635"
+    :value="isShow"
+    :mask-close="false"
+    :auto-close="false"
+    :title="$t(`m.manageCommon['审批']`)"
+    :loading="approvalConfirmBtnLoading"
+    @confirm="onApprovalConfirm"
+    @cancel="onApprovalCancel">
+    <bk-form ref="approvalForm" :model="formData" :rules="formRules">
+      <bk-form-item :label="$t(`m.managePage['审批结果']`)" :label-width="140">
+        <bk-radio-group v-if="approvalInfo.showAllOption"
+          v-model="approvalInfo.result">
+          <bk-radio :value="true" class="mr50">{{ $t(`m.managePage['通过']`) }}</bk-radio>
+          <bk-radio :value="false">{{ $t(`m.manageCommon['拒绝']`) }}</bk-radio>
+        </bk-radio-group>
+        <span v-else
+          :class="['result-tag', approvalInfo.result ? '' : 'reject']">
+          {{ approvalInfo.result ? $t(`m.managePage['通过']`) : $t(`m.manageCommon['拒绝']`) }}
+        </span>
+      </bk-form-item>
+
+      <bk-form-item :label="$t(`m.home['备注']`)" :label-width="140" :required="!approvalInfo.result" property="approvalNotice">
+        <bk-input type="textarea" :row="4" :maxlength="200" v-model="formData.approvalNotice"></bk-input>
+      </bk-form-item>
+    </bk-form>
+  </bk-dialog>
 </template>
 
 <script>
-    import { errorHandler } from '../../utils/errorHandler'
+  import { errorHandler } from '../../utils/errorHandler';
 
-    export default {
-        name: 'ApprovalDialog',
-        props: {
-            isShow: {
-                type: Boolean,
-                default: false
-            },
-            approvalInfo: {
-                type: Object,
-                default: () => ({
-                    result: true,
-                    showAllOption: false,
-                    approvalList: []
-                })
-            }
-        },
-        data () {
-            return {
-                approvalConfirmBtnLoading: false,
-                formData: { approvalNotice: '' },
-                formRules: {
-                    approvalNotice: [{
-                        validator: this.checkApprovalNotice,
-                        message: this.$t(`m.systemConfig['备注']`) + this.$t('m.common["为必填项，请补充完善"]'),
-                        trigger: 'blur'
+  export default {
+    name: 'ApprovalDialog',
+    props: {
+      isShow: {
+        type: Boolean,
+        default: false,
+      },
+      approvalInfo: {
+        type: Object,
+        default: () => ({
+          result: true,
+          showAllOption: false,
+          approvalList: [],
+        }),
+      },
+    },
+    data() {
+      return {
+        approvalConfirmBtnLoading: false,
+        formData: { approvalNotice: '' },
+        formRules: {
+          approvalNotice: [{
+            validator: this.checkApprovalNotice,
+            message: this.$t('m.systemConfig[\'备注\']') + this.$t('m.common["为必填项，请补充完善"]'),
+            trigger: 'blur',
 
-                    }]
-                }
-            }
+          }],
         },
-        methods: {
-            onApprovalConfirm () {
-                this.approvalConfirmBtnLoading = true
-                this.$refs.approvalForm.validate().then(async val => {
-                    if (val) {
-                        const data = {
-                            result: this.approvalInfo.result.toString(),
-                            opinion: this.formData.approvalNotice,
-                            approval_list: this.approvalInfo.approvalList
-                        }
-                        await this.$store.dispatch('workbench/batchApproval', data).then((res) => {
-                            this.$emit('cancel', true)
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.formData.approvalNotice = ''
-                        })
-                    }
-                }).finally(() => {
-                    this.approvalConfirmBtnLoading = false
-                })
-            },
-            onApprovalCancel () {
-                this.formData.approvalNotice = ''
-                this.approvalConfirmBtnLoading = false
-                this.$emit('cancel')
-            },
-            checkApprovalNotice (val) {
-                if (!this.approvalInfo.result) {
-                    return val !== ''
-                }
-                return true
-            }
+      };
+    },
+    methods: {
+      onApprovalConfirm() {
+        this.approvalConfirmBtnLoading = true;
+        this.$refs.approvalForm.validate().then(async (val) => {
+          if (val) {
+            const data = {
+              result: this.approvalInfo.result.toString(),
+              opinion: this.formData.approvalNotice,
+              approval_list: this.approvalInfo.approvalList,
+            };
+            await this.$store.dispatch('workbench/batchApproval', data).then(() => {
+              this.$emit('cancel', true);
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {
+                this.formData.approvalNotice = '';
+              });
+          }
+        })
+          .finally(() => {
+            this.approvalConfirmBtnLoading = false;
+          });
+      },
+      onApprovalCancel() {
+        this.formData.approvalNotice = '';
+        this.approvalConfirmBtnLoading = false;
+        this.$emit('cancel');
+      },
+      checkApprovalNotice(val) {
+        if (!this.approvalInfo.result) {
+          return val !== '';
         }
-    }
+        return true;
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 .result-tag {

@@ -37,7 +37,14 @@
 [(English Documents Available)](en/operate_ticket.md)
 - [token校验](zh_hans/verify_token.md)
 [(English Documents Available)](en/verify_token.md)
-
+- [单据评论](zh_hans/ticket_comment.md)
+[(English Documents Available)](en/ticket_comment.md)
+- [服务目录创建](zh_hans/create_service_catalog.md)
+[(English Documents Available)](en/create_service_catalog.md)
+- [服务导入](zh_hans/import_service.md)
+[(English Documents Available)](en/import_service.md)
+- [服务更新](zh_hans/update_service.md)
+[(English Documents Available)](en/update_service.md)
 
 待补充
 

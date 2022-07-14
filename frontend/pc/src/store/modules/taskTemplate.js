@@ -20,110 +20,110 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
-    namespaced: true,
-    state: {},
-    mutations: {},
-    actions: {
-        // 获取任务列表
-        getTemplateList ({ commit, state, dispatch }, params) {
-            return ajax.get(`workflow/task_schemas/`, { params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 查询单个任务信息
-        getTemplateDetail ({ commit, state, dispatch }, id) {
-            return ajax.get(`workflow/task_schemas/${id}/`).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 克隆任务模板
-        cloneTemplate ({ commit, state, dispatch }, id) {
-            return ajax.post(`workflow/task_schemas/${id}/clone/`).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 删除任务
-        deleteTemplate ({ commit, state, dispatch }, id) {
-            return ajax.delete(`workflow/task_schemas/${id}/`).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 创建单个任务
-        createNewTemplate ({ commit, state, dispatch }, params) {
-            return ajax.post(`workflow/task_schemas/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 更新单个任务
-        updateTemplate ({ commit, state, dispatch }, {params, id}) {
-            return ajax.put(`workflow/task_schemas/${id}/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 创建任务字段
-        createTemplateField ({ commit, state, dispatch }, {params}) {
-            return ajax.post(`workflow/task_field_schemas/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 更新任务字段
-        updateTemplateField ({ commit, state, dispatch }, {params, id}) {
-            return ajax.patch(`workflow/task_field_schemas/${id}/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 删除模板字段
-        deleteTemplateField ({ commit, state, dispatch }, {id}) {
-            return ajax.delete(`workflow/task_field_schemas/${id}/`).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 获取模板字段列表
-        getTemplateFields ({ commit, state, dispatch }, params) {
-            return ajax.get(`workflow/task_field_schemas/`, {params}).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 引用公共触发器
-        patchCloneTriggers ({ commit, state, dispatch }, params) {
-            return ajax.post(`trigger/triggers/clone/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 删除触发器
-        deleteTrigger ({ commit, state, dispatch }, id) {
-            return ajax.delete(`trigger/triggers/${id}/`).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 获取触发器列表
-        getTemplateTriggers ({ commit, state, dispatch }, params) {
-            return ajax.get(`trigger/triggers/`, { params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 获取当前stage及之前stage的字段
-        getFrontFieldsList ({ commit, state, dispatch },  params) {
-            return ajax.get(`workflow/task_schemas/${params.id}/variables/`, { params }).then(response => {
-                let res = response.data
-                return res
-            })
-        }
-    }
-}
+  namespaced: true,
+  state: {},
+  mutations: {},
+  actions: {
+    // 获取任务列表
+    getTemplateList({ commit, state, dispatch }, params) {
+      return ajax.get(`workflow/task_schemas/`, { params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 查询单个任务信息
+    getTemplateDetail({ commit, state, dispatch }, id) {
+      return ajax.get(`workflow/task_schemas/${id}/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 克隆任务模板
+    cloneTemplate({ commit, state, dispatch }, id) {
+      return ajax.post(`workflow/task_schemas/${id}/clone/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 删除任务
+    deleteTemplate({ commit, state, dispatch }, id) {
+      return ajax.delete(`workflow/task_schemas/${id}/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 创建单个任务
+    createNewTemplate({ commit, state, dispatch }, params) {
+      return ajax.post(`workflow/task_schemas/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 更新单个任务
+    updateTemplate({ commit, state, dispatch }, { params, id }) {
+      return ajax.put(`workflow/task_schemas/${id}/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 创建任务字段
+    createTemplateField({ commit, state, dispatch }, { params }) {
+      return ajax.post(`workflow/task_field_schemas/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 更新任务字段
+    updateTemplateField({ commit, state, dispatch }, { params, id }) {
+      return ajax.patch(`workflow/task_field_schemas/${id}/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 删除模板字段
+    deleteTemplateField({ commit, state, dispatch }, { id }) {
+      return ajax.delete(`workflow/task_field_schemas/${id}/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 获取模板字段列表
+    getTemplateFields({ commit, state, dispatch }, params) {
+      return ajax.get(`workflow/task_field_schemas/`, { params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 引用公共触发器
+    patchCloneTriggers({ commit, state, dispatch }, params) {
+      return ajax.post(`trigger/triggers/clone/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 删除触发器
+    deleteTrigger({ commit, state, dispatch }, id) {
+      return ajax.delete(`trigger/triggers/${id}/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 获取触发器列表
+    getTemplateTriggers({ commit, state, dispatch }, params) {
+      return ajax.get(`trigger/triggers/`, { params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 获取当前stage及之前stage的字段
+    getFrontFieldsList({ commit, state, dispatch }, params) {
+      return ajax.get(`workflow/task_schemas/${params.id}/variables/`, { params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};

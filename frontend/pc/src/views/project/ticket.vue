@@ -21,19 +21,19 @@
   -->
 
 <template>
-    <div class="all-ticket-page">
-        <all-ticket-list :project-id="$store.state.project.id" from="projectTicket"></all-ticket-list>
-    </div>
+  <div class="all-ticket-page">
+    <all-ticket-list :project-id="$store.state.project.id" from="projectTicket"></all-ticket-list>
+  </div>
 </template>
 <script>
-    import AllTicketList from '../ticket/allTicket/index'
+  import AllTicketList from '../ticket/allTicket/index';
 
-    export default {
-        name: 'ProjectTicket',
-        components: {
-            AllTicketList
-        }
-    }
+  export default {
+    name: 'ProjectTicket',
+    components: {
+      AllTicketList,
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .all-ticket-page {

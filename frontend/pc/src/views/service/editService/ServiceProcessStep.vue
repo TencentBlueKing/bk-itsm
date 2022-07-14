@@ -21,200 +21,219 @@
   -->
 
 <template>
-    <div :class="[!isShowNodeConfig ? 'process-step' : 'process-step-node-conf']" v-bkloading="{ isLoading: flowDataLoading }">
-        <template v-if="!flowDataLoading">
-            <second-flow
-                v-if="!isShowNodeConfig"
-                ref="flowInfo"
-                :add-list="nodeList"
-                :line-list="lineList"
-                :flow-info="flowInfo"
-                @handleNodeClick="handleNodeClick">
-            </second-flow>
-            <div v-else>
-                <div class="node-type">{{ nodeType }}
-                    <i class="bk-itsm-icon icon-itsm-icon-three-one close-node-conf" @click="closeConfigur"></i>
-                </div>
-                <basic-node
-                    v-if="configur.type === 'NORMAL'"
-                    :flow-info="flowInfo"
-                    :configur="configur"
-                    @closeConfigur="closeConfigur">
-                </basic-node>
-                <autoNode
-                    v-if="configur.type === 'TASK'"
-                    :flow-info="flowInfo"
-                    :configur="configur"
-                    @closeConfigur="closeConfigur">
-                </autoNode>
-                <sopsNode
-                    v-if="configur.type === 'TASK-SOPS'"
-                    :flow-info="flowInfo"
-                    :configur="configur"
-                    @closeConfigur="closeConfigur">
-                </sopsNode>
-                <devopsNode
-                    v-if="configur.type === 'TASK-DEVOPS'"
-                    :flow-info="flowInfo"
-                    :configur="configur"
-                    @closeConfigur="closeConfigur">
-                </devopsNode>
-                <signNode
-                    v-if="configur.type === 'SIGN'"
-                    :flow-info="flowInfo"
-                    :configur="configur"
-                    @closeConfigur="closeConfigur">
-                </signNode>
-                <approval-node
-                    v-if="configur.type === 'APPROVAL'"
-                    :flow-info="flowInfo"
-                    :configur="configur"
-                    @closeConfigur="closeConfigur">
-                </approval-node>
-            </div>
-        </template>
-    </div>
+  <div :class="[!isShowNodeConfig ? 'process-step' : 'process-step-node-conf']" v-bkloading="{ isLoading: flowDataLoading }">
+    <template v-if="!flowDataLoading">
+      <second-flow
+        v-if="!isShowNodeConfig"
+        ref="flowInfo"
+        :add-list="nodeList"
+        :line-list="lineList"
+        :flow-info="flowInfo"
+        @handleNodeClick="handleNodeClick">
+      </second-flow>
+      <div v-else>
+        <div class="node-type">{{ nodeType }}
+          <i class="bk-itsm-icon icon-itsm-icon-three-one close-node-conf" @click="closeConfigur"></i>
+        </div>
+        <basic-node
+          v-if="configur.type === 'NORMAL'"
+          :flow-info="flowInfo"
+          :configur="configur"
+          @closeConfigur="closeConfigur">
+        </basic-node>
+        <autoNode
+          v-if="configur.type === 'TASK'"
+          :flow-info="flowInfo"
+          :configur="configur"
+          @closeConfigur="closeConfigur">
+        </autoNode>
+        <sopsNode
+          v-if="configur.type === 'TASK-SOPS'"
+          :flow-info="flowInfo"
+          :configur="configur"
+          @closeConfigur="closeConfigur">
+        </sopsNode>
+        <devopsNode
+          v-if="configur.type === 'TASK-DEVOPS'"
+          :flow-info="flowInfo"
+          :configur="configur"
+          @closeConfigur="closeConfigur">
+        </devopsNode>
+        <signNode
+          v-if="configur.type === 'SIGN'"
+          :flow-info="flowInfo"
+          :configur="configur"
+          @closeConfigur="closeConfigur">
+        </signNode>
+        <approval-node
+          v-if="configur.type === 'APPROVAL'"
+          :flow-info="flowInfo"
+          :configur="configur"
+          @closeConfigur="closeConfigur">
+        </approval-node>
+        <bk-plugin-node
+          v-if="configur.type === 'BK-PLUGIN'"
+          :flow-info="flowInfo"
+          :configur="configur"
+          @closeConfigur="closeConfigur">
+        </bk-plugin-node>
+        <web-hook-node
+          v-if="configur.type === 'WEBHOOK'"
+          :flow-info="flowInfo"
+          :configur="configur"
+          @closeConfigur="closeConfigur">
+        </web-hook-node>
+      </div>
+    </template>
+  </div>
 </template>
 
 <script>
-    import axios from 'axios'
-    import { errorHandler } from '../../../utils/errorHandler'
-    import secondFlow from './flowCanvas/secondFlow.vue'
-    import basicNode from '@/views/processManagement/processDesign/nodeConfigue/basicNode.vue'
-    import autoNode from '@/views/processManagement/processDesign/nodeConfigue/autoNode.vue'
-    import sopsNode from '@/views/processManagement/processDesign/nodeConfigue/sopsNode.vue'
-    import signNode from '@/views/processManagement/processDesign/nodeConfigue/signNode.vue'
-    import devopsNode from '@/views/processManagement/processDesign/nodeConfigue/devopsNode.vue'
-    import ApprovalNode from '@/views/processManagement/processDesign/nodeConfigue/ApprovalNode.vue'
+  import axios from 'axios';
+  import { errorHandler } from '../../../utils/errorHandler';
+  import secondFlow from './flowCanvas/secondFlow.vue';
+  import basicNode from '@/views/processManagement/processDesign/nodeConfigue/basicNode.vue';
+  import autoNode from '@/views/processManagement/processDesign/nodeConfigue/autoNode.vue';
+  import sopsNode from '@/views/processManagement/processDesign/nodeConfigue/sopsNode.vue';
+  import signNode from '@/views/processManagement/processDesign/nodeConfigue/signNode.vue';
+  import devopsNode from '@/views/processManagement/processDesign/nodeConfigue/devopsNode.vue';
+  import ApprovalNode from '@/views/processManagement/processDesign/nodeConfigue/ApprovalNode.vue';
+  import webHookNode from '@/views/processManagement/processDesign/nodeConfigue/webHookNode.vue';
+  import bkPluginNode from '@/views/processManagement/processDesign/nodeConfigue/bkPluginNode.vue';
 
-    export default {
-        name: 'ServiceProcessStep',
-        components: {
-            secondFlow,
-            basicNode,
-            autoNode,
-            sopsNode,
-            signNode,
-            ApprovalNode,
-            devopsNode
-        },
-        props: {
-            serviceInfo: {
-                type: Object,
-                default: () => ({})
+  export default {
+    name: 'ServiceProcessStep',
+    components: {
+      secondFlow,
+      basicNode,
+      autoNode,
+      sopsNode,
+      signNode,
+      ApprovalNode,
+      devopsNode,
+      bkPluginNode,
+      webHookNode,
+    },
+    props: {
+      serviceInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      flowInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    data() {
+      return {
+        flowDataLoading: false,
+        isShowNodeConfig: false,
+        nodeList: [],
+        lineList: [],
+        configur: {},
+      };
+    },
+    computed: {
+      processId() {
+        return this.serviceInfo.workflow_id;
+      },
+      nodeType() {
+        const nodoTypeList = {
+          'TASK-DEVOPS': this.$t('m["蓝盾节点"]'),
+          'TASK-SOPS': this.$t('m["标准运维节点"]'),
+          NORMAL: this.$t('m["手动节点"]'),
+          TASK: this.$t('m["任务节点"]'),
+          APPROVAL: this.$t('m["审批节点"]'),
+          SIGN: this.$t('m["会签节点"]'),
+          WEBHOOK: this.$t('m["WEBHOOK节点"]'),
+          'BK-PLUGIN': this.$t('m["蓝鲸插件节点"]'),
+        };
+        return nodoTypeList[this.configur.type];
+      },
+    },
+    watch: {
+      isShowNodeConfig(val) {
+        this.$emit('setConfigStatus', val);
+      },
+    },
+    created() {
+      this.$emit('setConfigStatus', this.isShowNodeConfig);
+    },
+    mounted() {
+      if (this.processId) {
+        this.getFlowChart();
+      }
+    },
+    methods: {
+      // 获取流程图
+      getFlowChart() {
+        this.flowDataLoading = true;
+        axios.all([
+          this.$store.dispatch('deployCommon/getStates', { workflow: this.processId }),
+          this.$store.dispatch('deployCommon/getChartLink', {
+            workflow: this.processId,
+            page_size: 1000,
+          }),
+        ]).then(axios.spread((userResp, reposResp) => {
+          this.nodeList = userResp.data;
+          this.lineList = reposResp.data.items;
+        }))
+          .finally(() => {
+            this.flowDataLoading = false;
+          });
+      },
+      handleNodeClick(data) {
+        this.isShowNodeConfig = true;
+        this.configur = data;
+      },
+      closeConfigur() {
+        this.isShowNodeConfig = false;
+        this.configur = {};
+        this.$emit('updateFlowInfo');
+      },
+      // 保存节点位置
+      submitFlow() {
+        const lineInfoList = this.$refs.flowInfo.canvasData;
+        const params = {
+          workflow_id: this.processId,
+          transitions: [],
+        };
+        lineInfoList.lines.forEach(item => {
+          params.transitions.push({
+            id: item.lineInfo.id,
+            axis: {
+              start: item.source.arrow,
+              end: item.target.arrow,
             },
-            flowInfo: {
-                type: Object,
-                default: () => ({})
-            }
-        },
-        data () {
-            return {
-                flowDataLoading: false,
-                isShowNodeConfig: false,
-                nodeList: [],
-                lineList: [],
-                configur: {}
-            }
-        },
-        computed: {
-            processId () {
-                return this.serviceInfo.workflow_id
-            },
-            nodeType () {
-                const nodoTypeList = {
-                    'TASK-DEVOPS': this.$t(`m["蓝盾节点"]`),
-                    'TASK-SOPS': this.$t(`m["标准运维节点"]`),
-                    'NORMAL': this.$t(`m["手动节点"]`),
-                    'TASK': this.$t(`m["任务节点"]`),
-                    'APPROVAL': this.$t(`m["审批节点"]`),
-                    'SIGN': this.$t(`m["会签节点"]`)
-                }
-                return nodoTypeList[this.configur.type]
-            }
-        },
-        watch: {
-            isShowNodeConfig (val) {
-                this.$emit('setConfigStatus', val)
-            }
-        },
-        created () {
-            this.$emit('setConfigStatus', this.isShowNodeConfig)
-        },
-        mounted () {
-            if (this.processId) {
-                this.getFlowChart()
-            }
-        },
-        methods: {
-            // 获取流程图
-            getFlowChart () {
-                this.flowDataLoading = true
-                axios.all([
-                    this.$store.dispatch('deployCommon/getStates', { 'workflow': this.processId }),
-                    this.$store.dispatch('deployCommon/getChartLink', {
-                        'workflow': this.processId,
-                        'page_size': 1000
-                    })
-                ]).then(axios.spread((userResp, reposResp) => {
-                    this.nodeList = userResp.data
-                    this.lineList = reposResp.data.items
-                })).finally(() => {
-                    this.flowDataLoading = false
-                })
-            },
-            handleNodeClick (data) {
-                this.isShowNodeConfig = true
-                this.configur = data
-            },
-            closeConfigur () {
-                this.isShowNodeConfig = false
-                this.configur = {}
-                this.$emit('updateFlowInfo')
-            },
-            // 保存节点位置
-            submitFlow () {
-                const lineInfoList = this.$refs.flowInfo.canvasData
-                const params = {
-                    workflow_id: this.processId,
-                    transitions: []
-                }
-                lineInfoList.lines.forEach(item => {
-                    params.transitions.push({
-                        id: item.lineInfo.id,
-                        axis: {
-                            start: item.source.arrow,
-                            end: item.target.arrow
-                        }
-                    })
-                })
-                this.$store.dispatch('deployCommon/updateFlowLine', { params }).catch(res => {
-                    errorHandler(res, this)
-                })
-            },
-            saveProcess () {
-                const id = this.processId
-                const params = []
-                return this.$store.dispatch('cdeploy/submitChart', { params, id }).then((res) => {
-                    this.$bkMessage({
-                        message: this.$t(`m.treeinfo["保存成功"]`),
-                        theme: 'success'
-                    })
-                }, (res) => {
-                    if (res.data && res.data.data) {
-                        this.errorList = res.data.data.invalid_state_ids
-                        this.$refs.flowInfo.errorNodes(this.errorList)
-                    }
-                    errorHandler(res, this)
-                    return { data: { result: false } }
-                })
-            },
-            validate () {
-                this.submitFlow()
-                return this.saveProcess()
-            }
-        }
-    }
+          });
+        });
+        this.$store.dispatch('deployCommon/updateFlowLine', { params }).catch(res => {
+          errorHandler(res, this);
+        });
+      },
+      saveProcess() {
+        const id = this.processId;
+        const params = [];
+        return this.$store.dispatch('cdeploy/submitChart', { params, id }).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.treeinfo["保存成功"]'),
+            theme: 'success',
+          });
+        }, (res) => {
+          if (res.data && res.data.data) {
+            this.errorList = res.data.data.invalid_state_ids;
+            this.$refs.flowInfo.errorNodes(this.errorList);
+          }
+          errorHandler(res, this);
+          return { data: { result: false } };
+        });
+      },
+      validate() {
+        this.submitFlow();
+        return this.saveProcess();
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 .process-step {

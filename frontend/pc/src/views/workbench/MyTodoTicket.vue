@@ -21,20 +21,20 @@
   -->
 
 <template>
-    <div class="my-todo-ticket-page">
-        <nav-title :title-name="$t(`m['我的待办']`)"></nav-title>
-        <todo-list from="myTodoTicket"></todo-list>
-    </div>
+  <div class="my-todo-ticket-page">
+    <nav-title :title-name="$t(`m['我的待办']`)"></nav-title>
+    <todo-list from="myTodoTicket"></todo-list>
+  </div>
 </template>
 <script>
-    import NavTitle from '@/components/common/layout/NavTitle'
-    import TodoList from '../ticket/TodoList'
+  import NavTitle from '@/components/common/layout/NavTitle';
+  import TodoList from '../ticket/TodoList';
 
-    export default {
-        name: 'MyTodoTicket',
-        components: {
-            NavTitle,
-            TodoList
-        }
-    }
+  export default {
+    name: 'MyTodoTicket',
+    components: {
+      NavTitle,
+      TodoList,
+    },
+  };
 </script>

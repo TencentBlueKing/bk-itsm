@@ -113,6 +113,9 @@ class TicketPermissionValidate(permissions.BasePermission):
         if view.action == "get_ticket_output":
             return True
 
+        if view.action == "is_processor":
+            return True
+
         # 查看权限校验
         if request.method in permissions.SAFE_METHODS:
 
@@ -137,7 +140,7 @@ class TicketPermissionValidate(permissions.BasePermission):
             obj.service_id, username
         ):
             return True
-        return any([obj.can_operate(username), iam_ticket_manage_auth])
+        return any([obj.can_operate(username)])
 
     def iam_ticket_manage_auth(self, request, obj):
         # 本地开发环境，不校验单据管理权限

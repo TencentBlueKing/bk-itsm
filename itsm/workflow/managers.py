@@ -26,6 +26,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import copy
 import json
 import os
+import random
+import string
 import time
 import six
 from six.moves import range
@@ -312,7 +314,7 @@ class WorkflowManager(Manager):
         content.update(is_draft=False)
         return self.create(**content)
 
-    def restore(self, data, operator="", for_migrate=False):
+    def restore(self, data, operator="", for_migrate=False, name=None):
         """WorkflowVersion->Workflow's record"""
         case_one = (
             data.get("is_builtin")
@@ -329,10 +331,10 @@ class WorkflowManager(Manager):
             )
             print("workflow exist, skip restore workflow {}".format(data.get("name")))
             return
-        return self.clone(data, operator, for_migrate)
+        return self.clone(data, operator, for_migrate, name)
 
     @transaction.atomic
-    def clone(self, data, operator="", for_migrate=False):
+    def clone(self, data, operator="", for_migrate=False, name=None):
         from django.db.models.signals import post_save
         from itsm.workflow.signals.handlers import init_after_workflow_created
         from itsm.workflow.models import (
@@ -345,7 +347,7 @@ class WorkflowManager(Manager):
         )
         from itsm.iadmin.models import SystemSettings
         from distutils.dir_util import copy_tree
-        
+
         states = data.pop("states")
         transitions = data.pop("transitions")
         fields = data.pop("fields")
@@ -389,6 +391,10 @@ class WorkflowManager(Manager):
             else "{name}-{version_number}".format(**data),
             version_number=create_version_number(),
         )
+
+        if name is not None:
+            data.update(name=name)
+
         old_workflow_id = data.pop("workflow_id")
         old_state_ids = list(states.keys())
         # 临时关闭post_save信号：init_after_workflow_created，恢复workflow
@@ -413,7 +419,7 @@ class WorkflowManager(Manager):
             transitions, new_workflow_id, _state_map
         )
         if new_task_schemas:
-            task_settings = workflow.extras["task_settings"]
+            task_settings = workflow.extras.get("task_settings", [])
             if task_settings and isinstance(task_settings, dict):
                 new_settings = []
                 task_schema_ids = task_settings.pop("task_schema_ids")
@@ -1809,17 +1815,21 @@ class GlobalVariableManager(Manager):
         """创建全局变量"""
         mapping = {"string": "STRING", "number": "INT", "boolean": "BOOLEAN"}
         inst_data_dict = {item["ref_path"]: item["key"] for item in inst_data}
+
         # 取消有效
         self.filter(state_id=state_id, flow_id=flow_id).update(is_valid=False)
         for gvar in validate_data:
             if gvar["source"] != "global":
                 continue
+            key = get_random_key(gvar["name"])
+            if key[0].isdigit():
+                # 开头为数字，重新生成
+                first_letter = random.choice(string.ascii_letters)
+                key = first_letter + key[1:]
             gvar.update(
                 {
                     "type": mapping.get(gvar["type"], gvar["type"]),
-                    "key": inst_data_dict.get(
-                        gvar["ref_path"], get_random_key(gvar["name"])
-                    ),
+                    "key": inst_data_dict.get(gvar["ref_path"], key),
                 }
             )
             self.update_or_create(

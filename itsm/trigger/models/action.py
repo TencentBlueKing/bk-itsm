@@ -30,6 +30,7 @@ import jsonfield
 
 from django.db import models
 from django.utils.translation import ugettext as _
+from mako.template import Template
 
 from itsm.component.utils.client_backend_query import get_bk_users
 from itsm.component.constants import (
@@ -68,31 +69,55 @@ class Action(TriggerBaseModel):
         "need_refresh",
         "component_name",
         "end_time",
+        "ex_data",
+        "component_type",
     )
 
-    signal = models.CharField(_("触发事件信号"), choices=TRIGGER_SIGNAL_CHOICE, max_length=LEN_MIDDLE)
-    sender = models.CharField(_("触发对象"), help_text=_("一般为触发该信号的元素id"), max_length=LEN_NORMAL)
+    signal = models.CharField(
+        _("触发事件信号"), choices=TRIGGER_SIGNAL_CHOICE, max_length=LEN_MIDDLE
+    )
+    sender = models.CharField(
+        _("触发对象"), help_text=_("一般为触发该信号的元素id"), max_length=LEN_NORMAL
+    )
     rule_id = models.IntegerField(_("事件关联的触发器规则信息"), default=EMPTY_INT)
     trigger_id = models.IntegerField(_("事件关联的触发器信息"), default=EMPTY_INT)
     schema_id = models.IntegerField(_("事件关联的配置信息"))
 
     # 真正处罚对象的来源, 可以根据用户的需要来定义
     source_type = models.CharField(
-        _("响应事件来源类型"), help_text=_("记录响应事件的来源类型, 由用户自定义，方便使用方后期管理"), max_length=LEN_NORMAL, default=EMPTY_STRING,
+        _("响应事件来源类型"),
+        help_text=_("记录响应事件的来源类型, 由用户自定义，方便使用方后期管理"),
+        max_length=LEN_NORMAL,
+        default=EMPTY_STRING,
     )
     source_id = models.IntegerField(_("对应的来源PK值"), null=True, blank=True)
 
     context = jsonfield.JSONField(_("触发事件的上下文参数"), default=EMPTY_DICT)
-    inputs = jsonfield.JSONField(_("用户的输入参数"), help_text=_("输入参数引用的参数变量"), default=EMPTY_DICT)
-    outputs = jsonfield.JSONField(_("动作的输出参数"), help_text=_("动作的输出参数字典"), default=EMPTY_DICT)
+    inputs = jsonfield.JSONField(
+        _("用户的输入参数"), help_text=_("输入参数引用的参数变量"), default=EMPTY_DICT
+    )
+    outputs = jsonfield.JSONField(
+        _("动作的输出参数"), help_text=_("动作的输出参数字典"), default=EMPTY_DICT
+    )
 
     # 事件的执行状态
-    status = models.CharField(_("响应事件状态"), choices=ACTION_STATUS_CHOICE, default="CREATED", max_length=LEN_NORMAL)
+    status = models.CharField(
+        _("响应事件状态"),
+        choices=ACTION_STATUS_CHOICE,
+        default="CREATED",
+        max_length=LEN_NORMAL,
+    )
     end_time = models.DateTimeField(_("任务结束事件"), null=True)
     operator = models.CharField(_("执行人"), max_length=LEN_NORMAL, default=SYS)
-    ex_data = jsonfield.JSONField(_("执行错误信息"), help_text=_("状态为失败的时候记录的错误日志"), default=EMPTY_DICT)
+    ex_data = jsonfield.JSONField(
+        _("执行错误信息"), help_text=_("状态为失败的时候记录的错误日志"), default=EMPTY_DICT
+    )
+
+    params = jsonfield.JSONField(_("执行的参数"), help_text=_("手动触发器实际执行的参数信息"), default={})
 
     objects = ActionManagers()
+
+    temporary_params = None
 
     class Meta:
         verbose_name = _("响应动作表")
@@ -111,7 +136,7 @@ class Action(TriggerBaseModel):
         if self.action_schema.can_repeat:
             self.id = None
         self.save()
-        self.refresh_from_db(fields=['id'])
+        self.refresh_from_db(fields=["id"])
 
         if need_update_context:
             self.update_context()
@@ -150,7 +175,13 @@ class Action(TriggerBaseModel):
     @property
     def component_obj(self):
         self.context.update(self.outputs if self.outputs else EMPTY_DICT)
-        return self.action_schema.component_class(self.context, self.action_schema.params, self.id, self.count_down)
+        if self.params:
+            return self.action_schema.component_class(
+                self.context, self.params, self.id, self.count_down
+            )
+        return self.action_schema.component_class(
+            self.context, self.action_schema.params, self.id, self.count_down
+        )
 
     @property
     def count_down(self):
@@ -166,6 +197,26 @@ class Action(TriggerBaseModel):
     @property
     def operate_type(self):
         return self.action_schema.get_operate_type_display()
+
+    def render_params(self, template_value):
+        try:
+            if isinstance(template_value, str):
+                return Template(template_value).render(**self.context)
+            if isinstance(template_value, dict):
+                render_value = {}
+                for key, value in template_value.items():
+                    render_value[key] = self.render_params(value)
+                return render_value
+            if isinstance(template_value, list):
+                return [self.render_params(value) for value in template_value]
+        except NameError:
+            return template_value
+        return template_value
+
+    def action_params(self, context):
+        self.update_context()
+        self.context.update(context)
+        return self.render_params(self.action_schema.params)
 
     @property
     def trigger_name(self):
@@ -200,7 +251,7 @@ class Action(TriggerBaseModel):
         for _type, signals in TRIGGER_SIGNAL.items():
             if self.signal in signals:
                 return _type
-        return 'Undefined'
+        return "Undefined"
 
     @property
     def signal_name(self):
@@ -209,6 +260,10 @@ class Action(TriggerBaseModel):
     @property
     def need_refresh(self):
         return self.action_schema.component_class.need_refresh
+
+    @property
+    def component_type(self):
+        return self.action_schema.component_type
 
     @property
     def component_name(self):
@@ -220,5 +275,5 @@ class Action(TriggerBaseModel):
             return EMPTY_DISPLAY_STRING
         if self.operator == SYS:
             return _("系统")
-        bk_users = get_bk_users(format='dict', users=[self.operator])
+        bk_users = get_bk_users(format="dict", users=[self.operator])
         return bk_users.get(self.operator, EMPTY_DISPLAY_STRING)

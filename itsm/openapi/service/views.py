@@ -23,6 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 from django.db import transaction
+from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 
@@ -37,13 +38,14 @@ from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.drf.mixins import ApiGatewayMixin
 from itsm.component.exceptions import ServicePartialError, ServiceInsertError
 from itsm.component.exceptions import ObjectNotExist
+from itsm.openapi.decorators import catch_openapi_exception
 from itsm.openapi.service.serializers import (
     ServiceRetrieveSerializer,
     ServiceSerializer,
 )
 from itsm.service.models import CatalogService, Service, ServiceCatalog
 from itsm.service.serializers import ServiceImportSerializer
-from itsm.workflow.models import Workflow
+from itsm.workflow.models import Workflow, WorkflowVersion
 from itsm.component.constants import role, DEFAULT_PROJECT_PROJECT_KEY
 from itsm.role.models import UserRole
 
@@ -63,15 +65,12 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
     )
 
     @action(detail=False, methods=["get"], serializer_class=ServiceSerializer)
+    @catch_openapi_exception
     def get_services(self, request):
         """
         服务项列表
         """
-
-        project_key = request.query_params.get(
-            "project_key", DEFAULT_PROJECT_PROJECT_KEY
-        )
-        queryset = self.queryset.filter(project_key=project_key).all()
+        queryset = self.queryset.all()
 
         catalog_id = request.query_params.get("catalog_id")
         if catalog_id:
@@ -96,17 +95,13 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
         return Response(self.serializer_class(queryset, many=True).data)
 
     @action(detail=False, methods=["get"], serializer_class=ServiceRetrieveSerializer)
+    @catch_openapi_exception
     def get_service_detail(self, request):
         """
         服务项详情
         """
-        project_key = request.query_params.get(
-            "project_key", DEFAULT_PROJECT_PROJECT_KEY
-        )
         try:
-            service = self.queryset.get(
-                pk=request.query_params.get("service_id"), project_key=project_key
-            )
+            service = self.queryset.get(pk=request.query_params.get("service_id"))
         except Service.DoesNotExist:
             return Response(
                 {
@@ -120,6 +115,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
         return Response(self.serializer_class(service).data)
 
     @action(detail=False, methods=["get"])
+    @catch_openapi_exception
     def get_service_catalogs(self, request):
         """
         服务目录
@@ -146,6 +142,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
         return Response([ServiceCatalog.open_api_subtree(root) for root in roots])
 
     @action(detail=False, methods=["get"])
+    @catch_openapi_exception
     def get_service_roles(self, request):
         """
         服务目录
@@ -197,6 +194,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
         return Response(states_roles)
 
     @action(detail=False, methods=["post"])
+    @catch_openapi_exception
     def insert_service(self, requests):
         """
         插入或新服务和流程
@@ -214,6 +212,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
         return Response()
 
     @action(detail=False, methods=["post"])
+    @catch_openapi_exception
     @custom_apigw_required
     def import_service(self, request):
         data = request.data
@@ -227,7 +226,40 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
             data["workflow_id"] = version.id
             if Service.validate_service_name(data["name"]):
                 raise ServiceInsertError(_("导入失败，服务名称已经存在"))
+
+            catalog_id = data.pop("catalog_id", None)
             service = Service.objects.create(**data)
+            service.bind_catalog(catalog_id, service.project_key)
+        return Response(
+            self.serializer_class(service, context=self.get_serializer_context()).data
+        )
+
+    @action(detail=False, methods=["post"])
+    @catch_openapi_exception
+    @custom_apigw_required
+    def update_service(self, request):
+        data = request.data
+        ServiceImportSerializer(data=data).is_valid(raise_exception=True)
+        with transaction.atomic():
+            service_id = data.pop("id")
+            service = Service.objects.get(id=service_id)
+            # 删除旧的服务
+            Workflow.objects.filter(id=service.workflow.workflow_id).delete()
+            WorkflowVersion.objects.filter(id=service.workflow.id).delete()
+            # 导入新的服务
+            workflow_tag_data = data.pop("workflow")
+            workflow = Workflow.objects.restore(
+                workflow_tag_data, request.user.username
+            )[0]
+            version = workflow.create_version()
+            data["workflow_id"] = version.id
+            if Service.objects.filter(~Q(id=service_id), name=data["name"]).exists():
+                raise ServiceInsertError(_("导入失败，服务名称已经存在"))
+            catalog_id = data.pop("catalog_id", None)
+            Service.objects.filter(id=service_id).update(**data)
+            # 重新绑定目录
+            service.bind_catalog(catalog_id, service.project_key)
+            service.refresh_from_db()
         return Response(
             self.serializer_class(service, context=self.get_serializer_context()).data
         )

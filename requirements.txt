@@ -73,7 +73,7 @@ chardet==3.0.4
 curlify==2.2.1
 idna==2.8
 urllib3==1.25.9
-pycrypto==2.6.1
+# pycrypto==2.6.1
 
 #others
 raven==6.1.0
@@ -86,12 +86,12 @@ mock==3.0.5
 
 # excel
 xlrd==1.2.0
-typing_extensions==3.6.5
+typing-extensions==3.7.4.3
 
 anyjson==0.3.3
 
 #bkouth
-PyJWT==1.6.1
+PyJWT==1.6.4
 cryptography==3.3.2
 
 # prometheus
@@ -99,6 +99,8 @@ django-prometheus==2.1.0
 
 # grpcio
 grpcio==1.27.2
+
+protobuf==3.19.4
 
 # opentelemetry
 opentelemetry-api==1.6.2
@@ -114,3 +116,13 @@ opentelemetry-instrumentation-dbapi==0.25b2
 opentelemetry-instrumentation-redis==0.25b2
 opentelemetry-instrumentation-logging==0.25b2
 opentelemetry-instrumentation-requests==0.25b2
+
+pyCryptodome==3.14.1
+
+Jinja2==2.11.1
+jmespath==0.10.0
+requests_toolbelt==0.9.1
+
+apigw-manager[cryptography]==1.0.7
+
+drf-yasg==1.20.0

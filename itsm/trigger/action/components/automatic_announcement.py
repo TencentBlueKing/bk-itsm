@@ -39,6 +39,7 @@ class RobotForms(BaseForm):
     """
 
     web_hook_id = StringField(name="Webhook ID", required=True)
+    chat_id = StringField(name="Chat ID", required=False, tips="群ID, 多个用,区分")
     content = StringField(name=_("文本内容"), field_type="TEXT", required=True)
     mentioned_list = StringField(
         name="需要提及的人的列表", tips="英文半角逗号分割的英文名列表，不填则默认@所有成员，None不@任何人", required=False
@@ -58,6 +59,15 @@ class AutomaticAnnouncementComponent(BaseComponent):
         web_hook_ids = self.data.get_one_of_inputs("web_hook_id")
         content = self.data.get_one_of_inputs("content")
         mentioned_list = self.data.get_one_of_inputs("mentioned_list")
+        chat_id = self.data.get_one_of_inputs("chat_id", "")
+
+        chat_ids = None
+        if len(chat_id) != 0:
+            if len(web_hook_ids.split(",")) > 1:
+                self.data.set_outputs("message", "当指定群时,Webhook ID只能选一个")
+                return False
+            chat_ids = "|".join(chat_id.split(","))
+
         if mentioned_list is None or len(mentioned_list) == 0:
             mentioned_list = ["@all"]
         elif mentioned_list == "None":
@@ -74,7 +84,9 @@ class AutomaticAnnouncementComponent(BaseComponent):
 
         threads = []
         for web_hook_id in web_hook_ids.split(","):
-            announcement = robot.Announcement(web_hook_id, content, mentioned_list)
+            announcement = robot.Announcement(
+                web_hook_id, content, mentioned_list, chat_ids
+            )
             threads.append(announcement)
 
         for thread in threads:

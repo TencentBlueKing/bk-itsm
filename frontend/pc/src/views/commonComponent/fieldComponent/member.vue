@@ -21,77 +21,77 @@
   -->
 
 <template>
-    <div v-if="item.showFeild" class="member-field">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :ext-cls="'bk-ext-item'" :desc="item.tips" desc-type="icon">
-            <div @click="item.checkValue = false" class="member-form-item">
-                <member-select :class="{ 'bk-border-error': item.checkValue }"
-                    v-model="selectedItems"
-                    :multiple="false"
-                    :disabled="item.is_readonly">
-                </member-select>
-                <business-card
-                    style="margin-top: 3px"
-                    :item="item">
-                </business-card>
-            </div>
-            <template v-if="item.checkValue">
-                <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-                <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-            </template>
-        </bk-form-item>
-    </div>
+  <div v-if="item.showFeild" class="member-field">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :ext-cls="'bk-ext-item'" :desc="item.tips" desc-type="icon">
+      <div @click="item.checkValue = false" class="member-form-item">
+        <member-select :class="{ 'bk-border-error': item.checkValue }"
+          v-model="selectedItems"
+          :multiple="false"
+          :disabled="item.is_readonly">
+        </member-select>
+        <business-card
+          style="margin-top: 3px"
+          :item="item">
+        </business-card>
+      </div>
+      <template v-if="item.checkValue">
+        <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+        <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+      </template>
+    </bk-form-item>
+  </div>
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js'
-    import memberSelect from '../memberSelect'
-    import businessCard from '@/components/common/BusinessCard.vue'
+  import mixins from '../../commonMix/field.js';
+  import memberSelect from '../memberSelect';
+  import businessCard from '@/components/common/BusinessCard.vue';
 
-    export default {
-        name: 'MEMBER',
-        components: { memberSelect, businessCard },
-        mixins: [mixins],
-        props: {
-            item: {
-                type: Object,
-                default () {
-                    return {}
-                }
-            },
-            fields: {
-                type: Array,
-                default () {
-                    return []
-                }
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false
-            }
+  export default {
+    name: 'MEMBER',
+    components: { memberSelect, businessCard },
+    mixins: [mixins],
+    props: {
+      item: {
+        type: Object,
+        default() {
+          return {};
         },
-        data () {
-            return {
-                selectedItems: []
-            }
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
         },
-        watch: {
-            'item.val' () {
-                if (this.item.val) {
-                    this.selectedItems = this.item.val ? [this.item.val] : []
-                }
-                this.conditionField(this.item, this.fields)
-            },
-            'selectedItems': {
-                handler (newval, oldval) {
-                    this.item.val = this.selectedItems.join(',')
-                }
-            }
-        },
-        async mounted () {
-            this.selectedItems = this.item.val ? [this.item.val] : []
-            this.conditionField(this.item, this.fields)
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        selectedItems: [],
+      };
+    },
+    watch: {
+      'item.val'() {
+        if (this.item.val) {
+          this.selectedItems = this.item.val ? [this.item.val] : [];
         }
-    }
+        this.conditionField(this.item, this.fields);
+      },
+      selectedItems: {
+        handler() {
+          this.item.val = this.selectedItems.join(',');
+        },
+      },
+    },
+    async mounted() {
+      this.selectedItems = this.item.val ? [this.item.val] : [];
+      this.conditionField(this.item, this.fields);
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

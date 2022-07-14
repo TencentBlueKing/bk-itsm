@@ -43,7 +43,6 @@ $.ajaxSetup({
  */
 function open_login_dialog(src, width, height){
     // https 兼容
-    src = src.replace('http', 'https');
     var login_html = '<div class="mod_login" id="loginbox" style="padding: 0px 0px; visibility: visible;" align="center">' +
                         '<iframe name="login_frame" id="login_frame"  width="100%" height="100%" frameborder="0" allowtransparency="yes"  src="'+src+
                         '" style="width:'+width+'px;height:'+height+'px;"></iframe>' +

@@ -20,19 +20,19 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
-    namespaced: true,
-    state: {},
-    mutations: {},
-    actions: {
-        // 打印工单
-        getOnePrint ({ commit, state, dispatch }, params) {
-            return ajax.get(`ticket/receipts/${params.id}/print_ticket/`, { params }).then(response => {
-                let res = response.data
-                return res
-            })
-        }
-    }
-}
+  namespaced: true,
+  state: {},
+  mutations: {},
+  actions: {
+    // 打印工单
+    getOnePrint({ commit, state, dispatch }, params) {
+      return ajax.get(`ticket/receipts/${params.id}/print_ticket/`, { params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};
