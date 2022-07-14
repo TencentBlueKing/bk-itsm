@@ -35,7 +35,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         return super(ServiceViewSet, self).update(request, *args, **kwargs)
 
-    # @custom_apigw_required
+    @custom_apigw_required
     def create(self, request, *args, **kwargs):
         return super(ServiceViewSet, self).create(request, *args, **kwargs)
 
@@ -48,6 +48,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
         workflow.update_workflow_configs(workflow_config)
         return workflow
 
+    @custom_apigw_required
     @action(detail=True, methods=["post"], permission_classes=())
     def deploy(self, request, *args, **kwargs):
         service = self.get_object()
@@ -56,7 +57,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
         service.name = workflow.name
         service.is_valid = True
         service.save()
-        return Response()
+        return Response({"version_number": workflow.id})
 
     @custom_apigw_required
     @action(detail=True, methods=["post"], permission_classes=())
