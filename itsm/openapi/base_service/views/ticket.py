@@ -29,6 +29,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ReadOnlyModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         return Response()
 
+    @custom_apigw_required
     @action(detail=False, methods=["post"])
     def create_ticket_with_version(self, request, *args, **kwargs):
         data = copy.deepcopy(request.data)
