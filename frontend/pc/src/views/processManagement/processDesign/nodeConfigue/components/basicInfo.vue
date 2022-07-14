@@ -90,7 +90,6 @@
             <deal-person
               ref="processors"
               :value="processorsInfo"
-              :show-overbook="true"
               :node-info="nodeInfo"
               :exclude-role-type-list="excludeProcessor">
             </deal-person>

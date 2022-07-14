@@ -235,7 +235,7 @@
           delivers: false,
           processors: false,
         },
-        excludeProcessor: ['EMPTY'],
+        excludeProcessor: ['EMPTY', 'OPEN'],
         processorsInfo: {
           type: '',
           value: '',
