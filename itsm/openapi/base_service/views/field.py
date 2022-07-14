@@ -127,9 +127,9 @@ class FieldViewSet(BaseFieldViewSet):
         field_object.save()
         return Response()
 
+    @custom_apigw_required
     @action(detail=False, methods=["post"])
     @catch_openapi_exception
-    @custom_apigw_required
     def batch_save(self, request, *args, **kwargs):
         state_id = request.data.get("state_id")
         data = request.data.get("fields")
@@ -142,7 +142,6 @@ class FieldViewSet(BaseFieldViewSet):
                 raise ParamError("只有人工节点可以操作字段")
 
             current_fields = Field.objects.filter(id__in=state.fields)
-
             builtin_field_ids = [
                 field.id for field in current_fields if field.is_builtin
             ]
@@ -156,7 +155,6 @@ class FieldViewSet(BaseFieldViewSet):
             ser.is_valid(raise_exception=True)
 
             data = ser.data
-
             current_ids = []
 
             for item in data:
@@ -187,46 +185,41 @@ class FieldViewSet(BaseFieldViewSet):
                     field_id = Field.objects.create(**item).id
                     current_ids.append(field_id)
 
-                remove_ids = set(state.fields) - set(current_ids)
-
-                # 内置字段不允许删除
-                for builtin_field_id in builtin_field_ids:
-                    try:
-                        remove_ids.remove(builtin_field_id)
-                    except Exception:
-                        continue
-
-                Field.objects.filter(id__in=remove_ids, state_id=state_id).delete()
-
                 if not current_ids:
                     current_ids.extend(builtin_field_ids)
 
-                state.fields = current_ids
-                state.save()
-
-            queryset = self.filter_queryset(self.get_queryset())
-
-            valid_fields = state.fields
-            ordering = "FIELD(`id`, {})".format(
-                ",".join(["'{}'".format(v) for v in valid_fields])
+            is_deleted_builtin = any(
+                [item not in current_ids for item in builtin_field_ids]
             )
-            queryset = queryset.filter(id__in=valid_fields).extra(
-                select={"ordering": ordering}, order_by=["ordering"]
-            )
+            if is_deleted_builtin:
+                raise ParamError("内置字段不允许删除!")
 
-            serializer_data = self.get_serializer(queryset, many=True).data
+            state.fields = current_ids
+            state.save()
 
-            # 级联关系的梳理
-            be_relied = {}
-            for field_info in serializer_data:
-                cur_field_key = field_info["key"]
-                for field_key in field_info["related_fields"].get("rely_on", []):
-                    if field_key not in be_relied:
-                        be_relied[field_key] = [cur_field_key]
-                    else:
-                        be_relied[field_key].append(cur_field_key)
-            for field in serializer_data:
-                if field["key"] in be_relied:
-                    field["related_fields"]["be_relied"] = be_relied[field["key"]]
+        queryset = self.get_queryset()
 
-            return Response(serializer_data)
+        valid_fields = state.fields
+        ordering = "FIELD(`id`, {})".format(
+            ",".join(["'{}'".format(v) for v in valid_fields])
+        )
+
+        queryset = queryset.filter(id__in=valid_fields).extra(
+            select={"ordering": ordering}, order_by=["ordering"]
+        )
+        serializer_data = self.get_serializer(queryset, many=True).data
+
+        # 级联关系的梳理
+        be_relied = {}
+        for field_info in serializer_data:
+            cur_field_key = field_info["key"]
+            for field_key in field_info["related_fields"].get("rely_on", []):
+                if field_key not in be_relied:
+                    be_relied[field_key] = [cur_field_key]
+                else:
+                    be_relied[field_key].append(cur_field_key)
+        for field in serializer_data:
+            if field["key"] in be_relied:
+                field["related_fields"]["be_relied"] = be_relied[field["key"]]
+
+        return Response(serializer_data)
