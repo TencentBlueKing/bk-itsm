@@ -4,12 +4,16 @@ from django.db.models.signals import post_save
 from rest_framework import serializers
 from django.utils.translation import ugettext as _
 
+from itsm.component.constants import DEFAULT_BK_BIZ_ID
 from itsm.component.exceptions import ParamError
 from itsm.component.utils.basic import TempDisableSignal
 from itsm.openapi.base_service.utils import WorkflowInitHandler
+from itsm.openapi.base_service.validator import CreateTicketValidator
 from itsm.service.models import ServiceCatalog, Service
 from itsm.service.serializers import ServiceSerializer
-from itsm.service.validators import key_validator
+from itsm.service.validators import key_validator, service_validate
+from itsm.ticket.serializers import TicketSerializer
+from itsm.ticket_status.models import TicketStatus
 from itsm.workflow.models import (
     Workflow,
     DEFAULT_ENGINE_VERSION,
@@ -176,3 +180,68 @@ class BatchSaveFieldSerializer(FieldSerializer):
 
 class ApiGwSerializer(serializers.Serializer):
     pass
+
+
+class TicketCreateSerializer(TicketSerializer):
+    """
+    单据处理序列化
+    """
+
+    creator = serializers.CharField(required=True)
+    flow_id = serializers.IntegerField(required=True)
+
+    def to_internal_value(self, data):
+        """验证参数和组装创建单据逻辑"""
+        ret = super(TicketSerializer, self).to_internal_value(data)
+        catalog_services = data["catalog_services"]
+        current_status = data["current_status"]
+        fields_kv = {field["key"]: field["value"] for field in data.get("fields", [])}
+
+        # 创建单
+        if "creator" in data:
+            ret.update(creator=data["creator"])
+        ret.update(
+            {
+                "service": data["service"],
+                "service_type": data["service"].key,
+                "flow_id": data["flow_id"],
+                "is_supervise_needed": data["service"].workflow.is_supervise_needed,
+                "supervisor": data["service"].workflow.supervisor,
+                "supervise_type": data["service"].workflow.supervise_type,
+                "catalog_id": catalog_services.catalog_id,
+                "is_draft": False,
+                "current_status": current_status,
+                "updated_by": data.get(
+                    "creator", self.context["request"].user.username
+                ),
+                "title": fields_kv["title"],
+                "bk_biz_id": fields_kv.get("bk_biz_id", DEFAULT_BK_BIZ_ID),
+                "attention": data.get("attention", False),
+            }
+        )
+        return ret
+
+    def run_validation(self, data):
+        if self.instance is None:
+            service, catalog_services = service_validate(data.get("service_id"))
+
+            # 设置初始工单状态
+            try:
+                current_status = TicketStatus.objects.get(
+                    service_type=service.key, is_start=True
+                ).key
+            except TicketStatus.DoesNotExist:
+                raise serializers.ValidationError({_("工单状态"): _("工单状态不存在，请检查")})
+
+            # 创建单据时，若没有传入creator参数，则采用request的当前用户
+            creator = data.get("creator", self.context["request"].user.username)
+            data.update(
+                {
+                    "service": service,
+                    "current_status": current_status,
+                    "catalog_services": catalog_services,
+                    "creator": creator,
+                }
+            )
+            self.validators += [CreateTicketValidator(self.context["request"])]
+        return super(TicketSerializer, self).run_validation(data)
