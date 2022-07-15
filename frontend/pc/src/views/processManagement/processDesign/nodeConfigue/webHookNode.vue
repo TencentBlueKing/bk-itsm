@@ -254,7 +254,7 @@
           delivers: false,
           processors: false,
         },
-        excludeProcessor: ['OPEN'],
+        excludeProcessor: ['EMPTY', 'OPEN'],
         isShowUrlVariable: false,
         filterParams: '',
         stateList: [],

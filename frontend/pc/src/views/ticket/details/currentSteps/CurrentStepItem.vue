@@ -683,6 +683,9 @@
             if (typeList.some(item => item === this.openFormInfo.btnInfo.key)) {
               this.cancelForm();
             }
+            setTimeout(() => {
+              this.reloadTicket();
+            }, 500);
           });
       },
       // 当前操作节点打开全屏

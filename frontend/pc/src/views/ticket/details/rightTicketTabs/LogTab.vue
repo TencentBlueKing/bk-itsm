@@ -115,10 +115,13 @@
       },
     },
     watch: {
-      nodeList(val) {
-        if (val.length !== 0) {
-          this.getCurrentProcess();
-        }
+      nodeList: {
+        handler(val) {
+          if (val.length !== 0 && !this.ticketInfo.is_over) {
+            this.getCurrentProcess();
+          }
+        },
+        deep: true,
       },
     },
     created() {
@@ -171,6 +174,7 @@
           });
       },
       getCurrentProcess() {
+        this.list = this.list.filter(ite => ite.color !== 'blue');
         this.nodeList.forEach((item, index) => {
           const processor = {
             action: '',
