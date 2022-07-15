@@ -188,6 +188,12 @@ class FieldViewSet(BaseFieldViewSet):
                 if not current_ids:
                     current_ids.extend(builtin_field_ids)
 
+            if state.type == "NORMAL" and state.is_builtin:
+                # 如果提单节点没有传标题，则插入标题字段id
+                title_id = Field.objects.get(id__in=state.fields, key="title").id
+                if title_id not in current_ids:
+                    current_ids.insert(0, title_id)
+
             is_deleted_builtin = any(
                 [item not in current_ids for item in builtin_field_ids]
             )
