@@ -140,7 +140,7 @@ class WebHookService(ItsmBaseService):
         整体渲染 extras 所有的变量
         """
         variables = ticket.get_output_fields(return_format="dict", need_display=True)
-
+        variables.update(ticket.meta.get("envs", {}))
         result = ParamsBuilder(extras=extras, variables=variables).result()
 
         return result
