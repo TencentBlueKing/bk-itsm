@@ -370,7 +370,7 @@ const ticketListMixins = {
         const formItem = this.searchForms.find(item => item.key === 'service_id__in');
         formItem.display = val.length;
         if (val.length) {
-          const serviceCatalogId = val[val.length - 1].id;
+          const serviceCatalogId = val[val.length - 1];
           // 当服务目录的数据发生变化时，清空服务数据
           formItem.value = [];
           this.getServiceData(serviceCatalogId);
