@@ -233,7 +233,7 @@ def get_bk_business(bk_biz_id, role_type):
     return ",".join(bk_business)
 
 
-def get_list_department_profiles(params, page_size=2000):
+def get_list_department_profiles(params, page_size=500):
     """
     分页查询部门的用户信息
 
@@ -311,6 +311,29 @@ def get_department_users(department_id, recursive=False, detail=False):
             return []
 
     return users
+
+
+def get_user_department_ids(username):
+    """
+    获取用户的组织架构ID，用于提升用户的组织架构提单速度
+    """
+    try:
+        res = client_backend.usermanage.list_profile_departments(
+            {"id": username, "with_family": True}
+        )
+        # 用户当前的组织架构id
+        current_department_ids = [int(item["id"]) for item in res]
+        department_ids = []
+        for item in res:
+            for family in item.get("family", []):
+                department_ids.append(family["id"])
+
+        department_ids.extend(current_department_ids)
+
+    except ComponentCallError as e:
+        logger.error("获取用户部门ids失败：username=%s, error=%s" % (username, str(e)))
+        return []
+    return set(department_ids)
 
 
 def get_department_info(department_id):
