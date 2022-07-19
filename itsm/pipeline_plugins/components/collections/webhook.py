@@ -28,12 +28,18 @@ import logging
 
 import jmespath
 import requests
+from django.conf import settings
 from jinja2 import Template
 from pipeline.utils.boolrule import BoolRule
 from pipeline.component_framework.component import Component
 from django.utils.translation import ugettext as _
 
-from itsm.component.constants import TRANSITION_OPERATE, NODE_FAILED, FINISHED
+from itsm.component.constants import (
+    TRANSITION_OPERATE,
+    NODE_FAILED,
+    FINISHED,
+    LESSCODE_PROJECT_KEY,
+)
 from itsm.component.utils.encode import EncodeWebhook
 from itsm.pipeline_plugins.components.collections.itsm_base_service import (
     ItsmBaseService,
@@ -195,6 +201,13 @@ class WebHookService(ItsmBaseService):
             retry=False,
         )
 
+    def get_common_args(self):
+        return {
+            "bk_app_code": settings.APP_ID,
+            "bk_app_secret": settings.APP_TOKEN,
+            "bk_username": settings.SYSTEM_USE_API_ACCOUNT,
+        }
+
     def execute(self, data, parent_data):
         if super(WebHookService, self).execute(data, parent_data):
             return True
@@ -257,6 +270,11 @@ class WebHookService(ItsmBaseService):
         body = extras.get("body", {})["content"]
         timeout = extras.get("settings", {}).get("timeout", 10)
         success_exp = extras.get("success_exp")
+
+        # 如果是less code的数据处理节点, 针对get or post 请求，填充认证信息
+        if ticket.project_key == LESSCODE_PROJECT_KEY:
+            common_args = self.get_common_args()
+            headers.update({"x-bkapi-authorization": json.dumps(common_args)})
 
         try:
             auth = EncodeWebhook.encode_authorization(extras.get("auth", {}))
@@ -321,6 +339,7 @@ class WebHookService(ItsmBaseService):
 
         try:
             resp = response.json()
+            print("resp == {}".format(resp))
         except Exception:
             err_message = "返回值非Json"
             self.do_exit_plugins(
