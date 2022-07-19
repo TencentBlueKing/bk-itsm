@@ -27,6 +27,7 @@ from itsm.workflow.serializers import (
     FieldSerializer,
     AuthModelSerializer,
     FieldValidator,
+    WorkflowVersion,
 )
 from itsm.workflow.signals.handlers import init_after_workflow_created
 
@@ -245,3 +246,9 @@ class TicketCreateSerializer(TicketSerializer):
             )
             self.validators += [CreateTicketValidator(self.context["request"])]
         return super(TicketSerializer, self).run_validation(data)
+
+
+class OpenApiWorkflowVersionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkflowVersion
+        fields = "__all__"

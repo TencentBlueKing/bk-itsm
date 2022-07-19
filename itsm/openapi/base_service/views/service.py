@@ -57,7 +57,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
         service.name = workflow.name
         service.is_valid = True
         service.save()
-        return Response({"version_number": workflow.id})
+        return Response({"version_number": service.workflow_id})
 
     @custom_apigw_required
     @action(detail=True, methods=["post"], permission_classes=())
