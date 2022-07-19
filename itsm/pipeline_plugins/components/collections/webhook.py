@@ -339,7 +339,6 @@ class WebHookService(ItsmBaseService):
 
         try:
             resp = response.json()
-            print("resp == {}".format(resp))
         except Exception:
             err_message = "返回值非Json"
             self.do_exit_plugins(
