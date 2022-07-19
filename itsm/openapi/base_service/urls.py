@@ -33,6 +33,7 @@ from itsm.openapi.base_service.views.state import StateViewSet
 from itsm.openapi.base_service.views.ticket import TicketViewSet
 from itsm.openapi.base_service.views.transition import TransitionViewSet
 from itsm.openapi.base_service.views.workflow import WorkflowViewSet
+from itsm.openapi.base_service.views.workflow_version import WorkflowVersionViewSet
 
 routers = DefaultRouter(trailing_slash=True)
 
@@ -43,5 +44,8 @@ routers.register(r"field", FieldViewSet, basename="field")
 routers.register(r"transition", TransitionViewSet, basename="transition")
 routers.register(r"role_type", RoleTypeModelViewSet, basename="role_type")
 routers.register(r"api_gateway", ApiGwViewSet, basename="api_gateway")
+routers.register(
+    r"workflow_version", WorkflowVersionViewSet, basename="workflow_version"
+)
 routers.register(r"ticket", TicketViewSet, basename="ticket")
 urlpatterns = routers.urls

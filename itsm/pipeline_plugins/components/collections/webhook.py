@@ -257,7 +257,20 @@ class WebHookService(ItsmBaseService):
         body = extras.get("body", {})["content"]
         timeout = extras.get("settings", {}).get("timeout", 10)
         success_exp = extras.get("success_exp")
-        auth = EncodeWebhook.encode_authorization(extras.get("auth", {}))
+
+        try:
+            auth = EncodeWebhook.encode_authorization(extras.get("auth", {}))
+        except Exception as e:
+            err_message = "auth信息解析失败， error={}".format(e)
+            self.do_exit_plugins(
+                ticket,
+                state_id,
+                current_node,
+                err_message,
+                error_message_template,
+                processors,
+            )
+            return False
 
         try:
             response = requests.request(
