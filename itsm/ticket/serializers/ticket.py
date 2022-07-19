@@ -352,6 +352,7 @@ class StatusSerializer(serializers.ModelSerializer):
             can_create_task=inst.can_create_task(username),
             can_execute_task=inst.can_execute_task(username),
             members=members,
+            desc=inst.state["desc"],
         )
         for index, item in enumerate(data["operations"]):
             data["operations"][index]["name"] = _(data["operations"][index]["name"])

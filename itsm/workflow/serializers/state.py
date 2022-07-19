@@ -189,6 +189,14 @@ class StateSerializer(serializers.ModelSerializer):
                         }
                     ],
                 }
+            if validated_data.get("type", "") == "TASK-DEVOPS":
+                outputs = GlobalVariable.objects.create_global_variable(
+                    instance.id,
+                    instance.workflow_id,
+                    instance.variables["outputs"],
+                    validated_data["variables"]["outputs"],
+                )
+                validated_data["variables"].update(outputs=outputs)
 
             state = super(StateSerializer, self).update(instance, validated_data)
 

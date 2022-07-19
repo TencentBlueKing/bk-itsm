@@ -2636,6 +2636,8 @@ export const m = {
   不能使用保留字符: 'Cannot use reserved characters',
   必须是数字: 'must be a number',
   '是必填项！': 'is required !',
+  输出变量: 'output result',
+  '如何获取蓝盾流水线变量? 可以在bash插件中使用 setEnv "hello" "world" 或者在 Python 插件中 使用 set_env("hello", "world") ，具体的使用方法请参考蓝盾指引。': 'How to get BlueShield pipeline variables? You can use setEnv "hello" "world" in the bash plugin or set_env("hello", "world") in the Python plugin. For the specific usage, please refer to the BlueShield guide.',
   点击修改: 'Click to modify',
   当前组织架构下共有员工: 'There are total employees under the current organizational structure',
   '人，如果开启了消息通知，会导致': ', if message notification is turned on, it will cause',
