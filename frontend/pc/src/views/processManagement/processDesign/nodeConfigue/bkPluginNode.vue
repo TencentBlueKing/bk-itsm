@@ -162,7 +162,7 @@
 </template>
 <script>
   import descInfo from './components/descInfo.vue';
-  import createForm from '@tencent/bkui-form/dist/bkui-form-umd';
+  import createForm from '@blueking/bkui-form/dist/bkui-form-umd';
   import dealPerson from './components/dealPerson.vue';
   import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
   import BasicCard from '@/components/common/layout/BasicCard.vue';
