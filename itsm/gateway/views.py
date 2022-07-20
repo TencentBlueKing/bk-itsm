@@ -218,14 +218,12 @@ def get_departments_lazy(request):
         department_id = request.GET.get("id", None)
         if department_id is None:
             params = {
-                "fields": "id,name,parent,level,order",
                 "lookup_field": "level",
                 "exact_lookups": "0",
             }
             res = get_list_departments(params)
         else:
             params = {
-                "fields": "id,name,parent,level,order",
                 "lookup_field": "parent",
                 "exact_lookups": department_id,
             }
