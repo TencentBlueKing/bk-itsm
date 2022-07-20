@@ -212,23 +212,14 @@ def get_departments(request):
 
 
 @cache_page(CACHE_5MIN, cache="default")
-def get_departments_lazy(request):
+def get_first_level_departments(request):
+    # 仅仅获取第一层的组织架构
     try:
-        # 获取所有部门的扁平化列表信息
-        department_id = request.GET.get("id", None)
-        if department_id is None:
-            params = {
-                "lookup_field": "level",
-                "exact_lookups": "0",
-            }
-            res = get_list_departments(params)
-        else:
-            params = {
-                "lookup_field": "parent",
-                "exact_lookups": department_id,
-            }
-            res = get_list_departments(params)
-
+        params = {
+            "lookup_field": "level",
+            "exact_lookups": "0",
+        }
+        res = get_list_departments(params)
     except ComponentCallError as e:
         return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_LIST").json()
 
