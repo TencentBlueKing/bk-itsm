@@ -76,7 +76,8 @@
           v-model="formData.levelSecond"
           :list="organizationList"
           :organization-loading="organizationLoading"
-          ext-cls="bk-form-width">
+          ext-cls="bk-form-width"
+          @toggle="toggleInfo">
         </select-tree>
       </template>
     </div>
@@ -184,14 +185,6 @@
       },
     },
     watch: {
-      'formData.levelSecond': {
-        handler(val) {
-          if (this.formData.levelOne === 'ORGANIZATION' && !!val) {
-            this.getOrganizationNumber(val);
-          }
-        },
-        deep: true,
-      },
       value: {
         handler(newVal, oldVal) {
           if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
@@ -221,6 +214,9 @@
       this.initData();
     },
     methods: {
+      toggleInfo(item) {
+        if (!this.nodeInfo.is_builtin && this.showOverbook) this.getOrganizationNumber(item.id);
+      },
       async initData() {
         this.initLoaing = true;
         await this.getRoleGroup();
