@@ -212,6 +212,32 @@ def get_departments(request):
 
 
 @cache_page(CACHE_5MIN, cache="default")
+def get_departments_lazy(request):
+    try:
+        # 获取所有部门的扁平化列表信息
+        department_id = request.GET.get("id", None)
+        if department_id is None:
+            params = {
+                "fields": "id,name,parent,level,order",
+                "lookup_field": "level",
+                "exact_lookups": "0",
+            }
+            res = get_list_departments(params)
+        else:
+            params = {
+                "fields": "id,name,parent,level,order",
+                "lookup_field": "parent",
+                "exact_lookups": department_id,
+            }
+            res = get_list_departments(params)
+
+    except ComponentCallError as e:
+        return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_LIST").json()
+
+    return Success(res).json()
+
+
+@cache_page(CACHE_5MIN, cache="default")
 def get_department_users(request):
     """获取部门用户列表，支持递归查询"""
     try:
