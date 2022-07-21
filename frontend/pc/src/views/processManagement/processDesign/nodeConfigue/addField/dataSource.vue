@@ -163,13 +163,13 @@
       },
       getSourceList() {
         // 根据不同类型来显示数据源类型列表
-        const typeList = this.globalChoise.source_type;
+        const typeList = this.globalChoise.source_type.filter(item => item.typeName !== 'CUSTOM_API');
         if (this.formInfo.type === 'TABLE') {
           this.sourceList = typeList.filter(item => item.typeName === 'CUSTOM');
         } else if (this.formInfo.type === 'TREESELECT') {
           this.sourceList = typeList.filter(item => item.typeName === 'DATADICT' || item.typeName === 'RPC');
         } else {
-          this.sourceList = this.globalChoise.source_type;
+          this.sourceList = typeList;
         }
       },
       // 获取Api系统列表
