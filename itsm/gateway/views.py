@@ -212,6 +212,21 @@ def get_departments(request):
 
 
 @cache_page(CACHE_5MIN, cache="default")
+def get_first_level_departments(request):
+    # 仅仅获取第一层的组织架构
+    try:
+        params = {
+            "lookup_field": "level",
+            "exact_lookups": "0",
+        }
+        res = get_list_departments(params)
+    except ComponentCallError as e:
+        return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_LIST").json()
+
+    return Success(res).json()
+
+
+@cache_page(CACHE_5MIN, cache="default")
 def get_department_users(request):
     """获取部门用户列表，支持递归查询"""
     try:
@@ -226,6 +241,24 @@ def get_department_users(request):
         return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_USERS").json()
 
     return Success(res).json()
+
+
+@cache_page(CACHE_5MIN, cache="default")
+def get_department_users_count(request):
+    """获取某个部门下的人员数量"""
+    try:
+        department_id = request.GET.get("id")
+        # 只拉取第一页的数据，拿到用户数
+        params = {
+            "id": department_id,
+            "recursive": "true",
+            "detail": True,
+            "page_size": 1,
+        }
+        res = client_backend.usermanage.list_department_profiles(params)
+    except ComponentCallError as e:
+        return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_USERS").json()
+    return Success({"count": res["count"]}).json()
 
 
 @cache_page(CACHE_5MIN, cache="default")

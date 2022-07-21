@@ -138,6 +138,7 @@ from itsm.component.constants import (
     LEN_XX_LONG,
     TASK_DEVOPS_STATE,
     WEBHOOK_STATE,
+    BK_PLUGIN_STATE,
 )
 from itsm.component.constants.trigger import (
     CREATE_TICKET,
@@ -151,12 +152,15 @@ from itsm.component.constants.trigger import (
     LEAVE_STATE,
     THROUGH_TRANSITION,
     SOURCE_TICKET,
+    GLOBAL_LEAVE_STATE,
+    GLOBAL_ENTER_STATE,
 )
 from common.shortuuid import uuid as _uu
 from itsm.component.utils.client_backend_query import (
     get_user_leader,
     get_user_departments,
     get_bk_users,
+    get_bk_business,
 )
 from itsm.sla_engine.constants import (
     RUNNING as SLA_RUNNING,
@@ -365,17 +369,18 @@ class Status(Model):
         )
         # Filter unprocessed user
         processor_list = list(set(user_list).difference(processed_user_list))
+
+        def custom_cmp(x, y):
+            keep = -1
+            reverse = 1
+            if user_list.index(x) < user_list.index(y):
+                return keep
+            else:
+                return reverse
+
+        processor_list.sort(key=functools.cmp_to_key(custom_cmp))
+
         if self.is_sequential and processor_list:
-
-            def custom_cmp(x, y):
-                keep = -1
-                reverse = 1
-                if user_list.index(x) < user_list.index(y):
-                    return keep
-                else:
-                    return reverse
-
-            processor_list.sort(key=functools.cmp_to_key(custom_cmp))
             processor = processor_list[0]
         else:
             processor = ",".join(processor_list)
@@ -444,6 +449,31 @@ class Status(Model):
         self.contexts.update(**kwargs)
         self.save()
 
+    def run_auto_approve(self, state_id):
+        from itsm.pipeline_plugins.components.collections.tasks import auto_approve
+
+        if not state_id:
+            return
+
+        msg = "检测到当前处理人包含提单人，系统自动过单"
+        callback_data = {
+            "fields": self.ticket.get_approve_fields(state_id, msg),
+            "ticket_id": self.ticket.id,
+            "source": "SYS",
+            "operator": self.ticket.creator,
+            "state_id": state_id,
+        }
+        logger.info(
+            "检测到当前单据开启了自动过单，即将准备自动过单, ticket_id={}, state_id={}, callback_data={}".format(
+                self.ticket.id, state_id, callback_data
+            )
+        )
+        activity_id = self.ticket.activity_for_state(state_id)
+        auto_approve.apply_async(
+            (self.id, self.ticket.creator, activity_id, callback_data),
+            countdown=settings.AUTO_APPROVE_TIME,
+        )  # 20秒之后自动回调
+
     def set_next_action(self, operator="system", **kwargs):
         """
         设置节点的操作动作和状态
@@ -481,9 +511,18 @@ class Status(Model):
                 )
                 if set(finished_processor_list) & set(new_processor_list):
                     raise DeliverOperateError("不允许向已经处理的人转单")
+
                 self.set_processors(
                     kwargs.get("processors_type", "PERSON"), kwargs.get("processors")
                 )
+                if (
+                    self.ticket.creator in new_processor_list
+                    and self.ticket.flow.is_auto_approve
+                ):
+                    # 提单人异常分派给自己的情况，并且开启了自动过单
+
+                    if "state_id" in kwargs:
+                        self.run_auto_approve(kwargs.get("state_id"))
 
             if action_type in [CLAIM_OPERATE, DISTRIBUTE_OPERATE]:
                 # 操作流状态机：派单->认领->处理
@@ -754,19 +793,30 @@ class Status(Model):
         """是否在审批/派单/认领列表中"""
         return username in self.get_processors()
 
-    def get_sign_display_processors(self, operator):
+    def get_sign_display_processors(self):
         """获取会签节点处理人/角色显示名称"""
         display_name = ""
         if self.processors_type in ["GENERAL", "CMDB"]:
             role_ids = list_by_separator(self.processors)
-            role_name_list = list(
-                UserRole.objects.filter(id__in=role_ids).values_list("name", "members")
-            )
-            role_name_members_list = [
-                "{}({})".format(role_name[0], role_name[1].strip(","))
-                for role_name in role_name_list
-            ]
-            display_name = ",".join(role_name_members_list)
+            roles = UserRole.objects.filter(id__in=role_ids)
+            role_name_list = list(roles.values_list("name", "members"))
+            if self.processors_type == "CMDB":
+                if self.bk_biz_id == DEFAULT_BK_BIZ_ID:
+                    return []
+
+                cmdb_users = get_bk_business(
+                    self.bk_biz_id, role_type=[role.role_key for role in roles]
+                )
+                display_name = "{}({})".format(
+                    "CMDB业务公用角色", ",".join(list_by_separator(cmdb_users))
+                )
+
+            if self.processors_type == "GENERAL":
+                role_name_members_list = [
+                    "{}({})".format(role_name[0], role_name[1].strip(","))
+                    for role_name in role_name_list
+                ]
+                display_name = ",".join(role_name_members_list)
 
         if self.processors_type == "PERSON":
             users = self.get_processor_in_sign_state()
@@ -774,12 +824,6 @@ class Status(Model):
                 display_name = transform_username(users)
             else:
                 user_list = [user for user in users.split(",") if user]
-                if operator in user_list:
-                    operator_index = user_list.index(operator)
-                    user_list[0], user_list[operator_index] = (
-                        user_list[operator_index],
-                        user_list[0],
-                    )
                 display_name = transform_username(user_list)
 
         if self.processors_type == "ORGANIZATION":
@@ -1034,11 +1078,15 @@ class Status(Model):
         )
         ordering = "CASE %s END" % clauses
 
+        filter_experssion = Q(state_id=self.state_id) | Q(
+            workflow_field_id__in=workflow_field_order
+        )
+
+        if self.is_first_status:
+            filter_experssion = filter_experssion | Q(workflow_field_id=0)
+
         return (
-            self.ticket.fields.filter(
-                Q(state_id=self.state_id)
-                | Q(workflow_field_id__in=workflow_field_order)
-            )
+            self.ticket.fields.filter(filter_experssion)
             .exclude(source=BASE_MODEL)
             .extra(
                 select={"ordering": ordering},
@@ -1074,7 +1122,13 @@ class Status(Model):
     def is_stopped(self):
         """结束/终止/失败"""
         stop_status = copy.deepcopy(self.STOPPED_STATUS)
-        if self.type in [TASK_STATE, TASK_SOPS_STATE, TASK_DEVOPS_STATE, WEBHOOK_STATE]:
+        if self.type in [
+            TASK_STATE,
+            TASK_SOPS_STATE,
+            TASK_DEVOPS_STATE,
+            WEBHOOK_STATE,
+            BK_PLUGIN_STATE,
+        ]:
             stop_status.pop()
         return self.status in stop_status
 
@@ -1914,6 +1968,16 @@ class Ticket(Model, BaseTicket):
         from itsm.openapi.ticket.serializers import SimpleLogsSerializer
 
         return SimpleLogsSerializer(self.logs.all(), many=True).data
+
+    @property
+    def ticket_complex_logs(self):
+        """
+        复杂单据日志
+        """
+
+        from itsm.openapi.ticket.serializers import ComplexLogsSerializer
+
+        return ComplexLogsSerializer(self.logs.all(), many=True).data
 
     @property
     def task_operators(self):
@@ -3051,7 +3115,13 @@ class Ticket(Model, BaseTicket):
             action_type = (
                 SYSTEM_OPERATE
                 if state.type
-                in [TASK_STATE, TASK_SOPS_STATE, TASK_DEVOPS_STATE, WEBHOOK_STATE]
+                in [
+                    TASK_STATE,
+                    TASK_SOPS_STATE,
+                    TASK_DEVOPS_STATE,
+                    WEBHOOK_STATE,
+                    BK_PLUGIN_STATE,
+                ]
                 else TRANSITION_OPERATE
             )
 
@@ -3086,15 +3156,9 @@ class Ticket(Model, BaseTicket):
         if Status.objects.filter(state_id=state_id, ticket_id=self.id).exists():
             # state_id, ticket_id对应唯一未删除的status，若存在多个，则存在BUG
             status = Status.objects.get(state_id=state_id, ticket_id=self.id)
-            last_operator = dotted_name(
-                self.logs.filter(status=status.id).last().operator
-            )
-            current_processors = (
-                f_processors if state.type == TASK_STATE else last_operator
-            )
             defaults.update(
                 processors_type=status.processors_type,
-                processors=current_processors,
+                processors=status.processors,
                 distribute_type="PROCESS",
                 action_type="TRANSITION",
                 status=RUNNING,
@@ -3457,8 +3521,8 @@ class Ticket(Model, BaseTicket):
             context={"dst_state": status.id, "operator": self.creator},
         )
 
-        # 全局 进入节点 触发球
-        self.send_trigger_signal(ENTER_STATE, sender=self.flow.workflow_id)
+        # 全局 进入节点 触发器
+        self.send_trigger_signal(GLOBAL_ENTER_STATE, sender=self.flow.workflow_id)
 
         # 提单节点给提单人发送关注通知邮件, 非提单节点给处理人发送单据待办通知邮件
         context = {}
@@ -3531,7 +3595,7 @@ class Ticket(Model, BaseTicket):
             self.start_sla(state_id)
 
         # 全局 进入节点 触发球
-        self.send_trigger_signal(ENTER_STATE, sender=self.flow.workflow_id)
+        self.send_trigger_signal(GLOBAL_ENTER_STATE, sender=self.flow.workflow_id)
 
         # 发送进入节点的信号
         self.send_trigger_signal(
@@ -3729,7 +3793,7 @@ class Ticket(Model, BaseTicket):
         self.send_trigger_signal(LEAVE_STATE, state_id)
 
         # 全局触发器
-        self.send_trigger_signal(LEAVE_STATE, sender=self.flow.workflow_id)
+        self.send_trigger_signal(GLOBAL_LEAVE_STATE, sender=self.flow.workflow_id)
 
     def do_in_state(self, state_id, fields, operator, source):
         """节点内动作
@@ -3768,7 +3832,7 @@ class Ticket(Model, BaseTicket):
                 LEAVE_STATE, state_id, context={"operator": operator}
             )
             # 全局触发器
-            self.send_trigger_signal(LEAVE_STATE, sender=self.flow.workflow_id)
+            self.send_trigger_signal(GLOBAL_LEAVE_STATE, sender=self.flow.workflow_id)
 
     def do_after_create(self, fields, from_ticket_id=None, source=WEB):
         # 创建关联关系
@@ -4629,6 +4693,75 @@ class Ticket(Model, BaseTicket):
         resume_at = datetime.now()
         for task in self._sla_tasks.filter(task_status=SLA_PAUSED):
             task.resume(resume_at)
+
+    def get_approve_fields(self, state_id, msg):
+        node_fields = TicketField.objects.filter(state_id=state_id, ticket_id=self.id)
+        fields = []
+        remarked = False
+        for field in node_fields:
+            if field.meta.get("code") == APPROVE_RESULT:
+                fields.append(
+                    {
+                        "id": field.id,
+                        "key": field.key,
+                        "type": field.type,
+                        "choice": field.choice,
+                        "value": "true",
+                    }
+                )
+            else:
+                if not remarked:
+                    fields.append(
+                        {
+                            "id": field.id,
+                            "key": field.key,
+                            "type": field.type,
+                            "choice": field.choice,
+                            "value": msg,
+                        }
+                    )
+                    remarked = True
+
+        return fields
+
+    @property
+    def comment(self):
+        return self.comments.comments
+
+    @property
+    def stars(self):
+        return self.comments.stars
+
+    def create_dynamic_fields(self, dynamic_fields):
+        """
+        dynamic_fields: list:[{
+            "type": "INT",
+            "name": "年龄",
+            "value": 1
+        }]
+        """
+        if not dynamic_fields:
+            return
+
+        fields = []
+        for field in dynamic_fields:
+            ticket_field = copy.deepcopy(field)
+            ticket_field.pop("workflow_id", None)
+            ticket_field.pop("flow_type", None)
+
+            # 填充默认值
+            default = ticket_field.pop("default", "")
+            if default:
+                ticket_field.update(_value=default)
+
+            ticket_field["ticket_id"] = self.id
+
+            ticket_field.pop("api_info", None)
+            ticket_field.pop("project_key", None)
+            ticket_field["workflow_field_id"] = 0
+            fields.append(TicketField(**ticket_field))
+
+        TicketField.objects.bulk_create(fields)
 
 
 class TicketOrganization(Model):

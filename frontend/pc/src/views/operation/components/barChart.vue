@@ -21,111 +21,111 @@
   -->
 
 <template>
-    <div class="bar-chart-wrap" ref="barChartWrap">
-        <canvas class="bar-chart" :height="height"></canvas>
-    </div>
+  <div class="bar-chart-wrap" ref="barChartWrap">
+    <canvas class="bar-chart" :height="height"></canvas>
+  </div>
 </template>
 <script>
-    import Chart from '@blueking/bkcharts'
+  import Chart from '@blueking/bkcharts';
 
-    export default {
-        name: 'BarChart',
-        props: {
-            title: {
-                type: String,
-                default: ''
-            },
-            desc: {
-                type: String,
-                default: ''
-            },
-            xAxisName: {
-                type: String,
-                default: ''
-            },
-            yAxisName: {
-                type: String,
-                default: ''
-            },
-            height: {
-                type: Number,
-                default: 320
-            },
-            chartData: {
-                type: Object,
-                default () {
-                    return {
-                        x: [],
-                        y: []
-                    }
-                }
-            },
-            loading: {
-                type: Boolean,
-                default: false
-            }
+  export default {
+    name: 'BarChart',
+    props: {
+      title: {
+        type: String,
+        default: '',
+      },
+      desc: {
+        type: String,
+        default: '',
+      },
+      xAxisName: {
+        type: String,
+        default: '',
+      },
+      yAxisName: {
+        type: String,
+        default: '',
+      },
+      height: {
+        type: Number,
+        default: 320,
+      },
+      chartData: {
+        type: Object,
+        default() {
+          return {
+            x: [],
+            y: [],
+          };
         },
-        data () {
-            return {
-                chartInstance: null
-            }
-        },
-        watch: {
-            loading (val) {
-                if (!val) {
-                    this.updateChart()
-                }
-            }
-        },
-        mounted () {
-            this.init()
-        },
-        methods: {
-            init () {
-                const ctx = this.$refs.barChartWrap.querySelector('.bar-chart').getContext('2d')
-                const { x, y } = this.chartData
-                this.chartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: x,
-                        datasets: [{
-                            data: y,
-                            backgroundColor: '#4b78c1',
-                            maxBarThickness: 24
-                        }]
-                    },
-                    options: {
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            x: {
-                                gridLines: {
-                                    display: false
-                                }
-                            },
-                            y: {
-                                gridLines: {
-                                    borderDash: [5, 3]
-                                }
-                            }
-                        },
-                        interaction: {
-                            mode: 'nearest'
-                        }
-                    }
-                })
-            },
-            updateChart () {
-                this.chartInstance.data.datasets[0].data = this.chartData.y
-                this.chartInstance.data.labels = this.chartData.x
-                this.chartInstance.update()
-            }
+      },
+      loading: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        chartInstance: null,
+      };
+    },
+    watch: {
+      loading(val) {
+        if (!val) {
+          this.updateChart();
         }
-    }
+      },
+    },
+    mounted() {
+      this.init();
+    },
+    methods: {
+      init() {
+        const ctx = this.$refs.barChartWrap.querySelector('.bar-chart').getContext('2d');
+        const { x, y } = this.chartData;
+        this.chartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: x,
+            datasets: [{
+              data: y,
+              backgroundColor: '#4b78c1',
+              maxBarThickness: 24,
+            }],
+          },
+          options: {
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+            scales: {
+              x: {
+                gridLines: {
+                  display: false,
+                },
+              },
+              y: {
+                gridLines: {
+                  borderDash: [5, 3],
+                },
+              },
+            },
+            interaction: {
+              mode: 'nearest',
+            },
+          },
+        });
+      },
+      updateChart() {
+        this.chartInstance.data.datasets[0].data = this.chartData.y;
+        this.chartInstance.data.labels = this.chartData.x;
+        this.chartInstance.update();
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
 

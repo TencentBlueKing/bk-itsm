@@ -20,52 +20,51 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import ajax from '../../utils/ajax'
+import ajax from "../../utils/ajax";
 
 export default {
-    namespaced: true,
-    state: {},
-    mutations: {},
-    actions: {
-        list ({ commit, state, dispatch }, params) {
-            return ajax.get(`service/dictdatas/`, { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        create ({ commit, state, dispatch }, params) {
-            delete params['parent_name']
-            return ajax.post(`service/dictdatas/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        delete ({ commit, state, dispatch }, id) {
-            return ajax.delete(`service/dictdatas/${id}/`).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        batchDelete ({ commit, state, dispatch }, params) {
-            return ajax.post(`service/dictdatas/batch_delete/`, params)
-                .then(response => {
-                    let res = response.data
-                    return res
-                })
-        },
-        update ({ commit, state, dispatch }, params) {
-            let id = params.id
-            return ajax.put(`service/dictdatas/${id}/`, params).then(response => {
-                let res = response.data
-                return res
-            })
-        },
-        // 获取树信息
-        getTreeInfo ({ commit, state, dispatch }, params) {
-            return ajax.get(`service/datadicts/get_data_by_key/`, { params: params }).then(response => {
-                let res = response.data
-                return res
-            })
-        }
-    }
-}
+  namespaced: true,
+  state: {},
+  mutations: {},
+  actions: {
+    list({ commit, state, dispatch }, params) {
+      return ajax.get(`service/dictdatas/`, { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    create({ commit, state, dispatch }, params) {
+      delete params["parent_name"];
+      return ajax.post(`service/dictdatas/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    delete({ commit, state, dispatch }, id) {
+      return ajax.delete(`service/dictdatas/${id}/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    batchDelete({ commit, state, dispatch }, params) {
+      return ajax.post(`service/dictdatas/batch_delete/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    update({ commit, state, dispatch }, params) {
+      const id = params.id;
+      return ajax.put(`service/dictdatas/${id}/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 获取树信息
+    getTreeInfo({ commit, state, dispatch }, params) {
+      return ajax.get(`service/datadicts/get_data_by_key/`, { params: params }).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+  },
+};

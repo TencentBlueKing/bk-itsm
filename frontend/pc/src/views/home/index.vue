@@ -21,37 +21,37 @@
   -->
 
 <template>
-    <div class="home-page-wrapper">
-        <div class="home-page-view">
-            <div class="home-background">
-                <p class="welcome-tips">Hi，{{ userName }}，{{ $t(`m.home['欢迎使用流程服务！']`) }}</p>
-            </div>
-            <div class="main-content">
-                <service-list></service-list>
-                <ticket-table></ticket-table>
-            </div>
-            <copyright-footer></copyright-footer>
-        </div>
+  <div class="home-page-wrapper">
+    <div class="home-page-view">
+      <div class="home-background">
+        <p class="welcome-tips">Hi，{{ userName }}，{{ $t(`m.home['欢迎使用流程服务！']`) }}</p>
+      </div>
+      <div class="main-content">
+        <service-list></service-list>
+        <ticket-table></ticket-table>
+      </div>
+      <copyright-footer></copyright-footer>
     </div>
+  </div>
 </template>
 <script>
-    import ServiceList from './serviceList.vue'
-    import TicketTable from './ticketTable.vue'
-    import CopyrightFooter from '@/components/common/layout/CopyrightFooter.vue'
+  import ServiceList from './serviceList.vue';
+  import TicketTable from './ticketTable.vue';
+  import CopyrightFooter from '@/components/common/layout/CopyrightFooter.vue';
 
-    export default {
-        name: 'Home',
-        components: {
-            ServiceList,
-            TicketTable,
-            CopyrightFooter
-        },
-        data () {
-            return {
-                userName: window.username || '--'
-            }
-        }
-    }
+  export default {
+    name: 'Home',
+    components: {
+      ServiceList,
+      TicketTable,
+      CopyrightFooter,
+    },
+    data() {
+      return {
+        userName: window.username || '--',
+      };
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .home-page-view {

@@ -329,7 +329,7 @@ class StatusSerializer(serializers.ModelSerializer):
 
             data["tasks"] = tasks
             # Format sign state processors
-            processors = inst.get_sign_display_processors(username)
+            processors = inst.get_sign_display_processors()
             processors = _("%s (共%d人, 已处理%d人)") % (
                 processors,
                 len(user_list),
@@ -909,14 +909,12 @@ class TicketSerializer(AuthModelSerializer):
             "resource_type": "service",
         }
 
-        apply_actions = ["ticket_management"]
+        apply_actions = ["ticket_management", "ticket_view"]
         auth_actions = iam_client.resource_multi_actions_allowed(
             apply_actions, [resource_info], project_key=instance.project_key
         )
-
-        data["auth_actions"] = []
-        if auth_actions.get("ticket_management"):
-            data["auth_actions"] = ["ticket_management"]
+        actions = [key for key, value in auth_actions.items() if value]
+        data["auth_actions"] = actions
 
         return data
 
@@ -1377,7 +1375,6 @@ class TicketStateOperateExceptionSerializer(serializers.Serializer):
         ]
 
         self.run_validators(data)
-        print(validated_data)
         return validated_data
 
     def to_representation(self, instance):
@@ -1399,6 +1396,8 @@ class TicketExportSerializer(serializers.Serializer):
     create_at = serializers.DateTimeField()
     end_at = serializers.DateTimeField()
     service_name = serializers.CharField()
+    stars = serializers.IntegerField()
+    comment = serializers.CharField()
 
     def to_representation(self, instance):
         data = super(TicketExportSerializer, self).to_representation(instance)

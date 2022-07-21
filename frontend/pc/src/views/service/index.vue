@@ -21,12 +21,12 @@
   -->
 
 <template>
-    <router-view></router-view>
+  <router-view></router-view>
 </template>
 <script>
-    export default {
-        name: 'Service'
-    }
+  export default {
+    name: 'Service',
+  };
 </script>
 <style lang="scss">
     @import '../../scss/mixins/scroller.scss';

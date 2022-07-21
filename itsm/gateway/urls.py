@@ -30,15 +30,18 @@ from django.conf.urls import url
 
 from itsm.gateway import views
 
-
 urlpatterns = [
     url(r"^test/token/$", views.get_token),
     url(r"^bk_login/get_batch_users/$", views.get_batch_users),
     url(r"^bk_login/get_all_users/$", views.get_all_users),
     url(r"^cmdb/get_app_list/$", views.get_app_list),
     url(r"^usermanage/get_departments/$", views.get_departments),
+    url(
+        r"^usermanage/get_first_level_departments/$", views.get_first_level_departments
+    ),
     url(r"^usermanage/get_department_info/$", views.get_department_info),
     url(r"^usermanage/get_department_users/$", views.get_department_users),
+    url(r"^usermanage/get_department_users_count/$", views.get_department_users_count),
     url(r"^usermanage/get_user_info/$", views.get_user_info),
     url(r"^sops/get_user_project_list/$", views.get_user_project_list),
     url(r"^sops/get_template_list/$", views.get_template_list),

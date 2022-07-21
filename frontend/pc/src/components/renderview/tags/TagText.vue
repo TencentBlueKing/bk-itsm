@@ -21,79 +21,77 @@
   -->
 
 <template>
-    <div
-        :class="['tag-text', { 'active-link': hasChildren }]" @click="onClick">
-        <div v-if="Array.isArray(value)">
-            <p class="text-block" v-for="(item, index) in value" :key="index">
-                <label v-if="item.label" class="label">
-                    {{ item.label }}
-                    <i v-if="item.desc || desc" v-bk-tooltips="item.desc || desc" class="bk-itsm-icon icon-itsm-icon-help"></i>
-                </label>
-                <span class="value">{{ item.value }}</span>
-            </p>
-        </div>
-        <p v-else>
-            <label v-if="label" class="label">
-                {{ label }}
-                <i v-if="desc" v-bk-tooltips="desc" class="bk-itsm-icon icon-itsm-icon-help"></i>
-            </label>
-            <span class="value">{{ value }}</span>
-        </p>
+  <div
+    :class="['tag-text', { 'active-link': hasChildren }]" @click="onClick">
+    <div v-if="Array.isArray(value)">
+      <p class="text-block" v-for="(item, index) in value" :key="index">
+        <label v-if="item.label" class="label">
+          {{ item.label }}
+          <i v-if="item.desc || desc" v-bk-tooltips="item.desc || desc" class="bk-itsm-icon icon-itsm-icon-help"></i>
+        </label>
+        <span class="value">{{ item.value }}</span>
+      </p>
     </div>
+    <p v-else>
+      <label v-if="label" class="label">
+        {{ label }}
+        <i v-if="desc" v-bk-tooltips="desc" class="bk-itsm-icon icon-itsm-icon-help"></i>
+      </label>
+      <span class="value">{{ value }}</span>
+    </p>
+  </div>
 </template>
 
 <script>
-    import { getFormMixins } from '../formMixins'
-    import Sideslider from '../sideslider/sideslider.js'
+  import { getFormMixins } from '../formMixins';
+  import Sideslider from '../sideslider/sideslider.js';
 
-    const textAttrs = {
-        styles: {
-            type: Object,
-            default: () => ({})
-        },
-        value: {
-            type: [String, Array],
-            default: ''
+  const textAttrs = {
+    styles: {
+      type: Object,
+      default: () => ({}),
+    },
+    value: {
+      type: [String, Array],
+      default: '',
+    },
+  };
+  export default {
+    name: 'TagText',
+    mixins: [getFormMixins(textAttrs)],
+    data() {
+      return {};
+    },
+    computed: {
+      hasChildren() {
+        return this.form.children && Array.isArray(this.form.children) && !!this.form.children.length;
+      },
+    },
+    methods: {
+      onClick() {
+        if (!this.hasChildren) {
+          return;
         }
-    }
-    export default {
-        name: 'TagText',
-        mixins: [getFormMixins(textAttrs)],
-        data () {
-            return {}
-        },
-        computed: {
-            hasChildren () {
-                return this.form.children && Array.isArray(this.form.children) && !!this.form.children.length
-            }
-        },
-        methods: {
-            onClick () {
-                if (!this.hasChildren) {
-                    return
-                }
-                let title = ''
-                if (Array.isArray(this.value)) {
-                    title = this.value.map(item => {
-                        return (item.label || '') + item.value
-                    }).join(',')
-                } else {
-                    title = (this.label || '') + this.value
-                }
-                const context = this.getContext()
-                if (context.config && context.config.mode === 'combine') {
-                    const topViewItem = this.getTopViewItem()
-                    topViewItem.appendCrumbsItem(title, this.form.children)
-                } else {
-                    Sideslider({
-                        title,
-                        formData: this.form.children,
-                        context: context
-                    })
-                }
-            }
+        let title = '';
+        if (Array.isArray(this.value)) {
+          title = this.value.map(item => (item.label || '') + item.value).join(',');
+        } else {
+          title = (this.label || '') + this.value;
         }
-    }
+        const context = this.getContext();
+        if (context.config && context.config.mode === 'combine') {
+          const topViewItem = this.getTopViewItem();
+          topViewItem.appendCrumbsItem(title, this.form.children);
+        } else {
+          Sideslider({
+            title,
+            formData: this.form.children,
+            context,
+          });
+        }
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

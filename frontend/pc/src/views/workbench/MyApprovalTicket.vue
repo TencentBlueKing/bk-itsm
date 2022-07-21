@@ -21,20 +21,20 @@
   -->
 
 <template>
-    <div class="my-approval-ticket-page">
-        <nav-title :title-name="$t(`m['待我审批']`)"></nav-title>
-        <approval-list></approval-list>
-    </div>
+  <div class="my-approval-ticket-page">
+    <nav-title :title-name="$t(`m['待我审批']`)"></nav-title>
+    <approval-list></approval-list>
+  </div>
 </template>
 <script>
-    import NavTitle from '@/components/common/layout/NavTitle'
-    import ApprovalList from '../ticket/ApprovalList'
+  import NavTitle from '@/components/common/layout/NavTitle';
+  import ApprovalList from '../ticket/ApprovalList';
 
-    export default {
-        name: 'MyTodoTicket',
-        components: {
-            NavTitle,
-            ApprovalList
-        }
-    }
+  export default {
+    name: 'MyTodoTicket',
+    components: {
+      NavTitle,
+      ApprovalList,
+    },
+  };
 </script>

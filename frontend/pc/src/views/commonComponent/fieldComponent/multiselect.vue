@@ -21,103 +21,105 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
-            <bk-select :class="{ 'bk-border-error': item.checkValue }"
-                :disabled="(item.is_readonly && !isCurrent) || disabled"
-                searchable
-                multiple
-                :font-size="'medium'"
-                :placeholder="item.desc"
-                v-model="selectedItems"
-                @selected="selected"
-                @toggle="item.checkValue = false">
-                <bk-option v-for="option in options"
-                    :key="option.key"
-                    :id="option.key"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-            <template v-if="item.checkValue">
-                <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-                <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-            </template>
-        </bk-form-item>
-    </div>
+  <div v-if="item.showFeild">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
+      <bk-select :class="{ 'bk-border-error': item.checkValue }"
+        :disabled="(item.is_readonly && !isCurrent) || disabled"
+        searchable
+        multiple
+        :font-size="'medium'"
+        :placeholder="item.desc"
+        v-model="selectedItems"
+        @selected="selected"
+        @toggle="item.checkValue = false">
+        <bk-option v-for="option in options"
+          :key="option.key"
+          :id="option.key"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+      <template v-if="item.checkValue">
+        <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+        <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+      </template>
+    </bk-form-item>
+  </div>
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js'
-    export default {
-        name: 'MULTISELECT',
-        mixins: [mixins],
-        props: {
-            item: {
-                type: Object,
-                required: true,
-                default: () => {
-                }
-            },
-            fields: {
-                type: Array,
-                default () {
-                    return []
-                }
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false
-            },
-            disabled: {
-                type: Boolean,
-                default: false
-            }
+  import mixins from '../../commonMix/field.js';
+  export default {
+    name: 'MULTISELECT',
+    mixins: [mixins],
+    props: {
+      item: {
+        type: Object,
+        required: true,
+        default: () => {
         },
-        data () {
-            return {
-                options: [],
-                selectedItems: []
-            }
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
         },
-        watch: {
-            'item.val' (newVal, oldVal) {
-                this.selectedItems = this.item.val === '' ? [] : this.item.val.split(',')
-                this.conditionField(this.item, this.fields)
-            },
-            'item.choice' (newVal, oldVal) {
-                if ((this.item.source_type === 'API' || this.item.source_type === 'DATADICT' || this.item.source_type === 'RPC') && (oldVal.length !== newVal.length)) {
-                    this.getOption()
-                }
-            }
-        },
-        async mounted () {
-            if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value
-            }
-            await this.getOption()
-            const valueStatus = await this.judgeValue(this.item.val, this.item.choice)
-            this.item.val = valueStatus ? this.item.val : ''
-            this.selectedItems = this.item.val === '' ? [] : this.item.val.split(',')
-            this.conditionField(this.item, this.fields)
-        },
-        methods: {
-            async getOption () {
-                this.options = this.item.choice = await this.getFieldOptions(this.item)
-            },
-            selected (ids) {
-                this.item.val = ids.join(',')
-                if (this.item.related_fields && this.item.related_fields.be_relied) {
-                    this.item.related_fields.be_relied.forEach(ite => {
-                        this.fields.forEach(it => {
-                            if (ite === it.key) {
-                                it.val = it.value = ''
-                            }
-                        })
-                    })
-                }
-            }
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        options: [],
+        selectedItems: [],
+      };
+    },
+    watch: {
+      'item.val'() {
+        this.selectedItems = this.item.val === '' ? [] : this.item.val.split(',');
+        this.conditionField(this.item, this.fields);
+      },
+      'item.choice'(newVal, oldVal) {
+        if ((this.item.source_type === 'API' || this.item.source_type === 'DATADICT' || this.item.source_type === 'RPC') && (oldVal.length !== newVal.length)) {
+          this.getOption();
         }
-    }
+      },
+    },
+    async mounted() {
+      if (this.item.value && !this.item.val) {
+        this.item.val = this.item.value;
+      }
+      await this.getOption();
+      const valueStatus = await this.judgeValue(this.item.val, this.item.choice);
+      this.item.val = valueStatus ? this.item.val : '';
+      this.selectedItems = this.item.val === '' ? [] : this.item.val.split(',');
+      this.conditionField(this.item, this.fields);
+    },
+    methods: {
+      async getOption() {
+        this.item.choice = await this.getFieldOptions(this.item);
+        this.options = this.item.choice;
+      },
+      selected(ids) {
+        this.item.val = ids.join(',');
+        if (this.item.related_fields && this.item.related_fields.be_relied) {
+          this.item.related_fields.be_relied.forEach((ite) => {
+            this.fields.forEach((it) => {
+              if (ite === it.key) {
+                it.value = '';
+                it.val = it.value;
+              }
+            });
+          });
+        }
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

@@ -8,8 +8,9 @@ from rest_framework.response import Response
 from itsm.component.constants import INVISIBLE
 from itsm.component.decorators import custom_apigw_required
 from itsm.component.drf import viewsets
+from itsm.openapi.base_service.serializers import OpenApiServiceSerializer
 from itsm.service.models import Service
-from itsm.service.serializers import ServiceSerializer, ServiceConfigSerializer
+from itsm.service.serializers import ServiceConfigSerializer
 from itsm.workflow.models import Workflow
 from itsm.workflow.validators import WorkflowPipelineValidator
 
@@ -18,7 +19,7 @@ from itsm.workflow.validators import WorkflowPipelineValidator
 class ServiceViewSet(viewsets.ModelViewSet):
     """服务项视图集合"""
 
-    serializer_class = ServiceSerializer
+    serializer_class = OpenApiServiceSerializer
     queryset = Service.objects.exclude(display_type=INVISIBLE)
     permission_free_actions = ["retrieve"]
 
@@ -28,7 +29,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
 
     @custom_apigw_required
     def retrieve(self, request, *args, **kwargs):
-        return super(ServiceViewSet, self).retrieve(self, request, *args, **kwargs)
+        return super(ServiceViewSet, self).retrieve(request, *args, **kwargs)
 
     @custom_apigw_required
     def update(self, request, *args, **kwargs):
@@ -46,6 +47,17 @@ class ServiceViewSet(viewsets.ModelViewSet):
         workflow = Workflow.objects.filter(id=workflow_id).first()
         workflow.update_workflow_configs(workflow_config)
         return workflow
+
+    @custom_apigw_required
+    @action(detail=True, methods=["post"], permission_classes=())
+    def deploy(self, request, *args, **kwargs):
+        service = self.get_object()
+        workflow = Workflow.objects.filter(id=service.workflow.workflow_id).first()
+        service.workflow_id = workflow.create_version().id
+        service.name = workflow.name
+        service.is_valid = True
+        service.save()
+        return Response({"version_number": service.workflow_id})
 
     @custom_apigw_required
     @action(detail=True, methods=["post"], permission_classes=())
@@ -94,8 +106,8 @@ class ServiceViewSet(viewsets.ModelViewSet):
         WorkflowPipelineValidator(Workflow.objects.get(id=workflow_id))()
 
         with transaction.atomic():
-            workflow = self.update_workflow_configs(workflow_id, workflow_config)
-            configs["workflow_id"] = workflow.create_version().id
+            self.update_workflow_configs(workflow_id, workflow_config)
+            configs["workflow_id"] = service.workflow.id
             service.update_service_configs(configs)
         context = self.get_serializer_context()
         return Response(self.serializer_class(instance=service, context=context).data)

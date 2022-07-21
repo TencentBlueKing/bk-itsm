@@ -4,10 +4,10 @@ mock/
 src/views/npm-debuge.log
 src/languager/lang/
 src/main.js
-src/store
+src/store/
+src/assets/jsflow.js
 src/views/common/memberSelect
 src/views/slaManager/ticketStatus/firstStep.vue
 src/views/processManagement/processDesign/nodeConfigue/autoComponents/responseDataNode.vue
-src/assets/jsflow.js
 src/views/commonComponent/customUpload/
 

@@ -21,137 +21,150 @@
   -->
 
 <template>
-    <div class="all-task-list">
-        <bk-table
-            v-bkloading="{ isLoading: isListLoading }"
-            :data="taskList"
-            :size="'small'">
-            <bk-table-column :label="$t(`m.task['顺序']`)" :width="60">
-                <template slot-scope="props">
-                    <span>{{ props.row.order || '--' }}</span>
-                    <!-- <i class="bk-itsm-icon icon-itsm-icon-sops" v-if="props.row.component_type !== 'NORMAL'"></i> -->
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.task['任务名称']`)">
-                <template slot-scope="props">
-                    <span
-                        v-bk-tooltips.top="props.row.name"
-                        class="task-name">
-                        {{props.row.name || '--'}}
-                    </span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.task['处理人']`)">
-                <template slot-scope="props">
-                    <span v-bk-tooltips.top="props.row.processor_users">{{props.row.processor_users || '--'}}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.task['任务类型']`)">
-                <template slot-scope="props">
-                    <span v-bk-tooltips.top="props.row.processor_users">{{getTaskTypeName(props.row.component_type) || '--'}}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.task['状态']`)" :wdith="120">
-                <template slot-scope="props">
-                    <!-- 任务状态组件 -->
-                    <task-status :status="props.row.status"></task-status>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.task['操作']`)" min-width="60">
-                <template slot-scope="props">
-                    <bk-button
-                        theme="primary"
-                        text
-                        @click="onViewTask(props.row)">
-                        {{$t(`m.task['查看']`)}}
-                    </bk-button>
-                </template>
-            </bk-table-column>
-        </bk-table>
-        <bk-sideslider
-            :is-show.sync="dealTaskInfo.show"
-            :quick-close="true"
-            :width="800">
-            <div slot="header">
-                <task-handle-trigger v-if="dealTaskInfo.show" :task-info="dealTaskInfo.itemContent" :title="dealTaskInfo.title" @close-slider="dealTaskInfo.show = false"></task-handle-trigger>
-            </div>
-            <div slot="content"
-                style="min-height: 300px;">
-                <deal-task
-                    v-if="dealTaskInfo.show"
-                    :deal-type="dealTaskInfo.type"
-                    :task-info="dealTaskInfo.itemContent"
-                    :basic-infomation="ticketInfo"
-                    @close="dealTaskInfo.show = false">
-                </deal-task>
-            </div>
-        </bk-sideslider>
-    </div>
+  <div class="all-task-list">
+    <bk-table
+      v-bkloading="{ isLoading: isListLoading }"
+      :data="taskList"
+      :size="'small'"
+    >
+      <bk-table-column :label="$t(`m.task['顺序']`)" :width="60">
+        <template slot-scope="props">
+          <span>{{ props.row.order || "--" }}</span>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.task['任务名称']`)">
+        <template slot-scope="props">
+          <span v-bk-tooltips.top="props.row.name" class="task-name">
+            {{ props.row.name || "--" }}
+          </span>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.task['处理人']`)">
+        <template slot-scope="props">
+          <span v-bk-tooltips.top="props.row.processor_users">{{
+            props.row.processor_users || "--"
+          }}</span>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.task['任务类型']`)">
+        <template slot-scope="props">
+          <span v-bk-tooltips.top="props.row.processor_users">{{
+            getTaskTypeName(props.row.component_type) || "--"
+          }}</span>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.task['状态']`)" :wdith="120">
+        <template slot-scope="props">
+          <!-- 任务状态组件 -->
+          <task-status :status="props.row.status"></task-status>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.task['操作']`)" min-width="60">
+        <template slot-scope="props">
+          <bk-button
+            theme="primary"
+            text
+            @click="onViewTask(props.row)"
+          >
+            {{ $t(`m.task['查看']`) }}
+          </bk-button>
+        </template>
+      </bk-table-column>
+    </bk-table>
+    <bk-sideslider
+      :is-show.sync="dealTaskInfo.show"
+      :quick-close="true"
+      :width="800"
+    >
+      <div slot="header">
+        <task-handle-trigger
+          v-if="dealTaskInfo.show"
+          :task-info="dealTaskInfo.itemContent"
+          :title="dealTaskInfo.title"
+          @close-slider="dealTaskInfo.show = false"
+        ></task-handle-trigger>
+      </div>
+      <div slot="content" style="min-height: 300px">
+        <deal-task
+          v-if="dealTaskInfo.show"
+          :deal-type="dealTaskInfo.type"
+          :task-info="dealTaskInfo.itemContent"
+          :basic-infomation="ticketInfo"
+          @close="dealTaskInfo.show = false"
+        >
+        </deal-task>
+      </div>
+    </bk-sideslider>
+  </div>
 </template>
 
 <script>
-    import { errorHandler } from '@/utils/errorHandler'
-    import TaskStatus from '../currentSteps/nodetask/TaskStatus.vue'
-    import dealTask from '../taskInfo/dealTask.vue'
-    import taskHandleTrigger from '../taskInfo/taskHandleTrigger.vue'
-    import { TASK_TEMPLATE_TYPES } from '@/constants/task.js'
+  import { errorHandler } from '@/utils/errorHandler';
+  import TaskStatus from '../currentSteps/nodetask/TaskStatus.vue';
+  import dealTask from '../taskInfo/dealTask.vue';
+  import taskHandleTrigger from '../taskInfo/taskHandleTrigger.vue';
+  import { TASK_TEMPLATE_TYPES } from '@/constants/task.js';
 
-    export default {
-        name: '',
-        components: {
-            dealTask,
-            TaskStatus,
-            taskHandleTrigger
+  export default {
+    name: '',
+    components: {
+      dealTask,
+      TaskStatus,
+      taskHandleTrigger,
+    },
+    props: {
+      ticketInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    data() {
+      return {
+        isListLoading: false,
+        taskList: [],
+        dealTaskInfo: {
+          show: false,
+          itemContent: {},
+          title: this.$t('m.task[\'查看任务\']'),
+          type: 'SEE',
         },
-        props: {
-            ticketInfo: {
-                type: Object,
-                default: () => ({})
-            }
-        },
-        data () {
-            return {
-                isListLoading: false,
-                taskList: [],
-                dealTaskInfo: {
-                    show: false,
-                    itemContent: {},
-                    title: this.$t(`m.task['查看任务']`),
-                    type: 'SEE'
-                },
-                taskTemplateTypes: TASK_TEMPLATE_TYPES
-            }
-        },
-        mounted () {
-            this.getTaskList()
-        },
-        methods: {
-            // 获取任务列表
-            getTaskList () {
-                this.isListLoading = true
-                const params = {
-                    ticket_id: this.ticketInfo.id
-                }
-                return this.$store.dispatch('taskFlow/getTaskList', params).then(res => {
-                    this.taskList = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isListLoading = false
-                })
-            },
-            onViewTask (row) {
-                this.dealTaskInfo.show = true
-                this.dealTaskInfo.itemContent = row
-            },
-            getTaskTypeName (type) {
-                const target = this.taskTemplateTypes.find(m => m.type === type)
-                return target ? target.name : type
-            }
-        }
-    }
+        taskTemplateTypes: TASK_TEMPLATE_TYPES,
+      };
+    },
+    mounted() {
+      this.getTaskList();
+    },
+    methods: {
+      // 获取任务列表
+      getTaskList() {
+        this.isListLoading = true;
+        const params = {
+          ticket_id: this.ticketInfo.id,
+        };
+        return this.$store
+          .dispatch('taskFlow/getTaskList', params)
+          .then((res) => {
+            this.taskList = res.data;
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isListLoading = false;
+          });
+      },
+      onViewTask(row) {
+        this.dealTaskInfo.show = true;
+        this.dealTaskInfo.itemContent = row;
+      },
+      getTaskTypeName(type) {
+        const target = this.taskTemplateTypes.find(m => m.type === type);
+        return target ? target.name : type;
+      },
+    },
+  };
 </script>
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .all-task-list {
     width: 100%;
     height: 100%;

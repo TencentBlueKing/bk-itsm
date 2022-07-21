@@ -21,51 +21,51 @@
   -->
 
 <template>
-    <div class="bk-itsm-service">
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p class="bk-come-back">
-                <span>{{ $t('m.serviceConfig["服务目录"]') }}</span>
-            </p>
-        </div>
-        <div class="itsm-page-content service-directory">
-            <div class="bk-directory-tree">
-                <tree-info
-                    :tree-info="treeInfo"
-                    ref="treeContent">
-                </tree-info>
-            </div>
-            <div class="bk-directory-table">
-                <tree-table
-                    ref="tableContent"
-                    :tree-info="treeInfo">
-                </tree-table>
-            </div>
-        </div>
+  <div class="bk-itsm-service">
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p class="bk-come-back">
+        <span>{{ $t('m.serviceConfig["服务目录"]') }}</span>
+      </p>
     </div>
+    <div class="itsm-page-content service-directory">
+      <div class="bk-directory-tree">
+        <tree-info
+          :tree-info="treeInfo"
+          ref="treeContent">
+        </tree-info>
+      </div>
+      <div class="bk-directory-table">
+        <tree-table
+          ref="tableContent"
+          :tree-info="treeInfo">
+        </tree-table>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
-    import treeInfo from './directoryCom/treeInfo.vue'
-    import treeTable from './directoryCom/treeTable.vue'
+  import treeInfo from './directoryCom/treeInfo.vue';
+  import treeTable from './directoryCom/treeTable.vue';
 
-    export default {
-        components: {
-            treeInfo,
-            treeTable
+  export default {
+    components: {
+      treeInfo,
+      treeTable,
+    },
+    data() {
+      return {
+        // 节点信息
+        treeInfo: {
+          node: {},
         },
-        data () {
-            return {
-                // 节点信息
-                treeInfo: {
-                    node: {}
-                }
-            }
-        },
-        computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
-            }
-        }
-    }
+      };
+    },
+    computed: {
+      sliderStatus() {
+        return this.$store.state.common.slideStatus;
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

@@ -344,6 +344,11 @@ DEFAULT_TABLE = [
         "一般审批流程基础模型",
         [FIELD_TITLE, FIELD_STATUS, FIELD_APPLY_CONTENT, FIELD_APPLY_REASON],
     ),
+    (
+        "简单",
+        "只有一个标题字段的基础模型",
+        [FIELD_TITLE],
+    ),
 ]
 TABLE = "TABLE"
 BASE_MODEL = "BASE-MODEL"
@@ -457,6 +462,8 @@ BUILTIN_IAM_SERVICES = [
     },
 ]
 
+BKBASE_CATALOG_KEY = "LANJINGJICHUPINGTAI"
+
 BUILTIN_BKBASE_SERVICES = [
     {
         "name": "创建资源组",
@@ -465,7 +472,7 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
     {
         "name": "资源组扩容",
@@ -474,7 +481,7 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
     {
         "name": "项目申请资源组",
@@ -483,7 +490,7 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
     {
         "name": "项目申请业务数据",
@@ -492,7 +499,7 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
     {
         "name": "申请角色权限",
@@ -501,7 +508,7 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
     {
         "name": "离线计算补算",
@@ -510,7 +517,7 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
     {
         "name": "第三方应用授权申请",
@@ -519,7 +526,7 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
     {
         "name": "TDM数据源接入",
@@ -528,9 +535,10 @@ BUILTIN_BKBASE_SERVICES = [
         "type": "BKBASE",
         "display_type": API,
         "display_role": "BK_BASE",
-        "bind": "approve_service_catalog",
+        "bind": BKBASE_CATALOG_KEY,
     },
 ]
 
 DEFAULT_PROJECT_PROJECT_KEY = "0"
 PUBLIC_PROJECT_PROJECT_KEY = "public"
+LESSCODE_PROJECT_KEY = "lesscode"

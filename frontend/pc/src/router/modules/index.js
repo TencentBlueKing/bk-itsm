@@ -20,14 +20,14 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import common from './common.js'
-import workbench from './workbench.js'
-import project from './project.js'
-import manage from './manage.js'
+import common from './common.js';
+import workbench from './workbench.js';
+import project from './project.js';
+import manage from './manage.js';
 
 export default [
-    ...common, // 公共路由
-    ...workbench, // 我的工作台
-    ...project, // 项目
-    ...manage // 平台管理
-]
+  ...common, // 公共路由
+  ...workbench, // 我的工作台
+  ...project, // 项目
+  ...manage, // 平台管理
+];

@@ -108,9 +108,12 @@ class TicketPermissionValidate(permissions.BasePermission):
                 request, node
             )
 
-            return [state_permission, iam_ticket_manage_auth]
+            return any([state_permission, iam_ticket_manage_auth])
 
         if view.action == "get_ticket_output":
+            return True
+
+        if view.action == "is_processor":
             return True
 
         # 查看权限校验

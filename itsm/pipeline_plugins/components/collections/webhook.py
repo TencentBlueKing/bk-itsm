@@ -23,16 +23,23 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import copy
+import json
 import logging
 
 import jmespath
 import requests
+from django.conf import settings
 from jinja2 import Template
 from pipeline.utils.boolrule import BoolRule
 from pipeline.component_framework.component import Component
 from django.utils.translation import ugettext as _
 
-from itsm.component.constants import TRANSITION_OPERATE, NODE_FAILED, FINISHED
+from itsm.component.constants import (
+    TRANSITION_OPERATE,
+    NODE_FAILED,
+    FINISHED,
+    LESSCODE_PROJECT_KEY,
+)
 from itsm.component.utils.encode import EncodeWebhook
 from itsm.pipeline_plugins.components.collections.itsm_base_service import (
     ItsmBaseService,
@@ -139,7 +146,7 @@ class WebHookService(ItsmBaseService):
         整体渲染 extras 所有的变量
         """
         variables = ticket.get_output_fields(return_format="dict", need_display=True)
-
+        variables.update(ticket.meta.get("envs", {}))
         result = ParamsBuilder(extras=extras, variables=variables).result()
 
         return result
@@ -148,6 +155,8 @@ class WebHookService(ItsmBaseService):
         resp = {"resp": resp}
         for variable in variables:
             value = jmespath.search(variable["ref_path"], resp)
+            if isinstance(value, bool):
+                value = json.dumps(value)
             if TicketGlobalVariable.objects.filter(
                 ticket_id=ticket_id, key=variable["key"]
             ).exists():
@@ -191,6 +200,13 @@ class WebHookService(ItsmBaseService):
             action=NODE_FAILED,
             retry=False,
         )
+
+    def get_common_args(self):
+        return {
+            "bk_app_code": settings.APP_ID,
+            "bk_app_secret": settings.APP_TOKEN,
+            "bk_username": settings.SYSTEM_USE_API_ACCOUNT,
+        }
 
     def execute(self, data, parent_data):
         if super(WebHookService, self).execute(data, parent_data):
@@ -254,7 +270,25 @@ class WebHookService(ItsmBaseService):
         body = extras.get("body", {})["content"]
         timeout = extras.get("settings", {}).get("timeout", 10)
         success_exp = extras.get("success_exp")
-        auth = EncodeWebhook.encode_authorization(extras.get("auth", {}))
+
+        # 如果是less code的数据处理节点, 针对get or post 请求，填充认证信息
+        if ticket.project_key == LESSCODE_PROJECT_KEY:
+            common_args = self.get_common_args()
+            headers.update({"x-bkapi-authorization": json.dumps(common_args)})
+
+        try:
+            auth = EncodeWebhook.encode_authorization(extras.get("auth", {}))
+        except Exception as e:
+            err_message = "auth信息解析失败， error={}".format(e)
+            self.do_exit_plugins(
+                ticket,
+                state_id,
+                current_node,
+                err_message,
+                error_message_template,
+                processors,
+            )
+            return False
 
         try:
             response = requests.request(
@@ -316,6 +350,10 @@ class WebHookService(ItsmBaseService):
                 processors,
             )
             return False
+
+        # 更新全局变量
+        variable_output = self.update_variables(resp, ticket_id, state_id, variables)
+
         if success_exp:
             try:
                 rule = BoolRule(success_exp)
@@ -342,8 +380,6 @@ class WebHookService(ItsmBaseService):
                 )
                 return False
 
-        # 更新全局变量
-        variable_output = self.update_variables(resp, ticket_id, state_id, variables)
         # 设置状态
         self.update_info(current_node, variables=variable_output)
 

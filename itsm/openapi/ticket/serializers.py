@@ -22,6 +22,8 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import random
+import string
 
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
@@ -32,8 +34,18 @@ from itsm.component.constants import (
     LEN_LONG,
     APPROVAL_CHOICES,
     LEN_NORMAL,
+    TASK_STATE,
+    NORMAL_STATE,
+    APPROVAL_STATE,
+    SIGN_STATE,
 )
 from itsm.component.exceptions import ParamError
+from itsm.ticket.models import Ticket
+from itsm.ticket.serializers import (
+    TicketComment,
+)
+from itsm.component.utils.basic import get_random_key
+from itsm.ticket.models import Status
 from itsm.ticket.serializers import TicketSerializer, TicketStateOperateSerializer
 from itsm.ticket.validators import ticket_fields_validate
 
@@ -197,6 +209,15 @@ class TicketLogsSerializer(serializers.Serializer):
     creator = serializers.CharField(read_only=True)
     logs = serializers.JSONField(read_only=True, source="ticket_logs")
 
+    def to_representation(self, instance):
+        data = super(TicketLogsSerializer, self).to_representation(instance)
+
+        return data
+
+
+class TicketComplexLogsSerializer(TicketLogsSerializer):
+    logs = serializers.JSONField(read_only=True, source="ticket_complex_logs")
+
 
 class SimpleLogsSerializer(serializers.Serializer):
     """
@@ -210,6 +231,50 @@ class SimpleLogsSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         data = super(SimpleLogsSerializer, self).to_representation(instance)
+        data["message"] = data["message"].format(
+            operator=instance.operator,
+            name=instance.from_state_name,
+            detail_message=instance.detail_message,
+            action=instance.action,
+        )
+        return data
+
+
+class ComplexLogsSerializer(serializers.Serializer):
+    operator = serializers.CharField(read_only=True)
+    operate_at = serializers.DateTimeField(read_only=True)
+    message = serializers.CharField(read_only=True)
+    source = serializers.CharField(read_only=True)
+    form_data = serializers.JSONField(read_only=True)
+
+    def to_representation(self, instance):
+        data = super(ComplexLogsSerializer, self).to_representation(instance)
+        # 返回form data 数据，由于API节点的 form data 太过于庞大，故只返回输出变量
+        node_status = Status.objects.filter(
+            ticket_id=instance.ticket_id, state_id=instance.from_state_id
+        ).first()
+
+        from_state_type = getattr(node_status, "type", "")
+        data["from_state_type"] = from_state_type
+
+        if from_state_type in [NORMAL_STATE, APPROVAL_STATE, SIGN_STATE]:
+            data["form_data"] = TicketFieldSerializer(
+                instance.form_data, many=True
+            ).data
+
+        if from_state_type == TASK_STATE:
+            form_data = []
+            if isinstance(instance.form_data, list) and instance.form_data:
+                for item in instance.form_data:
+                    form_data.append(
+                        {
+                            "output_variables": item.get("value", {}).get(
+                                "output_variables", []
+                            )
+                        }
+                    )
+            data["form_data"] = form_data
+
         data["message"] = data["message"].format(
             operator=instance.operator,
             name=instance.from_state_name,
@@ -313,6 +378,25 @@ class TicketCreateSerializer(TicketSerializer):
     creator = serializers.CharField(required=True)
 
 
+class DynamicFieldSerializer(serializers.Serializer):
+    name = serializers.CharField(required=True, max_length=32)
+    type = serializers.ChoiceField(
+        choices=[("STRING", "字符串"), ("INT", "数字")], required=True
+    )
+    value = serializers.CharField(required=True, max_length=32)
+    key = serializers.CharField(required=False, read_only=True)
+
+    def validate(self, attrs):
+        key = get_random_key(attrs["name"])
+        if key[0].isdigit():
+            # 开头为数字，重新生成
+            first_letter = random.choice(string.ascii_letters)
+            key = first_letter + key[1:]
+
+        attrs["key"] = key
+        return attrs
+
+
 class TicketNodeOperateSerializer(TicketStateOperateSerializer):
     """单据节点操作序列化"""
 
@@ -366,3 +450,37 @@ class TicketFilterSerializer(serializers.Serializer):
     )
     exclude_ticket_id__in = serializers.CharField(required=False)
     current_processor = serializers.CharField(required=False)
+
+
+class CommentSerializer(serializers.Serializer):
+    """工单评价序列化"""
+
+    ticket_id = serializers.IntegerField(required=False)
+    operator = serializers.CharField(max_length=16, required=True)
+    sn = serializers.CharField(required=True)
+    stars = serializers.IntegerField(required=True, max_value=6, min_value=1)
+    comments = serializers.CharField(
+        required=False, max_length=LEN_LONG, allow_null=True, allow_blank=True
+    )
+
+    def validate(self, attrs):
+        sn = attrs.get("sn", "")
+        try:
+            ticket = Ticket.objects.get(sn=sn)
+        except Ticket.DoesNotExist:
+            raise ParamError(_("sn={}对应的单据不存在!".format(sn)))
+
+        if ticket.current_status != "FINISHED":
+            raise ParamError(_("单据未结束，不允许评价!"))
+
+        try:
+            ticket_comment = TicketComment.objects.get(ticket_id=ticket.id)
+        except TicketComment.DoesNotExist:
+            raise ParamError(_("单据评价记录未存在，无法评价!"))
+
+        if ticket_comment.stars != 0:
+            raise ParamError(_("该单据已经被评论，请勿重复评论"))
+
+        attrs["ticket_id"] = ticket.id
+
+        return attrs
