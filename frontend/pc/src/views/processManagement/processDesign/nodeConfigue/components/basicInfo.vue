@@ -91,6 +91,7 @@
               ref="processors"
               :value="processorsInfo"
               :node-info="nodeInfo"
+              :show-overbook="true"
               :exclude-role-type-list="excludeProcessor">
             </deal-person>
           </div>

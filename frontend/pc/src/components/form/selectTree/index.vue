@@ -165,6 +165,7 @@
       },
       toggleInfo(tree) {
         this.checked = tree;
+        this.$emit('toggle', tree);
         this.setDispalyName();
         this.cancelAllSectedStatus();
         this.$set(tree, 'checkInfo', true);
