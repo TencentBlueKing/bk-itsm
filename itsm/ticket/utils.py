@@ -152,7 +152,7 @@ def get_custom_api_data(field):
     """
     from jinja2 import Template
 
-    config = field.meta.get("config", {})
+    config = field.meta.get("api_config", {})
     kv_relation = field.kv_relation
     envs = field.ticket.meta.get("envs", {})
     method = config.get("method", "GET")
