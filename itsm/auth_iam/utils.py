@@ -148,7 +148,11 @@ class IamRequest(object):
                     str(resource["resource_id"]),
                     {
                         "iam_resource_owner": resource.get("creator", ""),
-                        "_bk_iam_path_": bk_iam_path,
+                        "_bk_iam_path_": "/project,{}/".format(
+                            resource.get("project_key")
+                        )
+                        if resource.get("project_key") is not None
+                        else bk_iam_path,
                         "name": resource.get("resource_name", ""),
                     },
                 )
