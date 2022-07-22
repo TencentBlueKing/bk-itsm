@@ -160,6 +160,9 @@
         this.recipientItem.secondLevelList = [];
         if (this.recipientItem.key === 'ORGANIZATION') {
           this.getOrganization();
+          if (this.recipientItem.value) {
+            this.setinitValue(Number(this.recipientItem.value));
+          }
         } else if (this.recipientItem.key === 'VARIABLE') {
           this.recipientItem.value = this.recipientItem.value;
         } else if (this.recipientItem.key === 'PERSON') {
@@ -175,6 +178,12 @@
       this.variableList = this.triggerVariables;
     },
     methods: {
+      setinitValue(id) {
+        this.$store.dispatch('cdeploy/getTreeInfoChildren', { id }).then((res) => {
+          this.roles.viewtree = res.data;
+          this.concatName();
+        });
+      },
       getSecondLevelList() {
         // 清空二级数据
         this.recipientItem.value = [];
@@ -233,31 +242,24 @@
           // 操作角色组织架构
           this.roles.viewTreeDataList = res.data;
           this.roles.viewTreeDataList.forEach((tree) => {
-            this.treeData(tree, 'view');
+            this.setCheckedValue(tree, 'view');
           });
-          if (this.roles.viewtree.route.length) {
-            this.roles.viewTreeDataList.forEach((tree) => {
-              this.openChildren(tree, 'view');
-            });
-          }
         })
           .catch(() => {
 
           });
       },
-      recordCheckFn(tree) {
-        tree.checkInfo = false;
-        if (tree.children === null || (tree.children && !tree.children.length)) {
-          return;
-        }
-        tree.children.forEach((item) => {
-          this.recordCheckFn(item);
+      // 清除不符合value id的选中状态
+      recordCheckFn(list = this.roles.viewTreeDataList) {
+        list.forEach((tree) => {
+          this.$set(tree, 'checkInfo', false);
+          if (tree.children && tree.children.length) {
+            this.recordCheckFn(tree.children);
+          }
         });
       },
       toggleInfo(value) {
-        this.roles.viewTreeDataList.forEach((tree) => {
-          this.recordCheckFn(tree);
-        });
+        this.recordCheckFn();
         value.checkInfo = true;
         // 选中的数据
         this.roles.viewtree = value;
@@ -266,10 +268,15 @@
         // 关闭窗口
         this.closeTree();
       },
-      toggleChildren() {
-        if (arguments[1] === 'view') {
-          arguments[0].showChildren = !arguments[0].showChildren;
-          this.roles.viewTreeDataList = JSON.parse(JSON.stringify(this.roles.viewTreeDataList));
+      toggleChildren(item, type) {
+        if (type === 'view') {
+          this.$set(item, 'showChildren', !item.showChildren);
+          this.$store.dispatch('cdeploy/getTreeInfoChildren', { id: item.id }).then((res) => {
+            res.data.children.forEach(tree => {
+              this.setCheckedValue(tree, 'view');
+            });
+            this.$set(item, 'children', res.data.children || []);
+          });
         }
       },
       openChildren(tree, type) {
@@ -284,21 +291,19 @@
           this.openChildren(item, type);
         });
       },
-      treeData(tree, type) {
-        tree.checkInfo = false;
-        tree.has_children = !!(tree.children && tree.children.length);
-        // 选中可见角色
+      setCheckedValue(tree, type) {
+        this.$set(tree, 'checkInfo', false);
+        this.$set(tree, 'has_children', tree.has_children);
         if (String(this.recipientItem.value) === String(tree.id) && type === 'view') {
           tree.checkInfo = true;
-          this.roles.viewtree = tree;
+          this.checked = tree;
           this.concatName();
-        }
-        if (!tree.has_children) {
           return;
         }
-        tree.children.forEach((item) => {
-          this.treeData(item, type);
-        });
+        if (tree.has_children) {
+          this.$set(tree, 'showChildren', false);
+          this.$set(tree, 'children', []);
+        }
       },
       showTree(type) {
         if (type === 'view') {
@@ -310,12 +315,7 @@
         this.roles.viewTreeOpen = false;
       },
       concatName() {
-        let nameList = [];
-        if (this.roles.viewtree.route.length) {
-          nameList = this.roles.viewtree.route.map(item => item.name);
-        }
-        nameList.push(this.roles.viewtree.name);
-        this.$set(this.roles.viewtree, 'showName', nameList.join('/'));
+        this.$set(this.roles.viewtree, 'showName', this.roles.viewtree.full_name);
       },
       addRecipient() {
         this.itemInfo.value.splice(this.recipientIndex + 1, 0, {

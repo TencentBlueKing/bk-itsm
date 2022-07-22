@@ -106,23 +106,28 @@
     methods: {
       initData() {
         this.displayList = deepClone(this.list);
+        // debugger;
         if (this.displayList.length) {
           this.displayList.forEach((tree) => {
             this.setCheckedValue(tree);
           });
         }
-        if (this.value && this.checked) {
-          this.displayList.forEach((tree) => {
-            this.openChildren(tree);
-          });
+        if (this.value) {
+          this.setinitValue(Number(this.value));
         }
         if (this.checked) {
           this.$emit('change', deepClone(this.checked));
         }
       },
+      setinitValue(id) {
+        this.$store.dispatch('cdeploy/getTreeInfoChildren', { id }).then((res) => {
+          this.checked = res.data;
+          this.setDispalyName();
+        });
+      },
       setCheckedValue(tree) {
         this.$set(tree, 'checkInfo', false);
-        this.$set(tree, 'has_children', !!(tree.children && tree.children.length));
+        this.$set(tree, 'has_children', tree.has_children);
         if (this.value && String(this.value) === String(tree.id)) {
           tree.checkInfo = true;
           this.checked = tree;
@@ -131,14 +136,12 @@
         }
         if (tree.has_children) {
           this.$set(tree, 'showChildren', false);
-          tree.children.forEach((item) => {
-            this.setCheckedValue(item);
-          });
+          this.$set(tree, 'children', []);
         }
       },
       openChildren(tree) {
         this.$set(tree, 'showChildren', false);
-        this.$set(tree, 'showChildren', this.checked.route.some(item => String(item.id) === String(tree.id)));
+        // this.$set(tree, 'showChildren', this.checked.route.some(item => String(item.id) === String(tree.id)));
         if (!(tree.children && tree.children.length)) {
           return;
         }
@@ -147,12 +150,12 @@
         });
       },
       setDispalyName() {
-        let nameList = [];
-        if (this.checked.route.length) {
-          nameList = this.checked.route.map(item => item.name);
-        }
-        nameList.push(this.checked.name);
-        this.displayName = nameList.join('/');
+        // let nameList = [];
+        // if (this.checked.route.length) {
+        //   nameList = this.checked.route.map(item => item.name);
+        // }
+        // nameList.push(this.checked.name);
+        this.displayName = this.checked.full_name;
       },
       showTree() {
         if (this.loading) {
@@ -183,6 +186,18 @@
       },
       toggleChildren(item) {
         this.$set(item, 'showChildren', !item.showChildren);
+        this.$store.dispatch('cdeploy/getTreeInfoChildren', { id: item.id }).then((res) => {
+          // const CurRoute = item.route;
+          // CurRoute.push({
+          //   id: item.id,
+          //   name: item.name,
+          // });
+          res.data.children.forEach(ite => {
+            // this.$set(ite, 'route', CurRoute);
+            this.setCheckedValue(ite);
+          });
+          this.$set(item, 'children', res.data.children || []);
+        });
       },
     },
   };
