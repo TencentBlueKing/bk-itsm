@@ -140,8 +140,7 @@ export default {
             }
             // 字段与字段间的校验
             for (let k = 0; k < allList.length; k++) {
-              if (list[i].regex_config.rule.expressions[j].key === allList[k].key
-                                    && allList[k].showFeild) {
+              if (list[i].regex_config.rule.expressions[j].key === allList[k].key && allList[k].showFeild) {
                 const val1 = list[i].type === 'INT' ? list[i].val : new Date(list[i].val).getTime();
                 const val2 = allList[k].type === 'INT' ? allList[k].val : new Date(allList[k].val).getTime();
                 const result = this.checkExpressionResult(
@@ -155,7 +154,8 @@ export default {
               }
             }
           }
-          relateResult.result = linkRule === 'and' ? relateResult.validList.every(val => val.valid) : relateResult.validList.some(val => val.valid);
+          // 当validList为空并且or返回true
+          relateResult.result = linkRule === 'and' ? relateResult.validList.every(val => val.valid) : (!relateResult.validList.length || relateResult.validList.some(val => val.valid));
           allRelateList.push(relateResult);
         }
       }
