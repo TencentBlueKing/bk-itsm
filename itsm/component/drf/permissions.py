@@ -199,7 +199,7 @@ class IamAuthPermit(permissions.BasePermission):
         )
         iam_client = IamRequest(request)
         auth_actions = iam_client.batch_resource_multi_actions_allowed(
-            set(apply_actions), resources
+            set(apply_actions), resources, project_key
         )
         auth_actions = auth_actions.get(resources[0]["resource_id"], {})
 
@@ -299,7 +299,7 @@ class IamAuthProjectViewPermit(IamAuthPermit):
         )
         iam_client = IamRequest(request)
         auth_actions = iam_client.batch_resource_multi_actions_allowed(
-            set(apply_actions), resources
+            set(apply_actions), resources, project_key
         )
         auth_actions = auth_actions.get(resources[0]["resource_id"], {})
 
