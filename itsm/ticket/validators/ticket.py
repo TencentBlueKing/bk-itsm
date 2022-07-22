@@ -547,7 +547,7 @@ def ticket_fields_validate(fields, state_id, ticket, **kwargs):
     )
 
     for field in fields:
-        field_validate(field, state_fields, key_value, **kwargs)
+        field_validate(field, state_fields, key_value, ticket=ticket, **kwargs)
 
 
 def ticket_operate_validate(fields, state_id, ticket, username):
