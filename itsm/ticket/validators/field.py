@@ -26,8 +26,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import datetime
 import re
 
-from bamboo_engine.utils.boolrule import BoolRule
+
 from django.utils.translation import ugettext as _
+from pipeline.utils.boolrule import BoolRule
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
