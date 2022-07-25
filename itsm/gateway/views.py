@@ -212,6 +212,21 @@ def get_departments(request):
 
 
 @cache_page(CACHE_5MIN, cache="default")
+def get_first_level_departments(request):
+    # 仅仅获取第一层的组织架构
+    try:
+        params = {
+            "lookup_field": "level",
+            "exact_lookups": "0",
+        }
+        res = get_list_departments(params)
+    except ComponentCallError as e:
+        return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_LIST").json()
+
+    return Success(res).json()
+
+
+@cache_page(CACHE_5MIN, cache="default")
 def get_department_users(request):
     """获取部门用户列表，支持递归查询"""
     try:

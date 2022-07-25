@@ -36,6 +36,9 @@ urlpatterns = [
     url(r"^bk_login/get_all_users/$", views.get_all_users),
     url(r"^cmdb/get_app_list/$", views.get_app_list),
     url(r"^usermanage/get_departments/$", views.get_departments),
+    url(
+        r"^usermanage/get_first_level_departments/$", views.get_first_level_departments
+    ),
     url(r"^usermanage/get_department_info/$", views.get_department_info),
     url(r"^usermanage/get_department_users/$", views.get_department_users),
     url(r"^usermanage/get_department_users_count/$", views.get_department_users_count),

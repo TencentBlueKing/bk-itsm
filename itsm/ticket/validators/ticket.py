@@ -45,6 +45,7 @@ from itsm.component.constants import (
 )
 from itsm.component.exceptions import CreateTicketError, ParamError
 from itsm.component.utils.basic import dotted_name
+from itsm.component.utils.client_backend_query import get_user_department_ids
 from itsm.component.utils.conversion import format_exp_value
 from itsm.role.models import UserRole
 from itsm.service.models import Service
@@ -87,7 +88,9 @@ class CreateTicketValidator(object):
         field_keys = set()
         field_hash = {}
 
-        required_fields = filter(lambda f: f["validate_type"] == "REQUIRE", state_fields)
+        required_fields = filter(
+            lambda f: f["validate_type"] == "REQUIRE", state_fields
+        )
         required_keys = {f["key"] for f in required_fields}
 
         for f in fields:
@@ -107,7 +110,9 @@ class CreateTicketValidator(object):
             f.update(value=field_hash.get(f["key"], ""))
             state_fields_map.update({f["key"]: f})
 
-        first_state_field_validate(state_fields_map, fields, service=service.key, **kwargs)
+        first_state_field_validate(
+            state_fields_map, fields, service=service.key, **kwargs
+        )
 
 
 class StateOperateValidator(object):
@@ -139,15 +144,23 @@ class StateOperateValidator(object):
         """
 
         if self.current_node.action_type != DISTRIBUTE_OPERATE:
-            raise ParamError(_("当前节点无法进行【%s】操作") % ACTION_DICT.get(value.get("action_type", ""), _("不存在操作类型的")))
+            raise ParamError(
+                _("当前节点无法进行【%s】操作")
+                % ACTION_DICT.get(value.get("action_type", ""), _("不存在操作类型的"))
+            )
 
-        self.processor_validate(value, self.current_node.assignors_type, self.current_node.assignors)
+        self.processor_validate(
+            value, self.current_node.assignors_type, self.current_node.assignors
+        )
 
     def claim_validate(self, value):
         """认领校验"""
 
         if self.current_node.action_type != CLAIM_OPERATE:
-            raise ParamError(_("当前节点无法进行【%s】操作") % ACTION_DICT.get(value.get("action_type", ""), _("不存在操作类型的")))
+            raise ParamError(
+                _("当前节点无法进行【%s】操作")
+                % ACTION_DICT.get(value.get("action_type", ""), _("不存在操作类型的"))
+            )
 
         if UserRole.is_itsm_superuser(value["processors"]):
             return
@@ -167,7 +180,9 @@ class StateOperateValidator(object):
         if not value.get("action_message"):
             raise ParamError(_("转单描述信息不能为空，请重新确认."))
 
-        self.processor_validate(value, self.current_node.delivers_type, self.current_node.delivers)
+        self.processor_validate(
+            value, self.current_node.delivers_type, self.current_node.delivers
+        )
 
     def processor_validate(self, value, reference_processor_type, reference_processors):
         """
@@ -176,18 +191,27 @@ class StateOperateValidator(object):
         processors_type = value["processors_type"]
         processors = [p for p in str(value["processors"]).split(",") if p]
         if processors_type in ["CMDB", "GENERAL"]:
-            if reference_processor_type != processors_type and reference_processor_type not in [
-                "OPEN",
-                "BY_ASSIGNOR",
-                "PERSON",
-            ]:
+            if (
+                reference_processor_type != processors_type
+                and reference_processor_type
+                not in [
+                    "OPEN",
+                    "BY_ASSIGNOR",
+                    "PERSON",
+                ]
+            ):
                 # 当前的角色类型与指定不符合
                 raise ParamError(_("当前分配的用户组类型不正确"))
-            if reference_processor_type in ["OPEN", "BY_ASSIGNOR"] or not reference_processors:
+            if (
+                reference_processor_type in ["OPEN", "BY_ASSIGNOR"]
+                or not reference_processors
+            ):
                 # 没有指定的角色或者指定了角色类型，但是没有指定角色范围
                 valid_roles = [
                     str(role_id)
-                    for role_id in UserRole.objects.filter(role_type=processors_type).values_list("id", flat=True)
+                    for role_id in UserRole.objects.filter(
+                        role_type=processors_type
+                    ).values_list("id", flat=True)
                 ]
                 if not set(processors).issubset(set(valid_roles)):
                     # 角色范围不在 指定的角色范围之内
@@ -195,7 +219,9 @@ class StateOperateValidator(object):
                 return
 
             # 指定了角色类型和角色范围
-            reference_processors = set([p for p in str(reference_processors).split(",") if p])
+            reference_processors = set(
+                [p for p in str(reference_processors).split(",") if p]
+            )
             if not set(processors).issubset(set(reference_processors)):
                 # 检测当前的角色范围是否是指定范围之内
                 raise ParamError(_("当前分配的部分用户组可能不存在"))
@@ -211,7 +237,9 @@ class StateOperateValidator(object):
             )
 
             if not set(processors).issubset(set(valid_person)):
-                raise ParamError(_("当前分配的部分用户可能不符合条件，请确保用户在{}中").format(",".join(set(valid_person))))
+                raise ParamError(
+                    _("当前分配的部分用户可能不符合条件，请确保用户在{}中").format(",".join(set(valid_person)))
+                )
 
 
 def first_state_permission(fields, first_state, username):
@@ -219,11 +247,21 @@ def first_state_permission(fields, first_state, username):
     if first_state["processors_type"] == "OPEN":
         return
 
+    if first_state["processors_type"] == "ORGANIZATION":
+        user_department_ids = get_user_department_ids(username)
+        state_department_id = first_state["processors"]
+        if int(state_department_id) not in user_department_ids:
+            raise CreateTicketError(_("【{}】没有任务【提单】的【提交】操作权限.").format(username))
+        else:
+            return
+
     # 提单节点提交的字段bk_biz_id的值
     bk_biz_id = get_bk_biz_id(fields)
 
     if username in set(
-        UserRole.get_users_by_type(bk_biz_id, first_state["processors_type"], first_state["processors"])
+        UserRole.get_users_by_type(
+            bk_biz_id, first_state["processors_type"], first_state["processors"]
+        )
     ):
         return
 
@@ -246,7 +284,10 @@ def first_state_field_validate(state_fields, fields, **kwargs):
     """提单节点字段校验"""
     from itsm.ticket.validators.field import field_validate
 
-    key_value = {"params_" + field["key"]: format_exp_value(field.get("type"), field["value"]) for field in fields}
+    key_value = {
+        "params_" + field["key"]: format_exp_value(field.get("type"), field["value"])
+        for field in fields
+    }
     for field in fields:
         try:
             field_validate(field, state_fields, key_value, **kwargs)
@@ -294,13 +335,20 @@ def bind_derive_tickets_validate(from_ticket_id, to_ticket_ids):
         to_ticket = Ticket.objects.get(id=to_ticket_id)
 
         if TicketToTicket.objects.filter(
-            Q(Q(from_ticket_id=from_ticket_id) & Q(to_ticket_id=to_ticket_id) & Q(
-                related_type=DERIVE))
-            | Q(Q(from_ticket_id=to_ticket_id) & Q(to_ticket_id=from_ticket_id) & Q(
-                related_type=DERIVE))
+            Q(
+                Q(from_ticket_id=from_ticket_id)
+                & Q(to_ticket_id=to_ticket_id)
+                & Q(related_type=DERIVE)
+            )
+            | Q(
+                Q(from_ticket_id=to_ticket_id)
+                & Q(to_ticket_id=from_ticket_id)
+                & Q(related_type=DERIVE)
+            )
         ).exists():
             raise serializers.ValidationError(
-                _("单据【{}】和【{}】已存在关联关系").format(from_ticket.sn, to_ticket.sn))
+                _("单据【{}】和【{}】已存在关联关系").format(from_ticket.sn, to_ticket.sn)
+            )
 
 
 def merge_validate(from_ticket_ids, to_ticket_id, operator):
@@ -323,7 +371,10 @@ def merge_validate(from_ticket_ids, to_ticket_id, operator):
     from_ticket_ids = copy.deepcopy(from_ticket_ids)
     from_ticket_ids.append(to_ticket_id)
     tickets = list(
-        Ticket.objects.filter(id__in=from_ticket_ids).values("id", "service_id", "flow_id"))
+        Ticket.objects.filter(id__in=from_ticket_ids).values(
+            "id", "service_id", "flow_id"
+        )
+    )
 
     to_ticket = None
     for index, ticket in enumerate(tickets):
@@ -338,7 +389,9 @@ def merge_validate(from_ticket_ids, to_ticket_id, operator):
 
     # 关联操作的人为服务负责人或者ITSM超级管理员
     service = Service.objects.get(id=to_ticket["service_id"])
-    if not (UserRole.is_itsm_superuser(operator) or dotted_name(operator) in service.owners):
+    if not (
+        UserRole.is_itsm_superuser(operator) or dotted_name(operator) in service.owners
+    ):
         raise serializers.ValidationError(_("抱歉，您没有关联母子单的权限"))
 
     for ticket in tickets:
@@ -368,7 +421,8 @@ def tickets_can_be_slave(ticket_ids):
     """
     # 找出其中已是母单的单据
     master_tickets = TicketToTicket.objects.filter(
-        Q(related_type=MASTER_SLAVE) & Q(to_ticket_id__in=ticket_ids)).all()
+        Q(related_type=MASTER_SLAVE) & Q(to_ticket_id__in=ticket_ids)
+    ).all()
 
     if master_tickets:
         to_ticket_ids = [master_ticket.to_ticket_id for master_ticket in master_tickets]
@@ -376,7 +430,12 @@ def tickets_can_be_slave(ticket_ids):
         tickets = Ticket.objects.filter(id__in=to_ticket_ids)
         # 友好地提示那些单据是母单，无法绑定
         raise serializers.ValidationError(
-            _("单据 [{}] 已经是母单，无法成为子单".format(",".join([ticket.sn for ticket in tickets]))))
+            _(
+                "单据 [{}] 已经是母单，无法成为子单".format(
+                    ",".join([ticket.sn for ticket in tickets])
+                )
+            )
+        )
 
 
 def withdraw_validate(operator, ticket):
@@ -422,10 +481,9 @@ def terminate_validate(username, ticket, state_id, terminate_message):
         raise serializers.ValidationError(
             _("任务处于【{}】状态，无法操作.").format(
                 ",".join(
-                    TicketStatus.objects.filter(service_type=ticket.service,
-                                                key=status.status).values_list(
-                        "name", flat=True
-                    )
+                    TicketStatus.objects.filter(
+                        service_type=ticket.service, key=status.status
+                    ).values_list("name", flat=True)
                 )
             )
         )
@@ -434,7 +492,9 @@ def terminate_validate(username, ticket, state_id, terminate_message):
         raise serializers.ValidationError(_("指定流程节点【{}】不支持终止操作.").format(status.name))
 
     if not status.can_operate(username):
-        raise serializers.ValidationError(_("【{}】没有任务【{}】的操作权限.").format(username, status.name))
+        raise serializers.ValidationError(
+            _("【{}】没有任务【{}】的操作权限.").format(username, status.name)
+        )
 
     if not terminate_message:
         raise serializers.ValidationError(_("请输入终止原因！"))
@@ -473,17 +533,21 @@ def ticket_fields_validate(fields, state_id, ticket, **kwargs):
     key_value.update(
         {
             "params_%s" % item["key"]: item["value"]
-            for item in
-            TicketGlobalVariable.objects.filter(ticket_id=ticket.id).values("key", "value")
+            for item in TicketGlobalVariable.objects.filter(ticket_id=ticket.id).values(
+                "key", "value"
+            )
         }
     )
 
     key_value.update(
-        {"params_" + field["key"]: format_exp_value(field["type"], field["value"]) for field in
-         fields})
+        {
+            "params_" + field["key"]: format_exp_value(field["type"], field["value"])
+            for field in fields
+        }
+    )
 
     for field in fields:
-        field_validate(field, state_fields, key_value, **kwargs)
+        field_validate(field, state_fields, key_value, ticket=ticket, **kwargs)
 
 
 def ticket_operate_validate(fields, state_id, ticket, username):
@@ -499,10 +563,9 @@ def ticket_operate_validate(fields, state_id, ticket, username):
         raise serializers.ValidationError(
             _("任务处于【{}】状态，无法操作.").format(
                 ",".join(
-                    TicketStatus.objects.filter(service_type=ticket.service,
-                                                key=status.status).values_list(
-                        "name", flat=True
-                    )
+                    TicketStatus.objects.filter(
+                        service_type=ticket.service, key=status.status
+                    ).values_list("name", flat=True)
                 )
             )
         )
@@ -512,10 +575,13 @@ def ticket_operate_validate(fields, state_id, ticket, username):
         bk_biz_id = get_bk_biz_id(fields)
         if not status.can_first_state_operate(username, bk_biz_id):
             raise serializers.ValidationError(
-                _("【{}】没有任务【{}】的【提交】操作权限.").format(username, status.name))
+                _("【{}】没有任务【{}】的【提交】操作权限.").format(username, status.name)
+            )
 
     elif not status.can_operate(username, TRANSITION_OPERATE):
-        raise serializers.ValidationError(_("【{}】没有任务【{}】的【提交】操作权限.").format(username, status.name))
+        raise serializers.ValidationError(
+            _("【{}】没有任务【{}】的【提交】操作权限.").format(username, status.name)
+        )
 
 
 def ticket_status_validate(ticket, state_id):

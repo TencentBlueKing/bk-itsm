@@ -22,6 +22,8 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import random
+import string
 
 from django.db import transaction
 from django.db.models import Q
@@ -56,6 +58,18 @@ from itsm.workflow.models import (
 from itsm.workflow.serializers import TemplateFieldSerializer
 
 
+def generate_key(name):
+    """
+    数字开头的key会导致mako渲染报错，固对数字开头的key做统一处理
+    """
+    key = get_random_key(name)
+    if key[0].isdigit():
+        # 开头为数字，重新生成
+        first_letter = random.choice(string.ascii_letters)
+        key = first_letter + key[1:]
+    return key
+
+
 def state_created_handler(sender, flow_id, state_id, state_type, **kwargs):
     """节点创建后的触发操作"""
     # Sign state need create extra variables
@@ -71,7 +85,7 @@ def sign_update(state_id, flow_id):
     for variable in SIGN_VARIABLES:
         variable["flow_id"] = flow_id
         variable["state_id"] = state_id
-        variable["key"] = get_random_key(variable["name"])
+        variable["key"] = generate_key(variable["name"])
         global_variables.append(GlobalVariable(**variable))
         state.add_variables(
             variable["key"],
@@ -86,7 +100,7 @@ def sign_update(state_id, flow_id):
     field_ids = []
     for sign_field in SIGN_FIELDS:
         sign_field.update(
-            key=get_random_key(sign_field["name"]),
+            key=generate_key(sign_field["name"]),
             state_id=state_id,
             workflow_id=flow_id,
         )
@@ -103,7 +117,7 @@ def approval_update(state_id, flow_id):
     for variable in APPROVAL_VARIABLES + SIGN_VARIABLES:
         variable["flow_id"] = flow_id
         variable["state_id"] = state_id
-        variable["key"] = get_random_key(variable["name"])
+        variable["key"] = generate_key(variable["name"])
         global_variables.append(GlobalVariable(**variable))
         state.add_variables(
             variable["key"],
@@ -116,7 +130,7 @@ def approval_update(state_id, flow_id):
     field_ids = []
     key = ""
     for approval_field in APPROVAL_FIELDS:
-        field_key = get_random_key(approval_field["name"])
+        field_key = generate_key(approval_field["name"])
         show_conditions = approval_field.get("show_conditions")
         if not show_conditions:
             key = field_key

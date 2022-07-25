@@ -80,6 +80,7 @@
   import { errorHandler } from '@/utils/errorHandler';
   import fieldMix from '@/views/commonMix/field.js';
   import { mapState } from 'vuex';
+  import i18n from '@/i18n/index.js';
 
   export default {
     name: 'LogTab',
@@ -115,10 +116,13 @@
       },
     },
     watch: {
-      nodeList(val) {
-        if (val.length !== 0) {
-          this.getCurrentProcess();
-        }
+      nodeList: {
+        handler(val) {
+          if (val.length !== 0 && !this.ticketInfo.is_over) {
+            this.getCurrentProcess();
+          }
+        },
+        deep: true,
       },
     },
     created() {
@@ -171,6 +175,7 @@
           });
       },
       getCurrentProcess() {
+        this.list = this.list.filter(ite => ite.color !== 'blue');
         this.nodeList.forEach((item, index) => {
           const processor = {
             action: '',
@@ -181,14 +186,14 @@
             from_state_name: item.name || '',
             from_state_type: '',
             id: -index,
-            message: `${this.$t('m["正在进行中"]')}  ${item.processors}`,
+            message: `${i18n.t('m["正在进行中"]')}  ${item.processors}`,
             operate_at: item.update_at,
             operator: item.processors,
             processors: '',
             processors_type: '',
             showMore: false,
             tag:
-              `【${item.name}】${this.$t('m["正在进行中"]')}, ${this.$t('m["当前处理人"]')}${item.processors}`
+              `【${item.name}】${i18n.t('m["正在进行中"]')}, ${i18n.t('m["当前处理人"]')}${item.processors}`
               || '--',
             ticket: this.ticketInfo.id,
             ticket_id: this.ticketInfo.id,

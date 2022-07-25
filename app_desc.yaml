@@ -52,3 +52,6 @@ modules:
         svc_discovery:
             bk_saas:
                 -   bk_app_code: "bk_itsm"
+        bkmonitor:
+            port: 5001
+

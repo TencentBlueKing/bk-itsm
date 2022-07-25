@@ -22,12 +22,17 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import json
 
+import jmespath
+import requests
+from django.conf import settings
 from django.utils.translation import ugettext as _
 from mako.template import Template
 
 from common.log import logger
 from itsm.component.constants import GENERAL_NOTICE
+from itsm.component.exceptions import GetCustomApiDataError
 from itsm.component.utils.misc import transform_single_username
 from itsm.iadmin.contants import ACTION_CHOICES_DICT
 from itsm.iadmin.models import CustomNotice
@@ -126,3 +131,79 @@ def build_message(_notify, task_id, ticket, message, action, **kwargs):
             )
         )
         return None
+
+
+def get_custom_api_data(field):
+    """
+    config:
+    {
+        "method": "get post patch delete put",
+        "url": "http:// or  https://",
+        "query_params": {"key": "value"},
+        "headers": {},
+        "body": {},
+        "ref_path":"data"
+    }
+
+    kv_relations : {
+                  "key": "bk_biz_id",
+                  "name": "bk_biz_name"
+                }
+    """
+    from jinja2 import Template
+
+    config = field.meta.get("api_config", {})
+    kv_relation = field.kv_relation
+    envs = field.ticket.meta.get("envs", {})
+    method = config.get("method", "GET")
+    url = Template(config.get("url", "")).render(envs)
+    query_params = config.get("query_params", {})
+    headers = config.get("headers", {})
+    body = config.get("body", {})
+    ref_path = config.get("ref_path", "data")
+
+    auth_headers = {
+        "bk_app_code": settings.APP_ID,
+        "bk_app_secret": settings.APP_TOKEN,
+        "bk_username": settings.SYSTEM_USE_API_ACCOUNT,
+    }
+
+    headers.update({"x-bkapi-authorization": json.dumps(auth_headers)})
+
+    try:
+        response = requests.request(
+            method,
+            url,
+            data=body,
+            params=query_params,
+            headers=headers,
+            timeout=10,
+            verify=False,
+        )
+    except Exception as e:
+        raise GetCustomApiDataError("请求错误，error={}".format(e))
+
+    try:
+        resp_data = response.json()
+    except Exception as e:
+        raise GetCustomApiDataError("请求失败，返回内容非Json，error={}".format(e))
+
+    data = jmespath.search(ref_path, resp_data)
+    if data is None:
+        raise GetCustomApiDataError("请求失败，data 为None")
+
+    if not isinstance(data, list):
+        raise GetCustomApiDataError("请求失败，data 非 list，请检查路径")
+
+    kv_data = []
+
+    try:
+        for item in data:
+            kv_data.append(
+                {"key": item[kv_relation["key"]], "name": item[kv_relation["name"]]}
+            )
+
+    except KeyError as e:
+        raise GetCustomApiDataError("kv_relation配置不正确，error={}".format(e))
+
+    return kv_data

@@ -53,7 +53,7 @@ ITSM (IT 服务管理)是一套帮助企业对 IT 系统的规划、研发、实
 - [wiki](https://github.com/TencentBlueKing/bk-itsm/wiki)
 - [白皮书](https://bk.tencent.com/docs/document/6.0/145/6623)
 - [蓝鲸论坛](https://bk.tencent.com/s-mart/community)
-- [蓝鲸 DevOps 在线视频教程](https://cloud.tencent.com/developer/edu/major-100008)
+- [蓝鲸 DevOps 在线视频教程](https://bk.tencent.com/s-mart/video/)
 - 联系我们，加入腾讯蓝鲸运维开发交流群：878501914
 
 ## BlueKing Community
@@ -61,7 +61,6 @@ ITSM (IT 服务管理)是一套帮助企业对 IT 系统的规划、研发、实
 - [BK-CMDB](https://github.com/Tencent/bk-cmdb)：蓝鲸配置平台（蓝鲸 CMDB）是一个面向资产及应用的企业级配置管理平台。
 - [BK-CI](https://github.com/Tencent/bk-ci)：蓝鲸持续集成平台是一个开源的持续集成和持续交付系统，可以轻松将你的研发流程呈现到你面前。
 - [BK-BCS](https://github.com/Tencent/bk-bcs)：蓝鲸容器管理平台是以容器技术为基础，为微服务业务提供编排管理的基础服务平台。
-- [BK-BCS-SaaS](https://github.com/Tencent/bk-bcs-saas)：蓝鲸容器管理平台 SaaS 基于原生 Kubernetes 和 Mesos 自研的两种模式，提供给用户高度可扩展、灵活易用的容器产品服务。
 - [BK-PaaS](https://github.com/Tencent/bk-PaaS)：蓝鲸 PaaS 平台是一个开放式的开发平台，让开发者可以方便快捷地创建、开发、部署和管理 SaaS 应用。
 - [BK-SOPS](https://github.com/Tencent/bk-sops)：标准运维（SOPS）是通过可视化的图形界面进行任务流程编排和执行的系统，是蓝鲸体系中一款轻量级的调度编排类 SaaS 产品。
 

@@ -31,6 +31,7 @@ from itsm.component.constants import ResponseCodeStatus
 from itsm.ticket.models import TicketField, TicketGlobalVariable
 from itsm.ticket.permissions import TicketFieldPermissionValidate
 from itsm.ticket.serializers import FieldSerializer
+from itsm.ticket.utils import get_custom_api_data
 from itsm.workflow.views import BaseFieldViewSet
 
 
@@ -46,6 +47,14 @@ class FieldViewSet(BaseFieldViewSet):
         "state_id": ["exact"],
     }
     permission_classes = (TicketFieldPermissionValidate,)
+
+    @action(detail=True, methods=["get"])
+    def custom_api_choices(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.source_type != "CUSTOM_API":
+            return Response([])
+        data = get_custom_api_data(obj)
+        return Response(data)
 
     @action(detail=True, methods=["post"])
     def api_field_choices(self, request, *args, **kwargs):
@@ -74,7 +83,9 @@ class FieldViewSet(BaseFieldViewSet):
         params.update(
             {
                 "params_%s" % field["key"]: field["_value"]
-                for field in ticket.fields.filter(_value__isnull=False).exclude(_value="").values("key", "_value")
+                for field in ticket.fields.filter(_value__isnull=False)
+                .exclude(_value="")
+                .values("key", "_value")
                 if field["key"] not in request.data.keys()
             }
         )
@@ -83,12 +94,16 @@ class FieldViewSet(BaseFieldViewSet):
         params.update(
             {
                 "params_%s" % item["key"]: item["value"]
-                for item in TicketGlobalVariable.objects.filter(ticket_id=ticket.id).values("key", "value")
+                for item in TicketGlobalVariable.objects.filter(
+                    ticket_id=ticket.id
+                ).values("key", "value")
             }
         )
 
         # 单据全局属性
-        global_context = ticket.get_global_context(return_format='dict', prefix='params_')
+        global_context = ticket.get_global_context(
+            return_format="dict", prefix="params_"
+        )
         params.update(global_context)
 
         return Response(api_instance.get_api_choice(field_object.kv_relation, params))

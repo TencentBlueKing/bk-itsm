@@ -26,7 +26,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import datetime
 import re
 
+
 from django.utils.translation import ugettext as _
+from pipeline.utils.boolrule import BoolRule
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -73,7 +75,7 @@ def field_validate(field, state_fields, key_value, **kwargs):
         raise serializers.ValidationError(_("标题不能超过120个字符"))
 
     choice_validate(field, field_obj, key_value, **kwargs)
-    regex_validate(field, field_obj)
+    regex_validate(field, field_obj, kwargs.get("ticket", None))
     custom_regex_validate(field, field_obj)
 
 
@@ -227,7 +229,77 @@ def custom_regex_validate(field, field_obj):
         raise serializers.ValidationError(_("自定义正则出现异常， error = {}".format(e)))
 
 
-def regex_validate(field, field_obj):
+def validate_expression(field, expression, ticket):
+    VALIDATE_TYPE_MAP = {
+        "DATE": validate_date_expression,
+        "INT": validate_int_expression,
+        "DATETIME": validate_datetime_expression,
+    }
+    try:
+        return VALIDATE_TYPE_MAP[expression.type](field, expression, ticket)
+    except Exception:
+        return False
+
+
+def validate_int_expression(field, expression, ticket):
+    source = field["value"]
+    if expression.source == "field":
+        target_value = ticket.fields.get(key=expression.key).value
+    else:
+        target_value = expression.value
+
+    exp = "{}{}{}".format(source, expression.condition, target_value)
+    return BoolRule(exp).test()
+
+
+def validate_datetime_expression(field, expression, ticket):
+    source_timestamp = datetime.datetime.timestamp(
+        datetime.datetime.strptime(field["value"], "%Y-%m-%d %H:%M:%S")
+    )
+    if expression.source == "field":
+        if expression.key == "ticket_create_at":
+            target_value = ticket.create_at.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            target_value = ticket.fields.get(key=expression.key).value
+    elif expression.source == "system":
+        if expression.key == "system_time":
+            target_value = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            target_value = ""
+    else:
+        target_value = expression.value
+
+    target_timestamp = datetime.datetime.timestamp(
+        datetime.datetime.strptime(target_value, "%Y-%m-%d %H:%M:%S")
+    )
+    exp = "{}{}{}".format(source_timestamp, expression.condition, target_timestamp)
+    return BoolRule(exp).test()
+
+
+def validate_date_expression(field, expression, ticket):
+    source_timestamp = datetime.datetime.timestamp(
+        datetime.datetime.strptime(field["value"], "%Y-%m-%d")
+    )
+    if expression.source == "field":
+        if expression.key == "ticket_create_at":
+            target_value = ticket.create_at
+        else:
+            target_value = ticket.fields.get(key=expression.key).value
+    elif expression.source == "system":
+        if expression.key == "system_time":
+            target_value = datetime.datetime.now().strftime("%Y-%m-%d")
+        else:
+            target_value = ""
+    else:
+        target_value = expression.value
+    target_timestamp = datetime.datetime.timestamp(
+        datetime.datetime.strptime(target_value, "%Y-%m-%d")
+    )
+    exp = "{}{}{}".format(source_timestamp, expression.condition, target_timestamp)
+    return BoolRule(exp).test()
+
+
+def regex_validate(field, field_obj, ticket=None):
     regex = field_obj.regex
 
     regex_list = []
@@ -240,8 +312,21 @@ def regex_validate(field, field_obj):
     if regex in ["AFTER_DATE", "BEFORE_DATE", "AFTER_TIME", "BEFORE_TIME"]:
         RegexValidator(field_obj.name, regex).validate(field["value"])
 
-    elif regex and regex != "EMPTY":
+    if regex == "ASSOCIATED_FIELD_VALIDATION" and ticket:
+        # 联合字段校验
+        rule = field_obj.regex_config.rule
+        if rule.expressions:
+            results = []
+            for expression in rule.expressions:
+                results.append(validate_expression(field, expression, ticket))
 
+            expression_type = {"and": all, "or": any}
+            if not expression_type.get(rule.type, any)(results):
+                raise serializers.ValidationError(
+                    _("字段[{}]关联规则不满足条件，请检查".format(field_obj.name))
+                )
+
+    elif regex and regex != "EMPTY":
         if field_obj.type in ["INT", "STRING"]:
             RegexValidator(field_obj.name, regex).validate(str(field["value"]))
 

@@ -940,6 +940,7 @@ export const m = {
     '分派至：': 'To: ',
     请选择处理人: 'Please select processor ',
     转单人不能为空: 're-assign is required ',
+    分派人不能为空: 'Dispatcher is required',
     转单原因: 'Reason ',
     分派原因: 'Reason ',
     转单原因不能为空: 'Reasons for re-assign is required ',
