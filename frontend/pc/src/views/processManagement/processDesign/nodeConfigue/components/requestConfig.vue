@@ -288,8 +288,9 @@
     mounted() {
       if (this.isStatus) {
         if (Object.keys(this.configur.extras).length !== 0) {
-          const { auth, settings, query_params, body } = this.configur.extras.webhook_info;
+          const { auth, settings, query_params, body, headers } = this.configur.extras.webhook_info;
           this.config.queryParams = [...query_params, ...this.config.queryParams];
+          this.config.headers = [...headers, ...this.config.headers];
           this.config.settings.timeout = settings.timeout;
           this.config.authRadio = auth.auth_type || 'none';
           // const { username, password, Token } = auth_config
