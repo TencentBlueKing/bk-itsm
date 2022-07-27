@@ -250,7 +250,7 @@
                             if (xhr.status === 200 && this.handleResCode(response)) {
                                 fileObj.done = true
                                 fileObj.responseData = response
-                                this.$emit('on-success', fileObj, this.fileList)
+                                this.$emit('on-success', this.fileList)
                             } else {
                                 fileObj.errorMsg = response.message
                                 this.$emit('on-error', fileObj, this.fileList)
