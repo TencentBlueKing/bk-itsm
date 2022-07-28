@@ -51,7 +51,7 @@ class FieldForms(BaseForm):
 
 class ModifyPublicFieldComponent(BaseComponent):
     name = _("修改提单节点字段值")
-    code = "modify_state_field"
+    code = "modify_first_state_field"
     is_async = False
     form_class = FieldForms
     exclude_signal_type = [TASK_SIGNAL]
