@@ -276,10 +276,20 @@ class TicketManager(Manager):
 
     def get_iam_auth_tickets(self, queryset, username):
         iam_client = IamRequest(username=username)
-        service_ids = set(queryset.values_list("service_id", flat=True).distinct())
+
+        data = queryset.values("service_id", "project_key")
+        service_project_key_map = {}
+        service_ids = set()
+        for item in data:
+            service_ids.add(item["service_id"])
+            service_project_key_map[item["service_id"]] = item["project_key"]
 
         resources = [
-            {"resource_id": service_id, "resource_type": "service"}
+            {
+                "resource_id": service_id,
+                "resource_type": "service",
+                "project_key": service_project_key_map.get(service_id),
+            }
             for service_id in service_ids
         ]
 
@@ -356,7 +366,7 @@ class TicketManager(Manager):
         }
 
         queryset = queryset.filter(**filter_conditions)
-        
+
         if kwargs.get("creator__in"):
             queryset = queryset.filter(creator__contains=kwargs.get("creator__in"))
 
