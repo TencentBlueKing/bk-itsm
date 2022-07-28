@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from django.db import transaction
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from itsm.component.decorators import custom_apigw_required
+from itsm.component.exceptions import ParamError
 from itsm.workflow.models import State, TICKET_GLOBAL_VARIABLES, GlobalVariable
 from itsm.workflow.serializers import StateSerializer, GlobalVariableSerializer
 from itsm.workflow.views import BaseWorkflowElementViewSet
@@ -48,6 +50,43 @@ class StateViewSet(BaseWorkflowElementViewSet):
     @custom_apigw_required
     def update(self, request, *args, **kwargs):
         return super(StateViewSet, self).update(request, *args, **kwargs)
+
+    @custom_apigw_required
+    @action(detail=True, methods=["post"])
+    def update_attrs(self, request, *args, **kwargs):
+        """
+        {"key": "value"}
+        """
+        instance = self.get_object()
+        READ_ONLY_ATTRS = [
+            "id",
+            "is_delete",
+            "workflow_id",
+            "type",
+            "is_draft",
+            "creator",
+            "create_at",
+            "updated_by",
+            "update_at",
+            "end_at",
+            "fields",
+        ]
+        attrs = request.data.get("attrs", [])
+        for attr in attrs:
+            key = attr.get("key")
+
+            if not hasattr(instance, key):
+                raise ParamError("修改失败，属性{}不存在".format(key))
+
+            if key in READ_ONLY_ATTRS:
+                raise ParamError("{}是只读属性，不允许修改".format(key))
+            setattr(instance, key, attr.get("value"))
+
+        with transaction.atomic():
+            instance.save()
+
+        ser = self.get_serializer(instance)
+        return Response(ser.data)
 
     @custom_apigw_required
     def create(self, request, *args, **kwargs):
