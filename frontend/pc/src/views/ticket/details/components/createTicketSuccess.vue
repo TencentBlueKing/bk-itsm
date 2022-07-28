@@ -49,6 +49,9 @@
     mounted() {
       this.countDown();
     },
+    beforeDestroy() {
+      clearInterval(this.timer);
+    },
     methods: {
       countDown() {
         if (this.isStart) {
