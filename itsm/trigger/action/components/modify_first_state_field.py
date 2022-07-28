@@ -49,7 +49,7 @@ class FieldForms(BaseForm):
     )
 
 
-class ModifyPublicFieldComponent(BaseComponent):
+class ModifyFirstStateComponent(BaseComponent):
     name = _("修改提单节点字段值")
     code = "modify_first_state_field"
     is_async = False
