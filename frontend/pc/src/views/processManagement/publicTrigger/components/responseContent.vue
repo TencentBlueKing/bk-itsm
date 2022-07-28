@@ -35,6 +35,9 @@
         <template v-else-if="item.wayInfo.key === 'modify_field'">
           <modify-field :field-schema="item.wayInfo.field_schema"></modify-field>
         </template>
+        <template v-else-if="item.wayInfo.key === 'modify_first_state_field'">
+          <modify-field :field-schema="item.wayInfo.field_schema"></modify-field>
+        </template>
         <template v-else>
           <template v-for="(itemInfo, index) in item.wayInfo.field_schema">
             <!-- 对于多层嵌套和单层嵌套的区别 -->
