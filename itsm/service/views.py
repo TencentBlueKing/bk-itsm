@@ -41,7 +41,6 @@ from itsm.component.constants import (
     PY_IMPACT,
     SERVICE_LIST,
     SLA_MATRIX,
-    INVISIBLE,
     GENERAL,
     OPEN,
     ORGANIZATION,
@@ -259,9 +258,7 @@ class CatalogServiceViewSet(component_viewsets.ModelViewSet):
         query_params = dict(pk__in=service_ids)
         if is_valid is not None:
             query_params.update({"is_valid": is_valid})
-        services = (
-            Service.objects.exclude(display_type=INVISIBLE).filter(**query_params)
-        ).order_by("-update_at")
+        services = Service.objects.filter(**query_params).order_by("-update_at")
 
         # 支持额外过滤选项
         if name:
@@ -355,7 +352,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
     """服务项视图集合"""
 
     serializer_class = ServiceSerializer
-    queryset = Service.objects.exclude(display_type=INVISIBLE)
+    queryset = Service.objects.all()
     permission_classes = component_viewsets.AuthModelViewSet.permission_classes
     permission_free_actions = ["retrieve"]
 
