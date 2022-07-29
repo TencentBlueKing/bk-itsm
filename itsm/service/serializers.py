@@ -47,6 +47,7 @@ from itsm.component.constants import (
     OPEN,
     SERVICE_SOURCE_CHOICES,
     EMPTY_INT,
+    INVISIBLE,
 )
 from itsm.component.drf.serializers import (
     DynamicFieldsModelSerializer,
@@ -754,7 +755,7 @@ class ServiceConfigSerializer(serializers.Serializer):
     )
 
     def validate(self, attrs):
-        if attrs["display_type"] == OPEN:
+        if attrs["display_type"] in [OPEN, INVISIBLE]:
             attrs["display_role"] = EMPTY_STRING
         else:
             if "display_role" not in attrs:
