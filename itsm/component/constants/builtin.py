@@ -41,6 +41,7 @@ IMPACTS = URGENCYS = PRIORITYS = [
 # 对应RPC数据的关键字
 STATUS = "ticket_status"
 TABLE_FIELDS = "table_fields"
+STATE_FIELDS = "first_state_fields"
 FLOW_STATES = "flow_states"
 SERVICE_CATALOG = "service_catalog"
 

@@ -486,7 +486,7 @@ DATE_FORMAT = "Y-m-d"
 # NOTE 不要改动，否则，可能会改成和其他app的一样，这样会影响登录
 # SESSION_COOKIE_PATH = SITE_URL
 # Age of cookie, in seconds (default: 60 * 60 * 24 * 7 * 2  <2 weeks>).
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 1 * 1  # 设置cookie有效期为1小时
+# SESSION_COOKIE_AGE = 60 * 60 * 24 * 1 * 1  # 设置cookie有效期为1小时
 
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, "USERRES")
 # MEDIA_URL = '/media/'

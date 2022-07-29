@@ -386,7 +386,7 @@
       submit() {
         Promise.all([this.$refs.processors.verifyValue(), this.$refs.webForm.validate()]).then(() => {
           const { value: processors, type: processors_type } = this.$refs.processors.getValue();
-          const { queryParams, bodyFormData, bodyWwwForm, authRadio, auth_config, settings, bodyValue, bodyRadio, rawType } = this.$refs.requestConfig.config;
+          const { queryParams, bodyFormData, bodyWwwForm, authRadio, auth_config, settings, bodyValue, bodyRadio, rawType, headers } = this.$refs.requestConfig.config;
           const query_params = queryParams.filter(item => item.select);
           const outputs = this.returnReslut.filter(item => item.name !== '');
           outputs.forEach(item => {
@@ -405,6 +405,8 @@
           } else if (authRadio === 'bearer_token') {
             auth_params.auth_config.token = Token;
           }
+          // headers
+          const headers_params = headers.filter(item => item.select);
           // body
           const body_params = {
             type: bodyRadio !== 'none' ? bodyRadio : '',
@@ -436,7 +438,7 @@
                 url: this.formData.url,
                 query_params,
                 auth: auth_params,
-                headers: [],
+                headers: headers_params,
                 body: body_params,
                 settings: settings_parmas,
                 success_exp: this.formData.success_exp,

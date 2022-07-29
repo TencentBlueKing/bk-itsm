@@ -81,7 +81,7 @@ class ParamsBuilder:
     def result(self):
         extras_copy = copy.deepcopy(self.extras)
         data = self.jinja_render(extras_copy)
-        headers = data.get("headers", {})
+        headers = {header["key"]: header["value"] for header in data.get("headers", [])}
         encode_webhook = EncodeWebhook(headers=headers)
         content = encode_webhook.encode_body(data.get("body", {}))
 
