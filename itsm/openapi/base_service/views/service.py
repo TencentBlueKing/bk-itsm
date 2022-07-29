@@ -5,7 +5,6 @@ from django.utils.decorators import method_decorator
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from itsm.component.constants import INVISIBLE
 from itsm.component.decorators import custom_apigw_required
 from itsm.component.drf import viewsets
 from itsm.openapi.base_service.serializers import OpenApiServiceSerializer
@@ -20,7 +19,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
     """服务项视图集合"""
 
     serializer_class = OpenApiServiceSerializer
-    queryset = Service.objects.exclude(display_type=INVISIBLE)
+    queryset = Service.objects.all()
     permission_free_actions = ["retrieve"]
 
     @custom_apigw_required
