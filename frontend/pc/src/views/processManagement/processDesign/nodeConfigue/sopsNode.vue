@@ -488,21 +488,21 @@
         try {
           this.sopsFormLoading = true;
           const isCommon = this.basicsFormData.processType === 'common';
-          const res = await this.$store.dispatch('taskFlow/getSopsPreview', {
-            bk_biz_id: template.bk_biz_id,
-            template_id: template.id,
-            exclude_task_nodes_id: this.excludeTaskNodesId,
-          });
-          this.initFormDate = deepClone(res.data.pipeline_tree.constants);
           const constants = [];
           if (!isCommon) {
+            const res = await this.$store.dispatch('taskFlow/getSopsPreview', {
+              bk_biz_id: template.bk_biz_id,
+              template_id: template.id,
+              exclude_task_nodes_id: this.excludeTaskNodesId,
+            });
+            this.initFormDate = deepClone(res.data.pipeline_tree.constants);
             for (const key in res.data.pipeline_tree.constants) {
               if (res.data.pipeline_tree.constants[key].show_type === 'show') {
                 constants.push(res.data.pipeline_tree.constants[key]);
               }
             }
           } else {
-            constants.push(...res);
+            constants.push([]);
           }
           this.processingVariables(constants);
         } catch (e) {
