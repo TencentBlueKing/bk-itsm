@@ -415,7 +415,13 @@
             // 1 3 2 4
             // type 1  2 为响应
             // type 3  4 为处理
-            return {
+            return item.action_policies.length === 0 ? {
+              sla_name: item.name,
+              rWarningThreshold: 1,
+              pWarningThreshold: 1,
+              rTimeOutThreshold: 1,
+              pTimeOutThreshold: 1,
+            } : {
               sla_name: item.name,
               rWarningThreshold: condition[0][1] / 100 || 1, // 1为100%
               pWarningThreshold: condition[1][3] / 100 || 1,
