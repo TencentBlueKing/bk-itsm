@@ -367,6 +367,9 @@
         this.$store.dispatch('cdeploy/getTreeInfo').then((res) => {
           // 操作角色组织架构
           this.organizationList = res.data;
+          this.organizationList.forEach(item => {
+            this.$set(item, 'route', []);
+          });
         })
           .catch((res) => {
             errorHandler(res, this);
