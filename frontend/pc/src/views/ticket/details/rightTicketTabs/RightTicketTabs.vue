@@ -95,7 +95,7 @@
           </comment-tab>
         </bk-tab-panel>
         <bk-tab-panel
-          v-if="openFunction.CHILD_TICKET_SWITCH"
+          v-if="projectSwitch.CHILD_TICKET_SWITCH"
           name="mother-child"
           :label="$t(`m.newCommon['母子单']`)"
         >
@@ -167,7 +167,7 @@
     },
     computed: {
       ...mapState({
-        openFunction: state => state.openFunction,
+        projectSwitch: state => state.project.projectSwitch,
       }),
     },
     methods: {

@@ -244,7 +244,7 @@
         </span>
       </p>
     </template>
-    <div :class="{ 'bk-line-padding': scrollTopStatus }" v-if="projectSwitch.TRIGGER_SWITCH || openFunction.TRIGGER_SWITCH">
+    <div :class="{ 'bk-line-padding': scrollTopStatus }" v-if="projectSwitch.TRIGGER_SWITCH">
       <common-trigger-list :origin="'transition'"
         :source-id="customLine.lineValue.workflow"
         :sender="customLine.lineValue.id"
@@ -361,9 +361,6 @@
     computed: {
       globalChoise() {
         return this.$store.state.common.configurInfo;
-      },
-      openFunction() {
-        return this.$store.state.openFunction;
       },
       projectSwitch() {
         return this.$store.state.project.projectSwitch;

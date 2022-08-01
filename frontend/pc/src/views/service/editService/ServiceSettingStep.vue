@@ -134,7 +134,7 @@
         </bk-form>
       </div>
     </section>
-    <section class="settion-card" v-if="(projectSwitch.TRIGGER_SWITCH ||openFunction.TRIGGER_SWITCH) || openFunction.TASK_SWITCH">
+    <section class="settion-card" v-if="projectSwitch.TRIGGER_SWITCH || projectSwitch.TASK_SWITCH">
       <div
         class="card-title more-configuration mt20" data-test-id="editService-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
         <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
@@ -274,9 +274,6 @@
       };
     },
     computed: {
-      openFunction() {
-        return this.$store.state.openFunction;
-      },
       projectSwitch() {
         return this.$store.state.project.projectSwitch;
       },

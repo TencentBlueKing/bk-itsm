@@ -97,6 +97,12 @@
             open: false,
             isAvailable: true,
           },
+          task: {
+            id: '',
+            title: this.$t('m.home["任务功能开关："]'),
+            open: false,
+            isAvailable: true,
+          },
           smsComment: {
             id: '',
             title: this.$t('m.home["短信评论开关："]'),
@@ -116,7 +122,7 @@
       async getSettingsDate() {
         const res = await this.$store.dispatch('project/getProjectSettings', { project_key: this.$route.query.project_id });
         const tempObj = {};
-        const skipList = ['IS_ORGANIZATION', 'WIKI_SWITCH', 'TASK_SWITCH'];
+        const skipList = ['IS_ORGANIZATION', 'WIKI_SWITCH'];
         const result = res.data.filter(item => !skipList.includes(item.key));
         result.forEach(item => {
           if (item.key !== 'SERVICE_SWITCH' && this.switchKeyMap[item.key]) {

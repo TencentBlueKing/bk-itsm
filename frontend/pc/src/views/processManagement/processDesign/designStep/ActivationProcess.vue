@@ -185,7 +185,7 @@
     </basic-card>
     <!-- 展开高级配置 -->
     <div
-      v-if="(projectSwitch.TRIGGER_SWITCH || openFunction.TRIGGER_SWITCH) || openFunction.TASK_SWITCH"
+      v-if="projectSwitch.TRIGGER_SWITCH || projectSwitch.TASK_SWITCH"
       class="more-configuration mt20" data-test-id="activationProcess-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
       <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
       <i v-else class="bk-icon icon-up-shape"></i>
@@ -194,17 +194,16 @@
     <template v-if="showMoreConfig">
       <collapse-transition>
         <div>
-          <basic-card class="mt20"
+          <basic-card class="mt20" v-if="projectSwitch.TRIGGER_SWITCH"
             :card-label="$t(`m.newCommon['触发器']`)"
             :card-desc="$t(`m.taskTemplate['满足触发条件后要完成的特定动作']`)">
             <common-trigger-list
-              v-if="projectSwitch.TRIGGER_SWITCH || openFunction.TRIGGER_SWITCH"
               :origin="'workflow'"
               :source-id="processId"
               :table="flowInfo.table">
             </common-trigger-list>
           </basic-card>
-          <basic-card class="mt20"
+          <basic-card class="mt20" v-if="projectSwitch.TASK_SWITCH"
             :card-label="$t(`m.taskTemplate['任务配置']`)"
             :card-desc="$t(`m.taskTemplate['如果需要在流程中调用标准运维的业务流程进而创建任务，请在第一步的“填写流程信息”中，打开“是否关联业务”的开关。']`)">
             <TaskConfigPanel ref="taskConfigPanel" :workflow-info="flowInfo"></TaskConfigPanel>
@@ -348,9 +347,6 @@
       };
     },
     computed: {
-      openFunction() {
-        return this.$store.state.openFunction;
-      },
       projectSwitch() {
         return this.$store.state.project.projectSwitch;
       },

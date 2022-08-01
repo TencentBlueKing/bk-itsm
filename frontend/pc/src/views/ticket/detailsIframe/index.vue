@@ -54,7 +54,6 @@
   import leftTicketContent from '../details/leftTicketContent.vue';
   import { errorHandler } from '../../../utils/errorHandler';
   import { deepClone } from '../../../utils/util';
-  import { mapState } from 'vuex';
   import fieldMix from '@/views/commonMix/field.js';
 
   export default {
@@ -94,9 +93,9 @@
       };
     },
     computed: {
-      ...mapState({
-        openFunction: state => state.openFunction,
-      }),
+      projectSwitch() {
+        return this.$store.state.project.projectSwitch;
+      },
       token() {
         return this.$route.query.token;
       },
@@ -223,7 +222,7 @@
       // 更新节点信息
       updateNodeList(newNodeList) {
         const copyList = deepClone(newNodeList);
-        if (this.openFunction.FIRST_STATE_SWITCH) {
+        if (this.projectSwitch.FIRST_STATE_SWITCH) {
           this.firstStateFields = copyList.find(item => item.state_id === Number(this.ticketInfo.first_state_id)).fields;
           this.firstStateFields.forEach(item => {
             this.$set(item, 'showFeild', !!item.show_type);

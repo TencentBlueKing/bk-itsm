@@ -379,7 +379,6 @@
               this.moduleInfo[this.switchKeyMap[item.key]].id = item.id || '';
             }
           });
-          this.$store.commit('changeOpenFunction', tempObj);
         })
           .catch((res) => {
             errorHandler(res, this);
