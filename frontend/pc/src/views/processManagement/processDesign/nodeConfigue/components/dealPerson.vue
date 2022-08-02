@@ -72,13 +72,13 @@
       </template>
       <!-- 组织架构 -->
       <template v-else-if="formData.levelOne === 'ORGANIZATION'">
-        <select-tree
+        <bkTree
           v-model="formData.levelSecond"
           :list="organizationList"
           :organization-loading="organizationLoading"
           ext-cls="bk-form-width"
           @toggle="toggleInfo">
-        </select-tree>
+        </bkTree>
       </template>
     </div>
     <p class="bk-error-info" v-if="showError">{{ requiredMsg || $t(`m.treeinfo['处理人不能为空']`) }}</p>
@@ -100,14 +100,14 @@
 </template>
 <script>
   import memberSelect from '../../../../commonComponent/memberSelect';
-  import SelectTree from '../../../../../components/form/selectTree/index.vue';
+  import bkTree from '../../../../../components/form/bkTree/index.vue';
   import { errorHandler } from '../../../../../utils/errorHandler.js';
   import { isEmpty } from '../../../../../utils/util';
 
   export default {
     name: 'dealPerson',
     components: {
-      SelectTree,
+      bkTree,
       memberSelect,
     },
     props: {
