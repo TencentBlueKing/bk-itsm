@@ -59,6 +59,7 @@
           FIRST_STATE_SWITCH: 'basic',
           TABLE_FIELDS_SWITCH: 'module',
           SMS_COMMENT_SWITCH: 'smsComment',
+          NOTIFY_EXEMPT_SWITCH: 'notifyExempt',
         },
         moduleInfo: {
           basic: {
@@ -106,6 +107,12 @@
           smsComment: {
             id: '',
             title: this.$t('m.home["短信评论开关："]'),
+            open: false,
+            isAvailable: true,
+          },
+          notifyExempt: {
+            id: '',
+            title: this.$t('m.home["通知豁免开关："]'),
             open: false,
             isAvailable: true,
           },
