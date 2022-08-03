@@ -97,125 +97,7 @@
                       class="loading">
                       <i class="bk-itsm-icon icon-icon-loading icon-icon-loading-cus"></i>
                     </span>
-                </span>
-            </div>
-            <collapse-transition v-if="!readOnly">
-                <div class="bk-node-form" v-show="unfold">
-                    <!-- 禁用遮罩 -->
-                    <div class="bk-node-disabled" v-if="nodeInfo.status === 'SUSPEND'"></div>
-                    <div class="bk-form bk-form-vertical" v-if="hasNodeOptAuth">
-                        <!-- 节点任务 -->
-                        <node-task-list
-                            v-if="(nodeInfo.can_create_task || nodeInfo.can_execute_task)"
-                            :node-info="nodeInfo"
-                            :ticket-info="ticketInfo"
-                            @updateCurrentStep="successFn">
-                        </node-task-list>
-                        <sops-and-devops-task
-                            v-if="nodeInfo.status === 'FAILED' && (nodeInfo.type === 'TASK-SOPS' || nodeInfo.type === 'TASK-DEVOPS' || nodeInfo.type === 'WEBHOOK')"
-                            :constants="constants"
-                            :hooked-var-list="hookedVarList"
-                            :node-info="nodeInfo"
-                            :pipeline-list="pipelineList"
-                            :constant-default-value="constantDefaultValue"
-                            :ticket-info="ticketInfo"
-                            :workflow="workflow"
-                            :pipeline-constants="pipelineConstants"
-                            :pipeline-stages="pipelineStages"
-                            :pipeline-rules="pipelineRules"
-                            @reloadTicket="reloadTicket"
-                            @onChangeHook="onChangeHook">
-                        </sops-and-devops-task>
-                        <!-- api 节点处理 -->
-                        <api-node-handle-body
-                            v-if="nodeInfo.type === 'TASK'"
-                            :node-info="nodeInfo"
-                            :basic-infomation="ticketInfo"
-                            @updateOrderStatus="successFn">
-                            <!-- 节点触发器 -->
-                            <template #button-extend v-if="triggers && triggers.length && nodeInfo.can_operate">
-                                <bk-dropdown-menu
-                                    ref="dropdown"
-                                    class="bk-node-trigger"
-                                    :align="'right'"
-                                    :font-size="'medium'"
-                                    @show="isDropdownShow = true"
-                                    @hide="isDropdownShow = false">
-                                    <bk-button class="node-trigger-btn" slot="dropdown-trigger" style="width:auto;">
-                                        <span>{{ $t('m.newCommon["更多操作"]') }}</span>
-                                        <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
-                                    </bk-button>
-                                    <ul class="bk-dropdown-list" slot="dropdown-content">
-                                        <li v-for="(trigger, tIndex) in triggers" :key="tIndex">
-                                            <a href="javascript:;" @click="openTriggerDialog(trigger)">{{trigger.display_name}}</a>
-                                        </li>
-                                    </ul>
-                                </bk-dropdown-menu>
-                            </template>
-                        </api-node-handle-body>
-                        <div v-else-if="currSignProcessorInfo" class="bk-area-show-back">
-                            <!-- 静态展示 -->
-                            <template v-for="(ite, fIndex) in currSignProcessorInfo.fields">
-                                <fields-done
-                                    :key="fIndex"
-                                    :item="ite"
-                                    origin="log">
-                                </fields-done>
-                            </template>
-                        </div>
-                        <!-- 字段列表 -->
-                        <field-info
-                            v-else
-                            ref="fieldInfo"
-                            :fields="nodeInfo.fields"
-                            :all-field-list="allFieldList">
-                        </field-info>
-                        <process-form-plugin
-                            ref="fieldInfo1"
-                            :fields="nodeInfo.fields">
-                        </process-form-plugin>
-                    </div>
-                    <div class="bk-form-btn" v-if="nodeInfo.type !== 'TASK'">
-                        <!-- 响应后才能处理 -->
-                        <template v-if="isShowDealBtns">
-                            <template v-for="(btn, btnIndex) in nodeInfo.operations">
-                                <bk-button class="mr10"
-                                    v-if="ignoreOperations.indexOf(btn.key) === -1"
-                                    :key="btn.key"
-                                    :theme="btnIndex === 0 ? 'primary' : 'default'"
-                                    :title="btn.name"
-                                    :disabled="!btn.can_operate || !nodeInfo.is_schedule_ready"
-                                    :loading="isBtnLoading(nodeInfo) || submitting"
-                                    @click="clickBtn(btn)">
-                                    <template v-if="!nodeInfo.is_schedule_ready">
-                                        <span v-bk-tooltips.top="'请将任务列表中的任务全部处理完成之后再进行处理提交'">{{btn.name}}</span>
-                                    </template>
-                                    <template v-else>
-                                        {{btn.name}}
-                                    </template>
-                                </bk-button>
-                            </template>
-                        </template>
-                        <!-- 节点触发器 -->
-                        <bk-dropdown-menu
-                            v-if="triggers && triggers.length && nodeInfo.can_operate"
-                            ref="dropdown"
-                            class="bk-node-trigger"
-                            :align="'right'"
-                            :font-size="'medium'"
-                            @show="isDropdownShow = true"
-                            @hide="isDropdownShow = false">
-                            <bk-button class="node-trigger-btn" slot="dropdown-trigger" style="width:auto;">
-                                <span>{{ $t('m.newCommon["更多操作"]') }}</span>
-                                <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
-                            </bk-button>
-                            <ul class="bk-dropdown-list" slot="dropdown-content">
-                                <li v-for="(trigger, tIndex) in triggers" :key="tIndex">
-                                    <a href="javascript:;" @click="openTriggerDialog(trigger)">{{trigger.display_name}}</a>
-                                </li>
-                            </ul>
-                        </bk-dropdown-menu>
-                    </div>
+                  </span>
                 </div>
               </div>
             </div>
@@ -317,12 +199,19 @@
               </template>
             </div>
             <!-- 字段列表 -->
-            <field-info
-              v-else
-              ref="fieldInfo"
-              :fields="nodeInfo.fields"
-              :all-field-list="allFieldList">
-            </field-info>
+            <template v-else>
+              <field-info
+                v-if="nodeInfo.type === 'APPROVAL'"
+                ref="fieldInfo"
+                :fields="nodeInfo.fields"
+                :all-field-list="allFieldList">
+              </field-info>
+              <process-form-plugin
+                v-else
+                ref="formField"
+                :fields="nodeInfo.fields">
+              </process-form-plugin>
+            </template>
           </div>
           <div class="bk-form-btn" v-if="nodeInfo.type !== 'TASK'">
             <!-- 响应后才能处理 -->
@@ -669,6 +558,12 @@
           && !this.$refs.fieldInfo.checkValue()) {
           return;
         }
+        if (btn.key === 'TRANSITION'
+          && !Object.keys(this.$refs.formField.localValue)
+            .map(item => this.$refs.formField.localValue[item] !== '')
+            .every(ite => ite)) {
+          return;
+        }
         this.openFormInfo.btnInfo = btn;
         this.openFormInfo.title = btn.name;
         // 二次确认弹窗的样式不同
@@ -709,6 +604,9 @@
           const params = {
             state_id: this.nodeInfo.state_id,
             fields: this.nodeInfo.fields.filter(ite => !ite.is_readonly && ite.showFeild).map(item => {
+              if (this.nodeInfo.type === 'NORMAL') {
+                item.value = this.$refs.formField.localValue[item.key];
+              }
               if (item.type === 'FILE') {
                 item.value = item.value.toString();
               }
@@ -783,6 +681,7 @@
           params,
           id,
         };
+        debugger;
         this.$store.dispatch(`deployOrder/${type}`, valueParams).then(() => {
           this.$bkMessage({
             message: this.openFormInfo.title + this.$t('m.newCommon["成功"]'),
