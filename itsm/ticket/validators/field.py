@@ -148,6 +148,9 @@ def choice_validate(field, field_obj, key_value, **kwargs):
     ]:
         return
 
+    if field_obj.source_type == "CUSTOM_API":
+        return
+
     choice = get_choice(field_obj, key_value, **kwargs)
 
     if not choice:
