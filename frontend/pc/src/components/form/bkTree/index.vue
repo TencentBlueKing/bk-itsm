@@ -105,6 +105,7 @@
     methods: {
       nodeClickOne(node) {
         this.checked = node;
+        this.$emit('toggle', node);
         this.$emit('selected', node.id);
         this.setDispalyName();
         this.closeTree();
