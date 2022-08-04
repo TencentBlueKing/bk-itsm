@@ -1324,7 +1324,8 @@
       // 获取RPC数据
       getRpcList() {
         this.$store.dispatch('datadict/getPrcData').then((res) => {
-          this.prcData.list = res.data;
+          const skip_keys = ['table_fields', 'flow_states'];
+          this.prcData.list = res.data.filter(item => skip_keys.indexOf(item.key) === -1);
           if (this.prcData.list.filter(prcInfo => prcInfo.key === this.prcData.check).length) {
             this.prcTable = this.prcData.list.filter(prcInfo => prcInfo.key === this.prcData.check)[0].req_params;
           }
