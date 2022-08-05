@@ -200,17 +200,18 @@
             </div>
             <!-- 字段列表 -->
             <template v-else>
+              <process-form-plugin
+                v-if="isLessCode"
+                v-model="lessCodeDate"
+                ref="formField"
+                :fields="nodeInfo.fields">
+              </process-form-plugin>
               <field-info
-                v-if="nodeInfo.type === 'APPROVAL'"
+                v-else
                 ref="fieldInfo"
                 :fields="nodeInfo.fields"
                 :all-field-list="allFieldList">
               </field-info>
-              <process-form-plugin
-                v-else
-                ref="formField"
-                :fields="nodeInfo.fields">
-              </process-form-plugin>
             </template>
           </div>
           <div class="bk-form-btn" v-if="nodeInfo.type !== 'TASK'">
@@ -356,6 +357,7 @@
     },
     data() {
       return {
+        lessCodeDate: {},
         constants: [],
         hookedVarList: {},
         pipelineList: [],
@@ -399,6 +401,10 @@
       };
     },
     computed: {
+      // 判断单据是否来着lesscode
+      isLessCode() {
+        return this.$route.query.project_id === 'lessCode' && this.nodeInfo.type === 'NORMAL';
+      },
       // 会签人信息
       currSignProcessorInfo() {
         if (!this.nodeInfo.can_operate && this.nodeInfo.type === 'SIGN') {
@@ -464,6 +470,13 @@
     created() {
       this.initData();
       this.$store.commit('ticket/setHasTicketNodeOptAuth', this.hasNodeOptAuth);
+    },
+    mounted() {
+      if (this.isLessCode) {
+        this.nodeInfo.fields.forEach(item => {
+          this.$set(this.lessCodeDate, item.key, item.value || '');
+        });
+      }
     },
     methods: {
       initData() {
@@ -559,7 +572,7 @@
           return;
         }
         if (btn.key === 'TRANSITION'
-          && !Object.keys(this.$refs.formField.localValue)
+          && this.$refs.formField && !Object.keys(this.$refs.formField.localValue)
             .map(item => this.$refs.formField.localValue[item] !== '')
             .every(ite => ite)) {
           return;
@@ -604,8 +617,8 @@
           const params = {
             state_id: this.nodeInfo.state_id,
             fields: this.nodeInfo.fields.filter(ite => !ite.is_readonly && ite.showFeild).map(item => {
-              if (this.nodeInfo.type === 'NORMAL') {
-                item.value = this.$refs.formField.localValue[item.key];
+              if (this.isLessCode) {
+                item.value = this.lessCodeDate[item.key];
               }
               if (item.type === 'FILE') {
                 item.value = item.value.toString();
@@ -681,7 +694,6 @@
           params,
           id,
         };
-        debugger;
         this.$store.dispatch(`deployOrder/${type}`, valueParams).then(() => {
           this.$bkMessage({
             message: this.openFormInfo.title + this.$t('m.newCommon["成功"]'),
