@@ -214,6 +214,9 @@ inject_formatters = ("verbose",)
 # 注入到日志配置，会直接在对应 formatter 格式之后添加 trace_format
 # 日志中添加trace_id
 ENABLE_OTEL_TRACE = True if os.getenv("BKAPP_ENABLE_OTEL_TRACE", "0") == "1" else False
+BK_APP_OTEL_INSTRUMENT_DB_API = (
+    True if os.getenv("BKAPP_OTEL_INSTRUMENT_DB_API", "0") == "1" else False
+)
 if ENABLE_OTEL_TRACE:
     trace_format = "[trace_id]: %(otelTraceID)s [span_id]: %(otelSpanID)s [resource.service.name]: %(otelServiceName)s"
     inject_logging_trace_info(LOGGING, inject_formatters, trace_format)
