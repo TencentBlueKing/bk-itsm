@@ -22,7 +22,7 @@
 
 <template>
   <div class="bk-table-fields">
-    <template v-if="projectSwitch.FIRST_STATE_SWITCH || openFunction.FIRST_STATE_SWITCH">
+    <template v-if="projectSwitch.FIRST_STATE_SWITCH">
       <span class="bk-field-tip">{{ $t(`m['提单节点字段信息：']`)}}</span>
       <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
         <template v-for="(item, index) in firstStateFields">
@@ -39,8 +39,7 @@
         </template>
       </bk-form>
     </template>
-    <!-- <div class="split-line" v-if="openFunction.TABLE_FIELDS_SWITCH && openFunction.FIRST_STATE_SWITCH"></div> -->
-    <template v-if="projectSwitch.TABLE_FIELDS_SWITCH || openFunction.TABLE_FIELDS_SWITCH">
+    <template v-if="projectSwitch.TABLE_FIELDS_SWITCH">
       <span class="bk-field-tip">{{ $t(`m['基础字段信息：']`)}}</span>
       <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
         <div v-for="(item, index) in tableFields"
@@ -113,9 +112,6 @@
           phone: this.basicInfomation.profile.phone,
           department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : [],
         };
-      },
-      openFunction() {
-        return this.$store.state.openFunction;
       },
       projectSwitch() {
         return this.$store.state.project.projectSwitch;

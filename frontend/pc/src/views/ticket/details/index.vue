@@ -124,7 +124,6 @@
   import commonMix from '@/views/commonMix/common.js';
   import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
   import fieldMix from '@/views/commonMix/field.js';
-  import { mapState } from 'vuex';
   import { errorHandler } from '@/utils/errorHandler.js';
   import { deepClone } from '@/utils/util';
   import leftTicketContent from './leftTicketContent.vue';
@@ -211,9 +210,6 @@
       };
     },
     computed: {
-      ...mapState({
-        openFunction: state => state.openFunction,
-      }),
       token() {
         return this.$route.query.token;
       },
@@ -534,7 +530,8 @@
       // 更新节点信息
       updateNodeList(newNodeList) {
         const copyList = deepClone(newNodeList);
-        if (this.openFunction.FIRST_STATE_SWITCH) {
+        const isFirstStateSwitchOn = this.$store.state.project.projectSwitch.FIRST_STATE_SWITCH;
+        if (isFirstStateSwitchOn) {
           this.firstStateFields = copyList.find(item => item.state_id === Number(this.ticketInfo.first_state_id)).fields;
           this.firstStateFields.forEach(item => {
             this.$set(item, 'showFeild', !!item.show_type);

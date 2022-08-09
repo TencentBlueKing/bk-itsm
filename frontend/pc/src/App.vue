@@ -215,7 +215,6 @@
               tempObj[item.key] = item.value === 'on';
             }
           });
-          this.$store.commit('changeOpenFunction', tempObj);
         })
           .catch((res) => {
             errorHandler(res, this);

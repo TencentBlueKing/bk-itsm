@@ -149,38 +149,6 @@
           </ul>
         </div>
       </div>
-      <!-- 功能开关开关-->
-      <div class="bk-system-file">
-        <div class="bk-file-left">
-          <p class="bk-left-title">{{ $t('m.home["功能开关"]') }}</p>
-          <div class="bk-left-content">
-            <div class="bk-left-btn" v-for="(item,key) in moduleInfo" v-if="item.isAvailable" :key="key">
-              <span class="bk-clear-info">
-                {{ item.title }}
-              </span>
-              <bk-switcher
-                v-model="item.open"
-                v-cursor="{ active: !hasPermission(['global_settings_manage']) }"
-                :class="{
-                  'text-permission-disable': !hasPermission(['global_settings_manage'])
-                }"
-                :disabled="isAllStatusGetting || !hasPermission(['global_settings_manage'])"
-                size="small"
-                :on-text="$t(`m.home['打开']`)"
-                :off-text="$t(`m.home['关闭']`)"
-                @change="allSwitchChange($event,key)"></bk-switcher>
-            </div>
-          </div>
-        </div>
-        <div class="bk-file-right">
-          <p class="bk-right-title">{{ $t('m.home["功能开关"]') }}</p>
-          <ul class="bk-number-ul">
-            <li>
-              {{ $t('m.home["“功能开关”可以自定义启停以下ITSM功能模块，关闭后，该模块对应的所有的功能将被隐藏。"]') }}
-            </li>
-          </ul>
-        </div>
-      </div>
     </div>
     <!-- 数据库升级 -->
     <!-- <div class="bk-system-file">
@@ -379,7 +347,6 @@
               this.moduleInfo[this.switchKeyMap[item.key]].id = item.id || '';
             }
           });
-          this.$store.commit('changeOpenFunction', tempObj);
         })
           .catch((res) => {
             errorHandler(res, this);

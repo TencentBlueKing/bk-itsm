@@ -203,10 +203,19 @@ class ProjectPathTypeValidators(object):
             if active_trigger:
                 raise TriggerSwitchValidateError(_("存在被引用的触发器，请处理后再关闭"))
 
-    @staticmethod
-    def validate_task_switch(value):
+    def validate_task_switch(self, value):
         if value.get("value") == SWITCH_OFF:
-            active_task = Task.objects.filter(status__in=ACTIVE_TASK_STATUS).exists()
+            ticket_ids = (
+                Ticket.objects.filter(
+                    current_status=PROCESS_RUNNING,
+                    project_key=self.instance.project_id,
+                )
+                .order_by("-create_at")
+                .values_list("id", flat=True)[0:1000]
+            )
+            active_task = Task.objects.filter(
+                status__in=ACTIVE_TASK_STATUS, ticket_id__in=list(ticket_ids)
+            ).exists()
             if active_task:
                 raise TaskSwitchValidateError(_("存在含有未完成任务的单据，请处理后再关闭"))
 

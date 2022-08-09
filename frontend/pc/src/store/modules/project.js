@@ -159,7 +159,7 @@ export default {
     },
     updateProjectSettings ({ commit }, params) {
       const { id } = params
-      return ajax.put(`/project/project_settings/${id}`, params).then(response => response.data)
+      return ajax.put(`/project/project_settings/${id}/`, params).then(response => response.data)
     }
   },
 };

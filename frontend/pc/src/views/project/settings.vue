@@ -29,10 +29,31 @@
           </div>
         </div>
         <div class="setting-tip">
-          <p class="right-title">{{ $t('m.home["功能开关"]') }}</p>
+          <p class="right-title">{{ $t('m.home["功能描述"]') }}</p>
           <ul class="number-ul">
             <li>
-              {{ $t('m.home["“功能开关”可以自定义启停以下ITSM功能模块，关闭后，该模块对应的所有的功能将被隐藏。"]') }}
+              {{ $t('m.home["“提单信息展示开关“: 开启后单据详情页将展示提单信息"]') }}
+            </li>
+            <li>
+              {{ $t('m.home["“基础信息展示开关“: 开启后单据详情页将展示基础模型信息"]') }}
+            </li>
+            <li>
+              {{ $t('m.home["“母子单功能开关“: 开启后单据流转过程中可以设置母子单相关信息"]') }}
+            </li>
+            <li>
+              {{ $t('m.home["“流程预览开关“: 开启后单据详情页将展示流程预览入口"]') }}
+            </li>
+            <li>
+              {{ $t('m.home["“SLA功能开关“: 开启后将可以修改或新增SLA相关的配置"]') }}
+            </li>
+            <li>
+              {{ $t('m.home["“触发器功能开关“: 开启后可以在流程节点和服务中配置触发器"]') }}
+            </li>
+            <li>
+              {{ $t('m.home["“任务功能开关“: 开启后可以在流程节点和服务中配置任务"]') }}
+            </li>
+            <li>
+              {{ $t('m.home["“通知豁免开关“: 开启后本项目下的单据将不再出现在平台级别的每日通知中"]') }}
             </li>
           </ul>
         </div>
@@ -59,6 +80,7 @@
           FIRST_STATE_SWITCH: 'basic',
           TABLE_FIELDS_SWITCH: 'module',
           SMS_COMMENT_SWITCH: 'smsComment',
+          NOTIFY_EXEMPT_SWITCH: 'notifyExempt',
         },
         moduleInfo: {
           basic: {
@@ -97,9 +119,21 @@
             open: false,
             isAvailable: true,
           },
+          task: {
+            id: '',
+            title: this.$t('m.home["任务功能开关："]'),
+            open: false,
+            isAvailable: true,
+          },
           smsComment: {
             id: '',
             title: this.$t('m.home["短信评论开关："]'),
+            open: false,
+            isAvailable: true,
+          },
+          notifyExempt: {
+            id: '',
+            title: this.$t('m.home["通知豁免开关："]'),
             open: false,
             isAvailable: true,
           },
@@ -116,7 +150,7 @@
       async getSettingsDate() {
         const res = await this.$store.dispatch('project/getProjectSettings', { project_key: this.$route.query.project_id });
         const tempObj = {};
-        const skipList = ['IS_ORGANIZATION', 'WIKI_SWITCH', 'TASK_SWITCH'];
+        const skipList = ['IS_ORGANIZATION', 'WIKI_SWITCH'];
         const result = res.data.filter(item => !skipList.includes(item.key));
         result.forEach(item => {
           if (item.key !== 'SERVICE_SWITCH' && this.switchKeyMap[item.key]) {

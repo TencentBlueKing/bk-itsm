@@ -205,7 +205,7 @@
       from: String,
     },
     data() {
-      const columnList = COLUMN_LIST.filter(column => (this.$store.state.project.projectSwitch.SLA_SWITCH || this.$store.state.openFunction.SLA_SWITCH) || column.id !== 'priority');
+      const columnList = COLUMN_LIST.filter(column => this.$store.state.project.projectSwitch.SLA_SWITCH || column.id !== 'priority');
       return {
         columnList,
         type: 'todo',
