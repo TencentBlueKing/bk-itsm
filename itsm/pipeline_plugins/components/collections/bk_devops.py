@@ -22,9 +22,10 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+import json
 import logging
 
+import jmespath
 from django.conf import settings
 
 from itsm.component.constants import (
@@ -151,6 +152,29 @@ class BkDevOpsService(ItsmBaseService):
                 action=NODE_FAILED,
                 retry=False,
             )
+
+    def update_variables(self, resp, ticket_id, state_id, variables):
+        resp = resp["variables"]
+        for variable in variables:
+            value = jmespath.search(variable["ref_path"], resp)
+            if isinstance(value, bool):
+                value = json.dumps(value)
+            if TicketGlobalVariable.objects.filter(
+                ticket_id=ticket_id, key=variable["key"]
+            ).exists():
+                TicketGlobalVariable.objects.filter(
+                    ticket_id=ticket_id, key=variable["key"]
+                ).update(value=value)
+            else:
+                TicketGlobalVariable.objects.create(
+                    name=variable.get("name", ""),
+                    ticket_id=ticket_id,
+                    key=variable["key"],
+                    value=value,
+                    state_id=state_id,
+                )
+            variable["value"] = value
+        return variables
 
     def execute(self, data, parent_data):
         """
@@ -440,7 +464,17 @@ class BkDevOpsService(ItsmBaseService):
         if current_status in ["SUCCEED", "STAGE_SUCCESS"]:
             # 在成功状态，结束轮询
             data.set_outputs("params_devops_result_{}".format(state_id), True)
-            self.update_info(current_node, devops_result, result=True)
+
+            # 处理全局变量
+            state = ticket.flow.get_state(state_id)
+            variables = state["variables"].get("outputs", [])
+            # 更新全局变量
+            variable_output = self.update_variables(
+                status_info, ticket.id, state_id, variables
+            )
+            self.update_info(
+                current_node, devops_result, result=True, variables=variable_output
+            )
             current_node.set_status(status=FINISHED)
             self.finish_schedule()
             current_node.create_action_log(

@@ -117,6 +117,32 @@
         </devops-preview>
       </div>
       <no-data v-else></no-data>
+      <div class="piprline-title">
+        <p>{{ $t(`m['输出变量']`) }}:</p>
+        <p>{{ $t(`m['如何获取蓝盾流水线变量? 可以在bash插件中使用 setEnv "hello" "world" 或者在 Python 插件中 使用 set_env("hello", "world") ，具体的使用方法请参考蓝盾指引。']`) }}</p>
+      </div>
+      <bk-table :data="returnReslut"
+        :size="'small'">
+        <bk-table-column :label="$t(`m['变量名称']`)">
+          <template slot-scope="props">
+            <bk-input :behavior="'simplicity'" v-model="props.row.name" :disabled="disable" @change="changeReturnInput(props.row, props.$index)"></bk-input>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m['来源']`)">
+          <template slot-scope="props">
+            <bk-input :behavior="'simplicity'" v-model="props.row.ref_path" :disabled="disable" :placeholder="$t(`m['输入变量来源，如：resp.message']`)" @change="changeReturnInput(props.row, props.$index)"></bk-input>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m['操作']`)" width="100">
+          <template slot-scope="props" v-if="!disable && isShowDelete !== returnReslut.indexOf(props.row)">
+            <i class="bk-itsm-icon icon-flow-other-add result-icon" @click="addReturnReslut"></i>
+            <i class="bk-itsm-icon icon-flow-other-reduc result-icon"
+              :class="{ 'no-delete': retrunResultIsEmtry }"
+              @click="deleteReturnReslut(props.row)">
+            </i>
+          </template>
+        </bk-table-column>
+      </bk-table>
       <common-trigger-list :origin="'state'"
         :node-type="configur.type"
         :source-id="flowInfo.id"
@@ -231,7 +257,23 @@
           value: '',
         },
         stateList: [],
+        returnReslut: [
+          {
+            name: '',
+            ref_path: '',
+            check: false,
+          },
+        ],
+        disable: false,
       };
+    },
+    computed: {
+      isShowDelete() {
+        return this.returnReslut.length - 1;
+      },
+      retrunResultIsEmtry() {
+        return this.returnReslut.length <= 1;
+      },
     },
     watch: {
       'basicInfo.businessId'(val) {
@@ -266,6 +308,7 @@
               type: this.configur.processors_type,
               value: this.configur.processors,
             };
+            this.returnReslut = this.configur.extras.devops_info.outputs.length !== 0 ? [...this.configur.extras.devops_info.outputs, ...this.returnReslut] : [{ name: '', ref_path: '', check: false }];
             this.getExcludeRoleTypeList();
             this.configur.extras.devops_info.constants.forEach(item => {
               this.$set(this.hookVarList, item.key, item.checked);
@@ -301,6 +344,37 @@
       changeConstant(value, pipeline) {
         this.pipelineData[pipeline.id] = `\${${value}}`;
         this.hookSelectList[pipeline.id] = value;
+      },
+      addReturnReslut() {
+        this.returnReslut.push({
+          name: '',
+          ref_path: '',
+          check: false,
+        });
+      },
+      changeReturnInput(item) {
+        if (!item.check) {
+          item.check = true;
+          this.returnReslut.push({
+            name: '',
+            ref_path: '',
+            check: false,
+          });
+        } else {
+          const { name, ref_path } = item;
+          const checkList = [name, ref_path];
+          if (checkList.every(item => item === '')) {
+            this.returnReslut.pop();
+            item.check = false;
+          }
+        }
+      },
+      deleteReturnReslut(row) {
+        if (this.retrunResultIsEmtry) return;
+        const index = this.returnReslut.indexOf(row);
+        if (index !== -1) {
+          this.returnReslut.splice(index, 1);
+        }
       },
       // 计算处理人类型需要排除的类型
       getExcludeRoleTypeList() {
@@ -403,6 +477,11 @@
             checked: this.hookVarList[item],
             type: this.hookVarList[item] ? 'variable' : 'custom',
           }));
+          const outputs = this.returnReslut.filter(item => item.name !== '');
+          outputs.forEach(item => {
+            item.source = 'global';
+            item.type = 'string';
+          });
           const { value: processors, type: processors_type } = this.$refs.processors.getValue();
           const params = {
             extras: {
@@ -419,7 +498,11 @@
                   key: pipelineData.pipeline_id,
                 },
                 constants,
+                outputs,
               },
+            },
+            variables: {
+              outputs,
             },
             processors: processors || '',
             processors_type,
@@ -472,6 +555,7 @@
         }
         .piprline-title {
             font-size: 14px;
+            margin: 10px 0;
             p:nth-child(1) {
                 color: #63656e;
                 margin-bottom: 4px;
