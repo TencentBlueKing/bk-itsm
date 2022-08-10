@@ -23,6 +23,7 @@ modules:
             - name: rabbitmq
             - name: redis
             - name: bkrepo
+            - name: otel
         env_variables:
             - key: PIP_VERSION
               value: 20.2.3
