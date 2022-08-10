@@ -3177,6 +3177,11 @@ class Ticket(Model, BaseTicket):
                 ignore_params=status.ignore_params,
             )
 
+            # 针对引用变量类型的，当被打回时, 重新刷新处理人，防止引用变量被修改审批人仍为旧的问题
+            if state.processors_type == "VARIABLE":
+                defaults["processors_type"] = processors_type
+                defaults["processors"] = processors
+
             path = list(self.get_circle_path(state_id))
 
             circle_nodes = set()
