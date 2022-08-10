@@ -387,6 +387,17 @@ class Status(Model):
 
         return processor
 
+    def set_history_operators(self, current_operator):
+        """设置历史处理人"""
+        if self.updated_by is None:
+            self.updated_by = current_operator
+        else:
+            history_operators = [user for user in self.updated_by.split(",") if user]
+            if current_operator not in history_operators:
+                history_operators.append(current_operator)
+            self.updated_by = dotted_name(",".join(set(history_operators)))
+        self.save(update_fields=("updated_by",))
+
     def get_user_list(self):
         user_list = UserRole.get_users_by_type(
             self.bk_biz_id, self.processors_type, self.processors, self.ticket
@@ -3165,6 +3176,11 @@ class Ticket(Model, BaseTicket):
                 query_params=status.query_params,
                 ignore_params=status.ignore_params,
             )
+
+            # 针对引用变量类型的，当被打回时, 重新刷新处理人，防止引用变量被修改审批人仍为旧的问题
+            if state.processors_type == "VARIABLE":
+                defaults["processors_type"] = processors_type
+                defaults["processors"] = processors
 
             path = list(self.get_circle_path(state_id))
 
