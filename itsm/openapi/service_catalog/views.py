@@ -6,6 +6,7 @@ from itsm.component.constants import DEFAULT_PROJECT_PROJECT_KEY
 from itsm.component.decorators import custom_apigw_required
 from itsm.component.drf.mixins import ApiGatewayMixin
 from itsm.component.drf import viewsets as component_viewsets
+from itsm.openapi.decorators import catch_openapi_exception
 from itsm.service.models import ServiceCatalog
 from itsm.service.serializers import ServiceCatalogSerializer
 
@@ -29,20 +30,27 @@ class ServiceCatalogViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         return Response(tree_data)
 
     @custom_apigw_required
+    @catch_openapi_exception
     def list(self, request, *args, **kwargs):
         return Response()
 
     @custom_apigw_required
+    @catch_openapi_exception
     def destroy(self, request, *args, **kwargs):
         return Response()
 
     @custom_apigw_required
+    @catch_openapi_exception
     def update(self, request, *args, **kwargs):
         return Response()
 
-    @custom_apigw_required
+    # @custom_apigw_required
+    @catch_openapi_exception
     def create(self, request, *args, **kwargs):
         """
         {"parent__id":1,"name":"测试","desc":"","project_key":"0"}
         """
-        return super(ServiceCatalogViewSet, self).create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data)

@@ -805,6 +805,7 @@ class WorkflowImportSerializer(serializers.Serializer):
         required=True, allow_blank=True, choices=NOTIFY_RULE_CHOICES
     )
     notify_freq = serializers.IntegerField(default=EMPTY_INT)
+    workflow_id = serializers.IntegerField(required=False)
 
 
 class ServiceImportSerializer(serializers.Serializer):
@@ -830,17 +831,20 @@ class ServiceImportSerializer(serializers.Serializer):
     owners = serializers.CharField(
         required=False, error_messages={"blank": _("服务负责人不能为空")}
     )
-    catalog_id = serializers.IntegerField(required=True)
     workflow = WorkflowImportSerializer(required=True)
 
+    catalog_id = serializers.IntegerField(required=False)
+
     def validate(self, attrs):
+
         project_key = attrs["project_key"]
         if not Project.objects.filter(key=project_key).exists():
             raise serializers.ValidationError(_("导入失败，project_key 对应的项目不存在"))
 
-        catalog_id = attrs["catalog_id"]
-        if not ServiceCatalog.objects.filter(id=catalog_id).exists():
-            raise serializers.ValidationError(_("导入失败，对应的服务目录不存在"))
+        catalog_id = attrs.get("catalog_id", None)
+        if catalog_id is not None:
+            if not ServiceCatalog.objects.filter(id=catalog_id).exists():
+                raise serializers.ValidationError(_("导入失败，对应的服务目录不存在"))
 
         service_id = attrs.get("id", None)
         if service_id is not None:

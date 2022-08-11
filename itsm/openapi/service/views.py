@@ -215,20 +215,21 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
     @catch_openapi_exception
     @custom_apigw_required
     def import_service(self, request):
-        data = request.data
-        ServiceImportSerializer(data=data).is_valid(raise_exception=True)
+        ser = ServiceImportSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        service_data = ser.data
         with transaction.atomic():
-            workflow_tag_data = data.pop("workflow")
+            workflow_tag_data = service_data.pop("workflow")
             workflow = Workflow.objects.restore(
                 workflow_tag_data, request.user.username
             )[0]
             version = workflow.create_version()
-            data["workflow_id"] = version.id
-            if Service.validate_service_name(data["name"]):
+            service_data["workflow_id"] = version.id
+            if Service.validate_service_name(service_data["name"]):
                 raise ServiceInsertError(_("导入失败，服务名称已经存在"))
 
-            catalog_id = data.pop("catalog_id", None)
-            service = Service.objects.create(**data)
+            catalog_id = service_data.pop("catalog_id", None)
+            service = Service.objects.create(**service_data)
             service.bind_catalog(catalog_id, service.project_key)
         return Response(
             self.serializer_class(service, context=self.get_serializer_context()).data
@@ -239,7 +240,9 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
     @custom_apigw_required
     def update_service(self, request):
         data = request.data
-        ServiceImportSerializer(data=data).is_valid(raise_exception=True)
+        ser = ServiceImportSerializer(data=data)
+        ser.is_valid(raise_exception=True)
+        data = ser.data
         with transaction.atomic():
             service_id = data.pop("id")
             service = Service.objects.get(id=service_id)
@@ -254,7 +257,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
             version = workflow.create_version()
             data["workflow_id"] = version.id
             if Service.objects.filter(~Q(id=service_id), name=data["name"]).exists():
-                raise ServiceInsertError(_("导入失败，服务名称已经存在"))
+                raise ServiceInsertError(_("更新失败，服务名称已经存在"))
             catalog_id = data.pop("catalog_id", None)
             Service.objects.filter(id=service_id).update(**data)
             # 重新绑定目录
