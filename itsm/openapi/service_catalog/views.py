@@ -44,7 +44,7 @@ class ServiceCatalogViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         return Response()
 
-    # @custom_apigw_required
+    @custom_apigw_required
     @catch_openapi_exception
     def create(self, request, *args, **kwargs):
         """
