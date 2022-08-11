@@ -33,7 +33,7 @@ from itsm.component.constants import GENERAL_NOTICE
 from itsm.component.esb.esbclient import client_backend
 from itsm.component.exceptions import ComponentCallError
 from itsm.component.utils.basic import merge_dict_list
-from weixin.core.settings import WEIXIN_SHARE_URL
+from weixin.core.settings import WEIXIN_APP_EXTERNAL_HOST
 
 
 class BaseNotifier(object):
@@ -147,8 +147,8 @@ class WeixinNotifier(BaseNotifier):
             "content": self.message,
             "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "remark": _(
-                '<a href="https://{site_url}weixin/#/detail/{ticket_id}/">点击查看详情</a>'
-            ).format(site_url=WEIXIN_SHARE_URL, ticket_id=self.ticket_id),
+                '<a href="{site_url}weixin/#/detail/{ticket_id}/">点击查看详情</a>'
+            ).format(site_url=WEIXIN_APP_EXTERNAL_HOST, ticket_id=self.ticket_id),
             "wx_qy_agentid": self.wx_qy_agentid,
             "wx_qy_corpsecret": self.wx_qy_corpsecret,
         }
