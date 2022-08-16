@@ -45,7 +45,8 @@ from itsm.component.constants import (
     ROLE_CHOICES,
     USER_ROLE_CHOICES,
     PREFIX_KEY,
-    WORKFLOW_SUPERUSER_KEY, LEN_SHORT,
+    WORKFLOW_SUPERUSER_KEY,
+    LEN_SHORT,
 )
 from itsm.component.drf.mixins import ObjectManagerMixin
 from itsm.component.db import managers
@@ -94,7 +95,9 @@ class RoleType(Model):
     type = models.CharField(_("角色类型"), max_length=LEN_NORMAL)
     is_processor = models.BooleanField(_("可否操作单据"), default=True)
     is_display = models.BooleanField(_("是否显示"), default=True)
-    desc = models.CharField(_("角色描述"), max_length=LEN_MIDDLE, default=EMPTY_STRING, null=True, blank=True)
+    desc = models.CharField(
+        _("角色描述"), max_length=LEN_MIDDLE, default=EMPTY_STRING, null=True, blank=True
+    )
 
     objects = managers.Manager()
 
@@ -115,10 +118,18 @@ class RoleType(Model):
             try:
                 RoleType.objects.get_or_create(
                     type=role[0],
-                    defaults={"name": role[1], "desc": role[1], "is_display": role[2], "is_processor": role[3]},
+                    defaults={
+                        "name": role[1],
+                        "desc": role[1],
+                        "is_display": role[2],
+                        "is_processor": role[3],
+                    },
                 )
             except BaseException as error:
-                print("init builtin roles and user roles data role %s error %s" % (role, str(error)))
+                print(
+                    "init builtin roles and user roles data role %s error %s"
+                    % (role, str(error))
+                )
 
 
 class UserRole(ObjectManagerMixin, Model):
@@ -127,14 +138,20 @@ class UserRole(ObjectManagerMixin, Model):
     """
 
     role_type = models.CharField(_("对应角色类型"), max_length=LEN_NORMAL)
-    role_key = models.CharField(_("角色唯一标识"), max_length=LEN_MIDDLE, default=EMPTY_STRING)
+    role_key = models.CharField(
+        _("角色唯一标识"), max_length=LEN_MIDDLE, default=EMPTY_STRING
+    )
     name = models.CharField(_("角色命名"), max_length=LEN_NORMAL)
     members = models.CharField(_("角色组成人员"), max_length=LEN_XX_LONG)
     owners = models.CharField(_("负责人"), max_length=LEN_XX_LONG, default=EMPTY_STRING)
     access = models.CharField(_("对应服务"), max_length=LEN_MIDDLE)
-    desc = models.CharField(_("用户角色描述"), max_length=LEN_MIDDLE, default=EMPTY_STRING, null=True, blank=True)
+    desc = models.CharField(
+        _("用户角色描述"), max_length=LEN_MIDDLE, default=EMPTY_STRING, null=True, blank=True
+    )
     is_builtin = models.BooleanField(_("是否内置"), default=False)
-    project_key = models.CharField(_("项目key"), max_length=LEN_SHORT, null=False, default=0)
+    project_key = models.CharField(
+        _("项目key"), max_length=LEN_SHORT, null=False, default=0
+    )
 
     objects = managers.Manager()
 
@@ -159,39 +176,56 @@ class UserRole(ObjectManagerMixin, Model):
                 members = ",{},".format(",".join(settings.INIT_SUPERUSER))
             try:
                 cls.objects.get_or_create(
-                    defaults={"desc": role[5], "members": members, "name": role[1], "access": role[3]},
+                    defaults={
+                        "desc": role[5],
+                        "members": members,
+                        "name": role[1],
+                        "access": role[3],
+                    },
                     **{"role_key": role[0], "role_type": role[2]}
                 )
             except BaseException as error:
-                print("init_builtin_user_roles error role %s error %s" % (role, str(error)))
+                print(
+                    "init_builtin_user_roles error role %s error %s"
+                    % (role, str(error))
+                )
 
     @classmethod
     def has_access(cls, username, access, role_type="ADMIN"):
-        return cls.objects.filter(role_type=role_type, members__contains=dotted_name(username), access=access).exists()
+        return cls.objects.filter(
+            role_type=role_type, members__contains=dotted_name(username), access=access
+        ).exists()
 
     @classmethod
     def get_access_by_user(cls, username):
         """查询用户页面权限"""
 
-        access_list = cls.objects.filter(members__contains=dotted_name(username), role_type="ADMIN").values_list(
-            "role_key", flat=True
-        )
+        access_list = cls.objects.filter(
+            members__contains=dotted_name(username), role_type="ADMIN"
+        ).values_list("role_key", flat=True)
 
         return list(access_list)
 
     @classmethod
     def is_statics_manager(cls, username):
-        return cls.objects.filter(members__contains=dotted_name(username), role_key=ADMIN_STATICS_MANAGER_KEY).exists()
+        return cls.objects.filter(
+            members__contains=dotted_name(username), role_key=ADMIN_STATICS_MANAGER_KEY
+        ).exists()
 
     @classmethod
     def is_workflow_manager(cls, username):
         """判断是否是流程管理员"""
-        return cls.objects.filter(members__contains=dotted_name(username), role_key=WORKFLOW_SUPERUSER_KEY).exists()
+        return cls.objects.filter(
+            members__contains=dotted_name(username), role_key=WORKFLOW_SUPERUSER_KEY
+        ).exists()
 
     @classmethod
     def is_itsm_superuser(cls, username):
         """判断是否itsm超级管理员"""
-        return dotted_name(username) in cls.objects.get(role_key=ADMIN_SUPERUSER_KEY).members
+        return (
+            dotted_name(username)
+            in cls.objects.get(role_key=ADMIN_SUPERUSER_KEY).members
+        )
 
     @classmethod
     def get_general_role_by_user(cls, username):
@@ -215,7 +249,9 @@ class UserRole(ObjectManagerMixin, Model):
         try:
             cmdb_roles = {
                 item["role_key"]: {"role_id": item["id"], "bizs": set()}
-                for item in cls.objects.filter(role_type="CMDB").values("role_key", "id")
+                for item in cls.objects.filter(role_type="CMDB").values(
+                    "role_key", "id"
+                )
             }
             apps = cls.get_app_list_by_user(username, cmdb_roles)
 
@@ -259,7 +295,10 @@ class UserRole(ObjectManagerMixin, Model):
             search_fields = [role for role in all_roles]
             search_fields.extend(["bk_biz_id", "bk_biz_name"])
 
-            args_list = [{"role": role, "username": username, "search_fields": search_fields} for role in all_roles]
+            args_list = [
+                {"role": role, "username": username, "search_fields": search_fields}
+                for role in all_roles
+            ]
 
             pool = ThreadPool(20)
             apps_map = pool.map(_get_app_list_by_role, args_list)
@@ -285,13 +324,20 @@ class UserRole(ObjectManagerMixin, Model):
 
         try:
             # 查询通用角色列表
-            res = client_backend.cc.search_object_attribute({"bk_obj_id": "biz", "bk_supplier_account": "0"})
+            res = client_backend.cc.search_object_attribute(
+                {"bk_obj_id": "biz", "bk_supplier_account": "0"}
+            )
             roles = {
-                item["bk_property_id"]: item["bk_property_name"] for item in res if item["bk_property_group"] == "role"
+                item["bk_property_id"]: item["bk_property_name"]
+                for item in res
+                if item["bk_property_group"] == "role"
             }
 
             for role in roles:
-                cls.objects.update_or_create(defaults={"name": roles[role]}, **{"role_type": "CMDB", "role_key": role})
+                cls.objects.update_or_create(
+                    defaults={"name": roles[role]},
+                    **{"role_type": "CMDB", "role_key": role}
+                )
 
             cache.set(cache_key, roles, CACHE_5MIN)
 
@@ -318,7 +364,9 @@ class UserRole(ObjectManagerMixin, Model):
                 if bk_biz_id == DEFAULT_BK_BIZ_ID:
                     return []
 
-                cmdb_users = get_bk_business(bk_biz_id, role_type=[role.role_key for role in roles])
+                cmdb_users = get_bk_business(
+                    bk_biz_id, role_type=[role.role_key for role in roles]
+                )
                 return list_by_separator(cmdb_users)
 
             if user_type == "GENERAL":
@@ -339,9 +387,10 @@ class UserRole(ObjectManagerMixin, Model):
             return get_user_leader(users)
 
         if user_type == "ASSIGN_LEADER":
-            # 获取节点处理人的leader
-            status = ticket.node_status.get(state_id=int(users))
-            return get_user_leader(status.processed_user)
+            if ticket is not None:
+                # 获取节点处理人的leader
+                status = ticket.node_status.get(state_id=int(users))
+                return get_user_leader(status.processed_user)
 
         if user_type == "IAM":
             iam_roles_dict = {}
@@ -358,16 +407,25 @@ class UserRole(ObjectManagerMixin, Model):
         cache_key = "user_roles_{}".format(username)
         ctx = cache.get(cache_key)
         if not ctx:
-            roles = {"general": set([str(role["id"]) for role in cls.get_general_role_by_user(username)])}
+            roles = {
+                "general": set(
+                    [str(role["id"]) for role in cls.get_general_role_by_user(username)]
+                )
+            }
             bkuser_roles = BKUserRole.get_or_update_user_roles(username)
-            roles["cmdb"] = {str(role["role_id"]): role["bizs"] for role in bkuser_roles["cmdb"].values()}
+            roles["cmdb"] = {
+                str(role["role_id"]): role["bizs"]
+                for role in bkuser_roles["cmdb"].values()
+            }
             roles["organization"] = bkuser_roles["organization"]
             cache.set(cache_key, roles, CACHE_30MIN)
         return cache.get(cache_key)
 
     @classmethod
     def get_role_name(cls, user_type, role_ids):
-        roles = UserRole.objects.filter(role_type=user_type, id__in=role_ids).values("id", "name")
+        roles = UserRole.objects.filter(role_type=user_type, id__in=role_ids).values(
+            "id", "name"
+        )
         return {str(role["id"]): role["name"] for role in roles}
 
 
@@ -376,9 +434,13 @@ class BKUserRole(models.Model):
 
     roles_dict = {"cmdb": {}, "organization": []}
 
-    username = models.CharField(_("蓝鲸用户username"), max_length=LEN_NORMAL, default=EMPTY_STRING)
+    username = models.CharField(
+        _("蓝鲸用户username"), max_length=LEN_NORMAL, default=EMPTY_STRING
+    )
     roles = jsonfield.JSONField(_("用户角色"), default=roles_dict, null=True, blank=True)
-    uid = models.CharField(_("用户uid"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True, blank=True)
+    uid = models.CharField(
+        _("用户uid"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True, blank=True
+    )
     update_at = models.DateTimeField(_("更新时间"), auto_now=True)
 
     class Meta:
@@ -406,7 +468,9 @@ class BKUserRole(models.Model):
             departments = get_user_departments(username, id_only=True)
             roles.update(organization=departments)
 
-        BKUserRole.objects.update_or_create(username=username, defaults={"roles": roles})
+        BKUserRole.objects.update_or_create(
+            username=username, defaults={"roles": roles}
+        )
 
         return roles
 
