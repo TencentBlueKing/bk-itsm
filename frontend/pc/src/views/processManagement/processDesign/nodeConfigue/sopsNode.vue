@@ -613,9 +613,10 @@
           if (this.renderFormValidate && this.$refs.processors.verifyValue()) {
             this.secondClick = true;
             const formData = [];
+            const curbiz = this.projectList.find(item => item.bk_biz_id === this.basicsFormData.projectId);
             const biz = {
-              name: this.$t('m.treeinfo["业务"]'),
-              value: this.basicsFormData.projectId,
+              name: curbiz ? curbiz.name : this.$t('m.treeinfo["业务"]'),
+              value: curbiz ? curbiz.bk_biz_id : this.basicsFormData.projectId,
               key: 1,
               value_type: 'custom',
             };
