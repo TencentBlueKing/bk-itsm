@@ -169,25 +169,30 @@
         };
         if (this.nodeInfo.type === 'TASK-SOPS') {
           if (!this.$refs.sopsGetParam.getRenderFormValidate()) return;
+          const serviceBiz = this.nodeInfo.api_info.sops_info.find(item => item.key === 'bk_biz_id');
           const biz = {
-            name: this.$t('m.treeinfo["业务"]'),
-            value: this.nodeInfo.projectId || 2,
-            key: 1,
+            name: serviceBiz.name,
+            value: serviceBiz.params_value,
+            key: serviceBiz.key,
             value_type: 'custom',
           };
           const { exclude_task_nodes_id, template_id, template_source } = this.nodeInfo.contexts.task_params;
-          const formData = this.constants.map((item) => {
-            const formKey = Object.keys(this.$refs.sopsGetParam.formData).filter((key) => key === item.key);
-            const vt = this.hookedVarList[formKey] ? 'variable' : 'custom';
-            return {
-              name: item.name,
-              key: item.key,
-              value: this.hookedVarList[formKey]
-                ? this.$refs.sopsGetParam.formData[formKey].slice(2, this.$refs.sopsGetParam.formData[formKey].length - 1)
-                : this.$refs.sopsGetParam.formData[formKey],
-              value_type: vt,
-              is_quoted: this.hookedVarList[formKey],
-            };
+          const formData = [];
+          this.constants.map((item) => {
+            if (item.show_type === 'show') {
+              const formKey = Object.keys(this.$refs.sopsGetParam.formData).filter((key) => key === item.key);
+              const vt = this.hookedVarList[formKey] ? 'variable' : 'custom';
+              const formTeamlate = {
+                name: item.name,
+                key: item.key,
+                value: this.hookedVarList[formKey]
+                  ? this.$refs.sopsGetParam.formData[formKey].slice(2, this.$refs.sopsGetParam.formData[formKey].length - 1)
+                  : this.$refs.sopsGetParam.formData[formKey],
+                value_type: vt,
+                is_quoted: this.hookedVarList[formKey],
+              };
+              formData.push(formTeamlate);
+            }
           });
           params.inputs = {
             bk_biz_id: biz,
