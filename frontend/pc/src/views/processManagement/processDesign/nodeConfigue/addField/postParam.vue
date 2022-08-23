@@ -218,15 +218,6 @@
     },
     computed: {
       tableList() {
-        this.bodyTableData.forEach(item => {
-          // 判断是否是引用变量
-          if (/\${parmas_.*?\}/g.test(item.value)) {
-            item.source_type = 'FIELDS';
-            item.value_key = item.value.replace(/\${parmas_/g, '').replace('}', '');
-          } else {
-            item.source_type = 'CUSTOM';
-          }
-        });
         return this.bodyTableData.filter(item => item.isShow);
       },
     },
