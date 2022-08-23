@@ -1359,6 +1359,10 @@ class Ticket(Model, BaseTicket):
         _("项目key"), max_length=LEN_SHORT, null=False, default=0
     )
 
+    tag = models.CharField(
+        _("单据标签"), max_length=LEN_SHORT, null=True, blank=True, db_index=True
+    )
+
     objects = managers.TicketManager()
 
     auth_resource = {"resource_type": "ticket", "resource_type_name": "单据"}
