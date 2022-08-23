@@ -132,7 +132,7 @@
                 v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
                 v-cursor
                 class="bk-lable-primary text-permission-disable"
-                ::title="props.row.name"
+                :title="props.row.name"
                 @click="onServicePermissonCheck(['service_manage'], props.row)">
                 {{ props.row.name }}
               </span>
@@ -186,6 +186,36 @@
                   <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
                 </div>
               </div>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.serviceConfig['描述']`)" :width="changeFrom.serviceType ? '300' : '200'">
+            <template slot-scope="props">
+              <span
+                v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
+                v-cursor
+                class="bk-lable-primary text-permission-disable"
+                :title="props.row.desc"
+                @click="onServicePermissonCheck(['service_manage'], props.row)">
+                {{ props.row.desc }}
+              </span>
+              <template v-else>
+                <div v-if="props.row.id !== changeFrom.desc" class="bk-lable-display">
+                  <span
+                    class="bk-lable-primary"
+                    :title="props.row.desc"
+                    @click="changeEntry(props.row, 'edit')">
+                    {{ props.row.desc || '--' }}
+                  </span>
+                  <i v-show="tableHoverId === props.row.id" @click.stop="handleChange('desc', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
+                </div>
+                <div v-else class="hover-show-icon">
+                  <bk-input v-model="editValue"></bk-input>
+                  <div class="operation">
+                    <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('desc',props.row)"></i>
+                    <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
+                  </div>
+                </div>
+              </template>
             </template>
           </bk-table-column>
           <bk-table-column :label="$t(`m.common['创建人']`)">
@@ -452,6 +482,7 @@
         changeFrom: {
           name: '',
           serviceType: '',
+          desc: '',
           bounded_catalogs: '',
         },
         editValue: '',
@@ -555,23 +586,34 @@
             this.changeFrom.name = row.id;
             this.changeFrom.serviceType = '';
             this.changeFrom.bounded_catalogs = '';
+            this.changeFrom.desc = '';
             this.editValue = row.name;
             break;
-          case 'key':
+          case 'desc':
+            this.changeFrom.desc = row.id;
+            this.changeFrom.serviceType = '';
             this.changeFrom.name = '';
+            this.changeFrom.bounded_catalogs = '';
+            this.editValue = row.desc;
+            break;
+          case 'key':
             this.changeFrom.serviceType = row.id;
+            this.changeFrom.name = '';
+            this.changeFrom.desc = '';
             this.changeFrom.bounded_catalogs = '';
             this.editValue = row.key;
             break;
           case 'catalog_id':
-            this.changeFrom.name = '';
-            this.changeFrom.serviceType = '';
             this.changeFrom.bounded_catalogs = row.id;
+            this.changeFrom.name = '';
+            this.changeFrom.desc = '';
+            this.changeFrom.serviceType = '';
             break;
         }
       },
       closeEdit() {
         this.changeFrom.name = '';
+        this.changeFrom.desc = '';
         this.changeFrom.serviceType = '';
         this.changeFrom.bounded_catalogs = '';
       },
@@ -583,8 +625,8 @@
           id: curRow.id,
           key: curRow.key,
           name: curRow.name,
+          desc: curRow.desc,
           project_key: curRow.project_key,
-          desc: '',
         };
         this.$store.dispatch('serviceEntry/updateService', params).then(() => {
           this.$bkMessage({
