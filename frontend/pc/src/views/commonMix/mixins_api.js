@@ -510,13 +510,13 @@ export default {
           }
           if (lastType === 'array') {
             const baseItem = item.source_type === 'CUSTOM' ? item.value
-              : `\${parmas_${item.value_key}}`;
+              : `\${params_${item.value_key}}`;
             jsonDataDict.push(baseItem);
           }
           if (lastType === 'object') {
             const baseItem = {};
             baseItem[item.key] = item.source_type === 'CUSTOM' ? item.value
-              : `\${parmas_${item.value_key}}`;
+              : `\${params_${item.value_key}}`;
             Object.assign(jsonDataDict, baseItem);
           }
         }

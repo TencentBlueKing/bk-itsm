@@ -1082,6 +1082,7 @@ export const m = {
     开启状态: 'Open Status',
     开启: 'Open',
     历史处理人: 'Former Handlers',
+    描述: 'Description',
     服务目录: 'Catalogs',
     流程预览: 'Flow Preview ',
     类型: 'Type ',
