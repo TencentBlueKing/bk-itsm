@@ -69,7 +69,7 @@
           </bk-option>
         </bk-select>
       </bk-form-item>
-      <bk-form-item v-if="openFunction.SLA_SWITCH"
+      <bk-form-item v-if="projectSwitch.SLA_SWITCH"
         :label="$t(`m.serviceConfig['服务协议']`)">
         <bk-select v-model="directory.formInfo.sla"
           :placeholder="directory.place.sla"
@@ -222,8 +222,8 @@
       };
     },
     computed: {
-      openFunction() {
-        return this.$store.state.openFunction;
+      projectSwitch() {
+        return this.$store.state.project.projectSwitch;
       },
     },
     created() {

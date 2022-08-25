@@ -321,9 +321,6 @@
       globalChoise() {
         return this.$store.state.cdeploy.configurInfo;
       },
-      openFunction() {
-        return this.$store.state.openFunction;
-      },
     },
     watch: {
       'formInfo.processors'() {

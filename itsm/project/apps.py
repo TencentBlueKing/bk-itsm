@@ -33,20 +33,37 @@ from django.apps import AppConfig
 from django.db.models.signals import post_migrate
 
 
+def check_and_create_new_settings():
+    from itsm.iadmin.contants import PROJECT_SETTING
+    from itsm.project.models import ProjectSettings
+    from itsm.project.models import Project
+
+    project_keys = Project.objects.values_list("key", flat=True)
+    for project_key in project_keys:
+        if project_key == "public":
+            continue
+        for project_setting in PROJECT_SETTING:
+            # 如果不存在，则创建
+            if not ProjectSettings.objects.filter(
+                type=project_setting[1], key=project_setting[0], project_id=project_key
+            ).exists():
+                ProjectSettings.objects.create(
+                    type=project_setting[1],
+                    key=project_setting[0],
+                    value=project_setting[2],
+                    project_id=project_key,
+                )
+
+
 def app_ready_handler(sender, **kwargs):
     from itsm.project.models import Project
 
     print("init default project start")
     try:
         Project.init_default_project()
+        check_and_create_new_settings()
     except Exception as e:
         print("init default project exception: %s" % e)
-
-    print("init lesscode project start")
-    try:
-        Project.init_lesscode_project()
-    except Exception as e:
-        print("init lesscode project exception: %s" % e)
 
 
 class ProjectConfig(AppConfig):

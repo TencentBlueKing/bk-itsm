@@ -55,7 +55,9 @@ from itsm.component.utils.basic import now, namedtuplefetchall, dotted_name
 from itsm.component.utils.lock import share_lock
 from itsm.component.notify import EmailNotifier
 from itsm.component.utils.client_backend_query import get_biz_choices
+from itsm.iadmin.contants import NOTIFY_EXEMPT_SWITCH, SWITCH_ON
 from itsm.iadmin.models import SystemSettings
+from itsm.project.models import ProjectSettings
 from itsm.sla_engine.constants import TO_SECOND
 from itsm.role.models import UserRole
 from itsm.service.models import Service
@@ -508,7 +510,12 @@ def consume_notify():
     if count < end:
         end = count
 
-    queryset = Ticket.objects.filter(current_status="RUNNING")
+    notify_exempt_project_keys = ProjectSettings.objects.filter(
+        key=NOTIFY_EXEMPT_SWITCH, value=SWITCH_ON
+    ).values_list("project_id", flat=True)
+    queryset = Ticket.objects.filter(current_status="RUNNING").exclude(
+        project_key__in=notify_exempt_project_keys
+    )
 
     for item in range(1, end):
         user = email_notify.lpop("notify_queue")

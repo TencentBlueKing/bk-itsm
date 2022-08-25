@@ -80,7 +80,7 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (response) => {
     // status >= 200 && status <= 505
-    if ('result' in response.data && !response.data.result && 'message' in response.data) {
+    if (typeof response.data !== 'string' && 'result' in response.data && !response.data.result && 'message' in response.data) {
       window.app.$bkMessage({
         message: response.data.message,
         theme: 'error',

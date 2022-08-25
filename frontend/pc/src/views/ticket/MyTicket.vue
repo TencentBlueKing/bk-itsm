@@ -520,8 +520,8 @@
       };
     },
     computed: {
-      openFunction() {
-        return this.$store.state.openFunction;
+      projectSwitch() {
+        return this.$store.state.project.projectSwitch;
       },
       currTabSettingCache() {
         return this.$store.state.ticket.settingCache[this.activePanel];
@@ -571,7 +571,7 @@
           if (
             (this.activePanel === 'created'
             && column.id === 'creator')
-            || (!this.openFunction.SLA_SWITCH && column.id === 'priority')
+            || (!this.projectSwitch.SLA_SWITCH && column.id === 'priority')
           ) {
             return false;
           }

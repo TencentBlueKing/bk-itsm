@@ -231,7 +231,7 @@
     },
     computed: {
       ...mapState({
-        openFunction: state => state.openFunction,
+        projectSwitch: state => state.project.projectSwitch,
         systemPermission: state => state.common.systemPermission,
         projectList: state => state.project.projectList,
         projectListLoading: state => state.project.projectListLoading,
@@ -240,7 +240,7 @@
       topNav() {
         return this.routerList.filter((item) => {
           if (item.id === 'wiki') { // 知识库只在全局配置中对应开关打开时显示
-            return this.openFunction.WIKI_SWITCH;
+            return this.projectSwitch.WIKI_SWITCH;
           }
           if (item.id === 'manage') {
             return this.systemPermission.includes('platform_manage_access');
@@ -253,14 +253,14 @@
         const list = [];
         this.sideRouters.forEach((router) => {
           if (router.id === 'sla') {
-            this.openFunction.SLA_SWITCH && list.push(router);
+            this.projectSwitch.SLA_SWITCH && list.push(router);
           } else if (router.id === 'processManage') {
             const subRouters = router.subRouters.filter((item) => {
               if (item.id === 'processManageTpl') {
-                return this.openFunction.TASK_SWITCH;
+                return true;
               }
               if (item.id === 'processManageTrigger') {
-                return this.openFunction.TRIGGER_SWITCH;
+                return this.projectSwitch.TRIGGER_SWITCH;
               }
               return true;
             });

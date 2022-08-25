@@ -31,7 +31,7 @@
     </router-link>
     <!-- 母子单 -->
     <bk-popover
-      v-if="row.related_type && openFunction.CHILD_TICKET_SWITCH"
+      v-if="row.related_type"
       placement="top"
       :theme="'light'"
       :on-show="getInheritTicket">
@@ -128,9 +128,7 @@
       };
     },
     computed: {
-      openFunction() {
-        return this.$store.state.openFunction;
-      },
+
     },
     methods: {
       // 获取母子单
