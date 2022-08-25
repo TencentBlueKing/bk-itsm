@@ -157,7 +157,9 @@ export default defineComponent({
         }
       } else if (handlerType === 'PERSON') { // 类型为个人, 只能在 originHandler 中选
         includeList.firstIncludeList = ['PERSON']
-        includeList.secondIncludeList = originHandler.split(',').filter((id: string) => !!id)
+        includeList.secondIncludeList = [
+          { type: handlerType, list: originHandler.split(',') }
+        ]
       } else { // 其他默认类型（通用角色、组织架构、cmdb 角色...）, PERSON 只能在 handler 中选，`handlerType` 只能在 originHandler 中选
         includeList.firstIncludeList = ['PERSON', handlerType]
         // eslint-disable-next-line no-case-declarations
