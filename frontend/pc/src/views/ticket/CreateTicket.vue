@@ -604,6 +604,9 @@
             font-size: 12px;
             color: #63656e;
             line-height: 20px;
+            width: 100%;
+            word-break: break-all;
+            white-space: normal;
         }
         .favorite {
             display: inline-block;
