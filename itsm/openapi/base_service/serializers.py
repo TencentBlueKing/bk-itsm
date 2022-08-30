@@ -190,7 +190,7 @@ class TicketCreateSerializer(TicketSerializer):
     """
 
     creator = serializers.CharField(required=True)
-    flow_id = serializers.IntegerField(required=True)
+    flow_id = serializers.IntegerField(required=False)
     tag = serializers.CharField(required=False)
 
     class Meta:
@@ -238,7 +238,7 @@ class TicketCreateSerializer(TicketSerializer):
             {
                 "service": data["service"],
                 "service_type": data["service"].key,
-                "flow_id": data["flow_id"],
+                "flow_id": data.get("flow_id", data["service"].workflow.id),
                 "is_supervise_needed": data["service"].workflow.is_supervise_needed,
                 "supervisor": data["service"].workflow.supervisor,
                 "supervise_type": data["service"].workflow.supervise_type,
