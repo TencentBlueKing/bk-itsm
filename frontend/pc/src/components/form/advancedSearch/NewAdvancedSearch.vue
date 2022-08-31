@@ -43,7 +43,7 @@
           class="ml10 filter-btn"
           @click="onShowSearchMore">
         </bk-button>
-        <i data-test-id="ticket_button_highlightSetting" style="margin:0 10px;cursor: pointer;color:#3A84FF" class="bk-icon icon-cog-shape" @click="isHighlightSetting = true"></i>
+        <i data-test-id="ticket_button_highlightSetting" style="margin:0 10px;cursor: pointer;color:#3A84FF" class="bk-icon bk-itsm-icon icon-itsm-icon-lamp-nine" @click="isHighlightSetting = true"></i>
       </div>
     </div>
     <!-- 高级搜索 -->

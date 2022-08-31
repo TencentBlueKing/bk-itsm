@@ -151,7 +151,7 @@
       :auto-close="openDialog.autoClose"
       :mask-close="openDialog.autoClose"
       @confirm="submitUser">
-      <p slot="header">{{ itemContent.id ? $t('m.user["修改通用角色"]') : $t('m.user["新增通用角色"]') }}</p>
+      <p slot="header">{{ itemContent.id ? $t('m.user["修改用户组"]') : $t('m.user["新增用户组"]') }}</p>
       <div class="bk-add-project bk-add-module">
         <bk-form
           :label-width="200"
