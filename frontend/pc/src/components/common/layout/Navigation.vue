@@ -33,7 +33,7 @@
     </template>
     <template slot="header">
       <div class="nav-header">
-        <bk-button
+        <!-- <bk-button
           data-test-id="navigation-button-createTicket"
           theme="primary"
           icon="plus"
@@ -41,7 +41,7 @@
           class="create-bill-btn"
           @click="isCreateTicketDialogShow = true">
           {{ $t(`m.navigation["提单"]`) }}
-        </bk-button>
+        </bk-button> -->
         <ul class="nav-list">
           <li
             v-for="router in topNav"
