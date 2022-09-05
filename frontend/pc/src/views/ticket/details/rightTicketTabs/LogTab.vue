@@ -200,6 +200,7 @@
             type: 'primary',
             color: 'blue',
           };
+          console.log(item.status);
           if (item.status === 'RUNNING' && this.list.findIndex((item) => item.id === processor.id) === -1) {
             this.list.push(processor);
           }

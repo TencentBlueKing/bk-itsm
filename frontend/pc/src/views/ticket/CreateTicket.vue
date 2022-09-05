@@ -674,6 +674,8 @@
                 top: 22px;
                 right: 0;
                 padding: 8px 0;
+                overflow-y: auto;
+                @include scroller;
                 li {
                     height: 32px;
                     padding: 0 8px;

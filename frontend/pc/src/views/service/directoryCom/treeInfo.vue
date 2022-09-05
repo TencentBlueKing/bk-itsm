@@ -331,7 +331,7 @@
         this.$refs.tree5.searchNode(this.searchWord);
       },
       // 新增目录
-      openAdd(catalog) {
+      openAdd() {
         if (!this.hasPermission(['catalog_create'], this.$store.state.project.projectAuthActions)) {
           const projectInfo = this.$store.state.project.projectInfo;
           const resourceData = {
@@ -356,7 +356,7 @@
         this.toggleDialog('add');
         this.addDirectory.optType = 'add';
         this.addDirectory.formInfo = {
-          parent__id: catalog === 'root' ? 1 : this.treeInfo.node.id,
+          parent__id: this.treeInfo.node.id,
           parent___name: this.treeInfo.node.name,
           name: '',
           desc: '',
