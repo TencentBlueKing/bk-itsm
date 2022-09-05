@@ -57,24 +57,6 @@
               </bk-option>
             </bk-select>
           </bk-form-item>
-          <bk-form-item :label="$t(`m.tickets['其他设置']`)" class="mt20">
-            <bk-checkbox-group v-model="formData.otherSettings">
-              <bk-checkbox value="can_ticket_agency" class="mr40">
-                {{ $t(`m.tickets['支持代提']`) }}
-              </bk-checkbox>
-              <bk-checkbox value="is_supervise_needed" class="mr40">
-                {{ $t(`m.tickets['允许督办']`) }}
-              </bk-checkbox>
-            </bk-checkbox-group>
-          </bk-form-item>
-          <bk-form-item v-if="formData.otherSettings.includes('is_supervise_needed')" :label-width="100" :label="$t(`m.treeinfo['其他督办人']`)">
-            <deal-person
-              ref="supervisePerson"
-              form-type="inline-auto-width"
-              :value="supervisePerson"
-              :show-role-type-list="superviseTypes">
-            </deal-person>
-          </bk-form-item>
           <bk-form-item :label="$t(`m.treeinfo['自动处理']`)">
             <bk-checkbox
               :true-value="true"
@@ -399,7 +381,6 @@
         const {
           revokeWay,
           revokeState,
-          otherSettings,
           notify,
         } = this.formData;
         if (revokeWay === 'not_support') {
@@ -413,17 +394,9 @@
             state: revokeWay === 'specify_node' ? revokeState : 0,
           };
         }
-        // 其他设置
-        params.can_ticket_agency = otherSettings.some(key => key === 'can_ticket_agency');
-        workflow.is_supervise_needed = otherSettings.some(key => key === 'is_supervise_needed');
-        // 督办
-        if (this.$refs.supervisePerson && workflow.is_supervise_needed) {
-          const { type, value } = this.$refs.supervisePerson.getValue();
-          if (type !== 'STARTER') {
-            workflow.supervise_type = type;
-            workflow.supervisor = value;
-          }
-        }
+        // 其他设置 写死
+        params.can_ticket_agency = false; // 默认false
+        workflow.is_supervise_needed = true;
         // 通知方式
         workflow.notify = this.noticeType.filter(notifyItem => notify.some(item => notifyItem.typeName === item));
         workflow.notify.forEach(item => {

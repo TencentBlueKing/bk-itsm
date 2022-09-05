@@ -310,7 +310,9 @@
       if (this.editTask && this.item.value.id) { // 编辑任务时，需要加载模板详情
         this.getTemplateDetail(this.item.value.bk_biz_id, this.item.value.id);
       }
-      this.getTicketOutput();
+      if (this.basicInfomation.id) {
+        this.getTicketOutput();
+      }
       this.getTemplateList();
     },
     methods: {

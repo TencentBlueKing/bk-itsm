@@ -38,7 +38,7 @@
           :true-value="true"
           :false-value="false"
           v-model="exportInfo.allCheck"
-          @change="checkAll">
+          @change="checkAll('general')">
           {{ $t(`m.tickets['全选']`) }}
         </bk-checkbox>
       </p>
@@ -48,7 +48,7 @@
             :value="item.id"
             :key="item.id"
             class="mr10 mb10"
-            @change="checkOne(item)">
+            @change="checkOne('general', item)">
             {{item.name}}
           </bk-checkbox>
         </template>
@@ -56,13 +56,23 @@
       <!-- 单服务提单信息 -->
       <h3 class="export-section-title">{{ $t(`m.tickets['提单字段']`) }}</h3>
       <template v-if="exportInfo.serviceFieldsList.length">
+        <p class="pb20">
+          <bk-checkbox
+            :true-value="true"
+            :false-value="false"
+            v-model="exportInfo.serviceAllCheck"
+            @change="checkAll('service')">
+            {{ $t(`m.tickets['全选']`) }}
+          </bk-checkbox>
+        </p>
         <bk-checkbox-group v-model="exportInfo.serviceCheckList">
           <template v-for="item in exportInfo.serviceFieldsList">
             <bk-checkbox
               :value="item.id"
               :key="item.id"
               :disabled="item.disabled"
-              class="mr10 mb10">
+              class="mr10 mb10"
+              @change="checkOne('service', item)">
               {{item.name}}
             </bk-checkbox>
           </template>
@@ -86,7 +96,7 @@
     <div slot="footer">
       <bk-button
         theme="primary"
-        :disabled="!exportInfo.checkList.length && !exportInfo.serviceCheckList.length"
+        :disabled="!exportInfo.checkList.length"
         @click="submitExport">
         {{ $t('m.treeinfo["确定"]') }}
       </bk-button>
@@ -159,6 +169,7 @@
           width: 700,
           headerPosition: 'left',
           allCheck: false,
+          serviceAllCheck: false,
           checkList: [],
           serviceCheckList: [],
           serviceFieldsList: [],
@@ -210,24 +221,43 @@
           });
       },
       // 导出弹框全选变化
-      checkAll() {
-        if (this.exportInfo.checkList.length === this.exportFieldsList.length) {
-          this.exportInfo.checkList = [];
-          this.exportInfo.allCheck = false;
+      checkAll(type) {
+        if (type === 'general') {
+          if (this.exportInfo.checkList.length === this.exportFieldsList.length) {
+            this.exportInfo.checkList = [];
+            this.exportInfo.allCheck = false;
+          } else {
+            this.exportInfo.checkList = this.exportFieldsList.map(item => item.id);
+            this.exportInfo.allCheck = true;
+          }
         } else {
-          this.exportInfo.checkList = this.exportFieldsList.map(item => item.id);
-          this.exportInfo.allCheck = true;
+          if (this.exportInfo.serviceCheckList.length === this.exportInfo.serviceFieldsList.length) {
+            this.exportInfo.serviceCheckList = [];
+            this.exportInfo.serviceAllCheck = false;
+          } else {
+            this.exportInfo.serviceCheckList = this.exportInfo.serviceFieldsList.map(item => item.id);
+            this.exportInfo.serviceAllCheck = true;
+          }
         }
       },
       // 导出弹框checkbox变化
-      checkOne(item) {
-        const { checkList } = this.exportInfo;
-        if (checkList.some(checkItem => checkItem === item.id)) {
-          this.exportInfo.checkList = checkList.filter(checkItem => checkItem !== item.id);
+      checkOne(type, item) {
+        const { checkList, serviceCheckList } = this.exportInfo;
+        if (type === 'general') {
+          if (checkList.some(checkItem => checkItem === item.id)) {
+            this.exportInfo.checkList = checkList.filter(checkItem => checkItem !== item.id);
+          } else {
+            this.exportInfo.checkList.push(item.id);
+          }
+          this.exportInfo.allCheck = this.exportInfo.checkList.length === this.exportFieldsList.length;
         } else {
-          this.exportInfo.checkList.push(item.id);
+          if (serviceCheckList.some(checkItem => checkItem === item.id)) {
+            this.exportInfo.serviceCheckList = serviceCheckList.filter(checkItem => checkItem !== item.id);
+          } else {
+            this.exportInfo.serviceCheckList.push(item.id);
+          }
+          this.exportInfo.serviceAllCheck = this.exportInfo.serviceCheckList.length === this.exportInfo.serviceFieldsList.length;
         }
-        this.exportInfo.allCheck = checkList.length === this.exportFieldsList.length;
       },
       submitExport() {
         const params = {

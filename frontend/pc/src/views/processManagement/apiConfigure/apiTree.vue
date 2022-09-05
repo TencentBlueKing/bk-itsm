@@ -35,7 +35,7 @@
               ref="dropdown"
               style="width: 70px; line-height: 30px;">
               <div class="dropdown-trigger-btn" style="padding-left: 12px;" slot="dropdown-trigger">
-                <span>{{ $t(`m.systemConfig['接入']`)}}</span>
+                <span>{{ $t(`m.systemConfig['系统接入']`)}}</span>
                 <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
               </div>
               <ul class="bk-dropdown-list" slot="dropdown-content">
@@ -44,9 +44,9 @@
                     data-test-id="api_a_accessApi"
                     v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
                     :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
-                    :title="$t(`m.systemConfig['接入']`)"
+                    :title="$t(`m.systemConfig['系统接入']`)"
                     @click="openDictionary('JION')">
-                    {{ $t(`m.systemConfig['接入']`) }}
+                    {{ $t(`m.systemConfig['系统接入']`) }}
                   </a>
                 </li>
                 <li>
@@ -54,9 +54,9 @@
                     data-test-id="api_a_createApi"
                     v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
                     :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
-                    :title="$t(`m.systemConfig['新增']`)"
+                    :title="$t(`m.systemConfig['系统新增']`)"
                     @click="openDictionary('ADD')">
-                    {{$t(`m.systemConfig['新增']`)}}
+                    {{$t(`m.systemConfig['系统新增']`)}}
                   </a>
                 </li>
               </ul>
