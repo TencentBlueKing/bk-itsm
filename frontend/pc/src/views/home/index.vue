@@ -28,7 +28,7 @@
       </div>
       <div class="main-content">
         <service-list></service-list>
-        <ticket-table></ticket-table>
+        <!-- <ticket-table></ticket-table> -->
       </div>
       <copyright-footer></copyright-footer>
     </div>
@@ -36,14 +36,14 @@
 </template>
 <script>
   import ServiceList from './serviceList.vue';
-  import TicketTable from './ticketTable.vue';
+  // import TicketTable from './ticketTable.vue';
   import CopyrightFooter from '@/components/common/layout/CopyrightFooter.vue';
 
   export default {
     name: 'Home',
     components: {
       ServiceList,
-      TicketTable,
+      // TicketTable,
       CopyrightFooter,
     },
     data() {

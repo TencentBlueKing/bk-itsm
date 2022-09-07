@@ -223,7 +223,7 @@
     methods: {
       // 获取当前视图表格头显示字段
       getFields() {
-        let defaultColumn = ['id', 'title', 'service_name', 'current_processors', 'create_at', 'creator', 'operate'];
+        let defaultColumn = ['id', 'title', 'service_name', 'current_processors', 'create_at', 'creator', 'operate', 'status'];
         const allColumn = [
           { id: 'id', label: this.$t('m.tickets[\'单号\']'), width: '200', disabled: true, prop: 'sn' },
           { id: 'title', label: this.$t('m.tickets[\'标题\']'), minWidth: '180', prop: 'title' },

@@ -382,11 +382,8 @@
         this.isShowRightEdit = false;
       },
       onEditCancel() {
-        if (this.crtForm === 'add') {
-          this.cancelAddField();
-        } else {
-          this.crtForm = '';
-        }
+        this.cancelAddField();
+        this.crtForm = '';
         this.isShowRightEdit = false;
       },
       getAddFieldStatus(status) {
@@ -647,6 +644,13 @@
         this.crtForm = 'add';
       },
       fieldDelete(form) {
+        if (this.crtForm) {
+          this.$bkMessage({
+            message: this.$t('m["请先将当前字段属性关闭再进行操作"]'),
+            theme: 'warning',
+          });
+          return;
+        }
         if (form.id === 'add') {
           this.onEditCancel();
           return;

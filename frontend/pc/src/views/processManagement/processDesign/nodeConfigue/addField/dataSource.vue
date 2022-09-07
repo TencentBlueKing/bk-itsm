@@ -26,7 +26,7 @@
     <bk-select :ext-cls="typeClass"
       v-model="formInfo.source_type"
       :clearable="false"
-      :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE' || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT')) && formInfo.key !== 'bk_biz_id'"
+      :disabled="dataSourceDisable"
       searchable
       @selected="changeSource">
       <bk-option v-for="option in sourceList"
@@ -39,6 +39,7 @@
       <bk-select :ext-cls="'bk-halfline-item'"
         v-model="dictionaryData.check"
         :clearable="false"
+        :disabled="dataSourceDisable"
         searchable>
         <bk-option v-for="option in dictionaryData.list"
           :key="option.key"
@@ -141,6 +142,9 @@
     computed: {
       globalChoise() {
         return this.$store.state.common.configurInfo;
+      },
+      dataSourceDisable() {
+        return (this.changeInfo.is_builtin || this.changeInfo.source === 'TABLE' || (this.changeInfo.meta && this.changeInfo.meta.code === 'APPROVE_RESULT')) && this.formInfo.key !== 'bk_biz_id';
       },
     },
     watch: {

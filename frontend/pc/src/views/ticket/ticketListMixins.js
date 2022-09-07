@@ -146,12 +146,22 @@ const ticketListMixins = {
       return this.$store.state.ticket.settingCache[this.type];
     },
   },
+  watch: {
+    type(newVal, oldVal) {
+      const defaultType = ['event', 'change', 'request', 'question'];
+      if (newVal !== oldVal && defaultType.includes(newVal)) {
+        this.getTypeStatus();
+      }
+    },
+  },
   created() {
+    this.getTypeStatus();
     this.initData();
+    // console.log(this.type);
   },
   methods: {
     initData() {
-      let defaultFields = ['id', 'title', 'service_name', 'current_steps', 'current_processors', 'create_at', 'creator', 'operate'];
+      let defaultFields = ['id', 'title', 'service_name', 'current_steps', 'current_processors', 'create_at', 'creator', 'operate', 'status'];
       // 表格设置有缓存，使用缓存数据
       if (this.currTabSettingCache) {
         const { fields, size } = this.currTabSettingCache;
@@ -330,6 +340,19 @@ const ticketListMixins = {
     getRowStyle({ row }) {
       return `background-color: ${row.sla_color}`;
     },
+    // 获取状态颜色接口
+    getTypeStatus() {
+      const params = {};
+      const type = '';
+      this.$store
+        .dispatch('ticketStatus/getTypeStatus', { type, params })
+        .then((res) => {
+          this.colorHexList = res.data;
+        })
+        .catch((res) => {
+          errorHandler(res, this);
+        });
+    },
     getPriorityColor(row) {
       const priorityList = ['#A4AAB3', '#FFB848', '#FF5656'];
       let priorityIndex = 1;
@@ -342,6 +365,7 @@ const ticketListMixins = {
       } : { backgroundColor: priorityList[priorityIndex - 1] };
     },
     getstatusColor(row) {
+      // console.log(row)
       const statusColor = this.colorHexList.filter(item => item.service_type === row.service_type
                 && item.key === row.current_status);
       return statusColor.length
