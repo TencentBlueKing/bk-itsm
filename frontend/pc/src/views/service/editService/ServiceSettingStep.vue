@@ -352,10 +352,16 @@
         });
       },
       async validate() {
+        const {
+          supervisor,
+          can_ticket_agency: canTicketAgency,
+          is_supervise_needed: isSuperviseNeede,
+          supervise_type: superviseType,
+        } = this.serviceInfo;
         const params = {
           workflow_config: {
-            supervise_type: 'EMPTY',
-            supervisor: '',
+            supervise_type: superviseType || 'EMPTY',
+            supervisor: supervisor || '',
             revoke_config: {
               type: 0, // 默认值
               state: 0,
@@ -395,8 +401,8 @@
           };
         }
         // 其他设置 写死
-        params.can_ticket_agency = false; // 默认false
-        workflow.is_supervise_needed = true;
+        params.can_ticket_agency = canTicketAgency || false;
+        workflow.is_supervise_needed = isSuperviseNeede || true;
         // 通知方式
         workflow.notify = this.noticeType.filter(notifyItem => notify.some(item => notifyItem.typeName === item));
         workflow.notify.forEach(item => {
