@@ -26,7 +26,7 @@
       <p class="bk-api-title">{{ $t(`m.systemConfig["API列表"]`) }}</p>
       <div class="bk-api-button">
         <bk-dropdown-menu class="mr10 access-btn" @show="dropdownShow" @hide="dropdownHide" ref="apiDropdown">
-          <div class="dropdown-trigger-btn" style="padding-left: 6px;" slot="dropdown-trigger">
+          <div class="dropdown-trigger-btn" style="padding-left: 12px;" slot="dropdown-trigger">
             <span style="font-size: 14px;">{{ $t(`m.systemConfig['Api接入']`)}}</span>
             <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
           </div>

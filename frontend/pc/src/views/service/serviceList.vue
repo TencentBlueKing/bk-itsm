@@ -432,7 +432,6 @@
     {
       id: 'is_valid',
       label: '状态',
-      width: 200,
       minWidth: 200,
     },
   ];
