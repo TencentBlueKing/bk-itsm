@@ -308,14 +308,14 @@
         <textarea
           class="bk-form-textarea bk-textarea-tanble bk-halfline-item bk-halfline-margin field-input-tips"
           :placeholder="$t(`m.treeinfo['请输入字段填写说明']`)"
-          :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
+          :disabled="changeInfo.source === 'TABLE'"
           v-model.trim="formInfo.desc">
                 </textarea>
         <p class="field-tips-checkbox" style="margin-left: 335px;">
           <bk-checkbox
             :true-value="trueStatus"
+            :disabled="changeInfo.source === 'TABLE'"
             :false-value="falseStatus"
-            :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
             v-model="formInfo.is_tips">
             {{ $t('m.treeinfo["添加额外提示说明"]') }}
           </bk-checkbox>
@@ -327,7 +327,7 @@
           :required="true"
           :ext-cls="'bk-mt20-item'">
           <!-- 禁用：formInfo.isModule && formInfo.key!== 'bk_biz_id' -->
-          <textarea :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
+          <textarea :disabled="changeInfo.source === 'TABLE'"
             class="bk-form-textarea bk-textarea-tanble bk-halfline-item bk-halfline-margin"
             :placeholder="$t(`m.treeinfo['请输入，用于鼠标经过提示']`)"
             v-model.trim="formInfo.tips">

@@ -2268,7 +2268,7 @@ export const m = {
     请输入业务名称: 'Please enter a business name',
   },
   首页: 'Home',
-  我的工作台: 'Workbench',
+  我的单据: 'Ticket',
   项目: 'Project',
   知识库: 'Knowledge',
   平台管理: 'Administration',
@@ -2648,4 +2648,5 @@ export const m = {
   节点: 'Node',
   名称: 'Name',
   设置为全局变量: 'Set as global variable',
+  请先将当前字段属性关闭再进行操作: 'Please close the current field property before proceeding',
 };

@@ -41,7 +41,7 @@
         <bk-form-item :label="$t(`m.trigger['是否启用']`)">
           <bk-switcher data-test-id="triggers_switcher_isUseTrigger" v-model="formData.is_enabled" size="small"></bk-switcher>
         </bk-form-item>
-        <template v-if="!originInfoToTrigger.id">
+        <!-- <template v-if="!originInfoToTrigger.id">
           <bk-form-item :label="$t(`m.trigger['基础模型']`)">
             <bk-select v-model="formData.moduleType"
               searchable
@@ -56,7 +56,7 @@
               </bk-option>
             </bk-select>
           </bk-form-item>
-        </template>
+        </template> -->
         <bk-form-item :label="$t(`m.trigger['触发器描述']`)">
           <bk-input
             :placeholder="$t(`m.trigger['请输入触发器描述']`)"
@@ -238,7 +238,7 @@
           is_enabled: true,
           desc: '',
           signal: '',
-          moduleType: '',
+          // moduleType: '',
           moduleTypeDisabled: false,
           variableLoading: false,
         },
@@ -422,7 +422,7 @@
         this.formData.desc = this.triggerInfo.desc;
         this.formData.signal = this.triggerInfo.signal;
         if (this.triggerInfo.source_table_id) {
-          this.formData.moduleType = this.triggerInfo.source_table_id;
+          // this.formData.moduleType = this.triggerInfo.source_table_id;
           this.formData.moduleTypeDisabled = true;
           this.giveTableVariables(this.triggerInfo.source_table_id);
         }
@@ -625,7 +625,7 @@
               source_type: 'basic',
               source_id: 0,
               signal: this.formData.signal,
-              source_table_id: this.formData.moduleType,
+              // source_table_id: this.formData.moduleType,
               sender: 0,
               is_draft: type,
               is_enabled: this.formData.is_enabled,
