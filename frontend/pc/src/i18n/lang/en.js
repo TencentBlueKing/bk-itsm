@@ -429,6 +429,7 @@ export const m = {
     '任务功能开关：': 'Task Enabled:',
     '短信评论开关：': 'SMS comment Enabled:',
     '“功能开关”可以自定义启停以下ITSM功能模块，关闭后，该模块对应的所有的功能将被隐藏。': '"Function Control" can be customized to start and stop the following ITSM function module. When closed, all functions corresponding to this module will be hidden.',
+    '““SLA功能开关” 关闭后，该按钮开关和模块对应的所有的功能将被隐藏。': ' "SLA Function Control" is turned off, all functions corresponding to the button switch and the module will be hidden.',
     功能开关: 'Function Control',
     '流程预览功能开关：': 'Preview Enabled:',
     'SLA功能开关：': 'SLA Enabled:',
