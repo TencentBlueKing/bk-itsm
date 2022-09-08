@@ -34,7 +34,7 @@
               @hide="dropdownHide"
               ref="dropdown"
               style="width: 70px; line-height: 30px;">
-              <div class="dropdown-trigger-btn" style="padding-left: 12px;" slot="dropdown-trigger">
+              <div class="dropdown-trigger-btn" style="padding-left: 6px;" slot="dropdown-trigger">
                 <span>{{ $t(`m.systemConfig['系统接入']`)}}</span>
                 <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
               </div>

@@ -398,41 +398,41 @@
       id: 'name',
       label: '服务名称',
       minWidth: 200,
-      width: 200,
     },
     {
       id: 'key',
       label: '类型',
-      width: 200,
+      minWidth: 200,
     },
     {
       id: 'desc',
       label: '描述',
-      width: 200,
+      minWidth: 200,
     },
     {
       id: 'creator',
       label: '创建人',
-      width: 100,
+      minWidth: 100,
     },
     {
       id: 'updated_by',
       label: '更新人',
-      width: 100,
+      minWidth: 100,
     },
     {
       id: 'update_at',
       label: '更新时间',
-      width: 150,
+      minWidth: 150,
     },
     {
       id: 'bounded_catalogs',
       label: '关联目录',
-      width: 200,
+      minWidth: 200,
     },
     {
       id: 'is_valid',
       label: '状态',
+      minWidth: 200,
     },
   ];
   export default {
