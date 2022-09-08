@@ -16,6 +16,7 @@ desktop:
     width: 1200
     height: 720
     is_max: True
+    open_mode: new_tab
 date: 2020-07-02 18:00:00
 env:
   - key: BKAPP_ENABLE_SHARED_FS
