@@ -67,7 +67,7 @@
           </bk-input>
         </bk-form-item>
       </bk-form>
-      <div class="bk-basic-type" v-bk-clickoutside="handleClickOutSide">
+      <!-- <div class="bk-basic-type" v-bk-clickoutside="handleClickOutSide">
         <p class="bk-type-icon"><i class="bk-itsm-icon" :class="[iconInfo.key]"></i></p>
         <p class="bk-type-name">{{iconInfo.name}}</p>
         <div class="bk-type-change"
@@ -84,7 +84,7 @@
             <i class="bk-itsm-icon" :class="[item.key]" style="font-size: 24px"></i>
           </li>
         </ul>
-      </div>
+      </div> -->
     </div>
     <div class="bk-service-name">
       <h1><span class="is-outline"></span>{{$t(`m.trigger['触发机制']`)}}</h1>

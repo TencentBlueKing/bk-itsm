@@ -41,13 +41,14 @@
                 'bk-number-name': true,
                 'bk-version-click-color': versionInfo.version === item.version }">
                 <span>V{{item.version}}</span>
-                <span class="bk-current-version"
-                  v-if="item.is_latest === true">{{ $t('m.wiki["当前版本"]')}}</span>
               </p>
               <p :class="{
                 'bk-number-time': true,
                 'bk-version-click-color': versionInfo.version === item.version }">
-                {{item.create_at}}</p>
+                {{item.create_at}}
+                <span class="bk-current-version"
+                  v-if="item.is_latest === true">{{ $t('m.wiki["当前版本"]')}}</span>
+              </p>
               <div class="bk-version-click" v-if="versionInfo.version === item.version"></div>
             </li>
           </ul>
@@ -193,7 +194,7 @@
                 li {
                     width: 100%;
                     height: 54px;
-                    padding: 8px 0 8px 30px;
+                    padding: 2px 0 8px 30px;
                     color: #63656E;
                     font-size: 12px;
                     position: relative;
@@ -214,19 +215,19 @@
                         font-size: 16px;
                         position: relative;
                         font-weight: 700;
-
-                        .bk-current-version {
-                            display: inline-block;
-                            margin-left: 10px;
-                            background: #699DF4;
-                            color: #fff;
-                            padding: 0 5px;
-                            line-height: 20px;
-                            font-size: 12px;
-                            border-radius: 3px;
-                        }
+                      }
+                    .bk-number-time {
+                      .bk-current-version {
+                          display: inline-block;
+                          margin-left: 10px;
+                          background: #699DF4;
+                          color: #fff;
+                          padding: 0 5px;
+                          line-height: 20px;
+                          font-size: 12px;
+                          border-radius: 3px;
+                      }
                     }
-
                     .bk-version-click {
                         position: absolute;
                         top: -2px;
