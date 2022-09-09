@@ -226,7 +226,8 @@
       backButton() {
         this.$parent.backTab();
       },
-      ajaxSubmit() {
+      async ajaxSubmit() {
+        await this.saveTypeFlow();
         const params = {
           name: '启动',
           service_type: this.statusType,
