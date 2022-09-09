@@ -243,19 +243,21 @@
               </template>
             </div>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.serviceConfig['操作']`)" width="160">
+          <bk-table-column :label="$t(`m.serviceConfig['操作']`)" width="120" fixed="right">
             <template slot-scope="props">
               <!-- sla -->
-              <bk-button
-                v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
-                v-cursor
-                text
-                theme="primary"
-                class="btn-permission-disable"
-                @click="onServicePermissonCheck(['service_manage'], props.row)">
-                SLA
-              </bk-button>
-              <router-link v-else data-test-id="service_link_linkToSLA" class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id, catalog_id: $route.query.catalog_id } }">SLA</router-link>
+              <template v-if="openFunction.SLA_SWITCH">
+                <bk-button
+                  v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                  v-cursor
+                  text
+                  theme="primary"
+                  class="btn-permission-disable"
+                  @click="onServicePermissonCheck(['service_manage'], props.row)">
+                  SLA
+                </bk-button>
+                <router-link v-else data-test-id="service_link_linkToSLA" class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id, catalog_id: $route.query.catalog_id } }">SLA</router-link>
+              </template>
               <!-- 编辑 -->
               <bk-button
                 v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
@@ -530,6 +532,11 @@
         tableHoverId: '',
         isImportServiceShow: false,
       };
+    },
+    computed: {
+      openFunction() {
+        return this.$store.state.openFunction;
+      },
     },
     watch: {
       'treeInfo.node'() {

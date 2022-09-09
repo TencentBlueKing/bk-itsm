@@ -32,7 +32,7 @@ import i18n from '@/i18n/index.js';
 
 const ROUTE_LIST = [
   {
-    name: i18n.t('m["首页"]'),
+    name: i18n.t('m["服务台"]'),
     id: 'home',
     path: '/',
   },

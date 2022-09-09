@@ -2274,7 +2274,7 @@ export const m = {
     请输入服务名称: 'Please enter a service name',
     请输入业务名称: 'Please enter a business name',
   },
-  首页: 'Home',
+  服务台: 'Home',
   我的单据: 'Ticket',
   项目: 'Project',
   知识库: 'Knowledge',
