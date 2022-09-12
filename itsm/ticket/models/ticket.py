@@ -2107,13 +2107,15 @@ class Ticket(Model, BaseTicket):
         )
 
     def can_supervise(self, username):
-        return all(
-            [
-                self.is_supervise_needed,
-                not self.is_over,
-                username in self.real_supervisors,
-            ]
-        )
+        # return all(
+        #     [
+        #         self.is_supervise_needed,
+        #         not self.is_over,
+        #         username in self.real_supervisors,
+        #     ]
+        # )
+        # 调整为提单人都可以督办
+        return username == self.creator
 
     def iam_ticket_manage_auth(self, username):
         # 本地开发环境，不校验单据管理权限
