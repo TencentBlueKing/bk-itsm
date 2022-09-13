@@ -40,7 +40,7 @@
           </bk-input>
         </bk-form-item>
         <desc-info v-model="formInfo.desc"></desc-info>
-        <bk-form-item
+        <!-- <bk-form-item
           data-test-id="approveNode-input-nodeLabel"
           :label="$t(`m.treeinfo['节点标签：']`)"
           :required="true"
@@ -56,7 +56,7 @@
               :name="option.name">
             </bk-option>
           </bk-select>
-        </bk-form-item>
+        </bk-form-item> -->
         <bk-form-item
           data-test-id="approveNode-radio-approveMode"
           :label="$t(`m.treeinfo['审批方式：']`)"

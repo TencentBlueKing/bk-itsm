@@ -74,7 +74,7 @@
             </bk-table-column>
             <bk-table-column :label="$t(`m.manageCommon['提单人']`)" :width="140" :sortable="true" prop="creator"></bk-table-column>
             <bk-table-column :label="$t(`m.manageCommon['提单时间']`)" :width="180" :sortable="true" prop="create_at"></bk-table-column>
-            <bk-table-column :label="$t(`m.manageCommon['操作']`)" :width="100">
+            <bk-table-column :label="$t(`m.manageCommon['操作']`)" :width="100" fixed="right">
               <template slot-scope="props">
                 <template v-if="activePanel === 'approval'">
                   <bk-link theme="primary" @click="onOpenApprovalDialog(props.row.id, true)">{{ $t(`m.managePage['通过']`) }}</bk-link>

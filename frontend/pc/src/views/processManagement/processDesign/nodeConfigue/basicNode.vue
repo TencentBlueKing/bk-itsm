@@ -116,7 +116,7 @@
     },
     methods: {
       initData() {
-        this.getNodeTagList();
+        // this.getNodeTagList();
       },
       // 获取节点标签数据
       getNodeTagList() {

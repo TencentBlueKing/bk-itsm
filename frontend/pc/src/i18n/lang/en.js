@@ -2657,4 +2657,8 @@ export const m = {
   名称: 'Name',
   设置为全局变量: 'Set as global variable',
   请先将当前字段属性关闭再进行操作: 'Please close the current field property before proceeding',
+  自定义用户组: 'Custom User Group',
+  新增自定义用户组: 'Add custom user group',
+  修改自定义用户组: 'Edit custom user group',
+  '用户组名：': 'User Group Name：',
 };

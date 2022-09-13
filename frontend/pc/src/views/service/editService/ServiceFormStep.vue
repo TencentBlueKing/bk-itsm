@@ -134,12 +134,12 @@
           :required="true"
           property="name"
           error-display-type="normal">
-          <bk-input v-model="formData.name" :maxlength="120" :show-word-limit="true"></bk-input>
+          <bk-input v-model="formData.name" :maxlength="100" :show-word-limit="true"></bk-input>
         </bk-form-item>
         <bk-form-item
           :label="$t(`m.serviceConfig['服务描述']`)"
           property="desc">
-          <bk-input v-model="formData.desc" type="textarea" :row="3" :maxlength="100"></bk-input>
+          <bk-input v-model="formData.desc" type="textarea" :row="3" :maxlength="255"></bk-input>
         </bk-form-item>
         <bk-form-item
           data-test-id="service-select-serviceDirectory"
