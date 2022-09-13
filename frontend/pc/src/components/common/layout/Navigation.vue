@@ -412,7 +412,7 @@
         //     }
         // }
         if (router.id === 'project') {
-          this.$router.push({ name: 'projectTicket', query: { project_id: this.$store.state.project.id } });
+          this.$router.push({ name: 'projectServiceList', query: { project_id: this.$store.state.project.id } });
         } else {
           this.$router.push(router.path);
         }
@@ -452,7 +452,7 @@
         if (this.$route.name === 'projectServiceEdit') {
           path = 'projectServiceList';
         }
-        this.$router.push({ name: this.$route.name === 'ProjectGuide' ? 'projectTicket' : path, query: { project_id: val } });
+        this.$router.push({ name: this.$route.name === 'ProjectGuide' ? 'projectServiceList' : path, query: { project_id: val } });
       },
       applyForProjectViewPerm(project, perm) {
         if (!this.hasPermission([perm], project.auth_actions)) {

@@ -82,7 +82,7 @@
           if (!this.$store.state.project.id && projectsWithViewPerm.length !== 0) {
             this.$store.commit('project/setProjectId', projectsWithViewPerm[0].key);
             this.$store.dispatch('project/changeDefaultProject', projectsWithViewPerm[0].key);
-            this.$router.replace({ name: 'projectTicket', query: { project_id: projectsWithViewPerm[0].key } });
+            this.$router.replace({ name: 'projectServiceList', query: { project_id: projectsWithViewPerm[0].key } });
           }
         } catch (e) {
           errorHandler(e, this);
