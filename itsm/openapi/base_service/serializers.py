@@ -9,6 +9,7 @@ from itsm.component.exceptions import ParamError
 from itsm.component.utils.basic import TempDisableSignal
 from itsm.openapi.base_service.utils import WorkflowInitHandler
 from itsm.openapi.base_service.validator import CreateTicketValidator
+from itsm.postman.serializers import RemoteSystemSerializer, RemoteApiSerializer
 from itsm.service.models import ServiceCatalog, Service
 from itsm.service.serializers import ServiceSerializer
 from itsm.service.validators import key_validator, service_validate
@@ -285,3 +286,11 @@ class OpenApiWorkflowVersionSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkflowVersion
         fields = "__all__"
+
+
+class PostManSerializer(RemoteSystemSerializer):
+    pass
+
+
+class PostManRemoteApiSerializer(RemoteApiSerializer):
+    pass
