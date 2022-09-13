@@ -2571,6 +2571,7 @@ export const m = {
   头信息: 'Headers',
   主体: 'Body',
   字段名: 'field name',
+  用户组名: 'User Group Name',
   值: 'value',
   描述: 'describe',
   '必需以http://或https://开头': 'Must start with http:// or https://',

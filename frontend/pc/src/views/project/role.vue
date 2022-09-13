@@ -90,7 +90,7 @@
             </template>
           </bk-table-column>
 
-          <bk-table-column :label="$t(`m.user['角色名']`)" width="200">
+          <bk-table-column :label="$t(`m['用户组名']`)" width="200">
             <template slot-scope="props">
               <span :title="props.row.name">{{ props.row.name || '--' }}</span>
             </template>

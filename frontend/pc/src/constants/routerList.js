@@ -76,20 +76,20 @@ const ROUTE_LIST = [
   {
     name: i18n.t('m["项目"]'),
     id: 'project',
-    path: '/project/ticket',
+    path: '/project/service/list',
     subRouters: [
       {
         name: i18n.t('m["服务"]'),
         abbrName: 'Ser.',
         id: 'service',
         subRouters: [
-          {
-            name: i18n.t('m["单据"]'),
-            id: 'projectTicket',
-            icon: 'bk-itsm-icon icon-ticket_4',
-            path: '/project/ticket',
-            prefix: ['/ticket/detail', '/ticket/create'],
-          },
+          // {
+          //   name: i18n.t('m["单据"]'),
+          //   id: 'projectTicket',
+          //   icon: 'bk-itsm-icon icon-ticket_4',
+          //   path: '/project/ticket',
+          //   prefix: ['/ticket/detail', '/ticket/create'],
+          // },
           {
             name: i18n.t('m["服务"]'),
             id: 'projectServiceList',
