@@ -147,7 +147,7 @@
       </bk-table-column>
 
       <bk-table-column :label="$t(`m.systemConfig['接入数']`)" prop="count" width="80"></bk-table-column>
-      <bk-table-column :label="$t(`m.systemConfig['操作']`)" width="150">
+      <bk-table-column :label="$t(`m.systemConfig['操作']`)" width="150" fixed="right">
         <template slot-scope="props">
           <bk-button theme="primary" text
             data-test-id="api_button_apiTableExportApi"

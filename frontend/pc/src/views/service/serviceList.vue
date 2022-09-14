@@ -389,6 +389,7 @@
   import commonMix from '@/views/commonMix/common.js';
   import { errorHandler } from '../../utils/errorHandler';
   import treeInfo from './directoryCom/treeInfo.vue';
+  import { deepClone } from '../../utils/util';
   // import selectTree from '@/components/form/selectTree/index.vue'
   const FIELDS = [
     {
@@ -452,6 +453,7 @@
           node: {},
         },
         rules: {},
+        tableSettings: [],
         setting: {
           fields: FIELDS,
           selectedFields: FIELDS,
@@ -562,6 +564,11 @@
       this.rules.key = this.checkCommonRules('required').required;
     },
     mounted() {
+      const curTableSetting = JSON.parse(localStorage.getItem('tableSettings')).find(item => item.type === 'service');
+      if (curTableSetting) {
+        this.setting.size = curTableSetting.size;
+        this.setting.selectedFields = curTableSetting.fields;
+      }
       this.getServiceTypes();
       this.getList();
       this.getSlaList();
@@ -569,6 +576,18 @@
     },
     methods: {
       handleSettingChange({ fields, size }) {
+        const curTableSetting = deepClone(this.tableSettings.find(item => item.type === 'service'));
+        if (curTableSetting) {
+          curTableSetting.size = size;
+          curTableSetting.fields = fields;
+        } else {
+          this.tableSettings.push({
+            type: 'service',
+            size,
+            fields,
+          });
+        }
+        localStorage.setItem('tableSettings', JSON.stringify(this.tableSettings));
         this.setting.size = size;
         this.setting.selectedFields = fields;
       },

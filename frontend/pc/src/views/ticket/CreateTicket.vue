@@ -561,7 +561,7 @@
     margin: 0 auto;
     display: flex;
     align-items: center;
-    padding: 20px;
+    padding: 20px 100px 20px 20px;
     background: #ffffff;
     border-radius: 2px;
     box-shadow: 0px 2px 6px 0px rgba(6,6,6,0.1);

@@ -154,7 +154,7 @@ const ROUTE_LIST = [
         id: 'projectManage',
         subRouters: [
           {
-            name: i18n.t('m["用户组"]'),
+            name: i18n.t('m["自定义用户组"]'),
             id: 'projectRoles',
             icon: 'bk-itsm-icon icon-itsm-icon-two-zero',
             path: '/project/roles',

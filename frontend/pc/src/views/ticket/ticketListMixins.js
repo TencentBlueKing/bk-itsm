@@ -143,6 +143,7 @@ const ticketListMixins = {
       return this.$store.state.openFunction;
     },
     currTabSettingCache() {
+      this.$store.commit('ticket/getTicketSettingformLocalStorage');
       return this.$store.state.ticket.settingCache[this.type];
     },
   },
@@ -432,6 +433,7 @@ const ticketListMixins = {
         type: this.type,
         value: { fields: fieldIds, size },
       });
+      this.$store.commit('ticket/setTicketSettingToLocalStorage');
     },
     // 添加关注/取消关注
     onChangeAttention(row) {

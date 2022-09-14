@@ -202,6 +202,7 @@
         return this.$store.state.openFunction;
       },
       currTabSettingCache() {
+        this.$store.commit('ticket/getTicketSettingformLocalStorage');
         return this.$store.state.ticket.settingCache[`all_${this.serviceType}`];
       },
     },
@@ -364,6 +365,7 @@
           type: `all_${this.serviceType}`,
           value: { fields: fieldIds, size },
         });
+        this.$store.commit('ticket/setTicketSettingToLocalStorage');
       },
       getRowStyle({ row }) {
         return `background-color: ${row.sla_color}`;

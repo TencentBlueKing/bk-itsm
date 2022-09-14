@@ -68,7 +68,7 @@
               <span :title="props.row.updated_by">{{ props.row.updated_by || '--' }}</span>
             </template>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.slaContent['操作']`)" width="150">
+          <bk-table-column :label="$t(`m.slaContent['操作']`)" width="150" fixed="right">
             <template slot-scope="props">
               <bk-button theme="primary"
                 v-if="!props.row.configured"

@@ -38,7 +38,7 @@
         </bk-input>
       </bk-form-item>
       <desc-info v-model="formInfo.desc"></desc-info>
-      <bk-form-item :label="$t(`m.treeinfo['节点标签：']`)" :required="true">
+      <!-- <bk-form-item :label="$t(`m.treeinfo['节点标签：']`)" :required="true">
         <bk-select :ext-cls="'bk-form-width'"
           v-model="formInfo.tag"
           :clearable="false"
@@ -50,7 +50,7 @@
             :name="option.name">
           </bk-option>
         </bk-select>
-      </bk-form-item>
+      </bk-form-item> -->
       <bk-form-item data-test-id="basicInfo-select-ProcessingScenarios" :label="$t(`m.treeinfo['处理场景：']`)" :required="true">
         <bk-select :ext-cls="'bk-form-width'"
           v-model="formInfo.distribute_type"

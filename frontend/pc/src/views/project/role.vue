@@ -24,7 +24,7 @@
   <div class="bk-itsm-service">
     <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
       <p class="bk-come-back">
-        {{ $t('m["用户组"]') }}
+        {{ $t('m["自定义用户组"]') }}
       </p>
     </div>
     <div class="itsm-page-content">
@@ -110,7 +110,7 @@
               <span :title="props.row.owners">{{props.row.owners || '--'}}</span>
             </template>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.user['操作']`)" width="150">
+          <bk-table-column :label="$t(`m.user['操作']`)" width="150" fixed="right">
             <template slot-scope="props">
               <bk-button
                 data-test-id="userGroup_button_edit"
@@ -151,7 +151,7 @@
       :auto-close="openDialog.autoClose"
       :mask-close="openDialog.autoClose"
       @confirm="submitUser">
-      <p slot="header">{{ itemContent.id ? $t('m.user["修改用户组"]') : $t('m.user["新增用户组"]') }}</p>
+      <p slot="header">{{ itemContent.id ? $t('m["修改自定义用户组"]') : $t('m["新增自定义用户组"]') }}</p>
       <div class="bk-add-project bk-add-module">
         <bk-form
           :label-width="200"
@@ -161,7 +161,7 @@
           ref="dynamicForm">
           <bk-form-item
             data-test-id="role-input-roleName"
-            :label="$t(`m.user['角色名称：']`)"
+            :label="$t(`m['用户组名：']`)"
             :required="true"
             :property="'name'">
             <bk-input v-model.trim="formData.name" maxlength="120"></bk-input>
