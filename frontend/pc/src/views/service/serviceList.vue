@@ -238,6 +238,9 @@
                   {{(row.is_valid ? $t(`m.serviceConfig["启用"]`) : $t(`m.serviceConfig["关闭"]`))}}
                 </span>
               </template>
+              <template v-else-if="field.id === 'supervise_type'">
+                <span :title="setDisplayType(row)">{{setDisplayType(row)}}</span>
+              </template>
               <template v-else>
                 <span :title="row[field.id]">{{row[field.id] || '--'}}</span>
               </template>
@@ -390,6 +393,7 @@
   import { errorHandler } from '../../utils/errorHandler';
   import treeInfo from './directoryCom/treeInfo.vue';
   import { deepClone } from '../../utils/util';
+  import i18n from '@/i18n/index.js';
   // import selectTree from '@/components/form/selectTree/index.vue'
   const FIELDS = [
     {
@@ -399,42 +403,47 @@
     },
     {
       id: 'name',
-      label: '服务名称',
+      label: i18n.t('m["服务名称"]'),
       minWidth: 200,
     },
     {
       id: 'key',
-      label: '类型',
+      label: i18n.t('m["类型"]'),
       minWidth: 200,
     },
     {
       id: 'desc',
-      label: '描述',
+      label: i18n.t('m["描述"]'),
       minWidth: 200,
     },
     {
       id: 'creator',
-      label: '创建人',
+      label: i18n.t('m["创建人"]'),
       minWidth: 100,
     },
     {
       id: 'updated_by',
-      label: '更新人',
+      label: i18n.t('m["更新人"]'),
       minWidth: 100,
     },
     {
       id: 'update_at',
-      label: '更新时间',
+      label: i18n.t('m["更新时间"]'),
+      minWidth: 150,
+    },
+    {
+      id: 'supervise_type',
+      label: i18n.t('m["可见范围"]'),
       minWidth: 150,
     },
     {
       id: 'bounded_catalogs',
-      label: '关联目录',
+      label: i18n.t('m["关联目录"]'),
       minWidth: 200,
     },
     {
       id: 'is_valid',
-      label: '状态',
+      label: i18n.t('m["状态"]'),
       minWidth: 200,
     },
   ];
@@ -533,6 +542,8 @@
         editValue: '',
         tableHoverId: '',
         isImportServiceShow: false,
+        displayTypeList: [],
+        userList: [],
       };
     },
     computed: {
@@ -564,10 +575,11 @@
       this.rules.key = this.checkCommonRules('required').required;
     },
     mounted() {
+      this.getDisplayType();
       const curTableSetting = JSON.parse(localStorage.getItem('tableSettings')).find(item => item.type === 'service');
       if (curTableSetting) {
         this.setting.size = curTableSetting.size;
-        this.setting.selectedFields = curTableSetting.fields;
+        this.setting.selectedFields = this.setting.fields.slice(0).filter(m => curTableSetting.fields.find(item => item.id === m.id));
       }
       this.getServiceTypes();
       this.getList();
@@ -575,6 +587,26 @@
       this.getServiceDirectory();
     },
     methods: {
+      getDisplayType() {
+        const params = {
+          project_key: this.$store.state.project.id || this.$route.query.project.id,
+        };
+        Promise.all([this.$store.dispatch('deployCommon/getUser', {
+          is_processor: true,
+          project_key: this.$store.state.project.id,
+        }), this.$store.dispatch('deployCommon/getSecondUser', params)]).then(res => {
+          this.displayTypeList = res[0].data;
+          this.userList = res[1].data;
+        });
+      },
+      setDisplayType(row) {
+        const type = this.displayTypeList.find(item => item.type === row.display_type);
+        const users = this.userList.find(item => item.id === Number(row.display_role) && item.role_type === row.display_type);
+        if (users) {
+          return `${type.name}/${users.name}`;
+        }
+        return type.name;
+      },
       handleSettingChange({ fields, size }) {
         const curTableSetting = deepClone(this.tableSettings.find(item => item.type === 'service'));
         if (curTableSetting) {
