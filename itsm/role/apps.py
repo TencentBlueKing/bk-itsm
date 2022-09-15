@@ -36,16 +36,17 @@ from django.db.models.signals import post_migrate
 def app_ready_handler(sender, **kwargs):
     from itsm.role.models import RoleType, UserRole
 
-    print('init builtin roles and user roles data')
+    print("init builtin roles and user roles data")
     try:
+        RoleType.migrate_general_role_type()
         RoleType.init_builtin_roles()
         UserRole.init_builtin_user_roles()
     except Exception as e:
-        print('init builtin roles and user roles data exception: %s' % e)
+        print("init builtin roles and user roles data exception: %s" % e)
 
 
 class RoleConfig(AppConfig):
-    name = 'itsm.role'
+    name = "itsm.role"
 
     def ready(self):
         post_migrate.connect(app_ready_handler, sender=self)
