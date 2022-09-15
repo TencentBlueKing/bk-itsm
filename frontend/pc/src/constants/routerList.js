@@ -154,12 +154,6 @@ const ROUTE_LIST = [
         id: 'projectManage',
         subRouters: [
           {
-            name: i18n.t('m["自定义用户组"]'),
-            id: 'projectRoles',
-            icon: 'bk-itsm-icon icon-itsm-icon-two-zero',
-            path: '/project/roles',
-          },
-          {
             name: i18n.t('m["触发器"]'),
             id: 'projectTrigger',
             icon: 'bk-itsm-icon icon-slide',
@@ -170,6 +164,12 @@ const ROUTE_LIST = [
             id: 'projectNotice',
             icon: 'bk-itsm-icon icon-icon-notice-new',
             path: '/project/notice',
+          },
+          {
+            name: i18n.t('m["自定义用户组"]'),
+            id: 'projectRoles',
+            icon: 'bk-itsm-icon icon-itsm-icon-two-zero',
+            path: '/project/roles',
           },
         ],
       },
