@@ -131,6 +131,11 @@ class RoleType(Model):
                     % (role, str(error))
                 )
 
+    @classmethod
+    def migrate_general_role_type(cls, *args, **kwargs):
+        count = RoleType.objects.filter(type="GENERAL").update(name="自定义用户组")
+        print("migrate_general_role_type[GENERAL] count = {}".format(count))
+
 
 class UserRole(ObjectManagerMixin, Model):
     """
