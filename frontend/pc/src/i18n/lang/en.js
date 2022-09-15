@@ -2661,4 +2661,13 @@ export const m = {
   新增自定义用户组: 'Add custom user group',
   修改自定义用户组: 'Edit custom user group',
   '用户组名：': 'User Group Name：',
+  服务名称: 'Serivce',
+  类型: 'Type',
+  描述: 'Desc',
+  创建人: 'Creator',
+  更新人: 'Updater',
+  更新时间: 'Update time',
+  可见范围: 'Visible range',
+  关联目录: 'Associated directory',
+  状态: 'State',
 };
