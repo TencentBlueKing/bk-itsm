@@ -305,12 +305,19 @@
       },
     },
     created() {
-      this.rules.name = this.checkCommonRules('name').name;
-      this.rules.name.push({
-        validator: this.handleRepeatServiceName,
-        message: this.$t('m[\'服务名称重复，请重新输入\']'),
-        trigger: 'blur',
-      });
+      const nameRules = [
+        {
+          required: true,
+          message: this.$t('m.treeinfo["字段必填"]'),
+          trigger: 'blur',
+        },
+        {
+          validator: this.handleRepeatServiceName,
+          message: this.$t('m[\'服务名称重复，请重新输入\']'),
+          trigger: 'blur',
+        },
+      ];
+      this.rules.name = nameRules;
       this.rules.directory_id = this.checkCommonRules('required').required;
       this.rules.key = this.checkCommonRules('required').required;
       this.showFieldOption = this.type === 'edit' && !!this.serviceInfo.source;

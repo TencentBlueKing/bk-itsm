@@ -601,11 +601,20 @@
       },
       setDisplayType(row) {
         const type = this.displayTypeList.find(item => item.type === row.display_type);
-        const users = this.userList.find(item => item.id === Number(row.display_role) && item.role_type === row.display_type);
-        if (users) {
-          return `${type.name}/${users.name}`;
+        if (row.display_role === '') {
+          return type.name;
         }
-        return type.name;
+        const fields = row.display_role.split(',');
+        const users = this.userList.filter(item => item.role_type === row.display_type);
+        const result = [];
+        if (users) {
+          users.forEach(item => {
+            if (fields.includes(item.role_key)) {
+              result.push(item.name);
+            }
+          });
+        }
+        return result.length !== 0 ? `${type.name}/${result}` : type.name;
       },
       handleSettingChange({ fields, size }) {
         const curTableSetting = deepClone(this.tableSettings.find(item => item.type === 'service'));
