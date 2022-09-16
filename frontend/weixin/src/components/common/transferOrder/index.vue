@@ -206,13 +206,7 @@ export default defineComponent({
 
     // 根据用户信息设置二级处理人数据
     const inculdePersons = computed(() => {
-      const targetPersonRule = secondIncludeList.value.find((rule: IIncludeItem) => {
-        if (rule.type) {
-          return rule.type === 'PERSON'
-        } else {
-          return rule
-        }
-      })
+      const targetPersonRule = secondIncludeList.value.find((rule: IIncludeItem) => rule.type === 'PERSON')
       if (targetPersonRule) {
         return targetPersonRule.list
       }
