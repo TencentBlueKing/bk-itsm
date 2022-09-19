@@ -150,6 +150,10 @@ export default defineComponent({
           if (inculde.value.length && inculde.value.includes(item.username)) {
             return true
           }
+          // 当二级处理人为空时，返回所有结果
+          if (!inculde.value.length) {
+            return true
+          }
           return false
         }).map((item: IUserItem) => {
           const reg = new RegExp(value, 'i')
