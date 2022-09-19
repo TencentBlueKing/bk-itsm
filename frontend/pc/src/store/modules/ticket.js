@@ -36,6 +36,12 @@ export default {
     setSettingCache(state, { type, value }) {
       state.settingCache[type] = value;
     },
+    getTicketSettingformLocalStorage(state) {
+      state.settingCache = JSON.parse(localStorage.getItem('ticketSetting')) || {};
+    },
+    setTicketSettingToLocalStorage(state) {
+      localStorage.setItem('ticketSetting', JSON.stringify(state.settingCache));
+    },
     clearSettingCache() {
       state.settingCache = {};
     },

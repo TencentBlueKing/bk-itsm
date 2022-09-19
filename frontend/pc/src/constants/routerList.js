@@ -32,12 +32,12 @@ import i18n from '@/i18n/index.js';
 
 const ROUTE_LIST = [
   {
-    name: i18n.t('m["首页"]'),
+    name: i18n.t('m["服务台"]'),
     id: 'home',
     path: '/',
   },
   {
-    name: i18n.t('m["我的工作台"]'),
+    name: i18n.t('m["我的单据"]'),
     id: 'workbench',
     path: '/workbench/ticket/todo',
     subRouters: [
@@ -76,20 +76,20 @@ const ROUTE_LIST = [
   {
     name: i18n.t('m["项目"]'),
     id: 'project',
-    path: '/project/ticket',
+    path: '/project/service/list',
     subRouters: [
       {
         name: i18n.t('m["服务"]'),
         abbrName: 'Ser.',
         id: 'service',
         subRouters: [
-          {
-            name: i18n.t('m["单据"]'),
-            id: 'projectTicket',
-            icon: 'bk-itsm-icon icon-ticket_4',
-            path: '/project/ticket',
-            prefix: ['/ticket/detail', '/ticket/create'],
-          },
+          // {
+          //   name: i18n.t('m["单据"]'),
+          //   id: 'projectTicket',
+          //   icon: 'bk-itsm-icon icon-ticket_4',
+          //   path: '/project/ticket',
+          //   prefix: ['/ticket/detail', '/ticket/create'],
+          // },
           {
             name: i18n.t('m["服务"]'),
             id: 'projectServiceList',
@@ -154,12 +154,6 @@ const ROUTE_LIST = [
         id: 'projectManage',
         subRouters: [
           {
-            name: i18n.t('m["用户组"]'),
-            id: 'projectRoles',
-            icon: 'bk-itsm-icon icon-itsm-icon-two-zero',
-            path: '/project/roles',
-          },
-          {
             name: i18n.t('m["触发器"]'),
             id: 'projectTrigger',
             icon: 'bk-itsm-icon icon-slide',
@@ -171,23 +165,29 @@ const ROUTE_LIST = [
             icon: 'bk-itsm-icon icon-icon-notice-new',
             path: '/project/notice',
           },
+          {
+            name: i18n.t('m["自定义用户组"]'),
+            id: 'projectRoles',
+            icon: 'bk-itsm-icon icon-itsm-icon-two-zero',
+            path: '/project/roles',
+          },
         ],
       },
       // 2.6.0 等权限校验后显示
-      // {
-      //     name: i18n.t(`m["分析"]`),
-      //     abbrName: 'Ana',
-      //     id: 'analysis',
-      //     subRouters: [
-      //         {
-      //             name: i18n.t(`m["运营分析"]`),
-      //             id: 'projectOperationHome',
-      //             icon: 'bk-itsm-icon icon-operational-data',
-      //             path: '/project/projectOperation/home',
-      //             prefix: ['/project/projectOperation/service']
-      //         }
-      //     ]
-      // }
+      {
+        name: i18n.t('m["分析"]'),
+        abbrName: 'Ana',
+        id: 'analysis',
+        subRouters: [
+          {
+            name: i18n.t('m["运营分析"]'),
+            id: 'projectOperationHome',
+            icon: 'bk-itsm-icon icon-operational-data',
+            path: '/project/projectOperation/home',
+            prefix: ['/project/projectOperation/service'],
+          },
+        ],
+      },
     ],
   },
   {

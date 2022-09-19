@@ -253,6 +253,10 @@
       // 字段克隆
       onFormCloneClick(form) {
         if (this.crtForm) {
+          this.$bkMessage({
+            message: this.$t('m["请先将当前字段属性关闭再进行操作"]'),
+            theme: 'warning',
+          });
           return;
         }
         this.$emit('fieldClone', form);

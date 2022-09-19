@@ -52,7 +52,7 @@
             :maxlength="28"
             :show-word-limit="true"
             :disabled="!!project.key || editDialogFormDisable"
-            :placeholder="$t(`m['请输入28个字符以内的项目代号']`)">
+            :placeholder="$t(`m['请输入28个由小写字母、数字、下划线横线且必须以英文字母开头的项目代号']`)">
           </bk-input>
         </bk-form-item>
         <bk-form-item property="desc" :label="$t(`m['项目说明']`)">

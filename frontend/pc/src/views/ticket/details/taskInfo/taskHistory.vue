@@ -28,17 +28,18 @@
           {{$t(`m['单据触发器']`)}}
           <div slot="content" class="f13">
             <bk-table
+              :header-cell-attributes="headerCellAttributes"
               :data="ticketAction"
               :size="'small'"
               @sort-change="orderingClick">
-              <bk-table-column :label="$t(`m.task['执行时间']`)" :sortable="'custom'">
+              <bk-table-column :label="$t(`m.task['执行时间']`)" :show-overflow-tooltip="true" :sortable="'custom'">
                 <template slot-scope="props">
                   <span :title="props.row.end_time">
                     {{props.row.end_time || '--'}}
                   </span>
                 </template>
               </bk-table-column>
-              <bk-table-column :label="$t(`m.task['响应动作']`)">
+              <bk-table-column :label="$t(`m.task['响应动作']`)" :show-overflow-tooltip="true">
                 <template slot-scope="props">
                   <span
                     :title="props.row.display_name"
@@ -48,7 +49,7 @@
                   </span>
                 </template>
               </bk-table-column>
-              <bk-table-column :label="$t(`m.task['执行状态']`)" :sortable="'custom'">
+              <bk-table-column :label="$t(`m.task['执行状态']`)" :show-overflow-tooltip="true" :sortable="'custom'">
                 <template slot-scope="props">
                   <span class="bk-status-success"
                     :class="{ 'bk-status-failed': props.row.status === 'FAILED' }"
@@ -57,7 +58,7 @@
                   </span>
                 </template>
               </bk-table-column>
-              <bk-table-column :label="$t(`m.task['操作人']`)">
+              <bk-table-column :label="$t(`m.task['操作人']`)" :show-overflow-tooltip="true">
                 <template slot-scope="props">
                   <span :title="props.row.operator_username">
                     {{props.row.operator_username || '--'}}
@@ -74,14 +75,14 @@
               :data="item.actions"
               :size="'small'"
               @sort-change="orderingClick">
-              <bk-table-column :label="$t(`m.task['执行时间']`)" :sortable="'custom'">
+              <bk-table-column :label="$t(`m.task['执行时间']`)" :show-overflow-tooltip="true" :sortable="'custom'">
                 <template slot-scope="props">
                   <span :title="props.row.end_time">
                     {{props.row.end_time || '--'}}
                   </span>
                 </template>
               </bk-table-column>
-              <bk-table-column :label="$t(`m.task['响应动作']`)">
+              <bk-table-column :label="$t(`m.task['响应动作']`)" :show-overflow-tooltip="true">
                 <template slot-scope="props">
                   <span
                     :title="props.row.display_name"
@@ -91,7 +92,7 @@
                   </span>
                 </template>
               </bk-table-column>
-              <bk-table-column :label="$t(`m.task['执行状态']`)" :sortable="'custom'">
+              <bk-table-column :label="$t(`m.task['执行状态']`)" :show-overflow-tooltip="true" :sortable="'custom'">
                 <template slot-scope="props">
                   <span class="bk-status-success"
                     :class="{ 'bk-status-failed': props.row.status === 'FAILED' }"
@@ -100,7 +101,7 @@
                   </span>
                 </template>
               </bk-table-column>
-              <bk-table-column :label="$t(`m.task['操作人']`)">
+              <bk-table-column :label="$t(`m.task['操作人']`)" :show-overflow-tooltip="true">
                 <template slot-scope="props">
                   <span :title="props.row.operator_username">
                     {{props.row.operator_username || '--'}}
@@ -185,6 +186,12 @@
       this.getHistoryList();
     },
     methods: {
+      // 设置触发器table-header title
+      headerCellAttributes() {
+        return {
+          title: arguments[0].column.label,
+        };
+      },
       getHistoryList() {
         // 获取单据手动触发器
         this.loading = true;

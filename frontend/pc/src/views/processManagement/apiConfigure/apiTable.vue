@@ -27,7 +27,7 @@
       <div class="bk-api-button">
         <bk-dropdown-menu class="mr10 access-btn" @show="dropdownShow" @hide="dropdownHide" ref="apiDropdown">
           <div class="dropdown-trigger-btn" style="padding-left: 12px;" slot="dropdown-trigger">
-            <span style="font-size: 14px;">{{ $t(`m.systemConfig['接入']`)}}</span>
+            <span style="font-size: 14px;">{{ $t(`m.systemConfig['Api接入']`)}}</span>
             <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
           </div>
           <ul class="bk-dropdown-list" slot="dropdown-content">
@@ -147,7 +147,7 @@
       </bk-table-column>
 
       <bk-table-column :label="$t(`m.systemConfig['接入数']`)" prop="count" width="80"></bk-table-column>
-      <bk-table-column :label="$t(`m.systemConfig['操作']`)" width="150">
+      <bk-table-column :label="$t(`m.systemConfig['操作']`)" width="150" fixed="right">
         <template slot-scope="props">
           <bk-button theme="primary" text
             data-test-id="api_button_apiTableExportApi"

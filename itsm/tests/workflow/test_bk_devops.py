@@ -271,6 +271,7 @@ class PipelineTest(TestCase):
             "message": "String",
             "status": "SUCCEED",
             "errorInfoList": [],
+            "variables": {},
         }
         devops_service = BkDevOpsService(name="bk_devops")
         devops_service._runtime_attrs = {"by_flow": 1}

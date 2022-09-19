@@ -40,7 +40,7 @@
           </bk-input>
         </bk-form-item>
         <desc-info v-model="formInfo.desc"></desc-info>
-        <bk-form-item
+        <!-- <bk-form-item
           data-test-id="approveNode-input-nodeLabel"
           :label="$t(`m.treeinfo['节点标签：']`)"
           :required="true"
@@ -56,7 +56,7 @@
               :name="option.name">
             </bk-option>
           </bk-select>
-        </bk-form-item>
+        </bk-form-item> -->
         <bk-form-item
           data-test-id="approveNode-radio-approveMode"
           :label="$t(`m.treeinfo['审批方式：']`)"
@@ -65,15 +65,15 @@
           <bk-radio-group v-model="processType" @change="handleChangeDispose">
             <bk-radio :value="'multi'" :ext-cls="'mr20'">{{$t(`m.treeinfo['或签']`)}}
               <i class="bk-itsm-icon icon-icon-info tooltip-icon"
-                v-bk-tooltips="$t(`m.treeinfo['任一处理人完成审批即可。']`)"></i>
+                v-bk-tooltips="$t(`m.treeinfo['多个审批人当有一个审批人审批即可，该审批节点的审批结果为该审批人的审批结果']`)"></i>
             </bk-radio>
             <bk-radio :value="'sequential'" :ext-cls="'mr20'">{{$t(`m.treeinfo['顺序会签']`)}}
               <i class="bk-itsm-icon icon-icon-info tooltip-icon"
-                v-bk-tooltips="$t(`m.treeinfo['所有处理人按顺序进行审批。']`)"></i>
+                v-bk-tooltips="$t(`m.treeinfo['所有审批人必须按照审批人列表的顺序依次审批，直到满足条件才会结束，当不设置提前结束条件时，需要所有的审批人按照顺序依次审批完该节点才会结束']`)"></i>
             </bk-radio>
             <bk-radio :value="'random'">{{$t(`m.treeinfo['随机会签']`)}}
               <i class="bk-itsm-icon icon-icon-info tooltip-icon"
-                v-bk-tooltips="$t(`m.treeinfo['所有处理人随机进行审批。']`)"></i>
+                v-bk-tooltips="$t(`m.treeinfo['所有审批人都可以审批，没有顺序要求，直到满足条件才会结束，当不设置提前结束条件时，需要所有的审批人都审批完该节点才会结束']`)"></i>
             </bk-radio>
           </bk-radio-group>
           <template v-if="isShowSignSwitch">

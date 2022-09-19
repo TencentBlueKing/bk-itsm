@@ -335,9 +335,7 @@
             let isResponseNormal = true;
             let isProcessNormal = true;
             // sla的超时预警的阈值
-            const threshold = this.threshold.find(
-                (item) => item.sla_name === name
-            );
+            const threshold = this.threshold.find((item) => item.sla_name === name);
             const curResponseCost = JSON.parse(JSON.stringify(responseCost)); // 当前响应时间
             const curProcessCost = JSON.parse(JSON.stringify(processCost)); // 当前处理时间
             // 启动计时器

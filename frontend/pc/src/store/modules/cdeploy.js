@@ -317,9 +317,16 @@ export default {
         return res;
       });
     },
-    // 获取组织架构内容
+    // 获取第一层组织架构内容
     getTreeInfo({ commit, state, dispatch }) {
-      return ajax.get(`gateway/usermanage/get_departments/`).then((response) => {
+      return ajax.get(`gateway/usermanage/get_first_level_departments/`).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
+    // 获取组织架构内容
+    getTreeInfoChildren({ commit, state, dispatch }, params) {
+      return ajax.get(`gateway/usermanage/get_department_info/`, { params }).then((response) => {
         const res = response.data;
         return res;
       });

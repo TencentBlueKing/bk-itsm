@@ -9,9 +9,11 @@ from itsm.component.exceptions import ParamError
 from itsm.component.utils.basic import TempDisableSignal
 from itsm.openapi.base_service.utils import WorkflowInitHandler
 from itsm.openapi.base_service.validator import CreateTicketValidator
+from itsm.postman.serializers import RemoteSystemSerializer, RemoteApiSerializer
 from itsm.service.models import ServiceCatalog, Service
 from itsm.service.serializers import ServiceSerializer
 from itsm.service.validators import key_validator, service_validate
+from itsm.ticket.models import Ticket
 from itsm.ticket.serializers import TicketSerializer
 from itsm.ticket_status.models import TicketStatus
 from itsm.workflow.models import (
@@ -189,7 +191,39 @@ class TicketCreateSerializer(TicketSerializer):
     """
 
     creator = serializers.CharField(required=True)
-    flow_id = serializers.IntegerField(required=True)
+    flow_id = serializers.IntegerField(required=False)
+    tag = serializers.CharField(required=False)
+
+    class Meta:
+        model = Ticket
+        fields = (
+            "id",
+            "catalog_id",
+            "catalog_name",
+            "catalog_fullname",
+            "service_id",
+            "service_name",
+            "flow_id",
+            "sn",
+            "title",
+            "service_type",
+            "service_type_name",
+            "is_draft",
+            "current_status",
+            "current_status_display",
+            "comment_id",
+            "is_commented",
+            "is_over",
+            "related_type",
+            "has_relationships",
+            "priority_name",
+            "meta",
+            "bk_biz_id",
+            "project_key",
+            "task_schemas",
+            "tag",
+        ) + model.FIELDS
+        read_only_fields = ("sn",) + model.FIELDS
 
     def to_internal_value(self, data):
         """验证参数和组装创建单据逻辑"""
@@ -205,7 +239,7 @@ class TicketCreateSerializer(TicketSerializer):
             {
                 "service": data["service"],
                 "service_type": data["service"].key,
-                "flow_id": data["flow_id"],
+                "flow_id": data.get("flow_id", data["service"].workflow.id),
                 "is_supervise_needed": data["service"].workflow.is_supervise_needed,
                 "supervisor": data["service"].workflow.supervisor,
                 "supervise_type": data["service"].workflow.supervise_type,
@@ -252,3 +286,11 @@ class OpenApiWorkflowVersionSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkflowVersion
         fields = "__all__"
+
+
+class PostManSerializer(RemoteSystemSerializer):
+    pass
+
+
+class PostManRemoteApiSerializer(RemoteApiSerializer):
+    pass

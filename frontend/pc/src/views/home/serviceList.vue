@@ -21,45 +21,15 @@
   -->
 
 <template>
-  <div class="service-list-section">
-    <div class="tab-wrapper">
-      <span :class="['type-item', { active: type === 'latest' }]" @click="onTabChange('latest')">{{ $t(`m.common['常用服务']`) }}</span>
-      <span style="font-size: 16px; font-weight: normal; color: #dcdee5; margin: 0 10px;">|</span>
-      <span :class="['type-item', { active: type === 'all' }]" @click="onTabChange('all')">{{ $t(`m.common['全部服务']`) }}</span>
-    </div>
-    <div class="search-input-wrapper" v-bk-clickoutside="handleClickoutside">
-      <bk-input
-        class="search-input"
-        right-icon="bk-icon icon-search"
-        :placeholder="$t(`m.common['请输入服务名称，快速提单']`)"
-        :clearable="true"
-        @focus="searchHandler"
-        @change="searchHandler">
-      </bk-input>
-      <div class="search-result-content" v-if="isSearchResultShow">
-        <ul class="result-list" v-if="searchResultList.length > 0">
-          <li class="result-item" v-for="service in searchResultList" :key="service.id" @click="onSelectService(service)">
-            <i
-              :class="['bk-itsm-icon', service.favorite ? 'icon-favorite' : 'icon-rate']"
-              v-bk-tooltips="{
-                content: service.favorite ? $t(`m.common['取消收藏']`) : $t(`m.common['添加收藏']`),
-                placement: 'top',
-                delay: [300, 0]
-              }"
-              @click.stop="onCollectClick(service)">
-            </i>
-            <div class="name" v-html="service.highlightName"></div>
-            <div class="category">{{ service.serviceTypeName }}</div>
-          </li>
-        </ul>
-        <div class="no-data" v-else>{{ $t(`m.common['无匹配服务']`) }}</div>
+  <div>
+    <div class="service-list-section">
+      <div class="tab-wrapper">
+        <span class="type-item active">{{ $t(`m.common['常用服务']`) }}</span>
       </div>
-    </div>
-    <template v-if="type === 'latest'">
       <div class="recently-content" v-bkloading="{ isLoading: loading }">
-        <ul class="list-wrapper" v-if="serviceList.length > 0">
+        <ul class="list-wrapper" v-if="latestList.length > 0">
           <li
-            v-for="service in serviceList"
+            v-for="service in latestList"
             :key="service.id"
             class="service-item"
             @click="onSelectService(service)">
@@ -78,12 +48,12 @@
         <div class="recently-empty" v-else>
           <p>{{ $t(`m.common['您还没有留下脚印，您可以进行以下操作']`) }}</p>
           <div class="operation-wrapper">
-            <div class="operate">
+            <!-- <div class="operate">
               <div class="icon-area" @click="onTabChange('all')">
                 <i class="bk-itsm-icon icon-arrow-rect"></i>
               </div>
               <div class="text" @click="onTabChange('all')">{{ $t(`m.common['查看服务']`) }}</div>
-            </div>
+            </div> -->
             <div class="operate">
               <div class="icon-area" @click="onCreateTicket">
                 <i class="bk-itsm-icon icon-pen-rect"></i>
@@ -93,55 +63,79 @@
           </div>
         </div>
       </div>
-    </template>
-    <template v-else>
-      <div class="service-content" v-bkloading="{ isLoading: loading }">
-        <bk-tab v-if="!loading" :active="activeClassify" type="unborder-card" @tab-change="activeFold = true">
-          <bk-tab-panel
-            v-for="group in serviceList"
-            :key="group.name"
-            v-bind="group">
-            <template v-if="group.data.length > 0">
-              <ul class="list-wrapper">
-                <li
-                  v-for="service in ((type === 'all' && activeFold) ? group.data.slice(0, 16) : group.data)"
-                  :key="service.id"
-                  class="service-item"
-                  @click="onSelectService(service)">
-                  <div class="service-name" v-bk-overflow-tips>{{ service.name }}</div>
-                  <i
-                    :class="['bk-itsm-icon', 'collect-icon', service.favorite ? 'icon-favorite' : 'icon-rate']"
-                    v-bk-tooltips="{
-                      content: service.favorite ? $t(`m.common['取消收藏']`) : $t(`m.common['添加收藏']`),
-                      placement: 'top',
-                      delay: [300, 0]
-                    }"
-                    @click.stop="onCollectClick(service)">
-                  </i>
-                </li>
-              </ul>
-              <div class="show-more" v-if="type === 'all' && group.data.length > 16" @click="toggleFold(group.name)">
-                <template v-if="activeFold">
-                  <span>{{ $t(`m['更多']`) }}</span>
-                  <i class="bk-icon icon-angle-down"></i>
-                </template>
-                <template v-else>
-                  <span>{{ $t(`m['收起']`) }}</span>
-                  <i class="bk-icon icon-angle-up"></i>
-                </template>
-              </div>
-            </template>
-            <div class="service-empty" v-else>
-              <i class="bk-icon icon-empty"></i>
-              <p class="text">
-                <span>{{ $t(`m.common['暂无服务，']`) }}</span>
-                <router-link :to="{ name: 'projectServiceList', query: { project_id: $store.state.project.id } }">{{ $t(`m.taskTemplate['立即创建']`) }}</router-link>
-              </p>
-            </div>
-          </bk-tab-panel>
-        </bk-tab>
+    </div>
+    <div class="service-list-section" style="margin-top: 20px">
+      <div class="tab-wrapper">
+        <span class="type-item active">{{ $t(`m.common['全部服务']`) }}</span>
       </div>
-    </template>
+      <div class="search-input-wrapper" v-bk-clickoutside="handleClickoutside">
+        <bk-input
+          class="search-input"
+          right-icon="bk-icon icon-search"
+          :placeholder="$t(`m.common['请输入服务名称，快速提单']`)"
+          :clearable="true"
+          @focus="searchHandler"
+          @change="searchHandler">
+        </bk-input>
+        <div class="search-result-content" v-if="isSearchResultShow">
+          <ul class="result-list" v-if="searchResultList.length > 0">
+            <li class="result-item" v-for="service in searchResultList" :key="service.id" @click="onSelectService(service)">
+              <i
+                :class="['bk-itsm-icon', service.favorite ? 'icon-favorite' : 'icon-rate']"
+                v-bk-tooltips="{
+                  content: service.favorite ? $t(`m.common['取消收藏']`) : $t(`m.common['添加收藏']`),
+                  placement: 'top',
+                  delay: [300, 0]
+                }"
+                @click.stop="onCollectClick(service)">
+              </i>
+              <div class="name" v-html="service.highlightName"></div>
+              <div class="category">{{ service.serviceTypeName }}</div>
+            </li>
+          </ul>
+          <div class="no-data" v-else>{{ $t(`m.common['无匹配服务']`) }}</div>
+        </div>
+      </div>
+      <div class="service-content" v-bkloading="{ isLoading: loading }">
+        <template v-if="allList.length > 0">
+          <ul class="list-wrapper">
+            <li
+              v-for="service in activeFold ? allList.slice(0, 16) : allList"
+              :key="service.id"
+              class="service-item"
+              @click="onSelectService(service)">
+              <div class="service-name" v-bk-overflow-tips>{{ service.name }}</div>
+              <i
+                :class="['bk-itsm-icon', 'collect-icon', service.favorite ? 'icon-favorite' : 'icon-rate']"
+                v-bk-tooltips="{
+                  content: service.favorite ? $t(`m.common['取消收藏']`) : $t(`m.common['添加收藏']`),
+                  placement: 'top',
+                  delay: [300, 0]
+                }"
+                @click.stop="onCollectClick(service)">
+              </i>
+            </li>
+          </ul>
+          <div class="show-more" v-if="allList.length > 16" @click="toggleFold">
+            <template v-if="activeFold">
+              <span>{{ $t(`m['更多']`) }}</span>
+              <i class="bk-icon icon-angle-down"></i>
+            </template>
+            <template v-else>
+              <span>{{ $t(`m['收起']`) }}</span>
+              <i class="bk-icon icon-angle-up"></i>
+            </template>
+          </div>
+        </template>
+        <div class="service-empty" v-else>
+          <i class="bk-icon icon-empty"></i>
+          <p class="text">
+            <span>{{ $t(`m.common['暂无服务，']`) }}</span>
+            <router-link :to="{ name: 'projectServiceList', query: { project_id: $store.state.project.id } }">{{ $t(`m.taskTemplate['立即创建']`) }}</router-link>
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -170,27 +164,6 @@
     computed: {
       loading() {
         return this.latestLoading || this.allLoading || this.serviceClassfyLoading;
-      },
-      serviceList() {
-        if (this.type === 'latest') {
-          return this.latestList;
-        }
-        const list = this.serviceClassify.map(item => ({
-          name: item.key,
-          label: item.name,
-          data: [],
-        }));
-        this.allList.forEach(service => {
-          const group = list.find(item => item.name === service.key);
-          group.data.push(service);
-        });
-
-        return list;
-      },
-    },
-    watch: {
-      serviceList(val) {
-        this.activeClassify = val.length > 0 ? val[0].name : '';
       },
     },
     created() {
@@ -227,6 +200,7 @@
         this.$store.dispatch('service/getServiceList').then(resp => {
           if (resp.result) {
             this.allList = resp.data;
+            this.allList.sort((a, b) => b.favorite - a.favorite);
           }
         })
           .catch((res) => {
@@ -415,7 +389,7 @@
         padding: 16px 0 0;
     }
     .recently-content {
-        padding-top: 30px;
+        // padding-top: 30px;
         min-height: 276px;
     }
     .service-content {
@@ -490,6 +464,7 @@
     }
     .list-wrapper {
         overflow: hidden;
+        padding-top: 20px;
     }
     .recently-empty {
         color: #63656e;

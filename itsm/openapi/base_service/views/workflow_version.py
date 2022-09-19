@@ -28,6 +28,5 @@ class WorkflowVersionViewSet(ApiGatewayMixin, component_viewsets.ReadOnlyModelVi
     @action(detail=True, methods=["get"])
     def states(self, request, *args, **kwargs):
         instance = self.get_object()
-        print(instance.states)
         states = instance.states.values()
         return Response(list(states))

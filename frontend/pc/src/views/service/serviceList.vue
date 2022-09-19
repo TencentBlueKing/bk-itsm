@@ -121,130 +121,146 @@
               </template>
             </template>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.common['ID']`)" min-width="60">
-            <template slot-scope="props">
-              <span :title="props.row.id">{{ props.row.id || '--' }}</span>
-            </template>
-          </bk-table-column>
-          <bk-table-column :label="$t(`m.serviceConfig['服务名称']`)" prop="name" min-width="200" :width="changeFrom.name ? '300' : '200'">
-            <template slot-scope="props">
-              <span
-                v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
-                v-cursor
-                class="bk-lable-primary text-permission-disable"
-                ::title="props.row.name"
-                @click="onServicePermissonCheck(['service_manage'], props.row)">
-                {{ props.row.name }}
-              </span>
-              <template v-else>
-                <div v-if="props.row.id !== changeFrom.name" class="bk-lable-display">
-                  <span
-                    class="bk-lable-primary"
-                    :title="props.row.name"
-                    @click="changeEntry(props.row, 'edit')">
-                    {{ props.row.name }}
-                  </span>
-                  <i v-show="tableHoverId === props.row.id" @click.stop="handleChange('name', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
-                </div>
+          <bk-table-column
+            v-for="field in setting.selectedFields"
+            :key="field.id"
+            :label="field.label"
+            :width="field.width"
+            :min-width="field.minWidth"
+            :prop="field.id">
+            <div slot-scope="{ row }">
+              <template v-if="field.id === 'name'">
+                <span
+                  v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...row.auth_actions])"
+                  v-cursor
+                  class="bk-lable-primary text-permission-disable"
+                  :title="row.name"
+                  @click="onServicePermissonCheck(['service_manage'], row)">
+                  {{ row.name }}
+                </span>
+                <template v-else>
+                  <div v-if="row.id !== changeFrom.name" class="bk-lable-display">
+                    <span
+                      class="bk-lable-primary"
+                      :title="row.name"
+                      @click="changeEntry(row, 'edit')">
+                      {{ row.name }}
+                    </span>
+                    <i v-show="tableHoverId === row.id" @click.stop="handleChange('name', row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
+                  </div>
+                  <div v-else class="hover-show-icon">
+                    <bk-input v-model="editValue"></bk-input>
+                    <div class="operation">
+                      <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('name', row)"></i>
+                      <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
+                    </div>
+                  </div>
+                </template>
+              </template>
+              <template v-else-if="field.id === 'key'">
+                <template v-if="row.id !== changeFrom.serviceType">
+                  <template v-for="(type, typeIndex) in serviceTypesMap">
+                    <span v-if="row.key === type.key"
+                      :title="type.name"
+                      :key="typeIndex">
+                      {{ type.name }}
+                      <i v-show="tableHoverId === row.id" @click="handleChange('key', row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
+                    </span>
+                  </template>
+                </template>
                 <div v-else class="hover-show-icon">
-                  <bk-input v-model="editValue"></bk-input>
+                  <bk-select v-model="editValue"
+                    :placeholder="$t(`m.serviceConfig['请选择服务类型']`)"
+                    :clearable="false"
+                    style="width: 150px"
+                    searchable
+                    :font-size="'medium'">
+                    <bk-option v-for="option in serviceTypeList"
+                      :key="option.key"
+                      :id="option.key"
+                      :name="option.name">
+                    </bk-option>
+                  </bk-select>
                   <div class="operation">
-                    <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('name',props.row)"></i>
+                    <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('key', row)"></i>
                     <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
                   </div>
                 </div>
               </template>
-            </template>
-          </bk-table-column>
-          <bk-table-column :label="$t(`m.serviceConfig['类型']`)" :width="changeFrom.serviceType ? '250' : '150'">
-            <template slot-scope="props">
-              <template v-if="props.row.id !== changeFrom.serviceType">
-                <template v-for="(type, typeIndex) in serviceTypesMap">
-                  <span v-if="props.row.key === type.key"
-                    :title="type.name"
-                    :key="typeIndex">
-                    {{ type.name }}
-                    <i v-show="tableHoverId === props.row.id" @click="handleChange('key', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
-                  </span>
+              <template v-else-if="field.id === 'desc'">
+                <span
+                  v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...row.auth_actions])"
+                  v-cursor
+                  class="bk-lable-primary text-permission-disable"
+                  :title="row.desc"
+                  @click="onServicePermissonCheck(['service_manage'], row)">
+                  {{ row.desc }}
+                </span>
+                <template v-else>
+                  <div v-if="row.id !== changeFrom.desc" class="bk-lable-display">
+                    <span
+                      :title="row.desc">
+                      {{ row.desc || '--' }}
+                    </span>
+                    <i v-show="tableHoverId === row.id" @click.stop="handleChange('desc', row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
+                  </div>
+                  <div v-else class="hover-show-icon">
+                    <bk-input v-model="editValue"></bk-input>
+                    <div class="operation">
+                      <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('desc', row)"></i>
+                      <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
+                    </div>
+                  </div>
                 </template>
               </template>
-              <div v-else class="hover-show-icon">
-                <bk-select v-model="editValue"
-                  :placeholder="$t(`m.serviceConfig['请选择服务类型']`)"
-                  :clearable="false"
-                  style="width: 150px"
-                  searchable
-                  :font-size="'medium'">
-                  <bk-option v-for="option in serviceTypeList"
-                    :key="option.key"
-                    :id="option.key"
-                    :name="option.name">
-                  </bk-option>
-                </bk-select>
-                <div class="operation">
-                  <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('key',props.row)"></i>
-                  <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
+              <template v-else-if="field.id === 'bounded_catalogs'">
+                <span v-if="row.id !== changeFrom.bounded_catalogs" :title="row.bounded_catalogs[0]">{{ row.bounded_catalogs[0] || '--' }}<i v-show="tableHoverId === row.id" @click="handleChange('catalog_id', row)" class="bk-itsm-icon icon-itsm-icon-six"></i></span>
+                <div v-else class="hover-show-icon">
+                  <bk-cascade
+                    :list="dirList"
+                    clearable
+                    :check-any-level="true"
+                    style="width: 250px;"
+                    :ext-popover-cls="'custom-cls'"
+                    @change="handleChangeTree">
+                  </bk-cascade>
+                  <div class="operation">
+                    <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('catalog_id', row)"></i>
+                    <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
+                  </div>
                 </div>
-              </div>
-            </template>
+              </template>
+              <template v-else-if="field.id === 'is_valid'">
+                <span class="bk-status-color"
+                  :class="{ 'bk-status-gray': !row.is_valid }"></span>
+                <span style="margin-left: 5px;"
+                  :title="row.is_valid ? $t(`m.serviceConfig['启用']`) : $t(`m.serviceConfig['关闭']`)">
+                  {{(row.is_valid ? $t(`m.serviceConfig["启用"]`) : $t(`m.serviceConfig["关闭"]`))}}
+                </span>
+              </template>
+              <template v-else-if="field.id === 'supervise_type'">
+                <span :title="setDisplayType(row)">{{setDisplayType(row)}}</span>
+              </template>
+              <template v-else>
+                <span :title="row[field.id]">{{row[field.id] || '--'}}</span>
+              </template>
+            </div>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.common['创建人']`)">
-            <template slot-scope="props">
-              <span :title="props.row.creator">{{props.row.creator || '--'}}</span>
-            </template>
-          </bk-table-column>
-          <bk-table-column :label="$t(`m.common['更新人']`)">
-            <template slot-scope="props">
-              <span :title="props.row.updated_by">{{props.row.updated_by || '--'}}</span>
-            </template>
-          </bk-table-column>
-          <bk-table-column :label="$t(`m.serviceConfig['更新时间']`)" width="200">
-            <template slot-scope="props">
-              <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
-            </template>
-          </bk-table-column>
-          <bk-table-column :label="$t(`m.serviceConfig['关联目录']`)" :width="changeFrom.bounded_catalogs ? '250' : '200'">
-            <template slot-scope="props">
-              <span v-if="props.row.id !== changeFrom.bounded_catalogs" :title="props.row.bounded_catalogs[0]">{{ props.row.bounded_catalogs[0] || '--' }}<i v-show="tableHoverId === props.row.id" @click="handleChange('catalog_id', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i></span>
-              <div v-else class="hover-show-icon">
-                <bk-cascade
-                  :list="dirList"
-                  clearable
-                  :check-any-level="true"
-                  style="width: 250px;"
-                  :ext-popover-cls="'custom-cls'"
-                  @change="handleChangeTree">
-                </bk-cascade>
-                <div class="operation">
-                  <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('catalog_id',props.row)"></i>
-                  <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
-                </div>
-              </div>
-            </template>
-          </bk-table-column>
-          <bk-table-column :label="$t(`m.serviceConfig['状态']`)" width="80">
-            <template slot-scope="props">
-              <span class="bk-status-color"
-                :class="{ 'bk-status-gray': !props.row.is_valid }"></span>
-              <span style="margin-left: 5px;"
-                :title="props.row.is_valid ? $t(`m.serviceConfig['启用']`) : $t(`m.serviceConfig['关闭']`)">
-                {{(props.row.is_valid ? $t(`m.serviceConfig["启用"]`) : $t(`m.serviceConfig["关闭"]`))}}
-              </span>
-            </template>
-          </bk-table-column>
-          <bk-table-column :label="$t(`m.serviceConfig['操作']`)" width="160">
+          <bk-table-column :label="$t(`m.serviceConfig['操作']`)" width="120" fixed="right">
             <template slot-scope="props">
               <!-- sla -->
-              <bk-button
-                v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
-                v-cursor
-                text
-                theme="primary"
-                class="btn-permission-disable"
-                @click="onServicePermissonCheck(['service_manage'], props.row)">
-                SLA
-              </bk-button>
-              <router-link v-else data-test-id="service_link_linkToSLA" class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id, catalog_id: $route.query.catalog_id } }">SLA</router-link>
+              <template v-if="openFunction.SLA_SWITCH">
+                <bk-button
+                  v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                  v-cursor
+                  text
+                  theme="primary"
+                  class="btn-permission-disable"
+                  @click="onServicePermissonCheck(['service_manage'], props.row)">
+                  SLA
+                </bk-button>
+                <router-link v-else data-test-id="service_link_linkToSLA" class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id, catalog_id: $route.query.catalog_id } }">SLA</router-link>
+              </template>
               <!-- 编辑 -->
               <bk-button
                 v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
@@ -318,6 +334,15 @@
               </bk-popover>
             </template>
           </bk-table-column>
+          <bk-table-column type="setting" :tippy-options="{ zIndex: 3000 }">
+            <bk-table-setting-content
+              :fields="setting.fields"
+              :selected="setting.selectedFields"
+              :max="setting.max"
+              :size="setting.size"
+              @setting-change="handleSettingChange">
+            </bk-table-setting-content>
+          </bk-table-column>
         </bk-table>
       </div>
       <bk-dialog
@@ -367,8 +392,61 @@
   import commonMix from '@/views/commonMix/common.js';
   import { errorHandler } from '../../utils/errorHandler';
   import treeInfo from './directoryCom/treeInfo.vue';
+  import { deepClone } from '../../utils/util';
+  import i18n from '@/i18n/index.js';
   // import selectTree from '@/components/form/selectTree/index.vue'
-
+  const FIELDS = [
+    {
+      id: 'id',
+      label: 'ID',
+      width: 60,
+    },
+    {
+      id: 'name',
+      label: i18n.t('m["服务名称"]'),
+      minWidth: 200,
+    },
+    {
+      id: 'key',
+      label: i18n.t('m["类型"]'),
+      minWidth: 200,
+    },
+    {
+      id: 'desc',
+      label: i18n.t('m["描述"]'),
+      minWidth: 200,
+    },
+    {
+      id: 'creator',
+      label: i18n.t('m["创建人"]'),
+      minWidth: 100,
+    },
+    {
+      id: 'updated_by',
+      label: i18n.t('m["更新人"]'),
+      minWidth: 100,
+    },
+    {
+      id: 'update_at',
+      label: i18n.t('m["更新时间"]'),
+      minWidth: 150,
+    },
+    {
+      id: 'supervise_type',
+      label: i18n.t('m["可见范围"]'),
+      minWidth: 150,
+    },
+    {
+      id: 'bounded_catalogs',
+      label: i18n.t('m["关联目录"]'),
+      minWidth: 200,
+    },
+    {
+      id: 'is_valid',
+      label: i18n.t('m["状态"]'),
+      minWidth: 200,
+    },
+  ];
   export default {
     name: 'ServiceList',
     components: {
@@ -384,6 +462,12 @@
           node: {},
         },
         rules: {},
+        tableSettings: [],
+        setting: {
+          fields: FIELDS,
+          selectedFields: FIELDS,
+          size: 'small',
+        },
         importCatalogId: [],
         isCheckImport: false,
         isHasFile: false,
@@ -452,12 +536,20 @@
         changeFrom: {
           name: '',
           serviceType: '',
+          desc: '',
           bounded_catalogs: '',
         },
         editValue: '',
         tableHoverId: '',
         isImportServiceShow: false,
+        displayTypeList: [],
+        userList: [],
       };
+    },
+    computed: {
+      openFunction() {
+        return this.$store.state.openFunction;
+      },
     },
     watch: {
       'treeInfo.node'() {
@@ -483,12 +575,63 @@
       this.rules.key = this.checkCommonRules('required').required;
     },
     mounted() {
+      this.getDisplayType();
+      const curTableSetting = JSON.parse(localStorage.getItem('tableSettings')).find(item => item.type === 'service');
+      if (curTableSetting) {
+        this.setting.size = curTableSetting.size;
+        this.setting.selectedFields = this.setting.fields.slice(0).filter(m => curTableSetting.fields.find(item => item.id === m.id));
+      }
       this.getServiceTypes();
       this.getList();
       this.getSlaList();
       this.getServiceDirectory();
     },
     methods: {
+      getDisplayType() {
+        const params = {
+          project_key: this.$store.state.project.id || this.$route.query.project.id,
+        };
+        Promise.all([this.$store.dispatch('deployCommon/getUser', {
+          is_processor: true,
+          project_key: this.$store.state.project.id,
+        }), this.$store.dispatch('deployCommon/getSecondUser', params)]).then(res => {
+          this.displayTypeList = res[0].data;
+          this.userList = res[1].data;
+        });
+      },
+      setDisplayType(row) {
+        const type = this.displayTypeList.find(item => item.type === row.display_type);
+        if (row.display_role === '') {
+          return type.name;
+        }
+        const fields = row.display_role.split(',');
+        const users = this.userList.filter(item => item.role_type === row.display_type);
+        const result = [];
+        if (users) {
+          users.forEach(item => {
+            if (fields.includes(item.role_key)) {
+              result.push(item.name);
+            }
+          });
+        }
+        return result.length !== 0 ? `${type.name}/${result}` : type.name;
+      },
+      handleSettingChange({ fields, size }) {
+        const curTableSetting = deepClone(this.tableSettings.find(item => item.type === 'service'));
+        if (curTableSetting) {
+          curTableSetting.size = size;
+          curTableSetting.fields = fields;
+        } else {
+          this.tableSettings.push({
+            type: 'service',
+            size,
+            fields,
+          });
+        }
+        localStorage.setItem('tableSettings', JSON.stringify(this.tableSettings));
+        this.setting.size = size;
+        this.setting.selectedFields = fields;
+      },
       cellMouseEnter(row) {
         this.tableHoverId = row.id;
       },
@@ -555,23 +698,34 @@
             this.changeFrom.name = row.id;
             this.changeFrom.serviceType = '';
             this.changeFrom.bounded_catalogs = '';
+            this.changeFrom.desc = '';
             this.editValue = row.name;
             break;
-          case 'key':
+          case 'desc':
+            this.changeFrom.desc = row.id;
+            this.changeFrom.serviceType = '';
             this.changeFrom.name = '';
+            this.changeFrom.bounded_catalogs = '';
+            this.editValue = row.desc;
+            break;
+          case 'key':
             this.changeFrom.serviceType = row.id;
+            this.changeFrom.name = '';
+            this.changeFrom.desc = '';
             this.changeFrom.bounded_catalogs = '';
             this.editValue = row.key;
             break;
           case 'catalog_id':
-            this.changeFrom.name = '';
-            this.changeFrom.serviceType = '';
             this.changeFrom.bounded_catalogs = row.id;
+            this.changeFrom.name = '';
+            this.changeFrom.desc = '';
+            this.changeFrom.serviceType = '';
             break;
         }
       },
       closeEdit() {
         this.changeFrom.name = '';
+        this.changeFrom.desc = '';
         this.changeFrom.serviceType = '';
         this.changeFrom.bounded_catalogs = '';
       },
@@ -583,8 +737,8 @@
           id: curRow.id,
           key: curRow.key,
           name: curRow.name,
+          desc: curRow.desc,
           project_key: curRow.project_key,
-          desc: '',
         };
         this.$store.dispatch('serviceEntry/updateService', params).then(() => {
           this.$bkMessage({

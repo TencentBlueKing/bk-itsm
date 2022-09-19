@@ -875,6 +875,7 @@ class TicketModelViewSet(ModelViewSet):
             request=request,
         )
         node_status = ticket.node_status.get(state_id=state_id)
+        node_status.set_history_operators(request.user.username)
 
         # 单据审批新增事务控制
         if node_status.type in [SIGN_STATE, APPROVAL_STATE]:

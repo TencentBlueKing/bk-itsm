@@ -308,14 +308,12 @@
         <textarea
           class="bk-form-textarea bk-textarea-tanble bk-halfline-item bk-halfline-margin field-input-tips"
           :placeholder="$t(`m.treeinfo['请输入字段填写说明']`)"
-          :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
           v-model.trim="formInfo.desc">
                 </textarea>
         <p class="field-tips-checkbox" style="margin-left: 335px;">
           <bk-checkbox
             :true-value="trueStatus"
             :false-value="falseStatus"
-            :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
             v-model="formInfo.is_tips">
             {{ $t('m.treeinfo["添加额外提示说明"]') }}
           </bk-checkbox>
@@ -327,7 +325,7 @@
           :required="true"
           :ext-cls="'bk-mt20-item'">
           <!-- 禁用：formInfo.isModule && formInfo.key!== 'bk_biz_id' -->
-          <textarea :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
+          <textarea
             class="bk-form-textarea bk-textarea-tanble bk-halfline-item bk-halfline-margin"
             :placeholder="$t(`m.treeinfo['请输入，用于鼠标经过提示']`)"
             v-model.trim="formInfo.tips">
@@ -337,7 +335,7 @@
               {{ $t('m.treeinfo["效果预览"]') }}
             </span>
           </p>
-          <div class="bk-form-disabled" v-if="changeInfo.source === 'TABLE' || changeInfo.is_builtin"></div>
+          <!-- <div class="bk-form-disabled" v-if="changeInfo.source === 'TABLE' || changeInfo.is_builtin"></div> -->
         </bk-form-item>
       </template>
       <!-- 公共字段不需要填写条件隐藏' -->
@@ -1113,6 +1111,9 @@
         params.validate_type = this.formInfo.validate;
         params.regex = this.formInfo.regex;
         params.regex_config = this.formInfo.regex_config;
+        params.desc = this.formInfo.desc;
+        params.is_tips = this.formInfo.is_tips;
+        params.tips = this.formInfo.tips;
         // 字段默认值
         params.default = '';
         if (this.showType.belongDefaultList.some(defaultType => defaultType === this.formInfo.type)) {
@@ -1324,7 +1325,8 @@
       // 获取RPC数据
       getRpcList() {
         this.$store.dispatch('datadict/getPrcData').then((res) => {
-          this.prcData.list = res.data;
+          const skip_keys = ['table_fields', 'flow_states'];
+          this.prcData.list = res.data.filter(item => skip_keys.indexOf(item.key) === -1);
           if (this.prcData.list.filter(prcInfo => prcInfo.key === this.prcData.check).length) {
             this.prcTable = this.prcData.list.filter(prcInfo => prcInfo.key === this.prcData.check)[0].req_params;
           }

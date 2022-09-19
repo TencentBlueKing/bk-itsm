@@ -315,7 +315,7 @@ class WebHookService(ItsmBaseService):
         try:
             # 返回code 非 200
             if response.status_code not in [200, 201]:
-                err_message = "返回状态码非200"
+                err_message = "返回状态码非200, response={}".format(response.text)
                 self.do_exit_plugins(
                     ticket,
                     state_id,
@@ -340,7 +340,7 @@ class WebHookService(ItsmBaseService):
         try:
             resp = response.json()
         except Exception:
-            err_message = "返回值非Json"
+            err_message = "返回值非Json, response={}".format(response.text)
             self.do_exit_plugins(
                 ticket,
                 state_id,

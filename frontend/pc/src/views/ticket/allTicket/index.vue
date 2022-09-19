@@ -430,6 +430,18 @@
         return !!this.$route.query.project_id;
       },
     },
+    watch: {
+      curService: {
+        handler(newVal, oldVal) {
+          const defaultType = ['event', 'change', 'request', 'question'];
+          if (newVal.key !== oldVal.key && defaultType.includes(newVal.key)) {
+            this.serviceType = newVal.key;
+            this.getTypeStatus();
+          }
+        },
+        deep: true,
+      },
+    },
     created() {
       this.initData();
     },
@@ -624,7 +636,6 @@
           .then((res) => {
             if (res.result) {
               this.serviceList = res.data;
-              console.log(res.data);
               this.serviceList.forEach((item) => {
                 item.label = item.name;
                 this.$set(this.counts, item.key, 0);
@@ -829,7 +840,7 @@
         this.$store
           .dispatch('eventType/getAppList')
           .then((res) => {
-            this.searchForms.find((item) => item.key === 'bk_biz_id').list =            res.data;
+            this.searchForms.find((item) => item.key === 'bk_biz_id').list = res.data;
           })
           .catch((res) => {
             errorHandler(res, this);

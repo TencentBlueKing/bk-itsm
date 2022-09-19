@@ -70,7 +70,7 @@
         </bk-table-column>
         <bk-table-column prop="creator" :label="$t(`m['创建人']`)"></bk-table-column>
         <bk-table-column :sortable="true" prop="create_at" :label="$t(`m['创建时间']`)"></bk-table-column>
-        <bk-table-column :label="$t(`m['操作']`)">
+        <bk-table-column :label="$t(`m['操作']`)" fixed="right">
           <template slot-scope="props">
             <bk-button
               v-cursor="{ active: !hasPermission(['project_edit'], props.row.auth_actions) }"

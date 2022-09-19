@@ -44,7 +44,7 @@
                 <ul class="bk-trigger-content">
                   <li v-for="(item, index) in boundTriggerList" :key="index" @click.stop="openNew('add', item)" :class="{ 'li-transition': origin === 'transition' }">
                     <span class="bk-trigger-icon">
-                      <i class="bk-itsm-icon icon-info-circle" :class="[item.iconKey]" style="font-size: 24px"></i>
+                      <i class="bk-itsm-icon icon-info-circle icon-slide" style="font-size: 24px"></i>
                     </span>
                     <span class="bk-trigger-name" :title="item.name">{{ item.name || '--' }}
                       <span v-if="item.is_draft" style="color: #3A84FF;">{{ $t('m.taskTemplate["(草稿)"]') }}</span>

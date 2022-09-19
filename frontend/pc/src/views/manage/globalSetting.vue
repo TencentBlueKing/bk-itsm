@@ -154,21 +154,23 @@
         <div class="bk-file-left">
           <p class="bk-left-title">{{ $t('m.home["功能开关"]') }}</p>
           <div class="bk-left-content">
-            <div class="bk-left-btn" v-for="(item,key) in moduleInfo" v-if="item.isAvailable" :key="key">
-              <span class="bk-clear-info">
-                {{ item.title }}
-              </span>
-              <bk-switcher
-                v-model="item.open"
-                v-cursor="{ active: !hasPermission(['global_settings_manage']) }"
-                :class="{
-                  'text-permission-disable': !hasPermission(['global_settings_manage'])
-                }"
-                :disabled="isAllStatusGetting || !hasPermission(['global_settings_manage'])"
-                size="small"
-                :on-text="$t(`m.home['打开']`)"
-                :off-text="$t(`m.home['关闭']`)"
-                @change="allSwitchChange($event,key)"></bk-switcher>
+            <div class="bk-left-btn" v-for="(item,key) in moduleInfo" :key="key">
+              <template v-if="onceSlaSwitcher(item)">
+                <span class="bk-clear-info">
+                  {{ item.title }}
+                </span>
+                <bk-switcher
+                  v-model="item.open"
+                  v-cursor="{ active: !hasPermission(['global_settings_manage']) }"
+                  :class="{
+                    'text-permission-disable': !hasPermission(['global_settings_manage'])
+                  }"
+                  :disabled="isAllStatusGetting || !hasPermission(['global_settings_manage'])"
+                  size="small"
+                  :on-text="$t(`m.home['打开']`)"
+                  :off-text="$t(`m.home['关闭']`)"
+                  @change="allSwitchChange($event,key)"></bk-switcher>
+              </template>
             </div>
           </div>
         </div>
@@ -177,6 +179,9 @@
           <ul class="bk-number-ul">
             <li>
               {{ $t('m.home["“功能开关”可以自定义启停以下ITSM功能模块，关闭后，该模块对应的所有的功能将被隐藏。"]') }}
+            </li>
+            <li v-if="moduleInfo.sla.open">
+              {{ $t('m.home["“SLA功能开关” 关闭后，该按钮开关和模块对应的所有的功能将被隐藏。"]') }}
             </li>
           </ul>
         </div>
@@ -363,6 +368,13 @@
       await this.getVersionList();
     },
     methods: {
+      onceSlaSwitcher(item) {
+        const { isAvailable, open, title } = item;
+        if (title === 'SLA功能开关：') {
+          return open;
+        }
+        return isAvailable;
+      },
       async getEnableStatusAndStorage() {
         this.isAllStatusGetting = true;
         await this.$store.dispatch('attachmentStorage/getEnableStatus').then((res) => {

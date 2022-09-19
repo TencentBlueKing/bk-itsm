@@ -561,7 +561,7 @@
     margin: 0 auto;
     display: flex;
     align-items: center;
-    padding: 20px;
+    padding: 20px 100px 20px 20px;
     background: #ffffff;
     border-radius: 2px;
     box-shadow: 0px 2px 6px 0px rgba(6,6,6,0.1);
@@ -604,6 +604,9 @@
             font-size: 12px;
             color: #63656e;
             line-height: 20px;
+            width: 100%;
+            word-break: break-all;
+            white-space: normal;
         }
         .favorite {
             display: inline-block;
@@ -671,6 +674,8 @@
                 top: 22px;
                 right: 0;
                 padding: 8px 0;
+                overflow-y: auto;
+                @include scroller;
                 li {
                     height: 32px;
                     padding: 0 8px;

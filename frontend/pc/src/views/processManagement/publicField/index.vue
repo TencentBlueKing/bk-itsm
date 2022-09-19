@@ -149,7 +149,7 @@
               <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
             </template>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.treeinfo['操作']`)" width="150">
+          <bk-table-column :label="$t(`m.treeinfo['操作']`)" width="150" fixed="right">
             <template slot-scope="props">
               <!-- 编辑 -->
               <bk-button

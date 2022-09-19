@@ -134,12 +134,12 @@
           :required="true"
           property="name"
           error-display-type="normal">
-          <bk-input v-model="formData.name" :maxlength="120" :show-word-limit="true"></bk-input>
+          <bk-input v-model="formData.name" :maxlength="100" :show-word-limit="true"></bk-input>
         </bk-form-item>
         <bk-form-item
           :label="$t(`m.serviceConfig['服务描述']`)"
           property="desc">
-          <bk-input v-model="formData.desc" type="textarea" :row="3" :maxlength="100"></bk-input>
+          <bk-input v-model="formData.desc" type="textarea" :row="3" :maxlength="255"></bk-input>
         </bk-form-item>
         <bk-form-item
           data-test-id="service-select-serviceDirectory"
@@ -305,12 +305,19 @@
       },
     },
     created() {
-      this.rules.name = this.checkCommonRules('name').name;
-      this.rules.name.push({
-        validator: this.handleRepeatServiceName,
-        message: this.$t('m[\'服务名称重复，请重新输入\']'),
-        trigger: 'blur',
-      });
+      const nameRules = [
+        {
+          required: true,
+          message: this.$t('m.treeinfo["字段必填"]'),
+          trigger: 'blur',
+        },
+        {
+          validator: this.handleRepeatServiceName,
+          message: this.$t('m[\'服务名称重复，请重新输入\']'),
+          trigger: 'blur',
+        },
+      ];
+      this.rules.name = nameRules;
       this.rules.directory_id = this.checkCommonRules('required').required;
       this.rules.key = this.checkCommonRules('required').required;
       this.showFieldOption = this.type === 'edit' && !!this.serviceInfo.source;
@@ -382,11 +389,8 @@
         this.isShowRightEdit = false;
       },
       onEditCancel() {
-        if (this.crtForm === 'add') {
-          this.cancelAddField();
-        } else {
-          this.crtForm = '';
-        }
+        this.cancelAddField();
+        this.crtForm = '';
         this.isShowRightEdit = false;
       },
       getAddFieldStatus(status) {
@@ -647,6 +651,13 @@
         this.crtForm = 'add';
       },
       fieldDelete(form) {
+        if (this.crtForm) {
+          this.$bkMessage({
+            message: this.$t('m["请先将当前字段属性关闭再进行操作"]'),
+            theme: 'warning',
+          });
+          return;
+        }
         if (form.id === 'add') {
           this.onEditCancel();
           return;

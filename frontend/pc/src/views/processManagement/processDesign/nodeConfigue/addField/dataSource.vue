@@ -26,7 +26,7 @@
     <bk-select :ext-cls="typeClass"
       v-model="formInfo.source_type"
       :clearable="false"
-      :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE' || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT')) && formInfo.key !== 'bk_biz_id'"
+      :disabled="dataSourceDisable"
       searchable
       @selected="changeSource">
       <bk-option v-for="option in sourceList"
@@ -39,6 +39,7 @@
       <bk-select :ext-cls="'bk-halfline-item'"
         v-model="dictionaryData.check"
         :clearable="false"
+        :disabled="dataSourceDisable"
         searchable>
         <bk-option v-for="option in dictionaryData.list"
           :key="option.key"
@@ -142,6 +143,9 @@
       globalChoise() {
         return this.$store.state.common.configurInfo;
       },
+      dataSourceDisable() {
+        return (this.changeInfo.is_builtin || this.changeInfo.source === 'TABLE' || (this.changeInfo.meta && this.changeInfo.meta.code === 'APPROVE_RESULT')) && this.formInfo.key !== 'bk_biz_id';
+      },
     },
     watch: {
       'formInfo.type'() {
@@ -163,13 +167,13 @@
       },
       getSourceList() {
         // 根据不同类型来显示数据源类型列表
-        const typeList = this.globalChoise.source_type;
+        const typeList = this.globalChoise.source_type.filter(item => item.typeName !== 'CUSTOM_API');
         if (this.formInfo.type === 'TABLE') {
           this.sourceList = typeList.filter(item => item.typeName === 'CUSTOM');
         } else if (this.formInfo.type === 'TREESELECT') {
           this.sourceList = typeList.filter(item => item.typeName === 'DATADICT' || item.typeName === 'RPC');
         } else {
-          this.sourceList = this.globalChoise.source_type;
+          this.sourceList = typeList;
         }
       },
       // 获取Api系统列表
