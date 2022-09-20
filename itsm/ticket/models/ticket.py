@@ -2115,7 +2115,7 @@ class Ticket(Model, BaseTicket):
         #     ]
         # )
         # 调整为提单人都可以督办
-        return username == self.creator
+        return username == self.creator and not self.is_over
 
     def iam_ticket_manage_auth(self, username):
         # 本地开发环境，不校验单据管理权限
