@@ -23,18 +23,23 @@
 <template>
   <div class="no-data">
     <img :src="imgUrl">
-    <p>
+    <p :style="{ 'font-size': fontSize + 'px' }">
       {{ text || $t('m.treeinfo["暂无数据"]') }}
     </p>
   </div>
 </template>
 
 <script>
+
   export default {
     name: 'NoData',
     props: {
       text: {
         type: String,
+      },
+      fontSize: {
+        type: [Number, String],
+        default: 16,
       },
     },
     data() {

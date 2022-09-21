@@ -59,7 +59,7 @@
           RUNNING: {
             cls: 'running',
             icon: 'bk-itsm-icon icon-icon-loading',
-            text: this.$t('m.task["执行中"]'),
+            text: this.$t('m.task["等待处理"]'),
           },
           SUCCESS: {
             cls: 'success',

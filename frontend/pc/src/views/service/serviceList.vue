@@ -98,8 +98,7 @@
           <bk-table-column
             type="selection"
             width="60"
-            align="center"
-            :selectable="disabledFn">
+            align="center">
             <template slot-scope="props">
               <template v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])">
                 <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
@@ -601,6 +600,9 @@
       },
       setDisplayType(row) {
         const type = this.displayTypeList.find(item => item.type === row.display_type);
+        if (type === undefined) {
+          return this.i18n.t('m["不可见"]');
+        }
         if (row.display_role === '') {
           return type.name;
         }
@@ -1061,7 +1063,7 @@
       // 全选 半选
       handleSelectAll(selection) {
         this.dataList.forEach(item => {
-          if (!item.bounded_catalogs[0] && this.hasPermission(['service_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
+          if (this.hasPermission(['service_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
             item.checkStatus = !!selection.length;
           }
         });

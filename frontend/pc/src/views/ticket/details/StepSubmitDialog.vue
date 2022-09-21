@@ -136,7 +136,7 @@
         },
         formInfo: {
           suspend_message: '',
-          closeState: '',
+          closeState: 'TERMINATED', // 关单初始值 ‘已终止’
           close_message: '',
         },
         endList: [],
@@ -194,7 +194,8 @@
         this.$store
           .dispatch('deployOrder/getEndStatus', { type, key })
           .then((res) => {
-            this.endList = res.data;
+            // 所有的关单都属于外力中途异常介入
+            this.endList = res.data.filter(item => item.key === 'TERMINATED');
           })
           .catch((res) => {
             errorHandler(res, this);

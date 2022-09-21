@@ -86,7 +86,7 @@
         {{ $t(`m.newCommon["刷新"]`) }}
       </bk-button>
       <bk-popover
-        :content="$t(`m.tickets['单据当前不能被撤回']`)"
+        :content="$t(`m.tickets['只有提单人才能撤单']`)"
         :disabled="ticketInfo.can_withdraw"
       >
         <bk-button
