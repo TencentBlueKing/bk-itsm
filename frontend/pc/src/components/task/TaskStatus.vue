@@ -39,6 +39,9 @@
         type: String,
         default: '',
       },
+      nodeType: {
+        type: String,
+      },
     },
     data() {
       return {
@@ -55,11 +58,15 @@
     },
     methods: {
       getStatusInfo() {
+        const runningStatusMap = {
+          APPROVAL: this.$t('m.task["等待审批中"]'),
+          NORMAL: this.$t('m.task["等待处理中"]'),
+        };
         const statusMap = {
           RUNNING: {
             cls: 'running',
             icon: 'bk-itsm-icon icon-icon-loading',
-            text: this.$t('m.task["执行中"]'),
+            text: runningStatusMap[this.nodeType] || this.$t('m.task["执行中"]'),
           },
           SUCCESS: {
             cls: 'success',
