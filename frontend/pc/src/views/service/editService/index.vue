@@ -66,6 +66,7 @@
         <service-setting-step v-else-if="currStep === 3"
           ref="serviceSettingStep"
           :service-info="serviceInfo"
+          @updateFlowInfo="getFlowDetailInfo"
           :flow-info="flowInfo">
         </service-setting-step>
       </template>
