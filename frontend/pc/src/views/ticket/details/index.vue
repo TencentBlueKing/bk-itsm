@@ -61,7 +61,7 @@
           <i data-v-639c8670="" class="bk-icon icon-angle-left"></i>
         </div>
         <div id="ticketContainerRight" class="ticket-container-right" v-show="showRightTabs">
-          <div v-if="hasNodeOptAuth" :class="['sla-information', isShowSla ? 'hide' : '']">
+          <div v-if="openFunction.SLA_SWITCH && hasNodeOptAuth" :class="['sla-information', isShowSla ? 'hide' : '']">
             <div class="sla-view">
               <div class="sla-title" @click="handleClickShowSla">
                 <i :class="['bk-itsm-icon', !isShowSla ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
