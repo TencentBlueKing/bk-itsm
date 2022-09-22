@@ -425,7 +425,7 @@ USER_ROLE_CHOICES = [
 ROLE_CHOICES = [
     # type    name    is_display   is_processor
     (CMDB, "CMDB业务公用角色", True, True),
-    (GENERAL, "自定义用户组", True, True),
+    (GENERAL, "自定义角色", True, True),
     (ADMIN, "管理员角色表", True, False),
     (OPEN, "不限", False, True),
     (PERSON, "个人", False, True),
