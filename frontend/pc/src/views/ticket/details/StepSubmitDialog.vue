@@ -62,7 +62,7 @@
           </bk-form-item>
         </template>
         <template v-if="ticketOperateType === 'close'">
-          <bk-form-item
+          <!-- <bk-form-item
             :label="$t(`m.newCommon['关闭状态']`)"
             :required="true"
             :property="'closeState'"
@@ -81,7 +81,7 @@
               >
               </bk-option>
             </bk-select>
-          </bk-form-item>
+          </bk-form-item> -->
           <bk-form-item
             :label="$t(`m.newCommon['关闭原因']`)"
             :required="true"
