@@ -106,11 +106,6 @@
               trigger: 'blur',
             },
             {
-              max: 50,
-              message: '不能多于50个字符',
-              trigger: 'blur',
-            },
-            {
               validator: this.validateName,
               message(val) {
                 return `${val}-此项目名称已存在`;
@@ -122,11 +117,6 @@
             {
               required: true,
               message: '必填项',
-              trigger: 'blur',
-            },
-            {
-              max: 28,
-              message: '不能多于28个字符',
               trigger: 'blur',
             },
             {
@@ -143,11 +133,6 @@
             },
           ],
           desc: [
-            {
-              max: 100,
-              message: '不能多于100个字符',
-              trigger: 'blur',
-            },
           ],
         },
       };

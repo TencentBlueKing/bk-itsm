@@ -166,7 +166,7 @@ const ROUTE_LIST = [
             path: '/project/notice',
           },
           {
-            name: i18n.t('m["自定义用户组"]'),
+            name: i18n.t('m["自定义角色组"]'),
             id: 'projectRoles',
             icon: 'bk-itsm-icon icon-itsm-icon-two-zero',
             path: '/project/roles',
