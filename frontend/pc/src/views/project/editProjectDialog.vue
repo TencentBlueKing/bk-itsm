@@ -40,26 +40,26 @@
         <bk-form-item property="name" :label="$t(`m['项目名称']`)" :required="true" error-display-type="normal">
           <bk-input
             v-model="projectForm.name"
-            :maxlength="50"
+            :maxlength="100"
             :show-word-limit="true"
             :disabled="editDialogFormDisable"
-            :placeholder="$t(`m['请输入50个字符以内的项目名称']`)">
+            :placeholder="$t(`m['请输入项目名称，不超过100个字符']`)">
           </bk-input>
         </bk-form-item>
         <bk-form-item property="key" :label="$t(`m['项目代号']`)" :required="true" error-display-type="normal">
           <bk-input
             v-model="projectForm.key"
-            :maxlength="28"
+            :maxlength="32"
             :show-word-limit="true"
             :disabled="!!project.key || editDialogFormDisable"
-            :placeholder="$t(`m['请输入28个由小写字母、数字、下划线横线且必须以英文字母开头的项目代号']`)">
+            :placeholder="$t(`m['请输入项目代号，不超过32个字符。需以英文字母开头，可包含小写字母、数字、下划线、中横线']`)">
           </bk-input>
         </bk-form-item>
         <bk-form-item property="desc" :label="$t(`m['项目说明']`)">
           <bk-input
             v-model="projectForm.desc"
             type="textarea"
-            :maxlength="100"
+            :maxlength="255"
             :label="$t(`m['请输入项目说明']`)"
             :placeholder="$t(`m['请输入项目说明']`)">
           </bk-input>
@@ -106,11 +106,6 @@
               trigger: 'blur',
             },
             {
-              max: 50,
-              message: '不能多于50个字符',
-              trigger: 'blur',
-            },
-            {
               validator: this.validateName,
               message(val) {
                 return `${val}-此项目名称已存在`;
@@ -122,11 +117,6 @@
             {
               required: true,
               message: '必填项',
-              trigger: 'blur',
-            },
-            {
-              max: 28,
-              message: '不能多于28个字符',
               trigger: 'blur',
             },
             {
@@ -143,11 +133,6 @@
             },
           ],
           desc: [
-            {
-              max: 100,
-              message: '不能多于100个字符',
-              trigger: 'blur',
-            },
           ],
         },
       };

@@ -281,9 +281,13 @@
         };
         return this.$store.dispatch('change/getSubmitFields', params).then(async (res) => {
           this.fieldList = res.data;
+          const priorityReadonly = this.fieldList.some(item => item.key === 'impact' || item.key === 'urgency');
           this.fieldList.forEach((item) => {
             if (item.type === 'CASCADE') {
               item.type = 'SELECT';
+            }
+            if (item.key === 'priority' && !priorityReadonly) {
+              this.$set(item, 'is_readonly', false);
             }
             this.$set(item, 'showFeild', true);
             this.$set(item, 'val', item.value);

@@ -640,7 +640,9 @@
       // 取消添加字段
       cancelAddField() {
         const index = this.ticketNodeForm.findIndex(item => item.id === 'add');
-        this.ticketNodeForm.splice(index, 1);
+        if (index !== -1) {
+          this.ticketNodeForm.splice(index, 1);
+        }
         this.crtForm = '';
       },
       // 字段克隆

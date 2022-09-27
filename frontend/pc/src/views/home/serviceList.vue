@@ -45,15 +45,15 @@
             </i>
           </li>
         </ul>
-        <div class="recently-empty" v-else>
-          <p>{{ $t(`m.common['您还没有留下脚印，您可以进行以下操作']`) }}</p>
+        <no-data v-else font-size="12" style="padding: 40px 0;" text="您当前似乎还没有使用过任何服务，您可以在下方全部服务中选择您所需要的服务进行提单"></no-data>
+        <!-- <div class="recently-empty" >
           <div class="operation-wrapper">
-            <!-- <div class="operate">
+            <div class="operate">
               <div class="icon-area" @click="onTabChange('all')">
                 <i class="bk-itsm-icon icon-arrow-rect"></i>
               </div>
               <div class="text" @click="onTabChange('all')">{{ $t(`m.common['查看服务']`) }}</div>
-            </div> -->
+            </div>
             <div class="operate">
               <div class="icon-area" @click="onCreateTicket">
                 <i class="bk-itsm-icon icon-pen-rect"></i>
@@ -61,7 +61,7 @@
               <div class="text" @click="onCreateTicket">{{ $t(`m.managePage['提单']`) }}</div>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
     <div class="service-list-section" style="margin-top: 20px">
@@ -142,9 +142,13 @@
   import debounce from 'throttle-debounce/debounce';
   import bus from '@/utils/bus.js';
   import { errorHandler } from '@/utils/errorHandler';
+  import NoData from '../../components/common/NoData.vue';
 
   export default {
     name: 'ServiceList',
+    components: {
+      NoData,
+    },
     data() {
       return {
         type: 'latest',
@@ -185,7 +189,7 @@
           const favoriteList = data[0].data;
           const recentlyList = data[1].data.filter(item => favoriteList.findIndex(fItem => fItem.id === item.id) === -1);
           const len = favoriteList.length;
-          this.latestList = len > 16 ? favoriteList.slice(0, 16) : favoriteList.concat(recentlyList.slice(0, 16 - len));
+          this.latestList = len > 16 ? favoriteList : favoriteList.concat(recentlyList.slice(0, 16 - len));
         })
           .catch(res => {
             errorHandler(res, this);
@@ -291,6 +295,7 @@
   };
 </script>
 <style lang="scss" scoped>
+    @import '../../scss/mixins/scroller.scss';
     .service-list-section {
         position: relative;
         padding: 20px;
@@ -390,7 +395,10 @@
     }
     .recently-content {
         // padding-top: 30px;
-        min-height: 276px;
+        min-height: 120px;
+        max-height: 240px;
+        overflow-y: auto;
+        @include scroller;
     }
     .service-content {
         position: relative;
@@ -422,7 +430,7 @@
     .service-item {
         float: left;
         position: relative;
-        margin-right: 30px;
+        margin-right: 29px;
         margin-bottom: 16px;
         color: #63656e;
         background: #f3f6fb;

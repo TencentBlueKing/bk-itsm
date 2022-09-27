@@ -484,12 +484,16 @@
           return;
         }
         this.previewTab = this.showTabList;
+        const priorityReadonly = this.previewTab.some(item => item.key === 'impact' || item.key === 'urgency');
         for (let i = 0; i < this.previewTab.length; i++) {
           for (let j = 0; j < this.previewTab[i].choice.length; j++) {
             this.previewTab[i].choice[j].typeName = this.previewTab[i].choice[0] ? this.previewTab[i].choice[0].key : '';
           }
           this.$set(this.previewTab[i], 'val', (this.previewTab[i].default || ''));
           this.$set(this.previewTab[i], 'showFeild', true);
+          if (this.previewTab[i].key === 'priority' && !priorityReadonly) {
+            this.$set(this.previewTab[i], 'is_readonly', false);
+          }
         }
         this.processInfo.isShow = true;
         this.isNecessaryToWatch({ fields: this.previewTab }, 'workflow');

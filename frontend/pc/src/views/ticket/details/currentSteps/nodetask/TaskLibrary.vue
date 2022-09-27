@@ -58,7 +58,11 @@
               <span class="task-name" @click="onTaskNameClick(props.row)">{{ props.row.name }}</span>
             </template>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.task['处理人']`)" prop="processors"></bk-table-column>
+          <bk-table-column :label="$t(`m.task['处理人']`)" prop="processors">
+            <template slot-scope="props">
+              <span>{{ props.row.processors.replace(/^(,|，)+|(,|，)+$/g, '') }}</span>
+            </template>
+          </bk-table-column>
           <bk-table-column :label="$t(`m.task['任务类型']`)">
             <template slot-scope="props">
               {{ getTaskZhName(props.row.component_type) }}

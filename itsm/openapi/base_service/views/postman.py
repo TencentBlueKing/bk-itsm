@@ -44,20 +44,21 @@ class PostManViewSet(viewsets.GenericViewSet):
         headers = config.get("headers", {})
         body = config.get("body", {})
 
-        auth_headers = {
-            "bk_app_code": settings.APP_ID,
-            "bk_app_secret": settings.APP_TOKEN,
-            "bk_username": settings.SYSTEM_USE_API_ACCOUNT,
-        }
-
+        # 默认 增加 application/json 的json头
+        headers.update({"Content-Type": "application/json"})
         # 如果自带了鉴权token，则不使用流程服务默认的选项
         if "x-bkapi-authorization" not in headers:
+            auth_headers = {
+                "bk_app_code": settings.APP_ID,
+                "bk_app_secret": settings.APP_TOKEN,
+                "bk_username": settings.SYSTEM_USE_API_ACCOUNT,
+            }
             headers.update({"x-bkapi-authorization": json.dumps(auth_headers)})
         try:
             response = requests.request(
                 method,
                 url,
-                data=body,
+                data=json.dumps(body),
                 params=query_params,
                 headers=headers,
                 timeout=10,

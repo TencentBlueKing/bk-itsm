@@ -416,7 +416,7 @@ class AutoStateService(ItsmBaseService):
                     ticket=ticket,
                     state_id=state_id,
                     state_status=FINISHED,
-                    ex_data=p_rsp.get("message", None),
+                    ex_data=p_rsp.get("message", "执行成功"),
                     rsp=p_rsp.get("data") or p_rsp,
                     variables=variables,
                     data=data,
@@ -424,11 +424,16 @@ class AutoStateService(ItsmBaseService):
                 )
                 return True
             if poll_time <= 0:
+                logger.error(
+                    "[AutoStateService_schedule] api_request_error, response={}".format(
+                        p_rsp
+                    )
+                )
                 self.do_exit_plugins(
                     ticket=ticket,
                     state_id=state_id,
                     state_status=FAILED,
-                    ex_data=p_rsp.get("message", None),
+                    ex_data=p_rsp.get("message", "API调用异常，返回结果不为True"),
                     rsp=p_rsp.get("data") or p_rsp,
                     variables=variables,
                     data=data,
