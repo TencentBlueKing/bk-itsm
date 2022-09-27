@@ -1468,7 +1468,7 @@ class Ticket(Model, BaseTicket):
         empty_priority_name = "--"
         # 单据已设置优先级
         if "priority" in self.meta:
-            return self.meta["priority"]["name"]
+            return self.meta["priority"].get("name", "")
         else:
             return empty_priority_name
 
