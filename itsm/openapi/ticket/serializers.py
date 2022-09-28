@@ -381,7 +381,7 @@ class TicketCreateSerializer(TicketSerializer):
 class DynamicFieldSerializer(serializers.Serializer):
     name = serializers.CharField(required=True, max_length=32)
     type = serializers.ChoiceField(
-        choices=[("STRING", "字符串"), ("INT", "数字")], required=True
+        choices=[("STRING", "字符串"), ("INT", "数字"), ("LINK", "链接")], required=True
     )
     value = serializers.CharField(required=True, max_length=32)
     key = serializers.CharField(required=False, read_only=True)
