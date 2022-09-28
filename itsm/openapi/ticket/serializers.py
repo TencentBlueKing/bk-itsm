@@ -219,6 +219,14 @@ class TicketComplexLogsSerializer(TicketLogsSerializer):
     logs = serializers.JSONField(read_only=True, source="ticket_complex_logs")
 
 
+class TicketApproveSerializer(TicketLogsSerializer):
+    sn = serializers.CharField(read_only=True)
+    state_id = serializers.IntegerField(read_only=True)
+    approver = serializers.CharField(read_only=True)
+    action = serializers.CharField(read_only=True)
+    remarked = serializers.CharField(read_only=True)
+
+
 class SimpleLogsSerializer(serializers.Serializer):
     """
     单据日志主要信息序列化
