@@ -21,6 +21,6 @@ class Migration(migrations.Migration):
     if settings.ENVIRONMENT == "dev":
         migration_json = "initial_dev.json"
 
-    dependencies = [('iam_migration', '0002_update')]
+    dependencies = [("iam_migration", "0002_update")]
 
-    operations = [migrations.RunPython(forward_func)]
+    operations = []

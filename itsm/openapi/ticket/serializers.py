@@ -219,6 +219,14 @@ class TicketComplexLogsSerializer(TicketLogsSerializer):
     logs = serializers.JSONField(read_only=True, source="ticket_complex_logs")
 
 
+class TicketApproveSerializer(TicketLogsSerializer):
+    sn = serializers.CharField(read_only=True)
+    state_id = serializers.IntegerField(read_only=True)
+    approver = serializers.CharField(read_only=True)
+    action = serializers.CharField(read_only=True)
+    remarked = serializers.CharField(read_only=True)
+
+
 class SimpleLogsSerializer(serializers.Serializer):
     """
     单据日志主要信息序列化
@@ -383,7 +391,7 @@ class DynamicFieldSerializer(serializers.Serializer):
     type = serializers.ChoiceField(
         choices=[("STRING", "字符串"), ("INT", "数字"), ("LINK", "链接")], required=True
     )
-    value = serializers.CharField(required=True, max_length=32)
+    value = serializers.CharField(required=True, max_length=255)
     key = serializers.CharField(required=False, read_only=True)
 
     def validate(self, attrs):
