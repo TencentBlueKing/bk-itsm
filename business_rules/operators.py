@@ -70,13 +70,13 @@ class BaseType(object):
 
 
 def export_type(cls):
-    """ Decorator to expose the given class to business_rules.export_rule_data. """
+    """Decorator to expose the given class to business_rules.export_rule_data."""
     cls.export_in_rule_data = True
     return cls
 
 
 def type_operator(input_type, label=None, assert_type_for_arguments=True, display=True):
-    """ Decorator to make a function into a type operator.
+    """Decorator to make a function into a type operator.
 
     - assert_type_for_arguments - if True this patches the operator function
       so that arguments passed to it will have _assert_valid_value_and_cast
@@ -93,7 +93,9 @@ def type_operator(input_type, label=None, assert_type_for_arguments=True, displa
         def inner(self, *args, **kwargs):
             if assert_type_for_arguments:
                 args = [self._assert_valid_value_and_cast(arg) for arg in args]
-                kwargs = dict((k, self._assert_valid_value_and_cast(v)) for k, v in kwargs.items())
+                kwargs = dict(
+                    (k, self._assert_valid_value_and_cast(v)) for k, v in kwargs.items()
+                )
             return func(self, *args, **kwargs)
 
         return inner
@@ -115,6 +117,10 @@ class StringType(BaseType):
     def equal_to(self, other_string):
         return self.value == other_string
 
+    @type_operator(FIELD_TEXT, label="不等于")
+    def non_equal(self, other_string):
+        return self.value != other_string
+
     @type_operator(FIELD_TEXT, label="等于(忽略大小写)")
     def equal_to_case_insensitive(self, other_string):
         return self.value.lower() == other_string.lower()
@@ -130,6 +136,10 @@ class StringType(BaseType):
     @type_operator(FIELD_TEXT, label="包含")
     def contains(self, other_string):
         return other_string in self.value
+
+    @type_operator(FIELD_TEXT, label="不包含")
+    def non_contains(self, other_string):
+        return other_string not in self.value
 
     @type_operator(FIELD_TEXT, label="正则匹配")
     def matches_regex(self, regex):
@@ -220,7 +230,9 @@ class SelectType(BaseType):
 
     @staticmethod
     def _case_insensitive_equal_to(value_from_list, other_value):
-        if isinstance(value_from_list, string_types) and isinstance(other_value, string_types):
+        if isinstance(value_from_list, string_types) and isinstance(
+            other_value, string_types
+        ):
             return value_from_list.lower() == other_value.lower()
         else:
             return value_from_list == other_value
@@ -246,7 +258,9 @@ class SelectMultipleType(BaseType):
 
     def _assert_valid_value_and_cast(self, value):
         if not hasattr(value, "__iter__"):
-            raise AssertionError("{0} is not a valid select multiple type".format(value))
+            raise AssertionError(
+                "{0} is not a valid select multiple type".format(value)
+            )
         return value
 
     @type_operator(FIELD_SELECT_MULTIPLE, label="包含")
