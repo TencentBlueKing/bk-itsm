@@ -276,7 +276,6 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
         if pk == "0":
             apis = []
             try:
-                project_key = request.data.get("project_key", "0")
                 remote_system = request.data.get("remote_system", "0")
                 data = json.loads(request.FILES.get("file").read())
             except ValueError:
@@ -284,8 +283,7 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
 
             for item in data:
                 try:
-                    item["project_key"] = project_key
-                    item["remote_system"] = remote_system
+                    item["remote_system_id"] = remote_system
                     api = RemoteApi.restore_api(item, request.user.username)
                     apis.append(api)
                 except Exception as e:
