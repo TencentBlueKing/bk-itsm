@@ -41,6 +41,7 @@
         <div class="bk-directory-table">
           <api-table v-if="!Object.keys(displayInfo['level_1']).length"
             ref="apiTable"
+            :remote-system="remoteSystem"
             :project-id="projectId"
             :first-level-info="firstLevelInfo"
             :custom-paging="customPaging"
@@ -49,6 +50,7 @@
             :list-info-ori="listInfo">
           </api-table>
           <api-content v-else
+            :remote-system="remoteSystem"
             :second-level-info="secondLevelInfo"
             :api-detail-info="apiDetailInfo"
             :tree-list="treeList"
@@ -89,6 +91,8 @@
           level_0: {},
           level_1: {},
         },
+        // 系统id
+        remoteSystem: '',
         // API 详情
         apiDetailInfo: {},
         // API列表
@@ -251,6 +255,7 @@
       async getTableList(id, customPaging, searchInfo) {
         await this.displayInfo.level_1;
         await this.$refs.apiTable;
+        this.remoteSystem = id;
         const params = {
           remote_system: id || '',
           page_size: customPaging ? customPaging.page_size : 10,

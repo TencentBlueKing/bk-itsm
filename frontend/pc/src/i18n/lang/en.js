@@ -2673,4 +2673,5 @@ export const m = {
   关联目录: 'Associated directory',
   状态: 'State',
   不可见: 'INVISIBLE',
+  请选择项目: 'Please select project',
 };

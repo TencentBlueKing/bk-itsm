@@ -38,6 +38,16 @@ const SEARCH_FORMS = [
     placeholder: i18n.t('m.tickets["请选择单号/标题"]'),
   },
   {
+    name: i18n.t('m["项目"]'),
+    desc: i18n.t('m["项目"]'),
+    type: 'select',
+    key: 'project_key',
+    display: true,
+    value: '',
+    list: [],
+    placeholder: i18n.t('m["请选择项目"]'),
+  },
+  {
     name: i18n.t('m.tickets["服务目录"]'),
     type: 'cascade',
     key: 'catalog_id',
