@@ -428,7 +428,7 @@ class StateViewSet(BaseWorkflowElementViewSet):
         for var in valid_inputs:
             if var["type"] in ["SELECT", "MULTISELECT"]:
                 new_var = copy.deepcopy(var)
-                new_var["key"] = "{}_display".format(var["key"])
+                new_var["key"] = "{}__display".format(var["key"])
                 new_var["name"] = "{}_display".format(var["name"])
                 new_inputs.append(new_var)
 
