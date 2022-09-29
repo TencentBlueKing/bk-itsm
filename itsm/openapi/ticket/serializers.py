@@ -391,7 +391,7 @@ class DynamicFieldSerializer(serializers.Serializer):
     type = serializers.ChoiceField(
         choices=[("STRING", "字符串"), ("INT", "数字"), ("LINK", "链接")], required=True
     )
-    value = serializers.CharField(required=True, max_length=32)
+    value = serializers.CharField(required=True, max_length=255)
     key = serializers.CharField(required=False, read_only=True)
 
     def validate(self, attrs):
