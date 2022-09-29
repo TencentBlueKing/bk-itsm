@@ -266,6 +266,16 @@
           placeholder: this.$t('m.tickets["请选择单号/标题"]'),
         },
         {
+          name: this.$t('m["项目"]'),
+          desc: this.$t('m["项目"]'),
+          type: 'select',
+          key: 'project_key',
+          display: true,
+          value: '',
+          list: [],
+          placeholder: this.$t('m["请选择项目"]'),
+        },
+        {
           name: this.$t('m.tickets["服务目录"]'),
           type: 'cascade',
           key: 'catalog_id',

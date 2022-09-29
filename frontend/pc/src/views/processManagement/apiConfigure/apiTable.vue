@@ -25,7 +25,7 @@
     <div class="bk-api-button mb20">
       <p class="bk-api-title">{{ $t(`m.systemConfig["API列表"]`) }}</p>
       <div class="bk-api-button">
-        <bk-dropdown-menu class="mr10 access-btn" @show="dropdownShow" @hide="dropdownHide" ref="apiDropdown">
+        <bk-dropdown-menu class="mr10 access-btn" @show="dropdownShow" @hide="dropdownHide" ref="apiDropdown" :disabled="disableImport">
           <div class="dropdown-trigger-btn" style="padding-left: 12px;" slot="dropdown-trigger">
             <span style="font-size: 14px;">{{ $t(`m.systemConfig['Api接入']`)}}</span>
             <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
@@ -55,11 +55,12 @@
         </bk-dropdown-menu>
         <bk-button :theme="'default'"
           data-test-id="api_button_apiTableuploadApi"
+          :disabled="disableImport"
           v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
           :class="{ 'btn-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
           :title="$t(`m.systemConfig['点击上传']`)"
           class="mr10 bk-btn-file">
-          <input :type="!projectId && !hasPermission(['public_api_create']) ? 'button' : 'file'" :value="fileVal" class="bk-input-file" @change="handleFile" @click="hasImportPermission">
+          <input :disabled="disableImport" :type="!projectId && !hasPermission(['public_api_create']) ? 'button' : 'file'" :value="fileVal" class="bk-input-file" @change="handleFile" @click="hasImportPermission">
           {{$t(`m.systemConfig['导入']`)}}
         </bk-button>
         <bk-button :theme="'default'"
@@ -228,6 +229,7 @@
         },
       },
       projectId: String,
+      remoteSystem: String,
       firstLevelInfo: {
         type: Object,
         default() {
@@ -288,7 +290,13 @@
         },
       },
     },
-    watch: {},
+    computed: {
+      disableImport() {
+        return Number(this.remoteSystem) === 0;
+      },
+    },
+    watch: {
+    },
     mounted() {
 
     },
@@ -470,6 +478,8 @@
         if (fileInfo.size <= 10 * 1024 * 1024) {
           const data = new FormData();
           data.append('file', fileInfo);
+          data.append('project_key', this.projectId);
+          data.append('remote_system', this.remoteSystem);
           const fileType = 'json';
           this.$store.dispatch('apiRemote/get_api_import', { fileType, data }).then((res) => {
             this.$bkMessage({
