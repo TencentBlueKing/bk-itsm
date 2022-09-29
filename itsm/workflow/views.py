@@ -415,7 +415,6 @@ class StateViewSet(BaseWorkflowElementViewSet):
     @action(detail=True, methods=["get"])
     def variables(self, request, *args, **kwargs):
         state = self.get_object()
-
         # 默认先把field和全局的变量都获取出来
         resource_type = request.GET.get("resource_type", "both")
         exclude_self = request.GET.get("exclude_self", False)
@@ -423,6 +422,17 @@ class StateViewSet(BaseWorkflowElementViewSet):
         valid_inputs = state.get_valid_inputs(
             exclude_self=exclude_self, resource_type=resource_type, scope="state"
         )
+
+        # 如果是下拉框选项的，则允许显示中文名
+        new_inputs = []
+        for var in valid_inputs:
+            if var["type"] in ["SELECT", "MULTISELECT"]:
+                new_var = copy.deepcopy(var)
+                new_var["key"] = "{}_display".format(var["key"])
+                new_var["name"] = "{}_display".format(var["name"])
+                new_inputs.append(new_var)
+
+        valid_inputs.extend(new_inputs)
 
         # 非提单节点可引用单据属性（提单节点提交前，尚未创建工单）
         if not state.is_first_state:
