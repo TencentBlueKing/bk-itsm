@@ -28,6 +28,7 @@
           <slot></slot>
         </div>
         <bk-select
+          v-if="!isIframe"
           :loading="projectLoading"
           :search-with-pinyin="true"
           v-model="searchForms[1].value"
@@ -211,6 +212,7 @@
       },
       panel: String,
       curServcie: Object,
+      isIframe: Boolean,
       isCustomTab: {
         type: Boolean,
         default() {
@@ -317,6 +319,8 @@
         this.projectLoading = true;
         const res = await this.$store.dispatch('project/getProjectAllList');
         this.projectList = res.data;
+        const projectItem = this.searchForms.find(item => item.key === 'project_key');
+        projectItem.list = res.data;
         this.projectLoading = false;
       },
       // 过滤参数

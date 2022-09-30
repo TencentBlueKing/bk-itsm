@@ -39,6 +39,7 @@ const printOrder = () => import('../views/commonComponent/printOrder/index.vue')
 const TicketDetail = () => import('../views/ticket/details/index.vue');
 // 工单处理页面-iframe
 const TicketDetailIframe = () => import('../views/ticket/detailsIframe/index.vue');
+const TicketApprovalIframe = () => import('../views/ticket/approvalIframe/index.vue');
 // 流程设计
 const process = () => import('../views/processManagement/processDesign/index.vue');
 const ProcessHome = () => import('../views/processManagement/processDesign/processHome/ProcessHome.vue');
@@ -234,6 +235,14 @@ const routes = [
         path: 'detail', // 工单详情
         name: 'TicketDetail',
         component: TicketDetail,
+      },
+      {
+        path: 'approval-iframe', // 审批工单-iframe
+        name: 'TicketApprovalIframe',
+        component: TicketApprovalIframe,
+        meta: {
+          iframe: true,
+        },
       },
       {
         path: 'detail-iframe', // 工单详情-iframe

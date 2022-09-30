@@ -27,6 +27,7 @@
         class="advanced-search"
         ref="advancedSearch"
         :forms="searchForms"
+        :is-iframe="isIframe"
         :panel="type"
         :search-result-list="searchResultList"
         @deteleSearchResult="deteleSearchResult"
@@ -224,6 +225,10 @@
       ApprovalDialog,
     },
     mixins: [ticketListMixins],
+    props: {
+      isIframe: Boolean,
+      serviceId: [Number, String],
+    },
     data() {
       const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority');
       return {
