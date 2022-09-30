@@ -269,7 +269,11 @@
     watch: {
       forms: {
         handler(val) {
-          this.searchForms = val.filter(item => item.display);
+          if (this.isIframe) {
+            this.searchForms = val.filter(item => item.display && item.key !== 'project_key');
+          } else {
+            this.searchForms = val.filter(item => item.display);
+          }
         },
         deep: true,
         immediate: true,
