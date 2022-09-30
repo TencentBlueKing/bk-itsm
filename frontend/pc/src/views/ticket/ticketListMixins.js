@@ -122,6 +122,9 @@ const ticketListMixins = {
     ColumnCurrentStep,
     ColumnSn,
   },
+  props: {
+    serviceId: [Number, String],
+  },
   data() {
     return {
       searchForms: deepClone(SEARCH_FORMS),
