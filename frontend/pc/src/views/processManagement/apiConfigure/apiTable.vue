@@ -229,7 +229,7 @@
         },
       },
       projectId: String,
-      remoteSystem: String,
+      remoteSystem: [String, Number],
       firstLevelInfo: {
         type: Object,
         default() {
@@ -289,8 +289,6 @@
           this.$parent.listInfo = newVal;
         },
       },
-    },
-    computed: {
       disableImport() {
         return Number(this.remoteSystem) === 0;
       },
