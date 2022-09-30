@@ -186,7 +186,10 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         bk_biz_id__in = request.data.get("bk_biz_id__in", [])
         current_status__in = request.data.get("current_status__in", [])
         tag = request.data.get("tag", None)
+        project_key = request.data.get("project_key", None)
 
+        if project_key:
+            queryset = queryset.filter(project_key=project_key)
         if sns:
             queryset = queryset.filter(sn__in=sns)
         if creator:
