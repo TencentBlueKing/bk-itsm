@@ -384,6 +384,38 @@ class TicketCreateSerializer(TicketSerializer):
     """
 
     creator = serializers.CharField(required=True)
+    tag = serializers.CharField(required=False)
+
+    class Meta:
+        model = Ticket
+        fields = (
+            "id",
+            "catalog_id",
+            "catalog_name",
+            "catalog_fullname",
+            "service_id",
+            "service_name",
+            "flow_id",
+            "sn",
+            "title",
+            "service_type",
+            "service_type_name",
+            "is_draft",
+            "current_status",
+            "current_status_display",
+            "comment_id",
+            "is_commented",
+            "is_over",
+            "related_type",
+            "has_relationships",
+            "priority_name",
+            "meta",
+            "bk_biz_id",
+            "project_key",
+            "task_schemas",
+            "tag",
+        ) + model.FIELDS
+        read_only_fields = ("sn",) + model.FIELDS
 
 
 class DynamicFieldSerializer(serializers.Serializer):
