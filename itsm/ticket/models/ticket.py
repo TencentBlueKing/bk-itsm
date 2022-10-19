@@ -529,6 +529,7 @@ class Status(Model):
                 if (
                     self.ticket.creator in new_processor_list
                     and self.ticket.flow.is_auto_approve
+                    and self.type == "APPROVAL"
                 ):
                     # 提单人异常分派给自己的情况，并且开启了自动过单
 
