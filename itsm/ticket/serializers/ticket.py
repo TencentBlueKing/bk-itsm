@@ -850,6 +850,9 @@ class TicketSerializer(AuthModelSerializer):
         master_ticket = inst.get_master_ticket()
         master_or_self_ticket = master_ticket if master_ticket else inst
 
+        if "headers" in master_or_self_ticket.meta:
+            master_or_self_ticket.meta.pop("headers")
+
         data.update(
             current_status=master_or_self_ticket.current_status,
             current_status_display=master_or_self_ticket.current_status_display,
