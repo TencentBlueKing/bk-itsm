@@ -263,6 +263,16 @@
               </bk-button>
             </bk-popover>
           </li>
+          <li>
+            <bk-button
+              data-test-id="ticket_button_ticketService"
+              class="bk-dropdown-list-btn"
+              :text="true"
+              @click="onTicketBtnClick('service')"
+            >
+              {{ $t(`m["服务"]`) }}
+            </bk-button>
+          </li>
         </ul>
       </bk-dropdown-menu>
     </div>
@@ -388,10 +398,24 @@
               this.$refs.evaluationModal.show();
             }
             break;
+          case 'service':
+            {
+              this.JumpCurTicketService();
+            }
+            break;
           default: {
             this.ticketOperatingHandler(type);
           }
         }
+      },
+      JumpCurTicketService() {
+        // 判断服务是否存在
+        this.$store.dispatch('service/getServiceDetail', this.ticketInfo.service_id).then(res => {
+          if (res.result) {
+            const routeData = this.$router.resolve({ path: '/project/service/edit/basic', query: { project_id: this.$store.state.project.id, serviceId: this.ticketInfo.service_id } });
+            window.open(routeData.href, '_blank');
+          }
+        });
       },
       // 单据操作
       ticketOperatingHandler(type) {

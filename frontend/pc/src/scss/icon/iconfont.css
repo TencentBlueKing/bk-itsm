@@ -722,6 +722,9 @@ url("scss/icon/fonts/commonicon.eot?#iefix") format("embedded-opentype");
 .icon-admin-fill:before {
 	content: "\e1ed";
 }
+.icon-jump-fill:before {
+	content: "\e229";
+}
 .icon-approval-node:before {
 	content: "\e1ee";
 }
@@ -871,4 +874,7 @@ url("scss/icon/fonts/commonicon.eot?#iefix") format("embedded-opentype");
 }
 .icon-chajian-icon:before {
 	content: "\e228";
+}
+.icon-tiaozhuan:before {
+	content: "\e22a";
 }

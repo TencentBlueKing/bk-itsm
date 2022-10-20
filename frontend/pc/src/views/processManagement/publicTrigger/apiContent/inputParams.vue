@@ -109,6 +109,7 @@
 </template>
 <script>
   import mixins from '../../../commonMix/mixins_api.js';
+  import { deepClone } from '../../../../utils/util';
   import { mapState } from 'vuex';
   export default {
     name: 'inputParams',
@@ -199,7 +200,7 @@
               }
               const oneItem = JSON.parse(JSON.stringify(Object.assign({ parentInfo: '' }, reqData[0].children[0])));
               for (let i = 1; i < item.length; i++) {
-                reqData[0].children.push(oneItem);
+                reqData[0].children.push(deepClone(oneItem));
               }
               for (const j in item) {
                 listToJsonStep(reqData[0].children, reqData[0].children[j], 'items', item[j], 'array');
