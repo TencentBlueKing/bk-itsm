@@ -234,13 +234,7 @@
       return {
         columnList,
         type: 'approval',
-        approvalInfo: {
-          showAllOption: false,
-          result: true,
-          approvalList: [],
-        },
         isExportDialogShow: false,
-        isApprovalDialogShow: false,
         // 批量审批选中单
         selectedList: [],
       };
@@ -276,24 +270,6 @@
           }
         } else {
           this.selectedList = this.selectedList.filter(item => item.id !== value.id);
-        }
-      },
-      onOpenApprovalDialog(id, result) {
-        this.isApprovalDialogShow = true;
-        this.approvalInfo = {
-          result,
-          approvalList: [{ ticket_id: id }],
-        };
-      },
-      onApprovalDialogHidden(result) {
-        this.isApprovalDialogShow = false;
-        this.approvalInfo = {
-          result: true,
-          showAllOption: false,
-          approvalList: [],
-        };
-        if (result) {
-          this.initData();
         }
       },
     },
