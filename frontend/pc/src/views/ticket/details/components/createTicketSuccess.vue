@@ -41,7 +41,7 @@
     },
     data() {
       return {
-        time: 30,
+        time: 10,
         timer: '',
         isStart: true,
       };

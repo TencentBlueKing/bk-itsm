@@ -149,6 +149,12 @@ const ticketListMixins = {
         attention: [],
         created: [],
       },
+      approvalInfo: {
+        showAllOption: false,
+        result: true,
+        approvalList: [],
+      },
+      isApprovalDialogShow: false,
     };
   },
   computed: {
@@ -472,6 +478,24 @@ const ticketListMixins = {
         .catch((res) => {
           errorHandler(res, this);
         });
+    },
+    onOpenApprovalDialog(id, result) {
+      this.isApprovalDialogShow = true;
+      this.approvalInfo = {
+        result,
+        approvalList: [{ ticket_id: id }],
+      };
+    },
+    onApprovalDialogHidden(result) {
+      this.isApprovalDialogShow = false;
+      this.approvalInfo = {
+        result: true,
+        showAllOption: false,
+        approvalList: [],
+      };
+      if (result) {
+        this.initData();
+      }
     },
   },
 };

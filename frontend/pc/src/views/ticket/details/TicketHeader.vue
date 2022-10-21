@@ -101,8 +101,7 @@
         </bk-button>
       </bk-popover>
       <bk-popover
-        :content="disabledText"
-        :disabled="ticketInfo.can_supervise"
+        :content="ticketInfo.can_supervise ? $t(`m.newCommon['执行催办操作后，将发送信息至处理人。']`) : disabledText"
       >
         <bk-button
           data-test-id="ticket_button_superviseTicket"
@@ -112,7 +111,7 @@
           :disabled="!ticketInfo.can_supervise"
           @click="onTicketBtnClick('supervise')"
         >
-          {{ $t(`m.newCommon["督办"]`) }}
+          {{ $t(`m.newCommon["催办"]`) }}
         </bk-button>
       </bk-popover>
       <bk-popover
@@ -444,7 +443,7 @@
           },
           supervise: {
             title: this.$t('m.newCommon["确认督办该节点？"]'),
-            instructions: this.$t('m.newCommon["执行督办操作后，将发送信息至处理人。"]'),
+            instructions: this.$t('m.newCommon["执行催办操作后，将发送信息至处理人。"]'),
             dispatchAcationPath: 'change/submitSupervise',
             successText: this.$t('m.newCommon["督办成功"]'),
             params: {},
