@@ -575,7 +575,7 @@
     },
     mounted() {
       this.getDisplayType();
-      const curTableSetting = JSON.parse(localStorage.getItem('tableSettings')).find(item => item.type === 'service');
+      const curTableSetting = localStorage.getItem('tableSettings') ? JSON.parse(localStorage.getItem('tableSettings')).find(item => item.type === 'service') : null;
       if (curTableSetting) {
         this.setting.size = curTableSetting.size;
         this.setting.selectedFields = this.setting.fields.slice(0).filter(m => curTableSetting.fields.find(item => item.id === m.id));
@@ -601,7 +601,7 @@
       setDisplayType(row) {
         const type = this.displayTypeList.find(item => item.type === row.display_type);
         if (type === undefined) {
-          return this.i18n.t('m["不可见"]');
+          return i18n.t('m["不可见"]');
         }
         if (row.display_role === '') {
           return type.name;
@@ -800,8 +800,8 @@
             this.isDataLoading = false;
           });
       },
-      async getServiceDirectory() {
-        await this.$store.dispatch('serviceCatalog/getTreeData', {
+      getServiceDirectory() {
+        this.$store.dispatch('serviceCatalog/getTreeData', {
           show_deleted: true,
           project_key: this.$store.state.project.id,
         }).then(res => {
