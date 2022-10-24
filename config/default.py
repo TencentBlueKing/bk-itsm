@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import base64
 import importlib
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 from blueapps.conf.default_settings import *  # noqa
 from blueapps.conf.log import get_logging_config_dict
@@ -176,7 +176,7 @@ MIDDLEWARE = (
 # mako 模板中：<script src="/a.js?v=${ STATIC_VERSION }"></script>
 # 如果静态资源修改了以后，上线前改这个版本号即可
 # STATIC_VERSION_END
-STATIC_VERSION = "LATEST_STATIC_VERSION"
+STATIC_VERSION = "2.6.2"
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
@@ -885,6 +885,18 @@ OPEN_VOICE_NOTICE = (
 BK_APIGW_NAME = os.getenv("BK_APIGW_NAME", "bk-itsm")
 # APIGW 访问地址
 BK_API_URL_TMPL = os.getenv("BK_API_URL_TMPL")
+
+# 如果是对外版PAASV3 并且 是容器化版本才会执行网关的migrate操作
+if IS_OPEN_V3 and ENGINE_REGION == "default":
+    # 网关管理员
+    BK_APIGW_MANAGER_MAINTAINERS = os.getenv(
+        "BK_APIGW_MANAGER_MAINTAINERS", "admin"
+    ).split(",")
+    # 网关服务地址
+    BKAPP_APIGW_API_HOST = os.getenv("BKAPP_APIGW_API_HOST", "")
+    api_host = urlparse(BKAPP_APIGW_API_HOST)
+    BK_APIGW_API_SERVER_HOST = api_host.netloc
+    BK_APIGW_API_SERVER_SUB_PATH = api_host.path.lstrip("/")
 
 # 蓝鲸插件授权过滤 APP
 PLUGIN_DISTRIBUTOR_NAME = os.getenv("BKAPP_PLUGIN_DISTRIBUTOR_NAME", APP_CODE)

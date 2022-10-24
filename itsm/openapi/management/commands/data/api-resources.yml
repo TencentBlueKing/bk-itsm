@@ -1,0 +1,1819 @@
+swagger: '2.0'
+basePath: /
+info:
+  version: '0.1'
+  title: API Gateway Resources
+  description: ''
+schemes:
+- http
+paths:
+  /apigw/grant/:
+    post:
+      operationId: apigw_grant
+      description: 蓝鲸网关接口授权接口
+      tags:
+      - 蓝鲸网关
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/v2/api_gateway/grant/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /field/:
+    get:
+      operationId: field_list
+      description: 字段列表
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/field/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+    post:
+      operationId: field_add
+      description: 新增一个字段
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/v2/field/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /field/batch_save/:
+    post:
+      operationId: field_batch_save
+      description: 字段批量保存
+      tags:
+      - 字段
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/v2/field/batch_save/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /field/{id}/:
+    delete:
+      operationId: field_delete
+      description: 删除字段
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: delete
+          path: /{env.api_sub_path}openapi/v2/field/{id}/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+    get:
+      operationId: field_detail
+      description: 查询某个字段的详情
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/field/{id}/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+    put:
+      operationId: filed_update
+      description: 更新字段
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: put
+          path: /{env.api_sub_path}openapi/v2/field/{id}/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /field/{id}/update_layout/:
+    post:
+      operationId: field_update_layout
+      description: 更新字段顺序
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/v2/field/{id}/update_layout/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /postman/remote_api/:
+    get:
+      operationId: remote_api
+      description: ''
+      tags:
+      - apigw接口
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/postman/remote_api/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /postman/run_api/:
+    post:
+      operationId: postman_run_api
+      description: ''
+      tags:
+      - apigw接口
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/v2/postman/run_api/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /postman/systems/:
+    get:
+      operationId: systems
+      description: ''
+      tags:
+      - apigw接口
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/postman/systems/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /role_type/:
+    get:
+      operationId: role_type
+      description: ''
+      tags:
+      - 用户角色
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/role_type/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /service/:
+    post:
+      operationId: add_service
+      description: 新增服务
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/v2/service/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /service/{id}/:
+    delete:
+      operationId: service_delete
+      description: 删除服务
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: delete
+          path: /{env.api_sub_path}openapi/v2/service/{id}/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+    get:
+      operationId: service_detail
+      description: 查看服务详情
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/service/{id}/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+    put:
+      operationId: service_put
+      description: 更新服务
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: put
+          path: /{env.api_sub_path}openapi/v2/service/{id}/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /service/{id}/deploy/:
+    post:
+      operationId: service_deploy
+      description: 服务部署
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/v2/service/{id}/deploy/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /service/{id}/save_configs/:
+    post:
+      operationId: service_save_config
+      description: 保存服务高级配置
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/v2/service/{id}/save_configs/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /state/:
+    get:
+      operationId: state_list
+      description: 节点列表
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/state/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+    post:
+      operationId: state_add
+      description: 新增一个节点
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/v2/state/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /state/{id}/:
+    delete:
+      operationId: state_delete
+      description: 删除某个节点
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: delete
+          path: /{env.api_sub_path}openapi/v2/state/{id}/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+    get:
+      operationId: state_detail
+      description: 查看某个节点的详情
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/state/{id}/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+    patch:
+      operationId: state_patch
+      description: 节点patch
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: patch
+          path: /{env.api_sub_path}openapi/v2/state/{id}/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+    put:
+      operationId: state_put
+      description: 修改节点
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: put
+          path: /{env.api_sub_path}openapi/v2/state/{id}/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /state/{id}/clone/:
+    post:
+      operationId: state_clone
+      description: 克隆某个节点
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/v2/state/{id}/clone/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /state/{id}/get_approve_states/:
+    get:
+      operationId: get_approve_states
+      description: 获取审批节点
+      tags:
+      - 流程节点
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/state/{id}/get_approve_states/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /state/{id}/group_variables/:
+    get:
+      operationId: group_variables
+      description: 获取分组变量
+      tags:
+      - 流程节点
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/state/{id}/group_variables/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+          resourcePermissionRequired: false
+        disabledStages: []
+        descriptionEn:
+  /state/{id}/post_states/:
+    get:
+      operationId: state_post_states
+      description: 获取节点的后置节点
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/state/{id}/post_states/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /state/{id}/pre_states/:
+    get:
+      operationId: state_pre_states
+      description: 获取节点的前置节点
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/state/{id}/pre_states/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /state/{id}/sign_variables/:
+    get:
+      operationId: state_sign_variables
+      description: 获取会签节点的输出变量
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/state/{id}/sign_variables/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /state/{id}/update_attrs/:
+    post:
+      operationId: update_attrs
+      description: 更新节点属性
+      tags:
+      - 流程节点
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/v2/state/{id}/update_attrs/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /state/{id}/variables/:
+    get:
+      operationId: state_variables
+      description: 获取某个节点的变量
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/state/{id}/variables/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /ticket/create_ticket_with_version/:
+    post:
+      operationId: create_ticket_with_version
+      description: 根据版本创建单据
+      tags:
+      - 单据
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/v2/ticket/create_ticket_with_version/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /transition/:
+    get:
+      operationId: transition_list
+      description: 线段列表
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/transition/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+    post:
+      operationId: transition_create
+      description: 线条创建
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/v2/transition/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /transition/{id}/:
+    delete:
+      operationId: transition_delete
+      description: 删除线条
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: delete
+          path: /{env.api_sub_path}openapi/v2/transition/{id}/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+    get:
+      operationId: transition_detail
+      description: 线条详情
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/transition/{id}/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+    patch:
+      operationId: transition_patch
+      description: 线条修改
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: patch
+          path: /{env.api_sub_path}openapi/v2/transition/{id}/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+    put:
+      operationId: transition_update
+      description: 修改线条
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: put
+          path: /{env.api_sub_path}openapi/v2/transition/{id}/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /transition/{id}/batch_update/:
+    post:
+      operationId: transition_batch_update
+      description: 线条批量更新
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/v2/transition/{id}/batch_update/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /transition/{id}/variables/:
+    get:
+      operationId: transition_variables
+      description: 线条变量
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/transition/{id}/variables/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /v2/devops_plugin/fields/:
+    get:
+      operationId: devops_plugin_fields
+      description: 蓝盾插件获取服务字段列表
+      tags:
+      - 蓝盾插件
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/devops_plugin/fields/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+          appVerifiedRequired: false
+          resourcePermissionRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/devops_plugin/services/:
+    get:
+      operationId: devops_plugin_services
+      description: 蓝盾插件获取服务列表
+      tags:
+      - 蓝盾插件
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/devops_plugin/services/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+          appVerifiedRequired: false
+          resourcePermissionRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/add_follower/:
+    post:
+      operationId: add_follower
+      description: 单据关注取关接口
+      tags: []
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/ticket/add_follower/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/approve/:
+    post:
+      operationId: approve
+      description: 对单据某个审批节点进行审批操作
+      tags: []
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/ticket/approve/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/callback_failed_ticket/:
+    get:
+      operationId: callback_failed_ticket
+      description: 回调失败的单据
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/ticket/callback_failed_ticket/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/create_service_catalog/:
+    post:
+      operationId: create_service_catalog
+      description: 创建服务目录
+      tags: []
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/service_catalog/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/create_ticket/:
+    post:
+      operationId: create_ticket
+      description: 创建单据
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/ticket/create_ticket/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/get_all_tickets:
+    get:
+      operationId: get_all_tickets
+      description: 获取单据的GET请求
+      tags: []
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/ticket/get_tickets/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages:
+        - prod
+        descriptionEn:
+  /v2/itsm/get_approver/:
+    get:
+      operationId: get_approver
+      description: 获取当前单据指定节点的审批人
+      tags: []
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/ticket/get_approver/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/get_services/:
+    get:
+      operationId: get_services
+      description: 服务列表查询
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/service/get_services/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/get_service_catalogs/:
+    get:
+      operationId: get_service_catalogs
+      description: 服务目录查询
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/service/get_service_catalogs/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/get_service_detail/:
+    get:
+      operationId: get_service_detail
+      description: 服务详情查询
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/service/get_service_detail/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/get_service_roles/:
+    get:
+      operationId: get_service_roles
+      description: 服务角色查询
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/service/get_service_roles/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/get_tickets/:
+    post:
+      operationId: get_tickets
+      description: 获取单据列表
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/ticket/get_tickets/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/get_tickets_by_user/:
+    get:
+      operationId: get_tickets_by_user
+      description: 通过用户获取单据
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/ticket/get_tickets_by_user/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/get_ticket_info/:
+    get:
+      operationId: get_ticket_info
+      description: 单据详情查询
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/ticket/get_ticket_info/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/get_ticket_logs/:
+    get:
+      operationId: get_ticket_logs
+      description: 单据日志查询
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/ticket/get_ticket_logs/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/get_ticket_status/:
+    get:
+      operationId: get_ticket_status
+      description: 单据状态查询
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/ticket/get_ticket_status/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/get_workflow_detail:
+    get:
+      operationId: get_workflow_detail
+      description: 获取流程详情
+      tags: []
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/worklfow/get_workflow_detail/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/import_service/:
+    post:
+      operationId: import_service
+      description: 导入服务
+      tags: []
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/service/import_service/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/operate_node/:
+    post:
+      operationId: operate_node
+      description: 处理单据节点
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/ticket/operate_node/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/operate_ticket/:
+    post:
+      operationId: operate_ticket
+      description: 处理单据
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/ticket/operate_ticket/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/proceed_approval/:
+    post:
+      operationId: proceed_approval
+      description: 审批节点处理
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/ticket/proceed_approval/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/proceed_fast_approval/:
+    post:
+      operationId: proceed_fast_approval
+      description: bkchat 快捷审批接口
+      tags: []
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/ticket/proceed_fast_approval/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/ticket_approval_result/:
+    post:
+      operationId: ticket_approval_result
+      description: 查询审批结果
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/ticket/ticket_approval_result/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/token/verify/:
+    post:
+      operationId: token_verify
+      description: token校验
+      tags:
+      - 无分类
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/ticket/token/verify/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /v2/itsm/update_service/:
+    post:
+      operationId: update_service
+      description: 更新某个服务
+      tags: []
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: post
+          path: /{env.api_sub_path}openapi/service/update_service/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: false
+        disabledStages: []
+        descriptionEn:
+  /workflow/get_global_choices/:
+    get:
+      operationId: workflow_get_global_choices
+      description: 查询流程全局选项
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/workflow/get_global_choices/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /workflow/get_regex_choice/:
+    get:
+      operationId: workflow_get_regex_choice
+      description: 查询流程内的正则选项
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/workflow/get_regex_choice/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /workflow/{id}/:
+    get:
+      operationId: workflow_detail
+      description: 查看流程详情
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/workflow/{id}/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /workflow/{id}/variables/:
+    get:
+      operationId: worklfow_variables
+      description: 查询某个流程的全局变量
+      tags:
+      - 流程
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/workflow/{id}/variables/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+        disabledStages: []
+        descriptionEn:
+  /workflow_version/{id}/states/:
+    get:
+      operationId: workflow_version_states
+      description: 获取流程版本的节点
+      tags:
+      - 流程版本
+      responses:
+        default:
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        backend:
+          type: HTTP
+          method: get
+          path: /{env.api_sub_path}openapi/v2/workflow_version/{id}/states/
+          matchSubpath: false
+          timeout: 0
+          upstreams: {}
+          transformHeaders: {}
+        authConfig:
+          userVerifiedRequired: true
+          resourcePermissionRequired: false
+        disabledStages: []
+        descriptionEn:

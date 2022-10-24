@@ -45,6 +45,8 @@ else:
 RUN_MODE = "STAGING"
 RIO_TOKEN = os.environ.get("RIO_TOKEN", "")
 
+BK_APIGW_STAGE_NAME = "stag"
+
 # 正式环境的日志级别可以在这里配置
 # V2
 # import logging

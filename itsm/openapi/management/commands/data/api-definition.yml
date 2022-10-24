@@ -1,0 +1,32 @@
+apigateway:
+  description: {{ settings.BK_APP_CODE }} apigw
+  is_public: true
+  maintainers:
+    {% for member in settings.BK_APIGW_MANAGER_MAINTAINERS %}
+    - "{{ member }}"
+    {% endfor %}
+
+stage:
+  name: {{ settings.BK_APIGW_STAGE_NAME }}
+  vars:
+    api_sub_path: {{ settings.BK_APIGW_API_SERVER_SUB_PATH }}
+  proxy_http:
+    timeout: 120
+    upstreams:
+      loadbalance: roundrobin
+      hosts:
+        - host: http://{{ settings.BK_APIGW_API_SERVER_HOST }}
+          weight: 100
+  rate_limit:
+    enabled: false
+    rate:
+      tokens: 5000
+      period: 60
+
+release:
+  version: {{ settings.STATIC_VERSION }}
+  comment: "auto release by bk-sops"
+
+
+grant_permissions:
+  - bk_app_code: "bk_lesscode"

@@ -50,6 +50,9 @@ RUN_MODE = "PRODUCT"
 LOG_LEVEL = "ERROR"
 RIO_TOKEN = os.environ.get("RIO_TOKEN", "")
 
+
+BK_APIGW_STAGE_NAME = "prod"
+
 # V2
 # import logging
 # logging.getLogger('root').setLevel('INFO')
