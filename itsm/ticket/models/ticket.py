@@ -2981,8 +2981,11 @@ class Ticket(Model, BaseTicket):
         for ticket_field in filter_field_query_set:
             ticket_field.value = fields_map[ticket_field.key]["value"]
             ticket_field.choice = fields_map[ticket_field.key].get("choice", [])
+            ticket_field.update_at = datetime.now()
 
-        bulk_update(filter_field_query_set, update_fields=["_value", "choice"])
+        bulk_update(
+            filter_field_query_set, update_fields=["_value", "choice", "update_at"]
+        )
 
     # def fill_state_fields(self, fields):
     #     """更新单据字段"""
