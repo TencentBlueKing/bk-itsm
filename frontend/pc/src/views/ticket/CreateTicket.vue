@@ -369,6 +369,7 @@
             choice: item.choice,
           });
         });
+        debugger;
         this.$store.dispatch('change/submit', params).then((res) => {
           this.$bkMessage({
             message: this.$t('m.common["提交成功！"]'),

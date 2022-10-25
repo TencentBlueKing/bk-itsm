@@ -186,6 +186,7 @@
           this.$store.dispatch('service/getServiceFavorites'),
           this.$store.dispatch('service/getRecentlyFavorite'),
         ]).then(data => {
+          console.log(data, '1');
           const favoriteList = data[0].data;
           const recentlyList = data[1].data.filter(item => favoriteList.findIndex(fItem => fItem.id === item.id) === -1);
           const len = favoriteList.length;
@@ -203,6 +204,7 @@
         this.allLoading = true;
         this.$store.dispatch('service/getServiceList').then(resp => {
           if (resp.result) {
+            console.log(resp.data, '2');
             this.allList = resp.data;
             this.allList.sort((a, b) => b.favorite - a.favorite);
           }

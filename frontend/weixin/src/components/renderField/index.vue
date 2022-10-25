@@ -177,7 +177,8 @@ export default defineComponent({
     /** 插入字段异步数据到 choice 中 */
     const getFieldChoice = useFieldChoice()
     getFieldChoice.insertRemoteChoiceData(fields.value)
-    watch(fields, () => {
+    watch(fields, (val) => {
+      console.log(val)
       getFieldChoice.insertRemoteChoiceData(fields.value)
     })
 

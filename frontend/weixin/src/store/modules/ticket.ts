@@ -125,6 +125,15 @@ const ticket = {
     // 组织架构
     getTreeInfo(): Promise<IResponse> {
       return $api.get('gateway/usermanage/get_departments/')
+    },
+    getSubmitFields(context: any, params: any): Promise<IResponse> {
+      return $api.get(`ticket/receipts/get_first_state_fields/?service_id=${params.service_id}`)
+    },
+    createTicketSubmit(content:any, params: any): Promise<IResponse> {
+      return $api.post('ticket/receipts/', params)
+    },
+    getServiceDetail(content:any, id: number): Promise<IResponse> {
+      return $api.get(`service/projects/${id}/`)
     }
   }
 }
