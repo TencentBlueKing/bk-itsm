@@ -29,8 +29,7 @@ class Command(BaseCommand):
         """
 
         # 如果是对外版PAASV3 并且 是容器化版本才会执行网关的migrate操作
-        # if settings.IS_OPEN_V3 and settings.ENGINE_REGION == "default":
-        if True:
+        if settings.IS_OPEN_V3 and settings.ENGINE_REGION == "default":
             print(
                 "find current paas version is v3(Containerized version) start migrate"
             )
