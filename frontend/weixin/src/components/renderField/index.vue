@@ -72,7 +72,7 @@ const registerComponents = (() => {
 const notSupportTypes: string [] = [
   'CUSTOMTABLE', // 自定义表格
   'TREESELECT', //  树形选择
-  'FILE', //        文件上传
+  // 'FILE', //        文件上传
   'CASCADE', //     级联字段
   'SOPS_TEMPLATE', // 标准运维
   'TABLE' //         表格 TODO
@@ -89,7 +89,8 @@ const notSupportEditTypes: string [] = [
 
 interface IFieldItem {
   id: number,
-  val: any
+  val: any,
+  key?: string
 }
 
 export default defineComponent({

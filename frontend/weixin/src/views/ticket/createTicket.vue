@@ -86,6 +86,14 @@ interface Iservice {
 //   value: string | number,
 //   choice: string
 // }
+const notSupportTypes: string [] = [
+  'CUSTOMTABLE', // 自定义表格
+  'TREESELECT', //  树形选择
+  // 'FILE', //        文件上传
+  'CASCADE', //     级联字段
+  'SOPS_TEMPLATE', // 标准运维
+  'TABLE' //         表格 TODO
+]
 export default defineComponent({
   name: 'createTicket',
   components: {
@@ -119,10 +127,54 @@ export default defineComponent({
         service.info = res.data
       }
     }
+    const getPriorityDisabled = ref<boolean>(true)
     const submitDisabled = ref<boolean>(true)
     watch(fieldList, (val) => {
-      submitDisabled.value = !val.every(item => item.value !== '')
+      getPriorityDisabled.value = true
+      submitDisabled.value = !val.filter(sup => !notSupportTypes.includes(sup.type) && sup.validate_type === 'REQUIRE').every(item => item.value !== '')
+      const CurrentApiFields = val.filter(ite => (ite.source_type === 'API' || ite.key === 'priority')
+        && ite.related_fields && ite.related_fields.rely_on
+        && ite.related_fields.rely_on.length)
+      let relyOnFieldsKeyList = []
+      CurrentApiFields.forEach((ite) => {
+        relyOnFieldsKeyList = [...ite.related_fields.rely_on]
+      })
+      const CurrentreBeReliedFields = val.filter(ite => ite.related_fields && ite.related_fields.be_relied
+        && ite.related_fields.be_relied.length)
+      const CurrentrelyOnFields = CurrentreBeReliedFields
+        .filter(ite => relyOnFieldsKeyList.indexOf(ite.key) !== -1)
+
+      CurrentrelyOnFields.forEach(ite => {
+        const rca = CurrentApiFields.filter(item_ => item_.related_fields.rely_on.indexOf(ite.key) !== -1)
+        rca.forEach(async (itemRelate) => {
+          const relateCurrentreBeRelied = CurrentrelyOnFields
+            .filter(itemRe => itemRelate.related_fields.rely_on.indexOf(itemRe.key) !== -1)
+          const isALlFill = relateCurrentreBeRelied.every(itemRely => itemRely.val)
+          if (isALlFill && getPriorityDisabled.value) {
+            getPriorityDisabled.value = false
+            const params = {
+              id: itemRelate.id,
+              api_instance_id: itemRelate.api_instance_id,
+              kv_relation: itemRelate.kv_relation
+            }
+            getPriority(params, itemRelate, isALlFill, CurrentrelyOnFields)
+          }
+        })
+      })
     }, { deep: true })
+    const getPriority = async (params: any, item: any, isALlFill: boolean, CurrentrelyOnFields: any): void => {
+      const data = JSON.parse(JSON.stringify(params))
+      data.service_type = item.service || service.info.key
+      delete data.id
+      item.allFill = isALlFill
+      CurrentrelyOnFields.forEach((i: any) => {
+        data[i.key] = i.value
+      })
+      store.dispatch('get_priority', data).then((res) => {
+        item.val = res.data
+        item.value = res.data
+      })
+    }
     const onCreateSubmit = async () => {
       const { catalog_id, id, bounded_catalogs } = service.info
       const params = {
@@ -246,38 +298,38 @@ export default defineComponent({
       height: 60px;
       margin-right: 10px;
     }
-    .created-sucess {
-      height: 50%;
+  }
+  .created-sucess {
+    height: 50%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position:absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    .sucess-icon {
+      color: #8ef286;
+      font-size: 200px;
+    }
+    .result {
+      margin: 24px 0;
+    }
+    .tip {
+      font-size: 28px;
+      margin-bottom: 40px;
+    }
+    .operate {
       width: 100%;
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      position:absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      margin: auto;
-      .sucess-icon {
-        color: #8ef286;
-        font-size: 200px;
-      }
-      .result {
-        margin: 24px 0;
-      }
-      .tip {
-        font-size: 28px;
-        margin-bottom: 40px;
-      }
-      .operate {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        .btn {
-          width: 200px;
-          height: 60px;
-          margin: 0 10px;
-        }
+      justify-content: center;
+      .btn {
+        width: 200px;
+        height: 60px;
+        margin: 0 10px;
       }
     }
   }

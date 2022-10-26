@@ -86,8 +86,8 @@ export default defineComponent({
     const originValue = computed(() => item.value.value || '{}')
 
     val.value = originValue.value
-    watch(originValue, (val) => {
-      val.value = val.value
+    watch(originValue, (value) => {
+      val.value = value
     })
     // value change
     watch(val, (val) => {
@@ -123,7 +123,6 @@ export default defineComponent({
 
     // 读取文件后
     const afterRead = (fileObj: any): void => {
-      console.log(fileObj, 'filefilefilefile')
       fileObj.status = 'uploading'
       fileObj.message = '上传中...'
       uploadFile(fileObj)
@@ -133,8 +132,7 @@ export default defineComponent({
     const uploadFile = (fileObj: any) => {
       const formData = new FormData()
       const xhr = new XMLHttpRequest()
-      const { name } = fileObj.file
-      formData.append(name, fileObj.file)
+      formData.append('field_file', fileObj.file)
 
       xhr.onreadystatechange = () => {
         if (xhr.readyState === 4) {
@@ -158,7 +156,7 @@ export default defineComponent({
         }
       }
       xhr.withCredentials = true
-      xhr.open('POST', `${(window as any).SITE_URL}weixin/api/misc/upload_file/`, true)
+      xhr.open('POST', `${(window as any).SITE_URL}/api/misc/upload_file/`, true)
       xhr.send(formData)
     }
 

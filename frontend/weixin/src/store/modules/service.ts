@@ -55,7 +55,11 @@ const service = {
       return $api.post(`service/projects/${id}/operate_favorite/`, { favorite }).then(response => response)
     },
     get_priority(content: any, payload: any) {
-      return $api.post(`sla/matrixs/priority_value`, { payload }).then(res => res.data)
+      return $api.post(`sla/matrixs/priority_value/`, payload).then(res => res.data)
+    },
+    getStepList(context: any, params: any) {
+      console.log(params)
+      return $api.get(`ticket/receipts/${params.id}/states/`, { params: params }).then(res => res.data)
     }
   }
 }

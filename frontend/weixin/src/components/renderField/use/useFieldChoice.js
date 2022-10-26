@@ -79,7 +79,7 @@ export default function () {
       const choice = Array.isArray(field.choice) ? field.choice : []
       if (!choice.some(it => it.can_delete)) {
         const sourceType = field.source_type
-        if (sourceType === 'API' || field.key === 'priority') {
+        if (sourceType === 'API') {
           getFieldApiData(field, fields)
         } else if (sourceType === 'DATADICT') {
           getFieldDatadictData(field)

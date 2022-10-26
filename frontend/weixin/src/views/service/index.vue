@@ -136,7 +136,6 @@ export default {
       const begin = (listState.pagination.page - 1) * listState.pagination.count
       const end = listState.pagination.page * listState.pagination.count
       const list = serviceList.initList.slice(begin, end)
-      console.log(list)
       serviceList.allList = [...serviceList.allList, ...list]
       listState.loading = false
     }
@@ -316,6 +315,11 @@ export default {
         text-align: right;
       }
     }
+  }
+  .no-data {
+    text-align: center;
+    margin: 100px 0;
+    font-size: 32px;
   }
 }
 .go-back-home {
