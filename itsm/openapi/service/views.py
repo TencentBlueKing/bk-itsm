@@ -116,6 +116,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
 
     @action(detail=False, methods=["get"])
     @catch_openapi_exception
+    @custom_apigw_required
     def get_service_catalogs(self, request):
         """
         服务目录
@@ -127,6 +128,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
 
         has_service = request.query_params.get("has_service")
         service_key = request.query_params.get("service_key")
+        name = request.query_params.get("name")
 
         # 返回绑定服务项或者根据service_key过滤
         if has_service == "true" or service_key:
@@ -135,6 +137,12 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
                     service_key=service_key, project_key=project_key
                 )
             )
+
+        if name:
+            nodes = ServiceCatalog.objects.filter(
+                name=name, is_deleted=False, project_key=project_key
+            )
+            return Response([ServiceCatalog.open_api_subtree(node) for node in nodes])
 
         roots = ServiceCatalog.objects.filter(
             level=0, is_deleted=False, project_key=project_key
