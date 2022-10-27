@@ -42,12 +42,12 @@ class ServiceRetrieveSerializer(serializers.Serializer):
     服务项详情序列化
     """
 
-    service_id = serializers.IntegerField(read_only=True, source='id')
-    workflow_id = serializers.IntegerField(read_only=True, source='workflow.id')
+    service_id = serializers.IntegerField(read_only=True, source="id")
+    workflow_id = serializers.IntegerField(read_only=True, source="workflow.id")
     name = serializers.CharField(read_only=True)
     service_type = serializers.CharField(read_only=True)
     desc = serializers.CharField(read_only=True)
-    fields = serializers.JSONField(read_only=True, source='first_state_fields')
+    fields = serializers.JSONField(read_only=True, source="first_state_fields")
 
 
 class WorkflowVersionFirstStateFieldSerializer(serializers.Serializer):
@@ -58,9 +58,20 @@ class WorkflowVersionFirstStateFieldSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     key = serializers.CharField(read_only=True)
     type = serializers.CharField(read_only=True)
+    default = serializers.CharField(read_only=True)
     name = serializers.CharField(read_only=True)
     desc = serializers.CharField(read_only=True)
     choice = serializers.JSONField(read_only=True, initial=list)
+    layout = serializers.CharField(read_only=True)
+    source_type = serializers.CharField(read_only=True)
+    source_uri = serializers.CharField(read_only=True)
+    api_instance_id = serializers.IntegerField(read_only=True)
+    api_info = serializers.JSONField(read_only=True, initial=dict)
+    kv_relation = serializers.JSONField(read_only=True, initial=dict)
     validate_type = serializers.CharField(read_only=True)
     regex = serializers.CharField(read_only=True)
+    regex_config = serializers.JSONField(read_only=True, initial=dict)
+    custom_regex = serializers.CharField(read_only=True)
     meta = serializers.JSONField(read_only=True, initial=dict)
+    show_type = serializers.IntegerField(read_only=True)
+    show_conditions = serializers.JSONField(read_only=True, initial=dict)
