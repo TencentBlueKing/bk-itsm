@@ -171,8 +171,8 @@ export default defineComponent({
         data[i.key] = i.value
       })
       store.dispatch('get_priority', data).then((res) => {
-        item.val = res.data
-        item.value = res.data
+        item.val = res
+        item.value = res
       })
     }
     const onCreateSubmit = async () => {
@@ -249,8 +249,6 @@ export default defineComponent({
   padding: 20px;
   position: relative;
   .created-page {
-    display: flex;
-    flex-direction: column;
     width: 100%;
     height: 100%;
     .create-header {
@@ -270,7 +268,6 @@ export default defineComponent({
         margin-right: 20px;
       }
       .header-content {
-        flex: 1;
         .service-title {
           height: 40px;
           line-height: 40px;

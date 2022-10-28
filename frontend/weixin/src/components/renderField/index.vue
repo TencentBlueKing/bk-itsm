@@ -26,7 +26,7 @@
       <div
         v-for="(item, index) in fields"
         :key="index"
-        :class="['field-wrap', { 'last': index === fields.length - 1}]">
+        :class="['field-wrap', { 'field-margin': !isViewMode, 'last': index === fields.length - 1}]">
         <template v-if="item.showFeild !== false">
           <component
             :is="`Field-${item.type}`"
@@ -221,6 +221,9 @@ export default defineComponent({
     padding: 12px 0;
     background: #ffffff;
   }
+}
+.field-margin {
+  margin: 20px 0;
 }
 .field-wrap {
   display: flex;

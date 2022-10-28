@@ -45,6 +45,11 @@ export default function () {
       return false
     }
     params['api_info'] = field.api_info
+    params.fields = {
+      id: field.id,
+      api_instance_id: field.api_instance_id,
+      kv_relation: field.kv_relation
+    }
     return store.dispatch('field/getfieldApiChoice', params).then(resp => {
       field.choice = resp.data.map(item => ({ key: item.key || item.id, name: item.name }))
     })

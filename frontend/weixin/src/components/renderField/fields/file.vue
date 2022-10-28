@@ -44,10 +44,21 @@
       </li>
       <li v-if="!uploadList.length" class="upload-item">无</li>
     </ul>
+    <div class="upload-template" v-if="!isViewMode && tempFileList.length > 0">
+        <label class="template-label">模板下载：</label>
+        <div class="template-list">
+          <ul v-for="(file, index) in tempFileList" :key="index">
+            <li @click="handleDownFileClick(file)" class="template-item">
+              {{ file.name }}
+              <span class="down-icon" @click="handleDownFileClick(file)"><van-icon name="down" /></span>
+            </li>
+          </ul>
+        </div>
+      </div>
   </div>
 </template>
 <script lang="ts">
-import { computed, defineComponent, ref, toRefs, watch } from 'vue'
+import { computed, defineComponent, onMounted, ref, toRefs, watch } from 'vue'
 
 export type TSucceedFiles = Record<string, { name: string, path: string }>
 
@@ -60,6 +71,11 @@ export interface IFileObj {
   status: 'done' | 'uploading' | 'failed';
   // eslint-disable-next-line camelcase
   succeed_files?: TSucceedFiles
+}
+interface ITemplateFileObj {
+  key: string,
+  path: string,
+  name: string
 }
 
 export default defineComponent({
@@ -78,13 +94,13 @@ export default defineComponent({
     'change'
   ],
   setup(props, { emit }) {
-    const { item } =  toRefs<{ item: any }>(props)
+    const { item, isViewMode } =  toRefs<{ item: any, isViewMode: boolean }>(props)
 
     const fileList = ref<IFileObj []>([]) // 已上传的文件列表（失败+成功）
     const updateKey = ref<number>(1010) // 更新组件 key
     const val = ref<string>('')
+    const tempFileList = ref<ITemplateFileObj []>([])
     const originValue = computed(() => item.value.value || '{}')
-
     val.value = originValue.value
     watch(originValue, (value) => {
       val.value = value
@@ -106,7 +122,11 @@ export default defineComponent({
       })
       return list
     })
-
+    onMounted(() => {
+      for (const key in item.value.choice) {
+        tempFileList.value.push({ ...item.value.choice[key], key })
+      }
+    })
     // 手动更新组件
     const updateComponent = () => {
       updateKey.value = new Date().getTime()
@@ -162,7 +182,12 @@ export default defineComponent({
 
     // 下载附件
     const handleDownFileClick = (file: TFile) => {
-      const downFileUrl =  `${(window as any).SITE_URL}weixin/api/ticket/fields/${item.value.id}/download_file/?unique_key=${file.key}&file_type=ticket`
+      let downFileUrl = ''
+      if (!isViewMode.value) {
+        downFileUrl = `${(window as any).SITE_URL}api/workflow/fields/${item.value.id}/download_file/?unique_key=${file.key}&file_type=template`
+      } else {
+        downFileUrl = `${(window as any).SITE_URL}weixin/api/ticket/fields/${item.value.id}/download_file/?unique_key=${file.key}&file_type=ticket`
+      }
       window.open(downFileUrl)
     }
 
@@ -179,6 +204,7 @@ export default defineComponent({
       updateKey,
       uploadList,
       originValue,
+      tempFileList,
       handleDownFileClick
     }
   }
@@ -218,6 +244,12 @@ export default defineComponent({
         color: #3a84ff;
         vertical-align: middle;
       }
+    }
+  }
+  .upload-template {
+    font-size: 24px;
+    .template-list {
+      color: #3c96ff;
     }
   }
 </style>
