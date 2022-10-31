@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import copy
 from django.conf import settings
+from django.db import transaction
 from django.utils.decorators import method_decorator
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -791,16 +792,19 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     def add_follower(self, request, *args, **kwargs):
         """关注or取关"""
         sn = request.data.get("sn")
-        user = request.data.get("user")
+        users = request.data.get("users").split(",")
         try:
             ticket = Ticket.objects.get(sn=sn)
         except Ticket.DoesNotExist:
             raise ParamError("sn[{}]对应的单据不存在！".format(sn))
         attention = request.data.get("attention")
-        if attention:
-            ticket.add_follower(user)
-        else:
-            ticket.delete_follower(user)
+        with transaction.atomic():
+            if attention:
+                for user in users:
+                    ticket.add_follower(user)
+            else:
+                for user in users:
+                    ticket.delete_follower(user)
         return Response()
 
     @action(detail=False, methods=["get"])
