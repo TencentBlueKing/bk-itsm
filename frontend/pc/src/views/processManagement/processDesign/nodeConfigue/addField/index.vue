@@ -699,8 +699,8 @@
         } else {
           this.frontNodesList = this.nodesList;
         }
-        this.assignmentData();
         this.changeRegex('ASSOCIATED_FIELD_VALIDATION');
+        this.assignmentData();
         // 获取字段校验方式
         this.getRegexList();
         // 获取PRC数据
@@ -714,14 +714,14 @@
         this.formInfo.key = assignValue.key;
         this.formInfo.type = assignValue.type;
         this.formInfo.regex = assignValue.regex;
-        if (this.formInfo.regex === 'CUSTOM') {
-          this.formInfo.customRegex = assignValue.custom_regex || '';
-        }
         if (assignValue.regex_config && assignValue.regex_config.rule) {
           this.changeRegex('ASSOCIATED_FIELD_VALIDATION');
           this.formInfo.regex_config.rule.type = assignValue.regex_config.rule.type;
-
+          
           this.formInfo.regex_config = assignValue.regex_config;
+        }
+        if (this.formInfo.regex === 'CUSTOM') {
+          this.formInfo.customRegex = assignValue.custom_regex || '';
         }
         this.formInfo.layout = assignValue.layout;
         this.formInfo.validate = assignValue.validate_type;
