@@ -2,6 +2,7 @@
   <div class="service">
     <div class="service-search">
       <van-search
+        shape="round"
         v-model="serviceSearchStr"
         placeholder="请输入服务名称"
         @update:model-value="onchange" />
@@ -13,15 +14,48 @@
         @refresh="onRefresh">
         <div v-if="!searchFocus" class="service-content">
           <div class="commonly-service">
-            <h2 class="serivce-title">常用服务</h2>
+            <h2 class="serivce-title">
+              <i class="itsm-mobile-icon icon-favorite-o"></i>
+              收藏的服务</h2>
             <van-loading
               v-if="commonlyLoading"
               size="24px"
               vertical>加载中...</van-loading>
             <div v-else class="container">
               <ul class="service-list">
-                <li v-for="serviceItem in serviceList.commonlylist" :key="serviceItem.id">
-                  <span class="name" @click="onCreateTicket(serviceItem)">{{serviceItem.name}}</span>
+                <li v-for="serviceItem in serviceList.favoriteList" :key="serviceItem.id">
+                  <span
+                    class="name"
+                    :title="serviceItem.name"
+                    @click="onCreateTicket(serviceItem)">
+                    {{serviceItem.name}}
+                  </span>
+                  <span class="favorite" @click="onChangeFavorite(serviceItem)">
+                    <i
+                      :class="['itsm-mobile-icon', serviceItem.favorite ? 'icon-favorite orange': 'icon-favorite-o']">
+                    </i>
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="commonly-service">
+            <h2 class="serivce-title">
+              <i class="itsm-mobile-icon icon-time-circle"></i>
+              近一个月使用服务</h2>
+            <van-loading
+              v-if="commonlyLoading"
+              size="24px"
+              vertical>加载中...</van-loading>
+            <div v-else class="container">
+              <ul class="service-list">
+                <li v-for="serviceItem in serviceList.latestList" :key="serviceItem.id">
+                  <span
+                    class="name"
+                    :title="serviceItem.name"
+                    @click="onCreateTicket(serviceItem)">
+                    {{serviceItem.name}}
+                  </span>
                   <span class="favorite" @click="onChangeFavorite(serviceItem)">
                     <i
                       :class="['itsm-mobile-icon', serviceItem.favorite ? 'icon-favorite orange': 'icon-favorite-o']">
@@ -32,7 +66,7 @@
             </div>
           </div>
           <div class="all-service">
-            <h2 class="serivce-title">全部服务</h2>
+            <h2 class="service-line"></h2>
             <van-loading
               v-if="allLoading"
               size="24px"
@@ -47,7 +81,12 @@
                 @load="onload('ss')">
                 <ul class="service-list">
                   <li v-for="serviceItem in serviceList.allList" :key="serviceItem.id">
-                    <span class="name" @click="onCreateTicket(serviceItem)">{{serviceItem.name}}</span>
+                    <span
+                      class="name"
+                      :title="serviceItem.name"
+                      @click="onCreateTicket(serviceItem)">
+                      {{serviceItem.name}}
+                    </span>
                     <span class="favorite" @click="onChangeFavorite(serviceItem)">
                       <i
                         :class="['itsm-mobile-icon', serviceItem.favorite ? 'icon-favorite orange': 'icon-favorite-o']">
@@ -85,12 +124,14 @@
 import { ref, Ref, reactive, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import { ITicketService } from '../../typings/ticket'
 
 interface IState {
-  searchResultList: Array<any>,
-  commonlylist: Array<any>,
-  allList: Array<any>,
-  initList: Array<any>
+  searchResultList: Array<ITicketService>,
+  favoriteList: Array<ITicketService>,
+  latestList: Array<ITicketService>,
+  allList: Array<ITicketService>,
+  initList: Array<ITicketService>
 }
 interface LState {
   list: Array<any>
@@ -116,7 +157,8 @@ export default {
     const serviceSearchStr: Ref<string> = ref('')
     const serviceList = reactive<IState>({
       searchResultList: [],
-      commonlylist: [],
+      favoriteList: [],
+      latestList: [], // 最近一个月使用服务
       allList: [],
       initList: []
     })
@@ -184,11 +226,8 @@ export default {
         store.dispatch('getServiceFavorites'),
         store.dispatch('getRecentFavorites')
       ]).then(res => {
-        const favoriteList = res[0]
-        const recentlyList = res[1].filter((i: object): boolean => {
-          return favoriteList.findIndex((f: object) => f.id === i.id) === -1
-        })
-        serviceList.commonlylist = favoriteList.concat(recentlyList)
+        serviceList.favoriteList = res[0]
+        serviceList.latestList = res[1]
       }).catch(e => {
         console.log(e)
       }).finally(() => {
@@ -248,8 +287,11 @@ export default {
   font-size: 32px;
   .service-search {
     width: 100%;
-    height: 100px;
     padding: 0 10px;
+    border-bottom: 4px solid #eee;
+    /deep/ .van-search__content {
+      background-color: #eff1f5;
+    }
   }
   .service-container {
     flex: 1;
@@ -260,10 +302,17 @@ export default {
     padding: 40px 20px;
     font-size: 32px;
     .serivce-title {
-      font-size: 32px;
-      color: #313238;
+      font-size: 28px;
+      color: #a2a4a7;
       font-weight: 400;
       padding: 0 28px;
+      i {
+        font-size: 36px;
+      }
+    }
+    .service-line {
+      border-bottom: 4px solid #eee;
+      margin: 10px 20px;
     }
     .container {
       width: 100%;
@@ -271,7 +320,7 @@ export default {
       .service-list {
         display: grid;
         justify-content: space-evenly;
-        grid-template-columns: repeat(auto-fill, 280px);
+        grid-template-columns: repeat(auto-fill, 320px);
         grid-gap: 20px;
         li {
           height: 80px;
@@ -281,9 +330,12 @@ export default {
           line-height: 60px;
           display: flex;
           .name {
-            width: 220px;
-            display: block;
+            width: 240px;
+            text-align: left;
             overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            word-break: break-all;
           }
           .favorite {
             width: 60px;

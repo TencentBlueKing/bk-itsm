@@ -128,3 +128,50 @@ export interface IOperation {
   key?: string,
   name?: string
 }
+
+export interface ITicketService {
+  id: number,
+  key: string,
+  name: string,
+  favortie: boolean,
+  bounded_catalogs: any[]
+}
+
+export interface IServiceInfo {
+  auth_actions: any[],
+  bounded_catalogs: any[],
+  bounded_relations: any[],
+  can_ticket_agency: boolean,
+  catalog_id: number,
+  create_at: string,
+  creator: string,
+  desc: string,
+  display_role: string,
+  display_type: string,
+  extras: object,
+  favorite: true
+  first_state_id: number,
+  id: number,
+  is_biz_needed: false
+  is_builtin: false
+  is_supervise_needed: false
+  is_valid: true
+  key: string,
+  name: string,
+  notify: any[]
+  notify_freq: number,
+  notify_rule: string,
+  owners: string,
+  project_key: string,
+  revoke_config: object,
+  sla: any[]
+  source: string,
+  supervise_type: string,
+  supervisor: string,
+  update_at: string,
+  updated_by: string,
+  version_number: string,
+  workflow: number | string,
+  workflow_id: number,
+  workflow_name: string
+}

@@ -35,7 +35,7 @@
           <div class="search-entry" @click="onSearchModeOpen">
             <van-icon name="search" />
           </div>
-          <div class="create-ticket itsm-mobile-icon icon-tianjia" @click="onCreateTicket"></div>
+          <div class="create-ticket" @click="onCreateTicket">+</div>
         </div>
       </template>
       <div v-if="searchMode" class="search-input">
@@ -231,10 +231,14 @@ export default {
     }
   }
   .create-ticket {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     margin-left: 20px;
-    font-size: 40px;
+    background: #3a83ff;
+    color: #fff;
+    border-radius: 8px;
+    line-height: 50px;
+    font-size: 50px;
     text-align: center;
   }
   .ticket-func {

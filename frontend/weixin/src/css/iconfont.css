@@ -24,6 +24,9 @@ url("../assets/font/iconcool.eot?#iefix") format("embedded-opentype");
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-time-circle:before {
+	content: "\e123";
+}
 .icon-info-line:before {
 	content: "\e104";
 }
@@ -83,4 +86,7 @@ url("../assets/font/iconcool.eot?#iefix") format("embedded-opentype");
 }
 .icon-tianjia:before {
 	content: "\e11f";
+}
+.icon-chenggong:before {
+	content: "\e122";
 }

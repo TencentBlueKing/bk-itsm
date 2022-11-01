@@ -2,18 +2,20 @@
   <div class="create-ticket">
     <div v-if="!isCreated" class="created-page">
       <section class="create-header">
-        <div class="create-icon">
-          <i class="itsm-mobile-icon icon-tidanxiangqing"></i>
-        </div>
-        <div class="header-content">
-          <h3 class="service-title">
-            <span class="service-name">{{ service.info.name }}</span>
-            <i
-              :class="['itsm-mobile-icon', service.info.favorite ? 'icon-favorite orange': 'icon-favorite-o']"
-              @click="onChangeFavorite(service.info)">
-            </i>
-          </h3>
-          <pre class="service-desc">{{ service.info.desc || '暂无备注' }}</pre>
+        <div class="create-container">
+          <div class="create-icon">
+            <i class="itsm-mobile-icon icon-tidanxiangqing"></i>
+          </div>
+          <div class="header-content">
+            <h3 class="service-title">
+              <span class="service-name">{{ service.info.name }}</span>
+              <i
+                :class="['itsm-mobile-icon', service.info.favorite ? 'icon-favorite orange': 'icon-favorite-o']"
+                @click="onChangeFavorite(service.info)">
+              </i>
+            </h3>
+            <pre class="service-desc">{{ service.info.desc || '暂无备注' }}</pre>
+          </div>
         </div>
       </section>
       <section class="field-content">
@@ -21,7 +23,7 @@
         ref="renderField"
         :fields="fieldList"></render-field>
       </section>
-      <section>
+      <section class="ticket-opera">
         <div class="attention">
           <van-checkbox
             v-model="attention"
@@ -29,27 +31,28 @@
             关注此单据，单据更新时通知我
           </van-checkbox>
         </div>
-        <van-button
-          class="btn"
-          type="primary"
-          style="margin-right: 20px"
-          :disabled="submitDisabled"
-          @click="onCreateSubmit">
-          提交
-        </van-button>
-        <van-button
-          class="btn"
-          type="default"
-          size="small"
-          @click="$router.go(-1)">
-          取消
-        </van-button>
+        <div class="opera-btn">
+          <van-button
+            class="btn"
+            type="default"
+            size="small"
+            @click="$router.go(-1)">
+            取消
+          </van-button>
+          <van-button
+            class="btn"
+            type="primary"
+            :disabled="submitDisabled"
+            @click="onCreateSubmit">
+            提交
+          </van-button>
+        </div>
       </section>
     </div>
     <div v-else class="created-sucess">
       <van-icon class="sucess-icon" name="checked" />
       <h2 class="result">提单成功</h2>
-      <p class="tip">当前流程已经跳转至下一节点，现在您可以选择</p>
+      <p class="tip">当前流程已经跳转至下一节点，您可以选择</p>
       <div class="operate">
         <van-button
           class="btn"
@@ -74,18 +77,12 @@ import { onMounted, ref, defineComponent, reactive, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
 import RenderField from '../../components/renderField/index.vue'
+import { IServiceInfo } from '../../typings/ticket'
 interface Iservice {
-  info: object,
+  info: IServiceInfo | object,
   createdId: string | number,
   createdSn: string
 }
-// interface Ifield {
-//   type: string,
-//   id: number,
-//   key: string,
-//   value: string | number,
-//   choice: string
-// }
 const notSupportTypes: string [] = [
   'CUSTOMTABLE', // 自定义表格
   'TREESELECT', //  树形选择
@@ -246,54 +243,74 @@ export default defineComponent({
 .create-ticket {
   width: 100%;
   height: 100%;
-  padding: 20px;
   position: relative;
   .created-page {
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
     .create-header {
-      border: 1px solid #dadada;
-      padding: 20px;
-      display: flex;
-      .create-icon {
-        width: 80px;
-        display: block;
-        height: 80px;
-        line-height: 80px;
-        border-radius: 50%;
-        text-align: center;
-        font-size: 40px;
-        color: #3a84ff;
-        background: #e1ecff;
-        margin-right: 20px;
-      }
-      .header-content {
-        .service-title {
-          height: 40px;
-          line-height: 40px;
-          margin-bottom: 10px;
-          i {
-            font-size: 40px;
-            margin-left: 10px;
-          }
+      width: 100%;
+      background-color: #f5f7fa;
+      .create-container {
+        background-color: #ffffff;
+        margin: 40px;
+        padding: 40px;
+        display: flex;
+        .create-icon {
+          width: 100px;
+          display: block;
+          height: 100px;
+          line-height: 100px;
+          border-radius: 50%;
+          text-align: center;
+          font-size: 40px;
+          color: #3a84ff;
+          background: #e1ecff;
+          margin-right: 20px;
         }
-        .service-desc {
-          word-break: break-all;
-          white-space: normal;
+        .header-content {
+          .service-title {
+            height: 40px;
+            line-height: 40px;
+            margin-bottom: 10px;
+            .service-name {
+              font-weight: normal;
+              color: #343538;
+            }
+            i {
+              font-size: 40px;
+              margin-left: 20px;
+            }
+          }
+          .service-desc {
+            word-break: break-all;
+            white-space: normal;
+            color: #9c9da7;
+          }
         }
       }
     }
     .field-content {
       flex: 1;
+      padding: 0 40px;
     }
-    .attention {
-      font-size: 28px;
-      margin: 20px 0;
-    }
-    .btn {
-      width: 120px;
-      height: 60px;
-      margin-right: 10px;
+    .ticket-opera {
+      padding: 40px;
+      .attention {
+        font-size: 28px;
+        margin: 20px 0;
+      }
+      .opera-btn {
+        margin-top: 40px;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        .btn {
+          width: 46%;
+          height: 80px;
+        }
+      }
     }
   }
   .created-sucess {
@@ -313,19 +330,20 @@ export default defineComponent({
       font-size: 200px;
     }
     .result {
-      margin: 24px 0;
+      margin: 30px 0;
     }
     .tip {
       font-size: 28px;
-      margin-bottom: 40px;
+      margin-bottom: 50px;
+      color: #6a6b73;
     }
     .operate {
       width: 100%;
       display: flex;
       justify-content: center;
       .btn {
-        width: 200px;
-        height: 60px;
+        width: 46%;
+        height: 80px;
         margin: 0 10px;
       }
     }
