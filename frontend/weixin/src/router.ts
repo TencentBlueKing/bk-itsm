@@ -27,6 +27,8 @@ const ApprovalList = () => import(/* webpackChunkName: "home" */ './views/home/a
 const ApplicationList = () => import(/* webpackChunkName: "home" */ './views/home/applicationList.vue')
 const AttentionList = () => import(/* webpackChunkName: "home" */ './views/home/attentionList.vue')
 const Ticket = () => import(/* webpackChunkName: "ticket" */ './views/ticket/index.vue')
+const CreateTicket = () => import(/* webpackChunkName: "ticket" */ './views/ticket/createTicket.vue')
+const Service = () => import(/* webpackChunkName: "ticket" */ './views/service/index.vue')
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -70,6 +72,22 @@ const router = createRouter({
       component: Ticket,
       meta: {
         title: '单据详情'
+      }
+    },
+    {
+      path: '/ticket/create',
+      name: 'createTicket',
+      component: CreateTicket,
+      meta: {
+        title: '创建单据'
+      }
+    },
+    {
+      path: '/service',
+      name: 'service',
+      component: Service,
+      meta: {
+        title: '服务提单'
       }
     }
   ]

@@ -8,6 +8,7 @@ url("../assets/font/iconcool.eot?#iefix") format("embedded-opentype");
     font-style: normal;
 }
 
+
 .itsm-mobile-icon {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'itsm-mobile' !important;
@@ -23,6 +24,9 @@ url("../assets/font/iconcool.eot?#iefix") format("embedded-opentype");
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-time-circle:before {
+	content: "\e123";
+}
 .icon-info-line:before {
 	content: "\e104";
 }
@@ -37,6 +41,9 @@ url("../assets/font/iconcool.eot?#iefix") format("embedded-opentype");
 }
 .icon-folder-shape:before {
 	content: "\e114";
+}
+.icon-favorite:before {
+	content: "\e121";
 }
 .icon-favorite-o:before {
 	content: "\e106";
@@ -70,4 +77,16 @@ url("../assets/font/iconcool.eot?#iefix") format("embedded-opentype");
 }
 .icon-index:before {
 	content: "\e11c";
+}
+.icon-chulijindu:before {
+	content: "\e11d";
+}
+.icon-tidanxiangqing:before {
+	content: "\e11e";
+}
+.icon-tianjia:before {
+	content: "\e11f";
+}
+.icon-chenggong:before {
+	content: "\e122";
 }
