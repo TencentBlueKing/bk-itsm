@@ -134,12 +134,12 @@ export interface ITicketService {
   key: string,
   name: string,
   favortie: boolean,
-  bounded_catalogs: any[]
+  bounded_catalogs: string[]
 }
 
 export interface IServiceInfo {
-  auth_actions: any[],
-  bounded_catalogs: any[],
+  auth_actions: string[],
+  bounded_catalogs: string[],
   bounded_relations: any[],
   can_ticket_agency: boolean,
   catalog_id: number,

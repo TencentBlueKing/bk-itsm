@@ -37,7 +37,8 @@ const service = {
       return $api.get('service/projects/get_favorite_service/').then(res => res.data)
     },
     getRecentFavorites() {
-      const now = dayjs(new Date())
+      const now = dayjs()
+      console.log(now)
       const curTime = now.format("YYYY-MM-DD HH:mm:ss")
       const startTime = now.subtract(1, "month").format("YYYY-MM-DD HH:mm:ss")
       return $api

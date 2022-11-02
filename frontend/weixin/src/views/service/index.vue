@@ -78,7 +78,7 @@
                 :finished="listState.finished"
                 finished-text="没有更多了"
                 offset="0"
-                @load="onload('ss')">
+                @load="onload">
                 <ul class="service-list">
                   <li v-for="serviceItem in serviceList.allList" :key="serviceItem.id">
                     <span

@@ -20,8 +20,9 @@
       </section>
       <section class="field-content">
         <render-field
-        ref="renderField"
-        :fields="fieldList"></render-field>
+          ref="renderField"
+          :fields="fieldList">
+        </render-field>
       </section>
       <section class="ticket-opera">
         <div class="attention">
@@ -49,7 +50,7 @@
         </div>
       </section>
     </div>
-    <div v-else class="created-sucess">
+    <div v-else class="created-success">
       <div class="sucess-icon itsm-mobile-icon icon-chenggong"></div>
       <h2 class="result">提单成功</h2>
       <p class="tip">当前流程已经跳转至下一节点，您可以选择</p>
@@ -128,23 +129,28 @@ export default defineComponent({
     const submitDisabled = ref<boolean>(true)
     watch(fieldList, (val) => {
       getPriorityDisabled.value = true
+      // 提交禁用按钮
       submitDisabled.value = !val.filter(sup => !notSupportTypes.includes(sup.type) && sup.validate_type === 'REQUIRE').every(item => item.value !== '')
-      const CurrentApiFields = val.filter(ite => (ite.source_type === 'API' || ite.key === 'priority')
+      // 当前需要依赖条件的字段列表
+      const currentApiFields = val.filter(ite => (ite.source_type === 'API' || ite.key === 'priority')
         && ite.related_fields && ite.related_fields.rely_on
         && ite.related_fields.rely_on.length)
+      // 当前字段列表所需要依赖字段的类型
       let relyOnFieldsKeyList = []
-      CurrentApiFields.forEach((ite) => {
+      currentApiFields.forEach((ite) => {
         relyOnFieldsKeyList = [...ite.related_fields.rely_on]
       })
+      // 当前字段所需要依赖项
       const CurrentreBeReliedFields = val.filter(ite => ite.related_fields && ite.related_fields.be_relied
         && ite.related_fields.be_relied.length)
-      const CurrentrelyOnFields = CurrentreBeReliedFields
+      // 当前字段列表所需要依赖的字段
+      const currentrelyOnFields = CurrentreBeReliedFields
         .filter(ite => relyOnFieldsKeyList.indexOf(ite.key) !== -1)
 
-      CurrentrelyOnFields.forEach(ite => {
-        const rca = CurrentApiFields.filter(item_ => item_.related_fields.rely_on.indexOf(ite.key) !== -1)
+      currentrelyOnFields.forEach(ite => {
+        const rca = currentApiFields.filter(item_ => item_.related_fields.rely_on.indexOf(ite.key) !== -1)
         rca.forEach(async (itemRelate) => {
-          const relateCurrentreBeRelied = CurrentrelyOnFields
+          const relateCurrentreBeRelied = currentrelyOnFields
             .filter(itemRe => itemRelate.related_fields.rely_on.indexOf(itemRe.key) !== -1)
           const isALlFill = relateCurrentreBeRelied.every(itemRely => itemRely.val)
           if (isALlFill && getPriorityDisabled.value) {
@@ -154,17 +160,17 @@ export default defineComponent({
               api_instance_id: itemRelate.api_instance_id,
               kv_relation: itemRelate.kv_relation
             }
-            getPriority(params, itemRelate, isALlFill, CurrentrelyOnFields)
+            getPriority(params, itemRelate, isALlFill, currentrelyOnFields)
           }
         })
       })
     }, { deep: true })
-    const getPriority = async (params: any, item: any, isALlFill: boolean, CurrentrelyOnFields: any): void => {
+    const getPriority = async (params: any, item: any, isALlFill: boolean, currentrelyOnFields: any): void => {
       const data = JSON.parse(JSON.stringify(params))
       data.service_type = item.service || service.info.key
       delete data.id
       item.allFill = isALlFill
-      CurrentrelyOnFields.forEach((i: any) => {
+      currentrelyOnFields.forEach((i: any) => {
         data[i.key] = i.value
       })
       store.dispatch('get_priority', data).then((res) => {
@@ -183,11 +189,12 @@ export default defineComponent({
         attention: attention.value
       }
       fieldList.value.forEach(item => {
+        const showField = item.showFeild || item.showField
         params.fields.push({
           type: item.type,
           id: item.id,
           key: item.key,
-          value: item.showFeild ? item.value : '',
+          value: showField ? item.value : '',
           choice: item.choice
         })
       })
@@ -313,7 +320,7 @@ export default defineComponent({
       }
     }
   }
-  .created-sucess {
+  .created-success {
     height: 50%;
     width: 100%;
     display: flex;
