@@ -50,7 +50,7 @@
       </section>
     </div>
     <div v-else class="created-sucess">
-      <van-icon class="sucess-icon" name="checked" />
+      <div class="sucess-icon itsm-mobile-icon icon-chenggong"></div>
       <h2 class="result">提单成功</h2>
       <p class="tip">当前流程已经跳转至下一节点，您可以选择</p>
       <div class="operate">
@@ -326,8 +326,8 @@ export default defineComponent({
     bottom: 0;
     margin: auto;
     .sucess-icon {
-      color: #8ef286;
-      font-size: 200px;
+      color: #2ecb55;
+      font-size: 140px;
     }
     .result {
       margin: 30px 0;
