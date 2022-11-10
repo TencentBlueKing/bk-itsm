@@ -101,7 +101,11 @@
       </van-pull-refresh>
       <div v-if="searchFocus">
         <ul class="result-list" v-if="serviceList.searchResultList.length > 0">
-          <li class="result-item" v-for="service in serviceList.searchResultList" :key="service.id">
+          <li
+            class="result-item"
+            v-for="service in serviceList.searchResultList"
+            :key="service.id"
+            @click="onCreateTicket(service)">
             <div class="favorite-icon">
               <span @click="onChangeFavorite(service)">
                 <i :class="['itsm-mobile-icon', service.favorite ? 'icon-favorite orange': 'icon-favorite-o']"></i>

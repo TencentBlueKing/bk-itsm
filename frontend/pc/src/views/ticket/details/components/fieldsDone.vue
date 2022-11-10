@@ -92,7 +92,7 @@
       </div>
       <bk-popover theme="light">
         <div class="bk-itsm-icon icon-icon-info bk-text-primary f12 rich-show"></div>
-        <div slot="content" style="white-space: normal;">
+        <div slot="content" style="white-space: normal; cursor: pointer;">
           <div v-bk-copy="item.value.replace(/<[^>]+>/g, '')" class="bk-li-right bk-fields-richtext tui-editor-contents"
             v-html="item.value" :title="'点击复制'">
           </div>
