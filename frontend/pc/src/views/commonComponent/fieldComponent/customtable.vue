@@ -182,7 +182,7 @@
           this.$bkInfo({
             title: '确认要删除此条数据？',
             confirmFn: () => {
-              this.item.val.splice(index, 1);
+              this.item.val.splice(index.$index, 1);
             },
           });
         }
