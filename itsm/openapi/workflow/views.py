@@ -28,6 +28,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from blueapps.account.decorators import login_exempt
+
+from itsm.component.decorators import custom_apigw_required
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.drf.mixins import ApiGatewayMixin
 from itsm.component.exceptions import ObjectNotExist
@@ -35,7 +37,7 @@ from itsm.openapi.workflow.serializers import WorkflowSerializer
 from itsm.workflow.models import WorkflowVersion
 
 
-@method_decorator(login_exempt, name='dispatch')
+@method_decorator(login_exempt, name="dispatch")
 class WorkflowViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     """
     服务项视图集合
@@ -44,13 +46,14 @@ class WorkflowViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     pagination_class = None
     queryset = WorkflowVersion.objects.all()
 
-    @action(detail=False, methods=['get'], serializer_class=WorkflowSerializer)
+    @action(detail=False, methods=["get"], serializer_class=WorkflowSerializer)
+    @custom_apigw_required
     def get_workflow_detail(self, request):
         """
         服务流程详情
         """
 
-        workflow_id = request.query_params.get('workflow_id')
+        workflow_id = request.query_params.get("workflow_id")
 
         try:
             workflow = self.queryset.get(pk=workflow_id)
@@ -58,10 +61,10 @@ class WorkflowViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         except WorkflowVersion.DoesNotExist:
             return Response(
                 {
-                    'result': False,
-                    'code': ObjectNotExist.ERROR_CODE_INT,
-                    'data': None,
-                    'message': ObjectNotExist.MESSAGE,
+                    "result": False,
+                    "code": ObjectNotExist.ERROR_CODE_INT,
+                    "data": None,
+                    "message": ObjectNotExist.MESSAGE,
                 }
             )
 
