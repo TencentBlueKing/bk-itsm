@@ -714,7 +714,6 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"])
     @catch_openapi_exception
-    @custom_apigw_required
     def proceed_fast_approval(self, request):
         """
         处理快速审批请求
