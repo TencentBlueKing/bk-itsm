@@ -66,6 +66,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
 
     @action(detail=False, methods=["get"], serializer_class=ServiceSerializer)
     @catch_openapi_exception
+    @custom_apigw_required
     def get_services(self, request):
         """
         服务项列表
@@ -96,6 +97,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
 
     @action(detail=False, methods=["get"], serializer_class=ServiceRetrieveSerializer)
     @catch_openapi_exception
+    @custom_apigw_required
     def get_service_detail(self, request):
         """
         服务项详情
@@ -151,6 +153,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
 
     @action(detail=False, methods=["get"])
     @catch_openapi_exception
+    @custom_apigw_required
     def get_service_roles(self, request):
         """
         服务目录
@@ -203,6 +206,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
 
     @action(detail=False, methods=["post"])
     @catch_openapi_exception
+    @custom_apigw_required
     def insert_service(self, requests):
         """
         插入或新服务和流程

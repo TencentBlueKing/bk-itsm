@@ -28,13 +28,15 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from blueapps.account.decorators import login_exempt
+
+from itsm.component.decorators import custom_apigw_required
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.drf.mixins import ApiGatewayMixin
 from itsm.task.models import Task, SopsTask
 from itsm.task.tasks import sops_task_poller
 
 
-@method_decorator(login_exempt, name='dispatch')
+@method_decorator(login_exempt, name="dispatch")
 class TaskViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     """
     任务视图集
@@ -43,12 +45,13 @@ class TaskViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     pagination_class = None
     queryset = Task.objects.filter(is_valid=True)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
+    @custom_apigw_required
     def sops_task_status(self, request):
         """
         sops状态回调接口
         """
-        sops_tasks = SopsTask.objects.filter(sops_task_id__in=request.data.get('tasks'))
+        sops_tasks = SopsTask.objects.filter(sops_task_id__in=request.data.get("tasks"))
         task_id_list = [sops_task.task_id for sops_task in sops_tasks]
         sops_task_poller(task_id_list)
 

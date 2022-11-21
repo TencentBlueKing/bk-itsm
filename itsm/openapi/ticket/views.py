@@ -226,6 +226,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action(detail=False, methods=["post"])
+    @custom_apigw_required
     def edit_field(self, request, *args, **kwargs):
         """
         单个修改字段值
@@ -640,6 +641,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"])
     @catch_openapi_exception
+    @custom_apigw_required
     def proceed_approval(self, request):
         # 审批节点的处理
         serializer = ProceedApprovalSerializer(
@@ -712,6 +714,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"])
     @catch_openapi_exception
+    @custom_apigw_required
     def proceed_fast_approval(self, request):
         """
         处理快速审批请求
@@ -750,6 +753,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"], url_path="token/verify")
     @catch_openapi_exception
+    @custom_apigw_required
     def verify(self, request):
         token = request.data.get("token", "")
         message = settings.APP_CODE + "_" + settings.SECRET_KEY
