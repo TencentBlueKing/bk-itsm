@@ -150,7 +150,7 @@ def send_fast_approval_message(title, content, receivers, ticket, state_id):
         "clickname": "查看详情",
         "clickurl": ticket.ticket_url,
         "callback": "{}openapi/ticket/proceed_fast_approval/".format(
-            settings.FRONTEND_URL.replace("https", "http")
+            settings.FRONTEND_URL
         ),
         "action": [{"name": "同意", "value": "true"}, {"name": "拒绝", "value": "false"}],
         "context": {"ticket_id": ticket_id, "state_id": state_id},
