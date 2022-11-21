@@ -35,13 +35,6 @@ class BaseBkchatConfig:
             )
             return
 
-        # 判断当前运行环境是否为"ieod"
-        if settings.RUN_VER != "ieod":
-            logger.info(
-                "[fast_approval]The current RUN_VER type: {}".format(settings.RUN_VER)
-            )
-            return
-
         # 异步执行发送快速审批通知操作
         notify_fast_approval_task.apply_async(
             args=[self, state_id, receivers, message, action], kwargs=kwargs
