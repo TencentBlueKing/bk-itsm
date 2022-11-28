@@ -429,7 +429,8 @@
         } else if (listTwo.some(type => type === typeValue)) {
           betweenList = this.globalChoise.methods.filter(methods => (methods.typeName !== 'issuperset' && methods.typeName !== 'notissuperset'));
         } else {
-          betweenList = this.globalChoise.methods.filter(methods => (methods.typeName === '==' || methods.typeName === '!='));
+          const filterList = ['==', '!=', 'issuperset', 'notissuperset'];
+          betweenList = this.globalChoise.methods.filter(methods => filterList.includes(methods.typeName));
         }
         return betweenList;
       },
