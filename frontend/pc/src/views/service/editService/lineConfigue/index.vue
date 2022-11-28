@@ -423,13 +423,17 @@
       checkBetweenList(typeValue) {
         const listOne = ['MULTISELECT', 'CHECKBOX', 'MEMBERS', 'TREESELECT'];
         const listTwo = ['DATE', 'DATETIME', 'DATETIMERANGE', 'INT'];
+        const listThree = ['TEXT', 'STRING'];
         let betweenList = [];
         if (listOne.some(type => type === typeValue)) {
           betweenList = this.globalChoise.methods.filter(methods => (methods.typeName === 'issuperset' || methods.typeName === 'notissuperset'));
         } else if (listTwo.some(type => type === typeValue)) {
           betweenList = this.globalChoise.methods.filter(methods => (methods.typeName !== 'issuperset' && methods.typeName !== 'notissuperset'));
+        } else if (listThree.some(type => type === typeValue)) {
+          const filterList = ['==', '!=', 'in', 'notin'];
+          betweenList = this.globalChoise.methods.filter(methods => filterList.includes(methods.typeName));
         } else {
-          const filterList = ['==', '!=', 'issuperset', 'notissuperset'];
+          const filterList = ['==', '!='];
           betweenList = this.globalChoise.methods.filter(methods => filterList.includes(methods.typeName));
         }
         return betweenList;
