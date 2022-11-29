@@ -641,7 +641,6 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"])
     @catch_openapi_exception
-    @custom_apigw_required
     def proceed_approval(self, request):
         # 审批节点的处理
         serializer = ProceedApprovalSerializer(
