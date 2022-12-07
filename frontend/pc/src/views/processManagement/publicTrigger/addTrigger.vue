@@ -708,7 +708,6 @@
                     }
                   } else {
                     // 区分人员选择
-                    console.log(schema);
                     if (schema.required) {
                       if (schema.type === 'MEMBERS' || schema.type === 'MULTI_MEMBERS') {
                         responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : schema.value.some(schemaMem => (Array.isArray(schemaMem.value) ? !schemaMem.value.length : !schemaMem.value));
