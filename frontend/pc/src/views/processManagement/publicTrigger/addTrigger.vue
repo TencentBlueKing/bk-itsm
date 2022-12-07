@@ -678,7 +678,8 @@
                     responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : !schema.apiId;
                   } else {
                     schema.apiContent.bodyTableData.forEach(apiValue => {
-                      if (apiValue.type !== 'array' && apiValue.type !== 'object') {
+                      // 是否必填 is_necessary
+                      if (apiValue.type !== 'array' && apiValue.type !== 'object' && apiValue.is_necessary) {
                         responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : (apiValue.source_type === 'CUSTOM' ? apiValue.value === '' : apiValue.value_key === '');
                       }
                     });
@@ -707,6 +708,7 @@
                     }
                   } else {
                     // 区分人员选择
+                    console.log(schema);
                     if (schema.required) {
                       if (schema.type === 'MEMBERS' || schema.type === 'MULTI_MEMBERS') {
                         responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : schema.value.some(schemaMem => (Array.isArray(schemaMem.value) ? !schemaMem.value.length : !schemaMem.value));
