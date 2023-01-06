@@ -28,6 +28,7 @@ from django.conf import settings
 from django.shortcuts import render
 from itsm.role.models import BKUserRole, UserRole
 from itsm.service.views import SysDictViewSet, CategoryModelViewSet, ServiceViewSet
+from itsm.sla.views import PriorityMatrixViewSet
 from itsm.ticket.views import FieldViewSet, TicketModelViewSet
 from itsm.ticket.views.event import EventLogViewSet
 from itsm.ticket_status.views import TicketStatusViewSet
@@ -53,13 +54,17 @@ def index(request):
     BKUserRole.get_or_update_user_roles(request.user.username)
 
     site_url = settings.SITE_URL
-    
+
     if WEIXIN_APP_EXTERNAL_HOST:
         static_url = "{}static/weixin".format(WEIXIN_APP_EXTERNAL_HOST)
     else:
-        static_url = WEIXIN_STATIC_URL.rstrip('/')
-    
-    return render(request, 'index_mobile.html', {"WEIXIN_STATIC_URL": static_url, "SITE_URL": site_url},)
+        static_url = WEIXIN_STATIC_URL.rstrip("/")
+
+    return render(
+        request,
+        "index_mobile.html",
+        {"WEIXIN_STATIC_URL": static_url, "SITE_URL": site_url},
+    )
 
 
 class WXViewSet(TicketModelViewSet):
@@ -91,6 +96,10 @@ class WXTaskViewSet(TaskViewSet):
 
 
 class WXTicketLogViewSet(EventLogViewSet):
+    pass
+
+
+class WXPriorityMatrixViewSet(PriorityMatrixViewSet):
     pass
 
 

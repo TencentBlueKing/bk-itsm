@@ -29,7 +29,7 @@ const field = {
   actions: {
     // 获取级联字段数据源 （工单）
     getfieldApiChoice(context: any, payload: any) {
-      return $api.post(`ticket/fields/${payload.id}/api_field_choices/`, payload).then(res => res)
+      return $api.post(`ticket/receipts/api_field_choices/`, payload).then(res => res)
     },
     // 获取数据字典
     getDatadict(context: any, payload: any) {

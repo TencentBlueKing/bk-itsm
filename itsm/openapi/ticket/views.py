@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import copy
 from django.conf import settings
+from django.db import transaction
 from django.utils.decorators import method_decorator
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -77,6 +78,7 @@ from itsm.openapi.ticket.serializers import (
     CommentSerializer,
     DynamicFieldSerializer,
     TicketComplexLogsSerializer,
+    TicketApproveSerializer,
 )
 from itsm.openapi.ticket.validators import (
     openapi_operate_validate,
@@ -185,7 +187,10 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         bk_biz_id__in = request.data.get("bk_biz_id__in", [])
         current_status__in = request.data.get("current_status__in", [])
         tag = request.data.get("tag", None)
+        project_key = request.data.get("project_key", None)
 
+        if project_key:
+            queryset = queryset.filter(project_key=project_key)
         if sns:
             queryset = queryset.filter(sn__in=sns)
         if creator:
@@ -221,6 +226,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action(detail=False, methods=["post"])
+    @custom_apigw_required
     def edit_field(self, request, *args, **kwargs):
         """
         单个修改字段值
@@ -363,6 +369,97 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             serializer_class = TicketComplexLogsSerializer
 
         return Response(serializer_class(ticket).data)
+
+    @action(detail=False, methods=["post"], serializer_class=TicketApproveSerializer)
+    @catch_openapi_exception
+    @custom_apigw_required
+    def approve(self, request):
+
+        ser = TicketApproveSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+
+        sn = request.data.get("sn")
+        state_id = request.data.get("state_id")
+        approver = request.data.get("approver")
+        approve_action = request.data.get("action")
+        remark = request.data.get("remark")
+        ticket = Ticket.objects.get(sn=sn)
+        # 3.判断当前节点是否是RUNNING状态，否则通知
+        current_status = Status.objects.get(state_id=state_id, ticket_id=ticket.id)
+        if current_status.status != "RUNNING":
+            raise OperateTicketError("单据审批失败，单据当前状态非RUNNING")
+
+        node_status = ticket.node_status.get(state_id=state_id)
+
+        if node_status.type != "APPROVAL":
+            raise OperateTicketError("单据审批失败，目标节点{}不是审批节点".format(node_status.name))
+
+        if not node_status.can_sign_state_operate(approver):
+            raise OperateTicketError("单据审批失败，{}不是当前节点的审批人，无法审批".format(approver))
+
+        node_fields = TicketField.objects.filter(state_id=state_id, ticket_id=ticket.id)
+        fields = []
+        remarked = False
+        for field in node_fields:
+            if field.meta.get("code") == APPROVE_RESULT:
+                fields.append(
+                    {
+                        "id": field.id,
+                        "key": field.key,
+                        "type": field.type,
+                        "choice": field.choice,
+                        "value": approve_action,
+                    }
+                )
+            else:
+                if remarked:
+                    break
+                # 如果审批通过同时该字段是可选的，说明目标字段是审批通过备注
+                if approve_action == "true" and field.validate_type == "OPTION":
+                    fields.append(
+                        {
+                            "id": field.id,
+                            "key": field.key,
+                            "type": field.type,
+                            "choice": field.choice,
+                            "value": remark,
+                        }
+                    )
+                    remarked = True
+                # 如果审批通过同时该字段是可选的，说明目标字段是审批拒绝备注
+                if approve_action == "false" and field.validate_type == "REQUIRE":
+                    fields.append(
+                        {
+                            "id": field.id,
+                            "key": field.key,
+                            "type": field.type,
+                            "choice": field.choice,
+                            "value": remark,
+                        }
+                    )
+                    remarked = True
+
+        logger.info("approve request fields is {}".format(fields))
+
+        SignTask.objects.update_or_create(
+            status_id=node_status.id,
+            processor=approver,
+            defaults={
+                "status": "RUNNING",
+            },
+        )
+        res = ticket.activity_callback(state_id, approver, fields, API)
+        if not res.result:
+            logger.warning(
+                "callback error， current state id %s, error message: %s"
+                % (state_id, res.message)
+            )
+            ticket.node_status.filter(state_id=state_id).update(status=RUNNING)
+            raise OperateTicketError(
+                "单据操作失败，callback error, message={}".format(res.message)
+            )
+
+        return Response()
 
     @action(detail=False, methods=["post"])
     @catch_openapi_exception
@@ -654,6 +751,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"], url_path="token/verify")
     @catch_openapi_exception
+    @custom_apigw_required
     def verify(self, request):
         token = request.data.get("token", "")
         message = settings.APP_CODE + "_" + settings.SECRET_KEY
@@ -696,16 +794,19 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     def add_follower(self, request, *args, **kwargs):
         """关注or取关"""
         sn = request.data.get("sn")
-        user = request.data.get("user")
+        users = request.data.get("users").split(",")
         try:
             ticket = Ticket.objects.get(sn=sn)
         except Ticket.DoesNotExist:
             raise ParamError("sn[{}]对应的单据不存在！".format(sn))
         attention = request.data.get("attention")
-        if attention:
-            ticket.add_follower(user)
-        else:
-            ticket.delete_follower(user)
+        with transaction.atomic():
+            if attention:
+                for user in users:
+                    ticket.add_follower(user)
+            else:
+                for user in users:
+                    ticket.delete_follower(user)
         return Response()
 
     @action(detail=False, methods=["get"])

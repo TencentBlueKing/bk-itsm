@@ -98,7 +98,12 @@
           </span>
           <!-- 操作 -->
           <template v-else-if="field.id === 'operate'">
+            <template v-if="props.row.waiting_approve">
+              <bk-link class="table-link mr10" theme="primary" @click="onOpenApprovalDialog(props.row.id, true)">{{ $t(`m.managePage['通过']`) }}</bk-link>
+              <bk-link class="table-link" theme="primary" @click="onOpenApprovalDialog(props.row.id, false)">{{ $t(`m.manageCommon['拒绝']`) }}</bk-link>
+            </template>
             <router-link
+              v-else
               target="_blank"
               class="table-link mr10"
               :to="{ name: 'TicketDetail',
@@ -119,6 +124,12 @@
         </bk-table-setting-content>
       </bk-table-column>
     </bk-table>
+    <!-- 审批弹窗 -->
+    <approval-dialog
+      :is-show.sync="isApprovalDialogShow"
+      :approval-info="approvalInfo"
+      @cancel="onApprovalDialogHidden">
+    </approval-dialog>
     <!-- 导出 -->
     <export-ticket-dialog
       view-type="my_todo"
@@ -131,6 +142,7 @@
 </template>
 <script>
   import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch';
+  import ApprovalDialog from '@/components/ticket/ApprovalDialog.vue';
   import ExportTicketDialog from '@/components/ticket/ExportTicketDialog.vue';
   import i18n from '@/i18n/index.js';
   import ticketListMixins from './ticketListMixins.js';
@@ -199,6 +211,7 @@
     components: {
       AdvancedSearch,
       ExportTicketDialog,
+      ApprovalDialog,
     },
     mixins: [ticketListMixins],
     props: {

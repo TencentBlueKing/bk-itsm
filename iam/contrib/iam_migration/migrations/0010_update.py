@@ -18,4 +18,4 @@ class Migration(migrations.Migration):
 
     dependencies = [("iam_migration", "0009_update")]
 
-    operations = [migrations.RunPython(forward_func)]
+    operations = []

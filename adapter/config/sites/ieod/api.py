@@ -36,22 +36,22 @@ def get_batch_users(users, properties, is_exact=True, page_params=None, name_typ
     if not users:
         # 不带用户的情况下，直接返回空列表
         return []
-    
+
     # BLAME: fields为空时，exact_lookups查询出来的列表重复
     kwargs = {
-        'fields': 'username,display_name,telephone,email,qq,wx_userid,time_zone,id,domain,logo,category_id,departments',
+        "fields": "username,display_name,telephone,email,qq,wx_userid,time_zone,id,domain,logo,category_id,departments",
     }
 
     kwargs.update(page_params)
-    
+
     if not is_exact:
-        kwargs["fuzzy_lookups"] = ','.join(users)
+        kwargs["fuzzy_lookups"] = ",".join(users)
     else:
-        kwargs["exact_lookups"] = ','.join(users)
+        kwargs["exact_lookups"] = ",".join(users)
 
     if properties:
-        if properties == 'all':
-            kwargs.pop('fields')
+        if properties == "all":
+            kwargs.pop("fields")
         else:
             kwargs.update(fields=properties)
 
@@ -85,14 +85,15 @@ def get_all_users(users=None):
             normal_users.append(user)
     logger.info(
         "[get_all_users]正在获取全部用户,normal_users:{}, cross_dir_users:{}".format(
-            normal_users,
-            cross_dir_users))
+            normal_users, cross_dir_users
+        )
+    )
     all_users = query_user_info(normal_users, cross_dir_users)
     logger.info(
         "[get_all_users]获取全部用户结束,all_users:{}, normal_users:{}, cross_dir_users:{}".format(
-            all_users,
-            normal_users,
-            cross_dir_users))
+            all_users, normal_users, cross_dir_users
+        )
+    )
 
     all_users = [
         {
@@ -119,12 +120,17 @@ def query_user_info(normal_users, cross_dir_users):
     if cross_dir_users:
         for single_user in cross_dir_users:
             single_user_info = client_backend.usermanage.retrieve_user(
-                {'fields': 'username,display_name', 'id': single_user}
+                {"fields": "username,display_name", "id": single_user}
             )
             all_users.append(single_user_info)
     if normal_users:
         all_normal_users = client_backend.usermanage.list_users(
-            {'fields': 'username,display_name', 'exact_lookups': ",".join(normal_users)}
+            {"fields": "username,display_name", "exact_lookups": ",".join(normal_users)}
+        )
+        logger.info(
+            "[query_user_info] -> esb results return = {}, normal_users={}".format(
+                all_normal_users, normal_users
+            )
         )
         all_users.extend(all_normal_users["results"])
     return all_users

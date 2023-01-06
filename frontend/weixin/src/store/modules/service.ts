@@ -21,6 +21,7 @@
  */
 
 import $api from '../../apis/index'
+import dayjs from "dayjs"
 
 const service = {
   state: {},
@@ -28,6 +29,38 @@ const service = {
   actions: {
     getCategories() {
       return $api.get('service/categories/').then(res => res)
+    },
+    getServiceList() {
+      return $api.get('service/projects/all/').then(res => res.data)
+    },
+    getServiceFavorites() {
+      return $api.get('service/projects/get_favorite_service/').then(res => res.data)
+    },
+    getRecentFavorites() {
+      const now = dayjs()
+      console.log(now)
+      const curTime = now.format("YYYY-MM-DD HH:mm:ss")
+      const startTime = now.subtract(1, "month").format("YYYY-MM-DD HH:mm:ss")
+      return $api
+        .get(`ticket/receipts/recently_used_service/`, {
+          params: {
+            create_at__gte: startTime,
+            create_at__lte: curTime
+          }
+        })
+        .then(res => res.data)
+    },
+    // 收藏/取消收藏服务
+    toggleServiceFavorite(context: any, payload: any) {
+      const { id, favorite } = payload
+      return $api.post(`service/projects/${id}/operate_favorite/`, { favorite }).then(response => response)
+    },
+    get_priority(content: any, payload: any) {
+      return $api.post(`sla/matrixs/priority_value/`, payload).then(res => res.data)
+    },
+    getStepList(context: any, params: any) {
+      console.log(params)
+      return $api.get(`ticket/receipts/${params.id}/states/`, { params: params }).then(res => res.data)
     }
   }
 }

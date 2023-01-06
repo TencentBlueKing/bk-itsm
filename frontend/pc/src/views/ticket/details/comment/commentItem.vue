@@ -178,7 +178,7 @@
             margin-left: 20px;
         }
         .edited {
-            margin: 0 20px;
+            margin-left: 20px;
             height: 22px;
             width: 68px;
             text-align: center;
@@ -195,7 +195,6 @@
         .reply-praise {
             flex: 1;
             display: flex;
-            flex-direction: row-reverse;
             font-size: 18px;
             line-height: 28px;
             .expression {
@@ -216,8 +215,8 @@
                 cursor: pointer;
                 display: inline-block;
                 height: 28px;
-                line-height: 28px;
-                margin: 0 5px;
+                line-height: 24px;
+                margin: 0 10px;
             }
         }
     }

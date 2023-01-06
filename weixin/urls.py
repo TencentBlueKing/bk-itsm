@@ -41,26 +41,34 @@ from weixin.views import (
     WXRoleTypeViewSet,
     WXRpcApiViewSet,
     WXTicketStatusViewSet,
+    WXPriorityMatrixViewSet,
 )
 
 routers = DefaultRouter(trailing_slash=True)
 
-routers.register(r'ticket/receipts', WXViewSet, basename="wx_ticket")
-routers.register(r'ticket/logs', WXTicketLogViewSet, basename="wx_ticket_log")
-routers.register(r'ticket/fields', WXFieldViewSet, basename="wx_ticket_fields")
-routers.register(r'ticket_status/status', WXTicketStatusViewSet, basename="wx_ticket_status")
-routers.register(r'role/users', WXUserRoleViewSet, basename="wx_user_roles")
-routers.register(r'role/types', WXRoleTypeViewSet, basename="wx_role_types")
-routers.register(r'service/datadicts', WXSysDictViewSet, basename='wx_datadicts')
-routers.register(r'service/categories', WXCategoryViewSet, basename='wx_service_categories')
-routers.register(r'service/projects', WXServiceViewSet, basename='wx_service_projects')
-routers.register(r'iadmin/system_settings', WXSystemSettingsViewSet, basename='wx_system_settings')
-routers.register(r'task/tasks', WXTaskViewSet, basename='wx_tasks')
+routers.register(r"ticket/receipts", WXViewSet, basename="wx_ticket")
+routers.register(r"ticket/logs", WXTicketLogViewSet, basename="wx_ticket_log")
+routers.register(r"sla/matrixs", WXPriorityMatrixViewSet, basename="sla_matrixs")
+routers.register(r"ticket/fields", WXFieldViewSet, basename="wx_ticket_fields")
+routers.register(
+    r"ticket_status/status", WXTicketStatusViewSet, basename="wx_ticket_status"
+)
+routers.register(r"role/users", WXUserRoleViewSet, basename="wx_user_roles")
+routers.register(r"role/types", WXRoleTypeViewSet, basename="wx_role_types")
+routers.register(r"service/datadicts", WXSysDictViewSet, basename="wx_datadicts")
+routers.register(
+    r"service/categories", WXCategoryViewSet, basename="wx_service_categories"
+)
+routers.register(r"service/projects", WXServiceViewSet, basename="wx_service_projects")
+routers.register(
+    r"iadmin/system_settings", WXSystemSettingsViewSet, basename="wx_system_settings"
+)
+routers.register(r"task/tasks", WXTaskViewSet, basename="wx_tasks")
 
 urlpatterns = routers.urls + [
-    url(r'^gateway/', include('itsm.gateway.urls')),
-    url(r'^upload_file/$', upload),
-    url(r'^download_file/$', download),
-    url(r'^postman/rpc_api/$', WXRpcApiViewSet.as_view()),
-    url(r'^c/compapi/v2/usermanage/fs_list_users/$', get_batch_users),
+    url(r"^gateway/", include("itsm.gateway.urls")),
+    url(r"^upload_file/$", upload),
+    url(r"^download_file/$", download),
+    url(r"^postman/rpc_api/$", WXRpcApiViewSet.as_view()),
+    url(r"^c/compapi/v2/usermanage/fs_list_users/$", get_batch_users),
 ]

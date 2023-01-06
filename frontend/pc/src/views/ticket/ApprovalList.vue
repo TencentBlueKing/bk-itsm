@@ -27,6 +27,7 @@
         class="advanced-search"
         ref="advancedSearch"
         :forms="searchForms"
+        :is-iframe="isIframe"
         :panel="type"
         :search-result-list="searchResultList"
         @deteleSearchResult="deteleSearchResult"
@@ -224,18 +225,16 @@
       ApprovalDialog,
     },
     mixins: [ticketListMixins],
+    props: {
+      isIframe: Boolean,
+      serviceId: [Number, String],
+    },
     data() {
       const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority');
       return {
         columnList,
         type: 'approval',
-        approvalInfo: {
-          showAllOption: false,
-          result: true,
-          approvalList: [],
-        },
         isExportDialogShow: false,
-        isApprovalDialogShow: false,
         // 批量审批选中单
         selectedList: [],
       };
@@ -271,24 +270,6 @@
           }
         } else {
           this.selectedList = this.selectedList.filter(item => item.id !== value.id);
-        }
-      },
-      onOpenApprovalDialog(id, result) {
-        this.isApprovalDialogShow = true;
-        this.approvalInfo = {
-          result,
-          approvalList: [{ ticket_id: id }],
-        };
-      },
-      onApprovalDialogHidden(result) {
-        this.isApprovalDialogShow = false;
-        this.approvalInfo = {
-          result: true,
-          showAllOption: false,
-          approvalList: [],
-        };
-        if (result) {
-          this.initData();
         }
       },
     },

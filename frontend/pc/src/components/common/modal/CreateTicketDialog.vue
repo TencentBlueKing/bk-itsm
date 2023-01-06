@@ -155,6 +155,9 @@
           const group = list.find(item => item.name === service.key);
           group.data.push(service);
         });
+        list.forEach(service => {
+          service.data.sort((a, b) => b.favorite - a.favorite);
+        });
         return list;
       },
       listNum() {

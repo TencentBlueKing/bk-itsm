@@ -29,6 +29,7 @@
       :required="isRequire"
       :error="error"
       :error-message="errorMessage"
+      :disabled="item.is_readonly"
       placeholder="请选择"
       @click="handelerOpenPopup" />
     <p v-else class="common-view-field">
@@ -56,7 +57,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, toRefs, ref, nextTick, reactive, computed } from 'vue'
+import { defineComponent, toRefs, ref, nextTick, reactive, computed, watch } from 'vue'
 
 interface IFieldInfo {
   id?: number,
@@ -107,8 +108,13 @@ export default defineComponent({
       }
     }
     setDefaultSelectValue()
-
+    watch(item.value, (value) => {
+      if (value.key === 'priority' && value.allFill) {
+        setDefaultSelectValue()
+      }
+    }, { deep: true })
     const handelerOpenPopup = () => {
+      if (item.value.is_readonly) return
       showPicker.value = true
       nextTick(() => {
         const { choice } = item.value

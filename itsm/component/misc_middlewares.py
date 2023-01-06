@@ -263,22 +263,20 @@ class HttpsMiddleware(MiddlewareMixin):
             if request.path.startswith(EXEMPT_HTTPS_REDIRECT):
                 return None
 
-        # 如果发现不是woa过来的域名
-        if (
-            settings.WEIXIN_APP_EXTERNAL_HOST
-            and settings.WEIXIN_APP_EXTERNAL_HOST.find(request.get_host()) == -1
-        ):
-            # 如果 host的值和HTTP_REFERER一致，则跳转
-            # 如果是从开发者中心中出来的，此时有HTTP_REFERER
+            # 如果发现不是woa过来的域名
             if (
-                "HTTP_REFERER" not in request.META
-                or request.get_host() in request.META.get("HTTP_REFERER", "")
+                settings.WEIXIN_APP_EXTERNAL_HOST
+                and settings.WEIXIN_APP_EXTERNAL_HOST.find(request.get_host()) == -1
             ):
-                logger.info("执行跳转: request.path = {}".format(request.path))
-                return HttpResponseIndexRedirect(request.path)
+                # 如果 host的值和HTTP_REFERER一致，则跳转
+                # 如果是从开发者中心中出来的，此时有HTTP_REFERER
+                if (
+                    "HTTP_REFERER" not in request.META
+                    or request.get_host() in request.META.get("HTTP_REFERER", "")
+                ):
+                    logger.info("执行跳转: request.path = {}".format(request.path))
+                    return HttpResponseIndexRedirect(request.path)
 
-        # 非ieod环境不开启自动跳转
-        if settings.RUN_VER == "ieod":
             if not request.is_secure():
                 return HttpResponseIndexRedirect(request.path)
 

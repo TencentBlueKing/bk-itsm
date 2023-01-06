@@ -26,7 +26,7 @@
       <div
         v-for="(item, index) in fields"
         :key="index"
-        :class="['field-wrap', { 'last': index === fields.length - 1}]">
+        :class="['field-wrap', { 'field-margin': !isViewMode, 'last': index === fields.length - 1}]">
         <template v-if="item.showFeild !== false">
           <component
             :is="`Field-${item.type}`"
@@ -72,7 +72,7 @@ const registerComponents = (() => {
 const notSupportTypes: string [] = [
   'CUSTOMTABLE', // 自定义表格
   'TREESELECT', //  树形选择
-  'FILE', //        文件上传
+  // 'FILE', //        文件上传
   'CASCADE', //     级联字段
   'SOPS_TEMPLATE', // 标准运维
   'TABLE' //         表格 TODO
@@ -89,7 +89,8 @@ const notSupportEditTypes: string [] = [
 
 interface IFieldItem {
   id: number,
-  val: any
+  val: any,
+  key?: string
 }
 
 export default defineComponent({
@@ -219,6 +220,9 @@ export default defineComponent({
     padding: 12px 0;
     background: #ffffff;
   }
+}
+.field-margin {
+  margin: 20px 0;
 }
 .field-wrap {
   display: flex;

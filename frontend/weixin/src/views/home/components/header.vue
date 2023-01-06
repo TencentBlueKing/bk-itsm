@@ -23,7 +23,7 @@
 <template>
   <section class="home-header van-hairline--bottom" v-bind="$attrs">
     <div class="header-content " :class="{ 'search-mode': searchMode }">
-      <template v-if="!searchMode">
+      <template v-if="!searchMode && !ticketMode">
         <div class="logo">
           <img src="../../../assets/images/itsm-logo.svg">
         </div>
@@ -31,11 +31,14 @@
           <span class="current-type">{{ typeName }}</span>
           <van-icon name="play" class="triangle-icon" />
         </div>
-        <div class="search-entry" @click="onSearchModeOpen">
-          <van-icon name="search" />
+        <div class="ticket-func">
+          <div class="search-entry" @click="onSearchModeOpen">
+            <van-icon name="search" />
+          </div>
+          <div class="create-ticket" @click="onCreateTicket">+</div>
         </div>
       </template>
-      <div v-else class="search-input">
+      <div v-if="searchMode" class="search-input">
         <form action="#">
           <van-search
             ref="searchInput"
@@ -72,6 +75,7 @@
 <script lang="ts">
 import { useStore } from 'vuex'
 import { ref, Ref, computed, watch, onMounted, nextTick, toRefs } from 'vue'
+import { useRouter } from 'vue-router'
 
 interface ServiceList {
   name: string,
@@ -93,6 +97,7 @@ export default {
   ],
   setup(props, { emit }) {
     const store = useStore()
+    const router  = useRouter()
     const { keyword } = toRefs(props)
     const defaultType: ServiceList = {
       key: 'all',
@@ -155,6 +160,11 @@ export default {
     const onSearch = (): void => {
       emit('search', searchStr.value)
     }
+    const onCreateTicket = (): void => {
+      router.push({
+        name: 'service'
+      })
+    }
 
     onMounted(getAllTypeList)
 
@@ -174,7 +184,8 @@ export default {
       onSearchModeOpen,
       onSearchModeClose,
       onSearchClear,
-      onSearch
+      onSearch,
+      onCreateTicket
     }
   }
 }
@@ -219,6 +230,21 @@ export default {
       transform: rotate(90deg);
     }
   }
+  .create-ticket {
+    width: 50px;
+    height: 50px;
+    margin-left: 20px;
+    background: #3a83ff;
+    color: #fff;
+    border-radius: 8px;
+    line-height: 50px;
+    font-size: 50px;
+    text-align: center;
+  }
+  .ticket-func {
+    display: flex;
+    align-items: center;
+  }
   .search-entry {
     display: flex;
     align-items: center;
@@ -232,6 +258,17 @@ export default {
       font-size: 32px;
       color: #979ba5;
     }
+  }
+  .create-ticket-model {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 60px;
+    border: 2px solid #d3d3d3;
+    border-radius: 8px;
+    font-size: 32px;
+    margin: 0 60px;
   }
   .search-input {
     display: flex;

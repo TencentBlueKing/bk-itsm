@@ -206,8 +206,8 @@ METHOD_CHOICES = [
     (">=", ">="),
     ("issuperset", "包含"),
     ("notissuperset", "不包含"),
-    # ("in", u"属于"),
-    # ("not in", u"不属于"),
+    ("in", "包含(字符类型)"),
+    ("notin", "不包含(字符类型)"),
     # ("startswith", u"以某某开头"),
     # ("endswith", u"以某某结尾"),
 ]

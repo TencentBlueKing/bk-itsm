@@ -89,7 +89,9 @@ class BaseClient(object):
             res = client.request("GET", url, params=data, **kwargs)
 
         if not res:
-            message = "empty response: {}".format(url)
+            message = "empty response: {}, status code ={}, resp content = {}".format(
+                url, res.status_code, res.content
+            )
             # 获取tapd授权链接
             if settings.ITSM_TAPD_APIGW and settings.ITSM_TAPD_APIGW in url:
                 workspace_id = data.get("workspace_id", "")

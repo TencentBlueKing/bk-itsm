@@ -88,8 +88,16 @@
     <div v-else-if="item.type === 'RICHTEXT'" class="bk-fields-done-item">
       <span v-if="isShowName" class="bk-li-left" style="float: initial;" :title="item.name">{{item.name}}：</span>
       <div class="bk-li-right bk-fields-richtext tui-editor-contents"
-        v-html="item.value" :title="item.value.replace(/<[^>]+>/g, '')">
+        v-html="item.value">
       </div>
+      <bk-popover theme="light">
+        <div class="bk-itsm-icon icon-icon-info bk-text-primary f12 rich-show"></div>
+        <div slot="content" style="white-space: normal; cursor: pointer;">
+          <div v-bk-copy="item.value.replace(/<[^>]+>/g, '')" class="bk-li-right bk-fields-richtext tui-editor-contents"
+            v-html="item.value" :title="'点击复制'">
+          </div>
+        </div>
+      </bk-popover>
     </div>
     <!-- 多行文本展现出后台保存的内容格式 -->
     <div v-else-if="item.type === 'TEXT'" class="bk-fields-done-item">
@@ -298,6 +306,11 @@
 <style lang='scss' scoped>
     @import '../../../../scss/mixins/clearfix.scss';
     @import '../../../../scss/mixins/scroller.scss';
+    .rich-show {
+      margin-top: 10px;
+      margin-left: 4px;
+      cursor: default;
+    }
     .bk-fields-done {
         width: 100%;
         color: #737987;

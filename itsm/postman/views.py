@@ -273,16 +273,17 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
         """
         导入Api接口
         """
-
         if pk == "0":
             apis = []
             try:
+                remote_system = request.data.get("remote_system", "0")
                 data = json.loads(request.FILES.get("file").read())
             except ValueError:
                 raise ParamError(_("文件格式有误，请提供从本系统导出的json文件"))
 
             for item in data:
                 try:
+                    item["remote_system_id"] = remote_system
                     api = RemoteApi.restore_api(item, request.user.username)
                     apis.append(api)
                 except Exception as e:

@@ -27,6 +27,21 @@
         <div class="slot-content">
           <slot></slot>
         </div>
+        <bk-select
+          v-if="!isIframe"
+          :loading="projectLoading"
+          :search-with-pinyin="true"
+          v-model="searchForms[1].value"
+          :placeholder="searchForms[1].placeholder"
+          style="width: 250px;"
+          searchable
+          @change="onSearchClick">
+          <bk-option v-for="option in projectList"
+            :key="option.key"
+            :id="option.key"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
         <bk-input
           data-test-id="search_input_enter"
           :clearable="true"
@@ -197,6 +212,7 @@
       },
       panel: String,
       curServcie: Object,
+      isIframe: Boolean,
       isCustomTab: {
         type: Boolean,
         default() {
@@ -212,6 +228,8 @@
     },
     data() {
       return {
+        projectList: [],
+        projectLoading: false,
         isHighlightSetting: false,
         highlightObj: {
           reply_timeout_color: '#FFF5E3',
@@ -222,6 +240,7 @@
         searchForms: [],
         formField: {
           keyword: this.$t('m["单号/标题"]'),
+          project_key: this.$t('m["项目"]'),
           catalog_id: this.$t('m["服务目录"]'),
           creator__in: this.$t('m["提单人"]'),
           current_processor: this.$t('m["处理人"]'),
@@ -250,13 +269,18 @@
     watch: {
       forms: {
         handler(val) {
-          this.searchForms = val.filter(item => item.display);
+          if (this.isIframe) {
+            this.searchForms = val.filter(item => item.display && item.key !== 'project_key');
+          } else {
+            this.searchForms = val.filter(item => item.display);
+          }
         },
         deep: true,
         immediate: true,
       },
     },
     async created() {
+      await this.getProjectAllList();
       await this.getCatalogList();
       this.getTicketHighlight();
       const { query } = this.$route;
@@ -295,6 +319,14 @@
       }
     },
     methods: {
+      async getProjectAllList() {
+        this.projectLoading = true;
+        const res = await this.$store.dispatch('project/getProjectAllList');
+        this.projectList = res.data;
+        const projectItem = this.searchForms.find(item => item.key === 'project_key');
+        projectItem.list = res.data;
+        this.projectLoading = false;
+      },
       // 过滤参数
       async getCatalogList() {
         const params = {

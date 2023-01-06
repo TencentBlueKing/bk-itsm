@@ -529,6 +529,7 @@ class Status(Model):
                 if (
                     self.ticket.creator in new_processor_list
                     and self.ticket.flow.is_auto_approve
+                    and self.type == "APPROVAL"
                 ):
                     # 提单人异常分派给自己的情况，并且开启了自动过单
 
@@ -2890,6 +2891,7 @@ class Ticket(Model, BaseTicket):
 
     def callback_request(self):
         callback_url = self.meta.get("callback_url", "")
+        headers = self.meta.get("headers", {})
         if callback_url:
             message = AESVerification.gen_signature(
                 settings.APP_CODE + "_" + settings.SECRET_KEY
@@ -2910,7 +2912,9 @@ class Ticket(Model, BaseTicket):
                     "[TICKET] callback_request params is {}".format(request_data)
                 )
                 session = requests.session()
-                resp = session.post(url=callback_url, json=request_data, verify=False)
+                resp = session.post(
+                    url=callback_url, json=request_data, verify=False, headers=headers
+                )
                 if resp.status_code not in {200, 201}:
                     raise Exception(
                         "status_code is {}, msg is {}".format(
@@ -2977,8 +2981,11 @@ class Ticket(Model, BaseTicket):
         for ticket_field in filter_field_query_set:
             ticket_field.value = fields_map[ticket_field.key]["value"]
             ticket_field.choice = fields_map[ticket_field.key].get("choice", [])
+            ticket_field.update_at = datetime.now()
 
-        bulk_update(filter_field_query_set, update_fields=["_value", "choice"])
+        bulk_update(
+            filter_field_query_set, update_fields=["_value", "choice", "update_at"]
+        )
 
     # def fill_state_fields(self, fields):
     #     """更新单据字段"""

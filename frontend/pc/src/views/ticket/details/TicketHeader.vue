@@ -101,8 +101,7 @@
         </bk-button>
       </bk-popover>
       <bk-popover
-        :content="disabledText"
-        :disabled="ticketInfo.can_supervise"
+        :content="ticketInfo.can_supervise ? $t(`m.newCommon['执行催办操作后，将发送信息至处理人。']`) : disabledText"
       >
         <bk-button
           data-test-id="ticket_button_superviseTicket"
@@ -112,7 +111,7 @@
           :disabled="!ticketInfo.can_supervise"
           @click="onTicketBtnClick('supervise')"
         >
-          {{ $t(`m.newCommon["督办"]`) }}
+          {{ $t(`m.newCommon["催办"]`) }}
         </bk-button>
       </bk-popover>
       <bk-popover
@@ -263,6 +262,16 @@
               </bk-button>
             </bk-popover>
           </li>
+          <li>
+            <bk-button
+              data-test-id="ticket_button_ticketService"
+              class="bk-dropdown-list-btn"
+              :text="true"
+              @click="onTicketBtnClick('service')"
+            >
+              {{ $t(`m["服务"]`) }}
+            </bk-button>
+          </li>
         </ul>
       </bk-dropdown-menu>
     </div>
@@ -388,10 +397,24 @@
               this.$refs.evaluationModal.show();
             }
             break;
+          case 'service':
+            {
+              this.JumpCurTicketService();
+            }
+            break;
           default: {
             this.ticketOperatingHandler(type);
           }
         }
+      },
+      JumpCurTicketService() {
+        // 判断服务是否存在
+        this.$store.dispatch('service/getServiceDetail', this.ticketInfo.service_id).then(res => {
+          if (res.result) {
+            const routeData = this.$router.resolve({ path: '/project/service/edit/basic', query: { project_id: this.$store.state.project.id, serviceId: this.ticketInfo.service_id } });
+            window.open(routeData.href, '_blank');
+          }
+        });
       },
       // 单据操作
       ticketOperatingHandler(type) {
@@ -420,7 +443,7 @@
           },
           supervise: {
             title: this.$t('m.newCommon["确认督办该节点？"]'),
-            instructions: this.$t('m.newCommon["执行督办操作后，将发送信息至处理人。"]'),
+            instructions: this.$t('m.newCommon["执行催办操作后，将发送信息至处理人。"]'),
             dispatchAcationPath: 'change/submitSupervise',
             successText: this.$t('m.newCommon["督办成功"]'),
             params: {},

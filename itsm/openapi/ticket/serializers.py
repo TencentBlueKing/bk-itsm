@@ -219,6 +219,14 @@ class TicketComplexLogsSerializer(TicketLogsSerializer):
     logs = serializers.JSONField(read_only=True, source="ticket_complex_logs")
 
 
+class TicketApproveSerializer(TicketLogsSerializer):
+    sn = serializers.CharField(read_only=True)
+    state_id = serializers.IntegerField(read_only=True)
+    approver = serializers.CharField(read_only=True)
+    action = serializers.CharField(read_only=True)
+    remarked = serializers.CharField(read_only=True)
+
+
 class SimpleLogsSerializer(serializers.Serializer):
     """
     单据日志主要信息序列化
@@ -376,14 +384,46 @@ class TicketCreateSerializer(TicketSerializer):
     """
 
     creator = serializers.CharField(required=True)
+    tag = serializers.CharField(required=False)
+
+    class Meta:
+        model = Ticket
+        fields = (
+            "id",
+            "catalog_id",
+            "catalog_name",
+            "catalog_fullname",
+            "service_id",
+            "service_name",
+            "flow_id",
+            "sn",
+            "title",
+            "service_type",
+            "service_type_name",
+            "is_draft",
+            "current_status",
+            "current_status_display",
+            "comment_id",
+            "is_commented",
+            "is_over",
+            "related_type",
+            "has_relationships",
+            "priority_name",
+            "meta",
+            "bk_biz_id",
+            "project_key",
+            "task_schemas",
+            "tag",
+        ) + model.FIELDS
+        read_only_fields = ("sn",) + model.FIELDS
 
 
 class DynamicFieldSerializer(serializers.Serializer):
     name = serializers.CharField(required=True, max_length=32)
     type = serializers.ChoiceField(
-        choices=[("STRING", "字符串"), ("INT", "数字")], required=True
+        choices=[("STRING", "字符串"), ("INT", "数字"), ("LINK", "链接")], required=True
     )
-    value = serializers.CharField(required=True, max_length=32)
+    value = serializers.CharField(required=True, max_length=255)
     key = serializers.CharField(required=False, read_only=True)
 
     def validate(self, attrs):
