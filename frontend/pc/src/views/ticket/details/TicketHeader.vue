@@ -442,7 +442,7 @@
             },
           },
           supervise: {
-            title: this.$t('m.newCommon["确认督办该节点？"]'),
+            title: this.$t('m.newCommon["确认催办该节点？"]'),
             instructions: this.$t('m.newCommon["执行催办操作后，将发送信息至处理人。"]'),
             dispatchAcationPath: 'change/submitSupervise',
             successText: this.$t('m.newCommon["督办成功"]'),

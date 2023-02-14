@@ -1035,7 +1035,7 @@ export const m = {
     更多操作: 'More',
     '确认撤销此单据？': 'Confirm to cancel the ticket? ',
     '撤销后，您仍然可以在“我的申请单”中查看单据信息。': 'After the cancellation, you can still view the bill information in "My Application Ticket". ',
-    '确认督办该节点？': 'Confirm to supervise? ',
+    '确认催办该节点？': 'Confirm to supervise? ',
     '执行催办操作后，将发送信息至处理人。': 'Once supervised, the system will send message to the processor. ',
     撤单成功: 'Success ',
     领取成功: 'Success ',
