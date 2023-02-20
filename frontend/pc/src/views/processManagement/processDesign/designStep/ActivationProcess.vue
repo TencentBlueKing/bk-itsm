@@ -135,13 +135,13 @@
             </bk-form-item>
           </p>
         </bk-form-item>
-        <bk-form-item :label="$t(`m.treeinfo['是否督办']`)">
+        <bk-form-item :label="$t(`m.treeinfo['是否催办']`)">
           <bk-radio-group v-model="noticeData.is_supervise_needed">
             <bk-radio :value="trueStatus" class="mr20">{{ $t('m.treeinfo["是"]') }}</bk-radio>
             <bk-radio :value="falseStatus">{{ $t('m.treeinfo["否"]') }}</bk-radio>
           </bk-radio-group>
           <p class="card-inner-body" v-if="noticeData.is_supervise_needed">
-            <bk-form-item :label-width="100" :label="$t(`m.treeinfo['其他督办人']`)">
+            <bk-form-item :label-width="100" :label="$t(`m.treeinfo['其他催办人']`)">
               <bk-select style="float: left; width: 330px; margin-right: 10px;"
                 v-model="noticeData.supervise_type"
                 :clearable="false"
@@ -176,7 +176,7 @@
               </div>
               <p class="mt5 mb0 bk-revoke-span" v-if="noticeData.supervise_type === 'EMPTY'">
                 <i class="bk-icon icon-exclamation-circle" style="padding-right: 5px"></i>
-                <span>{{ $t('m.treeinfo["默认督办人：提单人"]') }}</span>
+                <span>{{ $t('m.treeinfo["默认催办人：提单人"]') }}</span>
               </p>
             </bk-form-item>
           </p>
@@ -299,7 +299,7 @@
           notify_freq: '',
           notify: ['WEIXIN', 'EMAIL'],
         },
-        // 督办角色
+        // 催办角色
         roles: {
           grouplist: [],
           supChildList: [],
@@ -410,7 +410,7 @@
             this.noticeData.notify_freq = Number(value.notify_freq / 3600);
           }
           this.noticeData.notify = value.notify.map(notify => notify.type);
-          // 督办
+          // 催办
           this.noticeData.is_supervise_needed = value.is_supervise_needed;
           if (this.noticeData.is_supervise_needed) {
             this.noticeData.supervise_type = value.supervise_type;
@@ -482,7 +482,7 @@
             errorHandler(res, this);
           });
       },
-      // 督办选择
+      // 催办选择
       changeSupChildList(value) {
         if (value !== 'EMPTY') {
           this.noticeData.supervisor = '';
@@ -552,14 +552,14 @@
         }
         // 通知方式
         params.notify = this.notifyList.filter(notify => this.noticeData.notify.some(item => notify.type === item));
-        // 督办
+        // 催办
         params.is_supervise_needed = this.noticeData.is_supervise_needed;
         params.supervise_type = this.noticeData.is_supervise_needed ? this.noticeData.supervise_type : 'EMPTY';
         params.supervisor = this.noticeData.is_supervise_needed ? (this.noticeData.supervise_type === 'PERSON' ? this.noticeData.personList.join(',') : this.noticeData.supervisor) : '';
-        // 督办人的校验
+        // 催办人的校验
         if (params.is_supervise_needed && params.supervise_type !== 'EMPTY' && !params.supervisor) {
           this.$bkMessage({
-            message: this.$t('m.treeinfo["督办人为必填"]'),
+            message: this.$t('m.treeinfo["催办人为必填"]'),
             theme: 'warning',
           });
           return;
