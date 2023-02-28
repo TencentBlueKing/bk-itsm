@@ -334,7 +334,6 @@
         margin: 0 auto;
         height: 100%;
         width: 100%;
-        background-color: #fff;
         .bk-navigation {
             min-width: 1366px;
             .navigation-container {
