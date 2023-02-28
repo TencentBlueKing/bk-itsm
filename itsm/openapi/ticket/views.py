@@ -813,7 +813,9 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     @catch_openapi_exception
     @custom_apigw_required
     def get_approver(self, request, *args, **kwargs):
-        """关注or取关"""
+        """
+        获取某个节点的处理人
+        """
         sn = request.query_params.get("sn")
         state_id = request.query_params.get("state_id")
         try:
@@ -825,3 +827,60 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         sign_tasks = SignTask.objects.filter(status_id=status.id)
         processors = [task.processor for task in sign_tasks]
         return Response({"approver": ",".join(processors)})
+
+    @action(detail=False, methods=["get"])
+    @catch_openapi_exception
+    @custom_apigw_required
+    def get_approve_node_result(self, request, *args, **kwargs):
+        """
+        获取审批节点详情
+        return {
+            "节点名称"
+            "审批人",
+            "审批结果"，
+            "审批备注"
+        }
+        """
+        sn = request.query_params.get("sn")
+        state_id = request.query_params.get("state_id")
+
+        try:
+            ticket = Ticket.objects.get(sn=sn)
+        except Ticket.DoesNotExist:
+            raise ParamError("sn[{}]对应的单据不存在！".format(sn))
+
+        try:
+            status = Status.objects.get(ticket_id=ticket.id, state_id=state_id)
+        except Exception:
+            raise ParamError("sn[{}], state[{}] 未查到对应的节点状态".format(sn, state_id))
+
+        if status.status != "FINISHED":
+            raise ParamError("sn[{}], state[{}] 当前节点状态为非结束状态".format(sn, state_id))
+
+        approve_result = False
+        approve_remark = ""
+
+        # ticket_fields 字段是排好序的，所以第一个一定是选项
+        for field in status.ticket_fields:
+            if field.type == "RADIO" and field.value == "true":
+                approve_result = True
+            if (
+                approve_result
+                and field.type == "TEXT"
+                and field.validate_type == "OPTION"
+            ):
+                approve_remark = field.value
+            if (
+                not approve_result
+                and field.type == "TEXT"
+                and field.validate_type == "REQUIRE"
+            ):
+                approve_remark = field.value
+        data = {
+            "name": status.name,
+            "processed_user": status.processed_user,
+            "approve_result": approve_result,
+            "approve_remark": approve_remark,
+        }
+
+        return Response(data)
