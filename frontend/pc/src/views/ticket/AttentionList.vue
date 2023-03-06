@@ -78,6 +78,8 @@
           :label="field.label"
           :width="field.width"
           :min-width="field.minWidth"
+          :render-header="$renderHeader"
+          :show-overflow-tooltip="true"
           :sortable="field.sortable"
           :prop="field.prop">
           <template slot-scope="props">
@@ -126,6 +128,14 @@
             @setting-change="handleSettingChange">
           </bk-table-setting-content>
         </bk-table-column>
+        <div class="empty" slot="empty">
+          <empty
+            :is-error="listError"
+            :is-search="searchToggle"
+            @onRefresh="getTicketList()"
+            @onClearSearch="$refs.advancedSearch.onClearClick()">
+          </empty>
+        </div>
       </bk-table>
     </div>
     <!-- 评价弹窗 -->
@@ -150,6 +160,7 @@
   import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue';
   import i18n from '@/i18n/index.js';
   import ticketListMixins from './ticketListMixins.js';
+  import Empty from '../../components/common/Empty.vue';
 
   const COLUMN_LIST = [
     {
@@ -216,6 +227,7 @@
       AdvancedSearch,
       ExportTicketDialog,
       EvaluationTicketModal,
+      Empty,
     },
     mixins: [ticketListMixins],
     props: {

@@ -65,6 +65,8 @@
         <bk-table-column
           :label="$t(`m.newCommon['单号']`)"
           min-width="140"
+          :show-overflow-tooltip="true"
+          :render-header="$renderHeader"
         >
           <template slot-scope="props">
             <span
@@ -76,7 +78,7 @@
             </span>
           </template>
         </bk-table-column>
-        <bk-table-column :label="$t(`m.newCommon['绑定时间']`)">
+        <bk-table-column :label="$t(`m.newCommon['绑定时间']`)" :render-header="$renderHeader" :show-overflow-tooltip="true">
           <template slot-scope="props">
             <span
               v-if="props.row.related_status === 'UNBIND_FAILED'"
@@ -108,6 +110,12 @@
             </bk-button>
           </template>
         </bk-table-column>
+        <div class="empty" slot="empty">
+          <empty
+            :is-error="listError"
+            @onRefresh="getInheritStateList()">
+          </empty>
+        </div>
       </bk-table>
     </div>
     <div
@@ -260,11 +268,13 @@
 <script>
   import InheritTicketAddDialog from './InheritTicketAddDialog';
   import { errorHandler } from '@/utils/errorHandler';
+  import Empty from '../../../../components/common/Empty.vue';
 
   export default {
     name: 'InheritTicketTab',
     components: {
       InheritTicketAddDialog,
+      Empty,
     },
     inject: ['reloadTicket'],
     props: {
@@ -314,6 +324,7 @@
         },
         unBindItem: '',
         checkList: [],
+        listError: false,
       };
     },
     async mounted() {
@@ -372,6 +383,7 @@
           params.token = this.$route.query.token;
         }
         this.tableLoading = true;
+        this.listError = false;
         this.$store
           .dispatch('change/getInheritState', params)
           .then((res) => {
@@ -402,6 +414,7 @@
             });
           })
           .catch((res) => {
+            this.listError = true;
             errorHandler(res, this);
           })
           .finally(() => {

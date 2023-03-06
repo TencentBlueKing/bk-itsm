@@ -32,28 +32,28 @@
           <span>{{ props.row.order || "--" }}</span>
         </template>
       </bk-table-column>
-      <bk-table-column :label="$t(`m.task['任务名称']`)">
+      <bk-table-column :label="$t(`m.task['任务名称']`)" :render-header="$renderHeader" :show-overflow-tooltip="true">
         <template slot-scope="props">
           <span v-bk-tooltips.top="props.row.name" class="task-name">
             {{ props.row.name || "--" }}
           </span>
         </template>
       </bk-table-column>
-      <bk-table-column :label="$t(`m.task['处理人']`)">
+      <bk-table-column :label="$t(`m.task['处理人']`)" :render-header="$renderHeader" :show-overflow-tooltip="true">
         <template slot-scope="props">
           <span v-bk-tooltips.top="props.row.processor_users">{{
             props.row.processor_users || "--"
           }}</span>
         </template>
       </bk-table-column>
-      <bk-table-column :label="$t(`m.task['任务类型']`)">
+      <bk-table-column :label="$t(`m.task['任务类型']`)" :render-header="$renderHeader" :show-overflow-tooltip="true">
         <template slot-scope="props">
           <span v-bk-tooltips.top="props.row.processor_users">{{
             getTaskTypeName(props.row.component_type) || "--"
           }}</span>
         </template>
       </bk-table-column>
-      <bk-table-column :label="$t(`m.task['状态']`)" :wdith="120">
+      <bk-table-column :label="$t(`m.task['状态']`)" :render-header="$renderHeader" :wdith="120" :show-overflow-tooltip="true">
         <template slot-scope="props">
           <!-- 任务状态组件 -->
           <task-status :status="props.row.status"></task-status>
@@ -70,6 +70,12 @@
           </bk-button>
         </template>
       </bk-table-column>
+      <div class="empty" slot="empty">
+        <empty
+          :is-error="listError"
+          @onRefresh="getTaskList()">
+        </empty>
+      </div>
     </bk-table>
     <bk-sideslider
       :is-show.sync="dealTaskInfo.show"
@@ -104,6 +110,7 @@
   import dealTask from '../taskInfo/dealTask.vue';
   import taskHandleTrigger from '../taskInfo/taskHandleTrigger.vue';
   import { TASK_TEMPLATE_TYPES } from '@/constants/task.js';
+  import Empty from '../../../../components/common/Empty.vue';
 
   export default {
     name: '',
@@ -111,6 +118,7 @@
       dealTask,
       TaskStatus,
       taskHandleTrigger,
+      Empty,
     },
     props: {
       ticketInfo: {
@@ -129,6 +137,7 @@
           type: 'SEE',
         },
         taskTemplateTypes: TASK_TEMPLATE_TYPES,
+        listError: false,
       };
     },
     mounted() {
@@ -141,12 +150,14 @@
         const params = {
           ticket_id: this.ticketInfo.id,
         };
+        this.listError = false;
         return this.$store
           .dispatch('taskFlow/getTaskList', params)
           .then((res) => {
             this.taskList = res.data;
           })
           .catch((res) => {
+            this.listError = true;
             errorHandler(res, this);
           })
           .finally(() => {

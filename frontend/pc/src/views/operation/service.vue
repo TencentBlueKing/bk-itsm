@@ -91,8 +91,10 @@
           <chart-card
             style="width: 31%; height: 410px;"
             :title="$t(`m.operation['Top 10 提单用户']`)"
-            :loading="loading.top10CreateTicketUser">
+            :loading="loading.top10CreateTicketUser"
+            @search="getTop10CreateTicketUserData">
             <table-chart
+              :list-error="toggle.top10.error"
               :loading="loading.top10CreateTicketUser"
               :columns="creatorTableColumns"
               :chart-data="top10CreateTicketUserData">
@@ -285,6 +287,11 @@
           top10CreateTicketUser: false,
           biz: false,
         },
+        toggle: {
+          top10: {
+            error: false,
+          },
+        },
       };
     },
     computed: {
@@ -377,6 +384,7 @@
             create_at__lte: this.dateRange[1],
             service_id: this.serviceId,
           };
+          this.toggle.top10.error = false;
           const resp = await this.$store.dispatch('operation/getTop10CreateTicketUserData', params);
           const data = resp.data.map(item => {
             if (item.organization.length > 0) {
@@ -390,6 +398,7 @@
           });
           this.top10CreateTicketUserData = data;
         } catch (e) {
+          this.toggle.top10.error = true;
           console.error(e);
         } finally {
           this.loading.top10CreateTicketUser = false;

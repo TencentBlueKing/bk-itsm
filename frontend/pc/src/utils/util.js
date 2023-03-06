@@ -403,3 +403,7 @@ export function convertByteToSize(Byte) {
     }
     return `${(Byte / 1024 / 1024).toFixed(2)}M`;
 }
+// 适用未对做处理的bk-table 表格头
+export function renderHeader(h, { column }) {
+  return h('span', { attrs: { title: column.label }}, column.label);
+}

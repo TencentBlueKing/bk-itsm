@@ -62,11 +62,12 @@
             <div class="rotate rotate7"></div>
             <div class="rotate rotate8"></div>
           </div>
-          <span :title="item.name"
+          <div :title="item.name"
             class="node-title"
+            v-bk-overflow-tips
             :class="{ 'node-selected': item.selected }"
-            style="padding-right: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: calc(100% - 50px); position: absolute; top: 0; left: 42px;"
-            @click="nodeSelected(item)">{{item.name}}</span>
+            style="padding-right: 32px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: calc(100% - 50px); position: absolute; top: 0; left: 42px;"
+            @click="nodeSelected(item)">{{item.name}}</div>
           <span v-if="item.service_count !== undefined" class="bk-tree-count">{{ item.service_count }}</span>
           <i class="bk-icon icon-more bk-tree-point"
             :class="{ 'bk-point-selected': item.selected }"
@@ -163,6 +164,7 @@
         isEmpty: false,
         searchFlag: false,
         isDragSort: this.dragSort,
+        showTooltips: '',
       };
     },
     watch: {

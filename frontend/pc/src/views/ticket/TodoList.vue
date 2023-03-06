@@ -75,6 +75,8 @@
         :key="field.id"
         :label="field.label"
         :width="field.width"
+        :render-header="$renderHeader"
+        :show-overflow-tooltip="true"
         :min-width="field.minWidth"
         :sortable="field.sortable"
         :prop="field.prop">
@@ -123,6 +125,14 @@
           @setting-change="handleSettingChange">
         </bk-table-setting-content>
       </bk-table-column>
+      <div class="empty" slot="empty">
+        <empty
+          :is-error="listError"
+          :is-search="searchToggle"
+          @onRefresh="getTicketList()"
+          @onClearSearch="$refs.advancedSearch.onClearClick()">
+        </empty>
+      </div>
     </bk-table>
     <!-- 审批弹窗 -->
     <approval-dialog
@@ -146,6 +156,7 @@
   import ExportTicketDialog from '@/components/ticket/ExportTicketDialog.vue';
   import i18n from '@/i18n/index.js';
   import ticketListMixins from './ticketListMixins.js';
+  import Empty from '../../components/common/Empty.vue';
 
   const COLUMN_LIST = [
     {
@@ -212,6 +223,7 @@
       AdvancedSearch,
       ExportTicketDialog,
       ApprovalDialog,
+      Empty,
     },
     mixins: [ticketListMixins],
     props: {

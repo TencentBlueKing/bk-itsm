@@ -44,7 +44,7 @@
         :data="noticeList"
         :size="'small'">
         <bk-table-column type="index" label="No." align="center" width="60"></bk-table-column>
-        <bk-table-column :label="$t(`m.deployPage['通知类型']`)">
+        <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.deployPage['通知类型']`)">
           <template slot-scope="props">
             <template v-if="hasPermission(['notification_manage'], $store.state.project.projectAuthActions)">
               <span class="bk-lable-primary" @click="editorInfo(props.row)">{{props.row.action_name}}</span>
@@ -52,15 +52,21 @@
             <span v-else class="bk-table-permission" v-cursor="{ active: !hasPermission(['notification_manage'], $store.state.project.projectAuthActions) }" @click="editorInfo(props.row)">{{props.row.action_name}}</span>
           </template>
         </bk-table-column>
-        <bk-table-column :label="$t(`m.slaContent['更新时间']`)" prop="update_at"></bk-table-column>
-        <bk-table-column :label="$t(`m.deployPage['更新人']`)" prop="updated_by"></bk-table-column>
-        <bk-table-column :label="$t(`m.deployPage['操作']`)" width="150">
+        <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.slaContent['更新时间']`)" prop="update_at"></bk-table-column>
+        <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.deployPage['更新人']`)" prop="updated_by"></bk-table-column>
+        <bk-table-column :show-overflow-tooltip="true" :label="$t(`m.deployPage['操作']`)" width="150">
           <template slot-scope="props">
             <bk-button theme="primary" v-cursor="{ active: !hasPermission(['notification_manage'], $store.state.project.projectAuthActions) }" :disabled="!hasPermission(['notification_manage'], $store.state.project.projectAuthActions)" text @click="editorInfo(props.row)">
               {{ $t('m.deployPage["编辑"]') }}
             </bk-button>
           </template>
         </bk-table-column>
+        <div class="empty" slot="empty">
+          <empty
+            :is-error="listError"
+            @onRefresh="getNoticeList()">
+          </empty>
+        </div>
       </bk-table>
     </div>
     <!-- 编辑右侧弹窗 -->
@@ -89,11 +95,13 @@
   import editorNotice from './editorNotice.vue';
   import permission from '@/mixins/permission.js';
   import { mapState } from 'vuex';
+  import Empty from '../../../components/common/Empty.vue';
 
   export default {
     name: 'noticeConfigure',
     components: {
       editorNotice,
+      Empty,
     },
     mixins: [permission],
     data() {
@@ -112,6 +120,7 @@
           width: 700,
           formInfo: {},
         },
+        listError: false,
       };
     },
     computed: {
@@ -130,6 +139,7 @@
       // 获取数据
       getNoticeList() {
         this.isDataLoading = true;
+        this.listError = false;
         const params = {
           notify_type: this.checkId,
         };
@@ -137,6 +147,7 @@
           this.noticeList = res.data;
         })
           .catch((res) => {
+            this.listError = true;
             errorHandler(res, this);
           })
           .finally(() => {

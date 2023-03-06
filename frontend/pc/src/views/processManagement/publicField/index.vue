@@ -92,7 +92,7 @@
           @sort-change="handleSortChange"
           @page-change="handlePageChange"
           @page-limit-change="handlePageLimitChange">
-          <bk-table-column :label="$t(`m.treeinfo['字段名称']`)" min-width="150">
+          <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.treeinfo['字段名称']`)" min-width="150">
             <template slot-scope="props">
               <bk-button
                 v-if="!hasPermission(
@@ -119,30 +119,32 @@
               <span :title="props.row.key">{{ props.row.key || '--' }}</span>
             </template>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.treeinfo['字段类型']`)" min-width="150">
+          <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.treeinfo['字段类型']`)" min-width="150">
             <template slot-scope="props">
               <span :title="typeTransition(props.row.type)">
                 {{ typeTransition(props.row.type) || '--' }}
               </span>
             </template>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.treeinfo['字段值']`)" width="220">
+          <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.treeinfo['字段值']`)" width="220">
             <template slot-scope="props">
               <span :title="valueTransition(props.row)">{{ valueTransition(props.row) || '--' }}</span>
             </template>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.treeinfo['字段描述']`)" width="150">
+          <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.treeinfo['字段描述']`)" width="150">
             <template slot-scope="props">
               <span :title="props.row.desc">{{ props.row.desc || '--' }}</span>
             </template>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.treeinfo['最近更新人']`)" width="150">
+          <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.treeinfo['最近更新人']`)" width="150">
             <template slot-scope="props">
               <span :title="props.row.updated_by">{{ props.row.updated_by || '--' }}</span>
             </template>
           </bk-table-column>
           <bk-table-column
             sortable
+            :render-header="$renderHeader"
+            :show-overflow-tooltip="true"
             :sort-orders="['descending', 'ascending', null]"
             :label="$t(`m.treeinfo['最近更新时间']`)" width="150">
             <template slot-scope="props">
@@ -197,6 +199,14 @@
               </bk-button>
             </template>
           </bk-table-column>
+          <div class="empty" slot="empty">
+            <empty
+              :is-error="listError"
+              :is-search="!searchToggle"
+              @onRefresh="getList()"
+              @onClearSearch="clearSearch()">
+            </empty>
+          </div>
         </bk-table>
       </template>
     </div>
@@ -232,6 +242,7 @@
   import addField from '../processDesign/nodeConfigue/addField';
   import EmptyTip from '../../project/components/emptyTip.vue';
   import { errorHandler } from '../../../utils/errorHandler.js';
+  import Empty from '../../../components/common/Empty.vue';
 
   export default {
     name: 'publicField',
@@ -239,6 +250,7 @@
       addField,
       searchInfo,
       EmptyTip,
+      Empty,
     },
     mixins: [commonMix, permission],
     props: {
@@ -302,6 +314,7 @@
           },
         ],
         searchToggle: false,
+        listError: false,
         listInfo: [],
         // 新增
         workflow: 0,
@@ -353,6 +366,17 @@
       };
     },
     computed: {
+      emptyStatus() {
+        let status;
+        if (!this.searchToggle) {
+          status = 'search-empty';
+        } else if (this.listError) {
+          status = '500';
+        } else {
+          status = 'empty';
+        }
+        return status;
+      },
       createFieldPerm() {
         return this.projectId ? ['field_create'] : ['public_field_create'];
       },
@@ -407,6 +431,7 @@
           }
         });
         this.isDataLoading = true;
+        this.listError = false;
         this.$store.dispatch('publicField/get_template_fields', params).then((res) => {
           this.dataList = res.data.items;
           this.searchToggle = res.data.items.length !== 0;
@@ -415,6 +440,8 @@
           this.pagination.count = res.data.count;
         })
           .catch((res) => {
+            console.log(res);
+            this.listError = true;
             errorHandler(res, this);
           })
           .finally(() => {

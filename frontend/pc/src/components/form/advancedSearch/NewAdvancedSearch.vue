@@ -385,6 +385,7 @@
       onSearchResult(index) {
         const params = this.searchResultList[this.panel][index];
         this.$emit('search', params, false);
+        this.$emit('onClickSearchResult', true);
       },
       onClearClick() {
         this.searchForms.forEach((item) => {
