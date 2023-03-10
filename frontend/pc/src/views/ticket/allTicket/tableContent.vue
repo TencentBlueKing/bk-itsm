@@ -59,6 +59,8 @@
         :label="field.label"
         :width="field.width"
         :min-width="field.minWidth"
+        :render-header="$renderHeader"
+        :show-overflow-tooltip="true"
         :sortable="field.sortable"
         :prop="field.prop">
         <div slot-scope="{ row }">
@@ -134,6 +136,14 @@
           @setting-change="handleSettingChange">
         </bk-table-setting-content>
       </bk-table-column>
+      <div class="empty" slot="empty">
+        <empty
+          :is-error="listError"
+          :is-search="searchToggle"
+          @onRefresh="$parent.getAllTicketList()"
+          @onClearSearch="$emit('clearSearch')">
+        </empty>
+      </div>
     </bk-table>
     <!-- 评价弹窗 -->
     <evaluation-ticket-modal
@@ -147,15 +157,19 @@
   import ColumnSn from '@/components/ticket/table/ColumnSn';
   import ColumnCurrentStep from '@/components/ticket/table/ColumnCurrentStep';
   import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue';
+  import Empty from '../../../components/common/Empty.vue';
   export default {
     name: 'allTicketTable',
     components: {
       ColumnSn,
       ColumnCurrentStep,
       EvaluationTicketModal,
+      Empty,
     },
     props: {
       from: String,
+      searchToggle: Boolean,
+      listError: Boolean,
       pagination: {
         type: Object,
         default() {

@@ -48,8 +48,8 @@
       >
       </bk-button>
     </div>
-    <bk-table :data="associatedList" :size="'small'">
-      <bk-table-column :label="$t(`m.newCommon['单号']`)" min-width="140">
+    <bk-table :data="associatedList" :size="'small'" v-bkloading="{ isLoading: associaLoading }">
+      <bk-table-column :label="$t(`m.newCommon['单号']`)" min-width="140" :show-overflow-tooltip="true" :render-header="$renderHeader">
         <template slot-scope="props">
           <span
             class="bk-lable-primary"
@@ -60,12 +60,12 @@
           </span>
         </template>
       </bk-table-column>
-      <bk-table-column :label="$t(`m.newCommon['工单类型']`)">
+      <bk-table-column :label="$t(`m.newCommon['工单类型']`)" :show-overflow-tooltip="true" :render-header="$renderHeader">
         <template slot-scope="props">
           {{ props.row.service_type_name || "--" }}
         </template>
       </bk-table-column>
-      <bk-table-column :label="$t(`m.newCommon['服务名称']`)">
+      <bk-table-column :label="$t(`m.newCommon['服务名称']`)" :show-overflow-tooltip="true" :render-header="$renderHeader">
         <template slot-scope="props">
           <span :title="props.row.service_name">{{
             props.row.service_name || "--"
@@ -84,6 +84,12 @@
           </bk-button>
         </template>
       </bk-table-column>
+      <div class="empty" slot="empty">
+        <empty
+          :is-error="listError"
+          @onRefresh="getAssociatesHistory()">
+        </empty>
+      </div>
     </bk-table>
     <!-- 查看关联历史 -->
     <bk-dialog
@@ -119,6 +125,12 @@
             :label="$t(`m.newCommon['解绑时间']`)"
             prop="end_at"
           ></bk-table-column>
+          <div class="empty" slot="empty">
+            <empty
+              :is-error="historyListError"
+              @onRefresh="getAssociates()">
+            </empty>
+          </div>
         </bk-table>
       </div>
       <div slot="footer">
@@ -152,10 +164,12 @@
 <script>
   import AssociatedDialog from './AssociatedDialog.vue';
   import { errorHandler } from '@/utils/errorHandler.js';
+  import Empty from '../../../../../components/common/Empty.vue';
   export default {
     name: 'AssociatedTab',
     components: {
       AssociatedDialog,
+      Empty,
     },
     props: {
       ticketInfo: {
@@ -166,6 +180,7 @@
     data() {
       return {
         loading: false,
+        associaLoading: false,
         isShowAddAssociation: false,
         // 关联单历史信息
         historyInfo: {
@@ -178,6 +193,8 @@
         },
         historyList: [],
         associatedList: [],
+        listError: false,
+        historyListError: false,
       };
     },
     created() {},
@@ -191,6 +208,7 @@
           id: this.ticketInfo.id,
         };
         this.loading = true;
+        this.historyListError = false;
         if (this.$route.query.token) {
           params.token = this.$route.query.token;
         }
@@ -200,6 +218,7 @@
             this.associatedList = res.data;
           })
           .catch((res) => {
+            this.historyListError = true;
             errorHandler(res, this);
           })
           .finally(() => {
@@ -230,13 +249,19 @@
           id: this.ticketInfo.id,
           type: 'DERIVE',
         };
+        this.associaLoading = true;
+        this.listError = false;
         this.$store
           .dispatch('change/getBindHistory', params)
           .then((res) => {
             this.historyList = res.data;
           })
           .catch((res) => {
+            this.listError = true;
             errorHandler(res, this);
+          })
+          .finally(() => {
+            this.associaLoading = false;
           });
       },
       openAddAssociation() {

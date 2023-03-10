@@ -84,7 +84,7 @@
       'CW-TREESELECT': tree,
       'CW-FILE': file,
       'CW-CASCADE': cascade,
-      'CW-CUSTOM-FORM': customForm
+      'CW-CUSTOM-FORM': customForm,
     },
     mixins: [commonMix],
     props: {

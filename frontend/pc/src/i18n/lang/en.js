@@ -2674,4 +2674,10 @@ export const m = {
   状态: 'State',
   不可见: 'INVISIBLE',
   请选择项目: 'Please select project',
+  暂无数据: 'No Data',
+  数据获取异常: 'Data acquisition exception',
+  搜索结果为空: 'The search result is empty',
+  '可以尝试 调试关键词 或': 'Try debugging keywords or',
+  清空筛选条件: 'Clear the filter criteria',
+  刷新: 'refresh',
 };

@@ -47,6 +47,7 @@
             :custom-paging="customPaging"
             :tree-list="treeList"
             :path-list="pathList"
+            :get-list-error="listError"
             :list-info-ori="listInfo">
           </api-table>
           <api-content v-else
@@ -125,6 +126,7 @@
             { num: 20 },
           ],
         },
+        listError: false,
       };
     },
     computed: {
@@ -266,6 +268,7 @@
           project_key: this.projectId || 'public',
         };
         this.$refs.apiTable.isTableLoading = true;
+        this.listError = false;
         await this.$store.dispatch('apiRemote/get_remote_api', params).then((res) => {
           this.isSelectedApiList = res.data.items.filter(ite => !ite.is_builtin).map(item => item.path);
           this.listInfo = res.data.items.map((item) => {
@@ -277,6 +280,7 @@
           this.$refs.apiTable.pagination.count = res.data.count;
         })
           .catch((res) => {
+            this.listError = true;
             errorHandler(res, this);
           })
           .finally(() => {

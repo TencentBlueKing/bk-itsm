@@ -62,12 +62,16 @@
           :show-search="!loading.bizList"
           :placeholder="$t(`m.operation['请输入服务名称']`)"
           :loading="loading.serviceUse"
-          @search="handleServiceSearch">
+          @search="handleServiceSearch"
+          @clear="handleServiceClear">
           <table-chart
             :show-pagination="true"
             :pagination="serviceTablePagination"
             :columns="serviceTableColumns"
             :chart-data="serviceUseData"
+            :list-error="searchAndErrorToggles.service.error"
+            :search-toggle="searchAndErrorToggles.service.search"
+            @clearSearch="handleServiceClear"
             @onPageChange="onServiceTablePageChange"
             @onOrderChange="onServiceTableOrderChange">
           </table-chart>
@@ -79,12 +83,15 @@
           :placeholder="$t(`m.operation['请输入业务名称']`)"
           :show-search="true"
           :loading="loading.bizUse"
-          @search="handleBizSearch">
+          @search="handleBizSearch"
+          @clear="handleBizClear">
           <table-chart
             :show-pagination="true"
             :pagination="bizTablePagination"
             :columns="bizTableColumns"
             :chart-data="bizUseData"
+            :list-error="searchAndErrorToggles.biz.error"
+            :search-toggle="searchAndErrorToggles.biz.search"
             @onPageChange="onBizTablePageChange"
             @onOrderChange="onBizTableOrderChange">
           </table-chart>
@@ -124,10 +131,13 @@
         <chart-card
           style="height: 410px;"
           :title="$t(`m.operation['Top 10 提单用户']`)"
-          :loading="loading.top10CreateTicketUser">
+          :loading="loading.top10CreateTicketUser"
+          @search="getTop10CreateTicketUserData()">
           <table-chart
             :loading="loading.top10CreateTicketUser"
             :columns="creatorTableColumns"
+            :list-error="searchAndErrorToggles.top10.error"
+            :search-toggle="searchAndErrorToggles.top10.search"
             :chart-data="top10CreateTicketUserData">
           </table-chart>
         </chart-card>
@@ -464,6 +474,20 @@
           addedService: false,
         },
         project_key: this.$route.query.project_id || undefined,
+        searchAndErrorToggles: { // 搜索和获取数据错误
+          service: { // 使用服务
+            search: false,
+            error: false,
+          },
+          biz: { // 业务
+            search: false,
+            error: false,
+          },
+          top10: { // top 10 提单用户
+            search: false,
+            error: false,
+          },
+        },
       };
     },
     created() {
@@ -551,6 +575,7 @@
       // 业务使用统计
       async getBizUseData(order) {
         this.loading.bizUse = true;
+        this.searchAndErrorToggles.biz.error = false;
         try {
           const params = {
             project_key: this.project_key,
@@ -564,6 +589,7 @@
           this.bizTablePagination.count = resp.data.count;
           this.bizUseData = resp.data.items;
         } catch (e) {
+          this.searchAndErrorToggles.biz.error = false;
           console.error(e);
         } finally {
           this.loading.bizUse = false;
@@ -658,6 +684,7 @@
             create_at__gte: this.dateRange[0],
             create_at__lte: this.dateRange[1],
           };
+          this.searchAndErrorToggles.top10.error = false;
           const resp = await this.$store.dispatch('operation/getTop10CreateTicketUserData', params);
           const data = resp.data.map((item) => {
             if (item.organization.length > 0) {
@@ -671,6 +698,7 @@
           });
           this.top10CreateTicketUserData = data;
         } catch (e) {
+          this.searchAndErrorToggles.top10.error = true;
           console.error(e);
         } finally {
           this.loading.top10CreateTicketUser = false;
@@ -806,12 +834,23 @@
       },
       handleServiceSearch(val) {
         this.serviceSearchStr = val || undefined;
+        this.searchAndErrorToggles.service.search = true;
         this.serviceTablePagination.current = 1;
+        this.getServiceUseData();
+      },
+      handleBizClear() {
+        this.searchAndErrorToggles.biz.search = false;
+        this.getBizUseData();
+      },
+      handleServiceClear() {
+        this.serviceSearchStr = '';
+        this.searchAndErrorToggles.service.search = false;
         this.getServiceUseData();
       },
       handleBizSearch(val) {
         this.bizTablePagination.current = 1;
         if (val !== '') {
+          this.searchAndErrorToggles.biz.search = true;
           const matched = this.bizList.filter(item => item.name.toLowerCase().includes(val));
           if (matched.length > 0) {
             this.bizSearchIds = matched.map(item => item.key).join(',');
@@ -824,6 +863,7 @@
         } else {
           this.bizSearchIds = undefined;
           this.getBizUseData();
+          this.searchAndErrorToggles.biz.search = false;
         }
       },
       onServiceTablePageChange(page) {
