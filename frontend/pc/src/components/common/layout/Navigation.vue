@@ -30,7 +30,7 @@
     @toggle-click="isSideOpen = $event">
     <template slot="side-icon">
       <!-- <i class="bk-itsm-icon icon-itsm-logo logo-icon" style="font-size: 20px;"></i> -->
-      <img src="../../../images/itsm-logo.png" alt="" style="width: 30px; height: 28px;">
+      <img src="../../../images/itsm-logo.png" alt="" style="width: 32px; height: 32px;">
     </template>
     <template slot="header">
       <div class="nav-header">
