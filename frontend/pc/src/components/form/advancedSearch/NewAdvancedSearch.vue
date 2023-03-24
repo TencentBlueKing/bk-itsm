@@ -290,7 +290,11 @@
         if (queryList.includes(item.key)) {
           if (item.type === 'select') {
             query[item.key].split(',').map((ite) => {
-              item.value.push(ite);
+              if (Array.isArray(item.value)) {
+                item.value.push(ite);
+              } else {
+                item.val = ite;
+              }
             });
           } else if (item.type === 'member') {
             item.value.push(query[item.key]);
@@ -314,7 +318,7 @@
       });
       // 判断url参数有没有搜索字段
       if (formKey.some(item => queryList.includes(item))) {
-        this.showMore = true;
+        this.showMore = !this.isIframe;
         this.onSearchClick();
       }
     },
