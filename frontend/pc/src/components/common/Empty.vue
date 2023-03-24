@@ -30,7 +30,7 @@
       <p v-if="status === '500'" class="oper"><span class="oper-btn" @click="refresh">{{ $t(`m['刷新']`) }}</span></p>
       <p v-if="status === 'search-empty'" class="oper">{{ $t(`m['可以尝试 调试关键词 或']`) }}<span class="oper-btn"
         @click="clearSearch"> {{ $t(`m['清空筛选条件']`) }}</span></p>
-
+      <slot name="create"></slot>
     </div>
   </div>
 </template>
@@ -59,8 +59,8 @@
         pictures: {
           empty: require('../../images/empty.png'),
           500: require('../../images/error.png'),
-          'search-empty': require('../../images/search-empty.png')
-        }
+          'search-empty': require('../../images/search-empty.png'),
+        },
       };
     },
     computed: {

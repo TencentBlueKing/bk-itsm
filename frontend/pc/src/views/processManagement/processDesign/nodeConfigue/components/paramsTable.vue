@@ -6,7 +6,7 @@
           <bk-checkbox v-model="props.row.select" :disabled="disable"></bk-checkbox>
         </template>
       </bk-table-column>
-      <bk-table-column :label="$t(`m['字段名']`)">
+      <bk-table-column :label="$t(`m['字段名']`)" :render-header="$renderHeader">
         <template slot-scope="props">
           <bk-input :behavior="'simplicity'"
             :disabled="disable"
@@ -14,7 +14,7 @@
             @change="changeInput(props.row, props.$index)"></bk-input>
         </template>
       </bk-table-column>
-      <bk-table-column :label="$t(`m['值']`)">
+      <bk-table-column :label="$t(`m['值']`)" :render-header="$renderHeader">
         <template slot-scope="props">
           <bk-input style="z-index: 101"
             v-model="props.row.value"
@@ -45,7 +45,7 @@
           </bk-popover>
         </template>
       </bk-table-column>
-      <bk-table-column :label="$t(`m['描述']`)">
+      <bk-table-column :label="$t(`m['描述']`)" :render-header="$renderHeader">
         <template slot-scope="props">
           <bk-input
             :behavior="'simplicity'"

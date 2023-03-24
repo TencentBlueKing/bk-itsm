@@ -101,7 +101,8 @@
               </span>
             </li>
           </ul>
-          <div v-if="!searchToggle" class="search-tip">{{ $t('m["未查找到触发器"]') }}</div>
+          <!-- <div v-if="!searchToggle" class="search-tip">{{ $t('m["未查找到触发器"]') }}</div> -->
+          <empty style="text-align: center;" v-if="triggerList.length === 0" :is-search="!searchToggle" @onClearSearch="onClearSearch"></empty>
         </div>
       </template>
     </div>
@@ -130,12 +131,14 @@
   import permission from '@/mixins/permission.js';
   import addTrigger from './addTrigger.vue';
   import EmptyTip from '../../project/components/emptyTip.vue';
+  import Empty from '../../../components/common/Empty.vue';
 
   export default {
     name: 'publicTrigger',
     components: {
       addTrigger,
       EmptyTip,
+      Empty,
     },
     mixins: [permission],
     props: {
@@ -218,6 +221,10 @@
       },
       // 搜索
       searchInfo() {
+        this.getList();
+      },
+      onClearSearch() {
+        this.searchKey = '';
         this.getList();
       },
       clearSearch() {
