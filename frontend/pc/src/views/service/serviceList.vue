@@ -1263,5 +1263,10 @@
     overflow: hidden;
     max-width: calc(100% - 20px);
 }
+.bk-lable-primary {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
 
 </style>

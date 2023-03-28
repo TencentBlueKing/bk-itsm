@@ -405,5 +405,5 @@ export function convertByteToSize(Byte) {
 }
 // 适用未对做处理的bk-table 表格头
 export function renderHeader(h, { column }) {
-  return h('p', { directives:[{ name: 'bk-overflow-tips' }]}, [column.label]);
+  return h('p', { style: { overflow: 'hidden', 'white-space': 'nowrap', 'text-overflow': 'ellipsis' },  directives:[{ name: 'bk-overflow-tips' }]}, [column.label]);
 }

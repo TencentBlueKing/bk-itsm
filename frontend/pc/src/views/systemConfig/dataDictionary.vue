@@ -135,6 +135,14 @@
             </bk-button>
           </template>
         </bk-table-column>
+        <div class="empty" slot="empty">
+          <empty
+            :is-error="listError"
+            :is-search="Boolean(searchInfo.key)"
+            @onRefresh="getlist(1)"
+            @onClearSearch="onClearSearch">
+          </empty>
+        </div>
       </bk-table>
     </div>
     <!-- 新增字典 -->
@@ -159,15 +167,18 @@
 <script>
   import { errorHandler } from '../../utils/errorHandler';
   import addDataDirectory from './component/addDataDirectory.vue';
+  import Empty from '../../components/common/Empty.vue';
 
   export default {
     name: 'dataDictionary',
     components: {
       addDataDirectory,
+      Empty,
     },
     props: {},
     data() {
       return {
+        listError: false,
         isDataLoading: false,
         secondClick: false,
         versionStatus: true,
@@ -204,6 +215,10 @@
       this.getList();
     },
     methods: {
+      onClearSearch() {
+        this.searchInfo.key = '';
+        this.getList(1);
+      },
       // 获取列表数据
       getList(page) {
         // 查询时复位页码
@@ -218,12 +233,14 @@
           key__contains: this.searchInfo.key,
         };
         this.isDataLoading = true;
+        this.listError = false;
         this.$store.dispatch('datadict/list', params).then((res) => {
           this.dataList = res.data.items.map(item => ({ ...item, ownersInputValue: item.owners ? item.owners.split(',') : [] }));
           // 分页
           this.pagination.current = res.data.page;
           this.pagination.count = res.data.count;
         }, (res) => {
+          this.listError = true;
           errorHandler(res, this);
         })
           .finally(() => {
