@@ -595,7 +595,7 @@
       // 获取单据列表
       getTicketList() {
         const { type } = this.$route.params;
-        const searchParams =                JSON.stringify(this.lastSearchParams) === '{}'
+        const searchParams = JSON.stringify(this.lastSearchParams) === '{}'
           ? { service_id__in: this.$route.query.service_id } // 没有参数时默认将 url 参数作为查询参数
           : this.lastSearchParams;
         this.tabLoading = true;
