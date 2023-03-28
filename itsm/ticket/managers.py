@@ -200,11 +200,13 @@ class TicketManager(Manager):
         closed_status = set(
             TicketStatus.objects.filter(is_over=True).values_list("key", flat=True)
         )
+
+        # 如果run_node 是审批节点就算待我审批，不再细查
         my_approval_ticket = set(
             [
                 node.ticket_id
                 for node in running_node
-                if username in node.get_processor_in_sign_state().split(",")
+                # if username in node.get_processor_in_sign_state().split(",")
             ]
         )
         return queryset.filter(id__in=my_approval_ticket).exclude(
