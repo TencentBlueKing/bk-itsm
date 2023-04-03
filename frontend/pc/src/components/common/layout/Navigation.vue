@@ -273,8 +273,11 @@
       },
     },
     watch: {
-      '$route.fullPath'() {
-        this.setActive();
+      '$route.fullPath': {
+        handler() {
+          this.setActive();
+        },
+        immediate: true,
       },
       '$store.state.project.id'(val) {
         if (val) {
@@ -288,7 +291,6 @@
       },
     },
     created() {
-      this.setActive();
       this.getAccessService();
       bus.$on('openCreateTicketDialog', () => {
         this.isCreateTicketDialogShow = true;
@@ -315,7 +317,6 @@
       setActive() {
         const hasMatched = this.routerList.some((nav) => {
           const navId = nav.id;
-          this.getProjectList();
           if (Array.isArray(nav.subRouters) && nav.subRouters.length > 0) {
             const matched = this.traverseSubRouter(nav.subRouters, navId);
             if (matched.navId) {

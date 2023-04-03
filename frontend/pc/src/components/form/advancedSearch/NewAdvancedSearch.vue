@@ -324,12 +324,20 @@
     },
     methods: {
       async getProjectAllList() {
-        this.projectLoading = true;
-        const res = await this.$store.dispatch('project/getProjectAllList');
-        this.projectList = res.data;
+        const { projectList } = this.$store.state.project;
         const projectItem = this.searchForms.find(item => item.key === 'project_key');
-        projectItem.list = res.data;
-        this.projectLoading = false;
+        if (projectList && projectList.length !== 0) {
+          this.projectList = projectList;
+          projectItem.list = projectList;
+        } else {
+          this.projectLoading = true;
+          const res = await this.$store.dispatch('project/getProjectAllList');
+          if (res.result) {
+            this.projectList = res.data;
+            projectItem.list = res.data;
+          }
+          this.projectLoading = false;
+        }
       },
       // 过滤参数
       async getCatalogList() {
