@@ -32,14 +32,14 @@
               :data="ticketAction"
               :size="'small'"
               @sort-change="orderingClick">
-              <bk-table-column :label="$t(`m.task['执行时间']`)" :show-overflow-tooltip="true" :sortable="'custom'">
+              <bk-table-column :label="$t(`m.task['执行时间']`)" :render-header="$renderHeader" :show-overflow-tooltip="true" :sortable="'custom'">
                 <template slot-scope="props">
                   <span :title="props.row.end_time">
                     {{props.row.end_time || '--'}}
                   </span>
                 </template>
               </bk-table-column>
-              <bk-table-column :label="$t(`m.task['响应动作']`)" :show-overflow-tooltip="true">
+              <bk-table-column :label="$t(`m.task['响应动作']`)" :render-header="$renderHeader" :show-overflow-tooltip="true">
                 <template slot-scope="props">
                   <span
                     :title="props.row.display_name"
@@ -49,7 +49,7 @@
                   </span>
                 </template>
               </bk-table-column>
-              <bk-table-column :label="$t(`m.task['执行状态']`)" :show-overflow-tooltip="true" :sortable="'custom'">
+              <bk-table-column :label="$t(`m.task['执行状态']`)" :render-header="$renderHeader" :show-overflow-tooltip="true" :sortable="'custom'">
                 <template slot-scope="props">
                   <span class="bk-status-success"
                     :class="{ 'bk-status-failed': props.row.status === 'FAILED' }"
@@ -58,13 +58,19 @@
                   </span>
                 </template>
               </bk-table-column>
-              <bk-table-column :label="$t(`m.task['操作人']`)" :show-overflow-tooltip="true">
+              <bk-table-column :label="$t(`m.task['操作人']`)" :render-header="$renderHeader" :show-overflow-tooltip="true">
                 <template slot-scope="props">
                   <span :title="props.row.operator_username">
                     {{props.row.operator_username || '--'}}
                   </span>
                 </template>
               </bk-table-column>
+              <div class="empty" slot="empty">
+                <empty
+                  :is-error="listError"
+                  @onRefresh="getHistoryList()">
+                </empty>
+              </div>
             </bk-table>
           </div>
         </bk-collapse-item>
@@ -108,6 +114,12 @@
                   </span>
                 </template>
               </bk-table-column>
+              <div class="empty" slot="empty">
+                <empty
+                  :is-error="listError"
+                  @onRefresh="getHistoryList()">
+                </empty>
+              </div>
             </bk-table>
           </div>
         </bk-collapse-item>
@@ -134,11 +146,13 @@
 <script>
   import historyDetail from './taskHistoryDetail.vue';
   import { errorHandler } from '@/utils/errorHandler';
+  import Empty from '../../../../components/common/Empty.vue';
 
   export default {
     name: 'taskHistory',
     components: {
       historyDetail,
+      Empty,
     },
     props: {
       basicInfomation: {
@@ -170,6 +184,7 @@
         ticketAction: [],
         nodeActions: [],
         nodeIdMap: {},
+        listError: false,
       };
     },
     computed: {
@@ -195,6 +210,7 @@
       getHistoryList() {
         // 获取单据手动触发器
         this.loading = true;
+        this.listError = false;
         const { id } = this.basicInfomation;
         this.$store.dispatch('trigger/getTicketTriggerRecord', { id }).then((res) => {
           // this.historyList = res.data.filter(item => item.status === 'FAILED' || item.status === 'SUCCEED');
@@ -211,6 +227,7 @@
           });
         })
           .catch((res) => {
+            this.listError = true;
             errorHandler(res, this);
           })
           .finally(() => {

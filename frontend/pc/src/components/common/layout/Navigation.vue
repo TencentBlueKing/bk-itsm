@@ -29,7 +29,7 @@
     :need-menu="sideRouters.length > 0"
     @toggle-click="isSideOpen = $event">
     <template slot="side-icon">
-      <i class="bk-itsm-icon icon-itsm-logo logo-icon" style="font-size: 20px;"></i>
+      <img src="../../../images/itsm-logo.png" alt="" style="width: 36px; height: 36px;">
     </template>
     <template slot="header">
       <div class="nav-header">
@@ -273,8 +273,11 @@
       },
     },
     watch: {
-      '$route.fullPath'() {
-        this.setActive();
+      '$route.fullPath': {
+        handler() {
+          this.setActive();
+        },
+        immediate: true,
       },
       '$store.state.project.id'(val) {
         if (val) {
@@ -288,7 +291,6 @@
       },
     },
     created() {
-      this.setActive();
       this.getAccessService();
       bus.$on('openCreateTicketDialog', () => {
         this.isCreateTicketDialogShow = true;
@@ -315,7 +317,6 @@
       setActive() {
         const hasMatched = this.routerList.some((nav) => {
           const navId = nav.id;
-          this.getProjectList();
           if (Array.isArray(nav.subRouters) && nav.subRouters.length > 0) {
             const matched = this.traverseSubRouter(nav.subRouters, navId);
             if (matched.navId) {

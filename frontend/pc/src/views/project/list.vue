@@ -50,7 +50,7 @@
         @sort-change="handleSortChange"
         @page-change="handlePageChange"
         @page-limit-change="handlePageLimitChange">
-        <bk-table-column prop="name" :label="$t(`m['项目名称']`)">
+        <bk-table-column prop="name" :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m['项目名称']`)">
           <template slot-scope="props">
             <div class="name-wrap">
               <span
@@ -62,14 +62,14 @@
             </div>
           </template>
         </bk-table-column>
-        <bk-table-column prop="key" :label="$t(`m['项目代号']`)"></bk-table-column>
-        <bk-table-column prop="desc" :label="$t(`m['项目说明']`)">
+        <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" prop="key" :label="$t(`m['项目代号']`)"></bk-table-column>
+        <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" prop="desc" :label="$t(`m['项目说明']`)">
           <template slot-scope="props">
             {{ props.row.desc || '--' }}
           </template>
         </bk-table-column>
-        <bk-table-column prop="creator" :label="$t(`m['创建人']`)"></bk-table-column>
-        <bk-table-column :sortable="true" prop="create_at" :label="$t(`m['创建时间']`)"></bk-table-column>
+        <bk-table-column :show-overflow-tooltip="true" prop="creator" :label="$t(`m['创建人']`)"></bk-table-column>
+        <bk-table-column :show-overflow-tooltip="true" :sortable="true" prop="create_at" :label="$t(`m['创建时间']`)"></bk-table-column>
         <bk-table-column :label="$t(`m['操作']`)" fixed="right">
           <template slot-scope="props">
             <bk-button
@@ -99,6 +99,14 @@
             </div>
           </template>
         </bk-table-column>
+        <div class="empty" slot="empty">
+          <empty
+            :is-error="listError"
+            :is-search="searchToggle"
+            @onRefresh="getProjectList()"
+            @onClearSearch="onClearSearch()">
+          </empty>
+        </div>
       </bk-table>
     </div>
     <edit-project-dialog
@@ -130,11 +138,13 @@
   import { errorHandler } from '@/utils/errorHandler.js';
   import permission from '@/mixins/permission.js';
   import EditProjectDialog from './editProjectDialog.vue';
+  import Empty from '../../components/common/Empty.vue';
 
   export default {
     name: 'ProjectList',
     components: {
       EditProjectDialog,
+      Empty,
     },
     mixins: [permission],
     data() {
@@ -159,6 +169,8 @@
           count: 0,
           limit: 10,
         },
+        listError: false,
+        searchToggle: false,
       };
     },
     computed: {
@@ -182,6 +194,7 @@
     methods: {
       async getProjectList() {
         this.listLoading = true;
+        this.listError = false;
         try {
           const { current, limit } = this.pagination;
           const params = {
@@ -191,11 +204,15 @@
           };
           if (this.keyword !== '') {
             params.name__icontains = this.keyword;
+            this.searchToggle = true;
+          } else {
+            this.searchToggle = false;
           }
           const res = await this.$store.dispatch('project/getProjectList', params);
           this.pagination.count = res.data.count;
           this.list = res.data.items;
         } catch (e) {
+          this.listError = true;
           errorHandler(e, this);
         } finally {
           this.listLoading = false;
@@ -206,6 +223,11 @@
       },
       onSearchProject() {
         this.pagination.current = 1;
+        this.getProjectList();
+      },
+      onClearSearch() {
+        this.keyword = '';
+        this.searchToggle = false;
         this.getProjectList();
       },
       onCreateProject() {

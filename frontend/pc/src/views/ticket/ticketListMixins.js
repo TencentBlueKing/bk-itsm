@@ -155,6 +155,8 @@ const ticketListMixins = {
         approvalList: [],
       },
       isApprovalDialogShow: false,
+      listError: false,
+      searchToggle: false,
     };
   },
   computed: {
@@ -190,6 +192,7 @@ const ticketListMixins = {
       }
       this.setting.fields = this.columnList.slice(0);
       this.setting.selectedFields = this.columnList.slice(0).filter(m => defaultFields.includes(m.id));
+      if (this.$route.query.project_id) this.searchForms[1].value = this.$route.query.project_id || '';
       this.getTicketList();
       this.getTicketStatusTypes();
       this.getBusinessList();
@@ -250,9 +253,10 @@ const ticketListMixins = {
     // 获取单据列表
     getTicketList() {
       const searchParams = JSON.stringify(this.lastSearchParams) === '{}'
-        ? { service_id__in: this.$route.query.service_id } // 没有参数时默认将 url 参数作为查询参数
+        ? { service_id__in: this.$route.query.service_id || undefined, project_key: this.$route.query.project_id || undefined } // 没有参数时默认将 url 参数作为查询参数
         : this.lastSearchParams;
       this.listLoading = true;
+      this.listError = false;
       return this.$store.dispatch('change/getList', {
         page_size: this.pagination.limit,
         page: this.pagination.current,
@@ -275,6 +279,7 @@ const ticketListMixins = {
         }
       })
         .catch((res) => {
+          this.listError = true;
           errorHandler(res, this);
         })
         .finally(() => {
@@ -394,6 +399,7 @@ const ticketListMixins = {
     },
     handleSearch(params, toggle) {
       this.lastSearchParams = params;
+      this.searchToggle = true;
       this.getTicketList();
       if (Object.keys(params).length === 0 || !toggle) return;
       this.searchResultList[this.type].push(params);
@@ -407,6 +413,7 @@ const ticketListMixins = {
           item.display = false;
         }
       });
+      this.searchToggle = false;
     },
     handleSearchFormChange(key, val) {
       // to do something

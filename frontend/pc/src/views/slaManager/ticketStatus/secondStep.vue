@@ -31,13 +31,13 @@
       :data="dataList"
       :size="'small'"
       v-bkloading="{ isLoading: isDataLoading }">
-      <bk-table-column :label="$t(`m.slaContent['状态名']`)" :min-width="150">
+      <bk-table-column :render-header="$renderHeader" :label="$t(`m.slaContent['状态名']`)" :min-width="150" :show-overflow-tooltip="true">
         <template slot-scope="props">
           <span :title="nameFilter(props.row.name)">{{ nameFilter(props.row.name) }}</span>
         </template>
       </bk-table-column>
       <template v-for="item in statusOwnList">
-        <bk-table-column :label="localeCookie ? item.name : item.flow_status" :key="item.id">
+        <bk-table-column :render-header="$renderHeader" :label="localeCookie ? item.name : item.flow_status" :key="item.id" :show-overflow-tooltip="true">
           <template slot-scope="props">
             <template v-if="props.row.checkBoxStatus">
               <bk-checkbox class="bk-outline-none"
@@ -64,6 +64,9 @@
           </i>
         </template>
       </bk-table-column>
+      <div class="empty" slot="empty">
+        <empty :is-error="listError" @onRefresh="getTypeStatus()"> </empty>
+      </div>
     </bk-table>
     <div class="mt20">
       <bk-button theme="default"
@@ -203,6 +206,7 @@
         isDropdownShow: false,
         rules: {},
         localeCookie: false,
+        listError: false,
       };
     },
     async mounted() {
@@ -270,6 +274,7 @@
       },
       async getTypeStatus() {
         this.isDataLoading = true;
+        this.listError = false;
         const params = {
           // flow_status: 'RUNNING'
         };
@@ -281,6 +286,7 @@
           this.dataList = res.data;
         })
           .catch(res => {
+            this.listError = true;
             errorHandler(res, this);
           })
           .finally(() => {

@@ -47,7 +47,6 @@ from itsm.component.constants import (
     APPROVE_RESULT,
     INVISIBLE,
     PROCESS_RUNNING,
-    FIELD_STATUS,
     FIELD_PX_URGENCY,
     FIELD_PY_IMPACT,
     FIELD_TITLE,
@@ -84,6 +83,7 @@ from itsm.openapi.ticket.validators import (
     openapi_operate_validate,
     openapi_suspend_validate,
     openapi_unsuspend_validate,
+    edit_field_validate,
 )
 from itsm.service.models import ServiceCatalog, Service
 from itsm.ticket.models import (
@@ -100,7 +100,6 @@ from itsm.ticket.validators import (
     terminate_validate,
     withdraw_validate,
     FieldSerializer,
-    edit_field_validate,
 )
 
 
@@ -245,12 +244,12 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             form_data.extend([old_data, new_data])
 
         field = request.data.get("field")
-        ticket_id = request.data.get("ticket_id")
+        ticket_sn = request.data.get("sn")
 
         try:
-            ticket = Ticket.objects.get(id=ticket_id)
+            ticket = Ticket.objects.get(sn=ticket_sn)
         except Exception:
-            raise ValidationError("ticket_id = {} 对应的单据不存在！".format(ticket_id))
+            raise ValidationError("ticket_id = {} 对应的单据不存在！".format(ticket_sn))
 
         # 如果ticket当前状态为：已完成/已终止/已撤销，则无法修改字段
         if ticket.current_status in ["FINISHED", "TERMINATED", "REVOKED"]:
@@ -259,8 +258,9 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             )
 
         validate_data, field_obj = edit_field_validate(
-            field, service=ticket.service_type
+            ticket, field, service=ticket.service_type
         )
+
         field_value = validate_data["value"]
 
         update_data = {"_value": field_value}
@@ -292,18 +292,6 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
                 )
 
             ticket.refresh_sla_task()
-
-        # 修改了工单状态
-        if field_obj.key == FIELD_STATUS and ticket.current_status != field_value:
-            if field_value in ticket.status_instance.to_over_status_keys:
-                # 如果是结束状态，直接结束
-                ticket.close(
-                    close_status=field_value,
-                    desc=request.data.get("desc"),
-                    operator=request.user.username,
-                )
-                return Response()
-            ticket.update_current_status(field_value)
 
         # 修改了title，同步修改工单title
         if field_obj.key == FIELD_TITLE:
@@ -813,7 +801,9 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     @catch_openapi_exception
     @custom_apigw_required
     def get_approver(self, request, *args, **kwargs):
-        """关注or取关"""
+        """
+        获取某个节点的处理人
+        """
         sn = request.query_params.get("sn")
         state_id = request.query_params.get("state_id")
         try:
@@ -825,3 +815,60 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         sign_tasks = SignTask.objects.filter(status_id=status.id)
         processors = [task.processor for task in sign_tasks]
         return Response({"approver": ",".join(processors)})
+
+    @action(detail=False, methods=["get"])
+    @catch_openapi_exception
+    @custom_apigw_required
+    def get_approve_node_result(self, request, *args, **kwargs):
+        """
+        获取审批节点详情
+        return {
+            "节点名称"
+            "审批人",
+            "审批结果"，
+            "审批备注"
+        }
+        """
+        sn = request.query_params.get("sn")
+        state_id = request.query_params.get("state_id")
+
+        try:
+            ticket = Ticket.objects.get(sn=sn)
+        except Ticket.DoesNotExist:
+            raise ParamError("sn[{}]对应的单据不存在！".format(sn))
+
+        try:
+            status = Status.objects.get(ticket_id=ticket.id, state_id=state_id)
+        except Exception:
+            raise ParamError("sn[{}], state[{}] 未查到对应的节点状态".format(sn, state_id))
+
+        if status.status != "FINISHED":
+            raise ParamError("sn[{}], state[{}] 当前节点状态为非结束状态".format(sn, state_id))
+
+        approve_result = False
+        approve_remark = ""
+
+        # ticket_fields 字段是排好序的，所以第一个一定是选项
+        for field in status.ticket_fields:
+            if field.type == "RADIO" and field.value == "true":
+                approve_result = True
+            if (
+                approve_result
+                and field.type == "TEXT"
+                and field.validate_type == "OPTION"
+            ):
+                approve_remark = field.value
+            if (
+                not approve_result
+                and field.type == "TEXT"
+                and field.validate_type == "REQUIRE"
+            ):
+                approve_remark = field.value
+        data = {
+            "name": status.name,
+            "processed_user": status.processed_user,
+            "approve_result": approve_result,
+            "approve_remark": approve_remark,
+        }
+
+        return Response(data)

@@ -66,59 +66,66 @@
       </div>
       <div class="bk-tree-info" v-bkloading="{ isLoading: isTreeLoading }">
         <ul class="bk-tree-group" @scroll="scrollEvent">
-          <li v-for="(item, index) in treeList"
-            :key="index"
-            data-test-id="api_li_viewApiTable"
-            @click="showBackground(item, index, 0)">
-            <template v-if="!item.id">
-              <div class="bk-group-parent bk-p18"
-                :class="{ 'bk-group-li': item.check }">
-                <i class="bk-icon icon-folder bk-ml5"></i>
-                <span>{{ $t('m.systemConfig["全部系统"]') }}</span>
-              </div>
-            </template>
-            <template v-else>
-              <div class="bk-group-parent bk-p18 bk-handel"
-                :class="{ 'bk-group-li': item.check }">
-                <i class="bk-icon icon-folder-open bk-ml5"></i>
-                <span class="bk-group-name">{{item.name}}</span>
-                <span style="display: inline-block;" class="bk-edit" v-if="item.can_edit">
-                  <i class="bk-icon icon-more bk-tree-point bk-point-selected">
-                  </i>
-                  <ul class="bk-more" :style="styletranslateY">
-                    <li
-                      v-if="!item.is_builtin"
-                      data-test-id="api_li_deleteApiDirectory"
-                      v-cursor="{ active: !projectId && hasPermission(['public_api_manage']) }"
-                      :class="{ 'text-permission-disable': !projectId && hasPermission(['public_api_manage']) }"
-                      @click.stop="openDelete(item)">
-                      <span>{{ $t('m.systemConfig["删除"]') }}</span>
-                    </li>
-                    <li
-                      data-test-id="api_li_editApiDirectory"
-                      v-cursor="{ active: !projectId && hasPermission(['public_api_manage']) }"
-                      :class="{ 'text-permission-disable': !projectId && hasPermission(['public_api_manage']) }"
-                      @click.stop="openDictionary('CHANGE' ,item)">
-                      <span>{{ $t('m.systemConfig["编辑"]') }}</span>
-                    </li>
-                  </ul>
-                </span>
-              </div>
-              <collapse-transition>
-                <template v-if="item.showMore && false">
-                  <ul class="bk-group-child">
-                    <li v-for="(node, nodeIndex) in item.apis"
-                      :key="nodeIndex"
-                      class="bk-p42"
-                      :class="{ 'bk-group-li': node.check }"
-                      @click.stop="showBackground(node, index, 1)">
-                      <span class="bk-group-child-name">{{node.name}}</span>
-                    </li>
-                  </ul>
-                </template>
-              </collapse-transition>
-            </template>
-          </li>
+          <template v-if="treeList.length !== 0">
+            <li v-for="(item, index) in treeList"
+              :key="index"
+              data-test-id="api_li_viewApiTable"
+              @click="showBackground(item, index, 0)">
+              <template v-if="!item.id">
+                <div class="bk-group-parent bk-p18"
+                  :class="{ 'bk-group-li': item.check }">
+                  <i class="bk-icon icon-folder bk-ml5"></i>
+                  <span>{{ $t('m.systemConfig["全部系统"]') }}</span>
+                </div>
+              </template>
+              <template v-else>
+                <div class="bk-group-parent bk-p18 bk-handel"
+                  :class="{ 'bk-group-li': item.check }">
+                  <i class="bk-icon icon-folder-open bk-ml5"></i>
+                  <span class="bk-group-name" v-bk-overflow-tips>{{item.name}}</span>
+                  <span style="display: inline-block;" class="bk-edit" v-if="item.can_edit">
+                    <i class="bk-icon icon-more bk-tree-point bk-point-selected">
+                    </i>
+                    <ul class="bk-more" :style="styletranslateY">
+                      <li
+                        v-if="!item.is_builtin"
+                        data-test-id="api_li_deleteApiDirectory"
+                        v-cursor="{ active: !projectId && hasPermission(['public_api_manage']) }"
+                        :class="{ 'text-permission-disable': !projectId && hasPermission(['public_api_manage']) }"
+                        @click.stop="openDelete(item)">
+                        <span>{{ $t('m.systemConfig["删除"]') }}</span>
+                      </li>
+                      <li
+                        data-test-id="api_li_editApiDirectory"
+                        v-cursor="{ active: !projectId && hasPermission(['public_api_manage']) }"
+                        :class="{ 'text-permission-disable': !projectId && hasPermission(['public_api_manage']) }"
+                        @click.stop="openDictionary('CHANGE' ,item)">
+                        <span>{{ $t('m.systemConfig["编辑"]') }}</span>
+                      </li>
+                    </ul>
+                  </span>
+                </div>
+                <collapse-transition>
+                  <template v-if="item.showMore && false">
+                    <ul class="bk-group-child">
+                      <li v-for="(node, nodeIndex) in item.apis"
+                        :key="nodeIndex"
+                        class="bk-p42"
+                        :class="{ 'bk-group-li': node.check }"
+                        @click.stop="showBackground(node, index, 1)">
+                        <span class="bk-group-child-name">{{node.name}}</span>
+                      </li>
+                    </ul>
+                  </template>
+                </collapse-transition>
+              </template>
+            </li>
+          </template>
+          <Empty
+            v-else
+            :is-search="Boolean(searchWord)"
+            @onClearSearch="clearInfo"
+          ></Empty>
         </ul>
       </div>
     </div>
@@ -226,12 +233,14 @@
   import commonMix from '../../commonMix/common.js';
   import { errorHandler } from '../../../utils/errorHandler.js';
   import permission from '@/mixins/permission.js';
+  import Empty from '../../../components/common/Empty.vue';
 
   export default {
     name: 'apiTree',
     components: {
       collapseTransition,
       memberSelect,
+      Empty,
     },
     mixins: [commonMix, permission],
     props: {
@@ -531,7 +540,7 @@
             @include scroller;
             @include clearfix;
             overflow: auto;
-
+            text-align: center;
             li {
                 cursor: pointer;
                 overflow: hidden;
@@ -542,16 +551,24 @@
             .bk-group-li {
                 color: #4b8fff;
                 background-color: #e1ecff;
+                
             }
 
             .bk-group-name {
                 display: inline-block;
-                width: calc(100% - 72px);
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                text-align: left;
+                width: calc(100% - 50px);
             }
 
             .bk-group-child-name {
                 display: inline-block;
-                width: calc(100% - 30px);
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                width: calc(100% - 20px);
             }
 
             .bk-p42 {
@@ -560,6 +577,8 @@
 
             .bk-p18 {
                 padding-left: 18px;
+                display: flex;
+                align-items: center;
             }
 
             .bk-ml5 {

@@ -125,7 +125,9 @@
             :key="field.id"
             :label="field.label"
             :width="field.width"
+            :show-overflow-tooltip="true"
             :min-width="field.minWidth"
+            :render-header="$renderHeader"
             :prop="field.id">
             <div slot-scope="{ row }">
               <template v-if="field.id === 'name'">
@@ -342,6 +344,14 @@
               @setting-change="handleSettingChange">
             </bk-table-setting-content>
           </bk-table-column>
+          <div class="empty" slot="empty">
+            <empty
+              :is-error="listError"
+              :is-search="searchToggle"
+              @onRefresh="getList()"
+              @onClearSearch="clearSearch()">
+            </empty>
+          </div>
         </bk-table>
       </div>
       <bk-dialog
@@ -393,6 +403,7 @@
   import treeInfo from './directoryCom/treeInfo.vue';
   import { deepClone } from '../../utils/util';
   import i18n from '@/i18n/index.js';
+  import Empty from '../../components/common/Empty.vue';
   // import selectTree from '@/components/form/selectTree/index.vue'
   const FIELDS = [
     {
@@ -452,6 +463,7 @@
       NavTitle,
       searchInfo,
       treeInfo,
+      Empty,
       // selectTree
     },
     mixins: [permission, commonMix],
@@ -543,6 +555,8 @@
         isImportServiceShow: false,
         displayTypeList: [],
         userList: [],
+        listError: false,
+        searchToggle: false,
       };
     },
     computed: {
@@ -776,6 +790,7 @@
           return;
         }
         this.isDataLoading = true;
+        this.listError = false;
         this.$store.dispatch('catalogService/getServices', params).then(res => {
           if (res.data !== null) {
             if (Object.keys(res.data).length > 0) {
@@ -794,6 +809,7 @@
           }
         })
           .catch(res => {
+            this.listError = true;
             errorHandler(res, this);
           })
           .finally(() => {
@@ -1028,6 +1044,7 @@
       },
       // 简单查询
       searchContent() {
+        this.searchToggle = true;
         this.getList(1);
       },
       // 清空搜索表单
@@ -1036,9 +1053,11 @@
           item.value = '';
         });
         this.getList(1);
+        this.searchToggle = false;
       },
       searchMore() {
         this.$refs.searchInfo.searchMore();
+        this.searchToggle = true;
       },
       handlePageChange(page) {
         this.pagination.current = page;
@@ -1243,6 +1262,11 @@
     display: flex;
     overflow: hidden;
     max-width: calc(100% - 20px);
+}
+.bk-lable-primary {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 </style>

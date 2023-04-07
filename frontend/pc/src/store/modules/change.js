@@ -208,7 +208,7 @@ export default {
         return res;
       });
     },
-    // 提交督办
+    // 提交催办
     submitSupervise({ commit, state, dispatch }, params) {
       return ajax.post(`ticket/receipts/${params.id}/supervise/`).then((response) => {
         const res = response.data;

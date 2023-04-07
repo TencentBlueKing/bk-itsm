@@ -139,9 +139,11 @@
     width: 100%;
 }
 .view-item-wrap > .view-item {
-    margin-top: 10px;
+    margin-top: 4px;
     word-break: break-all;
-
+}
+/deep/ .table-label {
+  font-size: 14px;
 }
 .bread-crumbs {
     text-align: left;

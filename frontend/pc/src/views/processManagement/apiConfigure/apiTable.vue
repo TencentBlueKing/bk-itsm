@@ -102,7 +102,7 @@
           <span :title="props.row.id">{{ props.row.id || '--' }}</span>
         </template>
       </bk-table-column>
-      <bk-table-column :label="$t(`m.systemConfig['接口名称']`)" min-width="150">
+      <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.systemConfig['接口名称']`)" min-width="150">
         <template slot-scope="props">
           <!-- :disabled="props.row.is_builtin || !!props.row.count" -->
           <span class="bk-lable-primary"
@@ -115,20 +115,20 @@
           </span>
         </template>
       </bk-table-column>
-      <bk-table-column :label="$t(`m.systemConfig['接口路径']`)" min-width="250">
+      <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.systemConfig['接口路径']`)" min-width="250">
         <template slot-scope="props">
           <span class="bk-table-type">{{props.row.method}}</span>
           <span :title="props.row.path">{{props.row.path || '--'}}</span>
         </template>
       </bk-table-column>
-      <bk-table-column :label="$t(`m.systemConfig['接口分类']`)" min-width="100">
+      <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.systemConfig['接口分类']`)" min-width="100">
         <template slot-scope="props">
           <span :title="systemName(props.row.remote_system)">
             {{systemName(props.row.remote_system) || '--'}}
           </span>
         </template>
       </bk-table-column>
-      <bk-table-column :label="$t(`m.systemConfig['状态']`)" min-width="60">
+      <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.systemConfig['状态']`)" min-width="60">
         <template slot-scope="props">
           <span :title="props.row.is_activated ? $t(`m.systemConfig['启用']`) : $t(`m.systemConfig['关闭']`)">
             {{props.row.is_activated ? $t(`m.systemConfig['启用']`) : $t(`m.systemConfig['关闭']`)}}
@@ -136,19 +136,19 @@
         </template>
       </bk-table-column>
 
-      <bk-table-column :label="$t(`m.common['负责人']`)">
+      <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.common['负责人']`)">
         <template slot-scope="props">
           <span :title="props.row.owners">{{props.row.owners || '--'}}</span>
         </template>
       </bk-table-column>
-      <bk-table-column :label="$t(`m.common['创建人']`)">
+      <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.common['创建人']`)">
         <template slot-scope="props">
           <span :title="props.row.creator">{{props.row.creator || '--'}}</span>
         </template>
       </bk-table-column>
 
-      <bk-table-column :label="$t(`m.systemConfig['接入数']`)" prop="count" width="80"></bk-table-column>
-      <bk-table-column :label="$t(`m.systemConfig['操作']`)" width="150" fixed="right">
+      <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.systemConfig['接入数']`)" prop="count" width="80"></bk-table-column>
+      <bk-table-column :show-overflow-tooltip="true" :label="$t(`m.systemConfig['操作']`)" width="150" fixed="right">
         <template slot-scope="props">
           <bk-button theme="primary" text
             data-test-id="api_button_apiTableExportApi"
@@ -182,6 +182,15 @@
           </bk-button>
         </template>
       </bk-table-column>
+      <div class="empty" slot="empty">
+        <empty
+          status="500"
+          :is-error="listError"
+          :is-search="searchtoggle"
+          @onRefresh="serchEntry()"
+          @onClearSearch="clearInfo()">
+        </empty>
+      </div>
     </bk-table>
     <bk-sideslider
       :is-show.sync="entryInfo.show"
@@ -203,10 +212,12 @@
   import { errorHandler } from '../../../utils/errorHandler';
   import addApiInfo from './addApiInfo.vue';
   import permission from '@/mixins/permission.js';
+  import Empty from '../../../components/common/Empty.vue';
 
   export default {
     components: {
       addApiInfo,
+      Empty,
     },
     mixins: [permission],
     props: {
@@ -242,6 +253,7 @@
           return {};
         },
       },
+      listError: Boolean,
     },
     data() {
       return {
@@ -276,6 +288,7 @@
         },
         fileVal: '',
         typeInfo: '',
+        searchtoggle: false,
       };
     },
     computed: {
@@ -316,6 +329,7 @@
         await this.$parent.getRemoteApiDetail(item.id);
       },
       getRemoteSystemData() {
+        debugger;
         this.$parent.getRemoteSystemData();
         const customPaging = {
           page: this.pagination.current,
@@ -359,11 +373,13 @@
           page: this.pagination.current,
           page_size: this.pagination.limit,
         };
+        this.searchtoggle = true;
         this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo);
       },
       clearInfo() {
         this.searchInfo.key = '';
         this.serchEntry();
+        this.searchtoggle = false;
       },
       // 分页过滤数据
       handlePageLimitChange() {

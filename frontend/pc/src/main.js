@@ -106,8 +106,10 @@ Vue.use(Tooltip);
 Vue.use(Cascader);
 
 const ace = require("brace");
+const { renderHeader } = require('./utils/util')
 Vue.prototype.$ace = ace;
 Vue.prototype.$cookie = cookie;
+Vue.prototype.$renderHeader = renderHeader;
 require("brace/mode/javascript");
 require("brace/mode/python");
 require("brace/mode/json");

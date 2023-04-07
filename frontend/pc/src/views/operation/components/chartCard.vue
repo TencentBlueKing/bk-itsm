@@ -36,9 +36,10 @@
         <bk-input
           right-icon="bk-icon icon-search"
           :placeholder="placeholder"
-          :value="searchStr"
+          v-model="searchStr"
           :clearable="true"
-          @change="onSearch">
+          @change="onSearch"
+          @clear="onClear">
         </bk-input>
       </div>
     </div>
@@ -85,6 +86,9 @@
     methods: {
       searchHandler(val) {
         this.$emit('search', val);
+      },
+      onClear() {
+        this.$emit('clear');
       },
     },
   };

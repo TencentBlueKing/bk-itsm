@@ -54,6 +54,7 @@
             @on-icon="iconNode"
             @on-drag-node="onDragNode">
           </tree>
+          <Empty v-if="fliterArr.length === 0 && searchWord && $refs.tree5.searchFlag" :is-search="!!searchWord" @onClearSearch="clearInfo"></Empty>
         </div>
         <div class="bk-tree-more" ref="treeOperat" v-show="showMore">
           <ul>
@@ -145,11 +146,13 @@
   import commonMix from '../../commonMix/common.js';
   import { errorHandler } from '../../../utils/errorHandler';
   import permission from '@/mixins/permission.js';
+  import Empty from '../../../components/common/Empty.vue';
 
   export default {
     name: 'treeInfo',
     components: {
       tree,
+      Empty,
     },
     mixins: [commonMix, permission],
     props: {
@@ -186,11 +189,21 @@
         // 校验规则
         rules: {},
         parentIds: [],
+        fliterArr: [],
       };
     },
     computed: {
       showMore() {
         return this.$store.state.serviceCatalog.treeMore;
+      },
+    },
+    watch: {
+      treeList: {
+        handler(val) {
+          this.fliterArr = [];
+          this.filterNodeInfo(val, this.fliterArr);
+        },
+        deep: true,
       },
     },
     mounted() {
@@ -329,6 +342,15 @@
       clearInfo() {
         this.searchWord = '';
         this.$refs.tree5.searchNode(this.searchWord);
+      },
+      filterNodeInfo(data, arr) {
+        data.forEach(item => {
+          if (item.searched) {
+            arr.push(item);
+          } else {
+            this.filterNodeInfo(item.children, arr);
+          }
+        });
       },
       // 新增目录
       openAdd() {
