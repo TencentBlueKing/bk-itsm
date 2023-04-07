@@ -1,4 +1,13 @@
 # Changelog
+## [Version: 2.6.4] - 2023-04-07
+[Repaired] Modify the style of the document urging and basic information, repair the custom form editing display 
+[Optimization] Modify the leakage urging copywriting  
+[Optimization] Newly add OpenAPI interface to quickly obtain the approval results of an approval node  
+[Repaired] Modify the table air data status and text overflow display TIPS  
+[Repaired] Fix the text overflowing the empty state omissions  
+[Optimization] Approval document adding project ID filtration  
+[Optimization] Optimized when there are too many documents, the loading speed of my approval list  
+[Optimization] Optimize the list of request project lists 
 
 ## [Version: 2.6.1] - 2022-03-31
 [New] Community edition does not open the Blue Shield node         
