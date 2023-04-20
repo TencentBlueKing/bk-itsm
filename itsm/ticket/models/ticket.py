@@ -1446,6 +1446,31 @@ class Ticket(Model, BaseTicket):
                 waiting_approve[ticket_id] = False
         return waiting_approve
 
+    @classmethod
+    def get_batch_waiting_count(cls, ticket_ids, username):
+        """
+        获取批量审批剩余的数量
+        """
+        all_status = Status.objects.filter(
+            ticket_id__in=ticket_ids, status=RUNNING, type=APPROVAL_STATE
+        )
+        ticket_status = {}
+        for status in all_status:
+            ticket_status.setdefault(status.ticket_id, []).append(status)
+        count = 0
+        for ticket_id, approval_status in ticket_status.items():
+            for status in approval_status:
+                if username in status.get_processor_in_sign_state():
+                    is_running = cache.get(
+                        "approval_status_{}_{}_{}".format(
+                            username, status.ticket_id, status.state_id
+                        )
+                    )
+                    # 如果发现缓存中有这条记录，说明当前单据还没有审批完，不然正在执行的state_id一定会变
+                    if is_running:
+                        count += 1
+        return count
+
     @property
     def last_transition_id(self):
         """
