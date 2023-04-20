@@ -190,7 +190,7 @@
             </bk-option>
           </bk-select>
           <template v-if="formInfo.ticket_type === 'custom'">
-            <bk-select :ext-cls="'inline-form-width'"
+            <bk-select :ext-cls="'inline-form-width mt10'"
               v-model="formInfo.ticket_key"
               :loading="ticketKeyLoading"
               :clearable="false"
