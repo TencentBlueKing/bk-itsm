@@ -493,16 +493,13 @@ const ticketListMixins = {
         approvalList: [{ ticket_id: id }],
       };
     },
-    onApprovalDialogHidden(result) {
+    onApprovalDialogHidden() {
       this.isApprovalDialogShow = false;
       this.approvalInfo = {
         result: true,
         showAllOption: false,
         approvalList: [],
       };
-      if (result) {
-        this.initData();
-      }
     },
   },
 };

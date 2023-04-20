@@ -144,11 +144,17 @@
           </empty>
         </div>
       </bk-table>
+      <div class="loading" v-if="progressInfo.show">
+        <bk-round-progress :width="progressInfo.width" :percent="progressInfo.percent" :config="progressInfo.config" :content="progressInfo.content"></bk-round-progress>
+        <p>{{ $t(`m['批量审批任务已下发，如果您同时审批的单据较多，可能会耗时较长']`) }}</p>
+        <!-- <p>{{ '当前进度 7/100' }}</p> -->
+      </div>
     </div>
     <!-- 审批弹窗 -->
     <approval-dialog
       :is-show.sync="isApprovalDialogShow"
       :approval-info="approvalInfo"
+      @BatchApprovalPolling="BatchApprovalPolling"
       @cancel="onApprovalDialogHidden">
     </approval-dialog>
     <!-- 导出 -->
@@ -249,6 +255,19 @@
         isExportDialogShow: false,
         // 批量审批选中单
         selectedList: [],
+        progressInfo: {
+          count: '', // 轮询后的剩余数
+          countSum: '', // 审批单据的总数
+          show: false,
+          percent: 0,
+          width: '100px',
+          content: '',
+          config: {
+            strokeWidth: 10,
+            bgColor: '#f0f1f5',
+            activeColor: '#3785ff',
+          },
+        },
       };
     },
     methods: {
@@ -260,6 +279,37 @@
           showAllOption: true,
           approvalList: this.selectedList.map(item => ({ ticket_id: item.id })),
         };
+      },
+      // 获取审批状态
+      async getTicketsApproveStatus(ids) {
+        const params = {
+          ticket_ids: ids,
+        };
+        const res = await this.$store.dispatch('ticket/getTicketsApproveStatus', params);
+        if (res.result) {
+          this.progressInfo.count = res.data.count;
+          this.progressInfo.show = true;
+          const { count, countSum } = this.progressInfo;
+          this.progressInfo.percent = 1 - (count / countSum);
+          this.progressInfo.content = `${countSum - count}/${countSum}`;
+          if (this.progressInfo.percent === 1) {
+            this.progressInfo.config.activeColor = '#43e45f';
+            this.progressInfo.content = this.$t(`m['已完成']`);
+          }
+        }
+      },
+      // 批量审批轮询
+      BatchApprovalPolling(ids, countSum) {
+        this.progressInfo.countSum = countSum;
+        const timer = setInterval(() => {
+          if (this.progressInfo.count) {
+            this.getTicketsApproveStatus(ids);
+          } else {
+            clearInterval(timer);
+            this.progressInfo.show = false;
+            this.initData();
+          }
+        }, 1000);
       },
       // 可以选中
       canSelected(row) {
@@ -289,4 +339,24 @@
 </script>
 <style lang="scss" scoped>
     @import './ticketList.scss';
+    .table-wrap {
+      position: relative;
+      .loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        background: #fff;
+        opacity: 0.9;
+        z-index: 10;
+        color: #575961;
+        p {
+          line-height: 40px;
+        }
+      }
+    }
 </style>

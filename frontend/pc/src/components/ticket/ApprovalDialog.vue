@@ -95,7 +95,8 @@
               approval_list: this.approvalInfo.approvalList,
             };
             await this.$store.dispatch('workbench/batchApproval', data).then(() => {
-              this.$emit('cancel', true);
+              this.$emit('cancel');
+              this.$emit('BatchApprovalPolling', data.approval_list.map(item => item.ticket_id).toString(), data.approval_list.length);
             })
               .catch((res) => {
                 errorHandler(res, this);
