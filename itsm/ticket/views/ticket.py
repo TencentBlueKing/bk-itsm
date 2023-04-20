@@ -1919,7 +1919,7 @@ class TicketModelViewSet(ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def batch_waiting_approve(self, request, *args, **kwargs):
-        ticket_ids = json.loads(request.query_params.get("ticket_ids", "[]"))
+        ticket_ids = request.query_params.get("ticket_ids", "").split(",")
         count = Ticket.get_batch_waiting_count(ticket_ids, request.user.username)
         return Response({"count": count})
 
