@@ -147,7 +147,6 @@
       <div class="loading" v-if="progressInfo.show">
         <bk-round-progress :width="progressInfo.width" :percent="progressInfo.percent" :config="progressInfo.config" :content="progressInfo.content"></bk-round-progress>
         <p v-if="progressInfo.showTip">{{ $t(`m['批量审批任务已下发，如果您同时审批的单据较多，可能会耗时较长']`) }}</p>
-        <!-- <p>{{ '当前进度 7/100' }}</p> -->
       </div>
     </div>
     <!-- 审批弹窗 -->

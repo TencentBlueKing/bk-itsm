@@ -179,7 +179,6 @@ const ticketListMixins = {
   created() {
     this.getTypeStatus();
     this.initData();
-    // console.log(this.type);
   },
   methods: {
     initData() {
@@ -390,7 +389,6 @@ const ticketListMixins = {
       } : { backgroundColor: priorityList[priorityIndex - 1] };
     },
     getstatusColor(row) {
-      // console.log(row)
       const statusColor = this.colorHexList.filter(item => item.service_type === row.service_type
                 && item.key === row.current_status);
       return statusColor.length
