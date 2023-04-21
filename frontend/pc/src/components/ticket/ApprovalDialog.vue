@@ -61,6 +61,7 @@
         type: Boolean,
         default: false,
       },
+      selectedList: Array,
       approvalInfo: {
         type: Object,
         default: () => ({
@@ -86,6 +87,7 @@
     },
     methods: {
       onApprovalConfirm() {
+        const isBatchApproval = this.selectedList.length !== 0;
         this.approvalConfirmBtnLoading = true;
         this.$refs.approvalForm.validate().then(async (val) => {
           if (val) {
@@ -95,7 +97,12 @@
               approval_list: this.approvalInfo.approvalList,
             };
             await this.$store.dispatch('workbench/batchApproval', data).then(() => {
-              this.$emit('cancel', true);
+              // 批量审批
+              if (isBatchApproval) {
+                this.$emit('openApprovalMask');
+                this.$emit('BatchApprovalPolling', data.approval_list.map(item => item.ticket_id).toString(), data.approval_list.length);
+              }
+              this.$emit('cancel', !isBatchApproval);
             })
               .catch((res) => {
                 errorHandler(res, this);

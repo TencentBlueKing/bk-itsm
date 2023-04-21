@@ -2680,4 +2680,6 @@ export const m = {
   '可以尝试 调试关键词 或': 'Try debugging keywords or',
   清空筛选条件: 'Clear the filter criteria',
   刷新: 'refresh',
+  已完成: 'Finished',
+  '批量审批任务已下发，如果您同时审批的单据较多，可能会耗时较长': 'Batch approval tasks have been issued, and if you are approving multiple documents at the same time, it may take a long time.',
 };

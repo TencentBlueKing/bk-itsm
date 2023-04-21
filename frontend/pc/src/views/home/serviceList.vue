@@ -373,7 +373,7 @@
         }
         .bk-itsm-icon {
             position: absolute;
-            top: 6px;
+            top: 10px;
             left: 4px;
             font-size: 16px;
         }
