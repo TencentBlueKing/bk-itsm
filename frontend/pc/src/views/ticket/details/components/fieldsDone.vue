@@ -111,7 +111,7 @@
     <div v-else-if="item.type === 'LINK'" class="bk-fields-done-item">
       <span class="bk-li-left" :title="item.name">{{item.name}}：</span>
       <span class="bk-li-right bk-li-right-link">
-        <span class="bk-pot-after bk-li-link" :title="item.value" @click="openLickInIframe(item)">{{ item.value }}</span>
+        <span class="bk-pot-after bk-li-link" :title="item.value" @click="goToLink(item.value)">{{ item.value }}</span>
         <i class="bk-itsm-icon commonicon-icon icon-itsm-icon-three link-view" @click="openLickInIframe(item)"></i>
         <i class="bk-itsm-icon commonicon-icon icon-itsm-icon-copy link-copy" v-bk-copy="item.value"></i>
       </span>
@@ -393,6 +393,7 @@
               align-items: center;
             }
             .link-copy, .link-view {
+              margin-left: 4px;
               cursor: pointer;
               &:hover {
                 color: #3a84ff;
