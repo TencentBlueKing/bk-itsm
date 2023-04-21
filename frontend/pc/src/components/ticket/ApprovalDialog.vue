@@ -96,13 +96,13 @@
               opinion: this.formData.approvalNotice,
               approval_list: this.approvalInfo.approvalList,
             };
+            this.$emit('openApprovalMask', data.approval_list.length);
+            this.$emit('cancel', !isBatchApproval);
             await this.$store.dispatch('workbench/batchApproval', data).then(() => {
               // 批量审批
               if (isBatchApproval) {
-                this.$emit('openApprovalMask');
                 this.$emit('BatchApprovalPolling', data.approval_list.map(item => item.ticket_id).toString(), data.approval_list.length);
               }
-              this.$emit('cancel', !isBatchApproval);
             })
               .catch((res) => {
                 errorHandler(res, this);

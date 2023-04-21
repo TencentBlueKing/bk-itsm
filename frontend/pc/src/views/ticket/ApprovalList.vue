@@ -311,14 +311,18 @@
             this.getTicketsApproveStatus(ids);
           } else {
             clearInterval(timer);
+            this.progressInfo.percent = 0;
+            this.progressInfo.showTip = true;
             this.progressInfo.show = false;
+            this.progressInfo.content = '-/-';
             this.selectedList = [];
             this.initData();
           }
         }, 1000);
       },
-      openApprovalMask() {
-        this.$set(this.progressInfo, 'show', true);
+      openApprovalMask(sum) {
+        this.progressInfo.show = true;
+        this.progressInfo.content = `0/${sum}`;
       },
       // 可以选中
       canSelected(row) {
