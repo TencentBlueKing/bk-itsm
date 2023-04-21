@@ -963,7 +963,7 @@ export const m = {
     催办: 'Remind ',
     流程开始: 'Start ',
     操作日志: 'Operations ',
-    满意度评价: 'Rate ',  
+    满意度评价: 'Rate ',
     评价: 'Rate ',
     邮件通知: 'Email Notification',
     '邮件通知：': 'Email notification:',
