@@ -33,6 +33,9 @@ if RUN_VER == "open":
     from blueapps.patch.settings_open_saas import *  # noqa
 
     BK_STATIC_URL = STATIC_URL.rstrip("/")
+    BKAPP_STATIC_URL = os.environ.get("BKAPP_STATIC_URL", None)
+    if BKAPP_STATIC_URL:
+        BK_STATIC_URL = BKAPP_STATIC_URL
 else:
     from blueapps.patch.settings_paas_services import *  # noqa
 
