@@ -303,7 +303,7 @@ def custom_apigw_required(view_func):
 
         exempt = getattr(settings, "BK_APIGW_REQUIRE_EXEMPT", False)
         if exempt:
-            return view_func(request, *args, **kwargs)
+            return view_func(self, request, *args, **kwargs)
 
         if not hasattr(request, "jwt"):
             logger.warning(
