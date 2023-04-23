@@ -146,7 +146,7 @@
       </bk-table>
       <div class="loading" v-if="progressInfo.show">
         <bk-round-progress :width="progressInfo.width" :percent="progressInfo.percent" :config="progressInfo.config" :content="progressInfo.content"></bk-round-progress>
-        <p v-if="progressInfo.showTip">{{ $t(`m['批量审批任务已下发，如果您同时审批的单据较多，可能会耗时较长']`) }}</p>
+        <p class="approvel-tip"><span v-if="progressInfo.showTip">{{ $t(`m['批量审批任务已下发，如果您同时审批的单据较多，可能会耗时较长']`) }}</span></p>
       </div>
     </div>
     <!-- 审批弹窗 -->
@@ -306,6 +306,7 @@
         this.progressInfo.countSum = countSum;
         this.progressInfo.count = countSum;
         this.progressInfo.showTip = true;
+        this.progressInfo.config.activeColor = '#3785ff';
         const timer = setInterval(() => {
           if (this.progressInfo.count) {
             this.getTicketsApproveStatus(ids);
@@ -367,7 +368,11 @@
         opacity: 0.9;
         z-index: 10;
         color: #575961;
-        p {
+        text-align: center;
+        .approvel-tip {
+          display: block;
+          width: 100%;
+          height: 40px;
           line-height: 40px;
         }
       }
