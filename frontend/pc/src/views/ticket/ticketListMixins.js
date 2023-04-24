@@ -485,20 +485,21 @@ const ticketListMixins = {
         });
     },
     onOpenApprovalDialog(id, result) {
+      this.isBatch = false;
       this.isApprovalDialogShow = true;
       this.approvalInfo = {
         result,
         approvalList: [{ ticket_id: id }],
       };
     },
-    onApprovalDialogHidden(result) {
+    onApprovalDialogHidden() {
       this.isApprovalDialogShow = false;
       this.approvalInfo = {
         result: true,
         showAllOption: false,
         approvalList: [],
       };
-      if (result) this.initData();
+      // if (result) this.initData();
     },
   },
 };

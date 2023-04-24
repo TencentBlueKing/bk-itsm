@@ -32,7 +32,7 @@
     @confirm="onApprovalConfirm"
     @cancel="onApprovalCancel">
     <bk-form ref="approvalForm" :model="formData" :rules="formRules">
-      <bk-form-item :label="$t(`m.managePage['审批结果']`)" :label-width="140">
+      <bk-form-item :label="$t(`m.managePage['审批意见']`)" :label-width="140">
         <bk-radio-group v-if="approvalInfo.showAllOption"
           v-model="approvalInfo.result">
           <bk-radio :value="true" class="mr50">{{ $t(`m.managePage['通过']`) }}</bk-radio>
@@ -61,6 +61,7 @@
         type: Boolean,
         default: false,
       },
+      isBatch: Boolean,
       selectedList: Array,
       approvalInfo: {
         type: Object,
@@ -87,7 +88,6 @@
     },
     methods: {
       onApprovalConfirm() {
-        const isBatchApproval = this.selectedList.length !== 0;
         this.approvalConfirmBtnLoading = true;
         this.$refs.approvalForm.validate().then(async (val) => {
           if (val) {
@@ -96,12 +96,17 @@
               opinion: this.formData.approvalNotice,
               approval_list: this.approvalInfo.approvalList,
             };
-            this.$emit('openApprovalMask', data.approval_list.length);
-            this.$emit('cancel', !isBatchApproval);
-            await this.$store.dispatch('workbench/batchApproval', data).then(() => {
-              // 批量审批
-              if (isBatchApproval) {
+            if (this.isBatch) {
+              this.$emit('openApprovalMask', data.approval_list.length);
+            } else {
+              this.$emit('singleApproval', data.approval_list[0].ticket_id);
+              this.$emit('cancel', !this.isBatch);
+            }
+            await this.$store.dispatch('workbench/batchApproval', data).then(res => {
+              if (this.isBatch) {
                 this.$emit('BatchApprovalPolling', data.approval_list.map(item => item.ticket_id).toString(), data.approval_list.length);
+              } else {
+                this.$emit('singleApproval', data.approval_list[0].ticket_id, res);
               }
             })
               .catch((res) => {
