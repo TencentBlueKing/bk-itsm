@@ -147,6 +147,12 @@
     },
     mixins: [fieldMix, commonMix, apiFieldsWatch],
     data() {
+      const approveDict = {
+        审批意见: this.$t('m["审批意见"]'),
+        通过: this.$t('m.manageCommon["通过"]'),
+        拒绝: this.$t('m.manageCommon["拒绝"]'),
+        备注: this.$t('m["备注"]'),
+      };
       return {
         moreLoading: false, // 底部加载loading
         leftTicketDom: '',
@@ -208,6 +214,7 @@
         hasNodeOptAuth: false,
         isShowAssgin: false,
         basicStatus: true,
+        approveDict,
       };
     },
     computed: {
@@ -556,6 +563,14 @@
         copyList.forEach(item => {
           if (item.status === 'AUTO_SUCCESS') {
             item.status = 'FINISHED';
+          }
+          if (item.type === 'APPROVAL') {
+            item.fields.forEach(field => {
+              field.name = this.approveDict[field.name] || field.name;
+              field.choice.forEach(choice => {
+                choice.name = this.approveDict[choice.name] || choice.name;
+              });
+            });
           }
         });
         this.nodeList = copyList;

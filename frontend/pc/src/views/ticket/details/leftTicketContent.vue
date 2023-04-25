@@ -4,7 +4,7 @@
       <div class="ticket-base-info">
         <div class="ticket-creator" @click="isShowBasicInfo = !isShowBasicInfo">
           <i :class="['bk-itsm-icon', isShowBasicInfo ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
-          <span class="ticket-title">{{ $t(`m['提单信息']`) }}</span>
+          <span class="ticket-title">{{ $t(`m['单据信息']`) }}</span>
           <span>{{ $t(`m['提单人']`) }}: {{ ticketInfo.creator}}</span>
           <span>{{ $t(`m['提单时间']`) }}: {{ ticketInfo.create_at}}</span>
         </div>
