@@ -148,8 +148,8 @@
     mixins: [fieldMix, commonMix, apiFieldsWatch],
     data() {
       const approveDict = {
-        审批意见: this.$t('m["审批意见"]'),
-        通过: this.$t('m.manageCommon["通过"]'),
+        审批意见: this.$t('m.managePage["审批意见"]'),
+        通过: this.$t('m.managePage["通过"]'),
         拒绝: this.$t('m.manageCommon["拒绝"]'),
         备注: this.$t('m["备注"]'),
       };
