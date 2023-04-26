@@ -232,7 +232,7 @@ class WorkflowManager(Manager):
                 self.restore(flow_data)
             except BaseException as error:
                 print(
-                    u"init workflow [{name}] error : {error}".format(
+                    "init workflow [{name}] error : {error}".format(
                         name=flow_data.get("name", "none"), error=str(error)
                     )
                 )
@@ -304,7 +304,7 @@ class WorkflowManager(Manager):
                     self.restore(flow_data)
                 except BaseException as error:
                     print(
-                        u"init workflow [{name}] error : {error}".format(
+                        "init workflow [{name}] error : {error}".format(
                             name=flow_data.get("name", "none"), error=str(error)
                         )
                     )
@@ -474,6 +474,10 @@ class WorkflowManager(Manager):
                     ),
                 )
                 copy_tree(old_path, new_path)
+
+        # 刷新自动过单的配置
+        workflow.is_auto_approve = data.get("is_auto_approve", False)
+        workflow.save()
 
         # 刷新脏数据
         StateManager.refresh_states(_states, _field_map)
@@ -1350,7 +1354,7 @@ class TransitionManager(Manager):
         name="通过",
         creator="system",
     ):
-        """正向连接两个状态 """
+        """正向连接两个状态"""
 
         return self.create(
             name=name,
