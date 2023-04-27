@@ -101,8 +101,14 @@
           <!-- 操作 -->
           <template v-else-if="field.id === 'operate'">
             <template v-if="props.row.waiting_approve">
-              <bk-link class="table-link mr10" theme="primary" @click="onOpenApprovalDialog(props.row.id, true)">{{ $t(`m.managePage['通过']`) }}</bk-link>
-              <bk-link class="table-link" theme="primary" @click="onOpenApprovalDialog(props.row.id, false)">{{ $t(`m.manageCommon['拒绝']`) }}</bk-link>
+              <template v-if="approveLoadingID !== props.row.id">
+                <bk-link class="table-link mr10" theme="primary" @click="onOpenApprovalDialog(props.row.id, true)">{{ $t(`m.managePage['通过']`) }}</bk-link>
+                <bk-link class="table-link" theme="primary" @click="onOpenApprovalDialog(props.row.id, false)">{{ $t(`m.manageCommon['拒绝']`) }}</bk-link>
+              </template>
+              <div v-else class="table-link approve-laoding">
+                <p>{{ $t(`m.task['处理中']`) }}</p>
+                <p style="transform: translate(16px, 3px);" v-bkloading="{ isLoading: true, opacity: 1, zIndex: 10, theme: 'primary', mode: 'spin', size: 'mini' }"></p>
+              </div>
             </template>
             <router-link
               v-else
@@ -137,7 +143,9 @@
     <!-- 审批弹窗 -->
     <approval-dialog
       :is-show.sync="isApprovalDialogShow"
+      :is-batch="false"
       :approval-info="approvalInfo"
+      @singleApproval="singleApproval"
       @cancel="onApprovalDialogHidden">
     </approval-dialog>
     <!-- 导出 -->
@@ -235,10 +243,27 @@
         columnList,
         type: 'todo',
         isExportDialogShow: false,
+        approveLoadingID: '',
       };
+    },
+    methods: {
+      singleApproval(id, result) {
+        if (!result) {
+          this.approveLoadingID = id;
+          debugger;
+        } else {
+          if (result.result) {
+            this.approveLoadingID = '';
+            this.ticketList.splice(this.ticketList.findIndex(item => item.id === Number(id)), 1);
+          }
+        }
+      },
     },
   };
 </script>
 <style lang="scss" scoped>
     @import './ticketList.scss';
+    .approve-laoding {
+      display: flex;
+    }
 </style>

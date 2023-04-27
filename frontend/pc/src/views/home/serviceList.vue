@@ -45,7 +45,7 @@
             </i>
           </li>
         </ul>
-        <no-data v-else font-size="12" style="padding: 40px 0;" text="您当前似乎还没有使用过任何服务，您可以在下方全部服务中选择您所需要的服务进行提单"></no-data>
+        <no-data v-else font-size="12" style="padding: 40px 0;" :text="$t(`m['您当前似乎还没有使用过任何服务，您可以在下方全部服务中选择您所需要的服务进行提单']`)"></no-data>
         <!-- <div class="recently-empty" >
           <div class="operation-wrapper">
             <div class="operate">
