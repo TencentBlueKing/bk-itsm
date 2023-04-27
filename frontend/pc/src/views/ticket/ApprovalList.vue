@@ -125,7 +125,7 @@
                 <bk-link class="table-link" theme="primary" @click="onOpenApprovalDialog(props.row.id, false)">{{ $t(`m.manageCommon['拒绝']`) }}</bk-link>
               </template>
               <div v-else class="table-link approve-laoding">
-                <p>{{ $t(`m['审批中']`) }}</p>
+                <p>{{ $t(`m.task['处理中']`) }}</p>
                 <p style="transform: translate(16px, 3px);" v-bkloading="{ isLoading: true, opacity: 1, zIndex: 10, theme: 'primary', mode: 'spin', size: 'mini' }"></p>
               </div>
             </template>

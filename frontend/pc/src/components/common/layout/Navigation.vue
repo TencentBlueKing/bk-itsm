@@ -53,6 +53,23 @@
       </div>
       <div class="quick-entry">
         <bk-popover theme="navigation-popover" :arrow="false" offset="0, 2" :tippy-options="{ animateFill: false, hideOnClick: false }">
+          <div class="language" style="margin: 0 10px;">
+            <span :class="['language-btn bk-itsm-icon', curLanguage === 'zh' ? 'icon-yuyanqiehuanzhongwen' : 'icon-yuyanqiehuanyingwen']"></span>
+          </div>
+          <template slot="content">
+            <ul class="nav-language-list">
+              <li class="language-item" :class="{ 'active': curLanguage === 'zh' }" @click="changeLanguage('zh')">
+                <span class="bk-itsm-icon icon-yuyanqiehuanzhongwen"></span>
+                <span>{{ $t(`m["中文"]`) }}</span>
+              </li>
+              <li class="language-item" :class="{ 'active': curLanguage === 'en' }" @click="changeLanguage('en')">
+                <span class="bk-itsm-icon icon-yuyanqiehuanyingwen"></span>
+                <span>{{ $t(`m["英文"]`) }}</span>
+              </li>
+            </ul>
+          </template>
+        </bk-popover>
+        <bk-popover theme="navigation-popover" :arrow="false" offset="0, 2" :tippy-options="{ animateFill: false, hideOnClick: false }">
           <div class="right-question-icon">
             <svg class="bk-icon" style="margin-top: 2px; width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg">
               <path d="M32,4C16.5,4,4,16.5,4,32c0,3.6,0.7,7.1,2,10.4V56c0,1.1,0.9,2,2,2h13.6C36,63.7,52.3,56.8,58,42.4S56.8,11.7,42.4,6C39.1,4.7,35.6,4,32,4z M31.3,45.1c-1.7,0-3-1.3-3-3s1.3-3,3-3c1.7,0,3,1.3,3,3S33,45.1,31.3,45.1z M36.7,31.7c-2.3,1.3-3,2.2-3,3.9v0.9H29v-1c-0.2-2.8,0.7-4.4,3.2-5.8c2.3-1.4,3-2.2,3-3.8s-1.3-2.8-3.3-2.8c-1.8-0.1-3.3,1.2-3.5,3c0,0.1,0,0.1,0,0.2h-4.8c0.1-4.4,3.1-7.4,8.5-7.4c5,0,8.3,2.8,8.3,6.9C40.5,28.4,39.2,30.3,36.7,31.7z"></path>
@@ -189,6 +206,7 @@
 </template>
 <script>
   import { mapState } from 'vuex';
+  import Cookies from 'js-cookie';
   import bus from '@/utils/bus.js';
   import permission from '@/mixins/permission.js';
   import ROUTER_LIST from '@/constants/routerList.js';
@@ -196,6 +214,7 @@
   import CreateTicketDialog from '@/components/common/modal/CreateTicketDialog.vue';
   import EditProjectDialog from '@/views/project/editProjectDialog.vue';
   import { errorHandler } from '../../../utils/errorHandler';
+  import { getCookie } from '../../../utils/util';
 
   export default {
     name: 'Navigation',
@@ -227,6 +246,7 @@
           color: '',
         },
         editDialogFormDisable: false,
+        curLanguage: 'zh',
       };
     },
     computed: {
@@ -291,6 +311,7 @@
       },
     },
     created() {
+      this.curLanguage = getCookie('blueking_language') === 'en' ? 'en' : 'zh';
       this.getAccessService();
       bus.$on('openCreateTicketDialog', () => {
         this.isCreateTicketDialogShow = true;
@@ -312,6 +333,16 @@
           this.editDialogFormDisable = false;
           this.$store.commit('project/setProjectListLoading', false);
         }
+      },
+      changeLanguage(language) {
+        this.curLanguage = language;
+        const local = language === 'zh' ? 'zh-cn' : 'en';
+        Cookies.set('blueking_language', local, {
+          expires: 1,
+          domain: window.location.hostname.replace(/^[^.]+(.*)$/, '$1'),
+          path: '/',
+        });
+        window.location.reload();
       },
       // 高亮顶部和侧边栏导航项
       setActive() {
@@ -554,6 +585,13 @@
                 color: #ffffff;
             }
         }
+        .language-btn {
+          color: #768197;
+          font-size: 18px;
+          &:hover {
+            color: #3a84ff;
+          }
+        }
     }
     /deep/ .project-select.bk-select {
         border: none;
@@ -596,9 +634,9 @@
         box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
         border-radius: 0;
     }
-    .nav-operate-list {
+    .nav-operate-list, .nav-language-list {
         padding: 4px 0;
-        .operate-item {
+        .operate-item, .language-item {
             min-width: 80px;
             height: 30px;
             line-height: 30px;
@@ -615,6 +653,9 @@
                     color: #3a84ff;
                 }
             }
+        }
+        .active {
+          background-color: #eaf3ff;
         }
     }
     .project-select-extension {
