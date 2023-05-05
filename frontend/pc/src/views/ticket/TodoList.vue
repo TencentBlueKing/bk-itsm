@@ -75,6 +75,8 @@
         :key="field.id"
         :label="field.label"
         :width="field.width"
+        :render-header="$renderHeader"
+        :show-overflow-tooltip="true"
         :min-width="field.minWidth"
         :sortable="field.sortable"
         :prop="field.prop">
@@ -99,8 +101,14 @@
           <!-- 操作 -->
           <template v-else-if="field.id === 'operate'">
             <template v-if="props.row.waiting_approve">
-              <bk-link class="table-link mr10" theme="primary" @click="onOpenApprovalDialog(props.row.id, true)">{{ $t(`m.managePage['通过']`) }}</bk-link>
-              <bk-link class="table-link" theme="primary" @click="onOpenApprovalDialog(props.row.id, false)">{{ $t(`m.manageCommon['拒绝']`) }}</bk-link>
+              <template v-if="approveLoadingID !== props.row.id">
+                <bk-link class="table-link mr10" theme="primary" @click="onOpenApprovalDialog(props.row.id, true)">{{ $t(`m.managePage['通过']`) }}</bk-link>
+                <bk-link class="table-link" theme="primary" @click="onOpenApprovalDialog(props.row.id, false)">{{ $t(`m.manageCommon['拒绝']`) }}</bk-link>
+              </template>
+              <div v-else class="table-link approve-laoding">
+                <p>{{ $t(`m.task['处理中']`) }}</p>
+                <p style="transform: translate(16px, 3px);" v-bkloading="{ isLoading: true, opacity: 1, zIndex: 10, theme: 'primary', mode: 'spin', size: 'mini' }"></p>
+              </div>
             </template>
             <router-link
               v-else
@@ -123,11 +131,21 @@
           @setting-change="handleSettingChange">
         </bk-table-setting-content>
       </bk-table-column>
+      <div class="empty" slot="empty">
+        <empty
+          :is-error="listError"
+          :is-search="searchToggle"
+          @onRefresh="getTicketList()"
+          @onClearSearch="$refs.advancedSearch.onClearClick()">
+        </empty>
+      </div>
     </bk-table>
     <!-- 审批弹窗 -->
     <approval-dialog
       :is-show.sync="isApprovalDialogShow"
+      :is-batch="false"
       :approval-info="approvalInfo"
+      @singleApproval="singleApproval"
       @cancel="onApprovalDialogHidden">
     </approval-dialog>
     <!-- 导出 -->
@@ -146,6 +164,7 @@
   import ExportTicketDialog from '@/components/ticket/ExportTicketDialog.vue';
   import i18n from '@/i18n/index.js';
   import ticketListMixins from './ticketListMixins.js';
+  import Empty from '../../components/common/Empty.vue';
 
   const COLUMN_LIST = [
     {
@@ -212,6 +231,7 @@
       AdvancedSearch,
       ExportTicketDialog,
       ApprovalDialog,
+      Empty,
     },
     mixins: [ticketListMixins],
     props: {
@@ -223,10 +243,27 @@
         columnList,
         type: 'todo',
         isExportDialogShow: false,
+        approveLoadingID: '',
       };
+    },
+    methods: {
+      singleApproval(id, result) {
+        if (!result) {
+          this.approveLoadingID = id;
+          debugger;
+        } else {
+          if (result.result) {
+            this.approveLoadingID = '';
+            this.ticketList.splice(this.ticketList.findIndex(item => item.id === Number(id)), 1);
+          }
+        }
+      },
     },
   };
 </script>
 <style lang="scss" scoped>
     @import './ticketList.scss';
+    .approve-laoding {
+      display: flex;
+    }
 </style>

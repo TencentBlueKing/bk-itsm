@@ -90,22 +90,22 @@
             </template>
           </bk-table-column>
 
-          <bk-table-column :label="$t(`m['角色组名']`)" width="200">
+          <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m['角色组名']`)" width="200">
             <template slot-scope="props">
               <span :title="props.row.name">{{ props.row.name || '--' }}</span>
             </template>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.user['人员']`)">
+          <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.user['人员']`)">
             <template slot-scope="props">
               <span :title="props.row.members">{{props.row.members}}</span>
             </template>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.common['创建人']`)">
+          <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.common['创建人']`)">
             <template slot-scope="props">
               <span :title="props.row.creator">{{props.row.creator || '--'}}</span>
             </template>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.common['负责人']`)">
+          <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.common['负责人']`)">
             <template slot-scope="props">
               <span :title="props.row.owners">{{props.row.owners || '--'}}</span>
             </template>
@@ -137,6 +137,14 @@
               </bk-button>
             </template>
           </bk-table-column>
+          <div class="empty" slot="empty">
+            <empty
+              :is-error="listError"
+              :is-search="!searchToggle"
+              @onRefresh="getList()"
+              @onClearSearch="getList(1)">
+            </empty>
+          </div>
         </bk-table>
       </template>
     </div>
@@ -185,11 +193,13 @@
   import permission from '@/mixins/permission.js';
   import { errorHandler } from '../../utils/errorHandler';
   import EmptyTip from '../project/components/emptyTip.vue';
+  import Empty from '../../components/common/Empty.vue';
 
   export default {
     components: {
       memberSelect,
       EmptyTip,
+      Empty,
     },
     mixins: [permission],
     data() {
@@ -228,6 +238,7 @@
         itemContent: {},
         searchName: '',
         searchToggle: false,
+        listError: false,
         emptyTip: {
           title: this.$t('m[\'当前项目下还没有 <用户组>\']'),
           subTitle: this.$t('m[\'同一个职能团队可能会出现在多个不同的服务处理流程中，为了达到人员配置的一致性管理目的，你只需将对应的人员设置到同一个<用户组>中即可，这样便可以在不同的服务中配置引用它。\']'),
@@ -262,13 +273,15 @@
       this.getList();
     },
     methods: {
-      getList() {
+      getList(isSearch) {
         this.isDataLoading = true;
         const params = {
           role_type: 'GENERAL',
           name__icontains: this.searchName,
           project_key: this.$store.state.project.id,
         };
+        if (isSearch) this.searchName = '';
+        this.listError = false;
         this.$store.dispatch('user/getRoleList', params).then((res) => {
           this.tableList = res.data;
           this.searchToggle = res.data.length !== 0;
@@ -278,6 +291,7 @@
           });
         })
           .catch((res) => {
+            this.listError = true;
             errorHandler(res, this);
           })
           .finally(() => {
@@ -443,7 +457,3 @@
     },
   };
 </script>
-
-<style lang='scss' scoped>
-
-</style>

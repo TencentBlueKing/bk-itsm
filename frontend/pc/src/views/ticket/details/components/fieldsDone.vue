@@ -110,8 +110,10 @@
     <!-- 链接 -->
     <div v-else-if="item.type === 'LINK'" class="bk-fields-done-item">
       <span class="bk-li-left" :title="item.name">{{item.name}}：</span>
-      <span class="bk-li-right" :title="item.value">
-        <span class="bk-pot-after bk-li-link" @click="goToLink(item.value)">{{ $t('m.newCommon["点击查看"]') }}</span>
+      <span class="bk-li-right bk-li-right-link">
+        <span class="bk-pot-after bk-li-link" :title="item.value" @click="goToLink(item.value)">{{ item.value }}</span>
+        <i class="bk-itsm-icon commonicon-icon icon-itsm-icon-three link-view" @click="openLickInIframe(item)"></i>
+        <i class="bk-itsm-icon commonicon-icon icon-itsm-icon-copy link-copy" v-bk-copy="item.value"></i>
       </span>
     </div>
     <!-- 自定义表单 -->
@@ -143,6 +145,18 @@
       @click="edit(item)">
       <span class="bk-itsm-icon icon-edit-bold isOn"></span>
     </div>
+    <!-- link iframe -->
+    <bk-dialog v-model="iframeInfo.show"
+      width="1200"
+      theme="primary"
+      :show-footer="false"
+      @cancel="closeLinkIframe"
+      :mask-close="false">
+      <p style="font-size: 16px; font-weight: bold;">{{ iframeInfo.title }}</p>
+      <div class="iframe" style="width: 100%; height: 600px;">
+        <iframe :src="iframeInfo.url" width="100%" height="100%" frameborder="0"></iframe>
+      </div>
+    </bk-dialog>
   </div>
 </template>
 <script>
@@ -215,6 +229,11 @@
           formData: [],
           context: {},
         },
+        iframeInfo: {
+          show: false,
+          title: '',
+          url: '',
+        },
       };
     },
     computed: {
@@ -254,6 +273,17 @@
       }
     },
     methods: {
+      openLickInIframe(item) {
+        const { name, value } = item;
+        this.iframeInfo.title = name;
+        this.iframeInfo.url = value;
+        this.iframeInfo.show = true;
+      },
+      closeLinkIframe() {
+        this.iframeInfo.title = '';
+        this.iframeInfo.url = '';
+        this.iframeInfo.show = false;
+      },
       goToLink(url) {
         if (url.indexOf('http') !== 0) {
           url = `http://${url}`;
@@ -346,13 +376,28 @@
             .bk-li-link{
                 color: #3a84ff;
                 cursor: pointer;
+                display: block;
                 font-weight: bold;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
             .bk-li-left,
             .bk-li-right {
                 line-height: 26px;
                 color: #313238;
                 display: inline-block;
+            }
+            .bk-li-right-link {
+              display: flex;
+              align-items: center;
+            }
+            .link-copy, .link-view {
+              margin-left: 4px;
+              cursor: pointer;
+              &:hover {
+                color: #3a84ff;
+              }
             }
             .bk-li-left {
                 width: 120px;
@@ -416,6 +461,10 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+    .bk-li-right-link {
+      display: flex;
+      align-items: center;
     }
     .bk-li-left {
         display: inline-block;

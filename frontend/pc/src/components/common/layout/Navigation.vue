@@ -29,7 +29,7 @@
     :need-menu="sideRouters.length > 0"
     @toggle-click="isSideOpen = $event">
     <template slot="side-icon">
-      <i class="bk-itsm-icon icon-itsm-logo logo-icon" style="font-size: 20px;"></i>
+      <img src="../../../images/itsm-logo.png" alt="" style="width: 36px; height: 36px;">
     </template>
     <template slot="header">
       <div class="nav-header">
@@ -52,6 +52,23 @@
         </ul>
       </div>
       <div class="quick-entry">
+        <bk-popover theme="navigation-popover" :arrow="false" offset="0, 2" :tippy-options="{ animateFill: false, hideOnClick: false }">
+          <div class="language" style="margin: 0 10px;">
+            <span :class="['language-btn bk-itsm-icon', curLanguage === 'zh' ? 'icon-yuyanqiehuanzhongwen' : 'icon-yuyanqiehuanyingwen']"></span>
+          </div>
+          <template slot="content">
+            <ul class="nav-language-list">
+              <li class="language-item" :class="{ 'active': curLanguage === 'zh' }" @click="changeLanguage('zh')">
+                <span class="bk-itsm-icon icon-yuyanqiehuanzhongwen"></span>
+                <span>{{ $t(`m["中文"]`) }}</span>
+              </li>
+              <li class="language-item" :class="{ 'active': curLanguage === 'en' }" @click="changeLanguage('en')">
+                <span class="bk-itsm-icon icon-yuyanqiehuanyingwen"></span>
+                <span>{{ $t(`m["英文"]`) }}</span>
+              </li>
+            </ul>
+          </template>
+        </bk-popover>
         <bk-popover theme="navigation-popover" :arrow="false" offset="0, 2" :tippy-options="{ animateFill: false, hideOnClick: false }">
           <div class="right-question-icon">
             <svg class="bk-icon" style="margin-top: 2px; width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -189,6 +206,7 @@
 </template>
 <script>
   import { mapState } from 'vuex';
+  import Cookies from 'js-cookie';
   import bus from '@/utils/bus.js';
   import permission from '@/mixins/permission.js';
   import ROUTER_LIST from '@/constants/routerList.js';
@@ -196,6 +214,7 @@
   import CreateTicketDialog from '@/components/common/modal/CreateTicketDialog.vue';
   import EditProjectDialog from '@/views/project/editProjectDialog.vue';
   import { errorHandler } from '../../../utils/errorHandler';
+  import { getCookie } from '../../../utils/util';
 
   export default {
     name: 'Navigation',
@@ -227,6 +246,7 @@
           color: '',
         },
         editDialogFormDisable: false,
+        curLanguage: 'zh',
       };
     },
     computed: {
@@ -273,8 +293,11 @@
       },
     },
     watch: {
-      '$route.fullPath'() {
-        this.setActive();
+      '$route.fullPath': {
+        handler() {
+          this.setActive();
+        },
+        immediate: true,
       },
       '$store.state.project.id'(val) {
         if (val) {
@@ -288,7 +311,7 @@
       },
     },
     created() {
-      this.setActive();
+      this.curLanguage = getCookie('blueking_language') === 'en' ? 'en' : 'zh';
       this.getAccessService();
       bus.$on('openCreateTicketDialog', () => {
         this.isCreateTicketDialogShow = true;
@@ -311,11 +334,20 @@
           this.$store.commit('project/setProjectListLoading', false);
         }
       },
+      changeLanguage(language) {
+        this.curLanguage = language;
+        const local = language === 'zh' ? 'zh-cn' : 'en';
+        Cookies.set('blueking_language', local, {
+          expires: 1,
+          domain: window.location.hostname.replace(/^[^.]+(.*)$/, '$1'),
+          path: '/',
+        });
+        window.location.reload();
+      },
       // 高亮顶部和侧边栏导航项
       setActive() {
         const hasMatched = this.routerList.some((nav) => {
           const navId = nav.id;
-          this.getProjectList();
           if (Array.isArray(nav.subRouters) && nav.subRouters.length > 0) {
             const matched = this.traverseSubRouter(nav.subRouters, navId);
             if (matched.navId) {
@@ -553,6 +585,13 @@
                 color: #ffffff;
             }
         }
+        .language-btn {
+          color: #768197;
+          font-size: 18px;
+          &:hover {
+            color: #3a84ff;
+          }
+        }
     }
     /deep/ .project-select.bk-select {
         border: none;
@@ -595,9 +634,9 @@
         box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
         border-radius: 0;
     }
-    .nav-operate-list {
+    .nav-operate-list, .nav-language-list {
         padding: 4px 0;
-        .operate-item {
+        .operate-item, .language-item {
             min-width: 80px;
             height: 30px;
             line-height: 30px;
@@ -614,6 +653,9 @@
                     color: #3a84ff;
                 }
             }
+        }
+        .active {
+          background-color: #eaf3ff;
         }
     }
     .project-select-extension {

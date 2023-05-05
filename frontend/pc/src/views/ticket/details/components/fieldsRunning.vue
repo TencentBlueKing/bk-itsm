@@ -58,6 +58,7 @@
   import tree from '../../../commonComponent/fieldComponent/tree.vue';
   import file from '../../../commonComponent/fieldComponent/file.vue';
   import cascade from '../../../commonComponent/fieldComponent/cascade.vue';
+  import customForm from '../../../commonComponent/fieldComponent/customForm.vue';
   import { errorHandler } from '@/utils/errorHandler.js';
 
   export default {
@@ -83,6 +84,7 @@
       'CW-TREESELECT': tree,
       'CW-FILE': file,
       'CW-CASCADE': cascade,
+      'CW-CUSTOM-FORM': customForm,
     },
     mixins: [commonMix],
     props: {

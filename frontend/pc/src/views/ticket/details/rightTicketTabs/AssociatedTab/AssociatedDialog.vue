@@ -96,6 +96,7 @@
           <bk-table-column
             :label="$t(`m.newCommon['单号']`)"
             min-width="140"
+            :render-header="$renderHeader"
           >
             <template slot-scope="props">
               <span
@@ -110,6 +111,8 @@
           <bk-table-column
             :label="$t(`m.manageCommon['标题']`)"
             min-width="120"
+            :show-overflow-tooltip="true"
+            :render-header="$renderHeader"
           >
             <template slot-scope="props">
               <span :title="props.row.title">
@@ -119,14 +122,20 @@
           </bk-table-column>
           <bk-table-column
             :label="$t(`m.manageCommon['提单人']`)"
+            :show-overflow-tooltip="true"
+            :render-header="$renderHeader"
             prop="creator"
           ></bk-table-column>
           <bk-table-column
             :label="$t(`m.manageCommon['提单时间']`)"
+            :show-overflow-tooltip="true"
+            :render-header="$renderHeader"
             prop="create_at"
           ></bk-table-column>
           <bk-table-column
             :label="$t(`m.manageCommon['状态']`)"
+            :show-overflow-tooltip="true"
+            :render-header="$renderHeader"
             min-width="120"
           >
             <template slot-scope="props">
@@ -139,6 +148,12 @@
               </span>
             </template>
           </bk-table-column>
+          <div class="empty" slot="empty">
+            <empty
+              :is-error="listError"
+              @onRefresh="getList()">
+            </empty>
+          </div>
         </bk-table>
       </div>
       <div class="bk-ticket-button">
@@ -208,12 +223,14 @@
   import apiFieldsWatch from '@/views/commonMix/api_fields_watch';
   import axios from 'axios';
   import { errorHandler } from '../../../../../utils/errorHandler';
+  import Empty from '../../../../../components/common/Empty.vue';
 
   export default {
     name: 'AssociatedDialog',
     components: {
       SelectService,
       fieldInfo,
+      Empty,
     },
     mixins: [apiFieldsWatch],
     props: {
@@ -258,6 +275,7 @@
           serviceType: [],
           keyword: '',
         },
+        listError: false,
       };
     },
     computed: {
@@ -307,6 +325,7 @@
           resUrl += `${key}=${params[key]}`;
         }
         this.isTableLoading = true;
+        this.listError = false;
         this.$store
           .dispatch('change/getList', params)
           .then((res) => {
@@ -319,6 +338,7 @@
             this.pagination.count = res.data.count;
           })
           .catch((res) => {
+            this.listError = true;
             errorHandler(res, this);
           })
           .finally(() => {

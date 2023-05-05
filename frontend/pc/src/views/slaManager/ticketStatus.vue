@@ -40,7 +40,7 @@
           v-bkloading="{ isLoading: isDataLoading }"
           :data="dataList"
           :size="'small'">
-          <bk-table-column :label="$t(`m.slaContent['服务类型']`)" width="100">
+          <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.slaContent['服务类型']`)" width="100">
             <template slot-scope="props">
               <span
                 v-cursor="{ active: !hasPermission(['ticket_state_manage']) }"
@@ -53,17 +53,17 @@
               </span>
             </template>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.slaContent['单据状态']`)">
+          <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.slaContent['单据状态']`)">
             <template slot-scope="props">
               <span :title="props.row.ticket_status">{{ props.row.ticket_status || '--' }}</span>
             </template>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.slaContent['更新时间']`)" prop="update_at">
+          <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.slaContent['更新时间']`)" prop="update_at">
             <template slot-scope="props">
               <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
             </template>
           </bk-table-column>
-          <bk-table-column :label="$t(`m.slaContent['更新人']`)" width="120">
+          <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.slaContent['更新人']`)" width="120">
             <template slot-scope="props">
               <span :title="props.row.updated_by">{{ props.row.updated_by || '--' }}</span>
             </template>
@@ -91,6 +91,12 @@
               </bk-button>
             </template>
           </bk-table-column>
+          <div class="empty" slot="empty">
+            <empty
+              :is-error="listError"
+              @onRefresh="getTypeStatusList()">
+            </empty>
+          </div>
         </bk-table>
       </div>
     </div>
@@ -135,12 +141,14 @@
   import firstStep from './ticketStatus/firstStep';
   import secondStep from './ticketStatus/secondStep';
   import permission from '@/mixins/permission.js';
+  import Empty from '../../components/common/Empty.vue';
 
   export default {
     name: 'ticketStatus',
     components: {
       firstStep,
       secondStep,
+      Empty,
     },
     mixins: [permission],
     data() {
@@ -154,6 +162,7 @@
           addNew: false,
         },
         versionStatus: true,
+        listError: false,
         // 流程树
         lineList: [
           {
@@ -191,12 +200,14 @@
     methods: {
       getTypeStatusList() {
         this.isDataLoading = true;
+        this.listError = false;
         this.$store.dispatch('ticketStatus/getFourTypesList').then((res) => {
           this.dataList = res.data;
           const temp = this.dataList.findIndex(item => item.id === 3);
           this.dataList.splice(temp, 1);
         })
           .catch((res) => {
+            this.listError = true;
             errorHandler(res, this);
           })
           .finally(() => {

@@ -23,7 +23,7 @@
 <template>
   <div class="bk-table-fields">
     <template v-if="openFunction.FIRST_STATE_SWITCH">
-      <span class="bk-field-tip">{{ $t(`m['提单节点字段信息：']`)}}</span>
+      <span class="bk-field-tip">{{ $t(`m['单据内容：']`)}}</span>
       <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
         <template v-for="(item, index) in firstStateFields">
           <div v-if="item.showFeild"

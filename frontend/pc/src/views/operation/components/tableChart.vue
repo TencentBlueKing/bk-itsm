@@ -32,6 +32,7 @@
         v-for="col in columns"
         :key="col.key"
         :label="col.name"
+        :render-header="$renderHeader"
         :show-overflow-tooltip="col.key !== 'organization'"
         :sortable="col.sort ? 'custom' : false"
         :align="col.align || 'left'"
@@ -62,12 +63,24 @@
           </template>
         </div>
       </bk-table-column>
+      <div class="empty" slot="empty">
+        <empty
+          :is-error="listError"
+          :is-search="searchToggle"
+          @onRefresh="refresh(0)"
+          @onClearSearch="refresh(1)">
+        </empty>
+      </div>
     </bk-table>
   </div>
 </template>
 <script>
+  import Empty from '../../../components/common/Empty.vue';
   export default {
     name: 'TableChart',
+    components: {
+      Empty,
+    },
     props: {
       title: {
         type: String,
@@ -81,7 +94,15 @@
         type: Boolean,
         default: false,
       },
+      listError: {
+        type: Boolean,
+        default: false,
+      },
       showPagination: {
+        type: Boolean,
+        default: false,
+      },
+      searchToggle: {
         type: Boolean,
         default: false,
       },
@@ -113,6 +134,14 @@
       },
     },
     methods: {
+      refresh(type) {
+        this.$parent.searchStr = '';
+        if (type) {
+          this.$parent.$emit('clear');
+        } else {
+          this.$parent.$emit('search');
+        }
+      },
       getRowOrder(index) {
         return index + (this.pagination.current - 1) * this.pagination.limit + 1;
       },

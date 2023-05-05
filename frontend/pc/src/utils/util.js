@@ -403,3 +403,12 @@ export function convertByteToSize(Byte) {
     }
     return `${(Byte / 1024 / 1024).toFixed(2)}M`;
 }
+export function getCookie(name) {
+  var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+  return (arr = document.cookie.match(reg)) ? unescape(arr[2]) : null;
+}
+
+// 适用未对做处理的bk-table 表格头
+export function renderHeader(h, { column }) {
+  return h('p', { style: { overflow: 'hidden', 'white-space': 'nowrap', 'text-overflow': 'ellipsis' },  directives:[{ name: 'bk-overflow-tips' }]}, [column.label]);
+}

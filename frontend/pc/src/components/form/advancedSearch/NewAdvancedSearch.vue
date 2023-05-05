@@ -290,7 +290,11 @@
         if (queryList.includes(item.key)) {
           if (item.type === 'select') {
             query[item.key].split(',').map((ite) => {
-              item.value.push(ite);
+              if (Array.isArray(item.value)) {
+                item.value.push(ite);
+              } else {
+                item.val = ite;
+              }
             });
           } else if (item.type === 'member') {
             item.value.push(query[item.key]);
@@ -314,18 +318,26 @@
       });
       // 判断url参数有没有搜索字段
       if (formKey.some(item => queryList.includes(item))) {
-        this.showMore = true;
+        this.showMore = !this.isIframe;
         this.onSearchClick();
       }
     },
     methods: {
       async getProjectAllList() {
-        this.projectLoading = true;
-        const res = await this.$store.dispatch('project/getProjectAllList');
-        this.projectList = res.data;
+        const { projectList } = this.$store.state.project;
         const projectItem = this.searchForms.find(item => item.key === 'project_key');
-        projectItem.list = res.data;
-        this.projectLoading = false;
+        if (projectList && projectList.length !== 0) {
+          this.projectList = projectList;
+          projectItem.list = projectList;
+        } else {
+          this.projectLoading = true;
+          const res = await this.$store.dispatch('project/getProjectAllList');
+          if (res.result) {
+            this.projectList = res.data;
+            projectItem.list = res.data;
+          }
+          this.projectLoading = false;
+        }
       },
       // 过滤参数
       async getCatalogList() {
@@ -385,6 +397,7 @@
       onSearchResult(index) {
         const params = this.searchResultList[this.panel][index];
         this.$emit('search', params, false);
+        this.$emit('onClickSearchResult', true);
       },
       onClearClick() {
         this.searchForms.forEach((item) => {

@@ -70,16 +70,20 @@
           </div>
           <div class="bk-task-content">
             <p class="bk-none-content" v-if="templateList.length === 0">
-              <i class="bk-icon icon-info-circle"></i>
-              <span>{{$t(`m.taskTemplate['尚未创建任一任务模板，']`)}}</span>
-              <span
-                v-cursor="{ active: !hasPermission(['task_template_create']) }"
-                :class="['bk-primary', {
-                  'text-permission-disable': !hasPermission(['task_template_create'])
-                }]"
-                @click="addTemplate">
-                {{$t(`m.taskTemplate['立即创建']`)}}
-              </span>
+              <Empty :is-search="Boolean(searchKey)" :is-error="listError" @onClearSearch="clearSearch">
+                <template v-if="!searchKey" slot="create">
+                  <i class="bk-icon icon-info-circle"></i>
+                  <span>{{$t(`m.taskTemplate['尚未创建任一任务模板，']`)}}</span>
+                  <span
+                    v-cursor="{ active: !hasPermission(['task_template_create']) }"
+                    :class="['bk-primary', {
+                      'text-permission-disable': !hasPermission(['task_template_create'])
+                    }]"
+                    @click="addTemplate">
+                    {{$t(`m.taskTemplate['立即创建']`)}}
+                  </span>
+                </template>
+              </Empty>
             </p>
             <ul v-else>
               <li v-for="(item, index) in templateList" :key="index" @click="editTemplate(item)">
@@ -181,17 +185,20 @@
   import memberSelect from '../../commonComponent/memberSelect';
   import permission from '@/mixins/permission.js';
   import { errorHandler } from '../../../utils/errorHandler';
+  import Empty from '../../../components/common/Empty.vue';
 
   export default {
     name: 'taskTemplate',
     components: {
       commonStep,
       memberSelect,
+      Empty,
     },
     mixins: [permission],
     data() {
       return {
         infoStatus: true,
+        listError: false,
         // 新增流程页面切换
         addStatus: false,
         searchKey: '',
@@ -276,10 +283,12 @@
           name__icontains: this.searchKey,
         };
         this.listLoading = true;
+        this.listError = false;
         await this.$store.dispatch('taskTemplate/getTemplateList', params).then((res) => {
           this.templateList = res.data;
         })
           .catch((res) => {
+            this.listError = true;
             errorHandler(res, this);
           })
           .finally(() => {

@@ -81,6 +81,7 @@
                 :search-result-list="searchResultList"
                 @search="handleSearch"
                 @deteleSearchResult="deteleSearchResult"
+                @onClickSearchResult="onClickSearchResult"
                 @onChangeHighlight="getAllTicketList()"
                 @formChange="handleSearchFormChange"
                 @clear="handleClearSearch">
@@ -100,12 +101,15 @@
                 v-bkloading="{ isLoading: tableLoading }"
                 :data-list="dataList"
                 :pagination="pagination"
+                :search-toggle="searchToggle"
+                :get-list-error="listError"
                 :color-hex-list="colorHexList"
                 :service-type="serviceType"
                 @submitSuccess="evaluationSubmitSuccess"
                 @orderingClick="orderingClick"
                 @handlePageLimitChange="handlePageLimitChange"
-                @handlePageChange="handlePageChange">
+                @handlePageChange="handlePageChange"
+                @clearSearch="$refs.advancedSearch[0].onClearClick()">
               </table-content>
             </div>
           </div>
@@ -427,6 +431,7 @@
             bk_biz_id: '',
           },
         },
+        listError: false,
       };
     },
     computed: {
@@ -533,6 +538,9 @@
               this.editTabId = '';
             }
           });
+      },
+      onClickSearchResult(toggle) {
+        this.searchToggle = toggle;
       },
       clearTabError() {
         this.$refs.customFrom.clearError();
@@ -718,6 +726,7 @@
           fixParams.service_type = type;
           Object.assign(fixParams, searchParams);
         }
+        this.listError = false;
         return this.$store
           .dispatch(url, fixParams)
           .then((res) => {
@@ -735,6 +744,9 @@
             if (this.serviceType === type) {
               this.pagination.count = res.data.count;
             }
+          })
+          .catch(() => {
+            this.listError = true;
           })
           .finally(() => {
             this[`${type}Loading`] = false;
@@ -889,6 +901,7 @@
       // 删除搜索结果
       deteleSearchResult(type, index) {
         this.searchResultList[type].splice(index, 1);
+        this.searchToggle = false;
       },
       handleSearch(params, toggle) {
         // this.isAddTab = false
