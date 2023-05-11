@@ -37,7 +37,7 @@
         :initial-value="value"
         :options="editorOptions"
         @load="onEditorLoad"
-        @change="onEditorChange" />
+        @blur="onEditorBlur" />
       <i
         v-if="!isFull"
         class="bk-itsm-icon icon-order-open"
@@ -143,7 +143,7 @@
           errorHandler(err);
         }
       },
-      onEditorChange() {
+      onEditorBlur() {
         const value = this.getHtml();
         // 匹配 html 字符串中 a 标签是否有 target 属性，没有则加上 target="_blank"
         const replaceValue = appendTargetAttrToHtml(value);
