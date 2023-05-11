@@ -800,6 +800,12 @@ url("scss/icon/fonts/commonicon.eot?#iefix") format("embedded-opentype");
 .icon-sops-task-icon:before {
 	content: "\e20d";
 }
+.icon-yuyanqiehuanzhongwen:before {
+	content: "\e22b";
+}
+.icon-yuyanqiehuanyingwen:before {
+	content: "\e22c";
+}
 .icon-yinyong:before {
 	content: "\e20f";
 }

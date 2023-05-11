@@ -60,6 +60,10 @@ export default {
         return res;
       });
     },
+    // 审批、批量审批获取审批状态
+    getTicketsApproveStatus({ commit, state, dispatch }, params) {
+      return ajax.get("/ticket/receipts/batch_waiting_approve/", { params }).then((response) => response.data);
+    },
     // 批量实例化工单列表-工单处理人
     // params.ids
     getTicketsProcessors({ commit, state, dispatch }, params) {

@@ -53,7 +53,7 @@
       <bk-table
         ref="ticketList"
         class="ticket-table"
-        v-bkloading="{ isLoading: listLoading }"
+        v-bkloading="{ isLoading: listLoading && !approveLoadingID }"
         :data="ticketList"
         :pagination="pagination"
         :size="setting.size"
@@ -120,8 +120,14 @@
             </span>
             <!-- 操作 -->
             <template v-else-if="field.id === 'operate'">
-              <bk-link class="table-link mr10" theme="primary" @click="onOpenApprovalDialog(props.row.id, true)">{{ $t(`m.managePage['通过']`) }}</bk-link>
-              <bk-link class="table-link" theme="primary" @click="onOpenApprovalDialog(props.row.id, false)">{{ $t(`m.manageCommon['拒绝']`) }}</bk-link>
+              <template v-if="approveLoadingID !== props.row.id">
+                <bk-link class="table-link mr10" theme="primary" @click="onOpenApprovalDialog(props.row.id, true)">{{ $t(`m.managePage['通过']`) }}</bk-link>
+                <bk-link class="table-link" theme="primary" @click="onOpenApprovalDialog(props.row.id, false)">{{ $t(`m.manageCommon['拒绝']`) }}</bk-link>
+              </template>
+              <div v-else class="table-link approve-laoding">
+                <p>{{ $t(`m.task['处理中']`) }}</p>
+                <p style="transform: translate(16px, 3px);" v-bkloading="{ isLoading: true, opacity: 1, zIndex: 10, theme: 'primary', mode: 'spin', size: 'mini' }"></p>
+              </div>
             </template>
             <!-- 其他 -->
             <span v-else :title="props.row[field.id]">{{ props.row[field.id] || '--' }}</span>
@@ -136,19 +142,31 @@
           </bk-table-setting-content>
         </bk-table-column>
         <div class="empty" slot="empty">
-          <empty
+          <!-- <empty
             :is-error="listError"
             :is-search="searchToggle"
             @onRefresh="getTicketList()"
             @onClearSearch="$refs.advancedSearch.onClearClick()">
-          </empty>
+          </empty> -->
         </div>
       </bk-table>
+      <div class="loading" v-if="progressInfo.show">
+        <bk-round-progress :width="progressInfo.width" :percent="progressInfo.percent" :config="progressInfo.config" :content="progressInfo.content"></bk-round-progress>
+        <div class="approvel-tip">
+          <span v-if="progressInfo.showTip">{{ $t(`m['批量审批中，若单据过多可能会耗时较长']`) }}</span>
+        </div>
+        <div style="transform: translateY(-70px);" v-bkloading="{ isLoading: progressInfo.loading, opacity: 1, zIndex: 10, theme: 'primary', mode: 'spin', size: 'mini' }"></div>
+      </div>
     </div>
     <!-- 审批弹窗 -->
     <approval-dialog
       :is-show.sync="isApprovalDialogShow"
+      :is-batch="isBatch"
       :approval-info="approvalInfo"
+      :selected-list="selectedList"
+      @BatchApprovalPolling="BatchApprovalPolling"
+      @singleApproval="singleApproval"
+      @openApprovalMask="openApprovalMask"
       @cancel="onApprovalDialogHidden">
     </approval-dialog>
     <!-- 导出 -->
@@ -167,7 +185,7 @@
   import ApprovalDialog from '@/components/ticket/ApprovalDialog.vue';
   import i18n from '@/i18n/index.js';
   import ticketListMixins from './ticketListMixins.js';
-  import Empty from '../../components/common/Empty.vue';
+  // import Empty from '../../components/common/Empty.vue';
 
   const COLUMN_LIST = [
     {
@@ -234,7 +252,7 @@
       AdvancedSearch,
       ExportTicketDialog,
       ApprovalDialog,
-      Empty,
+      // Empty,
     },
     mixins: [ticketListMixins],
     props: {
@@ -249,17 +267,99 @@
         isExportDialogShow: false,
         // 批量审批选中单
         selectedList: [],
+        progressInfo: {
+          count: '', // 轮询后的剩余数
+          countSum: '', // 审批单据的总数
+          loading: false,
+          show: false,
+          showTip: true,
+          percent: 0,
+          width: '100px',
+          content: '',
+          config: {
+            strokeWidth: 10,
+            bgColor: '#f0f1f5',
+            activeColor: '#3785ff',
+          },
+        },
+        isBatch: true,
+        approveLoadingID: '',
       };
     },
     methods: {
       // 批量审批
       onBatchApprovalClick() {
+        this.isBatch = true;
         this.isApprovalDialogShow = true;
         this.approvalInfo = {
           result: true,
           showAllOption: true,
           approvalList: this.selectedList.map(item => ({ ticket_id: item.id })),
         };
+      },
+      // 单个审批
+      singleApproval(id, result) {
+        if (!result) {
+          this.approveLoadingID = id;
+        } else {
+          if (result.result) {
+            this.approveLoadingID = '';
+            this.ticketList.splice(this.ticketList.findIndex(item => item.id === Number(id)), 1);
+          }
+        }
+        this.updateSelectStatus();
+      },
+      // 获取审批状态
+      async getTicketsApproveStatus(ids) {
+        this.progressInfo.show = true;
+        const params = {
+          ticket_ids: ids,
+        };
+        const res = await this.$store.dispatch('ticket/getTicketsApproveStatus', params);
+        if (res.result) {
+          // 避免接口请求慢影响count记数
+          if (res.data.count <= this.progressInfo.count) {
+            this.progressInfo.count = res.data.count;
+            const { count, countSum } = this.progressInfo;
+            this.progressInfo.percent = 1 - (count / countSum);
+            this.progressInfo.content = `${countSum - count}/${countSum}`;
+            if (this.progressInfo.percent === 1) {
+              this.progressInfo.config.activeColor = '#43e45f';
+              this.progressInfo.content = this.$t('m["已完成"]');
+              this.progressInfo.showTip = false;
+              this.progressInfo.loading = false;
+            }
+          }
+        }
+      },
+      // 批量审批轮询
+      BatchApprovalPolling(ids, countSum) {
+        this.progressInfo.countSum = countSum;
+        this.progressInfo.count = countSum;
+        this.progressInfo.showTip = true;
+        this.progressInfo.config.activeColor = '#3785ff';
+        const timer = setInterval(() => {
+          if (this.progressInfo.count) {
+            this.getTicketsApproveStatus(ids);
+          } else {
+            clearInterval(timer);
+            this.progressInfo.percent = 0;
+            this.progressInfo.showTip = true;
+            this.progressInfo.show = false;
+            this.progressInfo.content = '-/-';
+            this.selectedList = [];
+            this.initData();
+          }
+        }, 500);
+      },
+      openApprovalMask(sum) {
+        this.progressInfo.loading = true;
+        this.progressInfo.show = true;
+        this.progressInfo.content = `0/${sum}`;
+        this.onApprovalDialogHidden();
+      },
+      updateSelectStatus() {
+        this.selectedList = this.ticketList.filter(item => item.checkStatus);
       },
       // 可以选中
       canSelected(row) {
@@ -289,4 +389,31 @@
 </script>
 <style lang="scss" scoped>
     @import './ticketList.scss';
+    .table-wrap {
+      position: relative;
+      .loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        background: #fff;
+        opacity: 0.9;
+        z-index: 10;
+        color: #575961;
+        text-align: center;
+        .approvel-tip {
+          display: block;
+          width: 100%;
+          height: 40px;
+          line-height: 40px;
+        }
+      }
+    }
+    .approve-laoding {
+      display: flex;
+    }
 </style>
