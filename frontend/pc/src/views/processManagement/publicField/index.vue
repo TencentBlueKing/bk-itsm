@@ -242,6 +242,7 @@
   import addField from '../processDesign/nodeConfigue/addField';
   import EmptyTip from '../../project/components/emptyTip.vue';
   import { errorHandler } from '../../../utils/errorHandler.js';
+  // import { deepClone } from '../../../utils/util';
   import Empty from '../../../components/common/Empty.vue';
   import _ from 'lodash';
 
@@ -648,7 +649,7 @@
       },
       // 关闭前验证字段表单
       closeSideslider() {
-        if (!_.isEqual(this.$refs.addField.formInfo, this.$refs.addField.initFromData.formInfo)) {
+        if (!_.isEqual(this.$refs.addField.formInfo, this.$refs.addField.initFormData.formInfo)) {
           this.$bkInfo({
             title: this.$t('m["确定离开当前页？"]'),
             subTitle: this.$t('m["离开将会导致未保存信息丢失"]'),

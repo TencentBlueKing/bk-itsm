@@ -621,7 +621,7 @@
         // 任务内置字段特殊处理
         fieldTypeList: [],
         hiddenConditionStatus: true,
-        initFromData: {},
+        initFormData: {},
       };
     },
     computed: {
@@ -656,10 +656,9 @@
         this.changeType();
       }
       const unwatch = this.$watch('apiDetail', (val) => {
-        this.initFromData.apiDetail = deepClone(val);
+        this.initFormData.apiDetail = deepClone(val);
         unwatch();
       });
-      this.initFromData.formInfo = deepClone(this.formInfo);
     },
     methods: {
       validateContent() {
@@ -793,7 +792,7 @@
           this.formInfo.name = this.sospInfo.name || '';
           this.formInfo.validate = 'REQUIRE';
         }
-
+        this.initFormData.formInfo = deepClone(this.formInfo);
         this.assignValue = JSON.parse(JSON.stringify(assignValue));
       },
       // 获取前置节点的字段信息
