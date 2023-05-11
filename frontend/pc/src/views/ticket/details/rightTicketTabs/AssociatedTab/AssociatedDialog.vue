@@ -223,6 +223,7 @@
   import apiFieldsWatch from '@/views/commonMix/api_fields_watch';
   import axios from 'axios';
   import { errorHandler } from '../../../../../utils/errorHandler';
+  import { deepClone } from '../../../../../utils/util';
   import Empty from '../../../../../components/common/Empty.vue';
 
   export default {
@@ -276,6 +277,7 @@
           keyword: '',
         },
         listError: false,
+        initFormData: {},
       };
     },
     computed: {
@@ -286,8 +288,12 @@
     mounted() {
       this.getList();
       this.getTypeStatus();
+      this.cacheInitData();
     },
     methods: {
+      cacheInitData() {
+        this.initFormData = deepClone(Object.assign({}, { checkList: this.checkList }, { typeSelected: this.typeSelected }));
+      },
       // 切换关联方式时清空fieldList
       clearFieldList() {
         this.fieldList = [];

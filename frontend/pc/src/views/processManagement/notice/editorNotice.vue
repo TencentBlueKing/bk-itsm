@@ -321,6 +321,7 @@
   import insertText from '@/utils/insertText.js';
   import { errorHandler } from '../../../utils/errorHandler.js';
   import permission from '@/mixins/permission.js';
+  import { deepClone } from '../../../utils/util';
 
   export default {
     name: 'editorNotice',
@@ -367,6 +368,7 @@
           message: false,
         },
         rules: {},
+        initFromData: {},
       };
     },
     mounted() {
@@ -379,6 +381,7 @@
         this.formInfo.title = this.noticeInfo.title_template;
         this.formInfo.message = this.noticeInfo.content_template;
         this.getVariableList();
+        this.initFromData = deepClone(this.formInfo);
       },
       // 获取变量数据
       getVariableList() {

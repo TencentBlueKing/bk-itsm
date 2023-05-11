@@ -2688,4 +2688,7 @@ export const m = {
   备注: 'Remarks',
   中文: 'Chinese',
   英文: 'English',
+  '确定离开当前页？': 'Are you sure to leave the current page?',
+  离开将会导致未保存信息丢失: 'Leaving will result in the loss of unsaved information',
+  离开: 'Leave',
 };

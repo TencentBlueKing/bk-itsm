@@ -128,6 +128,7 @@
   import getRpcParam from './getRpcParam.vue';
   import mixins from '../../../../commonMix/mixins_api.js';
   import { errorHandler } from '../../../../../utils/errorHandler';
+  import { deepClone } from '../../../../../utils/util';
 
   export default {
     name: 'dataContent',
@@ -205,6 +206,7 @@
         stateList: [],
         trueStatus: true,
         falseStatus: false,
+        initDataContent: {},
       };
     },
     computed: {
@@ -214,6 +216,7 @@
     },
     mounted() {
       this.getRelatedFields();
+      this.initDataContent = deepClone(this.apiDetail);
     },
     methods: {
       // 自定义类型

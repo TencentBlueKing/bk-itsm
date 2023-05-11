@@ -396,7 +396,8 @@
   import pinyin from 'pinyin';
   import { CUSTOM_FORM_DEFAULT_VALUE } from '../../../../../constants/field';
   import { errorHandler } from '../../../../../utils/errorHandler.js';
-    
+  import { deepClone } from '../../../../../utils/util';
+
   export default {
     name: 'addField',
     components: {
@@ -620,6 +621,7 @@
         // 任务内置字段特殊处理
         fieldTypeList: [],
         hiddenConditionStatus: true,
+        initFromData: {},
       };
     },
     computed: {
@@ -653,6 +655,11 @@
       if (this.changeInfo.id === 'add' && this.autoSelectedType) {
         this.changeType();
       }
+      const unwatch = this.$watch('apiDetail', (val) => {
+        this.initFromData.apiDetail = deepClone(val);
+        unwatch();
+      });
+      this.initFromData.formInfo = deepClone(this.formInfo);
     },
     methods: {
       validateContent() {
