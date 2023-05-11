@@ -1,4 +1,9 @@
 # Changelog
+## [Version: 2.6.5] - 2023-05-11
+[Optimization] Support CDN solution  
+[Optimization] Internationalization content supplement  
+[Optimization] Optimize the interaction effects of batch approval
+
 ## [Version: 2.6.4] - 2023-04-07
 [Repaired] Modify the style of the document urging and basic information, repair the custom form editing display 
 [Optimization] Modify the leakage urging copywriting  
