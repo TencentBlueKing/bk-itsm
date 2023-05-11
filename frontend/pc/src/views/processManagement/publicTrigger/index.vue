@@ -111,11 +111,15 @@
       <bk-sideslider
         :is-show.sync="sliderInfo.show"
         :title="sliderInfo.title"
+        :quick-close="true"
+        :before-close="closeSideslider"
         :width="sliderInfo.width">
         <div slot="content"
           v-bkloading="{ isLoading: sliderInfo.addLoading }"
           style="min-height: 300px;">
-          <add-trigger v-if="sliderInfo.show"
+          <add-trigger
+            ref="addTrigger"
+            v-if="sliderInfo.show"
             :trigger-info="triggerInfo"
             :project-id="projectId"
             @closeTrigger="closeTrigger"
@@ -132,6 +136,7 @@
   import addTrigger from './addTrigger.vue';
   import EmptyTip from '../../project/components/emptyTip.vue';
   import Empty from '../../../components/common/Empty.vue';
+  import _ from 'lodash';
 
   export default {
     name: 'publicTrigger',
@@ -317,6 +322,33 @@
               });
           },
         });
+      },
+      closeSideslider() {
+        let isEdit;
+        // 新建
+        if (!Object.keys(this.triggerInfo).length) {
+          isEdit = !_.isEqual(this.$refs.addTrigger.formData, this.$refs.addTrigger.initFormData.formData);
+        } else {
+          isEdit = !_.isEqual(this.$refs.addTrigger.formData, this.$refs.addTrigger.initFormData.formData)
+            || !_.isEqual(this.$refs.addTrigger.ruleItem, this.$refs.addTrigger.initFormData.ruleItem);
+        }
+        if (isEdit) {
+          this.$bkInfo({
+            title: this.$t('m["确定离开当前页？"]'),
+            subTitle: this.$t('m["离开将会导致未保存信息丢失"]'),
+            okText: this.$t('m["离开"]'),
+            confirmLoading: true,
+            confirmFn: () => {
+              this.sliderInfo.show = false;
+            },
+            cancelFn: () => {
+              this.sliderInfo.show = true;
+            },
+          });
+        } else {
+          this.sliderInfo.show = false;
+        }
+        this.triggerInfo = {};
       },
     },
   };

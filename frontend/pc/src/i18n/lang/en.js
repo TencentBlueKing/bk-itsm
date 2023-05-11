@@ -2377,7 +2377,7 @@ export const m = {
   事件触发满足时自动执行: 'Automatically execute when the event trigger is satisfied',
   '当用户或系统行为满足条件后，触发器会按照用户预设的动作自动执行；触发器可以帮助用户快速的为一些公共事件或人员，在全局的服务流程范围内设置同样的处理逻辑。': 'When the user or system behavior meets the conditions, the trigger will automatically execute according to the user\'s preset actions; the trigger can help the user quickly set the same processing logic for some public events or personnel within the scope of the global service process.',
   '如何在服务流程中配置触发器？': 'How to configure triggers in the service process?',
-  '你当前没有任何项目权限，你可以': '你当前没有任何项目权限，你可以You do not currently have any project permissions, you can',
+  '你当前没有任何项目权限，你可以': 'You do not currently have any project permissions, you can',
   '申请已有项目权限 或 创建新项目': 'Apply for existing project permissions or create a new project',
   '流程服务以“项目”维度来隔离不同服务团队的资源，根据你的需求选择创建全新的项目，或者申请已存在项目的访问权限来使用/管理你的服务吧。': 'Process services use the "project" dimension to isolate the resources of different service teams, choose to create a brand new project according to your needs, or apply for access to an existing project to use/manage your service.',
   开始使用流程服务: 'Start to use flow services',

@@ -207,6 +207,7 @@
   import triggerCondition from './components/triggerCondition.vue';
   import responseCondition from './components/responseCondition.vue';
   import { errorHandler } from '../../../utils/errorHandler.js';
+  import { deepClone } from '../../../utils/util';
 
   export default {
     name: 'addTrigger',
@@ -304,6 +305,7 @@
         rules: {},
         // 公共触发器可关联基础模型
         moduleTypes: [],
+        initFormData: {},
       };
     },
     computed: {
@@ -395,6 +397,8 @@
         if (this.triggerInfo.id) {
           this.contentLoading = true;
           this.getData();
+        } else {
+          this.initFormData = deepClone(Object.assign({}, { formData: this.formData}));
         }
       },
       // 基础模型类型
@@ -443,6 +447,7 @@
         }
         // 触发条件
         this.contentLoading = false;
+        this.initFormData = deepClone(Object.assign({}, { formData: this.formData }, { ruleItem: this.ruleItem }, { rulesList: this.rulesList }));
       },
       // 触发条件的显示
       conditionValue(itemInfo) {
