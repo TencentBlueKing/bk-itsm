@@ -2186,6 +2186,11 @@ class Ticket(Model, BaseTicket):
             # 用户名存在处理人列表中
             return True
 
+        # 说明可能存在截断的情况，这个时候需要去查询当前真实的用户
+        if len(self.current_processors) >= 255:
+            if username == self.real_current_processors:
+                return True
+
         user_roles = UserRole.get_user_roles(username)
 
         if all_processors.intersection(user_roles["general"]):
