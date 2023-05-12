@@ -242,7 +242,9 @@
   import addField from '../processDesign/nodeConfigue/addField';
   import EmptyTip from '../../project/components/emptyTip.vue';
   import { errorHandler } from '../../../utils/errorHandler.js';
+  // import { deepClone } from '../../../utils/util';
   import Empty from '../../../components/common/Empty.vue';
+  import _ from 'lodash';
 
   export default {
     name: 'publicField',
@@ -647,16 +649,22 @@
       },
       // 关闭前验证字段表单
       closeSideslider() {
-        this.$bkInfo({
-          title: this.$t('m["内容未保存，离开将取消操作！"]'),
-          confirmLoading: true,
-          confirmFn: () => {
-            this.sliderInfo.show = false;
-          },
-          cancelFn: () => {
-            this.sliderInfo.show = true;
-          },
-        });
+        if (!_.isEqual(this.$refs.addField.formInfo, this.$refs.addField.initFormData.formInfo)) {
+          this.$bkInfo({
+            title: this.$t('m["确定离开当前页？"]'),
+            subTitle: this.$t('m["离开将会导致未保存信息丢失"]'),
+            okText: this.$t('m["离开"]'),
+            confirmLoading: true,
+            confirmFn: () => {
+              this.sliderInfo.show = false;
+            },
+            cancelFn: () => {
+              this.sliderInfo.show = true;
+            },
+          });
+        } else {
+          this.sliderInfo.show = false;
+        }
       },
     },
   };

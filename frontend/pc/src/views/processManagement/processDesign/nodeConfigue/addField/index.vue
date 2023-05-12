@@ -396,7 +396,8 @@
   import pinyin from 'pinyin';
   import { CUSTOM_FORM_DEFAULT_VALUE } from '../../../../../constants/field';
   import { errorHandler } from '../../../../../utils/errorHandler.js';
-    
+  import { deepClone } from '../../../../../utils/util';
+
   export default {
     name: 'addField',
     components: {
@@ -620,6 +621,7 @@
         // 任务内置字段特殊处理
         fieldTypeList: [],
         hiddenConditionStatus: true,
+        initFormData: {},
       };
     },
     computed: {
@@ -653,6 +655,10 @@
       if (this.changeInfo.id === 'add' && this.autoSelectedType) {
         this.changeType();
       }
+      const unwatch = this.$watch('apiDetail', (val) => {
+        this.initFormData.apiDetail = deepClone(val);
+        unwatch();
+      });
     },
     methods: {
       validateContent() {
@@ -786,7 +792,7 @@
           this.formInfo.name = this.sospInfo.name || '';
           this.formInfo.validate = 'REQUIRE';
         }
-
+        this.initFormData.formInfo = deepClone(this.formInfo);
         this.assignValue = JSON.parse(JSON.stringify(assignValue));
       },
       // 获取前置节点的字段信息

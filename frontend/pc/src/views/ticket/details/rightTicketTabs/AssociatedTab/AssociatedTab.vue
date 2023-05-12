@@ -165,6 +165,7 @@
   import AssociatedDialog from './AssociatedDialog.vue';
   import { errorHandler } from '@/utils/errorHandler.js';
   import Empty from '../../../../../components/common/Empty.vue';
+  import _ from 'lodash';
   export default {
     name: 'AssociatedTab',
     components: {
@@ -226,22 +227,29 @@
           });
       },
       closeSideslider() {
-        this.$bkInfo({
-          type: 'warning',
-          title: this.$t('m["内容未保存，离开将取消操作！"]'),
-          confirmLoading: true,
-          confirmFn: () => {
-            // if (this.$refs.associated.typeSelected === 'associate') {
-            //     this.$refs.associated.bindTicket()
-            // } else {
-            //     this.$refs.associated.setFields()
-            // }
-            this.isShowAddAssociation = false;
-          },
-          cancelFn: () => {
-            this.isShowAddAssociation = true;
-          },
-        });
+        const isEdit = !_.isEqual(this.$refs.associated.typeSelected, this.$refs.associated.initFormData.typeSelected)
+          || !_.isEqual(this.$refs.associated.checkList, this.$refs.associated.initFormData.checkList);
+        if (isEdit) {
+          this.$bkInfo({
+            title: this.$t('m["确定离开当前页？"]'),
+            subTitle: this.$t('m["离开将会导致未保存信息丢失"]'),
+            okText: this.$t('m["离开"]'),
+            confirmLoading: true,
+            confirmFn: () => {
+              // if (this.$refs.associated.typeSelected === 'associate') {
+              //     this.$refs.associated.bindTicket()
+              // } else {
+              //     this.$refs.associated.setFields()
+              // }
+              this.isShowAddAssociation = false;
+            },
+            cancelFn: () => {
+              this.isShowAddAssociation = true;
+            },
+          });
+        } else {
+          this.isShowAddAssociation = false;
+        }
       },
       // 获取关联历史
       getAssociatesHistory() {

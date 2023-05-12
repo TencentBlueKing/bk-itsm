@@ -165,6 +165,7 @@
 
 <script>
   import { errorHandler } from '../../../../utils/errorHandler';
+  import { deepClone } from '../../../../utils/util';
   import cookie from 'cookie';
 
   export default {
@@ -214,6 +215,7 @@
         checkList: [],
         colorHexList: [],
         localeCookie: false,
+        initFormData: {},
       };
     },
     computed: {
@@ -244,11 +246,12 @@
       }
       await this.getTypeStatus();
       await this.getList();
-      this.localeCookie =            cookie.parse(document.cookie).blueking_language !== 'zh-cn';
+      this.localeCookie = cookie.parse(document.cookie).blueking_language !== 'zh-cn';
+      this.initFormData = deepClone(Object.assign({}, { templateInfo: this.templateInfo }, { checkList: this.checkList }));
     },
     methods: {
       getFlag(flag, info) {
-        const flag1 =                flag === 'chooseMother'
+        const flag1 = flag === 'chooseMother'
           && (info.related_type === 'slave'
           || info.related_type === 'master');
         const flag2 =                flag === 'chooseChild' && info.related_type === 'slave';
