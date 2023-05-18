@@ -429,6 +429,9 @@
         try {
           const params = { plugin_code: this.basicInfo.plugin, plugin_version: value };
           this.$store.dispatch('bkPlugin/getPluginDetail', params).then(res => {
+            // bkui-form组件不支持$schema定义的版本声明，先删除该字段
+            delete res.data.inputs.$schema;
+
             this.schema = res.data.inputs || {};
             Object.keys(this.schema.properties).map(item => {
               if (this.schema.properties[item].type === 'integer') {
