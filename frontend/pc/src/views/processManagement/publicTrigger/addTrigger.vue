@@ -398,7 +398,7 @@
           this.contentLoading = true;
           this.getData();
         } else {
-          this.initFormData = deepClone(Object.assign({}, { formData: this.formData}));
+          this.initFormData = deepClone(Object.assign({}, { formData: this.formData }));
         }
       },
       // 基础模型类型
