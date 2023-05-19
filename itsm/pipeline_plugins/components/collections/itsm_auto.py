@@ -233,6 +233,10 @@ class AutoStateService(ItsmBaseService):
                     "show_result": True,
                 }
             ]
+
+            if not isinstance(ex_data, str):
+                ex_data = str(ex_data)
+
             tlog = TicketEventLog.objects.create_log(
                 ticket=ticket,
                 state_id=state_id,
