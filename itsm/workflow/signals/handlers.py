@@ -148,6 +148,8 @@ def state_deleted_handler(sender, flow_id, state_id, **kwargs):
         Q(from_state_id=state_id) | Q(to_state_id=state_id)
     ).delete()
     GlobalVariable.objects.filter(flow_id=flow_id, state_id=state_id).delete()
+    state = State._objects.get(id=state_id)
+    Field.objects.filter(id__in=state.fields, workflow_id=state.workflow_id).delete()
 
 
 def task_schema_created_handler(sender, instance, created, *args, **kwargs):
