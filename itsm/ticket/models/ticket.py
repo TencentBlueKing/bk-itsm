@@ -2822,10 +2822,6 @@ class Ticket(Model, BaseTicket):
         ):
             return
 
-            # 如果当前单据没有开启发送邀请关注通知，则直接回去
-        if self.meta.get("enable_follow_notify", False) and action == FOLLOW_OPERATE:
-            return
-
         logger.info(
             "[ticket->notify] is executed, state_id={}, receivers={}, message={}, action={}".format(
                 state_id, receivers, message, action
