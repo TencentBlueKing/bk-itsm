@@ -2809,6 +2809,23 @@ class Ticket(Model, BaseTicket):
         """发送单据和任务通知"""
         from itsm.ticket.tasks import notify_task
 
+        # 如果单据关闭了发送邀请评价和邀请关注, 则不发送通知
+        enable_follow_notify = self.meta.get("notify_config", {}).get(
+            "enable_follow_notify", True
+        )
+        enable_finished_notify = self.meta.get("notify_config", {}).get(
+            "enable_finished_notify", True
+        )
+
+        if (not enable_follow_notify and action == FOLLOW_OPERATE) or (
+            not enable_finished_notify and action == FINISHED
+        ):
+            return
+
+            # 如果当前单据没有开启发送邀请关注通知，则直接回去
+        if self.meta.get("enable_follow_notify", False) and action == FOLLOW_OPERATE:
+            return
+
         logger.info(
             "[ticket->notify] is executed, state_id={}, receivers={}, message={}, action={}".format(
                 state_id, receivers, message, action
@@ -3594,6 +3611,7 @@ class Ticket(Model, BaseTicket):
         else:
             receivers = ",".join(status.get_processors())
             action = TRANSITION_OPERATE
+
         self.notify(
             state_id,
             receivers,
