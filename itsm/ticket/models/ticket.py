@@ -1079,9 +1079,9 @@ class Status(Model):
     def ticket_fields(self):
         """从单据字段中获取节点字段信息"""
         workflow_field_order = self.ticket.flow.states.get(str(self.state_id))["fields"]
-
         if not workflow_field_order:
             return self.ticket.fields.filter(state_id=self.state_id)
+
         clauses = " ".join(
             [
                 "WHEN workflow_field_id=%s THEN %s" % (pk, index)
@@ -1097,7 +1097,7 @@ class Status(Model):
         if self.is_first_status:
             filter_experssion = filter_experssion | Q(workflow_field_id=0)
 
-        return (
+        fields = (
             self.ticket.fields.filter(filter_experssion)
             .exclude(source=BASE_MODEL)
             .extra(
@@ -1108,6 +1108,16 @@ class Status(Model):
                 ),
             )
         )
+        if self.is_first_status:
+            dynamic_fields = []
+            state_fields = list(fields)
+            for field in state_fields:
+                if field.workflow_field_id == 0 and field.source == "CUSTOM":
+                    dynamic_fields.append(field)
+                    state_fields.remove(field)
+            return state_fields + dynamic_fields
+
+        return fields
 
     def approval_result(self, result, opinion):
         fields = []
@@ -4813,6 +4823,9 @@ class Ticket(Model, BaseTicket):
             "value": 1
         }]
         """
+        if not isinstance(dynamic_fields, list):
+            return
+
         if not dynamic_fields:
             return
 
