@@ -649,7 +649,11 @@
       },
       // 关闭前验证字段表单
       closeSideslider() {
-        if (!_.isEqual(this.$refs.addField.formInfo, this.$refs.addField.initFormData.formInfo)) {
+        const selectInfo = !this.$refs.addField.initFormData.selectInfo
+          || _.isEqual(this.$refs.addField.$refs.dataContent[0].$refs.responseData.selectInfo, this.$refs.addField.initFormData.selectInfo);
+        const bodyTableData = !this.$refs.addField.initFormData.bodyTableData
+          || _.isEqual(this.$refs.addField.$refs.dataContent[0].$refs.postParam.bodyTableData, this.$refs.addField.initFormData.bodyTableData);
+        if (!_.isEqual(this.$refs.addField.formInfo, this.$refs.addField.initFormData.formInfo) || !bodyTableData || !selectInfo) {
           this.$bkInfo({
             title: this.$t('m["确定离开当前页？"]'),
             subTitle: this.$t('m["离开将会导致未保存信息丢失"]'),
