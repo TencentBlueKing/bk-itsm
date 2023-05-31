@@ -26,21 +26,22 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from django.conf.urls import include, url
 from django_nyt.urls import get_pattern as get_nyt_pattern
 
-from itsm.sites.views import index, get_footer
+from itsm.sites.views import index, get_footer, init
 from weixin import views as weixin_views
 
 urlpatterns = [
     # main
-    url(r'^$', index),
+    url(r"^$", index),
+    url(r"^init/$", init),
     # flower, celery monitor
-    url(r'^o/bk_sops/', include('sops_proxy.urls')),
+    url(r"^o/bk_sops/", include("sops_proxy.urls")),
     # helper, fix database
-    url(r'^helper/', include('itsm.helper.urls')),
+    url(r"^helper/", include("itsm.helper.urls")),
     # weixin
-    url(r'^weixin/$', weixin_views.index),
-    url(r'^weixin/login/', include('weixin.core.urls')),
-    url(r'^weixin/api/', include('weixin.urls')),
+    url(r"^weixin/$", weixin_views.index),
+    url(r"^weixin/login/", include("weixin.core.urls")),
+    url(r"^weixin/api/", include("weixin.urls")),
     # wiki
-    url(r'^notifications/', get_nyt_pattern()),
-    url(r'^core/footer/$', get_footer),
+    url(r"^notifications/", get_nyt_pattern()),
+    url(r"^core/footer/$", get_footer),
 ]
