@@ -109,8 +109,11 @@
       };
     },
     watch: {
-      forms(val) {
-        this.formList = this.transFieldsToDraggable(val);
+      forms: {
+        handler(val) {
+          this.formList = this.transFieldsToDraggable(val);
+        },
+        deep: true,
       },
     },
     mounted() {
@@ -132,7 +135,8 @@
           }
           list.push(item);
         });
-        return list;
+        // 过滤非展示字段
+        return list.filter(field => field.showFeild);
       },
       // 整行表单拖拽
       onRowDragEnd(evt) {
