@@ -82,8 +82,22 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (response) => {
-    if ('IS_ITSM_ADMIN' in response.data) {
-      return response;
+    if (response.config.url === 'init/') {
+      if ('IS_ITSM_ADMIN' in response.data) {
+        const { DEFAULT_PROJECT, IS_ITSM_ADMIN, all_access, chname, username } = response.data;
+        window.DEFAULT_PROJECT = DEFAULT_PROJECT;
+        window.IS_ITSM_ADMIN = IS_ITSM_ADMIN;
+        window.all_access = all_access;
+        window.chname = chname;
+        window.username = username;
+        return response;
+      }
+      if (response.status === 401) {
+        const { login_url } = response.data;
+        const url = `${login_url.split('c_url=')[0]}c_url=${encodeURIComponent(location.href)}`;
+        response.data.login_url = url;
+        window.open(url, '_self');
+      }
     }
     // status >= 200 && status <= 505
     if ('result' in response.data && !response.data.result && 'message' in response.data) {
