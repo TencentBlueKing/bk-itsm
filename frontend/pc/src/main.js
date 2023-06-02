@@ -157,16 +157,7 @@ if (window.TAM_PROJECT_ID) {
     reportAssetSpeed: true,
   });
 }
-
-async function getPlatformPreData() {
-  try {
-    await store.dispatch('getPlatformPreData')
-  } catch (error) {
-    console.warn(error);
-  }
-}
-
-getPlatformPreData().then(() => {
+store.dispatch('getPlatformPreData').then(()=> {
   const app = new Vue({
     el: "#app",
     i18n,
@@ -179,6 +170,8 @@ getPlatformPreData().then(() => {
   });
   
   window.app = app;
+}).catch(error =>{
+  console.warn(error);
 })
 
 
