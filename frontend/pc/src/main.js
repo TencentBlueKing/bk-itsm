@@ -158,15 +158,15 @@ if (window.TAM_PROJECT_ID) {
   });
 }
 
-async function init() {
+async function getPlatformPreData() {
   try {
-    await store.dispatch('projectInit')
+    await store.dispatch('getPlatformPreData')
   } catch (error) {
     console.warn(error);
   }
 }
 
-init().then(() => {
+getPlatformPreData().then(() => {
   const app = new Vue({
     el: "#app",
     i18n,

@@ -371,7 +371,7 @@ export default new Vuex.Store({
   },
   // 公共 actions
   actions: {
-    projectInit() {
+    getPlatformPreData() {
       return ajax.get('init/').then((response) => response.data);
     },
     /**
