@@ -158,15 +158,28 @@ if (window.TAM_PROJECT_ID) {
   });
 }
 
-const app = new Vue({
-  el: "#app",
-  i18n,
-  router,
-  store,
-  components: {
-    App,
-  },
-  template: "<App/>",
-});
+async function init() {
+  try {
+    await store.dispatch('projectInit')
+  } catch (error) {
+    console.warn(error);
+  }
+}
 
-window.app = app;
+init().then(() => {
+  const app = new Vue({
+    el: "#app",
+    i18n,
+    router,
+    store,
+    components: {
+      App,
+    },
+    template: "<App/>",
+  });
+  
+  window.app = app;
+})
+
+
+

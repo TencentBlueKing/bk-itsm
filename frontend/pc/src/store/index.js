@@ -371,6 +371,9 @@ export default new Vuex.Store({
   },
   // 公共 actions
   actions: {
+    projectInit() {
+      return ajax.get('init/').then((response) => response.data);
+    },
     /**
      * 获取项目里面的 rtx 人员选择器数据
      *

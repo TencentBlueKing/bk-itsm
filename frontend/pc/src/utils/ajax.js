@@ -66,6 +66,9 @@ bus.$on('processData', (response) => {
  */
 instance.interceptors.request.use(
   (config) => {
+    if (config.url === 'init/') {
+      config.baseURL = '';
+    }
     // 添加工单查看权限
     const token = sessionStorage.getItem('itsm_token');
     if (token && config.url.indexOf('ticket/') === 0) {
@@ -79,6 +82,9 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (response) => {
+    if ('IS_ITSM_ADMIN' in response.data) {
+      return response;
+    }
     // status >= 200 && status <= 505
     if ('result' in response.data && !response.data.result && 'message' in response.data) {
       window.app.$bkMessage({
