@@ -134,7 +134,7 @@ def get_footer(request):
     return JsonResponse(
         {
             "result": True,
-            "data": Template(FOOTER).render(year=datetime.datetime.now().year),
+            "data": Template(FOOTER()).render(year=datetime.datetime.now().year),
             "code": "OK",
             "message": "success",
         }
