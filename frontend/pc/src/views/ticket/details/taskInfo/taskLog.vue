@@ -103,7 +103,7 @@
     mounted() {
       this.showTask = this.openFunction.TASK_SWITCH && this.basicInfomation.task_schemas.length;
       this.showArticle = window.is_article_tag_show;
-      this.showHistory = window.is_itsm_admin;
+      this.showHistory = Number(window.is_itsm_admin);
       this.checkInfo = 'slaRecord';
       if (this.showTask) {
         this.checkInfo = 'task';
