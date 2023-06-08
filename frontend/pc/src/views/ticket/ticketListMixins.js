@@ -256,6 +256,9 @@ const ticketListMixins = {
         : this.lastSearchParams;
       this.listLoading = true;
       this.listError = false;
+      if (this.$route.query.project_id) {
+        searchParams.project_key = this.$route.query.project_id;
+      }
       return this.$store.dispatch('change/getList', {
         page_size: this.pagination.limit,
         page: this.pagination.current,
