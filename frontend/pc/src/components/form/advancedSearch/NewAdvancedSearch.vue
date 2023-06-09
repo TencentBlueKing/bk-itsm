@@ -326,6 +326,7 @@
       async getProjectAllList() {
         const { projectList } = this.$store.state.project;
         const projectItem = this.searchForms.find(item => item.key === 'project_key');
+        if (!projectItem) return; // approve-iframe 没有项目下拉选择
         if (projectList && projectList.length !== 0) {
           this.projectList = projectList;
           projectItem.list = projectList;
