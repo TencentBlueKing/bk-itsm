@@ -27,6 +27,7 @@
         class="advanced-search"
         ref="advancedSearch"
         :forms="searchForms"
+        :is-iframe="isIframe"
         :panel="type"
         :search-result-list="searchResultList"
         @search="handleSearch"
@@ -232,6 +233,7 @@
     mixins: [ticketListMixins],
     props: {
       from: String,
+      isIframe: Boolean,
     },
     data() {
       const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority');
