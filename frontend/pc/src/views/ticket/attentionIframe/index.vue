@@ -7,7 +7,7 @@
 <script>
   import attentionList from '../AttentionList.vue';
   export default {
-    name: 'TicketApprovalIframe',
+    name: 'TicketAttentionIframe',
     components: {
       attentionList,
     },
