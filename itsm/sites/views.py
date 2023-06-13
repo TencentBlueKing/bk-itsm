@@ -106,7 +106,6 @@ def index(request):
         "index.html",
         {
             "is_vip": "true",
-            # "is_vip": "true" if request.META.get("HTTP_X_TIF_UID", "") else "false",
             "BK_CC_HOST": settings.BK_CC_HOST,
             "BK_JOB_HOST": settings.BK_JOB_HOST,
             "CUSTOM_TITLE": TITLE,
