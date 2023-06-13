@@ -251,11 +251,24 @@ const ticketListMixins = {
     },
     // 获取单据列表
     getTicketList() {
+      const query = this.$route.query;
       const searchParams = JSON.stringify(this.lastSearchParams) === '{}'
-        ? { service_id__in: this.$route.query.service_id || undefined, project_key: this.$route.query.project_id || undefined } // 没有参数时默认将 url 参数作为查询参数
+        ? { service_id__in: query.service_id || undefined, project_key: query.project_id || undefined } // 没有参数时默认将 url 参数作为查询参数
         : this.lastSearchParams;
       this.listLoading = true;
       this.listError = false;
+      // approve-iframe
+      if (Object.keys(query).length !== 0) {
+        Object.keys(query).forEach(item => {
+          if (item === 'project_id') {
+            searchParams.project_key = query.project_id;
+          } else if (item === 'service_id') {
+            searchParams.service_id__in = query[item];
+          } else {
+            searchParams[item] = query[item];
+          }
+        });
+      }
       return this.$store.dispatch('change/getList', {
         page_size: this.pagination.limit,
         page: this.pagination.current,
