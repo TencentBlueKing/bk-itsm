@@ -642,6 +642,12 @@
         },
         deep: true,
       },
+      isShowDataSource(val) {
+        if (val) {
+          this.initFormData.bodyTableData = deepClone(this.$refs.dataContent[0].$refs.postParam.bodyTableData);
+          this.initFormData.selectInfo = deepClone(this.$refs.dataContent[0].$refs.responseData.selectInfo);
+        }
+      },
     },
     async mounted() {
       this.isDataLoading = true;
@@ -655,10 +661,6 @@
       if (this.changeInfo.id === 'add' && this.autoSelectedType) {
         this.changeType();
       }
-      const unwatch = this.$watch('apiDetail', (val) => {
-        this.initFormData.apiDetail = deepClone(val);
-        unwatch();
-      });
     },
     methods: {
       validateContent() {
