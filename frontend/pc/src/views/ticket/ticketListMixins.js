@@ -25,6 +25,7 @@ import ColumnSn from '@/components/ticket/table/ColumnSn.vue';
 import { errorHandler } from '@/utils/errorHandler';
 import { deepClone } from '@/utils/util';
 import i18n from '@/i18n/index.js';
+import _ from 'lodash';
 
 const SEARCH_FORMS = [
   {
@@ -413,7 +414,19 @@ const ticketListMixins = {
       this.searchToggle = true;
       this.getTicketList();
       if (Object.keys(params).length === 0 || !toggle) return;
-      this.searchResultList[this.type].push(params);
+      
+      const paramLength = Object.keys(params).length;
+      // 匹配搜索结果中已存在的搜索内容，相同不添加
+      const matchList = this.searchResultList[this.type].filter(item => Object.keys(item).length === paramLength);
+      if (matchList.length !== 0) {
+        matchList.forEach(item => {
+          if (!_.isEqual(item, params)) {
+            this.searchResultList[this.type].push(params);
+          }
+        });
+      } else {
+        this.searchResultList[this.type].push(params);
+      }
     },
     deteleSearchResult(type, index) {
       this.searchResultList[type].splice(index, 1);

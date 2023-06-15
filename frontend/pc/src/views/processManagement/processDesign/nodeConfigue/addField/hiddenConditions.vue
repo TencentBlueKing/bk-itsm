@@ -36,7 +36,7 @@
       :class="{ 'mt20': nodeIndex }"
       v-for="(node, nodeIndex) in listInfo"
       :key="nodeIndex">
-      <bk-select style="width: 182px; float: left; margin-right: 10px;"
+      <bk-select style="min-width: 85px; float: left; margin-right: 10px;"
         v-model="node.key"
         searchable
         @selected="changeName(...arguments, node)">
@@ -46,7 +46,7 @@
           :name="option.name">
         </bk-option>
       </bk-select>
-      <bk-select style="width: 120px; float: left; margin-right: 10px;"
+      <bk-select style="min-width: 60px; float: left; margin-right: 10px;"
         v-model="node.condition"
         searchable>
         <bk-option v-for="option in node.betweenList"
@@ -61,6 +61,7 @@
         <template v-if="node.choiceList.length">
           <bk-select :ext-cls="'bk-form-style'"
             v-model="node.value"
+            style="width: 80px;"
             searchable
             :multiple="node.multiSelect">
             <bk-option v-for="option in node.choiceList"
