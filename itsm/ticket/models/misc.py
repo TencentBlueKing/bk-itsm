@@ -294,7 +294,7 @@ class TicketFollowerNotifyLog(NotifyLogModel):
             if not cls.objects.filter(ticket_token=ticket_token).exists():
                 break
 
-            get_random_string(6)
+            ticket_token = get_random_string(6)
             retry += 1
         else:
             # 尝试60次一直重复，则放弃生成code
