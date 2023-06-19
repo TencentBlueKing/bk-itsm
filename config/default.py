@@ -872,10 +872,10 @@ def redirect_func(request):
 BLUEAPPS_PAGE_401_RESPONSE_FUNC = redirect_func
 
 try:
-    # 自动过单时间，默认为20
-    AUTO_APPROVE_TIME = int(os.environ.get("AUTO_APPROVE_TIME", 20))
+    # 自动过单时间，默认为5
+    AUTO_APPROVE_TIME = int(os.environ.get("BKAPP_AUTO_APPROVE_TIME", 5))
 except Exception:
-    AUTO_APPROVE_TIME = 20
+    AUTO_APPROVE_TIME = 5
 
 OPEN_VOICE_NOTICE = (
     True if os.getenv("BKAPP_OPEN_VOICE_NOTICE", "false").lower() == "true" else False
