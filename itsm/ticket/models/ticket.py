@@ -4181,6 +4181,9 @@ class Ticket(Model, BaseTicket):
             action=FINISHED,
             retry=False,
         )
+
+        # 清理Token
+        TicketFollowerNotifyLog.objects.filter(ticket_id=self.id).delete()
         return
 
     def proceed(self, state_id, fields, operator="", source=WEB):
