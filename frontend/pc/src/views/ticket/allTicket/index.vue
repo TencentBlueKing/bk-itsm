@@ -679,6 +679,7 @@
           page: this.pagination.current,
           ordering: this.orderKey,
         };
+        
         const excludeList = ['request', 'change', 'event', 'question'];
         let url = 'change/getList';
         // 项目下的所有单据

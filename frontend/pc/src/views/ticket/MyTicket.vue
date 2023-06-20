@@ -170,7 +170,7 @@
               class="bk-status-color-info"
               :style="getstatusColor(props.row)"
             >
-              {{ props.row.current_status_display || "--" }}
+              {{ isChineseLanguage ? props.row.current_status_display: props.row.current_status || '--' }}
             </span>
             <!-- 优先级 -->
             <span

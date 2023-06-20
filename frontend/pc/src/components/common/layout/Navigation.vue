@@ -60,11 +60,13 @@
             <ul class="nav-language-list">
               <li class="language-item" :class="{ 'active': curLanguage === 'zh' }" @click="changeLanguage('zh')">
                 <span class="bk-itsm-icon icon-yuyanqiehuanzhongwen"></span>
-                <span>{{ $t(`m["中文"]`) }}</span>
+                <span>中文</span>
+                <!-- <span>{{ $t(`m["中文"]`) }}</span> -->
               </li>
               <li class="language-item" :class="{ 'active': curLanguage === 'en' }" @click="changeLanguage('en')">
                 <span class="bk-itsm-icon icon-yuyanqiehuanyingwen"></span>
-                <span>{{ $t(`m["英文"]`) }}</span>
+                <span>English</span>
+                <!-- <span>{{ $t(`m["英文"]`) }}</span> -->
               </li>
             </ul>
           </template>
@@ -227,7 +229,7 @@
     mixins: [permission],
     data() {
       return {
-        appName: window.log_name || '流程服务管理',
+        appName: window.log_name || this.$t(`m['流程服务']`),
         userName: window.username || '--',
         bkDocUrl: window.DOC_URL,
         routerList: ROUTER_LIST.slice(0),
