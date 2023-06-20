@@ -273,7 +273,7 @@
           disabledList: [],
         },
         styletranslateY: {
-          transform: 'translate(40px,-20px)',
+          transform: 'translate(30px,-20px)',
         },
         isTreeLoading: false,
         searchWord: '',
@@ -652,5 +652,11 @@
     }
     .group-text {
         cursor: pointer;
+        .dropdown-trigger-btn {
+          display: flex;
+          align-items: center;
+          line-height: 14px;
+          height: 30px;
+        }
     }
 </style>

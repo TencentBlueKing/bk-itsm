@@ -220,7 +220,7 @@
         frequencyList,
         showMoreConfig: false,
         revokeWayList: [
-          { name: '不支持撤回', id: 'not_support', key: 0 },
+          { name: this.$t('m[\'不支持撤回\']'), id: 'not_support', key: 0 },
           { name: this.$t('m.treeinfo[\'提单后，单据未被处理流转前，提单人可以撤回\']'), id: 'before_flow', key: 2 },
           { name: this.$t('m.treeinfo[\'任何节点，提单人都可撤回单据\']'), id: 'all_node', key: 1 },
           { name: this.$t('m.treeinfo[\'指定节点前可以撤回\']'), id: 'specify_node', key: 3 },

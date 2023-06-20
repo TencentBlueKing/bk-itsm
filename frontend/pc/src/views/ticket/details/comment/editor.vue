@@ -77,6 +77,7 @@
         this.editorData = newHtml;
         this.$emit('editorContent', newHtml);
       };
+      editor.config.placeholder = this.$t(`m['请输入内容...']`);
       editor.config.height = 150;
       editor.config.zIndex = 400;
       editor.config.excludeMenus = [

@@ -26,6 +26,7 @@ import { errorHandler } from '@/utils/errorHandler';
 import { deepClone } from '@/utils/util';
 import i18n from '@/i18n/index.js';
 import _ from 'lodash';
+import cookie from 'cookie';
 
 const SEARCH_FORMS = [
   {
@@ -158,6 +159,7 @@ const ticketListMixins = {
       isApprovalDialogShow: false,
       listError: false,
       searchToggle: false,
+      isChineseLanguage: true,
     };
   },
   computed: {
@@ -183,6 +185,7 @@ const ticketListMixins = {
   },
   methods: {
     initData() {
+      this.isChineseLanguage = cookie.parse(document.cookie).blueking_language === "zh-cn";
       let defaultFields = ['id', 'title', 'service_name', 'current_steps', 'current_processors', 'create_at', 'creator', 'operate', 'status'];
       // 表格设置有缓存，使用缓存数据
       if (this.currTabSettingCache) {
@@ -316,7 +319,7 @@ const ticketListMixins = {
     getTicketsProcessors(originList) {
       const copyList = deepClone(originList);
       originList.forEach((ticket) => {
-        this.$set(ticket, 'current_processors', '加载中...');
+        this.$set(ticket, 'current_processors', this.$t(`m.manageCommon['加载中...']`));
       });
       const ids = copyList.map(ticket => ticket.id);
       this.$store.dispatch('ticket/getTicketsProcessors', { ids: ids.toString() }).then((res) => {
@@ -337,7 +340,7 @@ const ticketListMixins = {
     getTicketsCreator(originList) {
       const copyList = deepClone(originList);
       originList.forEach((ticket) => {
-        this.$set(ticket, 'creator', '加载中...');
+        this.$set(ticket, 'creator', this.$t(`m.manageCommon['加载中...']`));
       });
       const ids = copyList.map(ticket => ticket.id);
       this.$store.dispatch('ticket/getTicketsCreator', { ids: ids.toString() }).then((res) => {
