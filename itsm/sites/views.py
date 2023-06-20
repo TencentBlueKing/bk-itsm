@@ -114,6 +114,7 @@ def index(request):
             "LOG_NAME": settings.LOG_NAME or _("流程服务"),
             "IS_USE_INVITE_SMS": "true" if settings.IS_USE_INVITE_SMS else "false",
             "BK_USER_MANAGE_HOST": BK_USER_MANAGE_HOST,
+            "BK_PAAS_ESB_HOST": settings.BK_PAAS_ESB_HOST,
             "TAM_PROJECT_ID": settings.TAM_PROJECT_ID,
             "DOC_URL": DOC_URL,
             "SOPS_URL": settings.SOPS_SITE_URL,
