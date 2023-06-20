@@ -714,8 +714,9 @@
                   } else {
                     // 区分人员选择
                     if (schema.required) {
+                      const filterField = ['STARTER_LEADER', 'ASSIGN_LEADER'];
                       if (schema.type === 'MEMBERS' || schema.type === 'MULTI_MEMBERS') {
-                        responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : schema.value.some(schemaMem => (Array.isArray(schemaMem.value) ? !schemaMem.value.length : !schemaMem.value));
+                        responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : schema.value.some(schemaMem => (Array.isArray(schemaMem.value) ? filterField.includes(schemaMem.key) ? schemaMem.value.length : !schemaMem.value.length : !schemaMem.value));
                       } else {
                         responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : (schema.key === 'field_value' ? !(schema.itemInfo[0].value || schema.itemInfo[0].val) : !schema.value);
                       }
