@@ -23,6 +23,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import ajax from "../utils/ajax";
+import { jsonp } from "../utils/util";
 
 import common from "./modules/common";
 import changeType from "./modules/changeType";
@@ -371,6 +372,10 @@ export default new Vuex.Store({
   },
   // 公共 actions
   actions: {
+    updateUserLanguage({}, language) {
+      const bkPaasEsbHost = window.BK_PAAS_ESB_HOST;
+      return jsonp(bkPaasEsbHost + '/api/c/compapi/v2/usermanage/fe_update_user_lanquage/', language);
+    },
     getPlatformPreData() {
       return ajax.get('init/').then((response) => response.data);
     },
