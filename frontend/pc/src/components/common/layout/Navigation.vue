@@ -229,7 +229,7 @@
     mixins: [permission],
     data() {
       return {
-        appName: window.log_name || this.$t(`m['流程服务']`),
+        appName: window.log_name || this.$t('m[\'流程服务\']'),
         userName: window.username || '--',
         bkDocUrl: window.DOC_URL,
         routerList: ROUTER_LIST.slice(0),
@@ -336,15 +336,21 @@
           this.$store.commit('project/setProjectListLoading', false);
         }
       },
-      changeLanguage(language) {
-        this.curLanguage = language;
-        const local = language === 'zh' ? 'zh-cn' : 'en';
-        Cookies.set('blueking_language', local, {
-          expires: 1,
-          domain: window.location.hostname.replace(/^[^.]+(.*)$/, '$1'),
-          path: '/',
-        });
-        window.location.reload();
+      async changeLanguage(language) {
+        try {
+          this.curLanguage = language;
+          const local = language === 'zh' ? 'zh-cn' : 'en';
+          Cookies.set('blueking_language', local, {
+            expires: 1,
+            domain: window.location.hostname.replace(/^[^.]+(.*)$/, '$1'),
+            path: '/',
+          });
+          await this.$store.dispatch('updateUserLanguage', { language });
+        } catch (error) {
+          console.warn(error);
+        } finally {
+          window.location.reload();
+        }
       },
       // 高亮顶部和侧边栏导航项
       setActive() {
