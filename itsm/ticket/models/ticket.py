@@ -3034,27 +3034,17 @@ class Ticket(Model, BaseTicket):
         for ticket_field in filter_field_query_set:
             ticket_field.value = fields_map[ticket_field.key]["value"]
             ticket_field.choice = fields_map[ticket_field.key].get("choice", [])
+            language_config = (
+                fields_map[ticket_field.key].get("meta", {}).get("language")
+            )
+            if language_config:
+                ticket_field.meta["language"] = language_config
             ticket_field.update_at = datetime.now()
 
         bulk_update(
-            filter_field_query_set, update_fields=["_value", "choice", "update_at"]
+            filter_field_query_set,
+            update_fields=["_value", "choice", "update_at", "meta"],
         )
-
-    # def fill_state_fields(self, fields):
-    #     """更新单据字段"""
-    #
-    #     for field in fields:
-    #         # 更新优先级由update_priority统一处理
-    #         if field["key"] == FIELD_PRIORITY:
-    #             continue
-    #
-    #         filter_fields = self.fields.filter(key=field["key"])
-    #         # 多个单据字段：插入到节点的基础模型字段 + 唯一基础模型字段
-    #         for ticket_field in filter_fields:
-    #             ticket_field.value = field["value"]
-    #             ticket_field.choice = field.get("choice", [])
-    #
-    #         bulk_update(filter_fields, update_fields=["_value", "choice"])
 
     def update_ticket_fields(self, fields):
         for field in fields:

@@ -22,7 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+import django
 from rest_framework import serializers
 
 from itsm.ticket.models import TicketField, TaskField
@@ -42,46 +42,51 @@ class FieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = TicketField
         fields = (
-            'id',
-            'key',
-            'type',
-            'choice',
-            'name',
-            'value',
-            'display',
-            'display_value',
-            'related_fields',
-            'meta',
-            'source_type',
-            'source_uri',
-            'kv_relation',
-            'validate_type',
-            'api_instance_id',
-            'regex',
-            'regex_config',
-            'custom_regex',
-            'default',
-            'desc',
-            'tips',
-            'is_tips',
-            'layout',
-            'is_valid',
-            'is_builtin',
-            'ticket_id',
-            'state_id',
-            'show_conditions',
-            'show_type',
-            'is_readonly',
-            'source',
-            'workflow_field_id'
+            "id",
+            "key",
+            "type",
+            "choice",
+            "name",
+            "value",
+            "display",
+            "display_value",
+            "related_fields",
+            "meta",
+            "source_type",
+            "source_uri",
+            "kv_relation",
+            "validate_type",
+            "api_instance_id",
+            "regex",
+            "regex_config",
+            "custom_regex",
+            "default",
+            "desc",
+            "tips",
+            "is_tips",
+            "layout",
+            "is_valid",
+            "is_builtin",
+            "ticket_id",
+            "state_id",
+            "show_conditions",
+            "show_type",
+            "is_readonly",
+            "source",
+            "workflow_field_id",
         ) + model.FIELDS
 
     def to_representation(self, instance):
         data = super(FieldSerializer, self).to_representation(instance)
-        data['workflow_id'] = instance.ticket.flow.workflow_id
+        data["workflow_id"] = instance.ticket.flow.workflow_id
         # 是否展示全部字段（条件隐藏）
-        data['show_result'] = instance.show_result(self.context.get('show_all_fields', True))
-
+        data["show_result"] = instance.show_result(
+            self.context.get("show_all_fields", True)
+        )
+        language = django.utils.translation.get_language()
+        data["name"] = (
+            data["meta"].get("language", {}).get(language, None) or data["name"]
+        )
         return data
 
 
@@ -90,7 +95,7 @@ class FieldSimpleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TicketField
-        fields = ('name', '_display_value', 'ticket', 'key')
+        fields = ("name", "_display_value", "ticket", "key")
 
 
 class FieldExportSerializer(serializers.Serializer):
@@ -103,11 +108,11 @@ class FieldExportSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         data = super(FieldExportSerializer, self).to_representation(instance)
-        state_name = ''
+        state_name = ""
         if instance.state_id:
             state = State.objects.filter(id=instance.state_id).first()
-            state_name = state.name if state else ''
-        data.update({'state_name': state_name})
+            state_name = state.name if state else ""
+        data.update({"state_name": state_name})
         return data
 
 
@@ -139,38 +144,38 @@ class TaskFieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskField
         fields = (
-            'id',
-            'key',
-            'type',
-            'choice',
-            'name',
-            'value',
-            'display',
-            'display_value',
-            'show_result',
-            'related_fields',
-            'meta',
-            'source_type',
-            'source_uri',
-            'kv_relation',
-            'validate_type',
-            'api_instance_id',
-            'regex',
-            'regex_config',
-            'custom_regex',
-            'default',
-            'desc',
-            'tips',
-            'is_tips',
-            'layout',
-            'is_valid',
-            'is_builtin',
-            'state_id',
-            'task_id',
-            'show_conditions',
-            'show_type',
-            'is_readonly',
-            'source',
+            "id",
+            "key",
+            "type",
+            "choice",
+            "name",
+            "value",
+            "display",
+            "display_value",
+            "show_result",
+            "related_fields",
+            "meta",
+            "source_type",
+            "source_uri",
+            "kv_relation",
+            "validate_type",
+            "api_instance_id",
+            "regex",
+            "regex_config",
+            "custom_regex",
+            "default",
+            "desc",
+            "tips",
+            "is_tips",
+            "layout",
+            "is_valid",
+            "is_builtin",
+            "state_id",
+            "task_id",
+            "show_conditions",
+            "show_type",
+            "is_readonly",
+            "source",
         ) + model.FIELDS
 
     def to_representation(self, instance):
