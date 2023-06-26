@@ -3,11 +3,12 @@ app_version: "2.6.6-alpha.3"
 app:
     region: default
     bk_app_code: bk_itsm
+    bk_app_name_en: ITSM
     bk_app_name: 流程服务
     market:
         category: 运维工具
-        introduction: 流程服务
-        description: 【流程服务】是蓝鲸推出的轻量级ITSM，通过可自定义设计的流程模块，覆盖IT服务中的不同管理活动或应用场景。帮助企业用户规范内部管理流程，提升沟通及管理效率。
+        introduction: 流程服务是蓝鲸推出的轻量级ITSM，通过可自定义设计的流程模块，覆盖IT服务中的不同管理活动或应用场景。帮助企业用户规范内部管理流程，提升沟通及管理效率。
+        introduction_en: bk_itsm is a lightweight ITSM created by Blueking. It covers different application scenarios in IT services through customizable workflows and help enterprise users to implement standardize IT workflow, improve communication and management efficiency.
         display_options:
             width: 1280
             height: 720
