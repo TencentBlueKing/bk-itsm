@@ -663,7 +663,7 @@
             item.triggerRules.list.forEach(firstItem => {
               firstItem.itemList.forEach(secondItem => {
                 if (secondItem.condition === 'non_empty') {
-                  item.triggerRules.checkStatus = secondItem.key === '' || secondItem.value === '';
+                  item.triggerRules.checkStatus = secondItem.key === '';
                 } else {
                   item.triggerRules.checkStatus = secondItem.key === '' || secondItem.condition === '' || secondItem.value === '';
                 }
