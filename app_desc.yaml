@@ -3,7 +3,7 @@ app_version: "2.6.6-alpha.3"
 app:
     region: default
     bk_app_code: bk_itsm
-    bk_app_name_en: ITSM
+    bk_app_name_en: Flow Service Management
     bk_app_name: 流程服务
     market:
         category: 运维工具
