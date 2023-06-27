@@ -7515,8 +7515,14 @@ msgstr "Custom form"
 msgid "提单人上级"
 msgstr "Ticket creator superior"
 
+msgid "自定义角色"
+msgstr "Custom roles"
+
+msgid "第三方系统"
+msgstr "Third party systems"
+
 msgid "权限中心角色"
-msgstr "Iam roles"
+msgstr "Iam Roles"
 
 msgid "是否使用权限中心角色"
 msgstr "Whether to use iam role"
@@ -7532,3 +7538,11 @@ msgstr "Terminate"
 
 msgid "已撤销"
 msgstr "Revoked"
+
+msgid "指定节点处理人上级"
+msgstr "Designated node handler supervisor"
+
+msgid "不支持撤回"
+msgstr "Withdrawal not supported"
+
+
