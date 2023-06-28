@@ -97,7 +97,8 @@
                   'icon-api-node',
                   'icon-task-icon',
                   'con-copy-new',
-                  'icon-sign-node',
+                  'icon-webhookjiedian',
+                  // 'icon-sign-node',
                   'icon-approval-node',
                   'icon-devops-task-icon'
                 ].includes(item.iconStyle) }
@@ -154,13 +155,13 @@
           { type: 'TASK-DEVOPS', iconStyle: 'icon-devops-task-icon' },
           { type: 'BK-PLUGIN', iconStyle: 'icon-chajian-icon' },
           { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
-          { type: 'SIGN', iconStyle: 'icon-sign-node-white f18' },
+          // { type: 'SIGN', iconStyle: 'icon-sign-node-white f18' },
         ],
         clickList: [
           { type: 'NORMAL', name: this.$t('m.treeinfo["手动节点"]'), iconStyle: 'icon-icon-artificial' },
           { type: 'TASK', name: this.$t('m.treeinfo["API节点"]'), iconStyle: 'icon-api-node' },
           { type: 'TASK-SOPS', name: this.$t('m.treeinfo["标准运维节点"]'), iconStyle: 'icon-task-icon' },
-          { type: 'SIGN', name: this.$t('m.treeinfo[\'会签节点\']'), iconStyle: 'icon-sign-node' },
+          // { type: 'SIGN', name: this.$t('m.treeinfo[\'会签节点\']'), iconStyle: 'icon-sign-node' },
           { type: 'WEBHOOK', name: this.$t('m[\'WEBHOOK节点\']'), iconStyle: 'icon-webhookjiedian' },
           { type: 'APPROVAL', name: this.$t('m.treeinfo[\'审批节点\']'), iconStyle: 'icon-approval-node' },
           { type: 'COVERAGE', name: this.$t('m.treeinfo["汇聚网关"]'), iconStyle: 'icon-flow-branch' },
@@ -379,8 +380,12 @@
     }
     .icon-webhookjiedian {
         font-size: 34px;
+        padding-top: 10px;
     }
     .icon-chajianjiedian {
         font-size: 34px;
+    }
+    .icon-flow-branch, .icon-flow-convergence, .icon-copy-new {
+      font-size: 26px;
     }
 </style>

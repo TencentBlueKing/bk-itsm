@@ -26,7 +26,7 @@
     <div class="page-content">
       <!-- btn -->
       <div :class="['service-left', isHiddenDirectory ? 'hide' : '']">
-        <tree-info :tree-info="treeInfo" :dir-list="dirList"></tree-info>
+        <tree-info ref="dirTree" :tree-info="treeInfo" :dir-list="dirList"></tree-info>
         <div class="hidden-tree" @click="hiddenTree">
           <i :class="['bk-itsm-icon', isHiddenDirectory ? 'icon-arrow-right' : 'icon-xiangzuo1']"></i>
         </div>
@@ -600,6 +600,11 @@
       this.getServiceDirectory();
     },
     methods: {
+      updateDirTree() {
+        if (this.$refs.dirTree) {
+          this.$refs.dirTree.getTreeList();
+        }
+      },
       getDisplayType() {
         const params = {
           project_key: this.$store.state.project.id || this.$route.query.project.id,
@@ -764,6 +769,7 @@
           this.editValue = '';
           this.closeEdit();
           this.getList();
+          if (type === 'catalog_id') this.updateDirTree();
         });
       },
       // 获取数据
@@ -1038,6 +1044,7 @@
               })
               .finally(() => {
                 this.secondClick = false;
+                this.updateDirTree();
               });
           },
         });

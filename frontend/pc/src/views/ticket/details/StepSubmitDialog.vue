@@ -46,7 +46,7 @@
             :label="$t(`m.newCommon['挂起原因']`)"
             :desc="
               $t(
-                `m.slaContent['挂起后单据流程将停止运行，且不计入SLA时长']`
+                `m.slaContent['挂起后单据流程将停止运行']`
               )
             "
             :required="true"

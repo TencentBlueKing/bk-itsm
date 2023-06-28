@@ -35,10 +35,10 @@
               <a href="javascript:;"
                 v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
                 :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
-                :title="$t(`m.systemConfig['接入']`)"
+                :title="$t(`m.systemConfig['接入API']`)"
                 data-test-id="api_a_apiTableAccessApi"
                 @click="openShade('JOIN')">
-                {{ $t(`m.systemConfig['接入']`) }}
+                {{ $t(`m.systemConfig['接入API']`) }}
               </a>
             </li>
             <li>
@@ -46,9 +46,9 @@
                 data-test-id="api_a_apiTableCreateApi"
                 v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
                 :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
-                :title="$t(`m.systemConfig['新增']`)"
+                :title="$t(`m.systemConfig['新增API']`)"
                 @click="openShade('ADD')">
-                {{$t(`m.systemConfig['新增']`)}}
+                {{$t(`m.systemConfig['新增API']`)}}
               </a>
             </li>
           </ul>
