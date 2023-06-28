@@ -435,12 +435,14 @@ export function jsonp (url, data) {
     ret += `&_time=${Date.now()}`;
   }
   JSONP.src = `${url}?callback=${callback}${ret}`;
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     window[callback] = r => {
       resolve(r);
       headEle.removeChild(JSONP);
       delete window[callback];
     };
     headEle.appendChild(JSONP);
+    reject(error)
+    headEle.removeChild(JSONP);
   });
 }
