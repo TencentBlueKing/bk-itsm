@@ -425,6 +425,7 @@ class DynamicFieldSerializer(serializers.Serializer):
     )
     value = serializers.CharField(required=True, max_length=255)
     key = serializers.CharField(required=False, read_only=True)
+    meta = serializers.DictField(required=False)
 
     def validate(self, attrs):
         key = get_random_key(attrs["name"])
