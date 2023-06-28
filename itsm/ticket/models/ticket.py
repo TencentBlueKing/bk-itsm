@@ -3956,6 +3956,25 @@ class Ticket(Model, BaseTicket):
 
         return list_view
 
+    def list_data(self):
+        return {
+            "sn": self.sn,
+            "id": self.id,
+            "title": self.title,
+            "service_id": self.service_id,
+            "service_type": self.service_type,
+            "meta": self.meta,
+            "bk_biz_id": self.bk_biz_id,
+            "current_status": self.current_status,
+            "create_at": self.create_at,
+            "creator": self.creator,
+            "is_supervise_needed": self.is_supervise_needed,
+            "flow_id": self.flow_id,
+            "supervise_type": self.supervise_type,
+            "supervisor": self.supervisor,
+            "project_key": self.project_key,
+        }
+
     @staticmethod
     def display_content(field_type, content):
         if field_type != "CUSTOM-FORM":

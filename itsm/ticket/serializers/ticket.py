@@ -495,7 +495,28 @@ class SimpleStatusSerializer(serializers.ModelSerializer):
 
 class TicketList(object):
     def __init__(self, instances, username, token):
-        self.instances = instances
+
+        # 说明是page
+        if isinstance(instances, list):
+            self.ticket_list = [ticket.list_data() for ticket in instances]
+        else:
+            self.ticket_list = instances.values(
+                "sn",
+                "id",
+                "title",
+                "service_id",
+                "service_type",
+                "meta",
+                "bk_biz_id",
+                "current_status",
+                "create_at",
+                "creator",
+                "is_supervise_needed",
+                "flow_id",
+                "supervise_type",
+                "supervisor",
+                "project_key",
+            )
         self.username = username
         self.token = token
 
@@ -609,26 +630,7 @@ class TicketList(object):
         return sla_task_info
 
     def to_client_representation(self):
-        ticket_list = list(
-            Ticket.objects.filter(pk__in=[x.pk for x in self.instances]).values(
-                "sn",
-                "id",
-                "title",
-                "service_id",
-                "service_type",
-                "meta",
-                "bk_biz_id",
-                "current_status",
-                "create_at",
-                "creator",
-                "is_supervise_needed",
-                "flow_id",
-                "supervise_type",
-                "supervisor",
-                "project_key",
-            )
-        )
-        ticket_ids = [ticket["id"] for ticket in ticket_list]
+        ticket_ids = [ticket["id"] for ticket in self.ticket_list]
         ticket_followers = self.get_attention_users(ticket_ids)
         email_invite = TicketCommentInvite.get_user_comments_invites(self.username)
         master_tickets = Ticket.get_batch_master_ticket(ticket_ids)
@@ -638,14 +640,14 @@ class TicketList(object):
         comments = TicketComment.ticket_comments(ticket_ids)
         supervisors_info = self.get_supervisor()
         service_info = self.get_service_info(
-            [ticket["service_id"] for ticket in ticket_list]
+            [ticket["service_id"] for ticket in self.ticket_list]
         )
         ticket_status = self.get_ticket_node_status(ticket_ids)
         workflow_version = self.get_workflow_version(
-            [ticket["flow_id"] for ticket in ticket_list]
+            [ticket["flow_id"] for ticket in self.ticket_list]
         )
         sla_task_info = self.get_sla_tasks(ticket_ids)
-        for inst in ticket_list:
+        for inst in self.ticket_list:
             comment_id = comments.get(inst["id"], {}).get("id")
             invites = email_invite.get(comment_id, []) if comment_id else []
             is_email_invite_token = self.token in invites
@@ -710,7 +712,7 @@ class TicketList(object):
             ):
                 inst.update(comment_id="-1")
 
-        return ticket_list
+        return self.ticket_list
 
 
 class TicketSerializer(AuthModelSerializer):

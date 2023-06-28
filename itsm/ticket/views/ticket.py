@@ -338,6 +338,9 @@ class TicketModelViewSet(ModelViewSet):
             filter_serializer = TicketFilterSerializer(data=request.query_params)
             filter_serializer.is_valid(raise_exception=True)
             kwargs = filter_serializer.validated_data
+            ordering = request.query_params.get("ordering")
+            if ordering:
+                queryset = queryset.order_by(ordering)
             queryset = Ticket.objects.get_tickets(
                 request.user.username, queryset, **kwargs
             )
