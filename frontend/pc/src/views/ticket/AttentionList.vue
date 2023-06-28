@@ -94,7 +94,7 @@
               :title="props.row.current_status_display"
               class="bk-status-color-info"
               :style="getstatusColor(props.row)">
-              {{ isChineseLanguage ? props.row.current_status_display: props.row.current_status || '--' }}
+              {{ isChineseLanguage ? props.row.current_status_display : props.row.current_status || '--' }}
             </span>
             <!-- 优先级 -->
             <span v-else-if="field.id === 'priority'"

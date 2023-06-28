@@ -197,11 +197,13 @@
 
     .bk-engine-node {
         width: 180px;
-
+        margin-bottom: 4px;
         ul {
             @include clearfix;
             cursor: pointer;
-
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
             .bk-tool-normal {
                 display: inline-block;
                 width: 30px;
