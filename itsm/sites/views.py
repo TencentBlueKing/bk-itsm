@@ -111,7 +111,7 @@ def index(request):
             "CUSTOM_TITLE": TITLE,
             "USE_LOG": "true",
             "LOGIN_URL": LOGIN_URL,
-            "LOG_NAME": settings.LOG_NAME or _("流程服务"),
+            "LOG_NAME": _("流程服务"),
             "IS_USE_INVITE_SMS": "true" if settings.IS_USE_INVITE_SMS else "false",
             "BK_USER_MANAGE_HOST": BK_USER_MANAGE_HOST,
             "BK_PAAS_ESB_HOST": settings.BK_PAAS_ESB_HOST,
