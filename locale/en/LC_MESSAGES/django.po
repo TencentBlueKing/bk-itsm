@@ -151,7 +151,7 @@ msgstr "Title (Ticket)"
 
 #: itsm/component/constants/basic.py:141 itsm/component/constants/basic.py:159
 msgid "提单人"
-msgstr "Sponsor"
+msgstr "Requester"
 
 #: itsm/component/constants/basic.py:142 itsm/component/constants/basic.py:160
 msgid "提单时间"
@@ -7088,7 +7088,7 @@ msgid "不限"
 msgstr "Open"
 
 msgid "个人"
-msgstr "Single Person"
+msgstr "Specific Person"
 
 msgid "派单人指定"
 msgstr "By Assignor"
@@ -7513,16 +7513,19 @@ msgid "自定义表单"
 msgstr "Custom form"
 
 msgid "提单人上级"
-msgstr "Ticket creator superior"
+msgstr "Requester's Superior"
 
 msgid "自定义角色"
 msgstr "Custom roles"
+
+msgid "自定义角色组"
+msgstr "Custom Role Group"
 
 msgid "第三方系统"
 msgstr "Third party systems"
 
 msgid "权限中心角色"
-msgstr "Iam Roles"
+msgstr "IAM Role"
 
 msgid "是否使用权限中心角色"
 msgstr "Whether to use iam role"
@@ -7540,7 +7543,7 @@ msgid "已撤销"
 msgstr "Revoked"
 
 msgid "指定节点处理人上级"
-msgstr "Designated node handler supervisor"
+msgstr "Processor's Superior of specific node"
 
 msgid "不支持撤回"
 msgstr "Withdrawal not supported"
