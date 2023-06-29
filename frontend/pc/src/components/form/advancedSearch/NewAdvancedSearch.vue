@@ -142,7 +142,7 @@
         </div>
       </div>
     </collapse-transition>
-    <div class="search-result" v-if="searchResult.length !== 0">
+    <!-- <div class="search-result" v-if="searchResult.length !== 0">
       <ul>
         <li v-for="(result, index) in searchResult" :key="index">
           <bk-popover placement="bottom" theme="light">
@@ -156,7 +156,7 @@
           <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="$emit('deteleSearchResult', panel, index)"></i>
         </li>
       </ul>
-    </div>
+    </div> -->
     <!-- 单据高亮设置 -->
     <bk-dialog
       v-model="isHighlightSetting"
@@ -395,11 +395,11 @@
       onSearchClick() {
         this.$emit('search', this.getParams(), true);
       },
-      onSearchResult(index) {
-        const params = this.searchResultList[this.panel][index];
-        this.$emit('search', params, false);
-        this.$emit('onClickSearchResult', true);
-      },
+      // onSearchResult(index) {
+      //   const params = this.searchResultList[this.panel][index];
+      //   this.$emit('search', params, false);
+      //   this.$emit('onClickSearchResult', true);
+      // },
       onClearClick() {
         this.searchForms.forEach((item) => {
           item.value = item.multiSelect ? [] : '';

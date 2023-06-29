@@ -25,7 +25,6 @@ import ColumnSn from '@/components/ticket/table/ColumnSn.vue';
 import { errorHandler } from '@/utils/errorHandler';
 import { deepClone } from '@/utils/util';
 import i18n from '@/i18n/index.js';
-import _ from 'lodash';
 import cookie from 'cookie';
 
 const SEARCH_FORMS = [
@@ -145,12 +144,6 @@ const ticketListMixins = {
         limit: 10,
       },
       listLoading: false,
-      searchResultList: {
-        todo: [],
-        approval: [],
-        attention: [],
-        created: [],
-      },
       approvalInfo: {
         showAllOption: false,
         result: true,
@@ -185,7 +178,7 @@ const ticketListMixins = {
   },
   methods: {
     initData() {
-      this.isChineseLanguage = cookie.parse(document.cookie).blueking_language === "zh-cn";
+      this.isChineseLanguage = cookie.parse(document.cookie).blueking_language === 'zh-cn';
       let defaultFields = ['id', 'title', 'service_name', 'current_steps', 'current_processors', 'create_at', 'creator', 'operate', 'status'];
       // 表格设置有缓存，使用缓存数据
       if (this.currTabSettingCache) {
@@ -412,24 +405,10 @@ const ticketListMixins = {
         ? { color: statusColor[0].color_hex, border: `1px solid ${statusColor[0].color_hex}` }
         : { color: '#3c96ff', border: '1px solid #3c96ff' };
     },
-    handleSearch(params, toggle) {
+    handleSearch(params) {
       this.lastSearchParams = params;
       this.searchToggle = true;
       this.getTicketList();
-      if (Object.keys(params).length === 0 || !toggle) return;
-      
-      const paramLength = Object.keys(params).length;
-      // 匹配搜索结果中已存在的搜索内容，相同不添加
-      const matchList = this.searchResultList[this.type].filter(item => Object.keys(item).length === paramLength);
-      if (matchList.length !== 0) {
-        matchList.forEach(item => {
-          if (!_.isEqual(item, params)) {
-            this.searchResultList[this.type].push(params);
-          }
-        });
-      } else {
-        this.searchResultList[this.type].push(params);
-      }
     },
     deteleSearchResult(type, index) {
       this.searchResultList[type].splice(index, 1);
