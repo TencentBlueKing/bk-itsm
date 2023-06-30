@@ -765,6 +765,9 @@ class TemplateFieldViewSet(component_viewsets.ModelViewSet):
         if not self.request.query_params.get("page_size"):
             self.pagination_class = None
         query_set = super(TemplateFieldViewSet, self).get_queryset()
+        ordering = self.request.query_params.get("ordering")
+        if ordering:
+            query_set = query_set.order_by(ordering)
         return query_set
 
     def get_list_queryset(self, request, queryset):
