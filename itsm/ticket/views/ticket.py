@@ -242,7 +242,7 @@ class TicketModelViewSet(ModelViewSet):
         "create_at": ["lte", "gte"],
         "bk_biz_id": ["exact", "in"],
     }
-    ordering_fields = ("create_at", "priority_order", "current_status_order")
+    ordering_fields = ("create_at",)
 
     def get_object(self):
         ticket = super(TicketModelViewSet, self).get_object()
@@ -339,11 +339,26 @@ class TicketModelViewSet(ModelViewSet):
             filter_serializer.is_valid(raise_exception=True)
             kwargs = filter_serializer.validated_data
             ordering = request.query_params.get("ordering")
-            if ordering:
+            if ordering and ordering not in [
+                "current_status_order",
+                "-current_status_order",
+            ]:
                 queryset = queryset.order_by(ordering)
             queryset = Ticket.objects.get_tickets(
                 request.user.username, queryset, **kwargs
             )
+
+            if ordering in ["current_status_order", "-current_status_order"]:
+                reverse = "order" if ordering == "current_status_order" else "-order"
+                order_by = (
+                    "ordering" if ordering == "current_status_order" else "-ordering"
+                )
+                custom_ordering = TicketOrderingFilter.current_status_order(
+                    reverse, request
+                )
+                select = {"ordering": custom_ordering}
+                queryset = queryset.extra(select=select, order_by=(order_by,))
+
         return queryset
 
     def create(self, request, *args, **kwargs):
