@@ -152,7 +152,6 @@
         ],
         userByList: [
           { id: 'TICKET', name: this.$t('m[\'单据\']') },
-          { id: 'SLA', name: this.$t('m[\'SLA\']') },
           { id: 'TASK', name: this.$t('m[\'任务\']') },
         ],
         rules: {
