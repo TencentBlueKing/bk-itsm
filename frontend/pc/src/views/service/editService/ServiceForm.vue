@@ -136,7 +136,14 @@
           list.push(item);
         });
         // 过滤非展示字段
-        return list.filter(field => field.showFeild);
+        const result = list.filter(field => {
+          if (Array.isArray(field)) {
+            const cur = field.filter(sub => sub && sub.showFeild); // 整行中的半行表单列表，为0时不展示
+            return cur.length ? cur : cur.length;
+          }
+          return field.showFeild;
+        });
+        return result;
       },
       // 整行表单拖拽
       onRowDragEnd(evt) {
