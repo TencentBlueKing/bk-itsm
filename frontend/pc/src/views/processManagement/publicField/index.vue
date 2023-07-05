@@ -455,6 +455,8 @@
         const { order } = data;
         if (order === 'descending') {
           this.ordering = '-update_at';
+        } else if (order === 'ascending') {
+          this.ordering = 'update_at';
         } else {
           this.ordering = undefined;
         }

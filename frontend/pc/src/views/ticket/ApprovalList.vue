@@ -39,7 +39,7 @@
             class="export"
             :title="$t(`m.tickets['导出']`)"
             @click="isExportDialogShow = true">
-            {{ $t('m.tickets["导出"]') }}</bk-button>
+            {{ $t(`m.tickets['导出']`) }}</bk-button>
           <bk-button
             :theme="'default'"
             :title="$t(`m.managePage['批量审批']`)"
@@ -142,12 +142,12 @@
           </bk-table-setting-content>
         </bk-table-column>
         <div class="empty" slot="empty">
-          <!-- <empty
+          <empty
             :is-error="listError"
             :is-search="searchToggle"
             @onRefresh="getTicketList()"
             @onClearSearch="$refs.advancedSearch.onClearClick()">
-          </empty> -->
+          </empty>
         </div>
       </bk-table>
       <div class="loading" v-if="progressInfo.show">
@@ -185,7 +185,7 @@
   import ApprovalDialog from '@/components/ticket/ApprovalDialog.vue';
   import i18n from '@/i18n/index.js';
   import ticketListMixins from './ticketListMixins.js';
-  // import Empty from '../../components/common/Empty.vue';
+  import Empty from '../../components/common/Empty.vue';
 
   const COLUMN_LIST = [
     {
@@ -252,7 +252,7 @@
       AdvancedSearch,
       ExportTicketDialog,
       ApprovalDialog,
-      // Empty,
+      Empty,
     },
     mixins: [ticketListMixins],
     props: {
@@ -325,7 +325,7 @@
             this.progressInfo.content = `${countSum - count}/${countSum}`;
             if (this.progressInfo.percent === 1) {
               this.progressInfo.config.activeColor = '#43e45f';
-              this.progressInfo.content = this.$t('m["已完成"]');
+              this.progressInfo.content = this.$t(`m['已完成']`);
               this.progressInfo.showTip = false;
               this.progressInfo.loading = false;
             }

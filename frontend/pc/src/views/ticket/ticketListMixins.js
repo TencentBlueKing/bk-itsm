@@ -153,6 +153,7 @@ const ticketListMixins = {
       listError: false,
       searchToggle: false,
       isChineseLanguage: true,
+      searchResultList: {}
     };
   },
   computed: {
@@ -178,6 +179,8 @@ const ticketListMixins = {
   },
   methods: {
     initData() {
+      // 同时兼容url中的project_id、project_key
+      const projectKey = this.$route.query.project_id || this.$route.query.project_key;
       this.isChineseLanguage = cookie.parse(document.cookie).blueking_language === 'zh-cn';
       let defaultFields = ['id', 'title', 'service_name', 'current_steps', 'current_processors', 'create_at', 'creator', 'operate', 'status'];
       // 表格设置有缓存，使用缓存数据
@@ -188,7 +191,7 @@ const ticketListMixins = {
       }
       this.setting.fields = this.columnList.slice(0);
       this.setting.selectedFields = this.columnList.slice(0).filter(m => defaultFields.includes(m.id));
-      if (this.$route.query.project_id) this.searchForms[1].value = this.$route.query.project_id || '';
+      if (projectKey) this.searchForms[1].value = projectKey || '';
       this.getTicketList();
       this.getTicketStatusTypes();
       this.getBusinessList();
@@ -249,16 +252,18 @@ const ticketListMixins = {
     // 获取单据列表
     getTicketList() {
       const query = this.$route.query;
+      // 同时兼容url中的project_id、project_key
+      const projectKey = query.project_id || query.project_key;
       const searchParams = JSON.stringify(this.lastSearchParams) === '{}'
-        ? { service_id__in: query.service_id || undefined, project_key: query.project_id || undefined } // 没有参数时默认将 url 参数作为查询参数
+        ? { service_id__in: query.service_id || undefined, project_key: projectKey || undefined } // 没有参数时默认将 url 参数作为查询参数
         : this.lastSearchParams;
       this.listLoading = true;
       this.listError = false;
       // approve-iframe
-      if (Object.keys(query).length !== 0) {
+      if (this.isIframe && Object.keys(query).length !== 0) {
         Object.keys(query).forEach(item => {
           if (item === 'project_id') {
-            searchParams.project_key = query.project_id;
+            searchParams.project_key = projectKey;
           } else if (item === 'service_id') {
             searchParams.service_id__in = query[item];
           } else {

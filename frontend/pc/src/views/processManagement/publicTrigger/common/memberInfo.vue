@@ -50,7 +50,7 @@
           v-model="recipientItem.value">
         </member-select>
       </template>
-      <template v-else-if="(recipientItem.key === 'GENERAL' || recipientItem.key === 'CMDB') && Array.isArray(recipientItem.value)">
+      <template v-else-if="(recipientItem.key === 'GENERAL' || recipientItem.key === 'CMDB' || recipientItem.key === 'IAM') && Array.isArray(recipientItem.value)">
         <bk-select style="float: left; width: 50%; margin-right: 6px;"
           v-model="recipientItem.value"
           :loading="recipientItem.isLoading"
@@ -205,10 +205,14 @@
           return;
         }
         recipientItem.isLoading = true;
-        this.$store.dispatch('deployCommon/getSecondUser', {
+        const params = {
           role_type: recipientItem.key,
-          project_key: this.$store.state.project.id,
-        }).then((res) => {
+        };
+        // 解决拉iam类型数据时，传project_key参数接口返回为空的问题
+        if (recipientItem.key !== 'IAM') {
+          params.project_key = this.$store.state.project.id;
+        }
+        this.$store.dispatch('deployCommon/getSecondUser', params).then((res) => {
           const valueList = res.data;
           const userList = [];
           if (recipientItem.key === 'GENERAL') {
