@@ -958,18 +958,18 @@ class SysDict(ObjectManagerMixin, Model):
             .order_by("order")
         )
 
-        if key == "PRIORITY":
-            return [
-                dict(
-                    [
-                        (field, getattr(dict_data, field))
-                        for field in fields
-                        if hasattr(dict_data, field)
-                    ]
-                )
-                for dict_data in dict_datas
-                if dict_data.key in ["1", "2", "3"]
-            ]
+        # if key == "PRIORITY":
+        #     return [
+        #         dict(
+        #             [
+        #                 (field, getattr(dict_data, field))
+        #                 for field in fields
+        #                 if hasattr(dict_data, field)
+        #             ]
+        #         )
+        #         for dict_data in dict_datas
+        #         if dict_data.key in ["1", "2", "3"]
+        #     ]
 
         return [
             dict(
