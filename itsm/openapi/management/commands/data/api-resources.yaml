@@ -1,0 +1,757 @@
+basePath: /
+info:
+  description: ''
+  title: API Gateway Resources
+  version: '0.1'
+paths:
+  /v2/devops_plugin/fields/:
+    get:
+      description: "\u84DD\u76FE\u63D2\u4EF6\u83B7\u53D6\u670D\u52A1\u5B57\u6BB5\u5217\
+        \u8868"
+      operationId: devops_plugin_fields
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u84DD\u76FE\u63D2\u4EF6"
+      x-bk-apigateway-resource:
+        allowApplyPermission: false
+        authConfig:
+          appVerifiedRequired: false
+          resourcePermissionRequired: false
+          userVerifiedRequired: true
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/devops_plugin/fields/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: false
+        matchSubpath: false
+  /v2/devops_plugin/services/:
+    get:
+      description: "\u84DD\u76FE\u63D2\u4EF6\u83B7\u53D6\u670D\u52A1\u5217\u8868"
+      operationId: devops_plugin_services
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u84DD\u76FE\u63D2\u4EF6"
+      x-bk-apigateway-resource:
+        allowApplyPermission: false
+        authConfig:
+          appVerifiedRequired: false
+          resourcePermissionRequired: false
+          userVerifiedRequired: true
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/devops_plugin/services/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: false
+        matchSubpath: false
+  /v2/itsm/add_follower/:
+    post:
+      description: "\u5355\u636E\u5173\u6CE8\u53D6\u5173\u63A5\u53E3"
+      operationId: add_follower
+      responses:
+        default:
+          description: ''
+      tags: []
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: true
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/ticket/add_follower/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/approve/:
+    post:
+      description: "\u5BF9\u5355\u636E\u67D0\u4E2A\u5BA1\u6279\u8282\u70B9\u8FDB\u884C\
+        \u5BA1\u6279\u64CD\u4F5C"
+      operationId: approve
+      responses:
+        default:
+          description: ''
+      tags: []
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: true
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/ticket/approve/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/callback_failed_ticket/:
+    get:
+      description: "\u56DE\u8C03\u5931\u8D25\u7684\u5355\u636E"
+      operationId: callback_failed_ticket
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: true
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/ticket/callback_failed_ticket/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/comment/:
+    post:
+      description: ''
+      operationId: comment
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u5355\u636E"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: true
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/ticket/comment/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/create_service_catalog/:
+    post:
+      description: "\u521B\u5EFA\u670D\u52A1\u76EE\u5F55"
+      operationId: create_service_catalog
+      responses:
+        default:
+          description: ''
+      tags: []
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/service_catalog/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/create_ticket/:
+    post:
+      description: "\u521B\u5EFA\u5355\u636E"
+      operationId: create_ticket
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/ticket/create_ticket/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/edit_field/:
+    post:
+      description: "\u7F16\u8F91\u5B57\u6BB5"
+      operationId: edit_field
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u5355\u636E"
+      x-bk-apigateway-resource:
+        allowApplyPermission: false
+        authConfig:
+          userVerifiedRequired: true
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/ticket/edit_field/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/get_all_tickets:
+    get:
+      description: "\u83B7\u53D6\u5355\u636E\u7684GET\u8BF7\u6C42"
+      operationId: get_all_tickets
+      responses:
+        default:
+          description: ''
+      tags: []
+      x-bk-apigateway-resource:
+        allowApplyPermission: false
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/ticket/get_tickets/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages:
+        - prod
+        isPublic: false
+        matchSubpath: false
+  /v2/itsm/get_approve_node_result/:
+    get:
+      description: "\u83B7\u53D6\u5BA1\u6279\u8282\u70B9\u7684\u5BA1\u6279\u7ED3\u679C"
+      operationId: get_approve_node_result
+      responses:
+        default:
+          description: ''
+      tags: []
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/ticket/get_approve_node_result/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/get_approver/:
+    get:
+      description: "\u83B7\u53D6\u5F53\u524D\u5355\u636E\u6307\u5B9A\u8282\u70B9\u7684\
+        \u5BA1\u6279\u4EBA"
+      operationId: get_approver
+      responses:
+        default:
+          description: ''
+      tags: []
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/ticket/get_approver/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/get_service_catalogs/:
+    get:
+      description: "\u670D\u52A1\u76EE\u5F55\u67E5\u8BE2"
+      operationId: get_service_catalogs
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/service/get_service_catalogs/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/get_service_detail/:
+    get:
+      description: "\u670D\u52A1\u8BE6\u60C5\u67E5\u8BE2"
+      operationId: get_service_detail
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/service/get_service_detail/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/get_service_roles/:
+    get:
+      description: "\u670D\u52A1\u89D2\u8272\u67E5\u8BE2"
+      operationId: get_service_roles
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: true
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/service/get_service_roles/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/get_services/:
+    get:
+      description: "\u670D\u52A1\u5217\u8868\u67E5\u8BE2"
+      operationId: get_services
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/service/get_services/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/get_ticket_info/:
+    get:
+      description: "\u5355\u636E\u8BE6\u60C5\u67E5\u8BE2"
+      operationId: get_ticket_info
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/ticket/get_ticket_info/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/get_ticket_logs/:
+    get:
+      description: "\u5355\u636E\u65E5\u5FD7\u67E5\u8BE2"
+      operationId: get_ticket_logs
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/ticket/get_ticket_logs/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/get_ticket_status/:
+    get:
+      description: "\u5355\u636E\u72B6\u6001\u67E5\u8BE2"
+      operationId: get_ticket_status
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/ticket/get_ticket_status/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/get_tickets/:
+    post:
+      description: "\u83B7\u53D6\u5355\u636E\u5217\u8868"
+      operationId: get_tickets
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/ticket/get_tickets/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/get_tickets_by_user/:
+    get:
+      description: "\u901A\u8FC7\u7528\u6237\u83B7\u53D6\u5355\u636E"
+      operationId: get_tickets_by_user
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/ticket/get_tickets_by_user/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/get_workflow_detail:
+    get:
+      description: "\u83B7\u53D6\u6D41\u7A0B\u8BE6\u60C5"
+      operationId: get_workflow_detail
+      responses:
+        default:
+          description: ''
+      tags: []
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: true
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/worklfow/get_workflow_detail/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/import_service/:
+    post:
+      description: "\u5BFC\u5165\u670D\u52A1"
+      operationId: import_service
+      responses:
+        default:
+          description: ''
+      tags: []
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/service/import_service/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/operate_node/:
+    post:
+      description: "\u5904\u7406\u5355\u636E\u8282\u70B9"
+      operationId: operate_node
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/ticket/operate_node/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/operate_ticket/:
+    post:
+      description: "\u5904\u7406\u5355\u636E"
+      operationId: operate_ticket
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/ticket/operate_ticket/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/proceed_approval/:
+    post:
+      description: "\u5BA1\u6279\u8282\u70B9\u5904\u7406"
+      operationId: proceed_approval
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/ticket/proceed_approval/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/proceed_fast_approval/:
+    post:
+      description: "bkchat \u5FEB\u6377\u5BA1\u6279\u63A5\u53E3"
+      operationId: proceed_fast_approval
+      responses:
+        default:
+          description: ''
+      tags: []
+      x-bk-apigateway-resource:
+        allowApplyPermission: false
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/ticket/proceed_fast_approval/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: false
+        matchSubpath: false
+  /v2/itsm/ticket_approval_result/:
+    post:
+      description: "\u67E5\u8BE2\u5BA1\u6279\u7ED3\u679C"
+      operationId: ticket_approval_result
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: true
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/ticket/ticket_approval_result/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/token/verify/:
+    post:
+      description: "token\u6821\u9A8C"
+      operationId: token_verify
+      responses:
+        default:
+          description: ''
+      tags:
+      - "\u65E0\u5206\u7C7B"
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/ticket/token/verify/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+  /v2/itsm/update_service/:
+    post:
+      description: "\u66F4\u65B0\u67D0\u4E2A\u670D\u52A1"
+      operationId: update_service
+      responses:
+        default:
+          description: ''
+      tags: []
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: post
+          path: /{env.api_sub_path}/openapi/service/update_service/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
+schemes:
+- http
+swagger: '2.0'
