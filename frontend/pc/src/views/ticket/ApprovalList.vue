@@ -39,7 +39,7 @@
             class="export"
             :title="$t(`m.tickets['导出']`)"
             @click="isExportDialogShow = true">
-            {{ $t('m.tickets["导出"]') }}</bk-button>
+            {{ $t(`m.tickets['导出']`) }}</bk-button>
           <bk-button
             :theme="'default'"
             :title="$t(`m.managePage['批量审批']`)"
@@ -325,7 +325,7 @@
             this.progressInfo.content = `${countSum - count}/${countSum}`;
             if (this.progressInfo.percent === 1) {
               this.progressInfo.config.activeColor = '#43e45f';
-              this.progressInfo.content = this.$t('m["已完成"]');
+              this.progressInfo.content = this.$t(`m['已完成']`);
               this.progressInfo.showTip = false;
               this.progressInfo.loading = false;
             }
