@@ -46,7 +46,7 @@ class Command(BaseCommand):
 
         if (
             settings.IS_OPEN_V3
-            and settings.NGINE_REGION == "default"
+            and settings.ENGINE_REGION == "default"
             and settings.ENABLE_SYNC_API_GATEWAY
         ):
             print(
