@@ -142,12 +142,12 @@
           </bk-table-setting-content>
         </bk-table-column>
         <div class="empty" slot="empty">
-          <!-- <empty
+          <empty
             :is-error="listError"
             :is-search="searchToggle"
             @onRefresh="getTicketList()"
             @onClearSearch="$refs.advancedSearch.onClearClick()">
-          </empty> -->
+          </empty>
         </div>
       </bk-table>
       <div class="loading" v-if="progressInfo.show">
@@ -185,7 +185,7 @@
   import ApprovalDialog from '@/components/ticket/ApprovalDialog.vue';
   import i18n from '@/i18n/index.js';
   import ticketListMixins from './ticketListMixins.js';
-  // import Empty from '../../components/common/Empty.vue';
+  import Empty from '../../components/common/Empty.vue';
 
   const COLUMN_LIST = [
     {
@@ -252,7 +252,7 @@
       AdvancedSearch,
       ExportTicketDialog,
       ApprovalDialog,
-      // Empty,
+      Empty,
     },
     mixins: [ticketListMixins],
     props: {

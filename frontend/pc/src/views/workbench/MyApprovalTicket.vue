@@ -31,7 +31,7 @@
   import ApprovalList from '../ticket/ApprovalList';
 
   export default {
-    name: 'MyTodoTicket',
+    name: 'MyApprovalTicket',
     components: {
       NavTitle,
       ApprovalList,
