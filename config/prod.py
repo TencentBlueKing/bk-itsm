@@ -48,7 +48,8 @@ else:
 
 # 正式环境
 RUN_MODE = "PRODUCT"
-
+BK_APIGW_STAGE_NAME = "prod"
+BKAPP_APIGW_SYNC_STAGE = ["prod"]
 # 只对正式环境日志级别进行配置，可以在这里修改
 LOG_LEVEL = "ERROR"
 RIO_TOKEN = os.environ.get("RIO_TOKEN", "")
@@ -75,7 +76,6 @@ DATABASES.update(
         },
     }
 )
-
 
 # ===============================================================================
 # CSRF SETTINGS

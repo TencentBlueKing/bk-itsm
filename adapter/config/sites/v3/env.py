@@ -25,3 +25,6 @@ os.environ["BKAPP_REDIS_PASSWORD"] = REDIS_PASSWORD
 
 if "BKAPP_FRONTEND_URL" not in os.environ:
     os.environ["BKAPP_FRONTEND_URL"] = get_bk_itsm_host()
+
+if "BKAPP_APIGW_API_HOST" not in os.environ:
+    os.environ["BKAPP_APIGW_API_HOST"] = get_bk_itsm_host()
