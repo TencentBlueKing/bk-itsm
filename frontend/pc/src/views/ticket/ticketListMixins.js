@@ -255,7 +255,7 @@ const ticketListMixins = {
       // 同时兼容url中的project_id、project_key
       const projectKey = query.project_id || query.project_key;
       const searchParams = JSON.stringify(this.lastSearchParams) === '{}'
-        ? { service_id__in: query.service_id || undefined, project_key: query.projectKey || undefined } // 没有参数时默认将 url 参数作为查询参数
+        ? { service_id__in: query.service_id || undefined, project_key: projectKey || undefined } // 没有参数时默认将 url 参数作为查询参数
         : this.lastSearchParams;
       this.listLoading = true;
       this.listError = false;
