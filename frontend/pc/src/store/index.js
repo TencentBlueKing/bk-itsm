@@ -374,7 +374,7 @@ export default new Vuex.Store({
   actions: {
     updateUserLanguage({}, language) {
       const bkPaasEsbHost = window.BK_PAAS_ESB_HOST;
-      return jsonp(bkPaasEsbHost + '/api/c/compapi/v2/usermanage/fe_update_user_lanquage/', language);
+      return jsonp(bkPaasEsbHost + '/api/c/compapi/v2/usermanage/fe_update_user_language/', language);
     },
     getPlatformPreData() {
       return ajax.get('init/').then((response) => response.data);
