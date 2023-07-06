@@ -355,8 +355,8 @@
           attention: !this.hasAttention,
         };
         const bkMessage = this.hasAttention
-          ? this.$t('m.manageCommon[\'取消关注成功~\']')
-          : this.$t('m.manageCommon[\'添加关注成功~\']');
+          ? this.$t('m.manageCommon[\'取消关注成功\']')
+          : this.$t('m.manageCommon[\'添加关注成功\']');
         this.$store
           .dispatch('deployOrder/setAttention', { params, id })
           .then(() => {
