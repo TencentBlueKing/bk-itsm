@@ -343,10 +343,10 @@
         this.$store.dispatch('deployOrder/setAttention', { params, id }).then(() => {
           if (row.hasAttention) {
             row.hasAttention = false;
-            bkMessage = this.$t('m.manageCommon[\'取消关注成功~\']');
+            bkMessage = this.$t('m.manageCommon[\'取消关注成功\']');
           } else {
             row.hasAttention = true;
-            bkMessage = this.$t('m.manageCommon[\'添加关注成功~\']');
+            bkMessage = this.$t('m.manageCommon[\'添加关注成功\']');
           }
           this.$bkMessage({
             message: bkMessage,

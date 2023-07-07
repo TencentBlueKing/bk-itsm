@@ -645,6 +645,7 @@
     .nav-operate-list, .nav-language-list {
         padding: 4px 0;
         .operate-item, .language-item {
+            padding: 0 12px;
             min-width: 80px;
             height: 30px;
             line-height: 30px;
