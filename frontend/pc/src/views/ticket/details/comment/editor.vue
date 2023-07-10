@@ -77,7 +77,7 @@
         this.editorData = newHtml;
         this.$emit('editorContent', newHtml);
       };
-      editor.config.placeholder = this.$t(`m['请输入内容...']`);
+      editor.config.placeholder = this.$t('m[\'请输入内容...\']');
       editor.config.height = 150;
       editor.config.zIndex = 400;
       editor.config.excludeMenus = [
@@ -114,7 +114,7 @@
         }
         if (!this.$store.state.ticket.hasTicketNodeOptAuth) {
           this.$bkMessage({
-            message: this.$t(`m['你当前无法发表内部评论']`),
+            message: this.$t('m[\'你当前无法发表内部评论\']'),
             theme: 'warning ',
           });
           return;

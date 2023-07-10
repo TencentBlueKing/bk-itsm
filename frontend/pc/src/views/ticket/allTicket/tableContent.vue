@@ -139,7 +139,7 @@
       <div class="empty" slot="empty">
         <empty
           :is-error="listError"
-          :is-search="searchToggle"
+          :is-search="true"
           @onRefresh="$parent.getAllTicketList()"
           @onClearSearch="$emit('clearSearch')">
         </empty>
@@ -169,7 +169,6 @@
     },
     props: {
       from: String,
-      searchToggle: Boolean,
       listError: Boolean,
       pagination: {
         type: Object,
@@ -189,12 +188,6 @@
         default() {
           return [];
         },
-      },
-      // 当前服务
-      // serviceType
-      serviceType: {
-        type: String,
-        default: '',
       },
     },
     data() {
@@ -219,7 +212,7 @@
       },
       currTabSettingCache() {
         this.$store.commit('ticket/getTicketSettingformLocalStorage');
-        return this.$store.state.ticket.settingCache[`all_${this.serviceType}`];
+        return this.$store.state.ticket.settingCache.all;
       },
     },
     watch: {
@@ -380,7 +373,7 @@
         this.setting.selectedFields = fields;
         const fieldIds = fields.map(m => m.id);
         this.$store.commit('ticket/setSettingCache', {
-          type: `all_${this.serviceType}`,
+          type: 'all',
           value: { fields: fieldIds, size },
         });
         this.$store.commit('ticket/setTicketSettingToLocalStorage');

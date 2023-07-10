@@ -37,13 +37,15 @@ export default {
       });
     },
     // 获取指定类型的列表信息
-    getTypeStatus({ commit, state, dispatch }, { type, params }) {
-      if (state.statusColorMap[type]) {
+    getTypeStatus({ commit, state, dispatch }, { type, params } = { type: '', params: {}}) {
+      if (type && state.statusColorMap[type]) {
         return state.statusColorMap[type];
       }
-      return ajax.get(`ticket_status/status/?service_type=${type}&ordering=order`, { params }).then((response) => {
+      return ajax.get(`ticket_status/status/`, { params: { ordering: 'order', service_type: type, ...params } }).then((response) => {
         const res = response.data;
-        state.statusColorMap[type] = res;
+        if (type) {
+          state.statusColorMap[type] = res;
+        }
         return res;
       });
     },
