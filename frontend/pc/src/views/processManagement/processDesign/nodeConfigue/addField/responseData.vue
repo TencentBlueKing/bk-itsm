@@ -350,8 +350,8 @@
           });
           const lastObj = `${rspDataList.length}_items_0`;
           rspDataList.push(lastObj);
-          const kvKeyAncestorsStr = `${rspDataList.toString()},${rspDataList.length}_${this.changeInfo.kv_relation.key}`;
-          const kvNameAncestorsStr = `${rspDataList.toString()},${rspDataList.length}_${this.changeInfo.kv_relation.name}`;
+          const kvKeyAncestorsStr = rspDataList.concat(this.changeInfo.kv_relation.key.split('.').map((item, index) => `${rspDataList.length + index}_${item}`)).join();
+          const kvNameAncestorsStr = rspDataList.concat(this.changeInfo.kv_relation.name.split('.').map((item, index) => `${rspDataList.length + index}_${item}`)).join();
           this.tampFormInfo.ancestorsList_str = rspDataList.toString(); // 记录、标记已选中Array --> tree组件/选取数租
           this.responseTableData.forEach((ite) => {
             // 关键字字段
