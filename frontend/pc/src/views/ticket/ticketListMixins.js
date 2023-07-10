@@ -153,7 +153,7 @@ const ticketListMixins = {
       listError: false,
       searchToggle: false,
       isChineseLanguage: true,
-      searchResultList: {}
+      searchResultList: {},
     };
   },
   computed: {
@@ -194,8 +194,6 @@ const ticketListMixins = {
       if (projectKey) this.searchForms[1].value = projectKey || '';
       this.getTicketList();
       this.getTicketStatusTypes();
-      this.getBusinessList();
-      this.getServiceTree();
     },
     // 获取单据所有状态分类列表
     getTicketStatusTypes() {
@@ -204,27 +202,6 @@ const ticketListMixins = {
       };
       this.$store.dispatch('ticketStatus/getOverallTicketStatuses', params).then((res) => {
         this.searchForms.find(item => item.key === 'current_status__in').list = res.data;
-      })
-        .catch((res) => {
-          errorHandler(res, this);
-        });
-    },
-    getBusinessList() {
-      this.$store.dispatch('eventType/getAppList').then((res) => {
-        this.searchForms.find(item => item.key === 'bk_biz_id').list = res.data;
-      })
-        .catch((res) => {
-          errorHandler(res, this);
-        });
-    },
-    // 查询级联数据
-    getServiceTree() {
-      const params = {
-        show_deleted: true,
-      };
-      this.$store.dispatch('serviceCatalog/getTreeData', params).then((res) => {
-        const formItem = this.searchForms.find(item => item.key === 'catalog_id');
-        formItem.list = res.data[0] ? res.data[0].children : [];
       })
         .catch((res) => {
           errorHandler(res, this);
@@ -317,7 +294,7 @@ const ticketListMixins = {
     getTicketsProcessors(originList) {
       const copyList = deepClone(originList);
       originList.forEach((ticket) => {
-        this.$set(ticket, 'current_processors', this.$t(`m.manageCommon['加载中...']`));
+        this.$set(ticket, 'current_processors', this.$t('m.manageCommon[\'加载中...\']'));
       });
       const ids = copyList.map(ticket => ticket.id);
       this.$store.dispatch('ticket/getTicketsProcessors', { ids: ids.toString() }).then((res) => {
@@ -338,7 +315,7 @@ const ticketListMixins = {
     getTicketsCreator(originList) {
       const copyList = deepClone(originList);
       originList.forEach((ticket) => {
-        this.$set(ticket, 'creator', this.$t(`m.manageCommon['加载中...']`));
+        this.$set(ticket, 'creator', this.$t('m.manageCommon[\'加载中...\']'));
       });
       const ids = copyList.map(ticket => ticket.id);
       this.$store.dispatch('ticket/getTicketsCreator', { ids: ids.toString() }).then((res) => {

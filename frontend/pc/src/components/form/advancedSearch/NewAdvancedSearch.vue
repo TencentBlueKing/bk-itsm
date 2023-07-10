@@ -35,7 +35,9 @@
           :placeholder="searchForms[1].placeholder"
           style="width: 250px;"
           searchable
-          @change="onSearchClick">
+          clearable
+          @selected="handleSelectProject"
+          @clear="handleSelectProject">
           <bk-option v-for="option in projectList"
             :key="option.key"
             :id="option.key"
@@ -142,21 +144,6 @@
         </div>
       </div>
     </collapse-transition>
-    <!-- <div class="search-result" v-if="searchResult.length !== 0">
-      <ul>
-        <li v-for="(result, index) in searchResult" :key="index">
-          <bk-popover placement="bottom" theme="light">
-            <span class="search-reult-content" @click="onSearchResult(index)">{{ result[0] }}</span>
-            <div slot="content">
-              <template v-for="(item, index1) in result">
-                <p :key="index1">{{ item }}</p>
-              </template>
-            </div>
-          </bk-popover>
-          <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="$emit('deteleSearchResult', panel, index)"></i>
-        </li>
-      </ul>
-    </div> -->
     <!-- 单据高亮设置 -->
     <bk-dialog
       v-model="isHighlightSetting"
@@ -204,27 +191,8 @@
           return [];
         },
       },
-      searchResultList: {
-        type: Object,
-        default() {
-          return {};
-        },
-      },
-      panel: String,
       curServcie: Object,
       isIframe: Boolean,
-      isCustomTab: {
-        type: Boolean,
-        default() {
-          return false;
-        },
-      },
-      isEditTab: {
-        type: Boolean,
-        default() {
-          return false;
-        },
-      },
     },
     data() {
       return {
@@ -250,21 +218,6 @@
           bk_biz_id: this.$t('m["业务"]'),
         },
       };
-    },
-    computed: {
-      searchResult() {
-        if (this.searchResultList[this.panel]) {
-          const result = this.searchResultList[this.panel].map((item) => {
-            const list = Object.keys(item).map(ite => `${this.formField[ite]}: ${item[ite]}`);
-            return list;
-          });
-          return result;
-        }
-        return [];
-      },
-      isfilter() {
-        return this.isCustomTab;
-      },
     },
     watch: {
       forms: {
@@ -323,6 +276,7 @@
       }
     },
     methods: {
+      // 获取项目列表
       async getProjectAllList() {
         const { projectList } = this.$store.state.project;
         const projectItem = this.searchForms.find(item => item.key === 'project_key');
@@ -340,33 +294,21 @@
           this.projectLoading = false;
         }
       },
-      // 过滤参数
+      // 获取服务目录
       async getCatalogList() {
         const params = {
           show_deleted: true,
         };
-        if (this.$route.query.project_id) {
-          params.project_key = this.$route.query.project_id;
+        const catelogForm = this.searchForms.find(item => item.key === 'catalog_id');
+        const projectForm = this.searchForms.find(item => item.key === 'project_key');
+        if (projectForm && projectForm.value) {
+          params.project_key = projectForm.value;
         }
+        catelogForm.loading = true;
         const res = await this.$store.dispatch('serviceCatalog/getTreeData', params);
         const result = res.data[0] ? res.data[0].children : [];
-        const formItem = this.searchForms.find(item => item.key === 'catalog_id');
-        if (this.isfilter && 'conditions' in this.curServcie) {
-          const list = [this.getTreebyId(result, this.curServcie.conditions.catalog_id[0])];
-          formItem.list = list;
-        }
-      },
-      getTreebyId(list, id) {
-        if (!id) return [];
-        for (let i = 0; i < list.length; i++) {
-          const node = list[i];
-          if (node.id === id) {
-            return node;
-          }
-          if (node.children && node.children.length > 0) {
-            this.getTreebyId(node.children, id);
-          }
-        }
+        catelogForm.list = result;
+        catelogForm.loading = false;
       },
       getParams() {
         const params = {};
@@ -395,11 +337,6 @@
       onSearchClick() {
         this.$emit('search', this.getParams(), true);
       },
-      // onSearchResult(index) {
-      //   const params = this.searchResultList[this.panel][index];
-      //   this.$emit('search', params, false);
-      //   this.$emit('onClickSearchResult', true);
-      // },
       onClearClick() {
         this.searchForms.forEach((item) => {
           item.value = item.multiSelect ? [] : '';
@@ -411,9 +348,24 @@
       onShowSearchMore() {
         this.showMore = !this.showMore;
       },
+      handleSelectProject() {
+        this.updateCatelogList();
+        this.onSearchClick();
+      },
       // change 事件，执行 form 中的回调函数
       onFormChange(val, form) {
+        if (form.key === 'project_key') {
+          this.updateCatelogList();
+        }
         this.$emit('formChange', form.key, val, this.searchForms);
+      },
+      updateCatelogList() {
+        const catelogForm = this.searchForms.find(item => item.key === 'catalog_id');
+        if (catelogForm) {
+          catelogForm.value = [];
+          catelogForm.list = [];
+          this.getCatalogList();
+        }
       },
       getTicketHighlight() {
         this.$store.dispatch('sla/getTicketHighlight').then(({ data }) => {
