@@ -24,9 +24,7 @@ import ajax from "../../utils/ajax";
 
 export default {
   namespaced: true,
-  state: {
-    statusColorMap: {},
-  },
+  state: {},
   mutations: {},
   actions: {
     // 获取四种类型的列表信息
@@ -38,15 +36,8 @@ export default {
     },
     // 获取指定类型的列表信息
     getTypeStatus({ commit, state, dispatch }, { type, params } = { type: '', params: {}}) {
-      if (type && state.statusColorMap[type]) {
-        return state.statusColorMap[type];
-      }
       return ajax.get(`ticket_status/status/`, { params: { ordering: 'order', service_type: type, ...params } }).then((response) => {
-        const res = response.data;
-        if (type) {
-          state.statusColorMap[type] = res;
-        }
-        return res;
+        return response.data;
       });
     },
     // 新增指定服务类型下的工单状态
