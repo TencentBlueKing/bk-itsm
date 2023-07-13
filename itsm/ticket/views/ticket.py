@@ -82,6 +82,7 @@ from itsm.component.constants import (
     GENERAL,
     ORGANIZATION,
     FAST_APPROVAL_MESSAGE,
+    SUSPENDED,
 )
 from itsm.component.constants.flow import EXPORT_SUPPORTED_TYPE
 from itsm.component.dlls.component import ComponentLibrary
@@ -864,6 +865,9 @@ class TicketModelViewSet(ModelViewSet):
 
         ticket = self.get_object()
 
+        if ticket.current_status == SUSPENDED:
+            raise ValidationError(_("处理失败，单据处于挂起状态中，请先恢复"))
+
         fields = request.data.get("fields")
         state_id = str(request.data.get("state_id", ""))
 
@@ -1113,6 +1117,10 @@ class TicketModelViewSet(ModelViewSet):
         username = request.user.username
 
         ticket = self.get_object()
+
+        if ticket.current_status == SUSPENDED:
+            raise ValidationError(_("催办失败，该单据处于挂起状态"))
+
         supervise_validate(ticket, username)
 
         message = request.data.get("message") or Template(SUPERVISE_MESSAGE).render(
@@ -1177,6 +1185,9 @@ class TicketModelViewSet(ModelViewSet):
         异常分派
         """
         ticket = self.get_object()
+
+        if ticket.current_status == SUSPENDED:
+            raise ValidationError(_("异常分派失败，该单据处于挂起状态"))
 
         operate_serializer = TicketStateOperateExceptionSerializer(
             request=request, ticket=ticket, operator=request.user.username
@@ -1768,6 +1779,15 @@ class TicketModelViewSet(ModelViewSet):
         opinion = request.data.get("opinion")
         approval_list = request.data.get("approval_list", [])
         user = request.user.username
+
+        ticket_ids = [ticket_info["ticket_id"] for ticket_info in approval_list]
+
+        ticket_list = Ticket.objects.filter(id__in=ticket_ids)
+
+        no_running_tickets = ticket_list.filter(current_status=SUSPENDED)
+        if no_running_tickets:
+            raise ValidationError(_("存在挂起的单据, 请检查"))
+
         for ticket_info in approval_list:
             ticket = Ticket.objects.get(id=ticket_info["ticket_id"])
             running_approval_status = ticket.node_status.filter(
