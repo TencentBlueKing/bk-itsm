@@ -987,13 +987,13 @@ class Status(Model):
                 service_type=service_type, key=self.ticket.current_status
             )
 
-            if setting.get("name") in TICKET_STATUS_DICT.keys():
-                to_ticket_status = (
-                    TicketStatus.objects.filter(service_type=service_type)
-                    .filter(key=setting.get("name"))
-                    .first()
-                )
-            else:
+            to_ticket_status = (
+                TicketStatus.objects.filter(service_type=service_type)
+                .filter(key=setting.get("name"))
+                .first()
+            )
+            if not to_ticket_status:
+                # 这段代码应该是兼容老的配置
                 to_ticket_status = (
                     TicketStatus.objects.filter(service_type=service_type)
                     .filter(name=setting.get("name"))
