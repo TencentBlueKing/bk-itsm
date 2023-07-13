@@ -27,6 +27,7 @@ import os
 import time
 from functools import reduce
 
+from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from common.log import logger
@@ -45,7 +46,7 @@ from itsm.component.constants import (
     ACTIVE_TASK_STATUS,
     SOURCE_WORKFLOW,
     SOURCE_TICKET,
-    SOURCE_TASK
+    SOURCE_TASK,
 )
 from itsm.iadmin.contants import (
     SWITCH_OFF,
@@ -67,8 +68,11 @@ class PathTypeValidators(object):
     def __call__(self, value):
         if self.instance:
             # 组织架构开关额外检查
-            validate_func = getattr(self, "validate_{}".format(self.instance.key.lower()), 
-                                    self.validate_other)
+            validate_func = getattr(
+                self,
+                "validate_{}".format(self.instance.key.lower()),
+                self.validate_other,
+            )
             validate_func(value)
 
     @staticmethod
@@ -76,6 +80,11 @@ class PathTypeValidators(object):
         path = value.get("value")
         if not path:
             raise AnnexStoreValidateError(_("路径不能为空！"))
+
+        # 如果是容器化环境, 由于使用的是制品库，跳过路径校验
+        if settings.ENGINE_REGION == "default":
+            return
+
         if not os.path.exists(path):
             raise AnnexStoreValidateError(_("路径不存在，请检查！"))
         file_path = os.path.join(path, "%s/" % int(time.time()))
@@ -95,9 +104,13 @@ class PathTypeValidators(object):
     def validate_is_organization(value):
         if value.get("value") == SWITCH_ON:
             try:
-                client_backend.usermanage.list_departments({"fields": "id", "__raw": True})
+                client_backend.usermanage.list_departments(
+                    {"fields": "id", "__raw": True}
+                )
             except ComponentCallError:
-                raise OrganizationStructureFunctionSwitchValidateError(_("组织架构接口调用失败，无法启用，请联系管理员"))
+                raise OrganizationStructureFunctionSwitchValidateError(
+                    _("组织架构接口调用失败，无法启用，请联系管理员")
+                )
 
         if value.get("value") == SWITCH_OFF:
             state_values = State.objects.filter(
@@ -105,9 +118,13 @@ class PathTypeValidators(object):
             ).values_list("workflow__name", "name")
             if state_values.exists():
                 raise OrganizationStructureFunctionSwitchValidateError(
-                    _("以下流程节点正在使用组织架构功能，请更改再关闭：{}").format(",".join(["->".join(v) for v in state_values]))
+                    _("以下流程节点正在使用组织架构功能，请更改再关闭：{}").format(
+                        ",".join(["->".join(v) for v in state_values])
+                    )
                 )
-            service_values = Service.objects.filter(display_type="ORGANIZATION").values_list("name", flat=True)
+            service_values = Service.objects.filter(
+                display_type="ORGANIZATION"
+            ).values_list("name", flat=True)
             if service_values.exists():
                 raise OrganizationStructureFunctionSwitchValidateError(
                     _("以下服务正在使用组织架构功能，请更改再关闭：{}").format(",".join(service_values))
@@ -116,10 +133,19 @@ class PathTypeValidators(object):
     @staticmethod
     def validate_child_ticket_switch(value):
         if value.get("value") == SWITCH_OFF:
-            master_slaves = TicketToTicket.objects.filter(related_type=MASTER_SLAVE).values_list('from_ticket',
-                                                                                                 'to_ticket')
-            all_ticket_ids = reduce(lambda x, y: x.union(y), [set(), ] + list(master_slaves))
-            active_ticket = Ticket.objects.filter(id__in=all_ticket_ids, current_status=PROCESS_RUNNING).exists()
+            master_slaves = TicketToTicket.objects.filter(
+                related_type=MASTER_SLAVE
+            ).values_list("from_ticket", "to_ticket")
+            all_ticket_ids = reduce(
+                lambda x, y: x.union(y),
+                [
+                    set(),
+                ]
+                + list(master_slaves),
+            )
+            active_ticket = Ticket.objects.filter(
+                id__in=all_ticket_ids, current_status=PROCESS_RUNNING
+            ).exists()
             if active_ticket:
                 raise ChildTicketSwitchValidateError(_("存在未完成的含有母子单的单据，请处理后再关闭"))
 
@@ -134,7 +160,9 @@ class PathTypeValidators(object):
     def validate_trigger_switch(value):
         if value.get("value") == SWITCH_OFF:
             quoted_status = [SOURCE_WORKFLOW, SOURCE_TICKET, SOURCE_TASK]
-            active_trigger = Trigger.objects.filter(source_type__in=quoted_status).exists()
+            active_trigger = Trigger.objects.filter(
+                source_type__in=quoted_status
+            ).exists()
             if active_trigger:
                 raise TriggerSwitchValidateError(_("存在被引用的触发器，请处理后再关闭"))
 
