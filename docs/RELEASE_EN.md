@@ -1,4 +1,23 @@
 # Changelog
+## [Version: 2.6.6] - 2023-07-13
+[Optimization] Internationalization content supplement  
+[Repaired] Fix the problem that the public field is configured with the API data source that the data cannot be displayed after the data source cannot be displayed    
+[Repaired] Repair the document page service directory is not related to the project associated with the project  
+[Repaired] Repair the service batch deletion of the directory after the directory deletes failure  
+[Repaired] Data statistical table sorting conditions have not taken effect, repair the problem  
+[Repaired] Project field form update time By ranks incorrect problems repair  
+[Repaired] The list of repair documents is empty as the form is not correct  
+[Repaired] The problem that the trigger processor cannot choose the second level drop -down box when choosing the role of the permissions center  
+[Repaired] Repair the problem of calling the right of the center interface when the switch language is repaired  
+[Repaired] Modify the list interface of the document list interface  
+[Repaired] Priority release user custom restrictions  
+[Repaired] Fix bugs that fail to flow in documents due to the token conflict  
+[Optimization] Automatically adjust the single time to 5s  
+[Repaired] When repairing the approval person is too much, the user prompts the problem that there is no authority  
+[Repaired] Fix the problem of abnormal exit when the API node MESSAGE returns the dictionary  
+[Repaired] The issue of the attachment path of the system under the containerized environment  
+[Repaired] Fix the problem that the custom state that cannot be empty cannot be empty   
+
 ## [Version: 2.6.5] - 2023-05-11
 [Optimization] Support CDN solution  
 [Optimization] Internationalization content supplement  
