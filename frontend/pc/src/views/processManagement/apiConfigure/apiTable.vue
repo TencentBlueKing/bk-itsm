@@ -27,7 +27,7 @@
       <div class="bk-api-button">
         <bk-dropdown-menu class="mr10 access-btn" @show="dropdownShow" @hide="dropdownHide" ref="apiDropdown" :disabled="disableImport">
           <div class="dropdown-trigger-btn" style="padding-left: 12px;" slot="dropdown-trigger">
-            <span style="font-size: 14px;">{{ $t(`m.systemConfig['Api接入']`)}}</span>
+            <span style="font-size: 14px;">{{ $t(`m.systemConfig['API接入']`)}}</span>
             <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
           </div>
           <ul class="bk-dropdown-list" slot="dropdown-content">

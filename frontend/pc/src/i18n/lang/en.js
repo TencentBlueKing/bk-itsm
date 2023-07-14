@@ -1277,7 +1277,7 @@ export const m = {
     导入: 'Import ',
     系统接入: 'Integrate System',
     系统新增: 'Add System',
-    Api接入: 'Integrate API',
+    API接入: 'Integrate API',
     API: 'API',
     接入接口: 'Integrate API',
     新增接口: 'Add API',
