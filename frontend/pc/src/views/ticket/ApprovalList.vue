@@ -137,7 +137,7 @@
                 class="table-link mr10"
                 :to="{ name: 'TicketDetail', query: { id: props.row.id, project_id: props.row.project_key, from } }">
                 {{ $t('m.manageCommon["查看"]') }}
-            </router-link>
+              </router-link>
             </template>
             <!-- 其他 -->
             <span v-else :title="props.row[field.id]">{{ props.row[field.id] || '--' }}</span>
