@@ -454,9 +454,9 @@
         return true;
       },
       // 是否显示异常分配按钮
-      isShowExceptionDistribute () {
-        if (!this.isShowAssgin || this.nodeAutoPass()) return false
-        return (this.nodeInfo.type === 'APPROVAL' || this.nodeInfo.type === 'NORMAL') && this.ticketInfo.current_status !== 'SUSPENDED'
+      isShowExceptionDistribute() {
+        if (!this.isShowAssgin || this.nodeAutoPass()) return false;
+        return (this.nodeInfo.type === 'APPROVAL' || this.nodeInfo.type === 'NORMAL') && this.ticketInfo.current_status !== 'SUSPENDED';
       },
     },
     created() {
