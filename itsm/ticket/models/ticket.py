@@ -139,6 +139,7 @@ from itsm.component.constants import (
     TASK_DEVOPS_STATE,
     WEBHOOK_STATE,
     BK_PLUGIN_STATE,
+    SUSPENDED,
 )
 from itsm.component.constants.trigger import (
     CREATE_TICKET,
@@ -2143,15 +2144,13 @@ class Ticket(Model, BaseTicket):
         )
 
     def can_supervise(self, username):
-        # return all(
-        #     [
-        #         self.is_supervise_needed,
-        #         not self.is_over,
-        #         username in self.real_supervisors,
-        #     ]
-        # )
         # 调整为提单人都可以督办
-        return username == self.creator and not self.is_over
+        # 挂起的时候不允许督办
+        return (
+            username == self.creator
+            and not self.is_over
+            and self.current_status != SUSPENDED
+        )
 
     def iam_ticket_manage_auth(self, username):
         # 本地开发环境，不校验单据管理权限
@@ -2178,6 +2177,7 @@ class Ticket(Model, BaseTicket):
         """
         能否操作单据：任一节点的处理人
         """
+
         if self.is_over or self.is_slave:
             return False
 

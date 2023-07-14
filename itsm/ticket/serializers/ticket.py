@@ -73,6 +73,7 @@ from itsm.component.constants import (
     LEN_XXX_LONG,
     EXCEPTION_DISTRIBUTE_OPERATE,
     WEBHOOK_STATE,
+    SUSPENDED,
 )
 from itsm.component.dlls.component import ComponentLibrary
 from itsm.component.exceptions import TriggerValidateError
@@ -665,10 +666,17 @@ class TicketList(object):
             supervisors = supervisors.split(",") if supervisors else []
             real_supervisors = supervisors + [inst["creator"]]
             inst["meta"] = real_ticket["meta"]
+
+            current_status = real_ticket["current_status"]
+            # 等待审批的条件为在审批节点 并且 单据处在非挂起状态
+            is_waiting_approve = (
+                waiting_approve.get(inst["id"], False) and current_status != SUSPENDED
+            )
+
             try:
                 inst.update(
                     service_name=service_info[inst["service_id"]],
-                    current_status=real_ticket["current_status"],
+                    current_status=current_status,
                     current_status_display=all_status.get(status_key, {}).get(
                         "name", "--"
                     ),
@@ -680,7 +688,7 @@ class TicketList(object):
                     current_processors="",  # ",".join(self.ticket_processors.get(inst.id, "")),
                     can_comment=self.can_comment(inst, comments, is_email_invite_token),
                     can_operate=False,
-                    waiting_approve=waiting_approve.get(inst["id"], False),
+                    waiting_approve=is_waiting_approve,
                     followers=ticket_followers.get(inst["id"], []),
                     comment_id=comments.get(inst["id"], {}).get("id", ""),
                     can_supervise=all(
