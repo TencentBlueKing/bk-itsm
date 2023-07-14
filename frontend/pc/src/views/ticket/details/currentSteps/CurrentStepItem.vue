@@ -226,7 +226,7 @@
                   </template>
                 </bk-button>
               </template>
-              <bk-button style="margin-right: 8px" v-if="!nodeAutoPass() && isShowAssgin && (nodeInfo.type === 'APPROVAL' || nodeInfo.type === 'NORMAL')" @click="clickBtn({ can_operate: true, key: 'EXCEPTION_DISTRIBUTE' ,name: $t(`m['异常分派']`) })">{{ $t(`m['异常分派']`) }}</bk-button>
+              <bk-button style="margin-right: 8px" v-if="isShowExceptionDistribute" @click="clickBtn({ can_operate: true, key: 'EXCEPTION_DISTRIBUTE' ,name: $t(`m['异常分派']`) })">{{ $t(`m['异常分派']`) }}</bk-button>
             </template>
             <!-- 节点触发器 -->
             <bk-dropdown-menu
@@ -452,6 +452,11 @@
         const nodeType = ['TASK-SOPS', 'TASK-DEVOPS', 'BK-PLUGIN', 'WEBHOOK'];
         if (nodeType.includes(this.nodeInfo.type) && this.nodeInfo.status === 'RUNNING') return false;
         return true;
+      },
+      // 是否显示异常分配按钮
+      isShowExceptionDistribute () {
+        if (!this.isShowAssgin || this.nodeAutoPass()) return false
+        return (this.nodeInfo.type === 'APPROVAL' || this.nodeInfo.type === 'NORMAL') && this.ticketInfo.current_status !== 'SUSPENDED'
       },
     },
     created() {

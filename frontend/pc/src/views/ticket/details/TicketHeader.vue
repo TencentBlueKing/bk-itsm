@@ -108,7 +108,7 @@
           size="small"
           class="mr10"
           theme="default"
-          :disabled="!ticketInfo.can_supervise"
+          :disabled="!ticketInfo.can_supervise || ticketInfo.current_status === 'SUSPENDED'"
           @click="onTicketBtnClick('supervise')"
         >
           {{ $t(`m.newCommon["催办"]`) }}

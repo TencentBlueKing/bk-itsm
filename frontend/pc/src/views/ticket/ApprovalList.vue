@@ -67,6 +67,7 @@
             <bk-checkbox
               v-if="props.row.waiting_approve"
               v-model="props.row.checkStatus"
+              :disabled="props.row.current_status === 'SUSPENDED'"
               @change="changeSelection(props.row)">
             </bk-checkbox>
           </template>
@@ -120,14 +121,23 @@
             </span>
             <!-- 操作 -->
             <template v-else-if="field.id === 'operate'">
-              <template v-if="approveLoadingID !== props.row.id">
-                <bk-link class="table-link mr10" theme="primary" @click="onOpenApprovalDialog(props.row.id, true)">{{ $t(`m.managePage['通过']`) }}</bk-link>
-                <bk-link class="table-link" theme="primary" @click="onOpenApprovalDialog(props.row.id, false)">{{ $t(`m.manageCommon['拒绝']`) }}</bk-link>
+              <template v-if="props.row.waiting_approve && props.row.current_status !== 'SUSPENDED'">
+                <template v-if="approveLoadingID !== props.row.id">
+                  <bk-link class="table-link mr10" theme="primary" @click="onOpenApprovalDialog(props.row.id, true)">{{ $t(`m.managePage['通过']`) }}</bk-link>
+                  <bk-link class="table-link" theme="primary" @click="onOpenApprovalDialog(props.row.id, false)">{{ $t(`m.manageCommon['拒绝']`) }}</bk-link>
+                </template>
+                <div v-else class="table-link approve-laoding">
+                  <p>{{ $t(`m.task['处理中']`) }}</p>
+                  <p style="transform: translate(16px, 3px);" v-bkloading="{ isLoading: true, opacity: 1, zIndex: 10, theme: 'primary', mode: 'spin', size: 'mini' }"></p>
+                </div>
               </template>
-              <div v-else class="table-link approve-laoding">
-                <p>{{ $t(`m.task['处理中']`) }}</p>
-                <p style="transform: translate(16px, 3px);" v-bkloading="{ isLoading: true, opacity: 1, zIndex: 10, theme: 'primary', mode: 'spin', size: 'mini' }"></p>
-              </div>
+              <router-link
+                v-else
+                target="_blank"
+                class="table-link mr10"
+                :to="{ name: 'TicketDetail', query: { id: props.row.id, project_id: props.row.project_key, from } }">
+                {{ $t('m.manageCommon["查看"]') }}
+            </router-link>
             </template>
             <!-- 其他 -->
             <span v-else :title="props.row[field.id]">{{ props.row[field.id] || '--' }}</span>
@@ -258,6 +268,7 @@
     props: {
       isIframe: Boolean,
       serviceId: [Number, String],
+      from: String,
     },
     data() {
       const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority');
@@ -304,7 +315,7 @@
         } else {
           if (result.result) {
             this.approveLoadingID = '';
-            this.ticketList.splice(this.ticketList.findIndex(item => item.id === Number(id)), 1);
+            this.getTicketList();
           }
         }
         this.updateSelectStatus();
@@ -363,11 +374,11 @@
       },
       // 可以选中
       canSelected(row) {
-        return row.waiting_approve;
+        return row.waiting_approve && row.current_status !== 'SUSPENDED';
       },
       // 全选 半选
       handleSelectAll(selection) {
-        this.ticketList.forEach((item) => {
+        this.ticketList.filter(item => item.current_status !== 'SUSPENDED').forEach((item) => {
           item.checkStatus = !!selection.length;
         });
         this.selectedList = selection;
