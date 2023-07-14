@@ -304,7 +304,7 @@
         } else {
           if (result.result) {
             this.approveLoadingID = '';
-            this.ticketList.splice(this.ticketList.findIndex(item => item.id === Number(id)), 1);
+            this.getTicketList();
           }
         }
         this.updateSelectStatus();

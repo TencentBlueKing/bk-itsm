@@ -26,3 +26,4 @@ config/local_settings.py
 #blueapps/
 .codecc
 build.yml
+.vscode
