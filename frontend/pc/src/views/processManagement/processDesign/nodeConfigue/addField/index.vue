@@ -725,7 +725,7 @@
         if (assignValue.regex_config && assignValue.regex_config.rule) {
           this.changeRegex('ASSOCIATED_FIELD_VALIDATION');
           this.formInfo.regex_config.rule.type = assignValue.regex_config.rule.type;
-          
+
           this.formInfo.regex_config = assignValue.regex_config;
         }
         if (this.formInfo.regex === 'CUSTOM') {
@@ -1400,6 +1400,7 @@
     .bk-halfline-item {
         display: inline-block;
         width: 49%;
+        vertical-align: top;
     }
     .bk-halfline-margin {
         margin-right: 1%;
