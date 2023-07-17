@@ -67,10 +67,10 @@ class Command(BaseCommand):
             call_command("sync_apigw_config", file=definition_file_path)
 
             print(
-                "[bk-itsm]call sync_apigw_config with definition: %s"
+                "[bk-itsm]call sync_apigw_stage with definition: %s"
                 % definition_file_path
             )
-            call_command("sync_apigw_config", file=definition_file_path)
+            call_command("sync_apigw_stage", file=definition_file_path)
 
             print(
                 "[bk-itsm]call sync_apigw_resources with resources: %s"
