@@ -220,17 +220,7 @@ class CustomNotice(models.Model):
         if CustomNotice.objects.filter(version="V1").exists():
             CustomNotice.objects.filter(version="V1").delete()
 
-        from itsm.project.models import Project
-
-        project_keys = Project.objects.filter(is_deleted=False).values_list(
-            "key", flat=True
-        )
-
-        for project_key in project_keys:
-            # 公共项目不参与初始化通知模板
-            if project_key == PUBLIC_PROJECT_PROJECT_KEY:
-                continue
-            cls.init_project_template(project_key=project_key)
+        cls.init_project_template(project_key=PUBLIC_PROJECT_PROJECT_KEY)
 
 
 class ReleaseVersionLogManager(models.Manager):
