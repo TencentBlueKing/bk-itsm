@@ -73,6 +73,7 @@ from itsm.component.constants import (
     LEN_XXX_LONG,
     EXCEPTION_DISTRIBUTE_OPERATE,
     WEBHOOK_STATE,
+    SUSPENDED,
 )
 from itsm.component.dlls.component import ComponentLibrary
 from itsm.component.exceptions import TriggerValidateError
@@ -495,7 +496,28 @@ class SimpleStatusSerializer(serializers.ModelSerializer):
 
 class TicketList(object):
     def __init__(self, instances, username, token):
-        self.instances = instances
+
+        # 说明是page
+        if isinstance(instances, list):
+            self.ticket_list = [ticket.list_data() for ticket in instances]
+        else:
+            self.ticket_list = instances.values(
+                "sn",
+                "id",
+                "title",
+                "service_id",
+                "service_type",
+                "meta",
+                "bk_biz_id",
+                "current_status",
+                "create_at",
+                "creator",
+                "is_supervise_needed",
+                "flow_id",
+                "supervise_type",
+                "supervisor",
+                "project_key",
+            )
         self.username = username
         self.token = token
 
@@ -609,26 +631,7 @@ class TicketList(object):
         return sla_task_info
 
     def to_client_representation(self):
-        ticket_list = list(
-            Ticket.objects.filter(pk__in=[x.pk for x in self.instances]).values(
-                "sn",
-                "id",
-                "title",
-                "service_id",
-                "service_type",
-                "meta",
-                "bk_biz_id",
-                "current_status",
-                "create_at",
-                "creator",
-                "is_supervise_needed",
-                "flow_id",
-                "supervise_type",
-                "supervisor",
-                "project_key",
-            )
-        )
-        ticket_ids = [ticket["id"] for ticket in ticket_list]
+        ticket_ids = [ticket["id"] for ticket in self.ticket_list]
         ticket_followers = self.get_attention_users(ticket_ids)
         email_invite = TicketCommentInvite.get_user_comments_invites(self.username)
         master_tickets = Ticket.get_batch_master_ticket(ticket_ids)
@@ -638,14 +641,14 @@ class TicketList(object):
         comments = TicketComment.ticket_comments(ticket_ids)
         supervisors_info = self.get_supervisor()
         service_info = self.get_service_info(
-            [ticket["service_id"] for ticket in ticket_list]
+            [ticket["service_id"] for ticket in self.ticket_list]
         )
         ticket_status = self.get_ticket_node_status(ticket_ids)
         workflow_version = self.get_workflow_version(
-            [ticket["flow_id"] for ticket in ticket_list]
+            [ticket["flow_id"] for ticket in self.ticket_list]
         )
         sla_task_info = self.get_sla_tasks(ticket_ids)
-        for inst in ticket_list:
+        for inst in self.ticket_list:
             comment_id = comments.get(inst["id"], {}).get("id")
             invites = email_invite.get(comment_id, []) if comment_id else []
             is_email_invite_token = self.token in invites
@@ -665,10 +668,17 @@ class TicketList(object):
             supervisors = supervisors.split(",") if supervisors else []
             real_supervisors = supervisors + [inst["creator"]]
             inst["meta"] = real_ticket["meta"]
+
+            current_status = real_ticket["current_status"]
+            # 等待审批的条件为在审批节点 并且 单据处在非挂起状态
+            is_waiting_approve = (
+                waiting_approve.get(inst["id"], False) and current_status != SUSPENDED
+            )
+
             try:
                 inst.update(
                     service_name=service_info[inst["service_id"]],
-                    current_status=real_ticket["current_status"],
+                    current_status=current_status,
                     current_status_display=all_status.get(status_key, {}).get(
                         "name", "--"
                     ),
@@ -680,7 +690,7 @@ class TicketList(object):
                     current_processors="",  # ",".join(self.ticket_processors.get(inst.id, "")),
                     can_comment=self.can_comment(inst, comments, is_email_invite_token),
                     can_operate=False,
-                    waiting_approve=waiting_approve.get(inst["id"], False),
+                    waiting_approve=is_waiting_approve,
                     followers=ticket_followers.get(inst["id"], []),
                     comment_id=comments.get(inst["id"], {}).get("id", ""),
                     can_supervise=all(
@@ -710,7 +720,7 @@ class TicketList(object):
             ):
                 inst.update(comment_id="-1")
 
-        return ticket_list
+        return self.ticket_list
 
 
 class TicketSerializer(AuthModelSerializer):

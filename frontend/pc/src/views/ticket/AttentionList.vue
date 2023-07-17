@@ -27,6 +27,7 @@
         class="advanced-search"
         ref="advancedSearch"
         :forms="searchForms"
+        :is-iframe="isIframe"
         :panel="type"
         :search-result-list="searchResultList"
         @search="handleSearch"
@@ -93,7 +94,7 @@
               :title="props.row.current_status_display"
               class="bk-status-color-info"
               :style="getstatusColor(props.row)">
-              {{ props.row.current_status_display || '--' }}
+              {{ isChineseLanguage ? props.row.current_status_display : props.row.current_status || '--' }}
             </span>
             <!-- 优先级 -->
             <span v-else-if="field.id === 'priority'"
@@ -232,6 +233,7 @@
     mixins: [ticketListMixins],
     props: {
       from: String,
+      isIframe: Boolean,
     },
     data() {
       const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority');

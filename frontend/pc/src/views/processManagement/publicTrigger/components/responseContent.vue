@@ -67,7 +67,7 @@
               :ext-cls="'mr50 pr10'">{{$t(`m.trigger['后台自动执行']`)}}</bk-radio>
             <bk-radio
               v-if="isShowFrontendTrigger"
-              :value="'MANUAL'">{{$t(`m.trigger['前台按钮触发']`)}}</bk-radio>
+              :value="'MANUAL'">{{$t(`m.trigger['按钮触发']`)}}</bk-radio>
           </bk-radio-group>
         </bk-form-item>
         <template v-if="item.performData.runMode === 'MANUAL'">

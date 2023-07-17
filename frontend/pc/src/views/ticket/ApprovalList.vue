@@ -39,7 +39,7 @@
             class="export"
             :title="$t(`m.tickets['导出']`)"
             @click="isExportDialogShow = true">
-            {{ $t('m.tickets["导出"]') }}</bk-button>
+            {{ $t(`m.tickets['导出']`) }}</bk-button>
           <bk-button
             :theme="'default'"
             :title="$t(`m.managePage['批量审批']`)"
@@ -67,6 +67,7 @@
             <bk-checkbox
               v-if="props.row.waiting_approve"
               v-model="props.row.checkStatus"
+              :disabled="props.row.current_status === 'SUSPENDED'"
               @change="changeSelection(props.row)">
             </bk-checkbox>
           </template>
@@ -111,7 +112,7 @@
               :title="props.row.current_status_display"
               class="bk-status-color-info"
               :style="getstatusColor(props.row)">
-              {{ props.row.current_status_display || '--' }}
+              {{ isChineseLanguage ? props.row.current_status_display: props.row.current_status || '--' }}
             </span>
             <!-- 优先级 -->
             <span v-else-if="field.id === 'priority'"
@@ -120,14 +121,23 @@
             </span>
             <!-- 操作 -->
             <template v-else-if="field.id === 'operate'">
-              <template v-if="approveLoadingID !== props.row.id">
-                <bk-link class="table-link mr10" theme="primary" @click="onOpenApprovalDialog(props.row.id, true)">{{ $t(`m.managePage['通过']`) }}</bk-link>
-                <bk-link class="table-link" theme="primary" @click="onOpenApprovalDialog(props.row.id, false)">{{ $t(`m.manageCommon['拒绝']`) }}</bk-link>
+              <template v-if="props.row.waiting_approve && props.row.current_status !== 'SUSPENDED'">
+                <template v-if="approveLoadingID !== props.row.id">
+                  <bk-link class="table-link mr10" theme="primary" @click="onOpenApprovalDialog(props.row.id, true)">{{ $t(`m.managePage['通过']`) }}</bk-link>
+                  <bk-link class="table-link" theme="primary" @click="onOpenApprovalDialog(props.row.id, false)">{{ $t(`m.manageCommon['拒绝']`) }}</bk-link>
+                </template>
+                <div v-else class="table-link approve-laoding">
+                  <p>{{ $t(`m.task['处理中']`) }}</p>
+                  <p style="transform: translate(16px, 3px);" v-bkloading="{ isLoading: true, opacity: 1, zIndex: 10, theme: 'primary', mode: 'spin', size: 'mini' }"></p>
+                </div>
               </template>
-              <div v-else class="table-link approve-laoding">
-                <p>{{ $t(`m.task['处理中']`) }}</p>
-                <p style="transform: translate(16px, 3px);" v-bkloading="{ isLoading: true, opacity: 1, zIndex: 10, theme: 'primary', mode: 'spin', size: 'mini' }"></p>
-              </div>
+              <router-link
+                v-else
+                target="_blank"
+                class="table-link mr10"
+                :to="{ name: 'TicketDetail', query: { id: props.row.id, project_id: props.row.project_key, from } }">
+                {{ $t('m.manageCommon["查看"]') }}
+              </router-link>
             </template>
             <!-- 其他 -->
             <span v-else :title="props.row[field.id]">{{ props.row[field.id] || '--' }}</span>
@@ -142,12 +152,12 @@
           </bk-table-setting-content>
         </bk-table-column>
         <div class="empty" slot="empty">
-          <!-- <empty
+          <empty
             :is-error="listError"
             :is-search="searchToggle"
             @onRefresh="getTicketList()"
             @onClearSearch="$refs.advancedSearch.onClearClick()">
-          </empty> -->
+          </empty>
         </div>
       </bk-table>
       <div class="loading" v-if="progressInfo.show">
@@ -185,7 +195,7 @@
   import ApprovalDialog from '@/components/ticket/ApprovalDialog.vue';
   import i18n from '@/i18n/index.js';
   import ticketListMixins from './ticketListMixins.js';
-  // import Empty from '../../components/common/Empty.vue';
+  import Empty from '../../components/common/Empty.vue';
 
   const COLUMN_LIST = [
     {
@@ -252,12 +262,13 @@
       AdvancedSearch,
       ExportTicketDialog,
       ApprovalDialog,
-      // Empty,
+      Empty,
     },
     mixins: [ticketListMixins],
     props: {
       isIframe: Boolean,
       serviceId: [Number, String],
+      from: String,
     },
     data() {
       const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority');
@@ -304,7 +315,7 @@
         } else {
           if (result.result) {
             this.approveLoadingID = '';
-            this.ticketList.splice(this.ticketList.findIndex(item => item.id === Number(id)), 1);
+            this.getTicketList();
           }
         }
         this.updateSelectStatus();
@@ -325,7 +336,7 @@
             this.progressInfo.content = `${countSum - count}/${countSum}`;
             if (this.progressInfo.percent === 1) {
               this.progressInfo.config.activeColor = '#43e45f';
-              this.progressInfo.content = this.$t('m["已完成"]');
+              this.progressInfo.content = this.$t('m[\'已完成\']');
               this.progressInfo.showTip = false;
               this.progressInfo.loading = false;
             }
@@ -363,11 +374,11 @@
       },
       // 可以选中
       canSelected(row) {
-        return row.waiting_approve;
+        return row.waiting_approve && row.current_status !== 'SUSPENDED';
       },
       // 全选 半选
       handleSelectAll(selection) {
-        this.ticketList.forEach((item) => {
+        this.ticketList.filter(item => item.current_status !== 'SUSPENDED').forEach((item) => {
           item.checkStatus = !!selection.length;
         });
         this.selectedList = selection;

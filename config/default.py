@@ -671,6 +671,7 @@ BK_JOB_HOST = os.environ.get("BK_JOB_HOST", "#")
 
 # 适配容器化
 USER_MANGE_HOST = os.environ.get("BK_COMPONENT_API_URL", BK_PAAS_HOST)
+BK_PAAS_ESB_HOST = USER_MANGE_HOST
 
 BK_USER_MANAGE_HOST = os.environ.get("BK_USER_MANAGE_HOST", USER_MANGE_HOST)
 
@@ -872,10 +873,10 @@ def redirect_func(request):
 BLUEAPPS_PAGE_401_RESPONSE_FUNC = redirect_func
 
 try:
-    # 自动过单时间，默认为20
-    AUTO_APPROVE_TIME = int(os.environ.get("AUTO_APPROVE_TIME", 20))
+    # 自动过单时间，默认为5
+    AUTO_APPROVE_TIME = int(os.environ.get("BKAPP_AUTO_APPROVE_TIME", 5))
 except Exception:
-    AUTO_APPROVE_TIME = 20
+    AUTO_APPROVE_TIME = 5
 
 OPEN_VOICE_NOTICE = (
     True if os.getenv("BKAPP_OPEN_VOICE_NOTICE", "false").lower() == "true" else False

@@ -60,11 +60,13 @@
             <ul class="nav-language-list">
               <li class="language-item" :class="{ 'active': curLanguage === 'zh' }" @click="changeLanguage('zh')">
                 <span class="bk-itsm-icon icon-yuyanqiehuanzhongwen"></span>
-                <span>{{ $t(`m["中文"]`) }}</span>
+                <span>中文</span>
+                <!-- <span>{{ $t(`m["中文"]`) }}</span> -->
               </li>
               <li class="language-item" :class="{ 'active': curLanguage === 'en' }" @click="changeLanguage('en')">
                 <span class="bk-itsm-icon icon-yuyanqiehuanyingwen"></span>
-                <span>{{ $t(`m["英文"]`) }}</span>
+                <span>English</span>
+                <!-- <span>{{ $t(`m["英文"]`) }}</span> -->
               </li>
             </ul>
           </template>
@@ -227,7 +229,7 @@
     mixins: [permission],
     data() {
       return {
-        appName: window.log_name || '流程服务管理',
+        appName: window.log_name || this.$t('m[\'流程服务\']'),
         userName: window.username || '--',
         bkDocUrl: window.DOC_URL,
         routerList: ROUTER_LIST.slice(0),
@@ -334,15 +336,21 @@
           this.$store.commit('project/setProjectListLoading', false);
         }
       },
-      changeLanguage(language) {
-        this.curLanguage = language;
-        const local = language === 'zh' ? 'zh-cn' : 'en';
-        Cookies.set('blueking_language', local, {
-          expires: 1,
-          domain: window.location.hostname.replace(/^[^.]+(.*)$/, '$1'),
-          path: '/',
-        });
-        window.location.reload();
+      async changeLanguage(language) {
+        try {
+          this.curLanguage = language;
+          const local = language === 'zh' ? 'zh-cn' : 'en';
+          Cookies.set('blueking_language', local, {
+            expires: 1,
+            domain: window.location.hostname.replace(/^[^.]+(.*)$/, '$1'),
+            path: '/',
+          });
+          await this.$store.dispatch('updateUserLanguage', { language });
+        } catch (error) {
+          console.warn(error);
+        } finally {
+          window.location.reload();
+        }
       },
       // 高亮顶部和侧边栏导航项
       setActive() {
@@ -637,6 +645,7 @@
     .nav-operate-list, .nav-language-list {
         padding: 4px 0;
         .operate-item, .language-item {
+            padding: 0 12px;
             min-width: 80px;
             height: 30px;
             line-height: 30px;

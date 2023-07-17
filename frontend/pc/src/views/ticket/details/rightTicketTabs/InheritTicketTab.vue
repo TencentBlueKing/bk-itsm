@@ -269,6 +269,7 @@
   import InheritTicketAddDialog from './InheritTicketAddDialog';
   import { errorHandler } from '@/utils/errorHandler';
   import Empty from '../../../../components/common/Empty.vue';
+  import _ from 'lodash';
 
   export default {
     name: 'InheritTicketTab',
@@ -333,17 +334,24 @@
     },
     methods: {
       closeSideslider() {
-        this.$bkInfo({
-          type: 'warning',
-          title: this.$t('m["内容未保存，离开将取消操作！"]'),
-          confirmLoading: true,
-          confirmFn: () => {
-            this.isShowAddInheritTicket = false;
-          },
-          cancelFn: () => {
-            this.isShowAddInheritTicket = true;
-          },
-        });
+        const isEdit = !_.isEqual(this.$refs.addInheritTicket.templateInfo, this.$refs.addInheritTicket.initFormData.templateInfo)
+          || !_.isEqual(this.$refs.addInheritTicket.checkList, this.$refs.addInheritTicket.initFormData.checkList);
+        if (isEdit) {
+          this.$bkInfo({
+            title: this.$t('m["确定离开当前页？"]'),
+            subTitle: this.$t('m["离开将会导致未保存信息丢失"]'),
+            okText: this.$t('m["离开"]'),
+            confirmLoading: true,
+            confirmFn: () => {
+              this.isShowAddInheritTicket = false;
+            },
+            cancelFn: () => {
+              this.isShowAddInheritTicket = true;
+            },
+          });
+        } else {
+          this.isShowAddInheritTicket = false;
+        }
       },
       showHistory() {
         if (!this.historyList.length) {

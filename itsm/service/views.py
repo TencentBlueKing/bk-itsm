@@ -113,7 +113,7 @@ class FavoriteModelViewSet(component_viewsets.ModelViewSet):
         return self.queryset.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        """创建收藏时补充用户信息 """
+        """创建收藏时补充用户信息"""
 
         user = serializer.context.get("request").user
         serializer.save(user=user)
@@ -160,8 +160,12 @@ class ServiceCatalogViewSet(component_viewsets.ModelViewSet):
         """
         如果该目录关联了服务，则无法删除
         """
-        if CatalogService.objects.filter(catalog_id=instance.id).exists():
-            raise CatalogDeleteError()
+
+        catalog_services = CatalogService.objects.filter(catalog_id=instance.id)
+        if catalog_services:
+            for catalog_service in catalog_services:
+                if not catalog_service.service.is_deleted:
+                    raise CatalogDeleteError()
         super().perform_destroy(instance)
 
     def get_queryset(self):
@@ -445,6 +449,9 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
 
         # 关联删除服务SLA任务
         ServiceSla.objects.filter(service_id__in=id_list).delete()
+
+        # 批量删除服务绑定关系
+        CatalogService.objects.filter(service_id__in=id_list).delete()
 
         return Response(real_deleted)
 

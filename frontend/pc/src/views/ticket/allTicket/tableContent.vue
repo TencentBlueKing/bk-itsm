@@ -85,7 +85,7 @@
             <span :title="row.current_status_display"
               class="bk-status-color-info"
               :style="getstatusColor(row)">
-              {{ row.current_status_display || '--' }}
+              {{ isChineseLanguage ? row.current_status_display: row.current_status || '--' }}
             </span>
           </template>
           <!-- 当前步骤 -->
@@ -139,7 +139,7 @@
       <div class="empty" slot="empty">
         <empty
           :is-error="listError"
-          :is-search="searchToggle"
+          :is-search="true"
           @onRefresh="$parent.getAllTicketList()"
           @onClearSearch="$emit('clearSearch')">
         </empty>
@@ -158,6 +158,7 @@
   import ColumnCurrentStep from '@/components/ticket/table/ColumnCurrentStep';
   import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue';
   import Empty from '../../../components/common/Empty.vue';
+  import cookie from 'cookie';
   export default {
     name: 'allTicketTable',
     components: {
@@ -168,7 +169,6 @@
     },
     props: {
       from: String,
-      searchToggle: Boolean,
       listError: Boolean,
       pagination: {
         type: Object,
@@ -189,12 +189,6 @@
           return [];
         },
       },
-      // 当前服务
-      // serviceType
-      serviceType: {
-        type: String,
-        default: '',
-      },
     },
     data() {
       return {
@@ -206,6 +200,7 @@
           size: 'medium',
         },
         ticketInfo: {},
+        isChineseLanguage: true,
       };
     },
     computed: {
@@ -217,7 +212,7 @@
       },
       currTabSettingCache() {
         this.$store.commit('ticket/getTicketSettingformLocalStorage');
-        return this.$store.state.ticket.settingCache[`all_${this.serviceType}`];
+        return this.$store.state.ticket.settingCache.all;
       },
     },
     watch: {
@@ -233,6 +228,7 @@
       },
     },
     async mounted() {
+      this.isChineseLanguage = cookie.parse(document.cookie).blueking_language === 'zh-cn';
       this.getFields();
     },
     methods: {
@@ -327,6 +323,7 @@
         if (value.order === 'descending') {
           order = `-${order}`;
         }
+        console.log(value);
         this.$emit('orderingClick', order || '-create_at');
       },
       // 添加关注/取消关注
@@ -339,10 +336,10 @@
         this.$store.dispatch('deployOrder/setAttention', { params, id }).then(() => {
           if (row.hasAttention) {
             row.hasAttention = false;
-            bkMessage = this.$t('m.manageCommon[\'取消关注成功~\']');
+            bkMessage = this.$t('m.manageCommon[\'取消关注成功\']');
           } else {
             row.hasAttention = true;
-            bkMessage = this.$t('m.manageCommon[\'添加关注成功~\']');
+            bkMessage = this.$t('m.manageCommon[\'添加关注成功\']');
           }
           this.$bkMessage({
             message: bkMessage,
@@ -376,7 +373,7 @@
         this.setting.selectedFields = fields;
         const fieldIds = fields.map(m => m.id);
         this.$store.commit('ticket/setSettingCache', {
-          type: `all_${this.serviceType}`,
+          type: 'all',
           value: { fields: fieldIds, size },
         });
         this.$store.commit('ticket/setTicketSettingToLocalStorage');

@@ -2,7 +2,7 @@
   <div class="wang-editor">
     <div class="change-comment" @click="handleChangeType" :title="commentType ? '点击切换评论类型' : '回复当前类型评论'">
       <i :class="['bk-itsm-icon', isInsideComment ? 'icon-suoding' : 'icon-jiesuo']"></i>
-      <span>{{ isInsideComment ? $t('m["内部评论"]') : $t('m["外部评论"]') }}</span>
+      <span>{{ isInsideComment ? $t(`m['内部评论']`) : $t(`m['外部评论']`) }}</span>
       <i class="bk-itsm-icon icon-jiantou_zuoyouqiehuan change-type"></i>
     </div>
     <div :id="editorId">
@@ -77,6 +77,7 @@
         this.editorData = newHtml;
         this.$emit('editorContent', newHtml);
       };
+      editor.config.placeholder = this.$t('m[\'请输入内容...\']');
       editor.config.height = 150;
       editor.config.zIndex = 400;
       editor.config.excludeMenus = [
@@ -113,7 +114,7 @@
         }
         if (!this.$store.state.ticket.hasTicketNodeOptAuth) {
           this.$bkMessage({
-            message: this.$t('m["你当前无法发表内部评论"]'),
+            message: this.$t('m[\'你当前无法发表内部评论\']'),
             theme: 'warning ',
           });
           return;

@@ -312,6 +312,9 @@
 </script>
 
 <style lang="scss" scoped>
+/deep/ .bk-dialog-header-inner {
+  text-align: left;
+}
 .deal-person {
   /deep/ .bk-form-width {
     width: 100%;

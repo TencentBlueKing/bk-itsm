@@ -43,6 +43,11 @@ module.exports = merge(webpackBase, {
                 changeOrigin: true,
                 secure: false
             },
+            '/init':{
+                target: ORIGIN + SET_URL,
+                changeOrigin: true,
+                secure: false
+            },
             '/openapi/*':{
                 target: ORIGIN + SET_URL,
                 changeOrigin: true,

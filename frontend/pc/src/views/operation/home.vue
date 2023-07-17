@@ -356,7 +356,9 @@
         bizSearchIds: undefined,
         serviceUseData: [],
         serviceSearchStr: undefined,
+        serviceOrder: undefined,
         bizUseData: [],
+        bizOrder: undefined,
         ticketClassifyData: {},
         ticketStatusData: {},
         creatorData: {},
@@ -552,7 +554,7 @@
         }
       },
       // 服务使用统计
-      async getServiceUseData(order) {
+      async getServiceUseData() {
         this.loading.serviceUse = true;
         try {
           const params = {
@@ -561,8 +563,10 @@
             create_at__lte: this.dateRange[1],
             page: this.serviceTablePagination.current,
             service_name: this.serviceSearchStr,
-            order_by: order,
           };
+          if (this.serviceOrder) {
+            params.order_by = this.serviceOrder;
+          }
           const resp = await this.$store.dispatch('operation/getServiceUseData', params);
           this.serviceTablePagination.count = resp.data.count;
           this.serviceUseData = resp.data.items;
@@ -573,7 +577,7 @@
         }
       },
       // 业务使用统计
-      async getBizUseData(order) {
+      async getBizUseData() {
         this.loading.bizUse = true;
         this.searchAndErrorToggles.biz.error = false;
         try {
@@ -583,8 +587,10 @@
             create_at__lte: this.dateRange[1],
             page: this.bizTablePagination.current,
             biz_id: this.bizSearchIds,
-            order_by: order,
           };
+          if (this.bizOrder) {
+            params.order_by = this.bizOrder;
+          }
           const resp = await this.$store.dispatch('operation/getBizUseData', params);
           this.bizTablePagination.count = resp.data.count;
           this.bizUseData = resp.data.items;
@@ -872,7 +878,8 @@
       },
       onServiceTableOrderChange(order) {
         this.serviceTablePagination.current = 1;
-        this.getServiceUseData(order);
+        this.serviceOrder = order;
+        this.getServiceUseData();
       },
       onBizTablePageChange(page) {
         this.bizTablePagination.current = page;
@@ -880,7 +887,8 @@
       },
       onBizTableOrderChange(order) {
         this.bizTablePagination.current = 1;
-        this.getBizUseData(order);
+        this.bizOrder = order;
+        this.getBizUseData();
       },
       onCreatorDimensionChange(val) {
         this.creatorChartDismension = val;

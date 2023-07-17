@@ -25,6 +25,7 @@ import ColumnSn from '@/components/ticket/table/ColumnSn.vue';
 import { errorHandler } from '@/utils/errorHandler';
 import { deepClone } from '@/utils/util';
 import i18n from '@/i18n/index.js';
+import cookie from 'cookie';
 
 const SEARCH_FORMS = [
   {
@@ -143,12 +144,6 @@ const ticketListMixins = {
         limit: 10,
       },
       listLoading: false,
-      searchResultList: {
-        todo: [],
-        approval: [],
-        attention: [],
-        created: [],
-      },
       approvalInfo: {
         showAllOption: false,
         result: true,
@@ -157,6 +152,8 @@ const ticketListMixins = {
       isApprovalDialogShow: false,
       listError: false,
       searchToggle: false,
+      isChineseLanguage: true,
+      searchResultList: {},
     };
   },
   computed: {
@@ -182,6 +179,9 @@ const ticketListMixins = {
   },
   methods: {
     initData() {
+      // 同时兼容url中的project_id、project_key
+      const projectKey = this.$route.query.project_id || this.$route.query.project_key;
+      this.isChineseLanguage = cookie.parse(document.cookie).blueking_language === 'zh-cn';
       let defaultFields = ['id', 'title', 'service_name', 'current_steps', 'current_processors', 'create_at', 'creator', 'operate', 'status'];
       // 表格设置有缓存，使用缓存数据
       if (this.currTabSettingCache) {
@@ -191,11 +191,9 @@ const ticketListMixins = {
       }
       this.setting.fields = this.columnList.slice(0);
       this.setting.selectedFields = this.columnList.slice(0).filter(m => defaultFields.includes(m.id));
-      if (this.$route.query.project_id) this.searchForms[1].value = this.$route.query.project_id || '';
+      if (projectKey) this.searchForms[1].value = projectKey || '';
       this.getTicketList();
       this.getTicketStatusTypes();
-      this.getBusinessList();
-      this.getServiceTree();
     },
     // 获取单据所有状态分类列表
     getTicketStatusTypes() {
@@ -204,27 +202,6 @@ const ticketListMixins = {
       };
       this.$store.dispatch('ticketStatus/getOverallTicketStatuses', params).then((res) => {
         this.searchForms.find(item => item.key === 'current_status__in').list = res.data;
-      })
-        .catch((res) => {
-          errorHandler(res, this);
-        });
-    },
-    getBusinessList() {
-      this.$store.dispatch('eventType/getAppList').then((res) => {
-        this.searchForms.find(item => item.key === 'bk_biz_id').list = res.data;
-      })
-        .catch((res) => {
-          errorHandler(res, this);
-        });
-    },
-    // 查询级联数据
-    getServiceTree() {
-      const params = {
-        show_deleted: true,
-      };
-      this.$store.dispatch('serviceCatalog/getTreeData', params).then((res) => {
-        const formItem = this.searchForms.find(item => item.key === 'catalog_id');
-        formItem.list = res.data[0] ? res.data[0].children : [];
       })
         .catch((res) => {
           errorHandler(res, this);
@@ -251,11 +228,26 @@ const ticketListMixins = {
     },
     // 获取单据列表
     getTicketList() {
+      const query = this.$route.query;
+      // 同时兼容url中的project_id、project_key
+      const projectKey = query.project_id || query.project_key;
       const searchParams = JSON.stringify(this.lastSearchParams) === '{}'
-        ? { service_id__in: this.$route.query.service_id || undefined, project_key: this.$route.query.project_id || undefined } // 没有参数时默认将 url 参数作为查询参数
+        ? { service_id__in: query.service_id || undefined, project_key: projectKey || undefined } // 没有参数时默认将 url 参数作为查询参数
         : this.lastSearchParams;
       this.listLoading = true;
       this.listError = false;
+      // approve-iframe
+      if (this.isIframe && Object.keys(query).length !== 0) {
+        Object.keys(query).forEach(item => {
+          if (item === 'project_id') {
+            searchParams.project_key = projectKey;
+          } else if (item === 'service_id') {
+            searchParams.service_id__in = query[item];
+          } else {
+            searchParams[item] = query[item];
+          }
+        });
+      }
       return this.$store.dispatch('change/getList', {
         page_size: this.pagination.limit,
         page: this.pagination.current,
@@ -302,7 +294,7 @@ const ticketListMixins = {
     getTicketsProcessors(originList) {
       const copyList = deepClone(originList);
       originList.forEach((ticket) => {
-        this.$set(ticket, 'current_processors', '加载中...');
+        this.$set(ticket, 'current_processors', this.$t('m.manageCommon[\'加载中...\']'));
       });
       const ids = copyList.map(ticket => ticket.id);
       this.$store.dispatch('ticket/getTicketsProcessors', { ids: ids.toString() }).then((res) => {
@@ -323,7 +315,7 @@ const ticketListMixins = {
     getTicketsCreator(originList) {
       const copyList = deepClone(originList);
       originList.forEach((ticket) => {
-        this.$set(ticket, 'creator', '加载中...');
+        this.$set(ticket, 'creator', this.$t('m.manageCommon[\'加载中...\']'));
       });
       const ids = copyList.map(ticket => ticket.id);
       this.$store.dispatch('ticket/getTicketsCreator', { ids: ids.toString() }).then((res) => {
@@ -395,12 +387,10 @@ const ticketListMixins = {
         ? { color: statusColor[0].color_hex, border: `1px solid ${statusColor[0].color_hex}` }
         : { color: '#3c96ff', border: '1px solid #3c96ff' };
     },
-    handleSearch(params, toggle) {
+    handleSearch(params) {
       this.lastSearchParams = params;
       this.searchToggle = true;
       this.getTicketList();
-      if (Object.keys(params).length === 0 || !toggle) return;
-      this.searchResultList[this.type].push(params);
     },
     deteleSearchResult(type, index) {
       this.searchResultList[type].splice(index, 1);
@@ -469,10 +459,10 @@ const ticketListMixins = {
       this.$store.dispatch('deployOrder/setAttention', { params, id }).then(() => {
         if (row.hasAttention) {
           row.hasAttention = false;
-          bkMessage = this.$t('m.manageCommon[\'取消关注成功~\']');
+          bkMessage = this.$t('m.manageCommon[\'取消关注成功\']');
         } else {
           row.hasAttention = true;
-          bkMessage = this.$t('m.manageCommon[\'添加关注成功~\']');
+          bkMessage = this.$t('m.manageCommon[\'添加关注成功\']');
         }
         this.$bkMessage({
           message: bkMessage,

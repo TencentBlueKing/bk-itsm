@@ -151,7 +151,7 @@ msgstr "Title (Ticket)"
 
 #: itsm/component/constants/basic.py:141 itsm/component/constants/basic.py:159
 msgid "提单人"
-msgstr "Sponsor"
+msgstr "Requester"
 
 #: itsm/component/constants/basic.py:142 itsm/component/constants/basic.py:160
 msgid "提单时间"
@@ -2066,10 +2066,6 @@ msgstr ""
 #: itsm/service/managers.py:526
 msgid "根目录"
 msgstr "Root"
-
-#: itsm/project/models/project.py:162
-msgid "项目"
-msgstr ""
 
 #: itsm/project/models/project.py:166 itsm/ticket/models/ticket.py:4614
 #, fuzzy
@@ -6887,10 +6883,10 @@ msgid "变更管理"
 msgstr "Changes"
 
 msgid "单选下拉框"
-msgstr "Single-select Box"
+msgstr "Single-Select Dropdown List"
 
 msgid "单选框"
-msgstr "Radio Box"
+msgstr "Radio"
 
 msgid "复选框"
 msgstr "Checkbox"
@@ -6905,40 +6901,40 @@ msgid "单行文本"
 msgstr "Input"
 
 msgid "多行文本"
-msgstr "Text"
+msgstr "Textarea"
 
 msgid "数字"
 msgstr "Number"
 
-msgid "时间"
+msgid "日期时间"
 msgstr "Datetime"
 
 msgid "时间间隔"
 msgstr "Datetime Range"
 
-msgid "多选人员选择"
-msgstr "Multiple User Select"
+msgid "多个人员选择"
+msgstr "Multiple-Person Selector"
 
-msgid "单选人员选择"
-msgstr "Single User Select"
+msgid "单个人员选择"
+msgstr "Single-Person Selector"
 
 msgid "富文本"
-msgstr "RichText"
+msgstr "Rich Text"
 
 msgid "附件上传"
-msgstr "Attachments"
+msgstr "Attachment"
 
 msgid "自定义表格"
-msgstr "ComplexTable"
+msgstr "Custom Table"
 
 msgid "树形选择"
-msgstr "TreeSelect"
+msgstr "Tree Selector"
 
 msgid "链接"
 msgstr "Link"
 
 msgid "可输入单选下拉框"
-msgstr "ComboSelect"
+msgstr "Multi-Select Dropdown List"
 
 msgid "级联"
 msgstr "CascadeSelect"
@@ -7088,7 +7084,7 @@ msgid "不限"
 msgstr "Open"
 
 msgid "个人"
-msgstr "Single Person"
+msgstr "Specific Person"
 
 msgid "派单人指定"
 msgstr "By Assignor"
@@ -7510,13 +7506,22 @@ msgid "{operator} {action} 【{name}】. 处理结果: 失败 {detail_message}"
 msgstr "{operator} {action} 【{name}】. Result：Failed {detail_message}"
 
 msgid "自定义表单"
-msgstr "Custom form"
+msgstr "Custom Form"
 
 msgid "提单人上级"
-msgstr "Ticket creator superior"
+msgstr "Requester's Superior"
+
+msgid "自定义角色"
+msgstr "Custom roles"
+
+msgid "自定义角色组"
+msgstr "Custom Role Group"
+
+msgid "第三方系统"
+msgstr "Third party systems"
 
 msgid "权限中心角色"
-msgstr "Iam roles"
+msgstr "IAM Role"
 
 msgid "是否使用权限中心角色"
 msgstr "Whether to use iam role"
@@ -7532,3 +7537,247 @@ msgstr "Terminate"
 
 msgid "已撤销"
 msgstr "Revoked"
+
+msgid "指定节点处理人上级"
+msgstr "Processor's Superior of specific node"
+
+msgid "不支持撤回"
+msgstr "Withdrawal not supported"
+
+msgid "创建项目"
+msgstr "New Project"
+
+msgid "项目查看"
+msgstr "View Project"
+
+msgid "项目编辑"
+msgstr "Edit Project"
+
+msgid "流程创建"
+msgstr "New Flow"
+
+msgid "流程管理"
+msgstr "Manage Flow"
+
+msgid "流程部署"
+msgstr "Deploy Flow"
+
+msgid "服务创建"
+msgstr "New Service"
+
+msgid "服务查看"
+msgstr "View Service"
+
+msgid "服务管理"
+msgstr "Manage Service"
+
+# 已废弃
+msgid "流程版本还原"
+msgstr "Restore Flow Version"
+
+# 已废弃
+msgid "流程版本管理"
+msgstr "Manage Flow Version"
+
+# 已废弃
+msgid "角色创建"
+msgstr "New Role"
+
+# 已废弃
+msgid "角色管理"
+msgstr "Manage Role"
+
+msgid "服务协议管理"
+msgstr "Manage SLA"
+
+# 已废弃
+msgid "流程元素管理"
+msgstr "Manage Flow Element"
+
+msgid "系统配置管理"
+msgstr "Manage System Configuration"
+
+msgid "工单查看"
+msgstr "View Ticket"
+
+msgid "工单管理"
+msgstr "Manage Ticket"
+
+msgid "运营数据查看"
+msgstr "View Data Analysis"
+
+msgid "字段新建"
+msgstr "New Field"
+
+msgid "字段查看"
+msgstr "View Field"
+
+msgid "字段编辑"
+msgstr "EditField"
+
+msgid "字段删除"
+msgstr "Delete Field"
+
+msgid "触发器新建"
+msgstr "New Trigger"
+
+msgid "触发器查看"
+msgstr "View Trigger"
+
+msgid "触发器编辑"
+msgstr "Edit Trigger"
+
+msgid "触发器管理"
+msgstr "Manage Trigger"
+
+msgid "设置查看"
+msgstr "View Setting"
+
+msgid "设置管理"
+msgstr "Manage Setting"
+
+msgid "目录新建"
+msgstr "New Service Directory"
+
+msgid "目录编辑"
+msgstr "Edit Service Directory"
+
+msgid "目录删除"
+msgstr "Delete Service Directory"
+
+msgid "用户组新建"
+msgstr "New Custom Role Group"
+
+msgid "用户组查看"
+msgstr "View Custom Role Group"
+
+msgid "用户组编辑"
+msgstr "Edit Custom Role Group"
+
+msgid "用户组删除"
+msgstr "Delete Custom Role Group"
+
+# 已废弃
+msgid "SLA 服务模式查看"
+msgstr "View SLA Service Mode"
+
+# 已废弃
+msgid "SLA 服务模式编辑"
+msgstr "Edit SLA Service Mode"
+
+# 已废弃
+msgid "SLA 服务模式删除"
+msgstr "Delete SLA Service Mode"
+
+# 已废弃
+msgid "SLA 服务模式新建"
+msgstr "New SLA Service Mode"
+
+# 已废弃
+msgid "SLA 服务协议查看"
+msgstr "View SLA Service Agreement"
+
+# 已废弃
+msgid "SLA 服务协议创建"
+msgstr "New SLA Service Agreement"
+
+# 已废弃
+msgid "SLA 服务协议编辑"
+msgstr "Edit SLA Service Agreement"
+
+# 已废弃
+msgid "SLA 服务协议删除"
+msgstr "Delete  Service Agreement"
+
+# 已废弃
+msgid "SLA 优先级查看"
+msgstr "View SLA Priority"
+
+# 已废弃
+msgid "SLA 优先级管理"
+msgstr "Manage SLA Priority"
+
+msgid "公共字段新建"
+msgstr "New Public Field"
+
+msgid "公共字段编辑"
+msgstr "Edit Public Field"
+
+msgid "公共字段删除"
+msgstr "Delete Field"
+
+msgid "公共字段查看"
+msgstr "View Public Field"
+
+msgid "公共API新建"
+msgstr "New Public API"
+
+msgid "公共API查看"
+msgstr "New Public API"
+
+msgid "公共API管理"
+msgstr "Manage Public API"
+
+msgid "任务模版查看"
+msgstr "View Task Template"
+
+msgid "任务模版创建"
+msgstr "New Task Template"
+
+msgid "任务模版管理"
+msgstr "Manage Task Template"
+
+msgid "通知配置查看"
+msgstr "View Notification"
+
+msgid "通知配置管理"
+msgstr "Manage Notification"
+
+msgid "全局设置查看"
+msgstr "View Global Setting"
+
+msgid "全局设置管理"
+msgstr "Manage Global Setting"
+
+msgid "单据状态查看"
+msgstr "View Ticket Status"
+
+msgid "单据状态管理"
+msgstr "Manage Ticket Status"
+
+msgid "平台管理访问"
+msgstr "View Administration"
+
+msgid "项目"
+msgstr "Project"
+
+# 已废弃
+msgid "通用角色"
+msgstr "Common Role"
+
+msgid "系统配置"
+msgstr "System Configuration"
+
+msgid "运营数据"
+msgstr "Data Analysis"
+
+msgid "用户组"
+msgstr "Custom Role Group"
+
+msgid "字段"
+msgstr "Field"
+
+msgid "SLA 服务协议"
+msgstr "SLA Service Agreement"
+
+msgid "SLA 服务模式"
+msgstr "SLA Service Mode"
+
+msgid "公共字段"
+msgstr "Public Field"
+
+msgid "公共API"
+msgstr "Public API"
+
+msgid "任务模版"
+msgstr "Task Template"

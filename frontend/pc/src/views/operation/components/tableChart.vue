@@ -165,11 +165,13 @@
           sortCondition = prop;
         } else if (order === 'descending') {
           sortCondition = `-${prop}`;
+        } else {
+          sortCondition = undefined;
         }
         this.$emit('onOrderChange', sortCondition);
       },
       handlePageChange(page) {
-        this.$emit('onPageChange', page);
+        this.$emit('onPageChange', page, this.sortCondition);
       },
       handlerCellClick(col, data) {
         if (typeof col.handler === 'function') {

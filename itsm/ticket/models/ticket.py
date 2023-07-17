@@ -139,6 +139,7 @@ from itsm.component.constants import (
     TASK_DEVOPS_STATE,
     WEBHOOK_STATE,
     BK_PLUGIN_STATE,
+    SUSPENDED,
 )
 from itsm.component.constants.trigger import (
     CREATE_TICKET,
@@ -987,13 +988,13 @@ class Status(Model):
                 service_type=service_type, key=self.ticket.current_status
             )
 
-            if setting.get("name") in TICKET_STATUS_DICT.keys():
-                to_ticket_status = (
-                    TicketStatus.objects.filter(service_type=service_type)
-                    .filter(key=setting.get("name"))
-                    .first()
-                )
-            else:
+            to_ticket_status = (
+                TicketStatus.objects.filter(service_type=service_type)
+                .filter(key=setting.get("name"))
+                .first()
+            )
+            if not to_ticket_status:
+                # 这段代码应该是兼容老的配置
                 to_ticket_status = (
                     TicketStatus.objects.filter(service_type=service_type)
                     .filter(name=setting.get("name"))
@@ -1079,9 +1080,9 @@ class Status(Model):
     def ticket_fields(self):
         """从单据字段中获取节点字段信息"""
         workflow_field_order = self.ticket.flow.states.get(str(self.state_id))["fields"]
-
         if not workflow_field_order:
             return self.ticket.fields.filter(state_id=self.state_id)
+
         clauses = " ".join(
             [
                 "WHEN workflow_field_id=%s THEN %s" % (pk, index)
@@ -1097,7 +1098,7 @@ class Status(Model):
         if self.is_first_status:
             filter_experssion = filter_experssion | Q(workflow_field_id=0)
 
-        return (
+        fields = (
             self.ticket.fields.filter(filter_experssion)
             .exclude(source=BASE_MODEL)
             .extra(
@@ -1108,6 +1109,16 @@ class Status(Model):
                 ),
             )
         )
+        if self.is_first_status:
+            dynamic_fields = []
+            state_fields = list(fields)
+            for field in state_fields:
+                if field.workflow_field_id == 0 and field.source == "CUSTOM":
+                    dynamic_fields.append(field)
+                    state_fields.remove(field)
+            return state_fields + dynamic_fields
+
+        return fields
 
     def approval_result(self, result, opinion):
         fields = []
@@ -2133,15 +2144,13 @@ class Ticket(Model, BaseTicket):
         )
 
     def can_supervise(self, username):
-        # return all(
-        #     [
-        #         self.is_supervise_needed,
-        #         not self.is_over,
-        #         username in self.real_supervisors,
-        #     ]
-        # )
         # 调整为提单人都可以督办
-        return username == self.creator and not self.is_over
+        # 挂起的时候不允许督办
+        return (
+            username == self.creator
+            and not self.is_over
+            and self.current_status != SUSPENDED
+        )
 
     def iam_ticket_manage_auth(self, username):
         # 本地开发环境，不校验单据管理权限
@@ -2168,6 +2177,7 @@ class Ticket(Model, BaseTicket):
         """
         能否操作单据：任一节点的处理人
         """
+
         if self.is_over or self.is_slave:
             return False
 
@@ -2185,6 +2195,11 @@ class Ticket(Model, BaseTicket):
         if username in all_processors:
             # 用户名存在处理人列表中
             return True
+
+        # 说明可能存在截断的情况，这个时候需要去查询当前真实的用户
+        if len(self.current_processors) >= 255:
+            if username == self.real_current_processors:
+                return True
 
         user_roles = UserRole.get_user_roles(username)
 
@@ -2804,6 +2819,19 @@ class Ticket(Model, BaseTicket):
         """发送单据和任务通知"""
         from itsm.ticket.tasks import notify_task
 
+        # 如果单据关闭了发送邀请评价和邀请关注, 则不发送通知
+        enable_follow_notify = self.meta.get("notify_config", {}).get(
+            "enable_follow_notify", True
+        )
+        enable_finished_notify = self.meta.get("notify_config", {}).get(
+            "enable_finished_notify", True
+        )
+
+        if (not enable_follow_notify and action == FOLLOW_OPERATE) or (
+            not enable_finished_notify and action == FINISHED
+        ):
+            return
+
         logger.info(
             "[ticket->notify] is executed, state_id={}, receivers={}, message={}, action={}".format(
                 state_id, receivers, message, action
@@ -3006,27 +3034,17 @@ class Ticket(Model, BaseTicket):
         for ticket_field in filter_field_query_set:
             ticket_field.value = fields_map[ticket_field.key]["value"]
             ticket_field.choice = fields_map[ticket_field.key].get("choice", [])
+            language_config = (
+                fields_map[ticket_field.key].get("meta", {}).get("language")
+            )
+            if language_config:
+                ticket_field.meta["language"] = language_config
             ticket_field.update_at = datetime.now()
 
         bulk_update(
-            filter_field_query_set, update_fields=["_value", "choice", "update_at"]
+            filter_field_query_set,
+            update_fields=["_value", "choice", "update_at", "meta"],
         )
-
-    # def fill_state_fields(self, fields):
-    #     """更新单据字段"""
-    #
-    #     for field in fields:
-    #         # 更新优先级由update_priority统一处理
-    #         if field["key"] == FIELD_PRIORITY:
-    #             continue
-    #
-    #         filter_fields = self.fields.filter(key=field["key"])
-    #         # 多个单据字段：插入到节点的基础模型字段 + 唯一基础模型字段
-    #         for ticket_field in filter_fields:
-    #             ticket_field.value = field["value"]
-    #             ticket_field.choice = field.get("choice", [])
-    #
-    #         bulk_update(filter_fields, update_fields=["_value", "choice"])
 
     def update_ticket_fields(self, fields):
         for field in fields:
@@ -3589,6 +3607,7 @@ class Ticket(Model, BaseTicket):
         else:
             receivers = ",".join(status.get_processors())
             action = TRANSITION_OPERATE
+
         self.notify(
             state_id,
             receivers,
@@ -3937,6 +3956,25 @@ class Ticket(Model, BaseTicket):
 
         return list_view
 
+    def list_data(self):
+        return {
+            "sn": self.sn,
+            "id": self.id,
+            "title": self.title,
+            "service_id": self.service_id,
+            "service_type": self.service_type,
+            "meta": self.meta,
+            "bk_biz_id": self.bk_biz_id,
+            "current_status": self.current_status,
+            "create_at": self.create_at,
+            "creator": self.creator,
+            "is_supervise_needed": self.is_supervise_needed,
+            "flow_id": self.flow_id,
+            "supervise_type": self.supervise_type,
+            "supervisor": self.supervisor,
+            "project_key": self.project_key,
+        }
+
     @staticmethod
     def display_content(field_type, content):
         if field_type != "CUSTOM-FORM":
@@ -4152,6 +4190,9 @@ class Ticket(Model, BaseTicket):
             action=FINISHED,
             retry=False,
         )
+
+        # 清理Token
+        TicketFollowerNotifyLog.objects.filter(ticket_id=self.id).delete()
         return
 
     def proceed(self, state_id, fields, operator="", source=WEB):
@@ -4794,6 +4835,9 @@ class Ticket(Model, BaseTicket):
             "value": 1
         }]
         """
+        if not isinstance(dynamic_fields, list):
+            return
+
         if not dynamic_fields:
             return
 

@@ -96,6 +96,7 @@
   import permission from '@/mixins/permission.js';
   import { mapState } from 'vuex';
   import Empty from '../../../components/common/Empty.vue';
+  import _ from 'lodash';
 
   export default {
     name: 'noticeConfigure',
@@ -134,6 +135,7 @@
     },
     mounted() {
       this.getNoticeList();
+      console.log(this.noticeInfo);
     },
     methods: {
       // 获取数据
@@ -170,16 +172,22 @@
         this.noticeInfo.show = false;
       },
       closeSideslider() {
-        this.$bkInfo({
-          title: this.$t('m["内容未保存，离开将取消操作！"]'),
-          confirmLoading: true,
-          confirmFn: () => {
-            this.noticeInfo.show = false;
-          },
-          cancelFn: () => {
-            this.noticeInfo.show = true;
-          },
-        });
+        if (!_.isEqual(this.$refs.editorNotice.formInfo, this.$refs.editorNotice.initFromData)) {
+          this.$bkInfo({
+            title: this.$t('m["确定离开当前页？"]'),
+            subTitle: this.$t('m["离开将会导致未保存信息丢失"]'),
+            okText: this.$t('m["离开"]'),
+            confirmLoading: true,
+            confirmFn: () => {
+              this.noticeInfo.show = false;
+            },
+            cancelFn: () => {
+              this.noticeInfo.show = true;
+            },
+          });
+        } else {
+          this.noticeInfo.show = false;
+        }
       },
     },
   };

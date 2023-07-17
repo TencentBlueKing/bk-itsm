@@ -207,6 +207,7 @@
   import triggerCondition from './components/triggerCondition.vue';
   import responseCondition from './components/responseCondition.vue';
   import { errorHandler } from '../../../utils/errorHandler.js';
+  import { deepClone } from '../../../utils/util';
 
   export default {
     name: 'addTrigger',
@@ -304,6 +305,7 @@
         rules: {},
         // 公共触发器可关联基础模型
         moduleTypes: [],
+        initFormData: {},
       };
     },
     computed: {
@@ -395,6 +397,8 @@
         if (this.triggerInfo.id) {
           this.contentLoading = true;
           this.getData();
+        } else {
+          this.initFormData = deepClone(Object.assign({}, { formData: this.formData }));
         }
       },
       // 基础模型类型
@@ -443,6 +447,7 @@
         }
         // 触发条件
         this.contentLoading = false;
+        this.initFormData = deepClone(Object.assign({}, { formData: this.formData }, { ruleItem: this.ruleItem }, { rulesList: this.rulesList }));
       },
       // 触发条件的显示
       conditionValue(itemInfo) {
@@ -658,7 +663,7 @@
             item.triggerRules.list.forEach(firstItem => {
               firstItem.itemList.forEach(secondItem => {
                 if (secondItem.condition === 'non_empty') {
-                  item.triggerRules.checkStatus = secondItem.key === '' || secondItem.value === '';
+                  item.triggerRules.checkStatus = secondItem.key === '';
                 } else {
                   item.triggerRules.checkStatus = secondItem.key === '' || secondItem.condition === '' || secondItem.value === '';
                 }
@@ -709,8 +714,9 @@
                   } else {
                     // 区分人员选择
                     if (schema.required) {
+                      const filterField = ['STARTER_LEADER', 'ASSIGN_LEADER'];
                       if (schema.type === 'MEMBERS' || schema.type === 'MULTI_MEMBERS') {
-                        responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : schema.value.some(schemaMem => (Array.isArray(schemaMem.value) ? !schemaMem.value.length : !schemaMem.value));
+                        responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : schema.value.some(schemaMem => (Array.isArray(schemaMem.value) ? filterField.includes(schemaMem.key) ? schemaMem.value.length : !schemaMem.value.length : !schemaMem.value));
                       } else {
                         responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : (schema.key === 'field_value' ? !(schema.itemInfo[0].value || schema.itemInfo[0].val) : !schema.value);
                       }

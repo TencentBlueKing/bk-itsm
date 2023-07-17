@@ -108,7 +108,7 @@
           size="small"
           class="mr10"
           theme="default"
-          :disabled="!ticketInfo.can_supervise"
+          :disabled="!ticketInfo.can_supervise || ticketInfo.current_status === 'SUSPENDED'"
           @click="onTicketBtnClick('supervise')"
         >
           {{ $t(`m.newCommon["催办"]`) }}
@@ -355,8 +355,8 @@
           attention: !this.hasAttention,
         };
         const bkMessage = this.hasAttention
-          ? this.$t('m.manageCommon[\'取消关注成功~\']')
-          : this.$t('m.manageCommon[\'添加关注成功~\']');
+          ? this.$t('m.manageCommon[\'取消关注成功\']')
+          : this.$t('m.manageCommon[\'添加关注成功\']');
         this.$store
           .dispatch('deployOrder/setAttention', { params, id })
           .then(() => {

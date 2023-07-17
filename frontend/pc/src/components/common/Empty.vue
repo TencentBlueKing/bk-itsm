@@ -102,7 +102,6 @@
   .tip {
     .title {
       display: block;
-      width: 84px;
       height: 22px;
       font-family: MicrosoftYaHei;
       font-size: 14px;

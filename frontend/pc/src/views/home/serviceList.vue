@@ -118,7 +118,7 @@
           </ul>
           <div class="show-more" v-if="allList.length > 16" @click="toggleFold">
             <template v-if="activeFold">
-              <span>{{ $t(`m['更多']`) }}</span>
+              <span>{{ $t(`m.newCommon['展开']`) }}</span>
               <i class="bk-icon icon-angle-down"></i>
             </template>
             <template v-else>

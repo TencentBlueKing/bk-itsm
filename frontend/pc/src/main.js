@@ -157,16 +157,22 @@ if (window.TAM_PROJECT_ID) {
     reportAssetSpeed: true,
   });
 }
+store.dispatch('getPlatformPreData').then(()=> {
+  const app = new Vue({
+    el: "#app",
+    i18n,
+    router,
+    store,
+    components: {
+      App,
+    },
+    template: "<App/>",
+  });
+  
+  window.app = app;
+}).catch(error =>{
+  console.warn(error);
+})
 
-const app = new Vue({
-  el: "#app",
-  i18n,
-  router,
-  store,
-  components: {
-    App,
-  },
-  template: "<App/>",
-});
 
-window.app = app;
+

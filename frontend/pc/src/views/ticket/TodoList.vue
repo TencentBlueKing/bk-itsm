@@ -91,7 +91,7 @@
             :title="props.row.current_status_display"
             class="bk-status-color-info"
             :style="getstatusColor(props.row)">
-            {{ props.row.current_status_display || '--' }}
+            {{ isChineseLanguage ? props.row.current_status_display : props.row.current_status || '--' }}
           </span>
           <!-- 优先级 -->
           <span v-else-if="field.id === 'priority'"
@@ -100,7 +100,7 @@
           </span>
           <!-- 操作 -->
           <template v-else-if="field.id === 'operate'">
-            <template v-if="props.row.waiting_approve">
+            <template v-if="props.row.waiting_approve && props.row.current_status !== 'SUSPENDED'">
               <template v-if="approveLoadingID !== props.row.id">
                 <bk-link class="table-link mr10" theme="primary" @click="onOpenApprovalDialog(props.row.id, true)">{{ $t(`m.managePage['通过']`) }}</bk-link>
                 <bk-link class="table-link" theme="primary" @click="onOpenApprovalDialog(props.row.id, false)">{{ $t(`m.manageCommon['拒绝']`) }}</bk-link>
@@ -116,7 +116,7 @@
               class="table-link mr10"
               :to="{ name: 'TicketDetail',
                      query: { id: props.row.id, project_id: props.row.project_key, from } }">
-              {{ props.row.can_operate ? $t(`m.manageCommon['处理']`) : $t('m.manageCommon["查看"]') }}
+              {{ props.row.can_operate && props.row.current_status !== 'SUSPENDED' ? $t(`m.manageCommon['处理']`) : $t('m.manageCommon["查看"]') }}
             </router-link>
           </template>
           <!-- 其他 -->
@@ -250,11 +250,10 @@
       singleApproval(id, result) {
         if (!result) {
           this.approveLoadingID = id;
-          debugger;
         } else {
           if (result.result) {
             this.approveLoadingID = '';
-            this.ticketList.splice(this.ticketList.findIndex(item => item.id === Number(id)), 1);
+            this.getTicketList();
           }
         }
       },

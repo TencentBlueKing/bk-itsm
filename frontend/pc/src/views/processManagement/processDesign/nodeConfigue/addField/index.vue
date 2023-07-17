@@ -396,7 +396,8 @@
   import pinyin from 'pinyin';
   import { CUSTOM_FORM_DEFAULT_VALUE } from '../../../../../constants/field';
   import { errorHandler } from '../../../../../utils/errorHandler.js';
-    
+  import { deepClone } from '../../../../../utils/util';
+
   export default {
     name: 'addField',
     components: {
@@ -620,6 +621,7 @@
         // 任务内置字段特殊处理
         fieldTypeList: [],
         hiddenConditionStatus: true,
+        initFormData: {},
       };
     },
     computed: {
@@ -639,6 +641,12 @@
           this.$emit('getAddFieldStatus', val.name !== '');
         },
         deep: true,
+      },
+      isShowDataSource(val) {
+        if (val) {
+          this.initFormData.bodyTableData = deepClone(this.$refs.dataContent[0].$refs.postParam.bodyTableData);
+          this.initFormData.selectInfo = deepClone(this.$refs.dataContent[0].$refs.responseData.selectInfo);
+        }
       },
     },
     async mounted() {
@@ -717,7 +725,7 @@
         if (assignValue.regex_config && assignValue.regex_config.rule) {
           this.changeRegex('ASSOCIATED_FIELD_VALIDATION');
           this.formInfo.regex_config.rule.type = assignValue.regex_config.rule.type;
-          
+
           this.formInfo.regex_config = assignValue.regex_config;
         }
         if (this.formInfo.regex === 'CUSTOM') {
@@ -786,7 +794,7 @@
           this.formInfo.name = this.sospInfo.name || '';
           this.formInfo.validate = 'REQUIRE';
         }
-
+        this.initFormData.formInfo = deepClone(this.formInfo);
         this.assignValue = JSON.parse(JSON.stringify(assignValue));
       },
       // 获取前置节点的字段信息
@@ -1392,6 +1400,7 @@
     .bk-halfline-item {
         display: inline-block;
         width: 49%;
+        vertical-align: top;
     }
     .bk-halfline-margin {
         margin-right: 1%;
