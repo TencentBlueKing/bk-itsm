@@ -66,7 +66,6 @@ class ProjectSerializer(ModelSerializer):
         instance.init_service_catalogs(catalogs)
         instance.init_project_settings()
         instance.init_project_sla()
-        instance.init_custom_notify_template()
         return instance
 
     def to_representation(self, instance):

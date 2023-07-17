@@ -43,6 +43,8 @@ else:
 
 # 预发布环境
 RUN_MODE = "STAGING"
+BK_APIGW_STAGE_NAME = "stag"
+BKAPP_APIGW_SYNC_STAGE = ["stag"]
 RIO_TOKEN = os.environ.get("RIO_TOKEN", "")
 
 # 正式环境的日志级别可以在这里配置
