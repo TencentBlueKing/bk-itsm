@@ -23,8 +23,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import base64
+import datetime
 import importlib
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 from blueapps.conf.default_settings import *  # noqa
 from blueapps.conf.log import get_logging_config_dict
@@ -114,6 +115,19 @@ AUTHENTICATION_BACKENDS += ("itsm.openapi.authentication.backend.CustomUserBacke
 IS_PAAS_V3 = int(os.getenv("BKPAAS_MAJOR_VERSION", False)) == 3
 IS_OPEN_V3 = IS_PAAS_V3 and RUN_VER == "open"
 
+ENABLE_SYNC_API_GATEWAY = bool(os.getenv("ENABLE_SYNC_API_GATEWAY", False))
+# 如果是对外版PAASV3 并且 是容器化版本 并且开启了网关同步 才会执行网关的migrate操作
+if IS_OPEN_V3 and ENGINE_REGION == "default" and ENABLE_SYNC_API_GATEWAY:
+    # 网关管理员
+    BK_APIGW_MANAGER_MAINTAINERS = os.getenv(
+        "BK_APIGW_MANAGER_MAINTAINERS", "admin"
+    ).split(",")
+    # 网关服务地址
+    BKAPP_APIGW_API_HOST = os.getenv("BKAPP_APIGW_API_HOST", "")
+    api_host = urlparse(BKAPP_APIGW_API_HOST)
+    BK_APIGW_API_SERVER_HOST = api_host.netloc
+    BK_APIGW_API_SERVER_SUB_PATH = api_host.path.lstrip("/")
+
 # IAM 开启开关
 USE_IAM = True if os.getenv("USE_IAM", "true").lower() == "true" else False
 if USE_IAM:
@@ -176,7 +190,8 @@ MIDDLEWARE = (
 # mako 模板中：<script src="/a.js?v=${ STATIC_VERSION }"></script>
 # 如果静态资源修改了以后，上线前改这个版本号即可
 # STATIC_VERSION_END
-STATIC_VERSION = "LATEST_STATIC_VERSION"
+STATIC_VERSION = "2.6.6"
+DEPLOY_DATETIME = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
