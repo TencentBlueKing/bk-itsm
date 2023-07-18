@@ -66,6 +66,8 @@ class ServiceManager(managers.Manager):
         from django.db.models import Q
         from itsm.workflow.models import Workflow
 
+        self.filter(name="帐号开通申请").update(name="账号开通申请")
+
         for builtin_service in BUILTIN_SERVICES:
 
             try:
@@ -175,7 +177,6 @@ class ServiceManager(managers.Manager):
         existed_services = self.filter(name__in=all_service_name).values_list(
             "name", flat=True
         )
-
         for new_service in services:
             original_workflow = all_original_workflow.get(new_service["flow_name"])
             if original_workflow is None or new_service["name"] in existed_services:
