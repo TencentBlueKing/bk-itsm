@@ -286,19 +286,10 @@ class HttpsMiddleware(MiddlewareMixin):
 class UserLoginForbiddenMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
 
-        logger.info(
-            "[UserLoginForbiddenMiddleware] request.path == {}".format(request.path)
-        )
-        logger.info(
-            "[UserLoginForbiddenMiddleware] response.url == {}".format(
-                getattr(response, "url", "")
-            )
-        )
-
         if (
-            request.path == "/init/"
+            "/init/" in request.path
             and response.status_code == 302
-            and "/account/login_forbidden/?hint_msg" in getattr(response, "url", "")
+            and "/account/login_forbidden/" in getattr(response, "url", "")
         ):
             return JsonResponse({"result": False, "location": response.url})
 
