@@ -285,6 +285,16 @@ class HttpsMiddleware(MiddlewareMixin):
 
 class UserLoginForbiddenMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
+
+        logger.info(
+            "[UserLoginForbiddenMiddleware] request.path == {}".format(request.path)
+        )
+        logger.info(
+            "[UserLoginForbiddenMiddleware] response.url == {}".format(
+                getattr(response, "url", "")
+            )
+        )
+
         if (
             request.path == "/init/"
             and response.status_code == 302
