@@ -142,6 +142,7 @@ if USE_IAM:
 MIDDLEWARE = (
     # 手动关闭服务中间件，需要到admin里设置key='SERVICE_SWITCH'这条数据的value
     "itsm.component.misc_middlewares.HttpsMiddleware",
+    "itsm.component.misc_middlewares.UserLoginForbiddenMiddleware",
     "itsm.component.misc_middlewares.ServiceSwitchCheck",
     # api网关接口豁免
     "itsm.component.misc_middlewares.ApiIgnoreCheck",
