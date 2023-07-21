@@ -377,7 +377,13 @@ export default new Vuex.Store({
       return jsonp(bkPaasEsbHost + '/api/c/compapi/v2/usermanage/fe_update_user_language/', language);
     },
     getPlatformPreData() {
-      return ajax.get('init/').then((response) => response.data);
+      return ajax.get('init/').then((response) => {
+        if (!response.data.result && response.data.location) {
+          window.location.href = `//${window.location.host}${response.data.location}`;
+          return;
+        }
+        return response.data;
+    });
     },
     /**
      * 获取项目里面的 rtx 人员选择器数据
