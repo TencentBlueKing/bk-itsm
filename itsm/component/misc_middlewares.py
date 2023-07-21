@@ -291,6 +291,6 @@ class UserLoginForbiddenMiddleware(MiddlewareMixin):
             and response.status_code == 302
             and "/account/login_forbidden/" in getattr(response, "url", "")
         ):
-            return JsonResponse({"result": False, "location": response.url})
+            return JsonResponse({"need_target": True, "location": response.url})
 
         return response

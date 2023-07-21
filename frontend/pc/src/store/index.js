@@ -378,7 +378,7 @@ export default new Vuex.Store({
     },
     getPlatformPreData() {
       return ajax.get('init/').then((response) => {
-        if (!response.data.result && response.data.location) {
+        if (response.data.need_target && response.data.location) {
           window.location.href = `//${window.location.host}${response.data.location}`;
           return;
         }
