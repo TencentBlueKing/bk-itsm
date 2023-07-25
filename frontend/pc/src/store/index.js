@@ -382,7 +382,7 @@ export default new Vuex.Store({
           window.location.href = `//${window.location.host}${response.data.data.location}`;
           return;
         }
-        return response.data;
+        return response.data.data;
     });
     },
     /**
