@@ -142,6 +142,7 @@ if USE_IAM:
 MIDDLEWARE = (
     # 手动关闭服务中间件，需要到admin里设置key='SERVICE_SWITCH'这条数据的value
     "itsm.component.misc_middlewares.HttpsMiddleware",
+    "itsm.component.misc_middlewares.UserLoginForbiddenMiddleware",
     "itsm.component.misc_middlewares.ServiceSwitchCheck",
     # api网关接口豁免
     "itsm.component.misc_middlewares.ApiIgnoreCheck",
@@ -190,7 +191,7 @@ MIDDLEWARE = (
 # mako 模板中：<script src="/a.js?v=${ STATIC_VERSION }"></script>
 # 如果静态资源修改了以后，上线前改这个版本号即可
 # STATIC_VERSION_END
-STATIC_VERSION = "2.6.6"
+STATIC_VERSION = "2.6.7"
 DEPLOY_DATETIME = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]

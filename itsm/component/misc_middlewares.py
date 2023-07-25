@@ -31,7 +31,7 @@ from io import StringIO
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.utils.deprecation import MiddlewareMixin
 from pyinstrument import Profiler
 
@@ -281,3 +281,22 @@ class HttpsMiddleware(MiddlewareMixin):
                 return HttpResponseIndexRedirect(request.path)
 
         return None
+
+
+class UserLoginForbiddenMiddleware(MiddlewareMixin):
+    def process_response(self, request, response):
+        if (
+            "/init/" in request.path
+            and response.status_code == 302
+            and "/account/login_forbidden/" in getattr(response, "url", "")
+        ):
+            return JsonResponse(
+                {
+                    "result": True,
+                    "data": {"need_target": True, "location": response.url},
+                    "message": "",
+                    "code": 0,
+                }
+            )
+
+        return response
