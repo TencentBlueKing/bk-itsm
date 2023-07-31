@@ -517,6 +517,7 @@ class TicketList(object):
                 "supervise_type",
                 "supervisor",
                 "project_key",
+                "current_processors",
             )
         self.username = username
         self.token = token
@@ -687,7 +688,7 @@ class TicketList(object):
                     if "priority" in inst["meta"]
                     else "--",
                     create_at=inst["create_at"].strftime("%Y-%m-%d %H:%M:%S"),
-                    current_processors="",  # ",".join(self.ticket_processors.get(inst.id, "")),
+                    current_processors=inst.get("current_processors", ""),
                     can_comment=self.can_comment(inst, comments, is_email_invite_token),
                     can_operate=False,
                     waiting_approve=is_waiting_approve,

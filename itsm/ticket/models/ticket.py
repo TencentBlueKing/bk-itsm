@@ -1718,7 +1718,7 @@ class Ticket(Model, BaseTicket):
                 Q(status__in=Status.CAN_OPERATE_STATUS)
                 | Q(status=FAILED, type=TASK_STATE)
             )
-        ).values("ticket_id", "id", "tag", "name")
+        ).values("ticket_id", "id", "tag", "name", "state_id", "type")
         ticket_status = {}
         for status in all_status:
             ticket_id = status.pop("ticket_id")
@@ -3973,6 +3973,7 @@ class Ticket(Model, BaseTicket):
             "supervise_type": self.supervise_type,
             "supervisor": self.supervisor,
             "project_key": self.project_key,
+            "current_processors": self.current_processors,
         }
 
     @staticmethod

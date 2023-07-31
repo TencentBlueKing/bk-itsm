@@ -29,7 +29,7 @@
     
 ![](./img/wiki_community.png)
     
-当然，不管你是想提交**issue**，还是提交**PR**，都需要你有一个 GitHub 帐号。你可以通过这个 [入口](https://github.com/join) 注册账号与我们深度互动。
+当然，不管你是想提交**issue**，还是提交**PR**，都需要你有一个 GitHub 账号。你可以通过这个 [入口](https://github.com/join) 注册账号与我们深度互动。
 
 你也可以点击 bk-sops 仓库上方的**Watch**按钮实时的跟踪社区的动态。
     
