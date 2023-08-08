@@ -27,25 +27,42 @@ import json
 
 from itsm.workflow.models.task import TaskSchema, TaskFieldSchema
 from rest_framework import serializers
-from itsm.component.constants import EMPTY_STRING, LEN_NORMAL, TASK_COMPONENT_CHOICE, TASK_STAGE_CHOICE, LEN_XX_LONG
-from itsm.workflow.serializers import TemplateFieldSerializer, DynamicFieldsModelSerializer, dotted_name, normal_name
+from itsm.component.constants import (
+    EMPTY_STRING,
+    LEN_NORMAL,
+    TASK_COMPONENT_CHOICE,
+    TASK_STAGE_CHOICE,
+    LEN_XX_LONG,
+)
+from itsm.workflow.serializers import (
+    TemplateFieldSerializer,
+    DynamicFieldsModelSerializer,
+    dotted_name,
+    normal_name,
+)
 
 
 class TaskSchemaSerializer(DynamicFieldsModelSerializer):
     """任务配置信息序列化"""
 
     name = serializers.CharField(
-        required=True, initial=EMPTY_STRING, max_length=LEN_NORMAL, allow_blank=True, allow_null=True
+        required=True, max_length=LEN_NORMAL, allow_blank=False, allow_null=False
     )
-    desc = serializers.CharField(required=False, initial=EMPTY_STRING, max_length=LEN_NORMAL, allow_blank=True)
-    component_type = serializers.ChoiceField(required=True, choices=TASK_COMPONENT_CHOICE)
-    owners = serializers.CharField(required=False, max_length=LEN_XX_LONG, allow_blank=True)
+    desc = serializers.CharField(
+        required=False, initial=EMPTY_STRING, max_length=LEN_NORMAL, allow_blank=True
+    )
+    component_type = serializers.ChoiceField(
+        required=True, choices=TASK_COMPONENT_CHOICE
+    )
+    owners = serializers.CharField(
+        required=False, max_length=LEN_XX_LONG, allow_blank=True
+    )
     is_draft = serializers.BooleanField(required=True)
 
     class Meta:
         model = TaskSchema
         fields = model.fields + model.FIELDS
-        read_only_fields = model.FIELDS + ('is_builtin',)
+        read_only_fields = model.FIELDS + ("is_builtin",)
 
     def to_internal_value(self, data):
         data = super(TaskSchemaSerializer, self).to_internal_value(data)
@@ -60,7 +77,9 @@ class TaskSchemaSerializer(DynamicFieldsModelSerializer):
 
 
 class TaskFieldSchemaSerializer(TemplateFieldSerializer):
-    task_schema_id = serializers.IntegerField(required=True,)
+    task_schema_id = serializers.IntegerField(
+        required=True,
+    )
     stage = serializers.ChoiceField(required=True, choices=TASK_STAGE_CHOICE)
 
     class Meta:
@@ -101,7 +120,8 @@ class TaskFieldSchemaSerializer(TemplateFieldSerializer):
         related_fields = []
         api_config = api_instance.get_config()
         task_fields_schema = TaskFieldSchema.objects.filter(
-            task_schema_id=validated_data["task_schema_id"], stage=validated_data["stage"]
+            task_schema_id=validated_data["task_schema_id"],
+            stage=validated_data["stage"],
         )
         for key in task_fields_schema.values_list("key", flat=True):
             if "${params_%s}" % key in json.dumps(api_config["query_params"]):
