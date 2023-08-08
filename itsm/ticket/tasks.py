@@ -512,7 +512,7 @@ def consume_notify():
     if count < end:
         end = count
 
-    queryset = Ticket.objects.filter(current_status="RUNNING")
+    queryset = Ticket.objects.filter(current_status="RUNNING", is_deleted=False)
 
     for item in range(1, end):
         user = email_notify.lpop("notify_queue")
