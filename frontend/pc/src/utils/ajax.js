@@ -83,8 +83,8 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (response) => {
     if (response.config.url === 'init/') {
-      if ('IS_ITSM_ADMIN' in response.data) {
-        const { DEFAULT_PROJECT, IS_ITSM_ADMIN, all_access, chname, username } = response.data;
+      if ('IS_ITSM_ADMIN' in response.data.data) {
+        const { DEFAULT_PROJECT, IS_ITSM_ADMIN, all_access, chname, username } = response.data.data;
         window.DEFAULT_PROJECT = DEFAULT_PROJECT;
         window.IS_ITSM_ADMIN = IS_ITSM_ADMIN;
         window.all_access = all_access;
