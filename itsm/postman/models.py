@@ -460,6 +460,17 @@ class RemoteApiInstance(Model):
 
         api_config["query_params"] = query_params
         rsp = bk.http(config=api_config)
+
+        api_protocol_keys = {"code", "data", "message", "result"}
+
+        if not api_protocol_keys.issubset(set(rsp.keys())):
+            return {
+                "result": False,
+                "code": ResponseCodeStatus.OK,
+                "message": _("接口返回协议不符合规范，请确保接口协议符合蓝鲸规范。详见: Github->API功能使用说明"),
+                "data": [],
+            }
+
         if not rsp["result"]:
             if rsp.get("code") == API_PERMISSION_ERROR_CODE:
                 raise IamPermissionDenied(
