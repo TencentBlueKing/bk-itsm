@@ -329,7 +329,7 @@ msgstr "Sign suggestion"
 #: itsm/component/constants/field.py:59 itsm/component/constants/field.py:81
 #: itsm/component/constants/field.py:99
 msgid "通过"
-msgstr "Approve"
+msgstr "Agree"
 
 #: itsm/component/constants/field.py:59 itsm/component/constants/field.py:80
 #: itsm/component/constants/field.py:99
