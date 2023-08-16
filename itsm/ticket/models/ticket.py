@@ -1513,7 +1513,8 @@ class Ticket(Model, BaseTicket):
     def ticket_url(self):
         if not self.notify_url:
             return "{site_url}/#/ticket/{ticket_id}/".format(
-                site_url=settings.TICKET_NOTIFY_HOST.rstrip("/"), ticket_id=self.id
+                site_url=settings.TICKET_NOTIFY_HOST.rstrip("/"),
+                ticket_id=self.id,
             )
         return self.notify_url
 
@@ -1552,11 +1553,12 @@ class Ticket(Model, BaseTicket):
             }
         )
         client = Cache()
-        self.notify_url = "{site_url}/#/ticket/{ticket_id}/?token={token}&cache_key={cache_key}".format(
+        self.notify_url = "{site_url}/#/ticket/{ticket_id}/?token={token}&cache_key={cache_key}&step_id={step_id}".format(  # noqa
             site_url=settings.TICKET_NOTIFY_HOST.rstrip("/"),
             ticket_id=self.id,
             token=ticket_token,
             cache_key=cache_key,
+            step_id=status.id,
         )
         data = json.dumps({"state_id": state_id, "ticket_id": self.id})
         client.set(cache_key, data, 60 * 60 * 24 * 30)
