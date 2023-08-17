@@ -140,6 +140,7 @@ from itsm.component.constants import (
     WEBHOOK_STATE,
     BK_PLUGIN_STATE,
     SUSPENDED,
+    SHOW_BY_CONDITION,
 )
 from itsm.component.constants.trigger import (
     CREATE_TICKET,
@@ -156,7 +157,6 @@ from itsm.component.constants.trigger import (
     GLOBAL_LEAVE_STATE,
     GLOBAL_ENTER_STATE,
 )
-from common.shortuuid import uuid as _uu
 from itsm.component.utils.client_backend_query import (
     get_user_leader,
     get_user_departments,
@@ -181,6 +181,7 @@ from itsm.component.utils.conversion import (
     conditions_conversion,
     rsp_conversion,
     build_conditions_by_mako_template,
+    show_conditions_validate,
 )
 from itsm.component.utils.graph import dfs_paths
 from itsm.component.utils.misc import transform_single_username, transform_username
@@ -1533,7 +1534,6 @@ class Ticket(Model, BaseTicket):
         )
 
     def generate_ticket_url(self, state_id, receivers):
-        cache_key = _uu()
         status = Status.objects.filter(ticket_id=self.id, state_id=state_id).first()
         if not status:
             logger.info(
@@ -1552,16 +1552,13 @@ class Ticket(Model, BaseTicket):
                 "state_id": state_id,
             }
         )
-        client = Cache()
-        self.notify_url = "{site_url}/#/ticket/{ticket_id}/?token={token}&cache_key={cache_key}&step_id={step_id}".format(  # noqa
+        self.notify_url = "{site_url}/#/ticket/{ticket_id}/?token={token}&step_id={step_id}".format(
+            # noqa
             site_url=settings.TICKET_NOTIFY_HOST.rstrip("/"),
             ticket_id=self.id,
             token=ticket_token,
-            cache_key=cache_key,
             step_id=status.id,
         )
-        data = json.dumps({"state_id": state_id, "ticket_id": self.id})
-        client.set(cache_key, data, 60 * 60 * 24 * 30)
 
     @property
     def service_type_name(self):
@@ -2530,6 +2527,44 @@ class Ticket(Model, BaseTicket):
             return FieldSerializer(fields, many=True).data
 
         return fields
+
+    def get_ticket_detail(self):
+        fields = []
+
+        state_fields = self.get_state_fields(self.first_state_id, need_serialize=False)
+        # 隐藏字段过滤
+        for f in state_fields:
+            if f.show_type == SHOW_BY_CONDITION:
+                key_value = {
+                    "params_%s"
+                    % item["key"]: format_exp_value(item["type"], item["_value"])
+                    for item in self.fields.values("key", "_value", "type")
+                }
+                if show_conditions_validate(f.show_conditions, key_value):
+                    continue
+
+            fields.append(
+                {
+                    "id": f.id,
+                    "key": f.key,
+                    "name": f.name,
+                    "choice": f.choice,
+                    "type": f.type,
+                    "display_value": f.display_value,
+                    "value": f._value,
+                }
+            )
+
+        detail = {
+            "title": self.title,
+            "sn": self.sn,
+            "creator": self.creator,
+            "current_status": self.current_status,
+            "create_at": self.create_at,
+            "fields": fields,
+        }
+
+        return detail
 
     def activity_for_state(self, state_id):
         """
