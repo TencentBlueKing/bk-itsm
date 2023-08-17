@@ -2550,7 +2550,8 @@ class Ticket(Model, BaseTicket):
                     "name": f.name,
                     "choice": f.choice,
                     "type": f.type,
-                    "value": f.display_value,
+                    "display_value": f.display_value,
+                    "value": f._value,
                 }
             )
 
