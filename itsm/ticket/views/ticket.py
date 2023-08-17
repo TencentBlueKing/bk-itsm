@@ -1687,7 +1687,7 @@ class TicketModelViewSet(ModelViewSet):
         return Response(FieldSerializer(ticket.table_fields(), many=True).data)
 
     @action(detail=True, methods=["get"])
-    def is_processor(self, request, *args, **kwargs):
+    def get_step_process_info(self, request, *args, **kwargs):
         ticket = self.get_object()
         step_id = request.query_params.get("step_id", None)
         processed_user = ""
@@ -1701,8 +1701,14 @@ class TicketModelViewSet(ModelViewSet):
                     processed_user = status.processed_user
                     break
 
+        detail = ticket.get_ticket_detail() if is_processor else None
+
         return Response(
-            {"is_processor": is_processor, "processed_user": processed_user}
+            {
+                "is_processor": is_processor,
+                "processed_user": processed_user,
+                "detail": detail,
+            }
         )
 
     @action(detail=True, methods=["post"])
