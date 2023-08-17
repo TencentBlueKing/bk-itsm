@@ -36,10 +36,10 @@
           data-test-id="trigger-input-name"
           :required="true"
           :property="'name'">
-          <bk-input v-model="formData.name" :placeholder="$t(`m.trigger['请输入触发器名称']`)"></bk-input>
+          <bk-input v-model="formData.name" :placeholder="$t(`m.trigger['请输入触发器名称']`)" @change="$emit('change')"></bk-input>
         </bk-form-item>
         <bk-form-item :label="$t(`m.trigger['是否启用']`)">
-          <bk-switcher data-test-id="triggers_switcher_isUseTrigger" v-model="formData.is_enabled" size="small"></bk-switcher>
+          <bk-switcher data-test-id="triggers_switcher_isUseTrigger" v-model="formData.is_enabled" size="small" @change="$emit('change')"></bk-switcher>
         </bk-form-item>
         <!-- <template v-if="!originInfoToTrigger.id">
           <bk-form-item :label="$t(`m.trigger['基础模型']`)">
@@ -63,7 +63,8 @@
             :type="'textarea'"
             :rows="3"
             :maxlength="100"
-            v-model="formData.desc">
+            v-model="formData.desc"
+            @change="$emit('change')">
           </bk-input>
         </bk-form-item>
       </bk-form>
@@ -100,7 +101,7 @@
           :required="true"
           :property="'signal'"
           style="width: 300px;">
-          <bk-select data-test-id="triggers_select_choiceEvent" v-model="formData.signal" :placeholder="$t(`m.trigger['请选择触发事件']`)">
+          <bk-select data-test-id="triggers_select_choiceEvent" v-model="formData.signal" :placeholder="$t(`m.trigger['请选择触发事件']`)" @change="$emit('change')">
             <bk-option-group
               v-for="(group, index) in triggerEventList"
               :name="group.name"
@@ -129,7 +130,8 @@
                   v-if="item.nameChange">
                   <bk-input style="width: 260px; display: inline-block;"
                     :clearable="true"
-                    v-model="item.name">
+                    v-model="item.name"
+                    @change="$emit('change')">
                   </bk-input>
                   <span class="bk-input-submit" @click.stop="handleClickName(item, 'submit')">{{$t(`m.trigger['确认']`)}}</span>
                   <span class="bk-input-submit" @click.stop="handleClickName(item, 'close')">{{$t(`m.trigger['取消']`)}}</span>
@@ -152,7 +154,7 @@
                 <!-- 条件触发开关 -->
                 <div class="bk-condition-switch">
                   <span class="mr5">{{$t(`m.trigger['条件触发']`)}}</span>
-                  <bk-switcher data-test-id="triggers_switcher_conditionTriggered" v-model="item.triggerStatus" size="small"></bk-switcher>
+                  <bk-switcher data-test-id="triggers_switcher_conditionTriggered" v-model="item.triggerStatus" size="small" @change="$emit('change')"></bk-switcher>
                 </div>
               </div>
               <div v-show="item.showContent">
@@ -596,17 +598,20 @@
       addRule() {
         const valueItem = JSON.parse(JSON.stringify(this.ruleItem));
         this.rulesList.push(valueItem);
+        this.$emit('change');
       },
       deleteRule(index) {
         if (this.rulesList.length === 1) {
           return;
         }
         this.rulesList.splice(index, 1);
+        this.$emit('change');
       },
       // 修改name
       changeName(item) {
         item.historyName = item.name;
         item.nameChange = true;
+        this.$emit('change');
       },
       handleClickName(item, type) {
         item.nameChange = false;

@@ -37,8 +37,10 @@
           :property="'prevId'"
           :error-display-type="'normal'"
           :ext-cls="'bk-mt0-item'">
-          <bk-select v-model="formInfo.prevId"
-            searchable>
+          <bk-select
+            v-model="formInfo.prevId"
+            searchable
+            @change="$emit('change')">
             <bk-option v-for="option in prevNodeList"
               :key="option.id"
               :id="option.id"
@@ -73,7 +75,8 @@
         <bk-input
           v-model="formInfo.key"
           :placeholder="$t(`m.treeinfo['请输入唯一标识']`)"
-          :disabled="typeof changeInfo.id === 'number' || changeInfo.is_builtin || changeInfo.source === 'TABLE'">
+          :disabled="typeof changeInfo.id === 'number' || changeInfo.is_builtin || changeInfo.source === 'TABLE'"
+          @change="$emit('change')">
         </bk-input>
       </bk-form-item>
       <bk-form-item
@@ -116,7 +119,7 @@
         v-if="formInfo.regex === 'ASSOCIATED_FIELD_VALIDATION' && !isEditPublic">
         <div class="bk-form-content" style="margin-left: 0">
           <p class="bk-form-p">{{$t(`m.newCommon["字段间关系"]`)}}</p>
-          <bk-radio-group v-model="formInfo.regex_config.rule.type">
+          <bk-radio-group v-model="formInfo.regex_config.rule.type" @change="$emit('change')">
             <bk-radio :value="'and'" :ext-cls="'mr20'">{{$t(`m.treeinfo['且']`)}}</bk-radio>
             <bk-radio :value="'or'">{{$t(`m.treeinfo['或']`)}}</bk-radio>
           </bk-radio-group>
@@ -128,7 +131,8 @@
           <bk-select style="width: 120px"
             :ext-cls="'field-valid-select'"
             v-model="expression.condition"
-            :clearable="false">
+            :clearable="false"
+            @change="$emit('change')">
             <bk-option v-for="option in betweenList"
               :key="option.id"
               :id="option.typeName"
@@ -164,7 +168,8 @@
           <bk-input
             v-model="formInfo.customRegex"
             :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
-            :placeholder="$t(`m.treeinfo['请输入正则规则']`)">
+            :placeholder="$t(`m.treeinfo['请输入正则规则']`)"
+            @change="$emit('change')">
           </bk-input>
         </bk-form-item>
       </template>
@@ -276,7 +281,7 @@
         <bk-form-item :ext-cls="'bk-halfline-item bk-halfline-margin bk-mt20-item'"
           :label="$t(`m.treeinfo['布局要求']`)"
           :required="true">
-          <bk-radio-group v-model="formInfo.layout">
+          <bk-radio-group v-model="formInfo.layout" @change="$emit('change')">
             <template v-for="(layout, layoutIndex) in globalChoise.layout_type">
               <bk-radio :ext-cls="'mr20'"
                 :key="layoutIndex"
@@ -290,7 +295,7 @@
         <bk-form-item :ext-cls="'bk-halfline-item bk-mt20-item'"
           :label="$t(`m.treeinfo['字段必填']`)"
           :required="true">
-          <bk-radio-group v-model="formInfo.validate">
+          <bk-radio-group v-model="formInfo.validate" @change="$emit('change')">
             <template v-for="(validate, validateIndex) in globalChoise.validate_type">
               <bk-radio :ext-cls="'mr20'"
                 :key="validateIndex"
@@ -308,13 +313,15 @@
         <textarea
           class="bk-form-textarea bk-textarea-tanble bk-halfline-item bk-halfline-margin field-input-tips"
           :placeholder="$t(`m.treeinfo['请输入字段填写说明']`)"
-          v-model.trim="formInfo.desc">
+          v-model.trim="formInfo.desc"
+          @change="$emit('change')">
                 </textarea>
         <p class="field-tips-checkbox" style="margin-left: 335px;">
           <bk-checkbox
             :true-value="trueStatus"
             :false-value="falseStatus"
-            v-model="formInfo.is_tips">
+            v-model="formInfo.is_tips"
+            @change="$emit('change')">
             {{ $t('m.treeinfo["添加额外提示说明"]') }}
           </bk-checkbox>
         </p>
@@ -328,8 +335,9 @@
           <textarea
             class="bk-form-textarea bk-textarea-tanble bk-halfline-item bk-halfline-margin"
             :placeholder="$t(`m.treeinfo['请输入，用于鼠标经过提示']`)"
-            v-model.trim="formInfo.tips">
-                    </textarea>
+            v-model.trim="formInfo.tips"
+            @change="$emit('change')">
+          </textarea>
           <p class="bk-label-tips">
             <span v-bk-tooltips.top="(formInfo.tips || $t(`m.treeinfo['字段释疑填填看哦']`))">
               {{ $t('m.treeinfo["效果预览"]') }}
@@ -345,7 +353,8 @@
           :ext-cls="'bk-mt20-item'">
           <bk-switcher v-model="formInfo.show_type"
             size="small"
-            :disabled="changeInfo.key === 'title'">
+            :disabled="changeInfo.key === 'title'"
+            @change="$emit('change')">
           </bk-switcher>
         </bk-form-item>
         <template v-if="formInfo.show_type">
@@ -670,6 +679,7 @@
         } else {
           this.isShowDataSource = false;
         }
+        this.$emit('change');
       },
       openDataSource() {
         this.isShowDataSource = true;
@@ -680,6 +690,7 @@
           keyElement.validator.content = '';
           keyElement.validator.state = '';
         }
+        this.$emit('change');
       },
       // 初始化赋值数据
       initData() {
@@ -839,6 +850,7 @@
       },
       // 改变字段类型，需要进行操作
       async changeType() {
+        this.$emit('change');
         // 改变字段类型，清空正则规则表达式
         this.formInfo.regex = 'EMPTY';
         this.formInfo.customRegex = '';
@@ -902,6 +914,7 @@
           });
       },
       onRegexFieldChange(key, expression) {
+        this.$emit('change');
         // system 表示系统内置条件，field 表示来源节点
         const systemCondition = ['system_time'];
         expression.source = systemCondition.includes(key) ? 'system' : 'field';
@@ -930,6 +943,7 @@
         }
       },
       changeApiInfo(val) {
+        this.$emit('change');
         this.apiDetail = val;
       },
       // rpc数据
@@ -938,6 +952,7 @@
       },
       // 上传文件模板
       handleFile(e) {
+        this.$emit('change');
         const fileInfo = e.target.files[0];
         const maxSize = 100000;
         const fileSize = fileInfo.size / 1024;

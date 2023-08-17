@@ -150,8 +150,10 @@
     <!-- 新增字段 -->
     <bk-sideslider
       :is-show.sync="sliderInfo.show"
+      :quick-close="true"
       :title="sliderInfo.title"
-      :width="sliderInfo.width">
+      :width="sliderInfo.width"
+      :before-close="handleBeforeClose">
       <div class="p20" slot="content" v-if="sliderInfo.show">
         <add-field
           :change-info="changeInfo"
@@ -163,6 +165,7 @@
           :is-edit-public="isEditPublic"
           :workflow="flowInfo ? flowInfo.id : 0"
           :state="configur.id ? configur.id : 0"
+          @change="isFormChanged = true"
           @closeShade="closeShade">
         </add-field>
       </div>
@@ -193,6 +196,7 @@
 <script>
   import draggable from 'vuedraggable';
   import apiFieldsWatch from '../../../../commonMix/api_fields_watch';
+  import useModalCloseConfirmation from '../../../../../utils/use-modal-close-confirmation';
   import fieldPreview from './fieldPreview.vue';
   import addField from '../addField';
   import inheritState from './inheritState';
@@ -275,6 +279,7 @@
         addOrigin: {
           isOther: false,
         },
+        isFormChanged: false,
       };
     },
     computed: {
@@ -380,6 +385,13 @@
       updateInfo() {
         this.cacheFieldsIndexInfo();
       },
+      async handleBeforeClose() {
+        if (this.isFormChanged) {
+          const result = await useModalCloseConfirmation();
+          return result;
+        }
+        return true;
+      },
       // 新增编辑弹窗
       closeShade() {
         this.sliderInfo.show = false;
@@ -443,6 +455,7 @@
         this.$store.dispatch(url, params).then((res) => {
           this.nodesList = res.data;
           this.sliderInfo.show = true;
+          this.isFormChanged = false;
         })
           .catch((res) => {
             errorHandler(res, this);
