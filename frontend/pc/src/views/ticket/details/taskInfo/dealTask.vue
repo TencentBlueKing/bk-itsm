@@ -486,10 +486,10 @@
 
             // 总结信息
             if (this.taskInfo.status === 'FINISHED') {
-              this.confirmFields =                            res.data.fields.confirm_fields.filter(item => !this.specialFieldTypes.includes(item.type));
-              this.confirmTaskTemplateFields =                            res.data.fields.confirm_fields.filter(item => ['SOPS_TEMPLATE', 'DEVOPS_TEMPLATE'].includes(item.type));
+              this.confirmFields = res.data.fields.confirm_fields.filter(item => !this.specialFieldTypes.includes(item.type));
+              this.confirmTaskTemplateFields = res.data.fields.confirm_fields.filter(item => ['SOPS_TEMPLATE', 'DEVOPS_TEMPLATE'].includes(item.type));
             } else {
-              this.confirmFields =                            res.data.fields.confirm_fields.filter(item => item.type !== 'COMPLEX-MEMBERS');
+              this.confirmFields = res.data.fields.confirm_fields.filter(item => item.type !== 'COMPLEX-MEMBERS');
             }
             this.confirmFields.forEach((item) => {
               if (item.type === 'CASCADE') {
