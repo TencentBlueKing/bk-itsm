@@ -235,6 +235,11 @@ class BkOpsService(ItsmBaseService):
             )
             return False
 
+        logger.info(
+            "[bk_sops_execute] start sops task success, task_id = {}".format(
+                sops_task_id
+            )
+        )
         data.set_outputs("sops_task_id", sops_task_id)
         data.set_outputs("bk_biz_id", task_params["bk_biz_id"])
         data.set_outputs("api_info", api_info)
@@ -244,6 +249,12 @@ class BkOpsService(ItsmBaseService):
     def schedule(self, data, parent_data, callback_data=None):
 
         sops_task_id = data.outputs.get("sops_task_id", None)
+        logger.info(
+            "[bk_sops_schedule] start query task status, task_id = {}".format(
+                sops_task_id
+            )
+        )
+
         bk_biz_id = data.outputs.get("bk_biz_id", None)
         api_info = data.outputs.get("api_info", None)
         state_id = data.inputs.state_id
@@ -295,6 +306,7 @@ class BkOpsService(ItsmBaseService):
             )
             self.finish_schedule()
             return False
+
         if task_result.get("result", False) is False:
             error_message = task_result.get("message", "")
             self.do_exit_plugins(
@@ -313,8 +325,19 @@ class BkOpsService(ItsmBaseService):
         task_info = task_result.get("data", {})
 
         current_status = task_info.get("state")
+        logger.info(
+            "[bk_sops_schedule] get task state success, state = {}".format(
+                current_status
+            )
+        )
+
         if current_status in ["CREATED", "RUNNING", "SUSPENDED"]:
             # 还在执行过程中，继续轮询
+            logger.info(
+                "[bk_sops_schedule] task_id = {}, state={}".format(
+                    sops_task_id, current_status
+                )
+            )
             return True
         if current_status in ["FAILED", "REVOKED"]:
             data.set_outputs("params_sops_result_%s" % state_id, False)
@@ -335,6 +358,11 @@ class BkOpsService(ItsmBaseService):
             return False
 
         if current_status in ["FINISHED"]:
+            logger.info(
+                "[bk_sops_schedule] task_id = {}, state={}".format(
+                    sops_task_id, current_status
+                )
+            )
             data.set_outputs("params_sops_result_%s" % state_id, True)
             self.finish_schedule()
             self.update_info(current_node, sops_result, result=True)
@@ -366,8 +394,8 @@ class BkOpsService(ItsmBaseService):
             task_params.update({"__raw": True, "node_id": child["id"]})
             result = client_backend.sops.get_task_node_detail(task_params)
             error_messages.append(
-                u"{}:{}".format(
-                    child["name"], result.get("data", {}).get("ex_data") or u"未知错误"
+                "{}:{}".format(
+                    child["name"], result.get("data", {}).get("ex_data") or "未知错误"
                 )
             )
         return "\n".join(error_messages)
