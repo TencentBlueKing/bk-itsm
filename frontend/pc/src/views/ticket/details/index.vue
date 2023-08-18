@@ -101,8 +101,7 @@
       :show-header="false"
       :show-footer="false"
       :mask-close="false"
-      @confirm="onDialogConfirm"
-      @cancel="onDialogCancel">
+      @cancel="goToHome">
       <div class="processed-info-content">
         <div class="header-area">
           <bk-icon class="info-icon" type="info-circle-shape" />
@@ -141,7 +140,7 @@
           </div>
         </div>
         <div class="action-btn">
-          <bk-button theme="primary">{{ $t('m["我知道了"]') }}</bk-button>
+          <bk-button theme="primary" @click="goToHome">{{ $t('m["我知道了"]') }}</bk-button>
         </div>
       </div>
     </bk-dialog>
@@ -694,14 +693,7 @@
           el.style.width = `calc(320px - ${this.dragLine.base}px)`;
         });
       },
-      onDialogConfirm() {
-        this.$router.push({
-          name: 'home',
-        });
-        location.reload();
-        // bus.$emit('processData', this.noPermitResp);
-      },
-      onDialogCancel() {
+      goToHome() {
         this.$router.push({
           name: 'home',
         });
