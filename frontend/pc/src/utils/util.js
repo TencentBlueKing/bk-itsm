@@ -446,3 +446,23 @@ export function jsonp (url, data) {
     headEle.removeChild(JSONP);
   });
 }
+
+export function transCustomFormToTable (formStr) {
+  const config = JSON.parse(formStr)
+  console.log(config)
+  const tables = [];
+  config.form_data.forEach(tableItem => {
+    const { label, scheme, value } = tableItem;
+    const cols = config.schemes[scheme].attrs.column;
+    const values = value.map(row => {
+      const valueItem = {};
+      Object.keys(row).forEach(key => {
+        valueItem[key] = row[key].value;
+      });
+      return valueItem;
+    })
+    tables.push({ label, cols, values });
+  })
+
+  return tables;
+}

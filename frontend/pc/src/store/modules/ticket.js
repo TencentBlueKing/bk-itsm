@@ -178,10 +178,10 @@ export default {
       const id = params;
       return ajax.get(`ticket/comments/${id}/`).then((response) => response.data);
     },
-    // 获取是否单据处理人
-    getTicketProcessStatus({ commit, state, dispatch }, { params }) {
+    // 获取节点执行处理信息
+    getStepProcessInfo({ commit, state, dispatch }, { params }) {
       const { id, step_id: stepId } = params;
-      return ajax.get(`ticket/receipts/${id}/is_processor/?step_id=${stepId}`).then((response) => response.data);
+      return ajax.get(`ticket/receipts/${id}/get_step_process_info/?step_id=${stepId}`).then((response) => response.data);
     },
   },
 };
