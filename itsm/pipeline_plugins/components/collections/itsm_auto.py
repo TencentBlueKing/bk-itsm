@@ -73,7 +73,7 @@ class AutoStateService(ItsmBaseService):
     """
 
     __need_schedule__ = True
-    interval = StaticIntervalGenerator(1)
+    interval = StaticIntervalGenerator(3)
 
     @staticmethod
     def poll_proceed(api_config, success_conditions):
