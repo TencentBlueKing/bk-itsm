@@ -94,24 +94,56 @@
     <no-ticket-content v-else
       :message="ticketErrorMessage">
     </no-ticket-content>
-    <bk-dialog v-model="isShowNoticeDialog"
-      theme="primary"
+    <bk-dialog
+      v-model="isShowDialog"
+      ext-cls="processed-info-dialog"
+      :width="800"
+      :show-header="false"
+      :show-footer="false"
       :mask-close="false"
-      header-position="left"
-      :title="$t(`m.newCommon['提示']`)"
-      @confirm="onNoticeConfirm">
-      {{$t(`m.newCommon['您要处理的节点已被']`)}} {{ processedUser }} {{$t(`m.newCommon['处理完成，可在流转日志中查看详情。']`)}}
-    </bk-dialog>
-    <bk-dialog v-model="isShowDialog"
-      theme="primary"
-      :mask-close="false"
-      header-position="left"
-      :ok-text="$t(`m['点击申请权限']`)"
-      :cancel-text="$t(`m['回到首页']`)"
-      :title="$t(`m.newCommon['提示']`)"
       @confirm="onDialogConfirm"
       @cancel="onDialogCancel">
-      {{$t(`m.newCommon['您要处理的节点已被']`)}} {{ processedUser }} {{$t(`m.newCommon['处理完成，可在流转日志中查看详情。']`)}}
+      <div class="processed-info-content">
+        <div class="header-area">
+          <bk-icon class="info-icon" type="info-circle-shape" />
+          <span class="tips">{{ $t('m["单据已由processor处理,您无需操作"]', { processor: processedUser }) }}</span>
+        </div>
+        <p class="section-title">{{ $t('m["单据基本信息"]') }}</p>
+        <div class="ticket-detail">
+          <div class="form-item">
+            <div class="label">{{ $t('m.tickets["标题"]') }}</div>{{ $t('m[":"]') }}
+            <div class="value-content"><span>{{ processedInfo.title }}</span></div>
+          </div>
+          <div class="form-item">
+            <div class="label">{{ $t('m.tickets["单号"]') }}</div>{{ $t('m[":"]') }}
+            <div class="value-content"><span>{{ processedInfo.sn }}</span></div>
+          </div>
+          <div class="form-item">
+            <div class="label">{{ $t('m.tickets["提单人"]') }}</div>{{ $t('m[":"]') }}
+            <div class="value-content"><span>{{ processedInfo.creator }}</span></div>
+          </div>
+          <div v-for="field in processedInfo.fields" class="form-item" :key="field.id">
+            <div class="label">{{ field.name }}</div>{{ $t('m[":"]') }}
+            <div class="value-content">
+              <bk-table v-if="field.type === 'TABLE'" :data="field.display_value">
+                <bk-table-column v-for="col in field.choice" :key="col.key" :label="col.name" :prop="col.key"></bk-table-column>
+              </bk-table>
+              <div v-else-if="field.type === 'CUSTOM-FORM'" class="custom-form-wrapper">
+                <div v-for="(table, index) in field.tables" class="table-item" :key="index">
+                  <p v-if="table.label" class="table-label">{{ table.label }}</p>
+                  <bk-table :data="table.values">
+                    <bk-table-column v-for="col in table.cols" :key="col.key" :label="col.name" :prop="col.key"></bk-table-column>
+                  </bk-table>
+                </div>
+              </div>
+              <span v-else>{{ field.display_value }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="action-btn">
+          <bk-button theme="primary">{{ $t('m["我知道了"]') }}</bk-button>
+        </div>
+      </div>
     </bk-dialog>
   </div>
 </template>
@@ -126,7 +158,7 @@
   import fieldMix from '@/views/commonMix/field.js';
   import { mapState } from 'vuex';
   import { errorHandler } from '@/utils/errorHandler.js';
-  import { deepClone } from '@/utils/util';
+  import { deepClone, transCustomFormToTable } from '@/utils/util';
   import leftTicketContent from './leftTicketContent.vue';
   import bus from '@/utils/bus';
 
@@ -188,7 +220,6 @@
           statusColor: '',
         },
         // 通知链接进入，但节点已被其他人处理提示
-        isShowNoticeDialog: false,
         isShowDialog: false,
         noticeInfo: {
           is_processed: false,
@@ -215,6 +246,7 @@
         isShowAssgin: false,
         basicStatus: true,
         approveDict,
+        processedInfo: {},
       };
     },
     computed: {
@@ -263,9 +295,15 @@
           id,
           step_id,
         };
-        this.$store.dispatch('ticket/getTicketProcessStatus', { params }).then(res => {
+        this.$store.dispatch('ticket/getStepProcessInfo', { params }).then(res => {
           if (res.data.is_processor) {
+            res.data.detail.fields.forEach(field => {
+              if (field.type === 'CUSTOM-FORM') {
+                field.tables = transCustomFormToTable(field.display_value);
+              }
+            });
             this.processedUser = res.data.processed_user;
+            this.processedInfo = res.data.detail;
             this.isShowDialog = true;
           } else {
             bus.$emit('processData', this.noPermitResp);
@@ -277,9 +315,6 @@
       let isCanOperate = false;
       let isHistoryOperator = false;
       await this.initData();
-      if (this.$route.query.cache_key) { // 通知链接进入
-        this.getTicketNoticeInfo();
-      }
       this.getProtocolsList();
       this.$nextTick(function () {
         this.leftTicketDom = document.querySelector('.comment-list');
@@ -659,34 +694,12 @@
           el.style.width = `calc(320px - ${this.dragLine.base}px)`;
         });
       },
-      getTicketNoticeInfo() {
-        this.$store.dispatch('deployOrder/getTicketNoticeInfo', {
-          params: { cache_key: this.$route.query.cache_key },
-        }).then(res => {
-          if (res.data && res.data.is_processed) {
-            this.noticeInfo = res.data;
-            this.processedUser = this.noticeInfo.processed_user;
-            this.isShowNoticeDialog = true;
-          } else {
-            // 删除 url cache_key
-            this.onNoticeConfirm();
-          }
-        })
-          .catch((res) => {
-            errorHandler(res, this);
-          });
-      },
-      // 确认
-      onNoticeConfirm() {
-        const query = deepClone(this.$route.query);
-        delete query.cache_key;
-        this.$router.replace({
-          name: this.$route.name,
-          query,
-        });
-      },
       onDialogConfirm() {
-        bus.$emit('processData', this.noPermitResp);
+        this.$router.push({
+          name: 'home',
+        });
+        location.reload();
+        // bus.$emit('processData', this.noPermitResp);
       },
       onDialogCancel() {
         this.$router.push({
@@ -792,5 +805,71 @@
         }
     }
 }
+.processed-info-content {
+  .header-area {
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #313238;
+    .info-icon {
+      margin-right: 8px;
+      color: #3a84ff;
+    }
+  }
+  .section-title {
+    margin: 24px 0 18px;
+    padding: 0 24px 0 50px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #313238;
+  }
+  .ticket-detail {
+    padding: 0 24px;
+    max-height: calc(100vh * 0.6 - 100px);
+    overflow: auto;
+    @include scroller;
+  }
+  .form-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    color: #63656e;
+    .label {
+      flex-shrink: 0;
+      padding-right: 2px;
+      width: 100px;
+      text-align: right;
+      word-break: break-all;
+    }
+    .value-content {
+      flex: 1;
+      word-break: break-all;
+      margin-left: 20px;
+      overflow: hidden;
+    }
+    .custom-form-wrapper {
+      .table-item {
+        margin-bottom: 12px;
+      }
+      .table-label {
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+    }
+  }
+  .action-btn {
+    padding: 12px 24px 0;
+    text-align: right;
+  }
+}
 
+</style>
+<style lang="scss">
+  @import '../../../scss/mixins/scroller.scss';
+  .processed-info-dialog.bk-dialog-wrapper .bk-dialog-body {
+    padding: 3px 0 24px;
+  }
 </style>

@@ -100,7 +100,7 @@ instance.interceptors.response.use(
       }
     }
     // status >= 200 && status <= 505
-    if ('result' in response.data && !response.data.result && 'message' in response.data) {
+    if (response.status !== 499 && 'result' in response.data && !response.data.result && 'message' in response.data) {
       window.app.$bkMessage({
         message: response.data.message,
         theme: 'error',
@@ -145,7 +145,7 @@ instance.interceptors.response.use(
           break;
         }
         case 499: {
-          if (response.config.url.match(/^(ticket\/receipts\/)*[0-9]*\/$/)) {
+          if (response.config.url.match(/ticket\/receipts\/[0-9]+\//)) {
             if ('step_id' in response.config.params) {
               if (response.config.params.step_id) {
                 bus.$emit('getIsProcessStatus', response);
