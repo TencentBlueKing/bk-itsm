@@ -175,6 +175,17 @@
       label: i18n.t('m.manageCommon[\'标题\']'),
       minWidth: '180' },
     {
+      id: 'creator',
+      label: i18n.t('m.manageCommon[\'提单人\']'),
+      minWidth: '140',
+      prop: 'creator' },
+    {
+      id: 'create_at',
+      label: i18n.t('m.manageCommon[\'提单时间\']'),
+      minWidth: '140',
+      sortable: 'custom',
+      prop: 'create_at' },
+    {
       id: 'service_name',
       label: i18n.t('m.home[\'服务\']'),
       minWidth: '140',
@@ -205,17 +216,6 @@
       minWidth: '120',
       sortable: 'custom',
       prop: 'status' },
-    {
-      id: 'create_at',
-      label: i18n.t('m.manageCommon[\'提单时间\']'),
-      minWidth: '140',
-      sortable: 'custom',
-      prop: 'create_at' },
-    {
-      id: 'creator',
-      label: i18n.t('m.manageCommon[\'提单人\']'),
-      minWidth: '140',
-      prop: 'creator' },
     {
       id: 'operate',
       label: i18n.t('m.manageCommon[\'操作\']'),

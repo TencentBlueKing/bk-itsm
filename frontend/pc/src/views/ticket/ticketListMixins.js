@@ -182,7 +182,7 @@ const ticketListMixins = {
       // 同时兼容url中的project_id、project_key
       const projectKey = this.$route.query.project_id || this.$route.query.project_key;
       this.isChineseLanguage = cookie.parse(document.cookie).blueking_language === 'zh-cn';
-      let defaultFields = ['id', 'title', 'service_name', 'current_steps', 'current_processors', 'create_at', 'creator', 'operate', 'status'];
+      let defaultFields = ['id', 'title', 'current_steps', 'current_processors', 'create_at', 'creator', 'operate', 'status'];
       // 表格设置有缓存，使用缓存数据
       if (this.currTabSettingCache) {
         const { fields, size } = this.currTabSettingCache;
