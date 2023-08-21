@@ -457,7 +457,7 @@ export function transCustomFormToTable (formStr) {
     const values = value.map(row => {
       const valueItem = {};
       Object.keys(row).forEach(key => {
-        valueItem[key] = row[key].value;
+        valueItem[key] = Array.isArray(row[key].value) ? row[key].value.map(item => item.value).join(';') : row[key].value;
       });
       return valueItem;
     })
