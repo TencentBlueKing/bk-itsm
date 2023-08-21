@@ -298,7 +298,7 @@
           if (res.data.is_processor) {
             res.data.detail.fields.forEach(field => {
               if (field.type === 'CUSTOM-FORM') {
-                field.tables = transCustomFormToTable(field.display_value);
+                field.tables = transCustomFormToTable(field.value);
               }
             });
             this.processedUser = res.data.processed_user;
