@@ -83,6 +83,13 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (response) => {
     if (response.config.url === 'init/') {
+      if (response.status === 401) {
+        const { login_url } = response.data;
+        const url = `${login_url.split('c_url=')[0]}c_url=${encodeURIComponent(location.href)}`;
+        response.data.login_url = url;
+        window.open(url, '_self');
+        return;
+      }
       if ('IS_ITSM_ADMIN' in response.data.data) {
         const { DEFAULT_PROJECT, IS_ITSM_ADMIN, all_access, chname, username } = response.data.data;
         window.DEFAULT_PROJECT = DEFAULT_PROJECT;
@@ -91,12 +98,6 @@ instance.interceptors.response.use(
         window.chname = chname;
         window.username = username;
         return response;
-      }
-      if (response.status === 401) {
-        const { login_url } = response.data;
-        const url = `${login_url.split('c_url=')[0]}c_url=${encodeURIComponent(location.href)}`;
-        response.data.login_url = url;
-        window.open(url, '_self');
       }
     }
     // status >= 200 && status <= 505
