@@ -293,8 +293,9 @@ const ticketListMixins = {
     // 异步获取单据处理人
     getTicketsProcessors(originList) {
       const copyList = deepClone(originList);
+      const message =  i18n.t('m.manageCommon[\'加载中...\']');
       originList.forEach((ticket) => {
-        this.$set(ticket, 'current_processors', this.$t('m.manageCommon[\'加载中...\']'));
+        this.$set(ticket, 'current_processors', message);
       });
       const ids = copyList.map(ticket => ticket.id);
       this.$store.dispatch('ticket/getTicketsProcessors', { ids: ids.toString() }).then((res) => {
@@ -306,16 +307,14 @@ const ticketListMixins = {
             this.$set(ticket, 'current_processors', replaceValue);
           });
         }
-      })
-        .catch((res) => {
-          errorHandler(res, this);
-        });
+      });
     },
     // 异步获取提单人
     getTicketsCreator(originList) {
       const copyList = deepClone(originList);
+      const message =  i18n.t('m.manageCommon[\'加载中...\']');
       originList.forEach((ticket) => {
-        this.$set(ticket, 'creator', this.$t('m.manageCommon[\'加载中...\']'));
+        this.$set(ticket, 'creator', message);
       });
       const ids = copyList.map(ticket => ticket.id);
       this.$store.dispatch('ticket/getTicketsCreator', { ids: ids.toString() }).then((res) => {
