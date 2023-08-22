@@ -113,7 +113,7 @@ class TicketPermissionValidate(permissions.BasePermission):
         if view.action == "get_ticket_output":
             return True
 
-        if view.action == "is_processor":
+        if view.action == "get_step_process_info":
             return True
 
         # 查看权限校验

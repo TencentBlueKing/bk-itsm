@@ -137,7 +137,9 @@
         <bk-sideslider
           :is-show.sync="triggerSliderInfo.isShow"
           :title="triggerSliderInfo.title"
-          :width="triggerSliderInfo.width">
+          :width="triggerSliderInfo.width"
+          :quick-close="true"
+          :before-close="handleBeforeClose">
           <div slot="content" v-bkloading="{ isLoading: triggerSliderInfo.addLoading }" style="min-height: 300px;">
             <add-trigger
               v-if="triggerSliderInfo.isShow"
@@ -145,7 +147,8 @@
               :trigger-info="triggerSliderInfo.item"
               :origin-info-to-trigger="originInfoToTrigger"
               @closeTrigger="triggerSliderInfo.isShow = false"
-              @getList="getBoundTriggerList">
+              @getList="getBoundTriggerList"
+              @change="isFormChanged = true">
             </add-trigger>
           </div>
         </bk-sideslider>
@@ -156,7 +159,8 @@
 <script>
   import addTrigger from '../../publicTrigger/addTrigger.vue';
   import collapseTransition from '@/utils/collapse-transition.js';
-  import { errorHandler } from '../../../../utils/errorHandler';
+  import useModalCloseConfirmation from '@/utils/use-modal-close-confirmation';
+  import { errorHandler } from '@/utils/errorHandler';
 
   export default {
     name: 'commonTriggerList',
@@ -226,6 +230,7 @@
         sourceType: '',
         senderId: '',
         triggerEventListFilter: '',
+        isFormChanged: false,
       };
     },
     computed: {
@@ -371,6 +376,7 @@
           this.triggerSliderInfo.item = item;
           this.triggerSliderInfo.isShow = true;
         }
+        this.isFormChanged = false;
       },
       citeTrigger() {
         const params = {
@@ -468,6 +474,13 @@
       clearSearch() {
         this.triggerDialogInfo.searchKey = '';
         this.getPublicTriggerList();
+      },
+      async handleBeforeClose() {
+        if (this.isFormChanged) {
+          const result = await useModalCloseConfirmation();
+          return result;
+        }
+        return true;
       },
     },
   };

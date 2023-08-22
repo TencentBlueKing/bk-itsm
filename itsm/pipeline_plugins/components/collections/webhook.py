@@ -45,7 +45,6 @@ from itsm.pipeline_plugins.components.collections.itsm_base_service import (
     ItsmBaseService,
 )
 from itsm.ticket.models import Ticket, TicketGlobalVariable, SYSTEM_OPERATE
-from pipeline.core.flow.activity import StaticIntervalGenerator
 
 logger = logging.getLogger("celery")
 
@@ -128,7 +127,6 @@ class WebHookService(ItsmBaseService):
     """
 
     __need_schedule__ = False
-    interval = StaticIntervalGenerator(1)
 
     def update_info(self, current_node, **kwargs):
         """

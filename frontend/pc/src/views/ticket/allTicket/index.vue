@@ -56,7 +56,7 @@
             @orderingClick="orderingClick"
             @handlePageLimitChange="handlePageLimitChange"
             @handlePageChange="handlePageChange"
-            @clearSearch="$refs.advancedSearch[0].onClearClick()">
+            @clearSearch="handleTableClearSearch">
           </table-content>
         </div>
       </div>
@@ -341,6 +341,9 @@
       // 评价成功回调
       evaluationSubmitSuccess() {
         this.getAllTicketList();
+      },
+      handleTableClearSearch() {
+        this.$refs.advancedSearch.onClearClick();
       },
     },
   };

@@ -1007,6 +1007,7 @@
                 theme: 'success',
               });
               this.getList(1);
+              this.updateDirTree();
             })
               .catch((res) => {
                 errorHandler(res, this);

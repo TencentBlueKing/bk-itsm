@@ -2682,4 +2682,8 @@ export const m = {
   流程服务: 'ITSM',
   不支持撤回: 'Not allowed to revoke',
   '请输入内容...': 'Please enter the content...',
+  单据基本信息: 'Ticket Basic Info',
+  ':': ':',
+  '单据已由processor处理,您无需操作': 'The ticket has been processed by {processor} and you do not need to operate',
+  我知道了: 'I See',
 };

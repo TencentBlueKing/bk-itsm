@@ -195,13 +195,16 @@
     <bk-sideslider
       :is-show.sync="entryInfo.show"
       :title="entryInfo.title"
-      :width="entryInfo.width">
+      :width="entryInfo.width"
+      :quick-close="true"
+      :before-close="handleBeforeClose">
       <div slot="content" style="padding: 20px" v-if="entryInfo.show">
         <add-api-info
           :first-level-info="firstLevelInfo"
           :path-list="pathList"
           :tree-list="treeList"
-          :type-info="typeInfo">
+          :type-info="typeInfo"
+          @change="isFormChanged = true">
         </add-api-info>
       </div>
     </bk-sideslider>
@@ -212,6 +215,7 @@
   import { errorHandler } from '../../../utils/errorHandler';
   import addApiInfo from './addApiInfo.vue';
   import permission from '@/mixins/permission.js';
+  import useModalCloseConfirmation from '@/utils/use-modal-close-confirmation';
   import Empty from '../../../components/common/Empty.vue';
 
   export default {
@@ -289,6 +293,7 @@
         fileVal: '',
         typeInfo: '',
         searchtoggle: false,
+        isFormChanged: false,
       };
     },
     computed: {
@@ -360,6 +365,7 @@
           ? this.$t('m.systemConfig["新增接口"]') : this.$t('m.systemConfig["接入接口"]');
         this.$refs.apiDropdown.hide();
         this.entryInfo.show = !this.entryInfo.show;
+        this.isFormChanged = false;
       },
       dropdownShow() {
         this.isDropdownShow = true;
@@ -522,6 +528,13 @@
       },
       exportFlow(item) {
         window.open(`${window.SITE_URL}api/postman/remote_api/${item.id}/exports/`);
+      },
+      async handleBeforeClose() {
+        if (this.isFormChanged) {
+          const result = await useModalCloseConfirmation();
+          return result;
+        }
+        return true;
       },
     },
   };

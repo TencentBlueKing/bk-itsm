@@ -65,7 +65,7 @@ def get_footer():
                     <a href="http://bk.tencent.com/s-mart/community/" class="link-item" target="_blank">{}</a>
                     <a href="http://bk.tencent.com/" class="link-item" target="_blank">{}</a>
                 </ul>
-                <div class="desc">Copyright &copy; 2012-${{year}} Tencent BlueKing. All Rights Reserved.V2.6.6</div>
+                <div class="desc">Copyright &copy; 2012-${{year}} Tencent BlueKing. All Rights Reserved.V2.6.7</div>
             </div>
             """.format(
         _("技术支持"), _("社区论坛"), _("产品官网")

@@ -234,18 +234,18 @@
     methods: {
       // 获取当前视图表格头显示字段
       getFields() {
-        let defaultColumn = ['id', 'title', 'service_name', 'current_processors', 'create_at', 'creator', 'operate', 'status'];
+        let defaultColumn = ['id', 'title', 'current_steps', 'current_processors', 'create_at', 'creator', 'operate', 'status'];
         const allColumn = [
           { id: 'id', label: this.$t('m.tickets[\'单号\']'), width: '200', disabled: true, prop: 'sn' },
           { id: 'title', label: this.$t('m.tickets[\'标题\']'), minWidth: '180', prop: 'title' },
-          { id: 'service_name', label: this.$t('m.tickets[\'服务\']'), minWidth: '140', prop: 'service_name' },
-          { id: 'type', label: this.$t('m.manageCommon[\'类型\']'), minWidth: '80' },
+          { id: 'creator', label: this.$t('m.tickets[\'提单人\']'), minWidth: '100', prop: 'creator' },
+          { id: 'create_at', label: this.$t('m.tickets[\'提单时间\']'), minWidth: '160', sortable: 'custom', prop: 'create_at' },
           { id: 'priority', label: this.$t('m.slaContent[\'优先级\']'), minWidth: '100', sortable: 'custom', prop: 'priority' },
           { id: 'current_steps', label: this.$t('m.newCommon[\'当前步骤\']'), minWidth: '100', prop: 'current_steps' },
           { id: 'current_processors', label: this.$t('m.tickets[\'当前处理人\']'), minWidth: '140', prop: 'current_processors' },
           { id: 'status', label: this.$t('m.manageCommon[\'状态\']'), minWidth: '120', sortable: 'custom', prop: 'status' },
-          { id: 'create_at', label: this.$t('m.tickets[\'提单时间\']'), minWidth: '160', sortable: 'custom', prop: 'create_at' },
-          { id: 'creator', label: this.$t('m.tickets[\'提单人\']'), minWidth: '100', prop: 'creator' },
+          { id: 'service_name', label: this.$t('m.tickets[\'服务\']'), minWidth: '140', prop: 'service_name' },
+          { id: 'type', label: this.$t('m.manageCommon[\'类型\']'), minWidth: '80' },
           { id: 'operate', label: this.$t('m.manageCommon[\'操作\']'), width: '120' },
         ];
         // 表格设置有缓存，使用缓存数据

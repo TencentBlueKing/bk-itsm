@@ -83,8 +83,15 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (response) => {
     if (response.config.url === 'init/') {
-      if ('IS_ITSM_ADMIN' in response.data) {
-        const { DEFAULT_PROJECT, IS_ITSM_ADMIN, all_access, chname, username } = response.data;
+      if (response.status === 401) {
+        const { login_url } = response.data;
+        const url = `${login_url.split('c_url=')[0]}c_url=${encodeURIComponent(location.href)}`;
+        response.data.login_url = url;
+        window.open(url, '_self');
+        return;
+      }
+      if ('IS_ITSM_ADMIN' in response.data.data) {
+        const { DEFAULT_PROJECT, IS_ITSM_ADMIN, all_access, chname, username } = response.data.data;
         window.DEFAULT_PROJECT = DEFAULT_PROJECT;
         window.IS_ITSM_ADMIN = IS_ITSM_ADMIN;
         window.all_access = all_access;
@@ -92,15 +99,9 @@ instance.interceptors.response.use(
         window.username = username;
         return response;
       }
-      if (response.status === 401) {
-        const { login_url } = response.data;
-        const url = `${login_url.split('c_url=')[0]}c_url=${encodeURIComponent(location.href)}`;
-        response.data.login_url = url;
-        window.open(url, '_self');
-      }
     }
     // status >= 200 && status <= 505
-    if ('result' in response.data && !response.data.result && 'message' in response.data) {
+    if (response.status !== 499 && 'result' in response.data && !response.data.result && 'message' in response.data) {
       window.app.$bkMessage({
         message: response.data.message,
         theme: 'error',
@@ -145,7 +146,7 @@ instance.interceptors.response.use(
           break;
         }
         case 499: {
-          if (response.config.url.match(/^(ticket\/receipts\/)*[0-9]*\/$/)) {
+          if (response.config.url.match(/ticket\/receipts\/[0-9]+\//)) {
             if ('step_id' in response.config.params) {
               if (response.config.params.step_id) {
                 bus.$emit('getIsProcessStatus', response);

@@ -98,7 +98,9 @@ class PathTypeValidators(object):
                 logger.error("测试路径移除异常：%s" % e)
         except Exception as e:
             logger.error("PathTypeValidators：路径无法写入， %s" % e)
-            raise AnnexStoreValidateError(_("路径无法写入，请联系管理员！"))
+            raise AnnexStoreValidateError(
+                "路径无法写入, path = {}. err={}，请联系管理员！".format(path, str(e))
+            )
 
     @staticmethod
     def validate_is_organization(value):

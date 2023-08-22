@@ -172,6 +172,10 @@ def get_field_display_value(field):
     if not field._value:
         return ""
 
+    # 如果是状态字段，display_value 应当为单据的
+    if field.key == "current_status":
+        return field.ticket.current_status_display
+
     # 兼容旧数据
     if field.type == "CASCADE" and settings.IS_BIZ_GROUP:
         for choice in field.choice:
@@ -196,8 +200,7 @@ def get_field_display_value(field):
         choice = {str(choice["key"]): str(choice["name"]) for choice in field.choice}
         return choice.get(field._value)
 
-    # if field.type in JSON_HANDLE_FIELDS:
-    #     return field.value
+    # if field.type
 
     return field.value
 

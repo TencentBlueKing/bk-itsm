@@ -69,25 +69,28 @@
         :property="'name'">
         <bk-input maxlength="120"
           :placeholder="$t(`m.systemConfig['请输入接口名称']`)"
-          v-model="directory.formInfo.name">
+          v-model="directory.formInfo.name"
+          @change="$emit('change')">
         </bk-input>
       </bk-form-item>
       <bk-form-item :label="$t(`m.systemConfig['负责人：']`)">
-        <member-select v-model="directory.formInfo.ownersInputValue"></member-select>
+        <member-select v-model="directory.formInfo.ownersInputValue" @change="$emit('change')"></member-select>
       </bk-form-item>
       <bk-form-item
         :label="$t(`m.systemConfig['函数名称']`)">
         <!-- eslint-disable vue/camelcase -->
         <bk-input
           :placeholder="$t(`m.systemConfig['请输入函数名称']`)"
-          v-model="directory.formInfo.func_name">
+          v-model="directory.formInfo.func_name"
+          @change="$emit('change')">
         </bk-input>
         <!-- eslint-enable -->
       </bk-form-item>
       <bk-form-item
         :label="$t(`m.systemConfig['接口路径']`)">
         <bk-input v-model="directory.formInfo.road" placeholder="please input path"
-          :disabled="(directory.formInfo.category === 'component' || directory.formInfo.category === 'buffet_component') && typeInfo !== 'ADD'">
+          :disabled="(directory.formInfo.category === 'component' || directory.formInfo.category === 'buffet_component') && typeInfo !== 'ADD'"
+          @change="$emit('change')">
           <template slot="prepend">
             <bk-dropdown-menu class="group-text"
               @show="dropdownShow"
@@ -114,7 +117,8 @@
         :label="$t(`m.systemConfig['版本号']`)">
         <bk-input
           :placeholder="$t(`m.systemConfig['请输入版本号']`)"
-          v-model="directory.formInfo.version">
+          v-model="directory.formInfo.version"
+          @change="$emit('change')">
         </bk-input>
       </bk-form-item>
       <bk-form-item
@@ -123,7 +127,8 @@
           :placeholder="$t(`m.systemConfig['请输入API描述']`)"
           :type="'textarea'"
           :rows="3"
-          v-model="directory.formInfo.desc">
+          v-model="directory.formInfo.desc"
+          @change="$emit('change')">
         </bk-input>
       </bk-form-item>
     </bk-form>
@@ -301,6 +306,7 @@
         this.directory.formInfo.name = dataItem.label;
         this.directory.formInfo.version = dataItem.version || 'v1';
         this.directory.formInfo.category = dataItem.category;
+        this.$emit('change');
       },
       changeCode(id) {
         // 切换 清空
@@ -318,6 +324,7 @@
         };
         const dataItem = this.treeList.slice(1).filter(item => item.id === id)[0];
         this.$parent.$parent.$parent.getChannelPathList(dataItem.code);
+        this.$emit('change');
       },
       dropdownShow() {
         this.isDropdownShow = true;

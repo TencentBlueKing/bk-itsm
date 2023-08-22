@@ -539,7 +539,7 @@ class TicketTest(TestCase):
             True,
         }
 
-        service = Service.objects.get(name="帐号开通申请")
+        service = Service.objects.get(name="账号开通申请")
         print("service name === {}".format(service.name))
         service.owners = ",admin,"
         service.save()

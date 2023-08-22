@@ -1,599 +1,599 @@
 # Changelog
+## [Version: 2.6.7] - 2023-08-22
+ [Improved]Show pop-up window when you don't have permission to view documents.  
+ [Improved] Change the adopted English to Agree when editing the English of approval nodes to maintain consistency.     
+ [Improved] Add a new switch for daily notification of document handling.  
+ [Improved] Error message when attachment is abnormal  
+ [Improved]Error message when third-party api return protocol is not satisfied.  
+ [Improved] Modify account number to account number  
+ [Fixed] Fix the problem that custom document status is not effective.
+
 ## [Version: 2.6.6] - 2023-07-13
-[Optimization] Internationalization content supplement  
-[Repaired] Fix the problem that the public field is configured with the API data source that the data cannot be displayed after the data source cannot be displayed    
-[Repaired] Repair the document page service directory is not related to the project associated with the project  
-[Repaired] Repair the service batch deletion of the directory after the directory deletes failure  
-[Repaired] Data statistical table sorting conditions have not taken effect, repair the problem  
-[Repaired] Project field form update time By ranks incorrect problems repair  
-[Repaired] The list of repair documents is empty as the form is not correct  
-[Repaired] The problem that the trigger processor cannot choose the second level drop -down box when choosing the role of the permissions center  
-[Repaired] Repair the problem of calling the right of the center interface when the switch language is repaired  
-[Repaired] Modify the list interface of the document list interface  
-[Repaired] Priority release user custom restrictions  
-[Repaired] Fix bugs that fail to flow in documents due to the token conflict  
-[Optimization] Automatically adjust the single time to 5s  
-[Repaired] When repairing the approval person is too much, the user prompts the problem that there is no authority  
-[Repaired] Fix the problem of abnormal exit when the API node MESSAGE returns the dictionary  
-[Repaired] The issue of the attachment path of the system under the containerized environment  
-[Repaired] Fix the problem that the custom state that cannot be empty cannot be empty   
+ [Improved] Internationalization content supplement  
+ [Fixed] Fix the problem that the public field is configured with the API data source that the data cannot be displayed after the data source cannot be displayed    
+ [Fixed] Repair the document page service directory is not related to the project associated with the project  
+ [Fixed] Repair the service batch deletion of the directory after the directory deletes failure  
+ [Fixed] Data statistical table sorting conditions have not taken effect, repair the problem  
+ [Fixed] Project field form update time By ranks incorrect problems repair  
+ [Fixed] The list of repair documents is empty as the form is not correct  
+ [Fixed] The problem that the trigger processor cannot choose the second level drop -down box when choosing the role of the permissions center  
+ [Fixed] Repair the problem of calling the right of the center interface when the switch language is repaired  
+ [Fixed] Modify the list interface of the document list interface  
+ [Fixed] Priority release user custom restrictions  
+ [Fixed] Fix bugs that fail to flow in documents due to the token conflict  
+ [Improved] Automatically adjust the single time to 5s  
+ [Fixed] When repairing the approval person is too much, the user prompts the problem that there is no authority  
+ [Fixed] Fix the problem of abnormal exit when the API node MESSAGE returns the dictionary  
+ [Fixed] The issue of the attachment path of the system under the containerized environment  
+ [Fixed] Fix the problem that the custom state that cannot be empty cannot be empty   
 
 ## [Version: 2.6.5] - 2023-05-11
-[Optimization] Support CDN solution  
-[Optimization] Internationalization content supplement  
-[Optimization] Optimize the interaction effects of batch approval
+ [Improved] Support CDN solution  
+ [Improved] Internationalization content supplement  
+ [Improved] Optimize the interaction effects of batch approval
 
 ## [Version: 2.6.4] - 2023-04-07
-[Repaired] Modify the style of the document urging and basic information, repair the custom form editing display 
-[Optimization] Modify the leakage urging copywriting  
-[Optimization] Newly add OpenAPI interface to quickly obtain the approval results of an approval node  
-[Repaired] Modify the table air data status and text overflow display TIPS  
-[Repaired] Fix the text overflowing the empty state omissions  
-[Optimization] Approval document adding project ID filtration  
-[Optimization] Optimized when there are too many documents, the loading speed of my approval list  
-[Optimization] Optimize the list of request project lists 
+ [Fixed] Modify the style of the document urging and basic information, repair the custom form editing display 
+ [Improved] Modify the leakage urging copywriting  
+ [Improved] Newly add OpenAPI interface to quickly obtain the approval results of an approval node  
+ [Fixed] Modify the table air data status and text overflow display TIPS  
+ [Fixed] Fix the text overflowing the empty state omissions  
+ [Improved] Approval document adding project ID filtration  
+ [Improved] Optimized when there are too many documents, the loading speed of my approval list  
+ [Improved] Optimize the list of request project lists 
 
 ## [Version: 2.6.1] - 2022-03-31
-[New] Community edition does not open the Blue Shield node         
-[New] Popover problem fixed, development framework version updated             
-[Optimization] Abnormal statistics of approval number after order transfer            
-[New] Notification template for project latitude         
-[Optimization] Update the permission model                   
-[Repaired] Sending orders to the organization structure is abnormal          
-[Repaired] Work order view permission authentication exception repair         
-[New] Support automatic node exception notification        
-[New] Custom tabs within the project         
-[New] Global trigger within a project        
-[New] Merge service and service catalog     
-[New] Services support cloning     
-[New] Commentary on documents     
-
+ [Feature] Community edition does not open the Blue Shield node         
+ [Feature] Popover problem fixed, development framework version updated             
+ [Improved] Abnormal statistics of approval number after order transfer            
+ [Feature] Notification template for project latitude         
+ [Improved] Update the permission model                   
+ [Fixed] Sending orders to the organization structure is abnormal          
+ [Fixed] Work order view permission authentication exception repair         
+ [Feature] Support automatic node exception notification        
+ [Feature] Custom tabs within the project         
+ [Feature] Global trigger within a project        
+ [Feature] Merge service and service catalog     
+ [Feature] Services support cloning     
+ [Feature] Commentary on documents
 
 ## [Version: 2.6.0] - 2021-09-09
- [New] Project Space, each project space manages the documents, services, elements, SLAs, and configuration management under the project.  
- [New] Platform Management, manage the basic/public configuration at platform level  
- [Optimization] Merge service and process concepts, eliminate process version  
- [Optimization]Front-end UI design optimization  
- [Optimization] Permission model update  
- [repaired] Assignment of orders to organizational structure exceptions
- [repaired] When creating a service, the service bill of lading information is not selected  
- [Optimization] Add fields, custom data duplication data correction still prompts duplication  
- [Optimization] Hide content related to the knowledge base  
- [Optimization] The newly created user is transferred to the general role, the user group cannot be pulled, and there is no prompt to apply for permission  
- [Optimization] Notification configuration permission settings, those without permission should be grayed out + locked  
- [Optimization] No prompt for user group delete permission  
- [Optimization] Edit the existing fields of the service bill of lading information, which cannot be saved  
+ [Feature] Project Space, each project space manages the documents, services, elements, SLAs, and configuration management under the project.  
+ [Feature] Platform Management, manage the basic/public configuration at platform level  
+ [Improved] Merge service and process concepts, eliminate process version  
+ [Improved]Front-end UI design optimization  
+ [Improved] Permission model update  
+ [Fixed] Assignment of orders to organizational structure exceptions
+ [Fixed] When creating a service, the service bill of lading information is not selected  
+ [Improved] Add fields, custom data duplication data correction still prompts duplication  
+ [Improved] Hide content related to the knowledge base  
+ [Improved] The newly created user is transferred to the general role, the user group cannot be pulled, and there is no prompt to apply for permission  
+ [Improved] Notification configuration permission settings, those without permission should be grayed out + locked  
+ [Improved] No prompt for user group delete permission  
+ [Improved] Edit the existing fields of the service bill of lading information, which cannot be saved  
 
 ## [Version: 2.5.9]-2021-05-07
- [repaired] Failed to download file in attachment upload field  
- [repaired] Repair the standard operation and maintenance form reference variable is edited again, the checked state is lost  
- [repaired] Abnormal field display when creating a task  
- [repaired] Some standard operation and maintenance tasks click to handle/view and report an exception  
- [repaired] The remaining time of sla in the current step increases  
- [repaired] New service agreement cannot be submitted & fixed my ticket to-do tab number is occasionally displayed incorrectly  
- [repaired] After repairing the basic information of the editing service, it is not updated  
- [optimization] Trigger conditions for initializing the community version of the Blue Shield mission template  
- [optimization] Added an exception when the standard operation and maintenance interface reports an error  
- [repaired] 2.5.8 Upgrade 2.5.9 will cause upgrade failure  
-
-## [Version: 2.5.9]-2021-04-27
- [repaired] Abnormal field display when creating a task  
- [repaired] Some standard operation and maintenance tasks click to handle/view and report an exception  
-
-## [Version: 2.5.9]-2021-04-23
- [repaired] The remaining time of sla in the current step increases  
- [repaired] New service agreement cannot be submitted & fixed my ticket to-do tab number is occasionally displayed incorrectly  
- [repaired] After repairing the basic information of the editing service, it is not updated  
- [optimization] Trigger conditions for initializing the community version of the Blue Shield mission template  
- [optimization] Added an exception when the standard operation and maintenance interface reports an error  
- 
- ## [Version: 2.5.9]-2021-04-07
- [New] The receipt supports multi-node and multi-task mode  
- [New] Standard operation and maintenance tasks can reference variable functions  
- [New] Functional support for segmented SLA  
-
-## [Version: 2.5.9] - 2021-03-31
- [New] Supports tasks in multi-node  
- [New] Supports to reference variable for SOPS task  
- [New] New version of SLA  
+ [Fixed] Failed to download file in attachment upload field  
+ [Fixed] Repair the standard operation and maintenance form reference variable is edited again, the checked state is lost  
+ [Fixed] Abnormal field display when creating a task  
+ [Fixed] Some standard operation and maintenance tasks click to handle/view and report an exception  
+ [Fixed] The remaining time of sla in the current step increases  
+ [Fixed] New service agreement cannot be submitted & fixed my ticket to-do tab number is occasionally displayed incorrectly  
+ [Fixed] After repairing the basic information of the editing service, it is not updated  
+ [Improved] Trigger conditions for initializing the community version of the Blue Shield mission template  
+ [Improved] Added an exception when the standard operation and maintenance interface reports an error  
+ [Fixed] 2.5.8 Upgrade 2.5.9 will cause upgrade failure  
+ [Fixed] Abnormal field display when creating a task  
+ [Fixed] Some standard operation and maintenance tasks click to handle/view and report an exception  
+ [Fixed] The remaining time of sla in the current step increases  
+ [Fixed] New service agreement cannot be submitted & fixed my ticket to-do tab number is occasionally displayed incorrectly  
+ [Fixed] After repairing the basic information of the editing service, it is not updated  
+ [Improved] Trigger conditions for initializing the community version of the Blue Shield mission template  
+ [Improved] Added an exception when the standard operation and maintenance interface reports an error  
+ [Feature] The receipt supports multi-node and multi-task mode  
+ [Feature] Standard operation and maintenance tasks can reference variable functions  
+ [Feature] Functional support for segmented SLA  
+ [Feature] Supports tasks in multi-node  
+ [Feature] Supports to reference variable for SOPS task  
+ [Feature] New version of SLA  
 
 ## [Version: 2.5.8] - 2021-03-16
- [New] New version of operational data released  
- [New] Exception handling when the person is empty  
- [New] SOPS release scenarios support replenishment orders  
- [optimization] List query speed optimization  
- [optimization] Organizational structure personnel display optimization  
- [optimization] Export logic optimization  
- [repaired] Handler issues when dispatching and transferring orders  
- [repaired] Inaccurate display of my to-do content  
+ [Feature] New version of operational data released  
+ [Feature] Exception handling when the person is empty  
+ [Feature] SOPS release scenarios support replenishment orders  
+ [Improved] List query speed optimization  
+ [Improved] Organizational structure personnel display optimization  
+ [Improved] Export logic optimization  
+ [Fixed] Handler issues when dispatching and transferring orders  
+ [Fixed] Inaccurate display of my to-do content  
  
 ## [Version: 2.5.7] - 2020-12-30
- [New] SOPS release scenario support  
- [New] IAM approval scenario support  
- [New] redis sentinel double password  
- [New] Ticket front page reconstruction and revision  
- [New] Ticket detail reconstruction and revision  
- [New] International integration of front and backend  
- [New] Add IAM built-in approval process  
- [New] Optimization of the withdrawn strategy logic, support users to configure withdrawn rules  
- [New] The role of the processor is increased to specify the superiors of different people  
- [New] Add trigger record display tab for ticket details  
- [repaired] Product document jump to document center  
- [repaired] Add built-in workflow and services  
- [repaired] Get service role is compatible with the scenario of not creator  
- [repaired] pipeline add candidate backend  
- [repaired] Add visible range configuration for API docking  
- [repaired] Title distinguish Enterprise Edition Community Edition  
- [repaired] Help add product documentation and problem feedback  
- [repaired] Product document jump to document center  
- [repaired] Attention ticket authentication logic  
- [Optimization] Moa application content optimization  
- [Optimization] Many errors were reported at 401  
- [Optimization] Report IAM changed to internal PAAS address  
- [repaired] Enterprise WeChat bots send multi messages when they are too large  
- [repaired] Flow details interface error, and the extra field exceeds the limit  
- [repaired] Service details interface permission issue  
- [repaired] Inactive services appear at the service entrance  
- [repaired] Custom table data is not backfilled  
- [repaired] Required fields of custom form are not verified  
- [repaired] Unable to unlink order
- [repaired] Repair the homepage waiting for my approval number is not refreshed  
- [repaired] The page freezes when the processor organization structure  
- [repaired] handle abnormal standard operation and maintenance tasks  
- [optimization] member synchronization mechanism of CMDB role  
- [optimization] export function optimization  
- [repaired] line trigger cannot be triggered  
- [repaired] access to role members
- [repaired] the task handler of the execution node cannot see the document  
- [repaired] no problem found in node clone field  
- [repaired] invalid deletion of nodes  
- [optimization] select the service and export the ticket according to the service bill of lading field  
- [New] log retrieval process initialization deployment  
- [repaired] fix the problem of alarm sending failure because the function name cannot be obtained from the stack  
- [repaired] the business card will not be displayed  
- [optimization] case support for service search  
- [repaired] The details of the repair node are not displayed in the current step  
+ [Feature] SOPS release scenario support  
+ [Feature] IAM approval scenario support  
+ [Feature] redis sentinel double password  
+ [Feature] Ticket front page reconstruction and revision  
+ [Feature] Ticket detail reconstruction and revision  
+ [Feature] International integration of front and backend  
+ [Feature] Add IAM built-in approval process  
+ [Feature] Improved of the withdrawn strategy logic, support users to configure withdrawn rules  
+ [Feature] The role of the processor is increased to specify the superiors of different people  
+ [Feature] Add trigger record display tab for ticket details  
+ [Fixed] Product document jump to document center  
+ [Fixed] Add built-in workflow and services  
+ [Fixed] Get service role is compatible with the scenario of not creator  
+ [Fixed] pipeline add candidate backend  
+ [Fixed] Add visible range configuration for API docking  
+ [Fixed] Title distinguish Enterprise Edition Community Edition  
+ [Fixed] Help add product documentation and problem feedback  
+ [Fixed] Product document jump to document center  
+ [Fixed] Attention ticket authentication logic  
+ [Improved] Moa application content optimization  
+ [Improved] Many errors were reported at 401  
+ [Improved] Report IAM changed to internal PAAS address  
+ [Fixed] Enterprise WeChat bots send multi messages when they are too large  
+ [Fixed] Flow details interface error, and the extra field exceeds the limit  
+ [Fixed] Service details interface permission issue  
+ [Fixed] Inactive services appear at the service entrance  
+ [Fixed] Custom table data is not backfilled  
+ [Fixed] Required fields of custom form are not verified  
+ [Fixed] Unable to unlink order
+ [Fixed] Repair the homepage waiting for my approval number is not refreshed  
+ [Fixed] The page freezes when the processor organization structure  
+ [Fixed] handle abnormal standard operation and maintenance tasks  
+ [Improved] member synchronization mechanism of CMDB role  
+ [Improved] export function optimization  
+ [Fixed] line trigger cannot be triggered  
+ [Fixed] access to role members
+ [Fixed] the task handler of the execution node cannot see the document  
+ [Fixed] no problem found in node clone field  
+ [Fixed] invalid deletion of nodes  
+ [Improved] select the service and export the ticket according to the service bill of lading field  
+ [Feature] log retrieval process initialization deployment  
+ [Fixed] fix the problem of alarm sending failure because the function name cannot be obtained from the stack  
+ [Fixed] the business card will not be displayed  
+ [Improved] case support for service search  
+ [Fixed] The details of the repair node are not displayed in the current step  
 
 ## [Version: 2.5.6] - 2020-10-22
- [New] Process configuration adds support for IAM roles  
- [New] Caching supports RedIS configuration  
- [New] Support for IAM instance search  
- [New] Add department information to business CARDS  
+ [Feature] Process configuration adds support for IAM roles  
+ [Feature] Caching supports RedIS configuration  
+ [Feature] Support for IAM instance search  
+ [Feature] Add department information to business CARDS  
 
 ## [Version: 2.5.5] - 2020-09-26
- [New] Process configuration add support authority center role  
- [Optimization] New version of personnel component replacement  
- [Optimization] Basic configuration removes organizational structure switch  
- [repaired] Migrate reports an error when deployed separately  
- [repaired] Process service name modification  
- [repaired] Selection of cross-domain personnel  
- [repaired] IAM request link uses BK_PAAS_INNER_HOST by default  
+ [Feature] Process configuration add support authority center role  
+ [Improved] New version of personnel component replacement  
+ [Improved] Basic configuration removes organizational structure switch  
+ [Fixed] Migrate reports an error when deployed separately  
+ [Fixed] Process service name modification  
+ [Fixed] Selection of cross-domain personnel  
+ [Fixed] IAM request link uses BK_PAAS_INNER_HOST by default  
 
 ## [Version: 2.5.4] - 2020-09-07
- [New] Add permission upgrade of version 2.4  
- [New] Add built-in approval process  
- [New] Process configuration add support authority center role  
- [Optimization] Bill of lading field verification prompt optimization  
- [Optimization] The name of the follower and the follower are conflicted, and the follower is modified to an email notification  
- [Optimization] All Ticket in the list of Tickets are released, everyone can see  
- [repaired] Fixed the bug that the built-in approval process failed to initialize  
- [repaired] Add view button in task table to view the task details   
- [repaired] When submitting the document, the dirty data of the previous node will be transferred to the current operating node  
- [repaired] The style of the workbench is messy after zooming  
- [repaired] Incomplete display of current processing steps  
- [repaired] The  sops template cannot be seen if no business is selected  
- [repaired] Remove the automatic execution content from statistical data  
- [repaired] The front-end style still shows that it has been followed after failing to follow the receipt  
- [repaired]  Back to the homepage is invalid when the user close the last tab  
- [repaired]  The creator actions granting will not be performed if the creator does not exist  
- [repaired]  The content after the api request parameter will overwrite the previous content  
- [repaired]  The current step is not updated after dispatch  
- [repaired]  The operation node cannot check the recurrence box again and cannot submit  
- [repaired]  The rich text control is upgraded to solve minor problems such as invalid bolding  
- [repaired]  The api log information name and processing time are not displayed  
+ [Feature] Add permission upgrade of version 2.4  
+ [Feature] Add built-in approval process  
+ [Feature] Process configuration add support authority center role  
+ [Improved] Bill of lading field verification prompt optimization  
+ [Improved] The name of the follower and the follower are conflicted, and the follower is modified to an email notification  
+ [Improved] All Ticket in the list of Tickets are released, everyone can see  
+ [Fixed] Fixed the bug that the built-in approval process failed to initialize  
+ [Fixed] Add view button in task table to view the task details   
+ [Fixed] When submitting the document, the dirty data of the previous node will be transferred to the current operating node  
+ [Fixed] The style of the workbench is messy after zooming  
+ [Fixed] Incomplete display of current processing steps  
+ [Fixed] The  sops template cannot be seen if no business is selected  
+ [Fixed] Remove the automatic execution content from statistical data  
+ [Fixed] The front-end style still shows that it has been followed after failing to follow the receipt  
+ [Fixed]  Back to the homepage is invalid when the user close the last tab  
+ [Fixed]  The creator actions granting will not be performed if the creator does not exist  
+ [Fixed]  The content after the api request parameter will overwrite the previous content  
+ [Fixed]  The current step is not updated after dispatch  
+ [Fixed]  The operation node cannot check the recurrence box again and cannot submit  
+ [Fixed]  The rich text control is upgraded to solve minor problems such as invalid bolding  
+ [Fixed]  The api log information name and processing time are not displayed  
  
 ## [Version: 2.5.3] - 2020-09-01
- [repaired] When previewing the flowchart, it prompts no permission problem fixed  
- [repaired] The new task page is not rendered, and an error is reported in the console  
- [repaired] The front end style is still displayed after the note fails  
- [repaired] When there is only one nav in the ticket details, delete no response  
- [optimization] Missing prompt for service list deletion  
+ [Fixed] When previewing the flowchart, it prompts no permission problem fixed  
+ [Fixed] The new task page is not rendered, and an error is reported in the console  
+ [Fixed] The front end style is still displayed after the note fails  
+ [Fixed] When there is only one nav in the ticket details, delete no response  
+ [Improved] Missing prompt for service list deletion  
 
 ## [Version: 2.5.2] - 2020-08-20
- [New] Add approval node
- [New] New field default value to add rich text  
- [New] Api node failure processing (retry, ignore)  
- [New] Add batch approval
- [New] Add followers
- [optimization] If the status of the countersignature node or the approval node is in process, the submit button will display loading  
- [optimization] After the workbench express bill of lading is completed, it will default to the global list of "all bill"  
- [optimization] The processor component is changed to display one line when out of focus, and multiple lines when in focus  
- [optimization] Quick bill of lading jump to the global view My application form  
- [optimization] Work order list and work order detail style optimization  
- [optimization] The pass platform application permission will open in a new browser tab  
- [optimization] After the permission application is passed, the menu bar refreshes without updating the permissions  
- [repaired] Fix the bug which raise exception "schedule service does not exist" when operate task.  
- [repaired] Fix displaying error of component type  
- [repaired] New field default value to add rich text  
- [repaired] Follow people button, follow people list  
- [repaired] The existing sequence is restored after adding new fields to the process design field list  
- [repaired] Fix the current step of the bill list is empty  
- [repaired] Fix log details only show the last one  
- [repaired] When the process administrator, the process design menu is not displayed  
- [repaired] Fix llog details handler field error  
+ [Feature] Add approval node
+ [Feature] New field default value to add rich text  
+ [Feature] Api node failure processing (retry, ignore)  
+ [Feature] Add batch approval
+ [Feature] Add followers
+ [Improved] If the status of the countersignature node or the approval node is in process, the submit button will display loading  
+ [Improved] After the workbench express bill of lading is completed, it will default to the global list of "all bill"  
+ [Improved] The processor component is changed to display one line when out of focus, and multiple lines when in focus  
+ [Improved] Quick bill of lading jump to the global view My application form  
+ [Improved] Work order list and work order detail style optimization  
+ [Improved] The pass platform application permission will open in a new browser tab  
+ [Improved] After the permission application is passed, the menu bar refreshes without updating the permissions  
+ [Fixed] Fix the bug which raise exception "schedule service does not exist" when operate task.  
+ [Fixed] Fix displaying error of component type  
+ [Fixed] New field default value to add rich text  
+ [Fixed] Follow people button, follow people list  
+ [Fixed] The existing sequence is restored after adding new fields to the process design field list  
+ [Fixed] Fix the current step of the bill list is empty  
+ [Fixed] Fix log details only show the last one  
+ [Fixed] When the process administrator, the process design menu is not displayed  
+ [Fixed] Fix llog details handler field error  
 
 ## [Version: 2.5.1] - 2020-07-31
- [new] Support to register auth action groups  
- [new] Support to grant related actions's permission after resource created  
+ [Feature] Support to register auth action groups  
+ [Feature] Support to grant related actions's permission after resource created  
 
 ## [Version: 2.5.0] - 2020-07-02
- [new] System authentication depends on IAM  
- [optimization] Icon migrate to iconcool  
- [optimization] Replaced task icon  
- [optimization] Global view table optimization, add processor, filter conditions, custom table header, etc.; i18n extraction  
- [optimization] The time control displays the current time by default  
- [optimization] Background management menu icon replacement  
- [repaired] Global view current processors error  
- [repaired] Pass platform cannot open permission center  
- [repaired] Cannot submit with default hidden fields  
- [repaired] Fix permissions for process design deployment  
- [repaired] Fix the new creation of sla service agreement management, turn off the reminder mechanism, there is still verification  
- [repaired] Fix /role/users api has no role_type parameter  
- [repaired] Fix the blinking of ticket details  
+ [Feature] System authentication depends on IAM  
+ [Improved] Icon migrate to iconcool  
+ [Improved] Replaced task icon  
+ [Improved] Global view table optimization, add processor, filter conditions, custom table header, etc.; i18n extraction  
+ [Improved] The time control displays the current time by default  
+ [Improved] Background management menu icon replacement  
+ [Fixed] Global view current processors error  
+ [Fixed] Pass platform cannot open permission center  
+ [Fixed] Cannot submit with default hidden fields  
+ [Fixed] Fix permissions for process design deployment  
+ [Fixed] Fix the new creation of sla service agreement management, turn off the reminder mechanism, there is still verification  
+ [Fixed] Fix /role/users api has no role_type parameter  
+ [Fixed] Fix the blinking of ticket details  
 
 ## [Version: 2.4.2] - 2020-05-26
- [New] Task-group is supported  
- [New] Support task group function in the process  
- [New] node configuration remove action button  
- [New] Trigger configuration management  
- [New] Support trigger function in the process  
- [New] Support configuration management of process administrator and person in charge  
- [New] API supports writing sandbox code  
- [New] Expansion of public variables in the process  
- [New] System function switch  
- [New] Provide fast bill entrance  
- [Fix] Fix the defect of rich text packaging  
+ [Feature] Task-group is supported  
+ [Feature] Support task group function in the process  
+ [Feature] node configuration remove action button  
+ [Feature] Trigger configuration management  
+ [Feature] Support trigger function in the process  
+ [Feature] Support configuration management of process administrator and person in charge  
+ [Feature] API supports writing sandbox code  
+ [Feature] Expansion of public variables in the process  
+ [Feature] System function switch  
+ [Feature] Provide fast bill entrance  
+ [Fixed] Fix the defect of rich text packaging  
 
 ## [Version: 2.4.4] - 2020-08-10
- [New] New field default value to add rich text  
- [New] Api node failure processing (retry, ignore)  
- [New] Add batch approval
- [New] Add followers
- [New] Links in rich text support opening in new tabs  
- [optimization] If the status of the countersignature node or the approval node is in process, the submit button will display loading  
- [optimization] The processor component is changed to display one line when out of focus, and multiple lines when in focus  
- [optimization] Quick bill of lading jump to the global view My application form  
- [optimization] Work order list and work order detail style optimization  
- [Optimization] Magicbox upgraded to 2.2.1  
- [Optimization] Node details and log details style optimization  
- [repaired] Fix the bug which raise exception "schedule service does not exist" when operate task.  
- [repaired] Fix displaying  error of component type  
- [repaired] New field default value to add rich text  
- [repaired] Follow people button, follow people list  
- [repaired] The existing sequence is restored after adding new fields to the process design field list  
- [repaired] Fix the current step of the bill list is empty  
- [repaired] Fix log details only show the last one  
- [repaired] When the process administrator, the process design menu is not displayed  
- [repaired] Fix llog details handler field error  
- [repaired] After the approval node is processed, the current step interface is not updated after polling  
- [repaired] Fix Sops node details task parameters are not displayed  
- [repaired] A default value will be matched when the person selector is empty  
+ [Feature] New field default value to add rich text  
+ [Feature] Api node failure processing (retry, ignore)  
+ [Feature] Add batch approval
+ [Feature] Add followers
+ [Feature] Links in rich text support opening in new tabs  
+ [Improved] If the status of the countersignature node or the approval node is in process, the submit button will display loading  
+ [Improved] The processor component is changed to display one line when out of focus, and multiple lines when in focus  
+ [Improved] Quick bill of lading jump to the global view My application form  
+ [Improved] Work order list and work order detail style optimization  
+ [Improved] Magicbox upgraded to 2.2.1  
+ [Improved] Node details and log details style optimization  
+ [Fixed] Fix the bug which raise exception "schedule service does not exist" when operate task.  
+ [Fixed] Fix displaying  error of component type  
+ [Fixed] New field default value to add rich text  
+ [Fixed] Follow people button, follow people list  
+ [Fixed] The existing sequence is restored after adding new fields to the process design field list  
+ [Fixed] Fix the current step of the bill list is empty  
+ [Fixed] Fix log details only show the last one  
+ [Fixed] When the process administrator, the process design menu is not displayed  
+ [Fixed] Fix llog details handler field error  
+ [Fixed] After the approval node is processed, the current step interface is not updated after polling  
+ [Fixed] Fix Sops node details task parameters are not displayed  
+ [Fixed] A default value will be matched when the person selector is empty  
 
 ## [Version: 2.4.3]-2020-07-10
- [New] Add new trigger action that to send messages by group robot  
- [New] Add line display in document flow chart view   
- [optimization] Add skip exclusive node for error configuration  
- [repaired] Fix the new creation of sla service agreement management, turn off the reminder mechanism, there is still verification  
- [repaired] Fix /role/users api has no role_type parameter  
- [repaired] Fix the blinking of ticket details  
- [repaired] Template filling will clear the fields that are not in the current field list  
- [optimization] Get all users information before serialize tickets' data  
- [optimization] The expanded display details of the log list are changed to the side-sliding pop-up window display  
+ [Feature] Add new trigger action that to send messages by group robot  
+ [Feature] Add line display in document flow chart view   
+ [Improved] Add skip exclusive node for error configuration  
+ [Fixed] Fix the new creation of sla service agreement management, turn off the reminder mechanism, there is still verification  
+ [Fixed] Fix /role/users api has no role_type parameter  
+ [Fixed] Fix the blinking of ticket details  
+ [Fixed] Template filling will clear the fields that are not in the current field list  
+ [Improved] Get all users information before serialize tickets' data  
+ [Improved] The expanded display details of the log list are changed to the side-sliding pop-up window display  
 
 ## [Version: 2.4.2]-2020-05-26
- [New] Task template configuration management  
- [New] Support task group in the ticket  
- [New] Remove action button configuration in node  
- [New] Trigger configuration management  
- [New] Support trigger function in the process  
- [New] Add permission settings in flow design  
- [New] API supports writing sandbox code  
- [New] Expansion of public variables in the process  
- [New] Add new system function switch  
- [New] Provide fast bill of lading entrance  
- [Fix] Fix the defect of rich text packaging  
+ [Feature] Task template configuration management  
+ [Feature] Support task group in the ticket  
+ [Feature] Remove action button configuration in node  
+ [Feature] Trigger configuration management  
+ [Feature] Support trigger function in the process  
+ [Feature] Add permission settings in flow design  
+ [Feature] API supports writing sandbox code  
+ [Feature] Expansion of public variables in the process  
+ [Feature] Add new system function switch  
+ [Feature] Provide fast bill of lading entrance  
+ [Fixed] Fix the defect of rich text packaging  
 
 ## [Version: 2.4.1] -2020-03-11
- [New] Front-end component upgrade  
- [New] Officials support the configuration of dynamic handlers  
- [Supplement] Official support for configuring action buttons  
- [New] Baseline supports association constraints  
- [Supplement] Support staff configuration organization structure (dependency: open_paas_ee> = 2.10.26, usermgr_ee> = 2.0.5)  
- [Fix] Chinese name process caused garbled characters  
+ [Feature] Front-end component upgrade  
+ [Feature] Officials support the configuration of dynamic handlers  
+ [Improved] Official support for configuring action buttons  
+ [Feature] Baseline supports association constraints  
+ [Improved] Support staff configuration organization structure (dependency: open_paas_ee> = 2.10.26, usermgr_ee> = 2.0.5)  
+ [Fixed] Chinese name process caused garbled characters  
 
 ## [Version: 2.3.1] -2019-12-27
- [Supplement] SLA management module  
- [Supplement] Basic model and public interest  
- [Supplement] Sort service catalog  
- [Supplementary] Radio Selector Component  
- [New] Notification template open configuration  
- [Supplement] Internationalization  
- [Supplement] single function of mother and child  
- [Optimization] Upgrade development framework  
- [Optimization] Upgrade to Python3  
- [Optimized] Open preset key editing  
- [Optimization] The document withdrawal function can be switched  
- [Optimization] Process preview function can be switched  
- [Optimization] Provide catalog view  
- [Optimization] single number differentiated service  
- [Optimization] Operation data query optimization  
+ [Improved] SLA management module  
+ [Improved] Basic model and public interest  
+ [Improved] Sort service catalog  
+ [Improved] Radio Selector Component  
+ [Feature] Notification template open configuration  
+ [Improved] Internationalization  
+ [Improved] single function of mother and child  
+ [Improved] Upgrade development framework  
+ [Improved] Upgrade to Python3  
+ [Improved] Open preset key editing  
+ [Improved] The document withdrawal function can be switched  
+ [Improved] Process preview function can be switched  
+ [Improved] Provide catalog view  
+ [Improved] single number differentiated service  
+ [Improved] Operation data query optimization  
  [Data migration] To transfer configuration related data, you need to run http://{host}/helper/db_fix_after_2_3_1/  
 
 ## [Version: 2.2.22] - 2020-03-21
- [new] support self-service apis  
- [repaired] fix api node save bugs  
+ [Feature] support self-service apis  
+ [Fixed] fix api node save bugs  
 
 ## [Version: 2.2.21] - 2020-03-03
- [new] add english version logs  
- [new] playing the login window function  
- [repaired] process of Chinese export problem  
- [repaired] some translation problems  
- [repaired] some translation problems  
+ [Feature] add english version logs  
+ [Feature] playing the login window function  
+ [Fixed] process of Chinese export problem  
+ [Fixed] some translation problems  
+ [Fixed] some translation problems  
 
 ## [Version: 2.2.20] - 2020-01-20
- [repaired] repair field repair API process caused by the import problem  
+ [Fixed] repair field repair API process caused by the import problem  
 
 ## [Version: 2.2.19] - 2020-01-16
- [repaired] international various translation problems  
- [repaired] to do show incorrect repair problem  
+ [Fixed] international various translation problems  
+ [Fixed] to do show incorrect repair problem  
 
 ## [Version: 2.2.18] - 2020-01-08
- [new] custom deployment template  
- [new] documents concerned notifications  
- [optimization] Optimization of standard operational node error display  
- [repaired] test its repair failure problem  
- [repaired] create correlation problem of the single failure repair  
- [repaired] 2.2.17 front-end bug fixes  
- [repaired] interface to turn single person authentication error problem of repair operation  
- [repaired] interface to get repair service list problem  
+ [Feature] custom deployment template  
+ [Feature] documents concerned notifications  
+ [Improved] Improved of standard operational node error display  
+ [Fixed] test its repair failure problem  
+ [Fixed] create correlation problem of the single failure repair  
+ [Fixed] 2.2.17 front-end bug fixes  
+ [Fixed] interface to turn single person authentication error problem of repair operation  
+ [Fixed] interface to get repair service list problem  
 
 ## [Version: 2.2.17] - 2019-12-18
- [optimization] Optimal replacement personnel selector  
- [optimization] optimization documents list query logic  
- [optimization] the optimization of the bill of lading interface  
- [new] to do little red dot  
- [new] field default values  
- [new] provide English description information  
+ [Improved] Optimal replacement personnel selector  
+ [Improved] optimization documents list query logic  
+ [Improved] the optimization of the bill of lading interface  
+ [Feature] to do little red dot  
+ [Feature] field default values  
+ [Feature] provide English description information  
  [data migration] new documents list query logic, need to be run as an administrator http://{host}/helper/db_fix_after_2_2_17/  
 
 ## [Version: 2.2.16] - 2019-12-10
- [repaired] fix its problem  
+ [Fixed] fix its problem  
 
 ## [Version: 2.2.15] - 2019-12-06
- [new] support custom deployment template  
- [repaired] repair admin page selection function  
- [repaired] gm role the administrator role table click no response management problems  
- [repaired] concurrent bill of lading, single number repeated problems  
- [repaired] standard operational node hop link problem  
- [repaired] translation problems  
+ [Feature] support custom deployment template  
+ [Fixed] repair admin page selection function  
+ [Fixed] gm role the administrator role table click no response management problems  
+ [Fixed] concurrent bill of lading, single number repeated problems  
+ [Fixed] standard operational node hop link problem  
+ [Fixed] translation problems  
 
 ## [Version: 2.2.12] - 2019-11-19
- [repaired] repair admin page selection function  
+ [Fixed] repair admin page selection function  
 
 ## [Version: 2.2.11] - 2019-11-08
- [new] tag support new node  
- [new] provide documents processing interface  
- [new] provide node processing interface  
- [optimization] documents log interfaces and status  
- [optimization] documents hangs, restore and suspension  
- [repaired] international translation problems  
- [repaired] process engine deadlock problem  
+ [Feature] tag support new node  
+ [Feature] provide documents processing interface  
+ [Feature] provide node processing interface  
+ [Improved] documents log interfaces and status  
+ [Improved] documents hangs, restore and suspension  
+ [Fixed] international translation problems  
+ [Fixed] process engine deadlock problem  
 
 ## [Version: 2.2.9] - 2019-11-05
- [new] nodes replication  
- [new] sorting services, service directory  
- [repaired] repair documents translation problems  
- [repaired] fix API log growing too fast  
- [repaired] repair documents revoked display problems  
+ [Feature] nodes replication  
+ [Feature] sorting services, service directory  
+ [Fixed] repair documents translation problems  
+ [Fixed] fix API log growing too fast  
+ [Fixed] repair documents revoked display problems  
  [data migration] attachment storage upgrade need to run as an administrator http://{host}/helper/db_fix_for_attachments/  
 
 ## [Version: 2.2.8] - 2019-10-29
- [repaired] repair work order statistics administrator privileges  
- [repaired] repair ordinary users to look at front nodes problem  
- [repaired] repair notice problems  
- [repaired] repair accessories problems  
- [repaired] repair bill of lading HouGong single filtering problem  
- [repaired] fix its problems  
- [optimization] optimization documents processing  
- [optimization] the optimization of the bill loading  
+ [Fixed] repair work order statistics administrator privileges  
+ [Fixed] repair ordinary users to look at front nodes problem  
+ [Fixed] repair notice problems  
+ [Fixed] repair accessories problems  
+ [Fixed] repair bill of lading HouGong single filtering problem  
+ [Fixed] fix its problems  
+ [Improved] optimization documents processing  
+ [Improved] the optimization of the bill loading  
 
 ## [Version: 2.2.7] - 2019-10-25
- [repaired] repair log style  
- [repaired] The attachment/repair repair data migration   
- [repaired] repair invited evaluation function  
+ [Fixed] repair log style  
+ [Fixed] The attachment/repair repair data migration   
+ [Fixed] repair invited evaluation function  
 
 ## [Version: 2.2.6] - 2019-10-23
- [new] can set the environment variable closed notification function: BKAPP_CLOSE_NOTIFY = 'close' the closure notice  
- [repaired] repair enterprise WeChat data dictionary  
- [repaired] repair enterprises WeChat hidden field problems  
- [repaired] repair workbench/operational data chart  
- [optimization] Operation documents page display  
- [optimization] Logical/style/optimization associated documents  
+ [Feature] can set the environment variable closed notification function: BKAPP_CLOSE_NOTIFY = 'close' the closure notice  
+ [Fixed] repair enterprise WeChat data dictionary  
+ [Fixed] repair enterprises WeChat hidden field problems  
+ [Fixed] repair workbench/operational data chart  
+ [Improved] Operation documents page display  
+ [Improved] Logical/style/optimization associated documents  
 
 ## [Version: 2.2.3] - 2019-10-16
- [new] open API interface  
- [repaired] repair data migration issues  
- [repaired] Drop-down box/repair repair custom form style  
- [repaired] fix international translation problems  
- [repaired] repair print issue  
- [repaired] repair work order export problem  
- [repaired] repair enterprise WeChat problem  
+ [Feature] open API interface  
+ [Fixed] repair data migration issues  
+ [Fixed] Drop-down box/repair repair custom form style  
+ [Fixed] fix international translation problems  
+ [Fixed] repair print issue  
+ [Fixed] repair work order export problem  
+ [Fixed] repair enterprise WeChat problem  
 
 ## [Version: 2.2.1] - 2019-08-22
- [new] process engine upgrades, support rule configuration, branch, parallel features such as flexible support, support conditions of complex configuration process lines  
- [new] process elements increases the API node, standard operational procedure, supporting configuration process automation  
- [new] API management functions, support API access gateway system and configuration details of the interface protocols  
- [new] API fields, show the list of the third party system data support  
- [new] version log viewer  
- [new] open to the public API, built single/check list, etc  
- [new] database upgrade function  
- [optimization] process editor interactive upgrade, support drag define the process  
- [optimization] optimize enterprise edition accessories directory configuration optimization  
- [optimization] documents related to the optimization and adjustment of the page  
- [optimization] upgrade Django version to 1.11.23  
- [optimization] documents details page preview support process and details view  
- [remark] the current version temporarily removed for examination and approval of mobile terminal function  
+ [Feature] process engine upgrades, support rule configuration, branch, parallel features such as flexible support, support conditions of complex configuration process lines  
+ [Feature] process elements increases the API node, standard operational procedure, supporting configuration process automation  
+ [Feature] API management functions, support API access gateway system and configuration details of the interface protocols  
+ [Feature] API fields, show the list of the third party system data support  
+ [Feature] version log viewer  
+ [Feature] open to the public API, built single/check list, etc  
+ [Feature] database upgrade function  
+ [Improved] process editor interactive upgrade, support drag define the process  
+ [Improved] optimize enterprise edition accessories directory configuration optimization  
+ [Improved] documents related to the optimization and adjustment of the page  
+ [Improved] upgrade Django version to 1.11.23  
+ [Improved] documents details page preview support process and details view  
+ [Improved] the current version temporarily removed for examination and approval of mobile terminal function  
  [data migration] the process version, services such as data upgrade: http://{host}/helper/db_fix_from_2_1_x_to_2_2_1/  
 
 ## [Version: 2.1.17] - 2019-08-16
- [new] service scope of visible function (support structure radio)  
- [new] support services more search criteria  
- [new] service items associated with process version features: association/unbundling  
- [new] process versioning: reduction, preview, delete  
- [new] process design management field type  
- [new] tree field  
- [new] processing process design management role can be pulled from the organizational structure of choice  
- [new] process design can choose complex form components  
- [new] process design judgment node can be back  
- [new] flow field support for the data dictionary  
- [new] data dictionary management and application  
- [new] data dictionary in the application of the process design  
- [new] attached storage configuration  
- [new] cache configuration  
- [new] organizational function switch  
- [new] merger management page  
- [new] SLA management function is applied to all services  
- [new] enterprise WeChat application version  
- [new] documents supervisory functions  
- [new] process preview function  
- [new] notice attention function  
- [new] complex form fields  
- [new] judgment nodes support back  
- [new] increase release and deployment management portal  
- [new] increase fast and the bill of lading entry  
- [new] organizational information display  
- [new] service classification collection function  
- [new] add attachments directory configuration function  
- [new] operating data view online  
- [new] according to the process id of the repair order interface, query process list interface  
- [new] field support for regular check  
- [new] enterprise WeChat inform support sending messages to a specific application  
- [new] work order status increase with dispatch/with claim  
- [new] ITSM administrator role, supporting the view and manage all documents  
- [new] support third party bill of lading operation system after login  
- [optimization] To optimize the field calibration problem  
- [optimization] Cascade query optimization business  
- [optimization] Optimize the page refresh optimization  
- [optimization] number length adjustment  
- [optimization] "Optimization" according to Chinese user name  
- [optimization] Change the default notification template  
- [optimization] Query interface optimization optimization documents  
- [optimization] data dictionary form the export  
- [optimization] Optimization of multistage display tree structure data dictionary  
- [optimization] filter documents to support the parent service directory  
- [optimization] For the bill of lading/optimization process versioning of logic and adjustment  
- [optimization] accessories store directory configuration optimization (docs/itsm_nfs)  
- [optimization] Optimization service items, service directory to upgrade the original classification management  
- [optimization] CMDB caching policy adjustment and support to clear the cache  
- [optimization] with plug-in replacement echarts plotly chart  
- [optimization] documents form displays details page optimization  
- [optimization] Optimization dispatch function to strengthen, support assignment in groups  
- [optimization] Optimize upgrade page interaction, support side up  
- [optimization] Optimizing adjustment documents sorting, sort by creation time  
- [optimization] Overall optimization page revised documents (query, view, processing, etc.)  
- [optimization] Optimize upgrade time controls, support more editing functions  
- [optimization] Optimization of adjusting part of the form controls, support multiple queries  
- [optimization] all document flow operation increase secondary pop-up window to confirm  
- [repaired] templates save problem  
- [repaired] Repair/repair security problem  
- [repaired] Preview/repair process problems  
- [repaired] General character creation problem  
- [repaired] work order dispatch failure problem  
- [repaired] Preview version problem/repair process  
- [repaired] repair process import format problem  
- [repaired] Couldn't query the problem for dispatch  
- [repaired] Personal display/repair process people  
- [repaired] event classification query failure problem  
- [repaired] Pack up node does not fill out the problem  
- [repaired] The role of CMDB can not bill of lading  
- [repaired] state of countless according to operational data  
- [repaired] template box does not cover problem  
- [repaired] about changes in the knowledge base to upload attachments  
- [repaired] work order SLA/derived form numerous according to the problem  
- [repaired] dispatch documents without permission to claim problem  
- [repaired] Repair the custom form to print, mobile terminal display problems  
- [repaired] the bill of lading can not to choose operation character of the nodes  
- [repaired] After CMDB3.2.6 version cascade field failure problem  
- [repaired] change flow field type, lead to the repair order template error problems  
- [repaired] repair template/draft/work order caused by dirty data security issues  
- [repaired] repair claim work order response time for computational problems  
- [repaired] repair parts has finished the repair order not calculated over a matter of time  
- [repaired] changes in both Chinese and English name is stored  
- [repaired] repair work order title data problems  
- [repaired] repair work order log data  
+ [Feature] service scope of visible function (support structure radio)  
+ [Feature] support services more search criteria  
+ [Feature] service items associated with process version features: association/unbundling  
+ [Feature] process versioning: reduction, preview, delete  
+ [Feature] process design management field type  
+ [Feature] tree field  
+ [Feature] processing process design management role can be pulled from the organizational structure of choice  
+ [Feature] process design can choose complex form components  
+ [Feature] process design judgment node can be back  
+ [Feature] flow field support for the data dictionary  
+ [Feature] data dictionary management and application  
+ [Feature] data dictionary in the application of the process design  
+ [Feature] attached storage configuration  
+ [Feature] cache configuration  
+ [Feature] organizational function switch  
+ [Feature] merger management page  
+ [Feature] SLA management function is applied to all services  
+ [Feature] enterprise WeChat application version  
+ [Feature] documents supervisory functions  
+ [Feature] process preview function  
+ [Feature] notice attention function  
+ [Feature] complex form fields  
+ [Feature] judgment nodes support back  
+ [Feature] increase release and deployment management portal  
+ [Feature] increase fast and the bill of lading entry  
+ [Feature] organizational information display  
+ [Feature] service classification collection function  
+ [Feature] add attachments directory configuration function  
+ [Feature] operating data view online  
+ [Feature] according to the process id of the repair order interface, query process list interface  
+ [Feature] field support for regular check  
+ [Feature] enterprise WeChat inform support sending messages to a specific application  
+ [Feature] work order status increase with dispatch/with claim  
+ [Feature] ITSM administrator role, supporting the view and manage all documents  
+ [Feature] support third party bill of lading operation system after login  
+ [Improved] To optimize the field calibration problem  
+ [Improved] Cascade query optimization business  
+ [Improved] Optimize the page refresh optimization  
+ [Improved] number length adjustment  
+ [Improved] "Improved" according to Chinese user name  
+ [Improved] Change the default notification template  
+ [Improved] Query interface optimization optimization documents  
+ [Improved] data dictionary form the export  
+ [Improved] Improved of multistage display tree structure data dictionary  
+ [Improved] filter documents to support the parent service directory  
+ [Improved] For the bill of lading/optimization process versioning of logic and adjustment  
+ [Improved] accessories store directory configuration optimization (docs/itsm_nfs)  
+ [Improved] Improved service items, service directory to upgrade the original classification management  
+ [Improved] CMDB caching policy adjustment and support to clear the cache  
+ [Improved] with plug-in replacement echarts plotly chart  
+ [Improved] documents form displays details page optimization  
+ [Improved] Improved dispatch function to strengthen, support assignment in groups  
+ [Improved] Optimize upgrade page interaction, support side up  
+ [Improved] Optimizing adjustment documents sorting, sort by creation time  
+ [Improved] Overall optimization page revised documents (query, view, processing, etc.)  
+ [Improved] Optimize upgrade time controls, support more editing functions  
+ [Improved] Improved of adjusting part of the form controls, support multiple queries  
+ [Improved] all document flow operation increase secondary pop-up window to confirm  
+ [Fixed] templates save problem  
+ [Fixed] Repair/repair security problem  
+ [Fixed] Preview/repair process problems  
+ [Fixed] General character creation problem  
+ [Fixed] work order dispatch failure problem  
+ [Fixed] Preview version problem/repair process  
+ [Fixed] repair process import format problem  
+ [Fixed] Couldn't query the problem for dispatch  
+ [Fixed] Personal display/repair process people  
+ [Fixed] event classification query failure problem  
+ [Fixed] Pack up node does not fill out the problem  
+ [Fixed] The role of CMDB can not bill of lading  
+ [Fixed] state of countless according to operational data  
+ [Fixed] template box does not cover problem  
+ [Fixed] about changes in the knowledge base to upload attachments  
+ [Fixed] work order SLA/derived form numerous according to the problem  
+ [Fixed] dispatch documents without permission to claim problem  
+ [Fixed] Repair the custom form to print, mobile terminal display problems  
+ [Fixed] the bill of lading can not to choose operation character of the nodes  
+ [Fixed] After CMDB3.2.6 version cascade field failure problem  
+ [Fixed] change flow field type, lead to the repair order template error problems  
+ [Fixed] repair template/draft/work order caused by dirty data security issues  
+ [Fixed] repair claim work order response time for computational problems  
+ [Fixed] repair parts has finished the repair order not calculated over a matter of time  
+ [Fixed] changes in both Chinese and English name is stored  
+ [Fixed] repair work order title data problems  
+ [Fixed] repair work order log data  
  [data migration] V1.1. X to V2.1. X data upgrade interface (suggested data backup in advance) : http://{host}/helper/db_fix_from_1_1_22_to_2_1_16/  
 
 ## [Version: 1.1.22] - 2018-11-27
- [new] global view  
- [new] knowledge base function module  
- [new] request management module  
- [new] problem management module  
- [new] documents printing function  
- [new] documents directly evaluation function  
- [new] form field support for regular check  
- [new] messages inviting evaluation function  
- [new] documents claim, the dispatch function  
- [new] work order bill of lading template  
- [new] increases the title field  
- [new] new query historical documents  
- [new] work order statistics administrator role  
- [new] new suspend and resume function  
- [new] process support configuration focuses on people  
- [new] work order support hangs, restore and revocation  
- [new] documents processing process, support save drafts  
- [new] username support Chinese display  
- [new] judgment types support configuration form and termination of the operation  
- [new] increase super administrators and built a single undo function of documents  
- [new] add flow log operator, documents of the bill of lading user name support Chinese display  
- [new] export documents, contains all the information field  
- [new] to turn single turn single reason need to fill in  
- [new] After the back to keep the latest operation information  
- [optimization] Optimize the homepage function changes  
- [optimization] Show/optimization of the bill of lading entry optimization, process and instructions  
- [optimization] To optimize the export function optimization, process sheet  
- [optimization] documents, query optimization, selection of the bill of lading query  
- [optimization] optimization dispatching and claimed function optimization  
- [optimization] Optimization of the bill of lading service directory to choose, only show the directory associated with the service process  
- [optimization] according to the process of the module name when creating documents to build single choice  
- [optimization] judgment node and ordinary node can add fields, can be terminated  
- [optimization] cancel resource application management module (classified to request management)  
- [optimization] documents sent notice to distinguish the attention and the processing  
- [optimization] Optimization process log order adjustment, displayed in chronological order  
- [optimization] Optimization in the process of editing, there is no limit to the property  
- [repaired] non-administrative abnormal issues fixed page open access list  
- [repaired] the trouble of bill of lading caton processing  
- [repaired] user query less than Chinese revised documents  
- [repaired] knowledge base function module repair style question  
- [repaired] documents print numerous repair according to the problem  
- [repaired] send notification after deleted field repair error problem  
- [repaired] to keep the time of flow field in the business field is empty problem to repair  
- [repaired] Get the role list there is no exception for incorrect repair problem  
- [repaired] failure event when acquiring the related business is empty repair times wrong problem  
+ [Feature] global view  
+ [Feature] knowledge base function module  
+ [Feature] request management module  
+ [Feature] problem management module  
+ [Feature] documents printing function  
+ [Feature] documents directly evaluation function  
+ [Feature] form field support for regular check  
+ [Feature] messages inviting evaluation function  
+ [Feature] documents claim, the dispatch function  
+ [Feature] work order bill of lading template  
+ [Feature] increases the title field  
+ [Feature] new query historical documents  
+ [Feature] work order statistics administrator role  
+ [Feature] new suspend and resume function  
+ [Feature] process support configuration focuses on people  
+ [Feature] work order support hangs, restore and revocation  
+ [Feature] documents processing process, support save drafts  
+ [Feature] username support Chinese display  
+ [Feature] judgment types support configuration form and termination of the operation  
+ [Feature] increase super administrators and built a single undo function of documents  
+ [Feature] add flow log operator, documents of the bill of lading user name support Chinese display  
+ [Feature] export documents, contains all the information field  
+ [Feature] to turn single turn single reason need to fill in  
+ [Feature] After the back to keep the latest operation information  
+ [Improved] Optimize the homepage function changes  
+ [Improved] Show/optimization of the bill of lading entry optimization, process and instructions  
+ [Improved] To optimize the export function optimization, process sheet  
+ [Improved] documents, query optimization, selection of the bill of lading query  
+ [Improved] optimization dispatching and claimed function optimization  
+ [Improved] Improved of the bill of lading service directory to choose, only show the directory associated with the service process  
+ [Improved] according to the process of the module name when creating documents to build single choice  
+ [Improved] judgment node and ordinary node can add fields, can be terminated  
+ [Improved] cancel resource application management module (classified to request management)  
+ [Improved] documents sent notice to distinguish the attention and the processing  
+ [Improved] Improved process log order adjustment, displayed in chronological order  
+ [Improved] Improved in the process of editing, there is no limit to the property  
+ [Fixed] non-administrative abnormal issues fixed page open access list  
+ [Fixed] the trouble of bill of lading caton processing  
+ [Fixed] user query less than Chinese revised documents  
+ [Fixed] knowledge base function module repair style question  
+ [Fixed] documents print numerous repair according to the problem  
+ [Fixed] send notification after deleted field repair error problem  
+ [Fixed] to keep the time of flow field in the business field is empty problem to repair  
+ [Fixed] Get the role list there is no exception for incorrect repair problem  
+ [Fixed] failure event when acquiring the related business is empty repair times wrong problem  
 
 ## [Version: 1.1.3] - 2018-09-18
-[new] support end operation  
-[new] support attachments upload template  
-[new] allows you to set single range  
-[new] change management, fault event management, resource application, inventory management, role management, process design  
-[new] rejected and termination of operations must be fill in  
-[new] compatible with HTTPS  
-[optimization] Optimize the process, main process between connected by arrows  
-[optimization] Optimize the validation rules to update  
-[optimization] Optimize the optimization send SMS  
-[repaired] Other issues fixed  
-[repaired] non-administrative single permission problems  
-[repaired] part of the space name lookup  
-[repaired] because of the lack of new change processes in change type lead to failure  
-[repaired] upload_file upload 403 bug fixes  
-[that] the attachment function ` NFS mount ` catalogue, hang under the path to the root directory of ` USERRES `  
-[that] suggest ` mysql > = 5.7 `, currently compatible with 5.6 ` `, subsequent versions consider upgrading to 5.7 ` `  
+[Feature] support end operation  
+[Feature] support attachments upload template  
+[Feature] allows you to set single range  
+[Feature] change management, fault event management, resource application, inventory management, role management, process design  
+[Feature] rejected and termination of operations must be fill in  
+[Feature] compatible with HTTPS  
+[Improved] Optimize the process, main process between connected by arrows  
+[Improved] Optimize the validation rules to update  
+[Improved] Optimize the optimization send SMS  
+[Fixed] Other issues fixed  
+[Fixed] non-administrative single permission problems  
+[Fixed] part of the space name lookup  
+[Fixed] because of the lack of new change processes in change type lead to failure  
+[Fixed] upload_file upload 403 bug fixes  
+[Improved] the attachment function ` NFS mount ` catalogue, hang under the path to the root directory of ` USERRES `  
+[Improved] suggest ` mysql > = 5.7 `, currently compatible with 5.6 ` `, subsequent versions consider upgrading to 5.7 ` `  

@@ -428,6 +428,8 @@ def remark_notify(ticket_id, creator, message, receivers):
 
 @periodic_task(run_every=crontab(minute=0, hour=8))
 def collection_near_users():
+    if settings.CLOSE_EVERY_DAY_TICKET_NOTIFY:
+        return
     last_month = datetime.now() - timedelta(days=30)
     BkUser = get_user_model()
     users = BkUser.objects.filter(last_login__gte=last_month)
@@ -497,6 +499,8 @@ def send_message(username, queryset):
 
 @periodic_task(run_every=crontab(minute="*/10", hour="9-12"))
 def consume_notify():
+    if settings.CLOSE_EVERY_DAY_TICKET_NOTIFY:
+        return
     email_notify = Cache("email_notify_queue")
     count = email_notify.llen("notify_queue")
     logger.info("正在消费通知数据，当前有{}数据待处理".format(count))
@@ -508,7 +512,7 @@ def consume_notify():
     if count < end:
         end = count
 
-    queryset = Ticket.objects.filter(current_status="RUNNING")
+    queryset = Ticket.objects.filter(current_status="RUNNING", is_deleted=False)
 
     for item in range(1, end):
         user = email_notify.lpop("notify_queue")

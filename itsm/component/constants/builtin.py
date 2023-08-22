@@ -440,7 +440,7 @@ ROLE_CHOICES = [
     (API, "第三方系统", False, True),
 ]
 
-BUILTIN_SERVICES = [{"name": "帐号开通申请", "flow_name": "一般审批流程", "desc": "内置审批服务"}]
+BUILTIN_SERVICES = [{"name": "账号开通申请", "flow_name": "一般审批流程", "desc": "内置审批服务"}]
 
 BUILTIN_IAM_SERVICES = [
     {

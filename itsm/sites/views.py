@@ -62,13 +62,20 @@ def init(request):
         DEFAULT_PROJECT = ""
     return JsonResponse(
         {
-            "DEFAULT_PROJECT": DEFAULT_PROJECT,
-            "chname": request.user.get_property("chname"),
-            "username": request.user.username,
-            "all_access": UserRole.get_access_by_user(request.user.username),
-            "IS_ITSM_ADMIN": 1
-            if UserRole.is_itsm_superuser(request.user.username)
-            else 0,
+            "code": 0,
+            "result": True,
+            "data": {
+                "DEFAULT_PROJECT": DEFAULT_PROJECT,
+                "chname": request.user.get_property("chname"),
+                "username": request.user.username,
+                "all_access": UserRole.get_access_by_user(request.user.username),
+                "IS_ITSM_ADMIN": 1
+                if UserRole.is_itsm_superuser(request.user.username)
+                else 0,
+                "need_target": False,  # 不需要强制跳转无权限页
+                "location": "",
+            },
+            "message": "",
         }
     )
 
