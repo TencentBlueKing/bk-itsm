@@ -1,4 +1,13 @@
 # Changelog
+## [Version: 2.6.7] - 2023-08-22
+ [Improved]Show pop-up window when you don't have permission to view documents.  
+ [Improved] Change the adopted English to Agree when editing the English of approval nodes to maintain consistency.     
+ [Improved] Add a new switch for daily notification of document handling.  
+ [Improved] Error message when attachment is abnormal  
+ [Improved]Error message when third-party api return protocol is not satisfied.  
+ [Improved] Modify account number to account number  
+ [Fixed] Fix the problem that custom document status is not effective.
+
 ## [Version: 2.6.6] - 2023-07-13
  [Improved] Internationalization content supplement  
  [Fixed] Fix the problem that the public field is configured with the API data source that the data cannot be displayed after the data source cannot be displayed    
