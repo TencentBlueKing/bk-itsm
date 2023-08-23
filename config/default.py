@@ -874,10 +874,8 @@ TAPD_OAUTH_URL = os.environ.get("TAPD_OAUTH_URL", "")
 # bkchat快速审批
 USE_BKCHAT = True if os.getenv("USE_BKCHAT", "true").lower() == "true" else False
 if USE_BKCHAT:
-    IM_TOKEN = os.environ.get("BKCHAT_IM_TOKEN", "")
     BKCHAT_URL = os.environ.get("BKCHAT_URL", "")
-    BKCHAT_APPID = os.environ.get("BKCHAT_APPID", "")
-    BKCHAT_APPKEY = os.environ.get("BKCHAT_APPKEY", "")
+    BKCHAT_CALLBACK_URL = os.environ.get("BKCHAT_CALLBACK_URL", "")
 
 
 def redirect_func(request):

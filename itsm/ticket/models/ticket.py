@@ -4899,6 +4899,12 @@ class Ticket(Model, BaseTicket):
 
         TicketField.objects.bulk_create(fields)
 
+    def get_approver(self, state_id):
+        status = self.node_status.get(state_id=state_id)
+        sign_tasks = SignTask.objects.filter(status_id=status.id)
+        processors = [task.processor for task in sign_tasks]
+        return ",".join(processors)
+
 
 class TicketOrganization(Model):
     username = models.CharField(_("用户名"), max_length=LEN_LONG)
