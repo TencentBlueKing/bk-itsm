@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import re
 
 import requests
@@ -13,10 +14,6 @@ from itsm.component.utils.conversion import show_conditions_validate, format_exp
 from itsm.ticket.models import Ticket, Status, TicketField, SignTask
 
 from itsm.ticket.utils import build_message
-from platform_config.open.bkchat.aes import Aes
-
-APPID = settings.BKCHAT_APPID
-APPKEY = settings.BKCHAT_APPKEY
 
 # 当前运行环境
 RUNNING_ENV = {
@@ -34,9 +31,6 @@ def notify_fast_approval_message(
     """
     构建快速审批通知参数
     """
-    if not settings.USE_BKCHAT:
-        return
-
     task_id = kwargs.get("task_id")
 
     # 如果关闭通知服务则不通知
@@ -149,9 +143,7 @@ def send_fast_approval_message(title, content, receivers, ticket, state_id):
         "key": ticket_sn,
         "clickname": "查看详情",
         "clickurl": ticket.ticket_url,
-        "callback": "{}openapi/ticket/proceed_fast_approval/".format(
-            settings.FRONTEND_URL
-        ),
+        "callback": settings.BKCHAT_CALLBACK_URL,
         "action": [{"name": "同意", "value": "true"}, {"name": "拒绝", "value": "false"}],
         "context": {"ticket_id": ticket_id, "state_id": state_id},
     }
@@ -159,12 +151,17 @@ def send_fast_approval_message(title, content, receivers, ticket, state_id):
         "[fast_approval({})]send fast approval message data:{}".format(ticket_sn, data)
     )
 
-    # data加密
-    data = Aes(APPID, APPKEY).encrypt_dict(data)
-
     # 构造请求参数
-    params = {"app_id": APPID, "app_key": APPKEY, "data": data}
-    headers = {"Content-Type": "application/json", "IM-TOKEN": settings.IM_TOKEN}
+    headers = {
+        "Content-Type": "application/json",
+        "X-Bkapi-Authorization": json.dumps(
+            {
+                "bk_app_code": settings.BK_APP_CODE,
+                "bk_app_secret": settings.BK_APP_SECRET,
+                "bk_username": "admin",
+            }
+        ),
+    }
 
     # 发送请求
     try:
@@ -173,7 +170,7 @@ def send_fast_approval_message(title, content, receivers, ticket, state_id):
                 title, receivers, ticket_id
             )
         )
-        resp_data = requests.post(url=settings.BKCHAT_URL, json=params, headers=headers)
+        resp_data = requests.post(url=settings.BKCHAT_URL, json=data, headers=headers)
         logger.info(
             "[fast_approval({})]send fast approval response content:{}".format(
                 ticket_sn, resp_data.content
@@ -213,13 +210,14 @@ def proceed_fast_approval(request):
     """
 
     # 1.解密request变携带的加密信息
-    result = Aes(APPID, APPKEY).decrypt_dict(request.body.decode("utf8"))
+    result = json.loads(request.body)
 
     # 2.对解密后的字段进行获取
     ticket_id = int(result.get("context").get("ticket_id"))
     state_id = int(result.get("context").get("state_id"))
     receiver = result.get("approver")
     approve_action = result.get("status")
+
     ticket = Ticket.objects.get(id=ticket_id)
     # 3.判断当前节点是否是RUNNING状态，否则通知
     current_status = Status.objects.get(state_id=state_id, ticket_id=ticket_id)
@@ -228,8 +226,8 @@ def proceed_fast_approval(request):
         content = "单号：{} ({})\n当前单据审批操作已被处理".format(ticket.sn, ticket.ticket_url)
         return JsonResponse(
             {
-                "result": True,
-                "data": None,
+                "result": False,
+                "data": {"approver": ticket.get_approver(state_id)},
                 "code": 0,
                 "message": "{}\n{}".format(title, content),
             }
@@ -280,7 +278,7 @@ def proceed_fast_approval(request):
         ticket.node_status.filter(state_id=state_id).update(status=RUNNING)
         return JsonResponse(
             {
-                "result": True,
+                "result": False,
                 "data": None,
                 "code": 0,
                 "message": "快速审批异常，请联系管理员",
