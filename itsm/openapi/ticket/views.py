@@ -630,6 +630,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"])
     @catch_openapi_exception
+    @custom_apigw_required
     def proceed_fast_approval(self, request):
         """
         处理快速审批请求
@@ -740,10 +741,8 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         except Ticket.DoesNotExist:
             raise ParamError("sn[{}]对应的单据不存在！".format(sn))
 
-        status = Status.objects.get(ticket_id=ticket.id, state_id=state_id)
-        sign_tasks = SignTask.objects.filter(status_id=status.id)
-        processors = [task.processor for task in sign_tasks]
-        return Response({"approver": ",".join(processors)})
+        processors = ticket.get_approver(state_id)
+        return Response({"approver": processors})
 
     @action(detail=False, methods=["get"])
     @catch_openapi_exception
