@@ -4910,7 +4910,6 @@ class Ticket(Model, BaseTicket):
             fields.append(TicketField(**ticket_field))
 
         TicketField.objects.bulk_create(fields)
-        self.get_ticket_result()
 
     def get_approver(self, state_id):
         status = self.node_status.get(state_id=state_id)
