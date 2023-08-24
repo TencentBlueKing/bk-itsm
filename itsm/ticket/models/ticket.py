@@ -2123,6 +2123,18 @@ class Ticket(Model, BaseTicket):
                 outputs[field.key] = value
         return outputs
 
+    def get_state_approve_result(self, state_id):
+        workflow_global_variable = GlobalVariable.objects.filter(
+            flow_id=self.flow.workflow_id, state_id=state_id, is_deleted=0
+        ).only("key", "meta")
+        for variable in workflow_global_variable:
+            if variable.meta.get("code", "") == NODE_APPROVE_RESULT:
+                result = TicketGlobalVariable.objects.filter(
+                    key=variable.key, ticket_id=self.id, state_id=state_id
+                ).first()
+                return result.value == "true"
+        return False
+
     def get_ticket_result(self):
         workflow_global_variable = GlobalVariable.objects.filter(
             flow_id=self.flow.workflow_id, is_deleted=0
@@ -4898,6 +4910,7 @@ class Ticket(Model, BaseTicket):
             fields.append(TicketField(**ticket_field))
 
         TicketField.objects.bulk_create(fields)
+        self.get_ticket_result()
 
     def get_approver(self, state_id):
         status = self.node_status.get(state_id=state_id)
