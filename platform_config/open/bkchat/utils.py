@@ -184,10 +184,10 @@ def send_fast_approval_message(title, content, receivers, ticket, state_id):
             )
         )
         # 验证是否请求成功
-        if result.get("code") != 0:
+        if not result.get("result"):
             logger.info(
                 "[fast_approval({})]send fast approval message failed:{}".format(
-                    ticket_sn, result.message
+                    ticket_sn, result.get("message")
                 )
             )
     except ComponentCallError as error:
@@ -210,7 +210,7 @@ def proceed_fast_approval(request):
     """
 
     # 1.解密request变携带的加密信息
-    result = json.loads(request.body)
+    result = request.data
 
     # 2.对解密后的字段进行获取
     ticket_id = int(result.get("context").get("ticket_id"))
@@ -227,8 +227,11 @@ def proceed_fast_approval(request):
         return JsonResponse(
             {
                 "result": False,
-                "data": {"approver": ticket.get_approver(state_id)},
-                "code": 0,
+                "data": {
+                    "approve_result": ticket.get_state_approve_result(state_id),
+                    "approver": ticket.get_approver(state_id),
+                },
+                "code": -1,
                 "message": "{}\n{}".format(title, content),
             }
         )
@@ -280,7 +283,7 @@ def proceed_fast_approval(request):
             {
                 "result": False,
                 "data": None,
-                "code": 0,
+                "code": -1,
                 "message": "快速审批异常，请联系管理员",
             }
         )
