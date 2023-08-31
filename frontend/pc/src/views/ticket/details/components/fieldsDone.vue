@@ -118,12 +118,14 @@
     </div>
     <!-- 自定义表单 -->
     <div v-else-if="item.type === 'CUSTOM-FORM'" class="bk-fields-done-item">
-      <span v-if="isShowName" class="bk-li-left" style="float: initial;" :title="item.name">{{item.name}}</span>
-      <render-view
-        style="width: calc(100% - 140px)"
-        :form-data="customForm.formData"
-        :context="customForm.context">
-      </render-view>
+      <span v-if="isShowName" class="bk-li-left" style="float: initial;" :title="item.name">{{item.name}}：</span>
+      <div class="custom-form-wrapper">
+        <render-view
+          style="margin-left: 0 !important;"
+          :form-data="customForm.formData"
+          :context="customForm.context">
+        </render-view>
+      </div>
     </div>
     <!-- 默认 -->
     <div class="bk-fields-done-item" v-else>
@@ -342,36 +344,22 @@
       cursor: default;
     }
     .bk-fields-done {
+        position: relative;
         width: 100%;
         color: #737987;
-        display: flex;
-        .isOn {
-            font-size: 22px;
-            opacity: 0;
-            color: #3A84FF;
-        }
-
         &:hover {
-            .isOn {
-                opacity: 1;
+            .bk-fields-done-edit {
+                display: block;
             }
         }
         .bk-fields-done-item {
             // @include scroller(#060707, 3px);
             // overflow: auto;
-            max-width: calc(100% - 30px);
+            max-width: calc(100% - 10px);
             overflow-wrap: break-word;
             display: flex;
             .bk-form-content {
               width: calc(100% - 130px);
-            }
-
-            .bk-fields-done-edit {
-                display: inline-block;
-                margin-top: 2px;
-                padding-left: 10px;
-                cursor: pointer;
-                align-self: flex-start;
             }
             .bk-li-link{
                 color: #3a84ff;
@@ -400,6 +388,7 @@
               }
             }
             .bk-li-left {
+                flex-shrink: 0;
                 width: 120px;
                 font-weight: 400;
                 margin-right: 10px;
@@ -426,6 +415,21 @@
                     text-overflow: ellipsis;
                     white-space: nowrap;
                 }
+            }
+        }
+        .custom-form-wrapper {
+          flex: 1;
+          overflow: hidden;
+        }
+        .bk-fields-done-edit {
+            display: none;
+            position: absolute;
+            top: 0;
+            right: 0;
+            cursor: pointer;
+            .isOn {
+                font-size: 22px;
+                color: #3A84FF;
             }
         }
     }
