@@ -101,6 +101,7 @@
         }
         return {
           type: item.type,
+          isIframe: item.isIframe || false,
         };
       },
     },

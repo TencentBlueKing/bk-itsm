@@ -33,6 +33,10 @@ export const COMMON_ATTRS = {
     type: Object,
     default: () => ({}),
   },
+  scheme: {
+    type: Object,
+    default: () => ({}),
+  },
   children: {
     type: [String, Array],
     required: false,
