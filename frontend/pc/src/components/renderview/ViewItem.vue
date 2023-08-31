@@ -89,7 +89,6 @@
     },
     computed: {
       componentType() {
-        console.log('type: ', `Tag${this.scheme.type.replace(/^[a-z]/, item => item.toUpperCase())}`);
         return `Tag${this.scheme.type.replace(/^[a-z]/, item => item.toUpperCase())}`;
       },
       currentDisplatCrumbs() {
