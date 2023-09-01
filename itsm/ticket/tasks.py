@@ -41,8 +41,8 @@ from django.utils.translation import ugettext as _
 from common.log import logger
 from common.mymako import render_mako_tostring
 from common.redis import Cache
-from config import RUN_VER
 from config.default import AUTO_COMMENT_DAYS, CLOSE_NOTIFY
+from itsm.component.bkchat.utils import notify_fast_approval_message
 
 from itsm.component.constants import (
     PROCESS_RUNNING,
@@ -294,10 +294,6 @@ def notify_task(ticket, receivers, message, action, **kwargs):
 @task
 def notify_fast_approval_task(ticket, state_id, receivers, message, action, **kwargs):
     """发送快速审批通知"""
-    if RUN_VER == "ieod":
-        from platform_config.ieod.bkchat.utils import notify_fast_approval_message
-    else:
-        from platform_config.open.bkchat.utils import notify_fast_approval_message
 
     notify_fast_approval_message(ticket, state_id, receivers, message, action, **kwargs)
 

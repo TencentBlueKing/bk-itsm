@@ -35,6 +35,7 @@ from blueapps.account.decorators import login_exempt
 from common.log import logger
 from common.cipher import AESVerification
 from common.redis import Cache
+from itsm.component.bkchat.utils import proceed_fast_approval
 from itsm.component.constants import (
     API,
     QUEUEING,
@@ -635,10 +636,6 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         """
         处理快速审批请求
         """
-        if settings.RUN_VER == "ieod":
-            from platform_config.ieod.bkchat.utils import proceed_fast_approval
-        else:
-            from platform_config.open.bkchat.utils import proceed_fast_approval
         return proceed_fast_approval(request)
 
     @action(detail=False, methods=["get"])
