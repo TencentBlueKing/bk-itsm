@@ -242,6 +242,7 @@ class TicketModelViewSet(ModelViewSet):
         "service_id": ["exact", "in"],
         "create_at": ["lte", "gte"],
         "bk_biz_id": ["exact", "in"],
+        "tag": ["exact"],
     }
     ordering_fields = ("create_at",)
 
