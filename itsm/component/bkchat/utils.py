@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-import re
 
 import requests
 from django.conf import settings
@@ -12,8 +11,6 @@ from itsm.component.constants import APPROVE_RESULT, API, RUNNING, SHOW_BY_CONDI
 from itsm.component.exceptions import ComponentCallError
 from itsm.component.utils.conversion import show_conditions_validate, format_exp_value
 from itsm.ticket.models import Ticket, Status, TicketField, SignTask
-
-from itsm.ticket.utils import build_message
 
 # 当前运行环境
 RUNNING_ENV = {
@@ -31,7 +28,6 @@ def notify_fast_approval_message(
     """
     构建快速审批通知参数
     """
-    task_id = kwargs.get("task_id")
 
     # 如果关闭通知服务则不通知
     # CLOSE_NOTIFY 从环境变量中得到
@@ -67,38 +63,30 @@ def notify_fast_approval_message(
                 )
             )
             return
-
-        # 从右向左删除
-        # 用来处理「当前环节」后的审批人列表
-        def rreplace(self, old, new, *max_length):
-            count = len(self)
-            if max_length and str(max_length[0]).isdigit():
-                count = max_length[0]
-            return new.join(self.rsplit(old, count))
-
-        # 构造内容，标题
-        content, title = build_message(
-            _notify, task_id, ticket, message, action, **kwargs
+        title = "## 『ITSM』{}: {}".format(
+            RUNNING_ENV.get(settings.RUN_MODE, ""), ticket.title
         )
+        content = title + "\n"
+        content += "**单号**: {}\n".format(ticket.sn)
+        content += "**服务目录**: {}\n".format(ticket.catalog_service_name)
 
-        # 修改「标题」，添加环境标识
-        title = title.replace(
-            "『ITSM』", "『ITSM{}』".format(RUNNING_ENV.get(settings.RUN_MODE, ""))
-        )
+        current_steps = ",".join([step.get("name") for step in ticket.current_steps])
 
-        # 修改「单号」，只显示单号，去除超链接
-        content = content.replace(content.split("\n")[2], " 单号：{}".format(ticket.sn))
+        content += "**当前环节**: {}\n".format(current_steps)
+        content += "**提单人**: {}\n".format(ticket.creator)
 
-        # 去除审批人列表
-        # 例：当前环节：admin审批(admin) -> 当前环节：admin审批
-        all_approver = (re.findall(r"[(](.*?)[)]", content)[-1]).split("(")[-1]
-        content = rreplace(content, "({})".format(all_approver), "", 1)
+        processor_list = [
+            processor for processor in ticket.current_processors.split(",") if processor
+        ]
+        if len(processor_list) > 3:
+            processor_content = ",".join(processor_list[0:3]) + "..."
+        else:
+            processor_content = ",".join(processor_list)
 
-        # 添加「提单人」信息
-        content = "{}提单人：{}".format(content, ticket.creator)
+        content += "**审批人**: {}".format(processor_content)
 
         # 添加「提单信息」
-        content = "{}\n --- 单据基本信息 ---".format(content)
+        content = "{}\n **--- 单据基本信息 ---**".format(content)
         state_fields = ticket.get_state_fields(
             ticket.first_state_id, need_serialize=False
         )
@@ -113,11 +101,10 @@ def notify_fast_approval_message(
                 if show_conditions_validate(f.show_conditions, key_value):
                     continue
 
-            detail = "{}：{}".format(
+            detail = "**{}**：{}".format(
                 f.name, ticket.display_content(f.type, f.display_value)
             )
             content = "{}\n {}".format(content, detail)
-        content = "{}\n --------------------".format(content)
 
         # 发送微信通知
         send_fast_approval_message(title, content, receivers, ticket, state_id)
@@ -147,10 +134,10 @@ def send_fast_approval_message(title, content, receivers, ticket, state_id):
         "action": [{"name": "同意", "value": "true"}, {"name": "拒绝", "value": "false"}],
         "context": {"ticket_id": ticket_id, "state_id": state_id},
     }
+
     logger.info(
         "[fast_approval({})]send fast approval message data:{}".format(ticket_sn, data)
     )
-
     # 构造请求参数
     headers = {
         "Content-Type": "application/json",

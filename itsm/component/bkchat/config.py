@@ -17,6 +17,7 @@ class BaseBkchatConfig:
         """
         if not settings.USE_BKCHAT:
             return
+
         # 判断当前节点是否存在
         try:
             current_state = State.objects.get(id=state_id)

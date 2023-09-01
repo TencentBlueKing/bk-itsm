@@ -8,15 +8,12 @@ import importlib
 
 from django.conf import settings
 
-bkchat_config = importlib.import_module(
-    "platform_config.{}.bkchat.config".format(settings.RUN_VER)
-)
+from itsm.component.bkchat.config import BaseBkchatConfig
+
 moa_config = importlib.import_module(
     "platform_config.{}.moa.config".format(settings.RUN_VER)
 )
 
-
-BaseBkchatConfig = bkchat_config.BaseBkchatConfig
 BaseMoaConfig = moa_config.BaseMoaConfig
 
 
