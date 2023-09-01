@@ -22,9 +22,52 @@ RUNNING_ENV = {
 APPROVE_MESSAGE = {"true": "同意", "false": "拒绝"}
 
 
-def notify_fast_approval_message(
-    ticket, state_id, receivers, message, action, **kwargs
-):
+def build_bkchat_summary(ticket):
+    title = "## 『ITSM』{}: {}".format(
+        RUNNING_ENV.get(settings.RUN_MODE, ""), ticket.title
+    )
+    content = title + "\n"
+    content += "**单号**: {}\n".format(ticket.sn)
+    content += "**服务目录**: {}\n".format(ticket.catalog_service_name)
+
+    current_steps = ",".join([step.get("name") for step in ticket.current_steps])
+
+    content += "**当前环节**: {}\n".format(current_steps)
+    content += "**提单人**: {}\n".format(ticket.creator)
+
+    processor_list = [
+        processor for processor in ticket.current_processors.split(",") if processor
+    ]
+    if len(processor_list) > 3:
+        processor_content = ",".join(processor_list[0:3]) + "..."
+    else:
+        processor_content = ",".join(processor_list)
+
+    content += "**审批人**: {}".format(processor_content)
+
+    # 添加「提单信息」
+    content = "{}\n **--- 单据基本信息 ---**".format(content)
+    state_fields = ticket.get_state_fields(ticket.first_state_id, need_serialize=False)
+    # 隐藏字段过滤
+    for f in state_fields.exclude(type__in=["TABLE", "CUSTOMTABLE", "FILE"]):
+        if f.show_type == SHOW_BY_CONDITION:
+            key_value = {
+                "params_%s"
+                % item["key"]: format_exp_value(item["type"], item["_value"])
+                for item in f.ticket.fields.values("key", "_value", "type")
+            }
+            if show_conditions_validate(f.show_conditions, key_value):
+                continue
+
+        detail = "**{}**：{}".format(
+            f.name, ticket.display_content(f.type, f.display_value)
+        )
+        content = "{}\n {}".format(content, detail)
+
+    return content
+
+
+def notify_fast_approval_message(ticket, state_id, receivers):
     """
     构建快速审批通知参数
     """
@@ -63,51 +106,10 @@ def notify_fast_approval_message(
                 )
             )
             return
-        title = "## 『ITSM』{}: {}".format(
-            RUNNING_ENV.get(settings.RUN_MODE, ""), ticket.title
-        )
-        content = title + "\n"
-        content += "**单号**: {}\n".format(ticket.sn)
-        content += "**服务目录**: {}\n".format(ticket.catalog_service_name)
 
-        current_steps = ",".join([step.get("name") for step in ticket.current_steps])
-
-        content += "**当前环节**: {}\n".format(current_steps)
-        content += "**提单人**: {}\n".format(ticket.creator)
-
-        processor_list = [
-            processor for processor in ticket.current_processors.split(",") if processor
-        ]
-        if len(processor_list) > 3:
-            processor_content = ",".join(processor_list[0:3]) + "..."
-        else:
-            processor_content = ",".join(processor_list)
-
-        content += "**审批人**: {}".format(processor_content)
-
-        # 添加「提单信息」
-        content = "{}\n **--- 单据基本信息 ---**".format(content)
-        state_fields = ticket.get_state_fields(
-            ticket.first_state_id, need_serialize=False
-        )
-        # 隐藏字段过滤
-        for f in state_fields.exclude(type__in=["TABLE", "CUSTOMTABLE", "FILE"]):
-            if f.show_type == SHOW_BY_CONDITION:
-                key_value = {
-                    "params_%s"
-                    % item["key"]: format_exp_value(item["type"], item["_value"])
-                    for item in f.ticket.fields.values("key", "_value", "type")
-                }
-                if show_conditions_validate(f.show_conditions, key_value):
-                    continue
-
-            detail = "**{}**：{}".format(
-                f.name, ticket.display_content(f.type, f.display_value)
-            )
-            content = "{}\n {}".format(content, detail)
-
+        content = build_bkchat_summary(ticket)
         # 发送微信通知
-        send_fast_approval_message(title, content, receivers, ticket, state_id)
+        send_fast_approval_message(ticket.title, content, receivers, ticket, state_id)
 
 
 def send_fast_approval_message(title, content, receivers, ticket, state_id):

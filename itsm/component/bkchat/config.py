@@ -37,7 +37,5 @@ class BaseBkchatConfig:
             return
 
         # 异步执行发送快速审批通知操作
-        notify_fast_approval_task.apply_async(
-            args=[self, state_id, receivers, message, action], kwargs=kwargs
-        )
+        notify_fast_approval_task.apply_async(args=[self, state_id, receivers])
         return
