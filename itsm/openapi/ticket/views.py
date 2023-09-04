@@ -35,7 +35,7 @@ from blueapps.account.decorators import login_exempt
 from common.log import logger
 from common.cipher import AESVerification
 from common.redis import Cache
-from itsm.component.bkchat.utils import proceed_fast_approval
+from itsm.component.bkchat.utils import proceed_fast_approval, build_bkchat_summary
 from itsm.component.constants import (
     API,
     QUEUEING,
@@ -637,6 +637,19 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         处理快速审批请求
         """
         return proceed_fast_approval(request)
+
+    @action(detail=False, methods=["get"])
+    @catch_openapi_exception
+    @custom_apigw_required
+    def get_fast_approval_summary(self, request):
+        sn = request.query_params.get("sn")
+        try:
+            ticket = Ticket.objects.get(sn=sn)
+        except Ticket.DoesNotExist:
+            raise ParamError("sn[{}]对应的单据不存在！".format(sn))
+
+        summary = build_bkchat_summary(ticket)
+        return Response({"summary": summary})
 
     @action(detail=False, methods=["get"])
     @catch_openapi_exception

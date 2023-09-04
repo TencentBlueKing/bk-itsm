@@ -292,10 +292,10 @@ def notify_task(ticket, receivers, message, action, **kwargs):
 
 
 @task
-def notify_fast_approval_task(ticket, state_id, receivers, message, action, **kwargs):
+def notify_fast_approval_task(ticket, state_id, receivers):
     """发送快速审批通知"""
 
-    notify_fast_approval_message(ticket, state_id, receivers, message, action, **kwargs)
+    notify_fast_approval_message(ticket, state_id, receivers)
 
 
 @periodic_task(run_every=(crontab(minute="*/1")), ignore_result=True)
