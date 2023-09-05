@@ -3727,9 +3727,7 @@ class Ticket(Model, BaseTicket):
         # Send notify
         processor = node_status.get_processor_in_sign_state()
         # 快速审批通知
-        self.notify_fast_approval(
-            state_id, processor, "", action=TRANSITION_OPERATE, kwargs=kwargs
-        )
+        self.notify_fast_approval(state_id, processor)
 
         # TODO 发送通知可用触发器替代
         self.notify(

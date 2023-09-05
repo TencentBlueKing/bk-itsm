@@ -133,8 +133,13 @@ def send_fast_approval_message(title, content, receivers, ticket, state_id):
         "clickname": "查看详情",
         "clickurl": ticket.ticket_url,
         "callback": settings.BKCHAT_CALLBACK_URL,
+        "summaryback": settings.ITSM_SUMMARY_URL,
         "action": [{"name": "同意", "value": "true"}, {"name": "拒绝", "value": "false"}],
-        "context": {"ticket_id": ticket_id, "state_id": state_id},
+        "context": {
+            "ticket_id": ticket_id,
+            "state_id": state_id,
+            "ticket_sn": ticket_sn,
+        },
     }
 
     logger.info(
