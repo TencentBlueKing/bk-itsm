@@ -32,7 +32,7 @@ def build_bkchat_summary(ticket):
 
     current_steps = ",".join([step.get("name") for step in ticket.current_steps])
 
-    content += "**当前环节**: {}\n".format(current_steps)
+    content += "**当前环节**: {}\n".format(current_steps or "无")
     content += "**提单人**: {}\n".format(ticket.creator)
 
     processor_list = [
@@ -43,7 +43,8 @@ def build_bkchat_summary(ticket):
     else:
         processor_content = ",".join(processor_list)
 
-    content += "**审批人**: {}".format(processor_content)
+    if processor_content:
+        content += "**审批人**: {}".format(processor_content)
 
     # 添加「提单信息」
     content = "{}\n **--- 单据基本信息 ---**".format(content)

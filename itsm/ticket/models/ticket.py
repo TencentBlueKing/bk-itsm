@@ -4053,7 +4053,7 @@ class Ticket(Model, BaseTicket):
                         try:
                             if isinstance(attr_value["value"], str):
                                 single.append(
-                                    "{}:{}".format(
+                                    "{}:{}\n".format(
                                         schemes_map[scheme][attr_name],
                                         attr_value["value"],
                                     )
@@ -4064,9 +4064,9 @@ class Ticket(Model, BaseTicket):
                                     data, err
                                 )
                             )
-                    detail.append(",".join(single))
+                    detail.append("".join(single))
                 if label:
-                    text_content.append("{}:\n{}\n".format(label, "\n".join(detail)))
+                    text_content.append("{}:\n{}".format(label, "\n".join(detail)))
             return "\n".join(text_content)
         except Exception as err:
             logger.exception(
