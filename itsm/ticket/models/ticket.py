@@ -4045,7 +4045,11 @@ class Ticket(Model, BaseTicket):
                 detail = []
                 if isinstance(data["value"], str):
                     if label and data["value"]:
-                        text_content.append("{}:\n{}\n".format(label, data["value"]))
+                        text_content.append(
+                            "{}:\n{}\n".format(
+                                label, data.get("label") or data["value"]
+                            )
+                        )
                     continue
                 for attr in data["value"]:
                     single = []
@@ -4055,7 +4059,7 @@ class Ticket(Model, BaseTicket):
                                 single.append(
                                     "{}:{}\n".format(
                                         schemes_map[scheme][attr_name],
-                                        attr_value["value"],
+                                        attr_value.get("label") or attr_value["value"],
                                     )
                                 )
                         except Exception as err:
