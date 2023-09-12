@@ -4053,11 +4053,14 @@ class Ticket(Model, BaseTicket):
                     single = []
                     for attr_name, attr_value in attr.items():
                         try:
-                            if isinstance(attr_value["value"], str):
+                            attr_display = (
+                                attr_value.get("label") or attr_value["value"]
+                            )
+                            if isinstance(attr_display, str):
                                 single.append(
                                     "{}:{}".format(
                                         schemes_map[scheme][attr_name],
-                                        attr_value.get("label") or attr_value["value"],
+                                        attr_display,
                                     )
                                 )
                         except Exception as err:
