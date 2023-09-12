@@ -4066,7 +4066,7 @@ class Ticket(Model, BaseTicket):
                                     data, err
                                 )
                             )
-                    detail.append(",".join(single))
+                    detail.append(", ".join(single))
                 text_content.append("{}:\n{}".format(label, "\n".join(detail)))
             return "\n".join(text_content)
         except Exception as err:
