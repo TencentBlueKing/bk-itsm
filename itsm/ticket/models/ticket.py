@@ -4041,14 +4041,12 @@ class Ticket(Model, BaseTicket):
             text_content = []
             for data in content["form_data"]:
                 scheme = data["scheme"]
-                label = data["label"]
+                label = data.get("label")
                 detail = []
                 if isinstance(data["value"], str):
                     if label and data["value"]:
                         text_content.append(
-                            "{}:\n{}\n".format(
-                                label, data.get("label") or data["value"]
-                            )
+                            "{}:\n{}".format(label, data.get("label") or data["value"])
                         )
                     continue
                 for attr in data["value"]:
@@ -4057,7 +4055,7 @@ class Ticket(Model, BaseTicket):
                         try:
                             if isinstance(attr_value["value"], str):
                                 single.append(
-                                    "{}:{}\n".format(
+                                    "{}:{}".format(
                                         schemes_map[scheme][attr_name],
                                         attr_value.get("label") or attr_value["value"],
                                     )
@@ -4068,9 +4066,8 @@ class Ticket(Model, BaseTicket):
                                     data, err
                                 )
                             )
-                    detail.append("".join(single))
-                if label:
-                    text_content.append("{}:\n{}".format(label, "\n".join(detail)))
+                    detail.append(",".join(single))
+                text_content.append("{}:\n{}".format(label, "\n".join(detail)))
             return "\n".join(text_content)
         except Exception as err:
             logger.exception(
