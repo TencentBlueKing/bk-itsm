@@ -27,7 +27,7 @@
       { 'has-children': form.children && form.children.length }
     ]"
     @click="onInnerLinkClick">
-    <label>{{ form.label || '--' }}</label>
+    <label>{{ form.label }}</label>
     <template v-if="type !== 'url'">
       <span v-if="!Array.isArray(form.value)">{{ form.value }}</span>
       <template v-else>
