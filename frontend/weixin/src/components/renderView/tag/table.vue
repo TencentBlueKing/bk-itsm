@@ -62,7 +62,7 @@
           <tr v-for="(item, index) in data" :key="index">
             <td v-for="(column, i) in columns" :key="i">
               <div class="table-cell">
-                <TableText :form="item[column.key]" />
+                <TableText :form="item[column.key]" :type="column.type" />
               </div>
             </td>
           </tr>
