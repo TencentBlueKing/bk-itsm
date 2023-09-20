@@ -678,6 +678,30 @@ paths:
         disabledStages: []
         isPublic: false
         matchSubpath: false
+  /v2/itsm/get_fast_approval_summary/:
+    post:
+      description: "获取快捷审批的描述信息"
+      operationId: get_fast_approval_summary
+      responses:
+        default:
+          description: ''
+      tags: []
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/ticket/get_fast_approval_summary/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
   /v2/itsm/ticket_approval_result/:
     post:
       description: "\u67E5\u8BE2\u5BA1\u6279\u7ED3\u679C"
@@ -744,30 +768,6 @@ paths:
           matchSubpath: false
           method: post
           path: /{env.api_sub_path}/openapi/service/update_service/
-          timeout: 0
-          transformHeaders: {}
-          type: HTTP
-          upstreams: {}
-        descriptionEn: null
-        disabledStages: []
-        isPublic: true
-        matchSubpath: false
-  /v2/itsm/get_fast_approval_summary/:
-    post:
-      description: "获取快捷审批的描述信息"
-      operationId: get_fast_approval_summary
-      responses:
-        default:
-          description: ''
-      tags: []
-      x-bk-apigateway-resource:
-        allowApplyPermission: true
-        authConfig:
-          userVerifiedRequired: false
-        backend:
-          matchSubpath: false
-          method: get
-          path: /{env.api_sub_path}/openapi/service/get_fast_approval_summary/
           timeout: 0
           transformHeaders: {}
           type: HTTP
