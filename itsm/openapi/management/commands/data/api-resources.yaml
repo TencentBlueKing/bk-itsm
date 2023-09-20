@@ -752,6 +752,30 @@ paths:
         disabledStages: []
         isPublic: true
         matchSubpath: false
+  /v2/itsm/get_fast_approval_summary/:
+    post:
+      description: "获取快捷审批的描述信息"
+      operationId: get_fast_approval_summary
+      responses:
+        default:
+          description: ''
+      tags: []
+      x-bk-apigateway-resource:
+        allowApplyPermission: true
+        authConfig:
+          userVerifiedRequired: false
+        backend:
+          matchSubpath: false
+          method: get
+          path: /{env.api_sub_path}/openapi/service/get_fast_approval_summary/
+          timeout: 0
+          transformHeaders: {}
+          type: HTTP
+          upstreams: {}
+        descriptionEn: null
+        disabledStages: []
+        isPublic: true
+        matchSubpath: false
 schemes:
 - http
 swagger: '2.0'
