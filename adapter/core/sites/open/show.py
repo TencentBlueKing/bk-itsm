@@ -70,7 +70,7 @@ def get_footer():
             """.format(
         _("技术支持"), _("社区论坛"), _("产品官网")
     )
-    return FOOTER
+    return settings.FOOTER or FOOTER
 
 
 LOGIN_URL = settings.BK_PAAS_HOST + "/login/"

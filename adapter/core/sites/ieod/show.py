@@ -44,7 +44,7 @@ def get_footer():
             """.format(
         _("联系BK助手"), settings.BK_DESKTOP_URL, _("蓝鲸桌面")
     )
-    return FOOTER
+    return settings.FOOTER or FOOTER
 
 
 LOGIN_URL = settings.BK_IEOD_LOGIN_URL
