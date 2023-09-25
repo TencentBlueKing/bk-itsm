@@ -22,33 +22,42 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+from django.conf import settings
+from django.http import HttpResponseRedirect
 
 from common.mymako import render_mako_context
 
 
-def error_404(request):
+def error_404(request, exception):
     """
     404提示页
     """
-    return render_mako_context(request, '404.html')
+    if settings.ENABLE_NOTIFY_ROUTER:
+        url_flag = "/{}/".format(settings.NOTIFY_ROUTER_NAME)
+        if url_flag in request.path:
+            return HttpResponseRedirect(
+                request.get_full_path().replace(url_flag, "/#/")
+            )
+
+    return render_mako_context(request, "404.html")
 
 
 def error_500(request):
     """
     500提示页
     """
-    return render_mako_context(request, '500.html')
+    return render_mako_context(request, "500.html")
 
 
 def error_401(request):
     """
     401提示页
     """
-    return render_mako_context(request, '401.html')
+    return render_mako_context(request, "401.html")
 
 
 def error_403(request, exception):
     """
     403提示页
     """
-    return render_mako_context(request, '403.html')
+    return render_mako_context(request, "403.html")

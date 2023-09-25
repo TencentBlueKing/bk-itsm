@@ -1552,8 +1552,13 @@ class Ticket(Model, BaseTicket):
                 "state_id": state_id,
             }
         )
-        self.notify_url = "{site_url}/#/ticket/{ticket_id}/?token={token}&step_id={step_id}".format(
+        flag = "#"
+        if settings.ENABLE_NOTIFY_ROUTER:
+            flag = settings.NOTIFY_ROUTER_NAME
+
+        self.notify_url = "{site_url}/{flag}/ticket/{ticket_id}/?token={token}&step_id={step_id}".format(
             # noqa
+            flag=flag,
             site_url=settings.TICKET_NOTIFY_HOST.rstrip("/"),
             ticket_id=self.id,
             token=ticket_token,
