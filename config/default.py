@@ -41,6 +41,7 @@ from config import (
     BK_PAAS_HOST,
     BK_PAAS_INNER_HOST,
     RUN_VER,
+    APP_TOKEN,
 )
 
 # 标准运维页面服务地址
@@ -908,6 +909,30 @@ PLUGIN_DISTRIBUTOR_NAME = os.getenv("BKAPP_PLUGIN_DISTRIBUTOR_NAME", APP_CODE)
 CLOSE_EVERY_DAY_TICKET_NOTIFY = bool(
     os.getenv("BKAPP_CLOSE_EVERY_DAY_TICKET_NOTIFY", False)
 )
+
+# 国密相关的改造配置
+# BKPAAS_BK_CRYPTO_TYPE 为 PaaSV3 国密版本支持变量，可选值：CLASSIC-国际算法，SHANGMI-国家算法
+# 通过该值确定 SYMMETRIC_CIPHER_TYPE
+if os.getenv("BKPAAS_BK_CRYPTO_TYPE") == "SHANGMI":
+    BKCRYPTO_SYMMETRIC_CIPHER_TYPE = "SM4"
+else:
+    BKCRYPTO_SYMMETRIC_CIPHER_TYPE = "AES"
+
+# 开启 blueapps 内置数据表加密
+BLUEAPPS_ENABLE_DB_ENCRYPTION = True
+
+# 使用 APP_TOKEN 作为非对称密码的 Key
+# 关于 BKCRYPTO 的配置，可参考：https://github.com/TencentBlueKing/crypto-python-sdk
+BKCRYPTO = {
+    "SYMMETRIC_TYPE": BKCRYPTO_SYMMETRIC_CIPHER_TYPE,
+    "SYMMETRIC_CIPHERS": {
+        "blueapps": {
+            # 配置非对称加密密钥，如需延迟到 `default.py` 外 lazy 加载 key，可使用 `get_key_config_func` 配置
+            # 详情参考：https://github.com/TencentBlueKing/crypto-python-sdk
+            "common": {"key": APP_TOKEN},
+        },
+    },
+}
 
 FOOTER = os.getenv("BKAPP_FOOTER", None)
 
