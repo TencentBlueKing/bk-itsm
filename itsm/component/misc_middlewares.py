@@ -133,16 +133,16 @@ class InstrumentProfilerMiddleware(ProfilerMiddleware):
             return response
         self.profiler.stop()
         outputs = settings.PROFILER.get("output", ["console"])
-        file_location = settings.PROFILER.get("file_location", "profiles")
-        if not os.path.exists(file_location):
-            os.mkdir(file_location)
-
         for output in outputs:
             output_text = self.profiler.output_html()
             if output == "console":
                 print(output_text)
 
             if output == "file":
+                file_location = settings.PROFILER.get("file_location", "profiles")
+                if not os.path.exists(file_location):
+                    os.mkdir(file_location)
+
                 file_loc = os.path.join(
                     file_location,
                     "%s%s-profile%s.html"

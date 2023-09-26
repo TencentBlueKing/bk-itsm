@@ -97,6 +97,16 @@ def transform_username(users, user_dict=None):
     return ",".join(ret_data)
 
 
+def get_transform_username_dict(users):
+    if not users:
+        return {}
+
+    if isinstance(users, str):
+        users = [user for user in users.split(",") if user]
+
+    return get_bk_users(format="dict", users=users)
+
+
 def get_days(begin, end):
     """根据日期间隔返回日期列表"""
     days = []

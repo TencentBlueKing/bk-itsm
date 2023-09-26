@@ -83,7 +83,11 @@ from itsm.component.utils.basic import (
     generate_random_sn,
 )
 from itsm.component.utils.client_backend_query import get_biz_names, get_template_list
-from itsm.component.utils.misc import transform_single_username, transform_username
+from itsm.component.utils.misc import (
+    transform_single_username,
+    transform_username,
+    get_transform_username_dict,
+)
 from common.utils import html_escape
 from itsm.postman.serializers import TaskStateApiInfoSerializer
 from itsm.service.validators import service_validate
@@ -303,7 +307,12 @@ class StatusSerializer(serializers.ModelSerializer):
             current_tasks_processors = list(
                 set(sign_tasks_processor_list).intersection(set(user_list))
             )
+
             tasks = []
+
+            # 采用批量查询，优化性能
+            transformed_users_dict = get_transform_username_dict(user_list[0:30])
+
             for user in user_list[0:30]:
                 task_can_view = False
                 task_field_list = []
@@ -318,7 +327,7 @@ class StatusSerializer(serializers.ModelSerializer):
                     ).data
 
                 task_info = {
-                    "processor": transform_single_username(user),
+                    "processor": transformed_users_dict.get(user, user),
                     "status": processor_task_id_map.get(user, {}).get("status", "WAIT"),
                     "can_view": task_can_view,
                     "fields": task_field_list,
