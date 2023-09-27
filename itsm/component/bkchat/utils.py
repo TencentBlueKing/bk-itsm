@@ -97,20 +97,9 @@ def notify_fast_approval_message(ticket, state_id, receivers):
         logger.info("[fast_approval({})]There is no receivers".format(ticket.sn))
         return
 
-    # 根据流程设定的通知方式通知
-    for _notify in ticket.flow.notify.all():
-        # 判断通知类型如果不是微信则返回
-        if _notify.type != "WEIXIN":
-            logger.info(
-                "[fast_approval({})]The current notify type: {}".format(
-                    ticket.sn, _notify.type
-                )
-            )
-            return
-
-        content = build_bkchat_summary(ticket)
-        # 发送微信通知
-        send_fast_approval_message(ticket.title, content, receivers, ticket, state_id)
+    content = build_bkchat_summary(ticket)
+    # 发送微信通知
+    send_fast_approval_message(ticket.title, content, receivers, ticket, state_id)
 
 
 def send_fast_approval_message(title, content, receivers, ticket, state_id):
