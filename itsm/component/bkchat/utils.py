@@ -83,15 +83,6 @@ def notify_fast_approval_message(ticket, state_id, receivers):
         )
         return
 
-    # 不通知
-    if ticket.flow.notify_rule == "NONE":
-        logger.info(
-            "[fast_approval({})]The notify_rule of the current flow: {}".format(
-                ticket.sn, ticket.flow.notify_rule
-            )
-        )
-        return
-
     # 如果通知接收人为空则不通知
     if not receivers:
         logger.info("[fast_approval({})]There is no receivers".format(ticket.sn))
