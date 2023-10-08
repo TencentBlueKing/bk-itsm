@@ -791,6 +791,7 @@ class WorkflowImportSerializer(serializers.Serializer):
     is_iam_used = serializers.BooleanField(required=True)
     is_task_needed = serializers.BooleanField(required=True)
     is_supervise_needed = serializers.BooleanField(required=True)
+    is_auto_approve = serializers.BooleanField(required=False)
     supervise_type = serializers.ChoiceField(required=True, choices=PROCESSOR_CHOICES)
     engine_version = serializers.CharField(required=True)
     supervisor = serializers.CharField(
