@@ -780,8 +780,15 @@ class TicketSerializer(AuthModelSerializer):
     def __init__(self, instance=None, data=empty, **kwargs):
         super(TicketSerializer, self).__init__(instance, data, **kwargs)
         # 针对批量获取的内容，可以在init的时候进行处理，避免每个数据的序列化都要去拉取接口
-        self.related_users = self.get_related_users()
         self.ticket_followers = self.get_attention_users()
+
+    def get_creator_and_current_processors(self, inst):
+        related_users = self.get_related_users()
+        creator = transform_single_username(inst.creator, related_users)
+        current_processors = transform_username(
+            list(inst.display_current_processors), related_users
+        )
+        return creator, current_processors
 
     def get_related_users(self):
         """
@@ -890,11 +897,11 @@ class TicketSerializer(AuthModelSerializer):
             or inst.can_view(username)
         )
 
+        creator, current_processors = self.get_creator_and_current_processors(inst)
+
         data.update(
-            creator=transform_single_username(inst.creator, self.related_users),
-            current_processors=transform_username(
-                list(inst.display_current_processors), self.related_users
-            ),
+            creator=creator,
+            current_processors=current_processors,
             can_comment=can_comment,
             can_operate=can_operate,
             can_view=can_view,
@@ -1000,6 +1007,9 @@ class TicketRetrieveSerializer(TicketSerializer):
             "project_key",
         ) + copy.deepcopy(TicketSerializer.Meta.fields)
         read_only_fields = copy.deepcopy(TicketSerializer.Meta.read_only_fields)
+
+    def get_creator_and_current_processors(self, inst):
+        return inst.creator, ",".join(inst.real_current_processors)
 
     def to_representation(self, inst):
         """单据详情"""
