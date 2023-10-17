@@ -679,7 +679,7 @@ paths:
         isPublic: false
         matchSubpath: false
   /v2/itsm/get_fast_approval_summary/:
-    post:
+    get:
       description: "获取快捷审批的描述信息"
       operationId: get_fast_approval_summary
       responses:
