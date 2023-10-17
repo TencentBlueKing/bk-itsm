@@ -23,8 +23,8 @@ APPROVE_MESSAGE = {"true": "同意", "false": "拒绝"}
 
 
 def build_bkchat_summary(ticket):
-    title = "## 『ITSM』{}: {}".format(
-        RUNNING_ENV.get(settings.RUN_MODE, ""), ticket.title
+    title = "## 『ITSM-{}』{}: {}".format(
+        settings.BKCHAT_ENV_FLAG, RUNNING_ENV.get(settings.RUN_MODE, ""), ticket.title
     )
     content = title + "\n"
     content += "**单号**: {}\n".format(ticket.sn)
