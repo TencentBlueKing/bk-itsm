@@ -123,6 +123,10 @@ def send_fast_approval_message(title, content, receivers, ticket, state_id):
         },
     }
 
+    # 如果配置了的环境标示, 需要在请求参数增加这种环境标示
+    if settings.BKCHAT_ENV:
+        data["env"] = settings.BKCHAT_ENV
+
     logger.info(
         "[fast_approval({})]send fast approval message data:{}".format(ticket_sn, data)
     )

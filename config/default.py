@@ -878,6 +878,7 @@ if USE_BKCHAT:
     BKCHAT_URL = os.environ.get("BKCHAT_URL", "")
     BKCHAT_CALLBACK_URL = os.environ.get("BKCHAT_CALLBACK_URL", "")
     ITSM_SUMMARY_URL = os.environ.get("ITSM_SUMMARY_URL", "")
+    BKCHAT_ENV = os.environ.get("BKCHAT_ENV", None)
 
 
 def redirect_func(request):
