@@ -32,6 +32,9 @@ modules:
             - key: RUN_VER
               value: open
               description: 运行环境
+            - key: GUNICORN_THREAD_NUM
+              value: 10
+              description: GunicornThread数量
         scripts:
             pre_release_hook: "bash ./bin/pre-release"
         processes:
