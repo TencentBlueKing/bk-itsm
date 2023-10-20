@@ -141,6 +141,7 @@ from itsm.component.constants import (
     BK_PLUGIN_STATE,
     SUSPENDED,
     SHOW_BY_CONDITION,
+    VARIABLE_LEADER,
 )
 from itsm.component.constants.trigger import (
     CREATE_TICKET,
@@ -3147,6 +3148,21 @@ class Ticket(Model, BaseTicket):
             if pros_type == PERSON:
                 return dotted_name(pros), PERSON
 
+            if pros_type == VARIABLE_LEADER:
+                # 引用变量的处理人逻辑
+                for f_key in pros.split(","):
+                    f_value = self.get_field_value(f_key)
+                    # 跳过空值字段
+                    if not f_value:
+                        continue
+                    users = f_value.split(",")
+                    # 取到第一个处理人则停止解析
+                    leaders = get_user_leader(users[0])
+                    leaders = dotted_name(",".join(leaders)) if leaders else ""
+                    return leaders, PERSON
+                else:
+                    # 所有引用的处理人字段均为空
+                    return "", PERSON
             if pros_type == VARIABLE:
                 # 引用变量的处理人逻辑
                 var_pros = ""
