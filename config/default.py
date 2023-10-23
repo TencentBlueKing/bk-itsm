@@ -926,7 +926,7 @@ BLUEAPPS_ENABLE_DB_ENCRYPTION = True
 # 使用 APP_TOKEN 作为非对称密码的 Key
 # 关于 BKCRYPTO 的配置，可参考：https://github.com/TencentBlueKing/crypto-python-sdk
 BKCRYPTO = {
-    "SYMMETRIC_TYPE": BKCRYPTO_SYMMETRIC_CIPHER_TYPE,
+    "SYMMETRIC_CIPHER_TYPE": BKCRYPTO_SYMMETRIC_CIPHER_TYPE,
     "SYMMETRIC_CIPHERS": {
         "blueapps": {
             # 配置非对称加密密钥，如需延迟到 `default.py` 外 lazy 加载 key，可使用 `get_key_config_func` 配置
