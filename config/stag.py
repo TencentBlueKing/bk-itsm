@@ -23,6 +23,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import importlib
+import logging
+import sys
 from urllib.parse import urljoin
 
 from config import RUN_VER, BK_PAAS_HOST, OPEN_VER  # noqa
@@ -105,3 +107,14 @@ if ENGINE_REGION == "default":
 BK_IAM_RESOURCE_API_HOST = os.getenv(
     "BKAPP_IAM_RESOURCE_API_HOST", urljoin(BK_PAAS_INNER_HOST, "/t/{}".format(APP_CODE))
 )
+
+IAM_LOG_DEBUG = os.environ.get("IAM_LOG_DEBUG", None) == "1"
+
+if IAM_LOG_DEBUG:
+    iam_logger = logging.getLogger("iam")
+    iam_logger.setLevel(logging.DEBUG)
+    debug_hanler = logging.StreamHandler(sys.stdout)
+    debug_hanler.setFormatter(
+        logging.Formatter("%(levelname)s [%(asctime)s] [IAM] %(message)s")
+    )
+    iam_logger.addHandler(debug_hanler)
