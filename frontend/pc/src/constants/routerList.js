@@ -66,6 +66,12 @@ const ROUTE_LIST = [
         path: '/workbench/ticket/attention',
       },
       {
+        name: i18n.t('m[\'我的经办\']'),
+        id: 'myHistoryTicket',
+        icon: 'bk-itsm-icon icon-ticket_star',
+        path: '/workbench/ticket/history',
+      },
+      {
         name: i18n.t('m[\'所有单据\']'),
         id: 'allUserTicket',
         icon: 'bk-itsm-icon icon-ticket_4',

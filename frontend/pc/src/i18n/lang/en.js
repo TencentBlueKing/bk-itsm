@@ -2277,6 +2277,7 @@ export const m = {
   我的待办: 'My Todos',
   待我审批: 'My Approvals',
   我发起的: 'My Requests',
+  我的经办: 'My Histories',
   我关注的: 'My Follows',
   所有单据: 'All Tickets',
   单据: 'Tickets',
