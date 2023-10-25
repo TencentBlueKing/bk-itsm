@@ -157,9 +157,7 @@ export default defineComponent({
       })
       const results = validateFns.map(fn => fn())
       const required = results.every(item => item)
-      const allNotSupportTypes = [...notSupportEditTypes, ...notSupportTypes]
-      const hasNotSupportField = fields.value.some(field => allNotSupportTypes.indexOf(field.type) !== -1)
-      return required && !hasNotSupportField
+      return required
     }
 
     /** 字段隐藏逻辑处理 */

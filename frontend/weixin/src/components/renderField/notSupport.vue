@@ -21,7 +21,7 @@
   -->
 
 <template>
-  <div v-if="!isViewMode" class="not-support required">
+  <div v-if="!isViewMode" :class="['not-support', { required: isRequire }]">
     <span class="van-ellipsis">{{ item.name }}
       <van-icon name="info-o" color="#ffb213" @click="handelNotSupportPrompt" />
     </span>
@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, computed, toRefs } from 'vue'
 import { Toast } from 'vant'
 
 export default defineComponent({
@@ -51,14 +51,17 @@ export default defineComponent({
       default: false
     }
   },
-  setup() {
+  setup(props) {
+    const { item } =  toRefs(props)
+    const isRequire = computed(() => item.value.validate_type === 'REQUIRE')
+
     const handelNotSupportPrompt = () => {
       Toast({
         message: '暂不支持操作，请至PC端处理',
         className: 'not-support-toast'
       })
     }
-    return { handelNotSupportPrompt }
+    return { isRequire, handelNotSupportPrompt }
   }
 })
 
