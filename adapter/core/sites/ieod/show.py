@@ -25,8 +25,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
-DOC_URL = settings.BK_IEOD_DOC_URL
-
 
 def get_title():
     return "{} | {}".format(_("流程服务"), _("腾讯蓝鲸智云"))

@@ -23,33 +23,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-import os
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-
-
-def get_doc_url():
-    from itsm.component.esb.esbclient import client_backend
-
-    try:
-        res = client_backend.doc_center.get_doc_link_by_path(
-            {"md_path": "流程服务/产品白皮书/产品简介/README.md"}
-        )
-        return os.path.join(settings.BK_PAAS_HOST, "o/bk_docs_center/", res)
-    except Exception as err:
-        print(err)
-        return os.path.join(
-            settings.BK_PAAS_HOST, "o/bk_docs_center/markdown/流程服务/产品白皮书/产品简介/README.md"
-        )
-
-
-# if settings.OPEN_VER == "enterprise":
-#     TITLE = "{} | {}".format(_("流程服务"), _("腾讯蓝鲸智云"))
-#     DOC_URL = get_doc_url()
-# else:
-
-# 企业版非企业版，统一跳到蓝鲸官网去
-DOC_URL = "https://bk.tencent.com/docs/markdown/流程服务/产品白皮书/产品简介/README.md"
 
 
 def get_title():

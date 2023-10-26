@@ -83,7 +83,7 @@ def init(request):
 @login_exempt
 def index(request):
     """首页"""
-    from adapter.core import TITLE, DOC_URL, LOGIN_URL
+    from adapter.core import TITLE, LOGIN_URL
 
     # 如果发现不是woa过来的域名
     if (
@@ -123,7 +123,7 @@ def index(request):
             "BK_USER_MANAGE_HOST": BK_USER_MANAGE_HOST,
             "BK_PAAS_ESB_HOST": settings.BK_PAAS_ESB_HOST,
             "TAM_PROJECT_ID": settings.TAM_PROJECT_ID,
-            "DOC_URL": DOC_URL,
+            "DOC_URL": settings.BK_DOC_URL,
             "SOPS_URL": settings.SOPS_SITE_URL,
         },
     )
