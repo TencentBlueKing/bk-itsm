@@ -864,7 +864,9 @@ api_public_key = os.environ.get("APIGW_PUBLIC_KEY", "")
 APIGW_PUBLIC_KEY = base64.b64decode(api_public_key)
 
 # show.py 敏感信息处理, 内部白皮书地址，内部登陆地址
-BK_IEOD_DOC_URL = os.environ.get("BK_IEOD_DOC_URL", "")
+BK_DOC_URL = os.environ.get(
+    "BK_DOC_URL", "https://bk.tencent.com/docs/markdown/流程服务/产品白皮书/产品简介/README.md"
+)
 BK_IEOD_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
 
 # itsm-tapd 网关API地址
