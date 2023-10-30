@@ -868,7 +868,7 @@ BK_DOC_CENTER_HOST = os.getenv(
     "BK_DOC_CENTER_HOST",
     os.getenv("BK_DOCS_URL_PREFIX", "{}o/bk_docs_center".format(BK_PAAS_HOST)),
 )
-BK_DOC_URL = "{}{}".format(BK_DOC_CENTER_HOST, "markdown/流程服务/产品白皮书/产品简介/README.md")
+BK_DOC_URL = "{}{}".format(BK_DOC_CENTER_HOST, "/markdown/流程服务/产品白皮书/产品简介/README.md")
 
 BK_IEOD_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
 
