@@ -169,7 +169,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
         workflow = self.queryset.get(id=service_id).workflow
         # 获取第一个提单节点的id
         first_state = workflow.first_state
-        # 根据提单节点 通过路径 乡下搜索，获得正确的state顺序
+        # 根据提单节点 通过路径 向下搜索，获得正确的state顺序
         states = workflow.post_states(first_state["id"])
 
         # 全量数据下，将提单节点插入第一个

@@ -22,6 +22,8 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+from collections import OrderedDict
+
 import six
 
 import jsonfield
@@ -571,6 +573,7 @@ class WorkflowVersion(WorkflowBase):
             if from_id in path:
                 from_id_index = path.index(from_id)
                 state_id_list.extend(path[from_id_index + 1 :])
+
         state_list = []
         common_type = [
             NORMAL_STATE,
@@ -579,7 +582,7 @@ class WorkflowVersion(WorkflowBase):
             TASK_STATE,
             TASK_SOPS_STATE,
         ]
-        for state_id in set(state_id_list):
+        for state_id in list(OrderedDict.fromkeys(state_id_list)):
             state_info = self.states[str(state_id)]
             if state_info["type"] in common_type:
                 state_list.append(state_info)
