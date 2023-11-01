@@ -134,6 +134,10 @@ const ticket = {
     },
     getServiceDetail(content:any, id: number): Promise<IResponse> {
       return $api.get(`service/projects/${id}/`)
+    },
+    getTicketProcessDetail(content: any, payload: any): Promise<IResponse> {
+      const { ticketId, stepId } = payload
+      return $api.get(`ticket/receipts/${ticketId}/get_step_process_info/`, { params: { step_id: stepId } })
     }
   }
 }

@@ -180,7 +180,9 @@ export default defineComponent({
       if (nodeListTimer.value) {
         clearTimeout(nodeListTimer.value)
       }
-      ticketPage.value.removeEventListener('scroll', handleStepsFixed, false)
+      if (ticketPage.value) {
+        ticketPage.value.removeEventListener('scroll', handleStepsFixed, false)
+      }
     })
 
     initData()

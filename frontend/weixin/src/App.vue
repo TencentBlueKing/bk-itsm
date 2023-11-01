@@ -41,6 +41,26 @@ export default defineComponent({
         duration: duration || 3000
       })
     })
+    emitter.on('showPermissionDialog', async (payload) => {
+      const { isDisplayProcessor, ticketId, stepId } = payload
+      let message = '无单据相关权限'
+
+      if (isDisplayProcessor) {
+        const res = await this.$store.dispatch('ticket/getTicketProcessDetail', { ticketId, stepId })
+        message = `单据已由 ${res.data.processed_user} 处理，您无需操作`
+      }
+
+      this.$dialog.alert({
+        message,
+        confirmButtonText: '回到首页',
+        confirmButtonColor: '#3a84ff',
+        beforeClose: () => {
+          const route = this.$router.resolve({ name: 'homeDefault' })
+          window.location.href = route.fullPath
+          return true
+        }
+      })
+    })
     this.$store.dispatch('getServiceConfig')
   }
 })
