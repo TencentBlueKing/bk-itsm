@@ -1080,12 +1080,15 @@ class TicketModelViewSet(ModelViewSet):
         # 分组
         ticket_actions = []
         state_actions = {}
+        transition_actions = []
         state_map = {}
         for item in actions:
             if item["signal_type"] == "STATE":
                 state_actions.setdefault(item["sender"], []).append(item)
             if item["signal_type"] == "FLOW":
                 ticket_actions.append(item)
+            if item["signal_type"] == "TRANSITION":
+                transition_actions.append(item)
 
         for state_id in state_actions.keys():
             state_map[state_id] = instance.state(state_id)["name"]
@@ -1094,6 +1097,7 @@ class TicketModelViewSet(ModelViewSet):
             {
                 "state": state_actions,
                 "ticket_actions": ticket_actions,
+                "transition": transition_actions,
                 "state_map": state_map,
             }
         )
