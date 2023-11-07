@@ -2645,6 +2645,7 @@ export const m = {
   '人都会收到单据代办通知，是否继续？如有疑问请咨询ITSM系统管理员。': 'Everyone will receive a notice of document agency. Do you want to continue? If in doubt, consult your ITSM system administrator.',
   当前节点未设置节点描述: 'The node description is not set for the current node',
   单据触发器: 'Ticket Trigger',
+  线条触发器: 'Transition Trigger',
   节点: 'Node',
   名称: 'Name',
   设置为全局变量: 'Set as a global variable',
