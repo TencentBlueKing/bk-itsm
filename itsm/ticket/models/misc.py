@@ -274,6 +274,8 @@ class TicketFollowerNotifyLog(NotifyLogModel):
     )
     is_sys_sended = models.BooleanField(_("是否系统流程发送"), default=False)
 
+    _objects = models.Manager()
+
     class Meta:
         app_label = "ticket"
         verbose_name = _("关注人通知日志")
@@ -286,7 +288,7 @@ class TicketFollowerNotifyLog(NotifyLogModel):
     def get_unique_token(cls):
         """生成唯一的短码，7位，3x62^6种"""
 
-        ticket_token = get_random_string(6)
+        ticket_token = get_random_string(8)
         retry = 0
 
         while retry < 60:
@@ -294,7 +296,7 @@ class TicketFollowerNotifyLog(NotifyLogModel):
             if not cls.objects.filter(ticket_token=ticket_token).exists():
                 break
 
-            ticket_token = get_random_string(6)
+            ticket_token = get_random_string(8)
             retry += 1
         else:
             # 尝试60次一直重复，则放弃生成code
