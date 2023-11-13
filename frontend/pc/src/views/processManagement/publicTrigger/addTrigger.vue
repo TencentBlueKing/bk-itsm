@@ -707,7 +707,11 @@
                           subItemSchema.field_schema.forEach(fieldSchema => {
                             if (fieldSchema.required) {
                               if (fieldSchema.type === 'MEMBERS' || fieldSchema.type === 'MULTI_MEMBERS') {
-                                responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : fieldSchema.value.some(schemaMem => (Array.isArray(schemaMem.value) ? !schemaMem.value.length : !schemaMem.value));
+                                responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : fieldSchema.value.some(schemaMem => {
+                                  const { key, value } = schemaMem;
+                                  return !['STARTER_LEADER', 'ASSIGN_LEADER', 'VARIABLE_LEADER'].includes(key)
+                                    && (Array.isArray(value) ? !value.length : !value);
+                                });
                               } else {
                                 responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : !fieldSchema.value;
                               }

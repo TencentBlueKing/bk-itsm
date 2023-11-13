@@ -325,7 +325,7 @@
       },
       // 新增字典
       openAddData(item) {
-        this.slideData = item;
+        this.slideData = { ...item, ownersInputValue: item.owners ? item.owners.split(',') : [] };
         this.customSettings.title = item.id ? this.$t('m.systemConfig["编辑字典"]') : this.$t('m.systemConfig["新增字典"]');
         this.customSettings.isShow = true;
       },
