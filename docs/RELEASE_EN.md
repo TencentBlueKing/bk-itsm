@@ -1,4 +1,24 @@
 # Changelog
+## [Version: 2.6.8] - 2023-11-09
+ [Improved] Gateway added description  
+ [Improved] Handle the problem of internationalization error when switching the list of documents quickly  
+ [Improved] Gateway adds a method to get the approval result of a node  
+ [Improved] The Community Edition supports the capabilities of the Approval Assistant  
+ [Improved] Custom form support url new page or iframe open link  
+ [Improved] Fix the problem of mobile login jumping  
+ [Improved] Optimize states node rendering performance to improve interface access speeds  
+ [Improved] Repair the problem that the automatic order over does not take effect when importing updates   
+ [Improved] Expand the number of gthreads to optimize interface performance concurrency performance  
+ [Improved] The process supports the selection of a specified variable superior  
+ [Improved] Add My Managers to Work Order Management  
+ [Fixed] Tips related to adding documents without permissions on the mobile side  
+ [Fixed] Fix TicketLog delete logic  
+ [Fixed] Fix get_service_roles ordering issue  
+ [Fixed] Repair the problem of mandatory checking of document details fields in the mobile terminal  
+ [Fixed] Fix the problem of mobile login jumping  
+ [Fixed] Repair the problem that the customized document status does not take effect  
+
+
 ## [Version: 2.6.7] - 2023-08-22
  [Improved]Show pop-up window when you don't have permission to view documents.  
  [Improved] Change the adopted English to Agree when editing the English of approval nodes to maintain consistency.     
