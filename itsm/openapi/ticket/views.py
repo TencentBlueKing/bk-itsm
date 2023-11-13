@@ -506,7 +506,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         处理单据（挂起、恢复、撤销）
         """
         sn = request.data.get("sn")
-        operator = request.data.get("operator")
+        operator = request.data.get("username") or request.data.get("operator")
         action_type = request.data.get("action_type")
         ticket = Ticket.objects.get(sn=sn)
 
@@ -529,7 +529,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             )
 
         if action_type == WITHDRAW_OPERATE:
-            withdraw_validate(operator, ticket)
+            withdraw_validate(operator, ticket, ignore_user=True)
         else:
             openapi_operate_validate(operator, ticket)
 

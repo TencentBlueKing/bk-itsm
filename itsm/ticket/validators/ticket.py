@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import copy
 
+from django.conf import settings
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
@@ -438,7 +439,7 @@ def tickets_can_be_slave(ticket_ids):
         )
 
 
-def withdraw_validate(operator, ticket):
+def withdraw_validate(operator, ticket, ignore_user=False):
     """
     校验规则：提单本人，且提单后续节点尚未处理过
     """
@@ -447,13 +448,15 @@ def withdraw_validate(operator, ticket):
         # 不可撤销或者已经结束的单，直接返回
         raise serializers.ValidationError(_("抱歉，当前流程配置无法撤单，请联系服务负责人"))
 
-    if operator != ticket.creator:
-        raise serializers.ValidationError(_("抱歉，你无权撤销单据，请联系提单人"))
+    if operator != ticket.creator and operator != settings.SYSTEM_USE_API_ACCOUNT:
+        raise serializers.ValidationError(
+            _("抱歉，你无权撤销单据，撤销单据的非当前单据的提单人, {}!={}".format(operator, ticket.creator))
+        )
 
     if ticket.is_over:
         raise serializers.ValidationError(_("抱歉，单据已经结束，无法撤销"))
 
-    if ticket.can_withdraw(operator):
+    if ticket.can_withdraw(operator, ignore_user):
         return
 
     raise serializers.ValidationError(_("抱歉，单据执行中，无法撤销"))

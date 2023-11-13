@@ -854,7 +854,7 @@ CONTENT_CREATOR_WITH_TRANSLATION = (
 )
 
 # 系统api调用账户
-SYSTEM_USE_API_ACCOUNT = "admin"
+SYSTEM_USE_API_ACCOUNT = os.environ.get("SYSTEM_USE_API_ACCOUNT", "admin")
 
 # 蓝盾
 DEVOPS_CLIENT_URL = os.environ.get("DEVOPS_CLIENT_URL", "")
@@ -868,7 +868,9 @@ BK_DOC_CENTER_HOST = os.getenv(
     "BK_DOC_CENTER_HOST",
     os.getenv("BK_DOCS_URL_PREFIX", "{}o/bk_docs_center".format(BK_PAAS_HOST)),
 )
-BK_DOC_URL = "{}{}".format(BK_DOC_CENTER_HOST, "/markdown/流程服务/产品白皮书/产品简介/README.md")
+BK_DOC_URL = "{}{}".format(
+    BK_DOC_CENTER_HOST, "/markdown/ITSM/UserGuide/Introduce/README.md"
+)
 
 BK_IEOD_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
 
