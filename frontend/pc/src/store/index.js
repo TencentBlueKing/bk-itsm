@@ -377,7 +377,9 @@ export default new Vuex.Store({
       return jsonp(bkPaasEsbHost + '/api/c/compapi/v2/usermanage/fe_update_user_language/', language);
     },
     getPlatformPreData() {
-      return ajax.get(`${SITE_URL}init/`).then((response) => {
+      return ajax.get('init/', {
+        baseURL: window.SITE_URL
+      }).then((response) => {
          if (response.data.data.need_target && response.data.data.location) {
           window.location.href = `//${window.location.host}${response.data.data.location}`;
           return;
