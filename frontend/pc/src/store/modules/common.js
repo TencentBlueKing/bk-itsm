@@ -91,14 +91,14 @@ export default {
       });
     },
     getManagePermission({ commitm }) {
-      return ajax.get(`/iam/permission/platform_permission/`).then((response) => {
+      return ajax.get(`iam/permission/platform_permission/`).then((response) => {
         const res = response.data;
         return res;
       });
     },
     // 获取项目资源的权限结构树
     getPermissionMeta({ commit, state, dispatch }) {
-      return ajax.get(`/iam/permission/meta/`).then((response) => {
+      return ajax.get(`iam/permission/meta/`).then((response) => {
         const res = response.data;
         commit("setPermissionMeta", res.data);
         return res;
@@ -106,7 +106,7 @@ export default {
     },
     // 获取权限中心跳转链接
     getIamUrl({ commit }, data) {
-      return ajax.post(`/iam/permission/query_apply_permission_url/`, data).then((response) => {
+      return ajax.post(`iam/permission/query_apply_permission_url/`, data).then((response) => {
         const res = response.data;
         return res;
       });

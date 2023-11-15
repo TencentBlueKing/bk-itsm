@@ -66,10 +66,6 @@ bus.$on('processData', (response) => {
  */
 instance.interceptors.request.use(
   (config) => {
-    // 接口请求如果已经配置了以SITE_URL开头，则不需要添加baseURL
-    if (new RegExp(`^${SITE_URL}`).test(config.url)) {
-      config.baseURL = '';
-    }
     // 添加工单查看权限
     const token = sessionStorage.getItem('itsm_token');
     if (token && config.url.indexOf('ticket/') === 0) {
@@ -83,7 +79,7 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (response) => {
-    if (response.config.url === `${SITE_URL}init/`) {
+    if (response.config.url === 'init/') {
       if (response.status === 401) {
         const { login_url } = response.data;
         const url = `${login_url.split('c_url=')[0]}c_url=${encodeURIComponent(location.href)}`;

@@ -201,4 +201,10 @@
             color: #63656E;
         }
     }
+    /deep/ {
+        .tui-editor-defaultUI,
+        .tui-editor-contents {
+            font-family: inherit;
+        }
+    }
 </style>
