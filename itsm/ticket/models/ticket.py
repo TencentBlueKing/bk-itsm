@@ -2245,8 +2245,10 @@ class Ticket(Model, BaseTicket):
 
     def can_view(self, username):
         """能否查看单据"""
+        all_state_processors = list(set([user for users in self.meta.get("state_processors",{}).values() for user in users.split(',')]))
         if (
-            dotted_name(username) in self.updated_by
+            username in all_state_processors
+            or dotted_name(username) in self.updated_by
             or username in self.task_operators
             or self.can_operate(username)
             or AttentionUsers.objects.filter(
