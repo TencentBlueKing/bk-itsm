@@ -707,7 +707,7 @@ try:
 except Exception:
     NEED_PROFILE = False
 PROFILE_TEST_PATH = [
-    {"path": path, "method": ["GET"]}
+    {"path": path, "method": ["GET", "POST"]}
     for path in os.environ.get("BKAPP_PROFILE_TEST_PATH", "").split(",")
     if path
 ]
