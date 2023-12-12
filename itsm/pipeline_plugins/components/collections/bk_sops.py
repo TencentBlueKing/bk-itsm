@@ -41,7 +41,7 @@ class BkOpsService(ItsmBaseService):
     interval = StaticIntervalGenerator(3)
 
     def prepare_task_params(self, state, ticket, sops_info):
-        values = ticket.get_output_fields(return_format="dict")
+        values = ticket.get_output_fields(return_format="dict", need_display=True)
         if sops_info["bk_biz_id"]["value_type"] == "variable":
             bk_biz_id = values.get(sops_info["bk_biz_id"]["value"], 0)
         else:

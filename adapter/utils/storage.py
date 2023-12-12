@@ -24,6 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django.core.files.storage import Storage
+from django.core.files import File
 
 
 class CephStorage(Storage):
@@ -35,8 +36,23 @@ class CephStorage(Storage):
     def storage(self):
         from bkstorages.backends.rgw import RGWBoto3Storage
 
+        class CustomRGWBoto3Storage(RGWBoto3Storage):
+            def save(self, name, content, max_length=None):
+                """
+                去除validate_file_name(name, allow_relative_path=True) 检查，保证content的可用性
+                """
+                if name is None:
+                    name = content.name
+
+                if not hasattr(content, "chunks"):
+                    content = File(content, name)
+
+                name = self.get_available_name(name, max_length=max_length)
+                name = self._save(name, content)
+                return name
+
         if self._storage is None:
-            self._storage = RGWBoto3Storage()
+            self._storage = CustomRGWBoto3Storage()
 
         return self._storage
 

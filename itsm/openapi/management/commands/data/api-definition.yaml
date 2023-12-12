@@ -27,3 +27,6 @@ stage:
 release:
   version: {{ settings.STATIC_VERSION }}+{{ settings.DEPLOY_DATETIME }}
   comment: "auto release by bk-sops"
+
+grant_permissions:
+  - bk_app_code: bk-audit
