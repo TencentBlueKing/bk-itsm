@@ -57,9 +57,14 @@
         </template>
         <template v-if="itemInfo.type === 'API_INFO' && apiId">
           <div style="min-height: 100px;" v-bkloading="{ isLoading: isLoading }">
-            <input-params v-if="!isLoading"
-              :item-info="itemInfo">
-            </input-params>
+            <template v-if="!isLoading">
+              <get-params
+                v-if="!['POST', 'PATCH', 'PUT'].includes(itemInfo.apiContent.method)"
+                :params="itemInfo.apiContent.req_params"
+                :value="itemInfo.value"
+                @change="itemInfo.value = $event" />
+              <post-params v-else :item-info="itemInfo" />
+            </template>
           </div>
         </template>
       </bk-form-item>
@@ -68,12 +73,14 @@
 </template>
 <script>
   import { errorHandler } from '../../../../utils/errorHandler';
-  import inputParams from '../apiContent/inputParams.vue';
+  import postParams from '../apiContent/postParams.vue';
+  import getParams from '../apiContent/getParams.vue';
 
   export default {
     name: 'apiCall',
     components: {
-      inputParams,
+      postParams,
+      getParams,
     },
     props: {
       item: {
@@ -97,6 +104,7 @@
     },
     methods: {
       initData() {
+        console.log(this.item);
         this.item.wayInfo.field_schema.forEach(schema => {
           if (schema.key === 'api_source' && schema.value) {
             this.getApiContent(schema.value);

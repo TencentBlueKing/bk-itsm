@@ -112,7 +112,7 @@
   import { deepClone } from '../../../../utils/util';
   import { mapState } from 'vuex';
   export default {
-    name: 'inputParams',
+    name: 'postParams',
     mixins: [mixins],
     props: {
       itemInfo: {
@@ -162,9 +162,9 @@
       this.variableList = this.triggerVariables;
     },
     methods: {
-      async initData() {
+      initData() {
         this.$set(this.itemInfo.apiContent, 'treeDataList', {});
-        this.itemInfo.apiContent.treeDataList = await this.jsonschemaToList({
+        this.itemInfo.apiContent.treeDataList = this.jsonschemaToList({
           root: JSON.parse(JSON.stringify(this.itemInfo.apiContent.req_body)),
         });
         // 如果数据已经存在，则进行表格初始化赋值
@@ -172,7 +172,7 @@
           this.itemInfo.apiContent.treeDataList = this.jsonValueTreeList(this.itemInfo.value, JSON.parse(JSON.stringify(this.itemInfo.apiContent.treeDataList)));
         }
         // 生成table表格数据
-        this.itemInfo.apiContent.bodyTableData = await this.treeToTableList(JSON.parse(JSON.stringify(this.itemInfo.apiContent.treeDataList[0].children)));
+        this.itemInfo.apiContent.bodyTableData = this.treeToTableList(JSON.parse(JSON.stringify(this.itemInfo.apiContent.treeDataList[0].children)));
         const bodyTableData = JSON.parse(JSON.stringify(this.itemInfo.apiContent.bodyTableData));
         // 加入/引用变量
         bodyTableData.forEach((item) => {
@@ -184,7 +184,7 @@
         });
         // 多层列表数据 关联 table表格数据
         this.recordChildren(bodyTableData);
-        this.itemInfo.apiContent.bodyTableData = await bodyTableData;
+        this.itemInfo.apiContent.bodyTableData = bodyTableData;
       },
       jsonValueTreeList(jsonData, treeDataList) {
         const listToJsonStep = function (lastObject, insertObject, key, item, lastType) {
@@ -324,7 +324,7 @@
         return item.children.length === 1;
       },
       // 计算所有子孙元素
-      async countChildren(dataOri) {
+      countChildren(dataOri) {
         let count = 0;
         const countChildrenStep = function (data) {
           if (data.children && data.children.length) {
@@ -334,11 +334,11 @@
             }
           }
         };
-        await countChildrenStep(dataOri);
+        countChildrenStep(dataOri);
         return count;
       },
       // 清除变量值
-      async cleanValue(item) {
+      cleanValue(item) {
         const copyItem = JSON.parse(JSON.stringify(item));
         const countChildrenStep = function (data) {
           data.value = '';
@@ -349,29 +349,29 @@
             }
           }
         };
-        await countChildrenStep(copyItem);
+        countChildrenStep(copyItem);
         return copyItem;
       },
       // 添加 array 列表元素
-      async addChildren(itemChildren) {
+      addChildren(itemChildren) {
         const item = this.itemInfo.apiContent.bodyTableData.filter(ite => (ite.level === itemChildren.level - 1 && ite.primaryKey === itemChildren.parentPrimaryKey && ite.ancestorsList.toString() === itemChildren.ancestorsList.slice(0, -1).toString()))[0];
 
         const index = this.itemInfo.apiContent.bodyTableData.indexOf(item) + 1;
-        const count = await this.countChildren(item);
-        const copyItem = await this.cleanValue(item.children[0]);
-        const insertList = await this.treeToTableList(
+        const count = this.countChildren(item);
+        const copyItem = this.cleanValue(item.children[0]);
+        const insertList = this.treeToTableList(
           JSON.parse(JSON.stringify([...item.children, copyItem])), item.level + 1,
           item.primaryKey, 'array', item.ancestorsList
         );
-        await insertList.forEach((ite) => {
+        insertList.forEach((ite) => {
           ite.children = [];
         });
         item.children = insertList.filter(ite => ite.level === item.level + 1);
-        await this.recordChildren(insertList, item.level + 1);
+        this.recordChildren(insertList, item.level + 1);
         this.itemInfo.apiContent.bodyTableData.splice(index, count, ...insertList);
       },
       // 删除元素
-      async deletChildren(item) {
+      deletChildren(item) {
         if (this.countSon(item)) {
           return;
         }
@@ -381,7 +381,7 @@
         }
         currentObj.splice(currentObj.indexOf(item), 1);
         const index = this.itemInfo.apiContent.bodyTableData.indexOf(item);
-        const count = await this.countChildren(item);
+        const count = this.countChildren(item);
         this.itemInfo.apiContent.bodyTableData.splice(index, count + 1);
       },
     },

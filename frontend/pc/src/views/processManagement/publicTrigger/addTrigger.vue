@@ -873,7 +873,12 @@
               key: field.key,
               value: {},
             };
-            valueInfo.value = this.treeToJson(field.apiContent.bodyTableData.filter(item => (!item.level)));
+            console.log(response);
+            if (!['POST', 'PATCH', 'PUT'].includes(field.apiContent.method)) {
+              valueInfo.value = field.value;
+            } else {
+              valueInfo.value = this.treeToJson(field.apiContent.bodyTableData.filter(item => (!item.level)));
+            }
             // 使用递归来取值
             // const checkInfo = (arr, parentKey) => {
             //     arr.forEach(itemArr => {

@@ -700,15 +700,11 @@
       },
       // 保存字段
       saveField(field) {
-        const index = this.ticketNodeForm.findIndex(item => item.id === field.id);
+        const index = this.ticketNodeForm.findIndex(item => item.id === this.crtForm);
         field.checkValue = false;
         field.showFeild = true;
         field.val = Object.prototype.hasOwnProperty.call(field, 'default') ? deepClone(field.default) : '';
-        if (index > -1) { // 编辑
-          this.ticketNodeForm.splice(index, 1, field);
-        } else { // 新增
-          this.ticketNodeForm.splice(-1, 1, field);
-        }
+        this.ticketNodeForm.splice(index, 1, field);
         this.crtForm = '';
       },
       // 保存字段半行拖拽后的位置

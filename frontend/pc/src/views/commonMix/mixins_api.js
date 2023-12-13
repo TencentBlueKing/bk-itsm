@@ -40,7 +40,7 @@ export default {
           checkInfo: false,
           key,
           type: valueJsonData.type || '',
-          desc: valueJsonData.description.toString(),
+          desc: valueJsonData.description || valueJsonData.desc,
           default: (valueJsonData.default !== undefined
                         && valueJsonData.default.toString()) ? valueJsonData.default : '',
           is_necessary: !level
@@ -109,7 +109,7 @@ export default {
         const valueList = {};
         valueList[item.key] = {
           type: item.type,
-          description: item.desc.toString(),
+          description: item.desc || item.description,
           required: (item.children && item.children.length)
             ? item.children.filter(item => item.is_necessary).map(ite => ite.key) : [],
         };
