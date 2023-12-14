@@ -104,7 +104,6 @@
     },
     methods: {
       initData() {
-        console.log(this.item);
         this.item.wayInfo.field_schema.forEach(schema => {
           if (schema.key === 'api_source' && schema.value) {
             this.getApiContent(schema.value);

@@ -873,7 +873,6 @@
               key: field.key,
               value: {},
             };
-            console.log(response);
             if (!['POST', 'PATCH', 'PUT'].includes(field.apiContent.method)) {
               valueInfo.value = field.value;
             } else {
