@@ -71,7 +71,11 @@ class ProfilerMiddleware(object):
             if not request_paths:
                 return True
             for path in request_paths:
-                if path["path"] == request.path and request.method in path["method"]:
+                if (
+                    path["path"] == request.path
+                    and request.method in path["method"]
+                    and "profile" in request.GET
+                ):
                     return True
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
