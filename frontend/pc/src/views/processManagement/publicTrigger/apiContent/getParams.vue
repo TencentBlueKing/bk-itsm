@@ -40,7 +40,7 @@
             <bk-select
               v-model="props.row.sourceType"
               :clearable="false"
-              @change="handleSourceTypeChange(props.row)">
+              @change="handleSourceTypeChange(props.row.name, $event)">
               <bk-option
                 v-for="option in sourceTypeList"
                 :key="option.key"
@@ -50,10 +50,10 @@
             </bk-select>
           </div>
           <div
-            v-if="props.row.sourceType === 'CUSTOM'"
+            v-if="props.row.sourceType === 'custom'"
             style="width: 140px; position: absolute; top: 4px; right: 15px;">
             <bk-input
-              v-model="localVal[props.row.name]"
+              v-model="localVal[props.row.name].value"
               :clearable="true"
               :placeholder="$t(`m.treeinfo['请输入参数值']`)"
               @change="change">
@@ -61,7 +61,7 @@
           </div>
           <div v-else style="width: 140px; position: absolute; top: 4px; right: 15px;">
             <bk-select
-              v-model="localVal[props.row.name]"
+              v-model="localVal[props.row.name].value"
               :clearable="false"
               :searchable="true"
               @change="change">
@@ -101,11 +101,11 @@
         localVal: {},
         sourceTypeList: [
           {
-            key: 'CUSTOM',
+            key: 'custom',
             name: this.$t('m.treeinfo["自定义"]'),
           },
           {
-            key: 'FIELDS',
+            key: 'reference',
             name: this.$t('m.treeinfo["引用变量"]'),
           },
         ],
@@ -113,13 +113,7 @@
     },
     computed: {
       ...mapState('trigger', {
-        triggerVariables: state => state.triggerVariables.map(item => {
-          const { key, name } = item;
-          return {
-            key: `\$\{params_${key}\}`,
-            name,
-          };
-        }),
+        triggerVariables: state => state.triggerVariables,
       }),
     },
     watch: {
@@ -136,16 +130,19 @@
         const tableData = [];
         this.params.forEach(item => {
           const { desc, is_necessary, name, sample, value } = item;
-          const val = (name in this.value) ? this.value[name] : value;
-          const sourceType = /\$\{params_\w+\}/.test(val) ? 'FIELDS' : 'CUSTOM';
-          tableData.push({ desc, is_necessary, name, sample, sourceType });
+          const val = (name in this.value) ? this.value[name] : { value, is_leaf: true, ref_type: 'custom' };
+          tableData.push({ desc, is_necessary, name, sample, sourceType: val.ref_type });
           this.$set(this.localVal, name, val);
         });
         this.tableData = tableData;
         this.change();
       },
-      handleSourceTypeChange(row) {
-        row.value = '';
+      handleSourceTypeChange(key, type) {
+        this.localVal[key] = {
+          ref_type: type,
+          value: '',
+          is_leaf: true,
+        };
         this.change();
       },
       change() {
