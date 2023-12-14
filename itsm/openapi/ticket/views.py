@@ -77,6 +77,7 @@ from itsm.openapi.ticket.serializers import (
     TicketComplexLogsSerializer,
     TicketApproveSerializer,
 )
+from itsm.openapi.ticket.tasks import openapi_start_ticket
 from itsm.openapi.ticket.utils import edit_ticket_field
 from itsm.openapi.ticket.validators import (
     openapi_operate_validate,
@@ -92,7 +93,6 @@ from itsm.ticket.models import (
     Status,
 )
 from itsm.ticket.serializers import TicketList, TicketSerializer
-from itsm.ticket.tasks import start_pipeline
 from itsm.ticket.validators import (
     terminate_validate,
     withdraw_validate,
@@ -414,10 +414,9 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         try:
             # 创建额外的全局字段
             instance.create_dynamic_fields(dynamic_fields)
-            instance.do_after_create(
-                data["fields"], request.data.get("from_ticket_id", None)
+            openapi_start_ticket.apply_async(
+                [instance, data["fields"], request.data.get("from_ticket_id", None)]
             )
-            start_pipeline.apply_async([instance])
         except Exception as e:
             logger.exception(
                 "[openapi][create_ticket]-> 单据创建失败， 错误原因 error={}".format(e)
