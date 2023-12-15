@@ -4398,15 +4398,15 @@ class Ticket(Model, BaseTicket):
                 detail_message=terminate_message,
             )
             self.close_moa_ticket(state_id, operator)
-            self.callback_request()
-            self.notify(
-                state_id=state_id,
-                receivers=self.creator,
-                message=message,
-                action=TERMINATE_OPERATE,
-                retry=False,
-            )
 
+        self.callback_request()
+        self.notify(
+            state_id=state_id,
+            receivers=self.creator,
+            message=message,
+            action=TERMINATE_OPERATE,
+            retry=False,
+        )
         self.stop_all_sla()
 
         return {"result": True, "message": _("流程终止成功：%s") % res.message, "code": 0}
@@ -4503,10 +4503,9 @@ class Ticket(Model, BaseTicket):
             # 更新状态
             self.update_current_status("REVOKED")
             self.close_moa_ticket(state_id, operator)
-            self.callback_request()
 
+        self.callback_request()
         self.stop_all_sla()
-
         # 撤销单据触发信号发送
         self.send_trigger_signal(DELETE_TICKET)
 
