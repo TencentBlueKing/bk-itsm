@@ -2975,6 +2975,7 @@ class Ticket(Model, BaseTicket):
                 ticket, message, operator, detail_message=desc
             )
 
+        self.close_moa_ticket(operator=operator)
         self.callback_request()
 
     def get_last_approver(self):
@@ -4239,8 +4240,8 @@ class Ticket(Model, BaseTicket):
         self.do_before_end_pipeline(operator, close_status, desc, source=WEB)
         # 直接终止后台流程
         task_service.revoke_pipeline(self.id)
-
         self.stop_all_sla()
+
         return
 
     def do_before_end_pipeline(
@@ -4397,7 +4398,8 @@ class Ticket(Model, BaseTicket):
                 name=node_status.name,
                 detail_message=terminate_message,
             )
-            self.close_moa_ticket(state_id, operator)
+            # 终止单据关闭所有待办
+            self.close_moa_ticket(operator)
 
         self.callback_request()
         self.notify(
@@ -4479,7 +4481,6 @@ class Ticket(Model, BaseTicket):
         node_status = self.status(state_id)
 
         message = "{operator} 撤销单据."
-
         with transaction.atomic():
             end_at = datetime.now()
             node_status.set_status(TERMINATED, operator, terminate_message=message)
@@ -4502,8 +4503,8 @@ class Ticket(Model, BaseTicket):
 
             # 更新状态
             self.update_current_status("REVOKED")
-            self.close_moa_ticket(state_id, operator)
-
+            self.close_moa_ticket(operator=operator)
+        task_service.revoke_pipeline(self.id)
         self.callback_request()
         self.stop_all_sla()
         # 撤销单据触发信号发送
