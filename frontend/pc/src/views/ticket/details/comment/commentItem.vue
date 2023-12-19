@@ -22,14 +22,14 @@
       </div>
     </div>
     <div class="comment-content">
-      <div v-html="curComment.content"></div>
+      <div v-dompurify-html="curComment.content"></div>
       <div
         v-if="curComment.hasOwnProperty('parent_creator')"
         class="comment-reply"
         @click="jumpTargetComment(curComment)">
         <div class="comment-message">
           <span><i class="bk-itsm-icon icon-yinyong"></i>{{ $t('m["回复"]') }} {{ curComment.parent_creator }} {{ $t('m["的评论"]') }} :</span>
-          <div v-html="curComment.parent_content"></div>
+          <div v-dompurify-html="curComment.parent_content"></div>
         </div>
       </div>
     </div>

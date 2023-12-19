@@ -59,6 +59,7 @@ import {
 import enLocale from "element-ui/lib/locale/lang/en";
 import zhLocale from "element-ui/lib/locale/lang/zh-CN";
 import locales from "element-ui/lib/locale";
+import VueDOMPurifyHTML from 'vue-dompurify-html';
 // view components
 import App from "./App";
 // components
@@ -104,6 +105,8 @@ Vue.use(Col);
 Vue.use(Pagination);
 Vue.use(Tooltip);
 Vue.use(Cascader);
+
+Vue.use(VueDOMPurifyHTML);
 
 const ace = require("brace");
 const { renderHeader } = require('./utils/util')
@@ -168,7 +171,7 @@ store.dispatch('getPlatformPreData').then(()=> {
     },
     template: "<App/>",
   });
-  
+
   window.app = app;
 }).catch(error =>{
   console.warn(error);
