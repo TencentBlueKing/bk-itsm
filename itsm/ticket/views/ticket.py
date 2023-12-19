@@ -81,7 +81,6 @@ from itsm.component.constants import (
     OPEN,
     GENERAL,
     ORGANIZATION,
-    FAST_APPROVAL_MESSAGE,
     SUSPENDED,
 )
 from itsm.component.constants.flow import EXPORT_SUPPORTED_TYPE
@@ -242,6 +241,7 @@ class TicketModelViewSet(ModelViewSet):
         "service_id": ["exact", "in"],
         "create_at": ["lte", "gte"],
         "bk_biz_id": ["exact", "in"],
+        "tag": ["exact"],
     }
     ordering_fields = ("create_at",)
 
@@ -1080,12 +1080,15 @@ class TicketModelViewSet(ModelViewSet):
         # 分组
         ticket_actions = []
         state_actions = {}
+        transition_actions = []
         state_map = {}
         for item in actions:
             if item["signal_type"] == "STATE":
                 state_actions.setdefault(item["sender"], []).append(item)
             if item["signal_type"] == "FLOW":
                 ticket_actions.append(item)
+            if item["signal_type"] == "TRANSITION":
+                transition_actions.append(item)
 
         for state_id in state_actions.keys():
             state_map[state_id] = instance.state(state_id)["name"]
@@ -1094,6 +1097,7 @@ class TicketModelViewSet(ModelViewSet):
             {
                 "state": state_actions,
                 "ticket_actions": ticket_actions,
+                "transition": transition_actions,
                 "state_map": state_map,
             }
         )
@@ -1145,18 +1149,9 @@ class TicketModelViewSet(ModelViewSet):
             **{"title": ticket.title}
         )
         # 构造快速审批通知信息
-        fast_approval_message = FAST_APPROVAL_MESSAGE.format(
-            **ticket.get_fast_approval_message_params()
-        )
         for step in ticket.current_steps:
             # 快速审批通知
-            ticket.notify_fast_approval(
-                step["state_id"],
-                step["processors"],
-                fast_approval_message,
-                action=SUPERVISE_OPERATE,
-                kwargs=kwargs,
-            )
+            ticket.notify_fast_approval(step["state_id"], step["processors"])
             ticket.notify(
                 state_id=step["state_id"],
                 receivers=step["processors"],

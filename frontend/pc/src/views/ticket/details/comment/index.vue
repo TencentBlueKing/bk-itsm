@@ -37,7 +37,7 @@
         <span class="repeal-reply" @click="repealReply">{{ $t('m["取消回复"]') }}</span>
       </div>
       <div class="reply-content">
-        <div v-html="replyContent.content"></div>
+        <div v-dompurify-html="replyContent.content"></div>
       </div>
     </div>
     <editor

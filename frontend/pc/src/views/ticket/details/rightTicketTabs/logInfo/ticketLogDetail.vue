@@ -23,7 +23,7 @@
 <template>
   <div>
     <bk-sideslider
-      :width="600"
+      :width="960"
       :is-show="show"
       :quick-close="true"
       :before-close="

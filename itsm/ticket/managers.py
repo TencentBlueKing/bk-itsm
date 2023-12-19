@@ -274,7 +274,7 @@ class TicketManager(Manager):
         return queryset.filter(
             Q(updated_by__contains=dotted_username)
             | Q(history_task_processors=dotted_username)
-        )
+        ).exclude(creator=username)
 
     def get_iam_auth_tickets(self, queryset, username):
         iam_client = IamRequest(username=username)

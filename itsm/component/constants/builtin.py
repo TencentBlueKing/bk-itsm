@@ -435,6 +435,7 @@ ROLE_CHOICES = [
     (BY_ASSIGNOR, "派单人指定", False, True),
     (EMPTY, "无", False, True),
     (ORGANIZATION, "组织架构", False, True),
+    (VARIABLE_LEADER, "指定变量上级", False, True),
     (VARIABLE, "引用变量", False, True),
     (IAM, "权限中心角色", False, True),
     (API, "第三方系统", False, True),

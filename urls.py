@@ -48,7 +48,7 @@ urlpatterns = [
     url(r"^", include("itsm.sites.urls")),
 ]
 
-# handler404 = 'error_pages.views.error_404'
+handler404 = "error_pages.views.error_404"
 handler500 = "error_pages.views.error_500"
 handler403 = "error_pages.views.error_403"
 handler401 = "error_pages.views.error_401"

@@ -141,6 +141,7 @@ from itsm.component.constants import (
     BK_PLUGIN_STATE,
     SUSPENDED,
     SHOW_BY_CONDITION,
+    VARIABLE_LEADER,
 )
 from itsm.component.constants.trigger import (
     CREATE_TICKET,
@@ -1552,8 +1553,13 @@ class Ticket(Model, BaseTicket):
                 "state_id": state_id,
             }
         )
-        self.notify_url = "{site_url}/#/ticket/{ticket_id}/?token={token}&step_id={step_id}".format(
+        flag = "#"
+        if settings.ENABLE_NOTIFY_ROUTER:
+            flag = settings.NOTIFY_ROUTER_NAME
+
+        self.notify_url = "{site_url}/{flag}/ticket/{ticket_id}/?token={token}&step_id={step_id}".format(
             # noqa
+            flag=flag,
             site_url=settings.TICKET_NOTIFY_HOST.rstrip("/"),
             ticket_id=self.id,
             token=ticket_token,
@@ -2122,6 +2128,18 @@ class Ticket(Model, BaseTicket):
             else:
                 outputs[field.key] = value
         return outputs
+
+    def get_state_approve_result(self, state_id):
+        workflow_global_variable = GlobalVariable.objects.filter(
+            flow_id=self.flow.workflow_id, state_id=state_id, is_deleted=0
+        ).only("key", "meta")
+        for variable in workflow_global_variable:
+            if variable.meta.get("code", "") == NODE_APPROVE_RESULT:
+                result = TicketGlobalVariable.objects.filter(
+                    key=variable.key, ticket_id=self.id, state_id=state_id
+                ).first()
+                return result.value == "true"
+        return False
 
     def get_ticket_result(self):
         workflow_global_variable = GlobalVariable.objects.filter(
@@ -2957,6 +2975,7 @@ class Ticket(Model, BaseTicket):
                 ticket, message, operator, detail_message=desc
             )
 
+        self.close_moa_ticket(operator=operator)
         self.callback_request()
 
     def get_last_approver(self):
@@ -3130,6 +3149,21 @@ class Ticket(Model, BaseTicket):
             if pros_type == PERSON:
                 return dotted_name(pros), PERSON
 
+            if pros_type == VARIABLE_LEADER:
+                # 引用变量的处理人逻辑
+                for f_key in pros.split(","):
+                    f_value = self.get_field_value(f_key)
+                    # 跳过空值字段
+                    if not f_value:
+                        continue
+                    users = f_value.split(",")
+                    # 取到第一个处理人则停止解析
+                    leaders = get_user_leader(users[0])
+                    leaders = dotted_name(",".join(leaders)) if leaders else ""
+                    return leaders, PERSON
+                else:
+                    # 所有引用的处理人字段均为空
+                    return "", PERSON
             if pros_type == VARIABLE:
                 # 引用变量的处理人逻辑
                 var_pros = ""
@@ -3715,9 +3749,7 @@ class Ticket(Model, BaseTicket):
         # Send notify
         processor = node_status.get_processor_in_sign_state()
         # 快速审批通知
-        self.notify_fast_approval(
-            state_id, processor, "", action=TRANSITION_OPERATE, kwargs=kwargs
-        )
+        self.notify_fast_approval(state_id, processor)
 
         # TODO 发送通知可用触发器替代
         self.notify(
@@ -4031,21 +4063,26 @@ class Ticket(Model, BaseTicket):
             text_content = []
             for data in content["form_data"]:
                 scheme = data["scheme"]
-                label = data["label"]
+                label = data.get("label")
                 detail = []
                 if isinstance(data["value"], str):
                     if label and data["value"]:
-                        text_content.append("{}:\n{}\n".format(label, data["value"]))
+                        text_content.append(
+                            "{}:\n{}".format(label, data.get("label") or data["value"])
+                        )
                     continue
                 for attr in data["value"]:
                     single = []
                     for attr_name, attr_value in attr.items():
                         try:
-                            if isinstance(attr_value["value"], str):
+                            attr_display = (
+                                attr_value.get("label") or attr_value["value"]
+                            )
+                            if isinstance(attr_display, str):
                                 single.append(
                                     "{}:{}".format(
                                         schemes_map[scheme][attr_name],
-                                        attr_value["value"],
+                                        attr_display,
                                     )
                                 )
                         except Exception as err:
@@ -4054,9 +4091,8 @@ class Ticket(Model, BaseTicket):
                                     data, err
                                 )
                             )
-                    detail.append(",".join(single))
-                if label:
-                    text_content.append("{}:\n{}\n".format(label, "\n".join(detail)))
+                    detail.append(", ".join(single))
+                text_content.append("{}:\n{}".format(label, "\n".join(detail)))
             return "\n".join(text_content)
         except Exception as err:
             logger.exception(
@@ -4204,8 +4240,8 @@ class Ticket(Model, BaseTicket):
         self.do_before_end_pipeline(operator, close_status, desc, source=WEB)
         # 直接终止后台流程
         task_service.revoke_pipeline(self.id)
-
         self.stop_all_sla()
+
         return
 
     def do_before_end_pipeline(
@@ -4228,9 +4264,8 @@ class Ticket(Model, BaseTicket):
             action=FINISHED,
             retry=False,
         )
-
         # 清理Token
-        TicketFollowerNotifyLog.objects.filter(ticket_id=self.id).delete()
+        TicketFollowerNotifyLog._objects.filter(ticket_id=self.id).delete()
         return
 
     def proceed(self, state_id, fields, operator="", source=WEB):
@@ -4363,16 +4398,17 @@ class Ticket(Model, BaseTicket):
                 name=node_status.name,
                 detail_message=terminate_message,
             )
-            self.close_moa_ticket(state_id, operator)
-            self.callback_request()
-            self.notify(
-                state_id=state_id,
-                receivers=self.creator,
-                message=message,
-                action=TERMINATE_OPERATE,
-                retry=False,
-            )
+            # 终止单据关闭所有待办
+            self.close_moa_ticket(operator)
 
+        self.callback_request()
+        self.notify(
+            state_id=state_id,
+            receivers=self.creator,
+            message=message,
+            action=TERMINATE_OPERATE,
+            retry=False,
+        )
         self.stop_all_sla()
 
         return {"result": True, "message": _("流程终止成功：%s") % res.message, "code": 0}
@@ -4442,13 +4478,14 @@ class Ticket(Model, BaseTicket):
             running_status.first().state_id if running_status else self.first_state_id
         )
 
-        node_status = self.status(state_id)
-
         message = "{operator} 撤销单据."
-
         with transaction.atomic():
             end_at = datetime.now()
-            node_status.set_status(TERMINATED, operator, terminate_message=message)
+
+            # 撤销单据撤销当前所有正在运行的节点
+            for status in running_status:
+                status.set_status(TERMINATED, operator, terminate_message=message)
+
             for ticket in self.master_slave_tickets:
                 TicketEventLog.objects.create_log(
                     ticket,
@@ -4468,11 +4505,10 @@ class Ticket(Model, BaseTicket):
 
             # 更新状态
             self.update_current_status("REVOKED")
-            self.close_moa_ticket(state_id, operator)
-            self.callback_request()
-
+            self.close_moa_ticket(operator=operator)
+        task_service.revoke_pipeline(self.id)
+        self.callback_request()
         self.stop_all_sla()
-
         # 撤销单据触发信号发送
         self.send_trigger_signal(DELETE_TICKET)
 
@@ -4898,6 +4934,12 @@ class Ticket(Model, BaseTicket):
             fields.append(TicketField(**ticket_field))
 
         TicketField.objects.bulk_create(fields)
+
+    def get_approver(self, state_id):
+        status = self.node_status.get(state_id=state_id)
+        sign_tasks = SignTask.objects.filter(status_id=status.id)
+        processors = [task.processor for task in sign_tasks]
+        return ",".join(processors)
 
 
 class TicketOrganization(Model):

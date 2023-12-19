@@ -35,6 +35,7 @@ from blueapps.account.decorators import login_exempt
 from common.log import logger
 from common.cipher import AESVerification
 from common.redis import Cache
+from itsm.component.bkchat.utils import proceed_fast_approval, build_bkchat_summary
 from itsm.component.constants import (
     API,
     QUEUEING,
@@ -76,6 +77,7 @@ from itsm.openapi.ticket.serializers import (
     TicketComplexLogsSerializer,
     TicketApproveSerializer,
 )
+from itsm.openapi.ticket.tasks import openapi_start_ticket
 from itsm.openapi.ticket.utils import edit_ticket_field
 from itsm.openapi.ticket.validators import (
     openapi_operate_validate,
@@ -91,7 +93,6 @@ from itsm.ticket.models import (
     Status,
 )
 from itsm.ticket.serializers import TicketList, TicketSerializer
-from itsm.ticket.tasks import start_pipeline
 from itsm.ticket.validators import (
     terminate_validate,
     withdraw_validate,
@@ -413,10 +414,9 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         try:
             # 创建额外的全局字段
             instance.create_dynamic_fields(dynamic_fields)
-            instance.do_after_create(
-                data["fields"], request.data.get("from_ticket_id", None)
+            openapi_start_ticket.apply_async(
+                [instance, data["fields"], request.data.get("from_ticket_id", None)]
             )
-            start_pipeline.apply_async([instance])
         except Exception as e:
             logger.exception(
                 "[openapi][create_ticket]-> 单据创建失败， 错误原因 error={}".format(e)
@@ -505,7 +505,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         处理单据（挂起、恢复、撤销）
         """
         sn = request.data.get("sn")
-        operator = request.data.get("operator")
+        operator = request.data.get("username") or request.data.get("operator")
         action_type = request.data.get("action_type")
         ticket = Ticket.objects.get(sn=sn)
 
@@ -528,7 +528,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             )
 
         if action_type == WITHDRAW_OPERATE:
-            withdraw_validate(operator, ticket)
+            withdraw_validate(operator, ticket, ignore_user=True)
         else:
             openapi_operate_validate(operator, ticket)
 
@@ -630,15 +630,25 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"])
     @catch_openapi_exception
+    @custom_apigw_required
     def proceed_fast_approval(self, request):
         """
         处理快速审批请求
         """
-        if settings.RUN_VER == "ieod":
-            from platform_config.ieod.bkchat.utils import proceed_fast_approval
-        else:
-            from platform_config.open.bkchat.utils import proceed_fast_approval
         return proceed_fast_approval(request)
+
+    @action(detail=False, methods=["get"])
+    @catch_openapi_exception
+    @custom_apigw_required
+    def get_fast_approval_summary(self, request):
+        sn = request.query_params.get("sn")
+        try:
+            ticket = Ticket.objects.get(sn=sn)
+        except Ticket.DoesNotExist:
+            raise ParamError("sn[{}]对应的单据不存在！".format(sn))
+
+        summary = build_bkchat_summary(ticket)
+        return Response({"summary": summary})
 
     @action(detail=False, methods=["get"])
     @catch_openapi_exception
@@ -740,10 +750,8 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         except Ticket.DoesNotExist:
             raise ParamError("sn[{}]对应的单据不存在！".format(sn))
 
-        status = Status.objects.get(ticket_id=ticket.id, state_id=state_id)
-        sign_tasks = SignTask.objects.filter(status_id=status.id)
-        processors = [task.processor for task in sign_tasks]
-        return Response({"approver": ",".join(processors)})
+        processors = ticket.get_approver(state_id)
+        return Response({"approver": processors})
 
     @action(detail=False, methods=["get"])
     @catch_openapi_exception

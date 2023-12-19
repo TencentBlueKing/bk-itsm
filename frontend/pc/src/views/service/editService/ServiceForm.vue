@@ -282,7 +282,7 @@
       },
       // 字段编辑保存
       onEditConfirm(form) {
-        const originForm = this.forms.find(item => item.id === form.id);
+        const originForm = this.forms.find(item => item.id === this.crtForm);
         if (originForm) {
           if (form.layout === 'COL_12') {
             form.layout_position = '';

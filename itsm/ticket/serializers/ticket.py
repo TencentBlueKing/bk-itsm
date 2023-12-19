@@ -83,7 +83,11 @@ from itsm.component.utils.basic import (
     generate_random_sn,
 )
 from itsm.component.utils.client_backend_query import get_biz_names, get_template_list
-from itsm.component.utils.misc import transform_single_username, transform_username
+from itsm.component.utils.misc import (
+    transform_single_username,
+    transform_username,
+    get_transform_username_dict,
+)
 from common.utils import html_escape
 from itsm.postman.serializers import TaskStateApiInfoSerializer
 from itsm.service.validators import service_validate
@@ -303,7 +307,12 @@ class StatusSerializer(serializers.ModelSerializer):
             current_tasks_processors = list(
                 set(sign_tasks_processor_list).intersection(set(user_list))
             )
+
             tasks = []
+
+            # 采用批量查询，优化性能
+            transformed_users_dict = get_transform_username_dict(user_list[0:30])
+
             for user in user_list[0:30]:
                 task_can_view = False
                 task_field_list = []
@@ -318,7 +327,7 @@ class StatusSerializer(serializers.ModelSerializer):
                     ).data
 
                 task_info = {
-                    "processor": transform_single_username(user),
+                    "processor": transformed_users_dict.get(user, user),
                     "status": processor_task_id_map.get(user, {}).get("status", "WAIT"),
                     "can_view": task_can_view,
                     "fields": task_field_list,
@@ -771,8 +780,15 @@ class TicketSerializer(AuthModelSerializer):
     def __init__(self, instance=None, data=empty, **kwargs):
         super(TicketSerializer, self).__init__(instance, data, **kwargs)
         # 针对批量获取的内容，可以在init的时候进行处理，避免每个数据的序列化都要去拉取接口
-        self.related_users = self.get_related_users()
         self.ticket_followers = self.get_attention_users()
+
+    def get_creator_and_current_processors(self, inst):
+        related_users = self.get_related_users()
+        creator = transform_single_username(inst.creator, related_users)
+        current_processors = transform_username(
+            list(inst.display_current_processors), related_users
+        )
+        return creator, current_processors
 
     def get_related_users(self):
         """
@@ -881,11 +897,11 @@ class TicketSerializer(AuthModelSerializer):
             or inst.can_view(username)
         )
 
+        creator, current_processors = self.get_creator_and_current_processors(inst)
+
         data.update(
-            creator=transform_single_username(inst.creator, self.related_users),
-            current_processors=transform_username(
-                list(inst.display_current_processors), self.related_users
-            ),
+            creator=creator,
+            current_processors=current_processors,
             can_comment=can_comment,
             can_operate=can_operate,
             can_view=can_view,
@@ -991,6 +1007,9 @@ class TicketRetrieveSerializer(TicketSerializer):
             "project_key",
         ) + copy.deepcopy(TicketSerializer.Meta.fields)
         read_only_fields = copy.deepcopy(TicketSerializer.Meta.read_only_fields)
+
+    def get_creator_and_current_processors(self, inst):
+        return inst.creator, ",".join(inst.real_current_processors)
 
     def to_representation(self, inst):
         """单据详情"""

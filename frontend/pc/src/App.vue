@@ -22,39 +22,41 @@
 
 <template>
   <div id="app" class="bk-app" @click="hiddenTree" v-bkloading="{ isLoading: loading }">
-    <!-- has navigation-->
-    <navigation v-if="!$route.meta.iframe">
-      <div
-        v-if="isShowView"
-        v-bkloading="{ isLoading: localLoading }"
-        class="bk-app-content">
-        <permissionApply
-          v-if="permissinApplyShow"
-          ref="permissionApply"
-          :permission-data="permissionData">
-        </permissionApply>
-        <router-view
-          v-else
-          :key="routerKey">
-        </router-view>
-      </div>
-    </navigation>
-    <!-- no navigation-->
-    <template v-else>
-      <div
-        v-if="isShowView"
-        v-bkloading="{ isLoading: localLoading }"
-        class="bk-app-content">
-        <permissionApply
-          v-if="permissinApplyShow"
-          ref="permissionApply"
-          :permission-data="permissionData">
-        </permissionApply>
-        <router-view
-          v-else
-          :key="routerKey">
-        </router-view>
-      </div>
+    <template v-if="isShowView">
+      <!-- has navigation-->
+      <navigation v-if="!$route.meta.iframe">
+        <div
+          v-if="isShowView"
+          v-bkloading="{ isLoading: localLoading }"
+          class="bk-app-content">
+          <permissionApply
+            v-if="permissinApplyShow"
+            ref="permissionApply"
+            :permission-data="permissionData">
+          </permissionApply>
+          <router-view
+            v-else
+            :key="routerKey">
+          </router-view>
+        </div>
+      </navigation>
+      <!-- no navigation-->
+      <template v-else>
+        <div
+          v-if="isShowView"
+          v-bkloading="{ isLoading: localLoading }"
+          class="bk-app-content">
+          <permissionApply
+            v-if="permissinApplyShow"
+            ref="permissionApply"
+            :permission-data="permissionData">
+          </permissionApply>
+          <router-view
+            v-else
+            :key="routerKey">
+          </router-view>
+        </div>
+      </template>
     </template>
     <PermissionModal ref="permissionModal"></PermissionModal>
   </div>

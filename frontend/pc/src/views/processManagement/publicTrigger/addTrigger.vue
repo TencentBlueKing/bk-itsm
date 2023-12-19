@@ -707,7 +707,11 @@
                           subItemSchema.field_schema.forEach(fieldSchema => {
                             if (fieldSchema.required) {
                               if (fieldSchema.type === 'MEMBERS' || fieldSchema.type === 'MULTI_MEMBERS') {
-                                responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : fieldSchema.value.some(schemaMem => (Array.isArray(schemaMem.value) ? !schemaMem.value.length : !schemaMem.value));
+                                responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : fieldSchema.value.some(schemaMem => {
+                                  const { key, value } = schemaMem;
+                                  return !['STARTER_LEADER', 'ASSIGN_LEADER', 'VARIABLE_LEADER'].includes(key)
+                                    && (Array.isArray(value) ? !value.length : !value);
+                                });
                               } else {
                                 responseItem.contentStatus = responseItem.contentStatus ? responseItem.contentStatus : !fieldSchema.value;
                               }
@@ -869,7 +873,11 @@
               key: field.key,
               value: {},
             };
-            valueInfo.value = this.treeToJson(field.apiContent.bodyTableData.filter(item => (!item.level)));
+            if (!['POST', 'PATCH', 'PUT'].includes(field.apiContent.method)) {
+              valueInfo.value = field.value;
+            } else {
+              valueInfo.value = this.treeToJson(field.apiContent.bodyTableData.filter(item => (!item.level)));
+            }
             // 使用递归来取值
             // const checkInfo = (arr, parentKey) => {
             //     arr.forEach(itemArr => {

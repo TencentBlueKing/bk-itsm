@@ -36,6 +36,7 @@
       v-if="crumbsList.length <= 1"
       :is="componentType"
       :form="form"
+      :scheme="scheme"
       v-bind="getAttrs(form)">
     </component>
     <render-view
@@ -50,12 +51,14 @@
 <script>
   import TagText from './tags/TagText.vue';
   import TagTable from './tags/TagTable.vue';
+  import TagUrl from './tags/TagUrl.vue';
   import { deepClone } from '../../utils/util';
   export default {
     name: 'ViewItem',
     components: {
       TagText,
       TagTable,
+      TagUrl,
       RenderView: () => import('./RenderView'),
     },
     inject: ['getContext'],

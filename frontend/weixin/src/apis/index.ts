@@ -48,8 +48,18 @@ axiosInstance.interceptors.response.use(
     return response.data
   },
   (error) => {
+    if (error.response.status === 499) {
+      const { url, params } = error.response.config
+      const matched = location.hash.match(/(^|&)step_id=(\d+)\w?/)
+      const stepId = matched ? matched[2] : ''
+      if (url.match(/ticket\/receipts\/[0-9]+\//) && stepId) {
+        emitter.emit('showPermissionDialog', { isDisplayProcessor: true, ticketId: params.id, stepId })
+      } else {
+        emitter.emit('showPermissionDialog', { isDisplayProcessor: false })
+      }
+      return Promise.reject(error)
+    }
     emitter.emit('notify', { type: 'danger', message: '接口返回异常', duration: 5000 })
-    console.error(error)
     return Promise.reject(error)
   }
 )

@@ -2,14 +2,12 @@
 from django.conf import settings
 
 from common.log import logger
-from itsm.component.constants import TRANSITION_OPERATE, APPROVAL_STATE
+from itsm.component.constants import APPROVAL_STATE
 from itsm.workflow.models import State
 
 
 class BaseBkchatConfig:
-    def notify_fast_approval(
-        self, state_id, receivers, message="", action=TRANSITION_OPERATE, **kwargs
-    ):
+    def notify_fast_approval(self, state_id, receivers):
         from itsm.ticket.tasks import notify_fast_approval_task
 
         """
@@ -17,6 +15,7 @@ class BaseBkchatConfig:
         """
         if not settings.USE_BKCHAT:
             return
+
         # 判断当前节点是否存在
         try:
             current_state = State.objects.get(id=state_id)
@@ -36,7 +35,5 @@ class BaseBkchatConfig:
             return
 
         # 异步执行发送快速审批通知操作
-        notify_fast_approval_task.apply_async(
-            args=[self, state_id, receivers, message, action], kwargs=kwargs
-        )
+        notify_fast_approval_task.apply_async(args=[self, state_id, receivers])
         return

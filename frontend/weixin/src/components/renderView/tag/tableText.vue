@@ -28,9 +28,11 @@
     ]"
     @click="onInnerLinkClick">
     <label>{{ form.label }}</label>
-    <span v-if="!Array.isArray(form.value)">{{ form.value }}</span>
-    <template v-else>
-      <TableText v-for="(item, i) in form.value" :key="i" :form="item" />
+    <template v-if="type !== 'url'">
+      <span v-if="!Array.isArray(form.value)">{{ form.value }}</span>
+      <template v-else>
+        <TableText v-for="(item, i) in form.value" :key="i" :form="item" />
+      </template>
     </template>
   </p>
 </template>
@@ -45,6 +47,10 @@ export default {
     form: {
       type: Object,
       default: () => ({})
+    },
+    type: {
+      type: String,
+      default: ''
     }
   },
   setup(props) {
@@ -73,6 +79,7 @@ export default {
 </script>
 <style lang="postcss">
 .table-text {
+  word-break: break-all;
   > label {
     color: #63656e;
   }

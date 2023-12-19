@@ -123,6 +123,56 @@
             </bk-table>
           </div>
         </bk-collapse-item>
+        <bk-collapse-item name="transition">
+          {{$t(`m['线条触发器']`)}}
+          <div slot="content" class="f13">
+            <bk-table
+              :header-cell-attributes="headerCellAttributes"
+              :data="transitionAction"
+              :size="'small'"
+              @sort-change="orderingClick">
+              <bk-table-column :label="$t(`m.task['执行时间']`)" :render-header="$renderHeader" :show-overflow-tooltip="true" :sortable="'custom'">
+                <template slot-scope="props">
+                  <span :title="props.row.end_time">
+                    {{props.row.end_time || '--'}}
+                  </span>
+                </template>
+              </bk-table-column>
+              <bk-table-column :label="$t(`m.task['响应动作']`)" :render-header="$renderHeader" :show-overflow-tooltip="true">
+                <template slot-scope="props">
+                  <span
+                    :title="props.row.display_name"
+                    style="color: #3A84FF;cursor: pointer"
+                    @click="openDetail(props.row)">
+                    {{props.row.component_name || '--'}}
+                  </span>
+                </template>
+              </bk-table-column>
+              <bk-table-column :label="$t(`m.task['执行状态']`)" :render-header="$renderHeader" :show-overflow-tooltip="true" :sortable="'custom'">
+                <template slot-scope="props">
+                  <span class="bk-status-success"
+                    :class="{ 'bk-status-failed': props.row.status === 'FAILED' }"
+                    :title="props.row.status_name">
+                    {{props.row.status_name || '--'}}
+                  </span>
+                </template>
+              </bk-table-column>
+              <bk-table-column :label="$t(`m.task['操作人']`)" :render-header="$renderHeader" :show-overflow-tooltip="true">
+                <template slot-scope="props">
+                  <span :title="props.row.operator_username">
+                    {{props.row.operator_username || '--'}}
+                  </span>
+                </template>
+              </bk-table-column>
+              <div class="empty" slot="empty">
+                <empty
+                  :is-error="listError"
+                  @onRefresh="getHistoryList()">
+                </empty>
+              </div>
+            </bk-table>
+          </div>
+        </bk-collapse-item>
       </bk-collapse>
     </div>
     <!-- 任务记录详情 -->
@@ -182,6 +232,7 @@
           id: '',
         },
         ticketAction: [],
+        transitionAction: [],
         nodeActions: [],
         nodeIdMap: {},
         listError: false,
@@ -216,6 +267,7 @@
           // this.historyList = res.data.filter(item => item.status === 'FAILED' || item.status === 'SUCCEED');
           // 单据触发器
           this.ticketAction = res.data.ticket_actions.filter(item => item.status === 'FAILED' || item.status === 'SUCCEED');
+          this.transitionAction =  res.data.transition.filter(item => item.status === 'FAILED' || item.status === 'SUCCEED');
           // 节点触发器
           this.nodeIdMap = res.data.state_map;
           this.nodeActions = Object.keys(res.data.state).map(state => {

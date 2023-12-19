@@ -192,7 +192,7 @@ MIDDLEWARE = (
 # mako 模板中：<script src="/a.js?v=${ STATIC_VERSION }"></script>
 # 如果静态资源修改了以后，上线前改这个版本号即可
 # STATIC_VERSION_END
-STATIC_VERSION = "2.6.7"
+STATIC_VERSION = "2.6.8"
 DEPLOY_DATETIME = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
@@ -707,7 +707,7 @@ try:
 except Exception:
     NEED_PROFILE = False
 PROFILE_TEST_PATH = [
-    {"path": path, "method": ["GET"]}
+    {"path": path, "method": ["GET", "POST"]}
     for path in os.environ.get("BKAPP_PROFILE_TEST_PATH", "").split(",")
     if path
 ]
@@ -854,7 +854,7 @@ CONTENT_CREATOR_WITH_TRANSLATION = (
 )
 
 # 系统api调用账户
-SYSTEM_USE_API_ACCOUNT = "admin"
+SYSTEM_USE_API_ACCOUNT = os.environ.get("SYSTEM_USE_API_ACCOUNT", "admin")
 
 # 蓝盾
 DEVOPS_CLIENT_URL = os.environ.get("DEVOPS_CLIENT_URL", "")
@@ -864,7 +864,14 @@ api_public_key = os.environ.get("APIGW_PUBLIC_KEY", "")
 APIGW_PUBLIC_KEY = base64.b64decode(api_public_key)
 
 # show.py 敏感信息处理, 内部白皮书地址，内部登陆地址
-BK_IEOD_DOC_URL = os.environ.get("BK_IEOD_DOC_URL", "")
+BK_DOC_CENTER_HOST = os.getenv(
+    "BK_DOC_CENTER_HOST",
+    os.getenv("BK_DOCS_URL_PREFIX", "{}o/bk_docs_center".format(BK_PAAS_HOST)),
+)
+BK_DOC_URL = "{}{}".format(
+    BK_DOC_CENTER_HOST, "/markdown/ITSM/UserGuide/Introduce/README.md"
+)
+
 BK_IEOD_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
 
 # itsm-tapd 网关API地址
@@ -875,10 +882,11 @@ TAPD_OAUTH_URL = os.environ.get("TAPD_OAUTH_URL", "")
 # bkchat快速审批
 USE_BKCHAT = True if os.getenv("USE_BKCHAT", "true").lower() == "true" else False
 if USE_BKCHAT:
-    IM_TOKEN = os.environ.get("BKCHAT_IM_TOKEN", "")
     BKCHAT_URL = os.environ.get("BKCHAT_URL", "")
-    BKCHAT_APPID = os.environ.get("BKCHAT_APPID", "")
-    BKCHAT_APPKEY = os.environ.get("BKCHAT_APPKEY", "")
+    BKCHAT_CALLBACK_URL = os.environ.get("BKCHAT_CALLBACK_URL", "")
+    ITSM_SUMMARY_URL = os.environ.get("ITSM_SUMMARY_URL", "")
+    BKCHAT_ENV = os.environ.get("BKCHAT_ENV", None)
+    BKCHAT_ENV_FLAG = os.environ.get("BKCHAT_ENV_FLAG", "")
 
 
 def redirect_func(request):
@@ -925,7 +933,7 @@ BLUEAPPS_ENABLE_DB_ENCRYPTION = True
 # 使用 APP_TOKEN 作为非对称密码的 Key
 # 关于 BKCRYPTO 的配置，可参考：https://github.com/TencentBlueKing/crypto-python-sdk
 BKCRYPTO = {
-    "SYMMETRIC_TYPE": BKCRYPTO_SYMMETRIC_CIPHER_TYPE,
+    "SYMMETRIC_CIPHER_TYPE": BKCRYPTO_SYMMETRIC_CIPHER_TYPE,
     "SYMMETRIC_CIPHERS": {
         "blueapps": {
             # 配置非对称加密密钥，如需延迟到 `default.py` 外 lazy 加载 key，可使用 `get_key_config_func` 配置
@@ -934,3 +942,8 @@ BKCRYPTO = {
         },
     },
 }
+
+FOOTER = os.getenv("BKAPP_FOOTER", None)
+
+ENABLE_NOTIFY_ROUTER = os.getenv("BKAPP_ENABLE_NOTIFY_ROUTER", False)
+NOTIFY_ROUTER_NAME = os.getenv("BKAPP_NOTIFY_ROUTER_NAME", "router")

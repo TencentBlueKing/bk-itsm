@@ -66,9 +66,6 @@ bus.$on('processData', (response) => {
  */
 instance.interceptors.request.use(
   (config) => {
-    if (config.url === 'init/') {
-      config.baseURL = '';
-    }
     // 添加工单查看权限
     const token = sessionStorage.getItem('itsm_token');
     if (token && config.url.indexOf('ticket/') === 0) {

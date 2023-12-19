@@ -71,9 +71,9 @@
         :class="{ 'bk-big-width': item.layout === 'COL_12' }"
         :key="index">
         <span class="bk-li-left" style="float: initial;">{{item.name}}：</span>
-        <span class="bk-li-right"
-          v-html="item.value">
-        </span>
+        <div class="bk-li-right">
+          <RichTextEditor :is-preview="true" :value="item.value" />
+        </div>
       </li>
       <li v-else-if="item.type === 'TEXT'"
         :class="{ 'bk-big-width': item.layout === 'COL_12' }"
@@ -116,11 +116,13 @@
   import RenderView from '../../../components/renderview/RenderView';
   import { deepClone } from '../../../utils/util.js';
   import { getCustomTableDisplayValue } from '@/components/RenderField/fieldUtils';
+  import RichTextEditor from '../../../components/form/richTextEditor/richTextEditor.vue.vue';
 
   export default {
     name: 'fieldPreview',
     components: {
       RenderView,
+      RichTextEditor,
     },
     props: {
       fields: {

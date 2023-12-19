@@ -71,7 +71,11 @@ class ProfilerMiddleware(object):
             if not request_paths:
                 return True
             for path in request_paths:
-                if path["path"] == request.path and request.method in path["method"]:
+                if (
+                    path["path"] == request.path
+                    and request.method in path["method"]
+                    and "profile" in request.GET
+                ):
                     return True
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
@@ -133,16 +137,16 @@ class InstrumentProfilerMiddleware(ProfilerMiddleware):
             return response
         self.profiler.stop()
         outputs = settings.PROFILER.get("output", ["console"])
-        file_location = settings.PROFILER.get("file_location", "profiles")
-        if not os.path.exists(file_location):
-            os.mkdir(file_location)
-
         for output in outputs:
             output_text = self.profiler.output_html()
             if output == "console":
                 print(output_text)
 
             if output == "file":
+                file_location = settings.PROFILER.get("file_location", "profiles")
+                if not os.path.exists(file_location):
+                    os.mkdir(file_location)
+
                 file_loc = os.path.join(
                     file_location,
                     "%s%s-profile%s.html"

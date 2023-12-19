@@ -24,6 +24,7 @@ import MyTodoTicket from '../../views/workbench/MyTodoTicket.vue';
 import MyApprovalTicket from '../../views/workbench/MyApprovalTicket.vue';
 import MyCreatedTicket from '../../views/workbench/MyCreatedTicket.vue';
 import MyAttentionTicket from '../../views/workbench/MyAttentionTicket.vue';
+import MyHistoryTicket from '../../views/workbench/MyHistoryTicket.vue';
 import AllTicket from '../../views/workbench/AllTicket.vue';
 
 export default [
@@ -46,6 +47,11 @@ export default [
     path: '/workbench/ticket/attention',
     name: 'myAttentionTicket',
     component: MyAttentionTicket,
+  },
+  {
+    path: '/workbench/ticket/history',
+    name: 'myHistoryTicket',
+    component: MyHistoryTicket,
   },
   {
     path: '/workbench/ticket/all',

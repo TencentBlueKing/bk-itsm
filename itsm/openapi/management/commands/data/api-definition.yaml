@@ -1,5 +1,6 @@
 apigateway:
-  description: {{ settings.BK_APP_CODE }} apigw
+  description:  流程服务（{{ settings.BK_APP_CODE }}）API 网关，包含了服务、单据等相关资源的查询和操作接口
+  description_en: {{ settings.BK_APP_CODE }} The API gateway contains the query and operation interface of related resources such as services, documents.
   is_public: true
   maintainers:
     {% for member in settings.BK_APIGW_MANAGER_MAINTAINERS %}
@@ -26,3 +27,6 @@ stage:
 release:
   version: {{ settings.STATIC_VERSION }}+{{ settings.DEPLOY_DATETIME }}
   comment: "auto release by bk-sops"
+
+grant_permissions:
+  - bk_app_code: bk-audit

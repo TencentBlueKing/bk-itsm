@@ -198,8 +198,6 @@ def get_bk_users(format="list", name_type="bk_username", users=None):
     bk_users = cache.get(cache_key)
     if not bk_users:
         bk_users = update_user_cache(cache_key, format, name_type, users)
-    # else:
-    #     update_user_cache.delay(cache_key, format, name_type, users)
     return bk_users
 
 
