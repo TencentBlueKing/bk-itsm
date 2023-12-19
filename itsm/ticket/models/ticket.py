@@ -4478,12 +4478,14 @@ class Ticket(Model, BaseTicket):
             running_status.first().state_id if running_status else self.first_state_id
         )
 
-        node_status = self.status(state_id)
-
         message = "{operator} 撤销单据."
         with transaction.atomic():
             end_at = datetime.now()
-            node_status.set_status(TERMINATED, operator, terminate_message=message)
+
+            # 撤销单据撤销当前所有正在运行的节点
+            for status in running_status:
+                status.set_status(TERMINATED, operator, terminate_message=message)
+
             for ticket in self.master_slave_tickets:
                 TicketEventLog.objects.create_log(
                     ticket,
