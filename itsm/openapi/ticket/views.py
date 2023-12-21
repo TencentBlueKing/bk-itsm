@@ -571,6 +571,14 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             ticket = Ticket.objects.get(sn=ticket_id)
         except Exception:
             raise ValidationError("process_inst_id = {} 对应的单据不存在！".format(ticket_id))
+
+        node_status = ticket.node_status.get(state_id=state_id)
+
+        if not node_status.can_sign_state_operate(serializer.validated_data["handler"]):
+            raise OperateTicketError(
+                "单据审批失败，{}不是当前节点的审批人，无法审批".format(serializer.validated_data["handler"])
+            )
+
         try:
             node_fields = TicketField.objects.filter(
                 state_id=state_id, ticket_id=ticket.id
@@ -581,6 +589,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
                     state_id, ticket_id
                 )
             )
+
         fields = []
         remarked = False
         for field in node_fields:

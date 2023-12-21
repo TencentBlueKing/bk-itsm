@@ -198,6 +198,21 @@ def proceed_fast_approval(request):
     approve_action = result.get("status")
 
     ticket = Ticket.objects.get(id=ticket_id)
+
+    node_status = ticket.node_status.get(state_id=state_id)
+    if not node_status.can_sign_state_operate(receiver):
+        return JsonResponse(
+            {
+                "result": False,
+                "data": {
+                    "approve_result": ticket.get_state_approve_result(state_id),
+                    "approver": ticket.get_approver(state_id),
+                },
+                "code": -1,
+                "message": "单据审批失败，{}不是当前节点的审批人，无法审批".format(receiver),
+            }
+        )
+
     # 3.判断当前节点是否是RUNNING状态，否则通知
     current_status = Status.objects.get(state_id=state_id, ticket_id=ticket_id)
     if current_status.status != "RUNNING":
