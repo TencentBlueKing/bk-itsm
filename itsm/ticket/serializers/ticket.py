@@ -961,6 +961,13 @@ class TicketSerializer(AuthModelSerializer):
             except TicketStatus.DoesNotExist:
                 raise serializers.ValidationError({_("工单状态"): _("工单状态不存在，请检查")})
 
+            state_processors = data.get("meta", {}).get("state_processors", {})
+            for state_id, state_processor in state_processors.items():
+                if not state_processor:
+                    raise serializers.ValidationError(
+                        {"state_processors": _("节点 {} 对应的审批人不允许为空".format(state_id))}
+                    )
+
             # 创建单据时，若没有传入creator参数，则采用request的当前用户
             creator = data.get("creator", self.context["request"].user.username)
             data.update(
