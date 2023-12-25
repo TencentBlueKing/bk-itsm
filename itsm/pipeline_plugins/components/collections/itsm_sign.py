@@ -95,10 +95,6 @@ class ItsmSignService(ItsmBaseService):
             ticket = Ticket.objects.get(id=ticket_id)
             node_status = Status.objects.get(ticket_id=ticket_id, state_id=state_id)
 
-            # 并发情况下如果用户到这里已经被其他渠道回调过
-            if not node_status.can_sign_state_operate(operator):
-                return True
-
             try:
                 ticket.do_in_sign_state(node_status, fields, operator, source)
                 ticket.update_ticket_fields(fields=fields)
