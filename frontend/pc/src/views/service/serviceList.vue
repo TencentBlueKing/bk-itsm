@@ -28,7 +28,7 @@
       <div :class="['service-left', isHiddenDirectory ? 'hide' : '']">
         <tree-info ref="dirTree" :tree-info="treeInfo" :dir-list="dirList"></tree-info>
         <div class="hidden-tree" @click="hiddenTree">
-          <i :class="['bk-itsm-icon', isHiddenDirectory ? 'icon-arrow-right' : 'icon-xiangzuo1']"></i>
+          <i :class="['bk-itsm-icon icon-xiangyou1', isHiddenDirectory ? 'closed' : '']"></i>
         </div>
       </div>
       <div :class="['service-right', isHiddenDirectory ? 'auto-wight' : '']">
@@ -1169,14 +1169,24 @@
             position: absolute;
             top: calc(50% - 30px);
             right: -14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             width: 14px;
-            height: 61px;
-            line-height: 61px;
-            background-color: #dcdee5;
-            cursor: pointer;
+            height: 60px;
             color: #ffffff;
+            background-color: #dcdee5;
             border-top-right-radius: 4px;
             border-bottom-right-radius: 4px;
+            cursor: pointer;
+            .icon-xiangyou1 {
+                display: inline-block;
+                font-size: 14px;
+                transition: transform 0.3s ease-in-out;
+                &.closed {
+                    transform: rotate(180deg);
+                }
+            }
         }
     }
     .service-right {
