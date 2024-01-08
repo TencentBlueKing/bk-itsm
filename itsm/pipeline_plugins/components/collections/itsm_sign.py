@@ -119,7 +119,7 @@ class ItsmSignService(ItsmBaseService):
                     self.do_before_exit(ticket, state_id, operator)
                     if key_value[
                         code_key[NODE_APPROVE_RESULT]
-                    ] == "false" and state.get(
+                    ] == "false" and state.get("extras", {}).get(
                         "enable_terminate_ticket_when_rejected", False
                     ):
                         logger.info(
