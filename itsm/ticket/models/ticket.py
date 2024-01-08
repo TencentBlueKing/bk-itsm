@@ -2948,7 +2948,7 @@ class Ticket(Model, BaseTicket):
             # TODO: 临时处理, 后面会放在母子单解绑逻辑中
             ticket.current_status = close_status
             ticket.node_status.filter(status__in=Status.RUNNING_STATUS).update(
-                status=FINISHED
+                status=close_status
             )
             ticket.current_task_processors = ""
             ticket.current_processors = ""

@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
 
-from itsm.component.constants import NODE_APPROVE_RESULT
+from itsm.component.constants import NODE_APPROVE_RESULT, TERMINATED
 from itsm.ticket.models import Ticket, Status, TicketGlobalVariable, SignTask
 from pipeline.component_framework.component import Component
 
@@ -88,12 +88,12 @@ class ItsmSignService(ItsmBaseService):
             operator = callback_data["operator"]
             fields = callback_data["fields"]
             source = callback_data["source"]
-
             variables = data.outputs.get("variables")
             finish_condition = data.outputs.get("finish_condition")
             code_key = data.outputs.get("code_key")
             ticket = Ticket.objects.get(id=ticket_id)
             node_status = Status.objects.get(ticket_id=ticket_id, state_id=state_id)
+            state = ticket.state(state_id)
 
             try:
                 ticket.do_in_sign_state(node_status, fields, operator, source)
@@ -117,6 +117,15 @@ class ItsmSignService(ItsmBaseService):
                         data.set_outputs("params_%s" % field["key"], field["value"])
 
                     self.do_before_exit(ticket, state_id, operator)
+                    if key_value[
+                        code_key[NODE_APPROVE_RESULT]
+                    ] == "false" and state.get(
+                        "enable_terminate_ticket_when_rejected", False
+                    ):
+                        logger.info(
+                            "[sign] enable_terminate_ticket_when_rejected is true ticket closed"
+                        )
+                        ticket.close(close_status=TERMINATED, operator="system")
                     self.finish_schedule()
             finally:
                 self.final_execute(node_status, operator)
