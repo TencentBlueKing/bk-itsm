@@ -229,12 +229,18 @@
             </div>
           </bk-form-item>
         </template>
-        <bk-form-item :label="$t(`m.treeinfo['自动处理']`)" :required="true">
+        <bk-form-item :label="$t(`m.treeinfo['自动处理']`)" :required="true" class="automatic-processing-form">
           <bk-checkbox
             :true-value="true"
             :false-value="false"
             v-model="formInfo.is_allow_skip">
             {{$t(`m['节点处理人为空时，直接跳过且不视为异常']`) }}
+          </bk-checkbox>
+          <bk-checkbox
+            :true-value="true"
+            :false-value="false"
+            v-model="formInfo.enable_terminate_ticket_when_rejected">
+            {{$t(`m['审批节点最终结果为拒绝时，自动终止单据']`) }}
           </bk-checkbox>
         </bk-form-item>
       </bk-form>
@@ -405,6 +411,7 @@
           is_multi: true,
           processors: [],
           is_allow_skip: false,
+          enable_terminate_ticket_when_rejected: false,
         },
         nodeTagList: [],
         allCondition: [],
@@ -481,6 +488,7 @@
         }
         this.formInfo.is_sequential = this.configur.is_sequential;
         this.formInfo.is_allow_skip = this.configur.is_allow_skip;
+        this.formInfo.enable_terminate_ticket_when_rejected = this.configur.enable_terminate_ticket_when_rejected;
         this.formInfo.processors = this.configur.processors ? this.configur.processors.split(',') : [];
         this.formInfo.ticket_type = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.type : 'keep';
         this.formInfo.ticket_key = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.name : '';
@@ -594,6 +602,7 @@
             finish_condition: this.finishCondition,
             is_multi: false,
             is_allow_skip: false,
+            enable_terminate_ticket_when_rejected: false,
           };
           // 基本信息
           params.name = this.formInfo.name;
@@ -625,6 +634,7 @@
           }
           // 处理人异常时
           params.is_allow_skip = this.formInfo.is_allow_skip;
+          params.enable_terminate_ticket_when_rejected = this.formInfo.enable_terminate_ticket_when_rejected;
           if (this.$refs.delivers) {
             const data = this.$refs.delivers.getValue();
             params.delivers_type = data.type;
@@ -805,6 +815,14 @@
 
 <style lang='scss' scoped>
     @import '../../../../scss/mixins/scroller.scss';
+    .automatic-processing-form {
+        /deep/ .bk-form-content {
+            .bk-form-checkbox {
+                display: block;
+                margin-top: 12px;
+            }
+        }
+    }
     .bk-error-info {
         color: #ff5656;
         font-size: 12px;
