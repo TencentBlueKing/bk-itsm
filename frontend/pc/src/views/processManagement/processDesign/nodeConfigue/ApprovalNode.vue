@@ -488,7 +488,7 @@
         }
         this.formInfo.is_sequential = this.configur.is_sequential;
         this.formInfo.is_allow_skip = this.configur.is_allow_skip;
-        this.formInfo.enable_terminate_ticket_when_rejected = this.configur.enable_terminate_ticket_when_rejected;
+        this.formInfo.enable_terminate_ticket_when_rejected = this.configur.extras.enable_terminate_ticket_when_rejected;
         this.formInfo.processors = this.configur.processors ? this.configur.processors.split(',') : [];
         this.formInfo.ticket_type = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.type : 'keep';
         this.formInfo.ticket_key = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.name : '';
@@ -634,7 +634,6 @@
           }
           // 处理人异常时
           params.is_allow_skip = this.formInfo.is_allow_skip;
-          params.enable_terminate_ticket_when_rejected = this.formInfo.enable_terminate_ticket_when_rejected;
           if (this.$refs.delivers) {
             const data = this.$refs.delivers.getValue();
             params.delivers_type = data.type;
@@ -647,6 +646,7 @@
           params.can_deliver = this.formInfo.can_deliver;
           params.ticket_type = this.formInfo.ticket_type;
           params.extras = {
+            enable_terminate_ticket_when_rejected: this.formInfo.enable_terminate_ticket_when_rejected,
             ticket_status: {
               name: this.formInfo.ticket_key,
               type: this.formInfo.ticket_type,
