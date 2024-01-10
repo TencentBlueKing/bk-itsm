@@ -4257,13 +4257,14 @@ class Ticket(Model, BaseTicket):
 
         self.send_trigger_signal(CLOSE_TICKET)
 
-        self.notify(
-            state_id="",
-            receivers=self.creator,
-            message=_("您的单据已经完成！"),
-            action=FINISHED,
-            retry=False,
-        )
+        if close_status == FINISHED:
+            self.notify(
+                state_id="",
+                receivers=self.creator,
+                message=_("您的单据已经完成！"),
+                action=FINISHED,
+                retry=False,
+            )
         # 清理Token
         TicketFollowerNotifyLog._objects.filter(ticket_id=self.id).delete()
         return
