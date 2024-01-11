@@ -86,6 +86,9 @@ module.exports = {
     plugins: [
         new CaseSensitivePathsPlugin(),
         new VueLoaderPlugin(),
-        new WebpackBar()
+        new WebpackBar(),
+        new webpack.DefinePlugin({
+            __VUE_PROD_DEVTOOLS__: JSON.stringify(false)
+        })
     ]
 }
