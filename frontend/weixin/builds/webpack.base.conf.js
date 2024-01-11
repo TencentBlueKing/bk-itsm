@@ -1,6 +1,7 @@
 const path = require('path')
 const { VueLoaderPlugin } = require('vue-loader')
 const tsImportPluginFactory = require('ts-import-plugin')
+const webpack = require('webpack')
 const WebpackBar = require('webpackbar')
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
 
