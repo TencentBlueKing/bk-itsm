@@ -48,9 +48,16 @@ def build_bkchat_summary(ticket):
 
     # 添加「提单信息」
     content = "{}\n **--- 单据基本信息 ---**".format(content)
-    state_fields = ticket.get_state_fields(ticket.first_state_id, need_serialize=False)
+    state_fields = ticket.get_state_fields(
+        ticket.first_state_id, need_serialize=False
+    ).exclude(type__in=["TABLE", "CUSTOMTABLE", "FILE"])
+    field_order = ticket.state(ticket.first_state_id)["fields"]
+    fields_map = {f.workflow_field_id: f for f in state_fields}
     # 隐藏字段过滤
-    for f in state_fields.exclude(type__in=["TABLE", "CUSTOMTABLE", "FILE"]):
+    for index in field_order:
+        f = fields_map.get(index, None)
+        if f is None:
+            continue
         if f.show_type == SHOW_BY_CONDITION:
             key_value = {
                 "params_%s"
