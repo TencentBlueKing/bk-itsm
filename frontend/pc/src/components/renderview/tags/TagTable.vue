@@ -26,7 +26,8 @@
     <bk-table
       ref="tagTable"
       :data="form.value"
-      :border="true">
+      :border="true"
+      :max-height="500">
       <bk-table-column
         v-for="(item) in column"
         :key="item.key"
