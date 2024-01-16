@@ -23,7 +23,7 @@
 <template>
   <div class="log-list" v-bkloading="{ isLoading: loading }">
     <div class="ticket-process-content" :style="!isShowSla ? 'height: calc(100vh - 430px);' : 'height: calc(100vh - 310px);'">
-      <div class="ticket-process">
+      <div v-if="openFunction.FLOW_PREVIEW" class="ticket-process">
         <i class="bk-itsm-icon icon-basic-info" @click="viewProcess"> {{ $t(`m["查看完整流程"]`) }}</i>
       </div>
       <bk-timeline
@@ -110,6 +110,7 @@
       },
       ...mapState({
         nodeList: (state) => state.deployOrder.nodeList,
+        openFunction: state => state.openFunction,
       }),
       token() {
         return this.$route.query.token;
