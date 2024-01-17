@@ -290,7 +290,7 @@
               this.$set(item, 'is_readonly', false);
             }
             this.$set(item, 'showFeild', true);
-            this.$set(item, 'val', item.value);
+            this.$set(item, 'val', item.key in this.$route.query ? this.$route.query[item.key] : item.value);
             this.$set(item, 'service', this.service.key);
           });
           this.isNecessaryToWatch({ fields: this.fieldList }, 'submit', () => {
