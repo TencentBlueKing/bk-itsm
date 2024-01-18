@@ -7,3 +7,6 @@ python manage.py createcachetable django_cache
 
 echo "init apigw public key"
 python manage.py sync_saas_apigw
+
+echo "register notice center"
+python manage.py register_notice

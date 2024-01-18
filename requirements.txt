@@ -127,3 +127,5 @@ apigw-manager[cryptography]==1.0.7
 blueapps[opentelemetry,bkcrypto]==4.8.0
 
 drf-yasg==1.20.0
+
+bk-notice-sdk==1.2.0

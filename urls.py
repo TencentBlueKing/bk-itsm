@@ -34,6 +34,7 @@ from django.views import static
 urlpatterns = [
     # Django后台数据库管理®
     url(r"^admin/", admin.site.urls),
+    url(r"^notice/", include("bk_notice_sdk.urls")),
     # 用户登录鉴权
     # url(r'^account/', include('account.urls')),
     url(r"^account/", include("blueapps.account.urls")),
