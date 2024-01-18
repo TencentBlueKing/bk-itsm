@@ -98,13 +98,21 @@ def transform_username(users, user_dict=None):
 
 
 def get_transform_username_dict(users):
+    def split_list(list, chunk_size):
+        return [list[i : i + chunk_size] for i in range(0, len(list), chunk_size)]
+
     if not users:
         return {}
 
     if isinstance(users, str):
         users = [user for user in users.split(",") if user]
 
-    return get_bk_users(format="dict", users=users)
+    users_dict = {}
+
+    users_list = split_list(users, 30)
+    for users in users_list:
+        users_dict.update(get_bk_users(format="dict", users=users))
+    return users_dict
 
 
 def get_days(begin, end):
