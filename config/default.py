@@ -84,6 +84,7 @@ INSTALLED_APPS += (
     "itsm.trigger",
     "itsm.task",
     "itsm.openapi",
+    "itsm.notice",
     "data_migration",
     # 'silk',
     "mptt",
@@ -107,6 +108,7 @@ INSTALLED_APPS += (
     "itsm.monitor",
     "blueapps.opentelemetry.instrument_app",
     "itsm.plugin_service",
+    "bk_notice_sdk",
 )
 
 INSTALLED_APPS = ("itsm.helper",) + INSTALLED_APPS
