@@ -49,7 +49,7 @@ def build_bkchat_summary(ticket):
 
     if ticket.tag not in ["bk_iam", "bk_ci_rbac"]:
         # 添加「提单信息」
-        content = "{}\n **--- 单据基本信息 ---**".format(content)
+        content = "{}\n**--- 单据基本信息 ---**".format(content)
 
     state_fields = ticket.get_state_fields(
         ticket.first_state_id, need_serialize=False
@@ -73,7 +73,7 @@ def build_bkchat_summary(ticket):
         detail = "**{}**：{}".format(
             f.name, ticket.display_content(f.type, f.display_value)
         )
-        content = "{}\n {}".format(content, detail)
+        content = "{}\n{}".format(content, detail)
     return content
 
 
