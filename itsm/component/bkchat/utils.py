@@ -27,12 +27,13 @@ def build_bkchat_summary(ticket):
         settings.BKCHAT_ENV_FLAG, RUNNING_ENV.get(settings.RUN_MODE, ""), ticket.title
     )
     content = title + "\n"
-    content += "**单号**: {}\n".format(ticket.sn)
-    content += "**服务目录**: {}\n".format(ticket.catalog_service_name)
 
-    current_steps = ",".join([step.get("name") for step in ticket.current_steps])
+    if ticket.tag not in ["bk_iam", "bk_ci_rbac"]:
+        content += "**单号**: {}\n".format(ticket.sn)
+        content += "**服务目录**: {}\n".format(ticket.catalog_service_name)
+        current_steps = ",".join([step.get("name") for step in ticket.current_steps])
+        content += "**当前环节**: {}\n".format(current_steps or "无")
 
-    content += "**当前环节**: {}\n".format(current_steps or "无")
     content += "**提单人**: {}\n".format(ticket.creator)
 
     processor_list = [
@@ -46,8 +47,10 @@ def build_bkchat_summary(ticket):
     if processor_content:
         content += "**审批人**: {}".format(processor_content)
 
-    # 添加「提单信息」
-    content = "{}\n **--- 单据基本信息 ---**".format(content)
+    if ticket.tag not in ["bk_iam", "bk_ci_rbac"]:
+        # 添加「提单信息」
+        content = "{}\n**--- 单据基本信息 ---**".format(content)
+
     state_fields = ticket.get_state_fields(
         ticket.first_state_id, need_serialize=False
     ).exclude(type__in=["TABLE", "CUSTOMTABLE", "FILE"])
@@ -70,8 +73,7 @@ def build_bkchat_summary(ticket):
         detail = "**{}**：{}".format(
             f.name, ticket.display_content(f.type, f.display_value)
         )
-        content = "{}\n {}".format(content, detail)
-
+        content = "{}\n{}".format(content, detail)
     return content
 
 
