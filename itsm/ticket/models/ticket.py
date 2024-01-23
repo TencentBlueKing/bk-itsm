@@ -4085,6 +4085,18 @@ class Ticket(Model, BaseTicket):
                                         attr_display,
                                     )
                                 )
+                            if isinstance(attr_display, list):
+                                values = []
+                                for item in attr_display:
+                                    if isinstance(item, dict) and "value" in item:
+                                        values.append(item["value"])
+                                if values:
+                                    single.append(
+                                        "{}:{}".format(
+                                            schemes_map[scheme][attr_name],
+                                            ",".join(values),
+                                        )
+                                    )
                         except Exception as err:
                             logger.error(
                                 "parser moa content error, form data is {}, err is {}".format(
