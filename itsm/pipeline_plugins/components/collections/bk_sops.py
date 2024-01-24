@@ -38,7 +38,7 @@ logger = logging.getLogger("celery")
 
 class BkOpsService(ItsmBaseService):
     __need_schedule__ = True
-    interval = StaticIntervalGenerator(3)
+    interval = StaticIntervalGenerator(10)
 
     def prepare_task_params(self, state, ticket, sops_info):
         values = ticket.get_output_fields(return_format="dict", need_display=True)
@@ -307,7 +307,7 @@ class BkOpsService(ItsmBaseService):
             self.finish_schedule()
             return False
 
-        if task_result.get("result", False) is False:
+        if not task_result.get("result", False):
             error_message = task_result.get("message", "")
             self.do_exit_plugins(
                 result=False,
