@@ -21,7 +21,7 @@
   -->
 
 <template>
-  <div class="project-page" v-bkloading="{ isLoading: projectDetailLoading }">
+  <div :class="['project-page', { 'show-notice': showNotice }]" v-bkloading="{ isLoading: projectDetailLoading }">
     <router-view v-if="$store.state.project.id && !projectDetailLoading"></router-view>
   </div>
 </template>
@@ -41,6 +41,7 @@
     computed: {
       ...mapState({
         projectListLoading: state => state.project.projectListLoading,
+        showNotice: state => state.showNotice,
       }),
     },
     watch: {
@@ -96,5 +97,8 @@
 <style lang="scss" scoped>
     .project-page {
         height: calc(100vh - 52px);
+        &.show-notice {
+            height: calc(100vh - 92px);
+        }
     }
 </style>

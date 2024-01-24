@@ -21,11 +21,12 @@
   -->
 
 <template>
-  <div class="all-ticket-page">
+  <div :class="['all-ticket-page', { 'show-notice': showNotice }]">
     <all-ticket-list from="allUserTicket"></all-ticket-list>
   </div>
 </template>
 <script>
+  import { mapState } from 'vuex';
   import AllTicketList from '../ticket/allTicket/index';
 
   export default {
@@ -33,10 +34,18 @@
     components: {
       AllTicketList,
     },
+    computed: {
+      ...mapState({
+        showNotice: state => state.showNotice,
+      }),
+    },
   };
 </script>
 <style lang="scss" scoped>
     .all-ticket-page {
         height: calc(100vh - 52px);
+        &.show-notice {
+            height: calc(100vh - 92px);
+        }
     }
 </style>

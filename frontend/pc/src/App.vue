@@ -22,11 +22,11 @@
 
 <template>
   <div id="app" class="bk-app" @click="hiddenTree" v-bkloading="{ isLoading: loading }">
+    <notice-component v-if="showNotice && !$route.meta.iframe" :api-url="apiUrl" @show-alert-change="handleNoticeChange" />
     <template v-if="isShowView">
       <!-- has navigation-->
-      <navigation v-if="!$route.meta.iframe">
+      <navigation v-if="!$route.meta.iframe" :class="{ 'show-notice': showNotice }">
         <div
-          v-if="isShowView"
           v-bkloading="{ isLoading: localLoading }"
           class="bk-app-content">
           <permissionApply
@@ -42,6 +42,7 @@
       </navigation>
       <!-- no navigation-->
       <template v-else>
+        <!-- ddd -->
         <div
           v-if="isShowView"
           v-bkloading="{ isLoading: localLoading }"
@@ -62,15 +63,20 @@
   </div>
 </template>
 <script>
+  import { mapState } from 'vuex';
+  import NoticeComponent from '@blueking/notice-component-vue2';
+  import '@blueking/notice-component-vue2/dist/style.css';
   import bus from './utils/bus';
   import Navigation from './components/common/layout/Navigation.vue';
   import PermissionModal from '@/components/common/modal/PermissionModal.vue';
   import permissionApply from '@/components/common/layout/permissionApply.vue';
   import permission from '@/mixins/permission.js';
   import { errorHandler } from './utils/errorHandler';
+
   export default {
     name: 'app',
     components: {
+      NoticeComponent,
       Navigation,
       PermissionModal,
       permissionApply,
@@ -88,6 +94,7 @@
         isRouterAlive: true,
         permissinApplyShow: false,
         routerKey: +new Date(),
+        apiUrl: `//${window.location.host}/notice/announcements/`,
         permissionData: {
           type: 'project', // 无权限类型: project、other
           permission: [],
@@ -95,6 +102,9 @@
       };
     },
     computed: {
+      ...mapState({
+        showNotice: state => state.showNotice,
+      }),
       routerTable() {
         return this.$store.state.tableList;
       },
@@ -319,6 +329,9 @@
           clearInterval(this.$store.state.deployOrder.intervalInfo.timeOut);
         }
       },
+      handleNoticeChange(isShow) {
+        this.$store.commit('setNoticeShow', isShow);
+      },
     },
   };
 </script>
@@ -338,6 +351,18 @@
         width: 100%;
         .bk-navigation {
             min-width: 1366px;
+            &.show-notice {
+              height: calc(100vh - 40px);
+            //   overflow: hidden;
+              .bk-navigation-wrapper {
+                .container-content {
+                  max-height: calc(100vh - 92px) !important;
+                }
+                .nav-slider-list {
+                  height: calc(100vh - 148px) !important;
+                }
+              }
+            }
             .navigation-container {
                 max-width: unset!important;
             }

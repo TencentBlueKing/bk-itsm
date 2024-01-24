@@ -22,7 +22,7 @@
 
 <template>
   <div class="home-page-wrapper">
-    <div class="home-page-view">
+    <div :class="['home-page-view', { 'show-notice': showNotice }]">
       <div class="home-background">
         <p class="welcome-tips">Hi，{{ userName }}，{{ $t(`m.home['欢迎使用流程服务！']`) }}</p>
       </div>
@@ -35,6 +35,7 @@
   </div>
 </template>
 <script>
+  import { mapState } from 'vuex';
   import ServiceList from './serviceList.vue';
   // import TicketTable from './ticketTable.vue';
   import CopyrightFooter from '@/components/common/layout/CopyrightFooter.vue';
@@ -51,11 +52,22 @@
         userName: window.username || '--',
       };
     },
+    computed: {
+      ...mapState({
+        showNotice: state => state.showNotice,
+      }),
+    },
   };
 </script>
 <style lang="scss" scoped>
     .home-page-view {
         min-height: calc(100vh - 52px);
+        &.show-notice {
+            min-height: calc(100vh - 92px);
+            .main-content {
+                min-height: calc(100vh - 287px);
+            }
+        }
     }
     .home-background {
         height: 160px;
