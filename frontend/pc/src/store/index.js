@@ -123,6 +123,7 @@ export default new Vuex.Store({
   // 公共 store
   state: {
     language: "zh-cn",
+    showNotice: window.NOTICE_CENTER_SWITCH === 'on',
     // 任务执行后刷新任务记录列表
     taskHistoryRefresh: false,
     // 缓存人员选择器数据
@@ -271,6 +272,9 @@ export default new Vuex.Store({
     // 设置语言
     setLanguage(state, value) {
       state.language = value;
+    },
+    setNoticeShow(state, value) {
+      state.showNotice = value;
     },
     /**
      * 更新当前用户 user

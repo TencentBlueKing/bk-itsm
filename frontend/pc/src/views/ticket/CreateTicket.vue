@@ -21,7 +21,7 @@
   -->
 
 <template>
-  <div class="create-ticket-page">
+  <div :class="['create-ticket-page', { 'show-notice': showNotice }]">
     <nav-title :show-icon="true"
       :title-name="$t(`m.navigation['提单']`)"
       @goBack="onBackIconClick">
@@ -162,6 +162,7 @@
   </div>
 </template>
 <script>
+  import { mapState } from 'vuex';
   import NavTitle from '@/components/common/layout/NavTitle';
   import apiFieldsWatchMixin from '@/views/commonMix/api_fields_watch.js';
   import FieldInfo from '@/views/managePage/billCom/fieldInfo.vue';
@@ -209,6 +210,11 @@
         routerInfo: {},
         isShowTemplateList: false,
       };
+    },
+    computed: {
+      ...mapState({
+        showNotice: state => state.showNotice,
+      }),
     },
     watch: {
       '$route'() {
@@ -553,6 +559,13 @@
 </script>
 <style lang="scss" scoped>
 @import '../../scss/mixins/scroller.scss';
+.create-ticket-page {
+    &.show-notice {
+        .create-ticket-body {
+            height: calc(100vh - 148px);
+        }
+    }
+}
 .create-ticket-body {
     margin: 2px 0;
     padding: 20px;

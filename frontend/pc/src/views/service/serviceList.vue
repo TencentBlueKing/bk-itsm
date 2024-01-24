@@ -23,7 +23,7 @@
 <template>
   <div>
     <nav-title :title-name="$t(`m.serviceConfig['服务']`)"></nav-title>
-    <div class="page-content">
+    <div :class="['page-content', { 'show-notice': showNotice }]">
       <!-- btn -->
       <div :class="['service-left', isHiddenDirectory ? 'hide' : '']">
         <tree-info ref="dirTree" :tree-info="treeInfo" :dir-list="dirList"></tree-info>
@@ -395,6 +395,7 @@
 
 <script>
   import axios from 'axios';
+  import { mapState } from 'vuex';
   import NavTitle from '@/components/common/layout/NavTitle';
   import searchInfo from '../commonComponent/searchInfo/searchInfo.vue';
   import permission from '@/mixins/permission.js';
@@ -560,6 +561,9 @@
       };
     },
     computed: {
+      ...mapState({
+        showNotice: state => state.showNotice,
+      }),
       openFunction() {
         return this.$store.state.openFunction;
       },
@@ -1156,6 +1160,9 @@
     height: calc(100vh - 104px);
     overflow: auto;
     @include scroller;
+    &.show-notice {
+        height: calc(100vh - 144px);
+    }
     .service-left {
         position: relative;
         height: 100%;
