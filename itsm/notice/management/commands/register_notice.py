@@ -30,9 +30,9 @@ class Command(BaseCommand):
             )
             return
         try:
-            call_command("register_application")
+            call_command("register_application", raise_error=True)
             SystemSettings.objects.update_or_create(
                 defaults={"value": "on"}, key=NOTICE_CENTER_SWITCH
             )
         except Exception as e:
-            logger.exception("[register_bk_itsm_notice] err: {}".format(e))
+            print("[register_bk_itsm_notice] err: {}".format(e))

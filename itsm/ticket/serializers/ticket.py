@@ -963,9 +963,27 @@ class TicketSerializer(AuthModelSerializer):
 
             state_processors = data.get("meta", {}).get("state_processors", {})
             for state_id, state_processor in state_processors.items():
+                if str(state_id) not in service.workflow.states:
+                    raise serializers.ValidationError(
+                        {
+                            "state_processors": _(
+                                "服务:{}, 节点({})不存在".format(service.name, state_id)
+                            )
+                        }
+                    )
+
+                state_name = service.workflow.states.get(str(state_id), {}).get(
+                    "name", ""
+                )
                 if not state_processor:
                     raise serializers.ValidationError(
-                        {"state_processors": _("节点 {} 对应的审批人不允许为空".format(state_id))}
+                        {
+                            "state_processors": _(
+                                "服务:{}, 节点({})对应的审批人不允许为空".format(
+                                    service.name, state_name
+                                )
+                            )
+                        }
                     )
 
             # 创建单据时，若没有传入creator参数，则采用request的当前用户

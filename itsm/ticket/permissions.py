@@ -76,6 +76,8 @@ class TicketPermissionValidate(permissions.BasePermission):
             "master_or_slave",
             "add_follower",
             "can_exception_distribute",
+            "get_ticket_output",
+            "get_step_process_info",
         ]:
             return True
 
@@ -109,12 +111,6 @@ class TicketPermissionValidate(permissions.BasePermission):
             )
 
             return any([state_permission, iam_ticket_manage_auth])
-
-        if view.action == "get_ticket_output":
-            return True
-
-        if view.action == "get_step_process_info":
-            return True
 
         # 查看权限校验
         if request.method in permissions.SAFE_METHODS:
