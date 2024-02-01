@@ -1066,6 +1066,18 @@ class StateManager(Manager):
             # 更新字段
             state.update(workflow_id=workflow_id)
 
+            # 如果 state 是用户组，则置为空
+            if state["processors_type"] in ["GENERAL", "IAM"]:
+                state["processors"] = ""
+
+            # 针对分派，如果选择的用户组，则置为空
+            if state["assignors_type"] == "GENERAL":
+                state["assignors"] = ""
+
+            # 针对分派，如果选择的用户组，则置为空
+            if state["delivers_type"] == "GENERAL":
+                state["delivers"] = ""
+
             # 旧流程版本数据兼容处理
             for k in ["fields", "extras"]:
                 if isinstance(state[k], six.string_types):
