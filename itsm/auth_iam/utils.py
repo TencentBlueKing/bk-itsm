@@ -244,6 +244,11 @@ def grant_resource_creator_related_actions(
     :param bk_token: 用户登录态
     :return:
     """
+
+    # 对于创建人是 admin 的资源，无需关联授权
+    if creator == "admin":
+        return
+
     iam_client = Client(
         settings.APP_CODE,
         settings.SECRET_KEY,
@@ -283,6 +288,9 @@ def grant_instance_creator_related_actions(
     :param delete_instance: 失败是否删除实例
     :return:
     """
+
+    if instance.creator == "admin":
+        return
 
     resource_type = instance.auth_resource["resource_type"]
     if isinstance(instance, TemplateField):
