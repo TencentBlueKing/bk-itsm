@@ -1,4 +1,14 @@
 # Changelog
+
+## [Version: 2.6.10] - 2024-02-04
+ [Improved] Allow to configure the timeout of permission center sdk & skip auto-authorization for resources created by admin.    
+ [Fixed] Fix the problem that the import process is abnormal when it is a user group.  
+ [Improved] Front-end access to message notification center
+
+## [Version: 2.6.9] - 2024-01-07
+ [Improved] Support url parameter default value on bill of lading page.    
+ [Fixed] Fix the problem that the order of fields in quick approval document is not consistent with the actual one.
+
 ## [Version: 2.6.8] - 2023-11-09
  [Improved] Gateway added description  
  [Improved] Handle the problem of internationalization error when switching the list of documents quickly  
