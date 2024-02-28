@@ -80,8 +80,23 @@ class RepoStorage(Storage):
     def storage(self):
         from bkstorages.backends.bkrepo import BKRepoStorage
 
+        class CustomBKRepoStorage(BKRepoStorage):
+            def save(self, name, content, max_length=None):
+                """
+                去除validate_file_name(name, allow_relative_path=True) 检查，保证content的可用性
+                """
+                if name is None:
+                    name = content.name
+
+                if not hasattr(content, "chunks"):
+                    content = File(content, name)
+
+                name = self.get_available_name(name, max_length=max_length)
+                name = self._save(name, content)
+                return name
+
         if self._storage is None:
-            self._storage = BKRepoStorage()
+            self._storage = CustomBKRepoStorage()
         return self._storage
 
     def save(self, name, content, max_length=None):
