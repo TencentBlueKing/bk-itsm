@@ -1,4 +1,8 @@
 # Changelog
+## [Version: 2.6.11] - 2024-02-29
+ [Improved] Fix the problem of uploading abnormality when the attachment is stored as a product library  
+ [Fixed] Repair the problem of unregistered the notification center of the containerization environment  
+ [Fixed] Repair the role of the initialization of the introduction authority center is an issue of abnormal emptiness  
 
 ## [Version: 2.6.10] - 2024-02-04
  [Improved] Allow to configure the timeout of permission center sdk & skip auto-authorization for resources created by admin.    
