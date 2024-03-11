@@ -34,6 +34,8 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET
 from mako.template import Template
 
+from itsm.iadmin.contants import NOTICE_CENTER_SWITCH
+from itsm.iadmin.models import SystemSettings
 from itsm.project.models import UserProjectAccessRecord
 from common.log import logger
 from config.default import FRONTEND_URL
@@ -108,6 +110,13 @@ def index(request):
 
     logger.info("HTTP_REFERER={}".format(request.META.get("HTTP_REFERER", "")))
 
+    try:
+        notice_center_switch_value = SystemSettings.objects.get(
+            key=NOTICE_CENTER_SWITCH
+        ).value
+    except SystemSettings.DoesNotExist:
+        notice_center_switch_value = "off"
+
     return render(
         request,
         "index.html",
@@ -125,6 +134,7 @@ def index(request):
             "TAM_PROJECT_ID": settings.TAM_PROJECT_ID,
             "DOC_URL": settings.BK_DOC_URL,
             "SOPS_URL": settings.SOPS_SITE_URL,
+            "NOTICE_CENTER_SWITCH": notice_center_switch_value,
         },
     )
 

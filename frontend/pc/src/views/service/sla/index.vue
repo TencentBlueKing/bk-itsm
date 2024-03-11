@@ -21,7 +21,7 @@
   -->
 
 <template>
-  <div class="project-sla-agreement">
+  <div :class="['project-sla-agreement', { 'show-notice': showNotice }]">
     <!-- title -->
     <div class="is-title">
       <p class="bk-come-back" @click="goToServiceList">
@@ -214,6 +214,7 @@
 
 <script>
   import axios from 'axios';
+  import { mapState } from 'vuex';
   import secondFlow from './slaJsflowCanvas/secondFlow.vue';
   import commonMix from '../../commonMix/common.js';
   import { ProcessTools } from '@/utils/process.js';
@@ -287,6 +288,9 @@
       };
     },
     computed: {
+      ...mapState({
+        showNotice: state => state.showNotice,
+      }),
       getTransitionLines() {
         return {
           from_state: this.agreementEditData.start_node_id,
@@ -599,6 +603,9 @@
 
     .project-sla-agreement {
         height: calc(100vh - 52px);
+        &.show-notice {
+            height: calc(100vh - 92px);
+        }
     }
     .bk-loading /deep/.bk-spin-loading {
         width: 16px;

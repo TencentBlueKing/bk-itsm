@@ -23,12 +23,12 @@
 <template>
   <div>
     <nav-title :title-name="$t(`m.serviceConfig['服务']`)"></nav-title>
-    <div class="page-content">
+    <div :class="['page-content', { 'show-notice': showNotice }]">
       <!-- btn -->
       <div :class="['service-left', isHiddenDirectory ? 'hide' : '']">
         <tree-info ref="dirTree" :tree-info="treeInfo" :dir-list="dirList"></tree-info>
         <div class="hidden-tree" @click="hiddenTree">
-          <i :class="['bk-itsm-icon', isHiddenDirectory ? 'icon-arrow-right' : 'icon-xiangzuo1']"></i>
+          <i :class="['bk-itsm-icon icon-xiangyou1', isHiddenDirectory ? 'closed' : '']"></i>
         </div>
       </div>
       <div :class="['service-right', isHiddenDirectory ? 'auto-wight' : '']">
@@ -395,6 +395,7 @@
 
 <script>
   import axios from 'axios';
+  import { mapState } from 'vuex';
   import NavTitle from '@/components/common/layout/NavTitle';
   import searchInfo from '../commonComponent/searchInfo/searchInfo.vue';
   import permission from '@/mixins/permission.js';
@@ -560,6 +561,9 @@
       };
     },
     computed: {
+      ...mapState({
+        showNotice: state => state.showNotice,
+      }),
       openFunction() {
         return this.$store.state.openFunction;
       },
@@ -1156,6 +1160,9 @@
     height: calc(100vh - 104px);
     overflow: auto;
     @include scroller;
+    &.show-notice {
+        height: calc(100vh - 144px);
+    }
     .service-left {
         position: relative;
         height: 100%;
@@ -1169,14 +1176,24 @@
             position: absolute;
             top: calc(50% - 30px);
             right: -14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             width: 14px;
-            height: 61px;
-            line-height: 61px;
-            background-color: #dcdee5;
-            cursor: pointer;
+            height: 60px;
             color: #ffffff;
+            background-color: #dcdee5;
             border-top-right-radius: 4px;
             border-bottom-right-radius: 4px;
+            cursor: pointer;
+            .icon-xiangyou1 {
+                display: inline-block;
+                font-size: 14px;
+                transition: transform 0.3s ease-in-out;
+                &.closed {
+                    transform: rotate(180deg);
+                }
+            }
         }
     }
     .service-right {

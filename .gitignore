@@ -27,3 +27,5 @@ config/local_settings.py
 .codecc
 build.yml
 .vscode
+
+pre-*-bkcodeai

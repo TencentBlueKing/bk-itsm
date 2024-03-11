@@ -92,7 +92,8 @@ class ItsmApprovalService(ItsmSignService):
             )
             activity_id = ticket.activity_for_state(state_id)
             auto_approve.apply_async(
-                (node_status.id, "system", activity_id, callback_data), countdown=20
+                (node_status.id, "system", activity_id, callback_data),
+                countdown=settings.AUTO_APPROVE_TIME,
             )  # 20秒之后自动回调
             return True
 

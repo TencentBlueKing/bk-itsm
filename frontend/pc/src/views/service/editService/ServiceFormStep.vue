@@ -21,7 +21,7 @@
   -->
 
 <template>
-  <div class="service-form" :class="{ 'hide-field-option': !showFieldOption }">
+  <div class="service-form" :class="{ 'show-notice': showNotice, 'hide-field-option': !showFieldOption }">
     <!-- 字段选择 -->
     <div :class="['field-option', isShowField ? 'field-hide' : '']">
       <div style="overflow: hidden; height: 100%;">
@@ -184,6 +184,7 @@
 </template>
 
 <script>
+  import { mapState } from 'vuex';
   import { errorHandler } from '../../../utils/errorHandler.js';
   import commonMix from '../../commonMix/common.js';
   import { deepClone } from '../../../utils/util.js';
@@ -292,6 +293,9 @@
       };
     },
     computed: {
+      ...mapState({
+        showNotice: state => state.showNotice,
+      }),
       catalogDisplayName() {
         return this.serviceInfo.bounded_catalogs ? this.serviceInfo.bounded_catalogs.join('/') : '';
       },
@@ -842,6 +846,12 @@
     &.hide-field-option {
         .basic-body {
             width: 100%;
+        }
+    }
+    &.show-notice {
+        height: calc(100vh - 204px);
+        .field-option {
+            height: calc(100vh - 204px);
         }
     }
     .field-hide {

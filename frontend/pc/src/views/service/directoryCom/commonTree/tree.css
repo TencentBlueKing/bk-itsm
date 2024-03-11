@@ -7,7 +7,7 @@
 }
 .fade-enter,
 .fade-leave-to {
-    opacity: 0
+    opacity: 0;
 }
 .bk-tree {
     font-size:14px;
@@ -49,19 +49,17 @@
         text-align: left;
     }
     .tree-drag-node {
+        height: 32px;
         .tree-expanded-icon {
             position: relative;
-            top: 1px;
+            top: 0;
             color: #c0c4cc;
             cursor: pointer;
+            z-index: 1;
         }
         .tree-node {
             display: inline-block;
         }
-    }
-    .tree-singe {
-        padding-bottom: 10px;
-        line-height: 26px;
     }
     .loading {
         width: 14px;
@@ -77,7 +75,7 @@
     }
     .node-icon {
         position: relative;
-        top: 2px;
+        top: 0px;
         left: 2px;
     }
     .mr5 {
@@ -256,10 +254,10 @@
         top: -15px;
     }
     li.single:after {
-        top: 10px;
+        top: 17px;
     }
     li.leaf.single:after {
-        top: 11px;
+        top: 17px;
     }
 }
 .bk-has-border-tree > li.tree-first-node:before {

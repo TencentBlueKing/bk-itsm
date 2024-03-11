@@ -311,9 +311,9 @@ class StatusSerializer(serializers.ModelSerializer):
             tasks = []
 
             # 采用批量查询，优化性能
-            transformed_users_dict = get_transform_username_dict(user_list[0:30])
+            transformed_users_dict = get_transform_username_dict(user_list)
 
-            for user in user_list[0:30]:
+            for user in user_list:
                 task_can_view = False
                 task_field_list = []
                 # 已处理完成的任务, 处理人具有权限查看
@@ -960,6 +960,31 @@ class TicketSerializer(AuthModelSerializer):
                 ).key
             except TicketStatus.DoesNotExist:
                 raise serializers.ValidationError({_("工单状态"): _("工单状态不存在，请检查")})
+
+            state_processors = data.get("meta", {}).get("state_processors", {})
+            for state_id, state_processor in state_processors.items():
+                if str(state_id) not in service.workflow.states:
+                    raise serializers.ValidationError(
+                        {
+                            "state_processors": _(
+                                "服务:{}, 节点({})不存在".format(service.name, state_id)
+                            )
+                        }
+                    )
+
+                state_name = service.workflow.states.get(str(state_id), {}).get(
+                    "name", ""
+                )
+                if not state_processor:
+                    raise serializers.ValidationError(
+                        {
+                            "state_processors": _(
+                                "服务:{}, 节点({})对应的审批人不允许为空".format(
+                                    service.name, state_name
+                                )
+                            )
+                        }
+                    )
 
             # 创建单据时，若没有传入creator参数，则采用request的当前用户
             creator = data.get("creator", self.context["request"].user.username)

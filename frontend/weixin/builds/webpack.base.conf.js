@@ -1,6 +1,7 @@
 const path = require('path')
 const { VueLoaderPlugin } = require('vue-loader')
 const tsImportPluginFactory = require('ts-import-plugin')
+const webpack = require('webpack')
 const WebpackBar = require('webpackbar')
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
 
@@ -86,6 +87,9 @@ module.exports = {
     plugins: [
         new CaseSensitivePathsPlugin(),
         new VueLoaderPlugin(),
-        new WebpackBar()
+        new WebpackBar(),
+        new webpack.DefinePlugin({
+            __VUE_PROD_DEVTOOLS__: JSON.stringify(false)
+        })
     ]
 }

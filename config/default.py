@@ -84,6 +84,7 @@ INSTALLED_APPS += (
     "itsm.trigger",
     "itsm.task",
     "itsm.openapi",
+    "itsm.notice",
     "data_migration",
     # 'silk',
     "mptt",
@@ -107,6 +108,7 @@ INSTALLED_APPS += (
     "itsm.monitor",
     "blueapps.opentelemetry.instrument_app",
     "itsm.plugin_service",
+    "bk_notice_sdk",
 )
 
 INSTALLED_APPS = ("itsm.helper",) + INSTALLED_APPS
@@ -192,7 +194,7 @@ MIDDLEWARE = (
 # mako 模板中：<script src="/a.js?v=${ STATIC_VERSION }"></script>
 # 如果静态资源修改了以后，上线前改这个版本号即可
 # STATIC_VERSION_END
-STATIC_VERSION = "2.6.8"
+STATIC_VERSION = "2.6.11"
 DEPLOY_DATETIME = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
@@ -912,6 +914,8 @@ BK_APIGW_NAME = os.getenv("BK_APIGW_NAME", "bk-itsm")
 # APIGW 访问地址
 BK_API_URL_TMPL = os.getenv("BK_API_URL_TMPL")
 
+BK_NOTICE = {"BK_API_URL_TMPL": BK_API_URL_TMPL or ""}
+
 # 蓝鲸插件授权过滤 APP
 PLUGIN_DISTRIBUTOR_NAME = os.getenv("BKAPP_PLUGIN_DISTRIBUTOR_NAME", APP_CODE)
 
@@ -947,3 +951,5 @@ FOOTER = os.getenv("BKAPP_FOOTER", None)
 
 ENABLE_NOTIFY_ROUTER = os.getenv("BKAPP_ENABLE_NOTIFY_ROUTER", False)
 NOTIFY_ROUTER_NAME = os.getenv("BKAPP_NOTIFY_ROUTER_NAME", "router")
+
+IAM_SDK_CLIENT_TIMEOUT = int(os.getenv("BKAPP_IAM_SDK_CLIENT_TIMEOUT", 20))

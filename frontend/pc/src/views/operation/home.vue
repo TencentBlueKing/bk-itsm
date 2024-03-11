@@ -21,7 +21,7 @@
   -->
 
 <template>
-  <div class="operation-home" ref="operationHome">
+  <div :class="['operation-home', { 'show-notice': showNotice }]" ref="operationHome">
     <div class="date-selector" :class="{ 'selector-fixed': isDateSelectorFixed }">
       <bk-date-picker
         type="daterange"
@@ -193,6 +193,7 @@
   </div>
 </template>
 <script>
+  import { mapState } from 'vuex';
   import dayjs from 'dayjs';
   import throttle from 'lodash/throttle';
   import SummaryCard from './components/summaryCard.vue';
@@ -491,6 +492,11 @@
           },
         },
       };
+    },
+    computed: {
+      ...mapState({
+        showNotice: state => state.showNotice,
+      }),
     },
     created() {
       this.getSummaryData();
@@ -836,7 +842,8 @@
         this.getDetailData();
       },
       scrollHandler(e) {
-        this.isDateSelectorFixed = e.target.scrollTop > 150;
+        const gap = this.showNotice ? 110 : 150;
+        this.isDateSelectorFixed = e.target.scrollTop > gap;
       },
       handleServiceSearch(val) {
         this.serviceSearchStr = val || undefined;
@@ -913,6 +920,11 @@
     .operation-home {
         position: relative;
         padding: 20px 20px 60px;
+        &.show-notice {
+          .date-selector.selector-fixed {
+              top: 92px;
+          }
+        }
     }
     .date-selector {
         position: absolute;

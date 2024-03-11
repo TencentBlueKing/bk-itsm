@@ -27,12 +27,13 @@ def build_bkchat_summary(ticket):
         settings.BKCHAT_ENV_FLAG, RUNNING_ENV.get(settings.RUN_MODE, ""), ticket.title
     )
     content = title + "\n"
-    content += "**单号**: {}\n".format(ticket.sn)
-    content += "**服务目录**: {}\n".format(ticket.catalog_service_name)
 
-    current_steps = ",".join([step.get("name") for step in ticket.current_steps])
+    if ticket.tag not in ["bk_iam", "bk_ci_rbac"]:
+        content += "**单号**: {}\n".format(ticket.sn)
+        content += "**服务目录**: {}\n".format(ticket.catalog_service_name)
+        current_steps = ",".join([step.get("name") for step in ticket.current_steps])
+        content += "**当前环节**: {}\n".format(current_steps or "无")
 
-    content += "**当前环节**: {}\n".format(current_steps or "无")
     content += "**提单人**: {}\n".format(ticket.creator)
 
     processor_list = [
@@ -46,11 +47,20 @@ def build_bkchat_summary(ticket):
     if processor_content:
         content += "**审批人**: {}".format(processor_content)
 
-    # 添加「提单信息」
-    content = "{}\n **--- 单据基本信息 ---**".format(content)
-    state_fields = ticket.get_state_fields(ticket.first_state_id, need_serialize=False)
+    if ticket.tag not in ["bk_iam", "bk_ci_rbac"]:
+        # 添加「提单信息」
+        content = "{}\n**--- 单据基本信息 ---**".format(content)
+
+    state_fields = ticket.get_state_fields(
+        ticket.first_state_id, need_serialize=False
+    ).exclude(type__in=["TABLE", "CUSTOMTABLE", "FILE"])
+    field_order = ticket.state(ticket.first_state_id)["fields"]
+    fields_map = {f.workflow_field_id: f for f in state_fields}
     # 隐藏字段过滤
-    for f in state_fields.exclude(type__in=["TABLE", "CUSTOMTABLE", "FILE"]):
+    for index in field_order:
+        f = fields_map.get(index, None)
+        if f is None:
+            continue
         if f.show_type == SHOW_BY_CONDITION:
             key_value = {
                 "params_%s"
@@ -63,8 +73,7 @@ def build_bkchat_summary(ticket):
         detail = "**{}**：{}".format(
             f.name, ticket.display_content(f.type, f.display_value)
         )
-        content = "{}\n {}".format(content, detail)
-
+        content = "{}\n{}".format(content, detail)
     return content
 
 
@@ -198,6 +207,21 @@ def proceed_fast_approval(request):
     approve_action = result.get("status")
 
     ticket = Ticket.objects.get(id=ticket_id)
+
+    node_status = ticket.node_status.get(state_id=state_id)
+    if not node_status.can_sign_state_operate(receiver):
+        return JsonResponse(
+            {
+                "result": False,
+                "data": {
+                    "approve_result": ticket.get_state_approve_result(state_id),
+                    "approver": ticket.get_approver(state_id),
+                },
+                "code": -1,
+                "message": "单据审批失败，{}不是当前节点的审批人，无法审批".format(receiver),
+            }
+        )
+
     # 3.判断当前节点是否是RUNNING状态，否则通知
     current_status = Status.objects.get(state_id=state_id, ticket_id=ticket_id)
     if current_status.status != "RUNNING":

@@ -44,7 +44,7 @@
         </bk-select>
       </div>
     </div>
-    <div class="section-content">
+    <div :class="['section-content', { 'show-notice': showNotice }]">
       <div class="date-selector" :class="{ 'selector-fixed': isDateSelectorFixed }">
         <bk-date-picker
           type="daterange"
@@ -119,6 +119,7 @@
   </div>
 </template>
 <script>
+  import { mapState } from 'vuex';
   import dayjs from 'dayjs';
   import throttle from 'lodash/throttle';
   import SummaryCard from './components/summaryCard.vue';
@@ -295,6 +296,9 @@
       };
     },
     computed: {
+      ...mapState({
+        showNotice: state => state.showNotice,
+      }),
       serviceName() {
         const service = this.serviceList.find(item => item.id === this.serviceId);
         return service ? service.name : '--';
@@ -454,7 +458,8 @@
         this.getDetailData();
       },
       scrollHandler(e) {
-        this.isDateSelectorFixed = e.target.scrollTop > 150;
+        const gap = this.showNotice ? 110 : 150;
+        this.isDateSelectorFixed = e.target.scrollTop > gap;
       },
       onAddedTicketDimensionChange(val) {
         this.addedTicketChartDismension = val;
@@ -514,7 +519,13 @@
         position: relative;
         height: calc(100vh - 104px );
         padding: 20px 20px 60px;
-        overflow: auto
+        overflow: auto;
+        &.show-notice {
+          height: calc(100vh - 144px );
+          .date-selector.selector-fixed {
+            top: 102px;
+          }
+        }
     }
     .date-selector {
         position: absolute;

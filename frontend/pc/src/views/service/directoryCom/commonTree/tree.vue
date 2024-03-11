@@ -32,7 +32,7 @@
                 'tree-second-node': !parent && index === 1,
                 'single': !multiple }"
       v-if="item.hasOwnProperty('visible') ? item.visible : true">
-      <div :class="['tree-drag-node', !multiple ? 'tree-singe' : '']"
+      <div class="tree-drag-node"
         :draggable="draggable" @dragstart="drag(item, $event)">
         <span
           @click.stop="expandNode(item)"
@@ -76,7 +76,7 @@
         </div>
       </div>
       <collapse-transition>
-        <bk-tree
+        <service-tree
           v-if="!isLeaf(item)"
           @dropTreeChecked="nodeCheckStatusChange"
           @async-load-nodes="asyncLoadNodes"
@@ -95,7 +95,7 @@
           :parent="item"
           :is-delete-root="isDeleteRoot"
           :multiple="multiple">
-        </bk-tree>
+        </service-tree>
       </collapse-transition>
     </li>
   </ul>
@@ -106,7 +106,7 @@
   import CollapseTransition from './collapse-transition';
 
   export default {
-    name: 'bk-tree',
+    name: 'service-tree',
     components: {
       CollapseTransition,
     },
@@ -749,7 +749,7 @@
     @import './tree.css';
     .bk-tree-point {
         position: absolute;
-        top: 5px;
+        top: 8px;
         right: 0;
         color: #737987;
         font-size: 19px;
@@ -769,7 +769,7 @@
         position: absolute;
         width: 20px;
         height: 16px;
-        top: 7px;
+        top: 9px;
         right: 20px;
         background-color: #f0f1f5;
         color: #979ba5;

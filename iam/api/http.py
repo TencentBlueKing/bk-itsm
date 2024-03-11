@@ -11,7 +11,6 @@ an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express o
 specific language governing permissions and limitations under the License.
 """
 
-
 import logging
 
 import requests
@@ -28,32 +27,77 @@ def _gen_header():
 
 
 def _http_request(
-    method, url, headers=None, data=None, verify=False, cert=None, timeout=None, cookies=None,
+    method,
+    url,
+    headers=None,
+    data=None,
+    verify=False,
+    cert=None,
+    timeout=None,
+    cookies=None,
 ):
     resp = requests.Response()
     try:
         if method == "GET":
             resp = requests.get(
-                url=url, headers=headers, params=data, verify=verify, cert=cert, timeout=timeout, cookies=cookies,
+                url=url,
+                headers=headers,
+                params=data,
+                verify=verify,
+                cert=cert,
+                timeout=timeout,
+                cookies=cookies,
             )
         elif method == "HEAD":
-            resp = requests.head(url=url, headers=headers, verify=verify, cert=cert, timeout=timeout, cookies=cookies,)
+            resp = requests.head(
+                url=url,
+                headers=headers,
+                verify=verify,
+                cert=cert,
+                timeout=timeout,
+                cookies=cookies,
+            )
         elif method == "POST":
             resp = requests.post(
-                url=url, headers=headers, json=data, verify=verify, cert=cert, timeout=timeout, cookies=cookies,
+                url=url,
+                headers=headers,
+                json=data,
+                verify=verify,
+                cert=cert,
+                timeout=timeout,
+                cookies=cookies,
             )
         elif method == "DELETE":
             resp = requests.delete(
-                url=url, headers=headers, json=data, verify=verify, cert=cert, timeout=timeout, cookies=cookies,
+                url=url,
+                headers=headers,
+                json=data,
+                verify=verify,
+                cert=cert,
+                timeout=timeout,
+                cookies=cookies,
             )
         elif method == "PUT":
             resp = requests.put(
-                url=url, headers=headers, json=data, verify=verify, cert=cert, timeout=timeout, cookies=cookies,
+                url=url,
+                headers=headers,
+                json=data,
+                verify=verify,
+                cert=cert,
+                timeout=timeout,
+                cookies=cookies,
             )
         else:
             return False, None
-    except requests.exceptions.RequestException:
-        logger.exception("http error! request: [method=`%s`, url=`%s`, data=`%s`]", method, url, data)
+    except requests.exceptions.RequestException as e:
+        logger.exception(
+            "http error! request: [method=`%s`, url=`%s`, data=`%s`]", method, url, data
+        )
+        print(
+            "http error! request: [method=`{}`, url=`{}`, data=`{}`, error={}]".format(
+                method, url, data, e
+            )
+        )
         return False, None
     else:
         request_id = resp.headers.get("X-Request-Id")
@@ -62,19 +106,28 @@ def _http_request(
         if not logger.isEnabledFor(logging.DEBUG) and len(content) > 200:
             content = content[:200] + b"......"
 
-        message_format = (
-            "request: [method=`%s`, url=`%s`, data=`%s`] response: [status_code=`%s`, request_id=`%s`, content=`%s`]"
-        )
-
+        message_format = "request: [method=`%s`, url=`%s`, data=`%s`] response: [status_code=`%s`, request_id=`%s`, content=`%s`]"  # noqa
         if resp.status_code != 200:
-            logger.error(message_format % (method, url, str(data), resp.status_code, request_id, content))
+            logger.error(
+                message_format
+                % (method, url, str(data), resp.status_code, request_id, content)
+            )
+            print(
+                message_format
+                % (method, url, str(data), resp.status_code, request_id, content)
+            )
             return False, None
 
-        logger.info(message_format % (method, url, str(data), resp.status_code, request_id, content))
+        logger.info(
+            message_format
+            % (method, url, str(data), resp.status_code, request_id, content)
+        )
         return True, resp.json()
     finally:
         if resp.request is None:
-            resp.request = requests.Request(method, url, headers=headers, data=data, cookies=cookies).prepare()
+            resp.request = requests.Request(
+                method, url, headers=headers, data=data, cookies=cookies
+            ).prepare()
 
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(
@@ -84,31 +137,60 @@ def _http_request(
             )
 
 
-def http_get(url, data, headers=None, verify=False, cert=None, timeout=None, cookies=None):
+def http_get(
+    url, data, headers=None, verify=False, cert=None, timeout=None, cookies=None
+):
     if not headers:
         headers = _gen_header()
     return _http_request(
-        method="GET", url=url, headers=headers, data=data, verify=verify, cert=cert, timeout=timeout, cookies=cookies,
+        method="GET",
+        url=url,
+        headers=headers,
+        data=data,
+        verify=verify,
+        cert=cert,
+        timeout=timeout,
+        cookies=cookies,
     )
 
 
-def http_post(url, data, headers=None, verify=False, cert=None, timeout=None, cookies=None):
+def http_post(
+    url, data, headers=None, verify=False, cert=None, timeout=None, cookies=None
+):
     if not headers:
         headers = _gen_header()
     return _http_request(
-        method="POST", url=url, headers=headers, data=data, verify=verify, cert=cert, timeout=timeout, cookies=cookies,
+        method="POST",
+        url=url,
+        headers=headers,
+        data=data,
+        verify=verify,
+        cert=cert,
+        timeout=timeout,
+        cookies=cookies,
     )
 
 
-def http_put(url, data, headers=None, verify=False, cert=None, timeout=None, cookies=None):
+def http_put(
+    url, data, headers=None, verify=False, cert=None, timeout=None, cookies=None
+):
     if not headers:
         headers = _gen_header()
     return _http_request(
-        method="PUT", url=url, headers=headers, data=data, verify=verify, cert=cert, timeout=timeout, cookies=cookies,
+        method="PUT",
+        url=url,
+        headers=headers,
+        data=data,
+        verify=verify,
+        cert=cert,
+        timeout=timeout,
+        cookies=cookies,
     )
 
 
-def http_delete(url, data, headers=None, verify=False, cert=None, timeout=None, cookies=None):
+def http_delete(
+    url, data, headers=None, verify=False, cert=None, timeout=None, cookies=None
+):
     if not headers:
         headers = _gen_header()
     return _http_request(

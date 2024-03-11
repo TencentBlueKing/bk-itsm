@@ -21,7 +21,7 @@
   -->
 
 <template>
-  <div class="all-ticket-page">
+  <div :class="['all-ticket-page', { 'show-notice': showNotice }]">
     <div class="ticket-tab">
       <nav-title :title-name="titleName"></nav-title>
       <div class="ticket-content">
@@ -73,6 +73,7 @@
 </template>
 <!-- 自定义tab 选择服务目录是只能选择下级目录 -->
 <script>
+  import { mapState } from 'vuex';
   import NavTitle from '@/components/common/layout/NavTitle';
   import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch';
   import TableContent from './tableContent';
@@ -202,6 +203,11 @@
         orderKey: '-create_at', // 排序
         listError: false,
       };
+    },
+    computed: {
+      ...mapState({
+        showNotice: state => state.showNotice,
+      }),
     },
     created() {
       this.initData();
@@ -353,6 +359,11 @@
 .all-ticket-page {
   height: 100%;
   background: #fafbfd;
+  &.show-notice {
+    .ticket-content {
+      height: calc(100vh - 186px);
+    }
+  }
   /deep/ .bk-tab-section {
     padding: 0;
     background-color: #f5f7fa;

@@ -2215,7 +2215,7 @@ class Ticket(Model, BaseTicket):
 
         # 说明可能存在截断的情况，这个时候需要去查询当前真实的用户
         if len(self.current_processors) >= 255:
-            if username == self.real_current_processors:
+            if username in self.real_current_processors:
                 return True
 
         user_roles = UserRole.get_user_roles(username)
@@ -2948,7 +2948,7 @@ class Ticket(Model, BaseTicket):
             # TODO: 临时处理, 后面会放在母子单解绑逻辑中
             ticket.current_status = close_status
             ticket.node_status.filter(status__in=Status.RUNNING_STATUS).update(
-                status=FINISHED
+                status=close_status
             )
             ticket.current_task_processors = ""
             ticket.current_processors = ""
@@ -4085,6 +4085,18 @@ class Ticket(Model, BaseTicket):
                                         attr_display,
                                     )
                                 )
+                            if isinstance(attr_display, list):
+                                values = []
+                                for item in attr_display:
+                                    if isinstance(item, dict) and "value" in item:
+                                        values.append(item["value"])
+                                if values:
+                                    single.append(
+                                        "{}:{}".format(
+                                            schemes_map[scheme][attr_name],
+                                            ",".join(values),
+                                        )
+                                    )
                         except Exception as err:
                             logger.error(
                                 "parser moa content error, form data is {}, err is {}".format(
@@ -4257,13 +4269,14 @@ class Ticket(Model, BaseTicket):
 
         self.send_trigger_signal(CLOSE_TICKET)
 
-        self.notify(
-            state_id="",
-            receivers=self.creator,
-            message=_("您的单据已经完成！"),
-            action=FINISHED,
-            retry=False,
-        )
+        if close_status == FINISHED:
+            self.notify(
+                state_id="",
+                receivers=self.creator,
+                message=_("您的单据已经完成！"),
+                action=FINISHED,
+                retry=False,
+            )
         # 清理Token
         TicketFollowerNotifyLog._objects.filter(ticket_id=self.id).delete()
         return

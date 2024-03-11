@@ -46,7 +46,7 @@
                 @step-changed="onStepChange">
             </bk-steps>
         </div> -->
-    <div :class="['steps-content', { 'steps-content-height': isShowNodeConfig }]" v-bkloading="{ isLoading: serviceLoading || flowInfoLoading }">
+    <div :class="['steps-content', { 'show-notice': showNotice, 'steps-content-height': isShowNodeConfig }]" v-bkloading="{ isLoading: serviceLoading || flowInfoLoading }">
       <template v-if="!serviceLoading && !flowInfoLoading">
         <service-form-step v-if="currStep === 1"
           ref="serviceFormStep"
@@ -93,6 +93,7 @@
   </div>
 </template>
 <script>
+  import { mapState } from 'vuex';
   import NavTitle from '@/components/common/layout/NavTitle';
   import ServiceFormStep from './ServiceFormStep.vue';
   import ServiceProcessStep from './ServiceProcessStep.vue';
@@ -132,6 +133,9 @@
       };
     },
     computed: {
+      ...mapState({
+        showNotice: state => state.showNotice,
+      }),
       currStep() {
         const routeMap = ['basic', 'process', 'setting'];
         const index = routeMap.indexOf(this.step);
@@ -338,6 +342,9 @@
     height: calc(100vh - 164px);
     overflow: auto;
     @include scroller;
+    &.show-notice {
+        height: calc(100vh - 204px);
+    }
 }
 .steps-content-height {
     height: calc(100vh - 165px);

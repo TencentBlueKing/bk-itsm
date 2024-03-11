@@ -18,6 +18,7 @@ import logging
 
 from cachetools import cached, TTLCache
 from requests.models import PreparedRequest
+from django.conf import settings
 
 from .http import http_get, http_post, http_put, http_delete
 
@@ -51,8 +52,15 @@ class Client(object):
         ok, _data = http_func(url, data, headers=headers, timeout=timeout)
 
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug("do http request: method=`%s`, url=`%s`, data=`%s`", http_func.__name__, url, json.dumps(data))
-            logger.debug("http request result: ok=`%s`, _data=`%s`", ok, json.dumps(_data))
+            logger.debug(
+                "do http request: method=`%s`, url=`%s`, data=`%s`",
+                http_func.__name__,
+                url,
+                json.dumps(data),
+            )
+            logger.debug(
+                "http request result: ok=`%s`, _data=`%s`", ok, json.dumps(_data)
+            )
             logger.debug("http request took %s ms", int((time.time() - begin) * 1000))
 
         if not ok:
@@ -71,7 +79,9 @@ class Client(object):
             "X-BK-APP-SECRET": self._app_secret,
             "X-Bk-IAM-Version": BK_IAM_VERSION,
         }
-        return self._call_api(http_func, self._host, path, data, headers, timeout=timeout)
+        return self._call_api(
+            http_func, self._host, path, data, headers, timeout=timeout
+        )
 
     def _call_esb_api(self, http_func, path, data, bk_token, bk_username, timeout=None):
         headers = {
@@ -86,7 +96,9 @@ class Client(object):
                 "bk_username": bk_username,
             }
         )
-        return self._call_api(http_func, self._bk_paas_host, path, data, headers, timeout=timeout)
+        return self._call_api(
+            http_func, self._bk_paas_host, path, data, headers, timeout=timeout
+        )
 
     # ---------- system
     def add_system(self, data):
@@ -104,21 +116,25 @@ class Client(object):
 
     # ---------- resource_type
     def batch_add_resource_types(self, system_id, data):
-        path = "/api/v1/model/systems/{system_id}/resource-types".format(system_id=system_id)
+        path = "/api/v1/model/systems/{system_id}/resource-types".format(
+            system_id=system_id
+        )
         ok, message, data = self._call_iam_api(http_post, path, data)
         # if alreay exists, return true
         return ok, message
 
     def update_resource_type(self, system_id, resource_type_id, data):
-        path = ("/api/v1/model/systems/{system_id}/resource-types/{resource_type_id}").format(
-            system_id=system_id, resource_type_id=resource_type_id
-        )
+        path = (
+            "/api/v1/model/systems/{system_id}/resource-types/{resource_type_id}"
+        ).format(system_id=system_id, resource_type_id=resource_type_id)
 
         ok, message, data = self._call_iam_api(http_put, path, data)
         return ok, message
 
     def batch_delete_resource_types(self, system_id, data):
-        path = "/api/v1/model/systems/{system_id}/resource-types?check_existence=false".format(system_id=system_id)
+        path = "/api/v1/model/systems/{system_id}/resource-types?check_existence=false".format(
+            system_id=system_id
+        )
         ok, message, data = self._call_iam_api(http_delete, path, data)
         return ok, message
 
@@ -129,24 +145,36 @@ class Client(object):
         return ok, message
 
     def update_action(self, system_id, action_id, data):
-        path = "/api/v1/model/systems/{system_id}/actions/{action_id}".format(system_id=system_id, action_id=action_id)
+        path = "/api/v1/model/systems/{system_id}/actions/{action_id}".format(
+            system_id=system_id, action_id=action_id
+        )
         ok, message, data = self._call_iam_api(http_put, path, data)
         return ok, message
 
     def batch_delete_actions(self, system_id, data):
-        path = "/api/v1/model/systems/{system_id}/actions?check_existence=false".format(system_id=system_id)
+        path = "/api/v1/model/systems/{system_id}/actions?check_existence=false".format(
+            system_id=system_id
+        )
         ok, message, data = self._call_iam_api(http_delete, path, data)
         return ok, message
 
     # register create association permission action.
     def add_resource_creator_actions(self, system_id, data):
-        path = "/api/v1/model/systems/{system_id}/configs/resource_creator_actions".format(system_id=system_id)
+        path = (
+            "/api/v1/model/systems/{system_id}/configs/resource_creator_actions".format(
+                system_id=system_id
+            )
+        )
         ok, message, data = self._call_iam_api(http_post, path, data)
         return ok, message
 
     # update create association permission action.
     def update_resource_creator_actions(self, system_id, data):
-        path = "/api/v1/model/systems/{system_id}/configs/resource_creator_actions".format(system_id=system_id)
+        path = (
+            "/api/v1/model/systems/{system_id}/configs/resource_creator_actions".format(
+                system_id=system_id
+            )
+        )
         ok, message, data = self._call_iam_api(http_put, path, data)
         return ok, message
 
@@ -154,7 +182,14 @@ class Client(object):
     def grant_resource_creator_actions(self, bk_token, bk_username, data):
         path = "/api/c/compapi/v2/iam/authorization/resource_creator_action/"
 
-        ok, message, _data = self._call_esb_api(http_post, path, data, bk_token, bk_username, timeout=5)
+        ok, message, _data = self._call_esb_api(
+            http_post,
+            path,
+            data,
+            bk_token,
+            bk_username,
+            timeout=settings.IAM_SDK_CLIENT_TIMEOUT,
+        )
         if not ok:
             return False, message
 
@@ -162,16 +197,20 @@ class Client(object):
 
     # ---------- action-topology
     def add_action_topology(self, system_id, action_type, data):
-        path = "/api/v1/model/systems/{system_id}/action-topologies/{action_type}".format(
-            system_id=system_id, action_type=action_type
+        path = (
+            "/api/v1/model/systems/{system_id}/action-topologies/{action_type}".format(
+                system_id=system_id, action_type=action_type
+            )
         )
         ok, message, data = self._call_iam_api(http_post, path, data)
         # if alreay exists, return true
         return ok, message
 
     def update_action_topology(self, system_id, action_type, data):
-        path = "/api/v1/model/systems/{system_id}/action-topologies/{action_type}".format(
-            system_id=system_id, action_type=action_type
+        path = (
+            "/api/v1/model/systems/{system_id}/action-topologies/{action_type}".format(
+                system_id=system_id, action_type=action_type
+            )
         )
         ok, message, data = self._call_iam_api(http_put, path, data)
         # if alreay exists, return true
@@ -186,7 +225,7 @@ class Client(object):
     # ---------- ping
     def ping(self):
         url = "{host}{path}".format(host=self._host, path="/ping")
-        ok, data = http_get(url, None, timeout=5)
+        ok, data = http_get(url, None, timeout=settings.IAM_SDK_CLIENT_TIMEOUT)
         return ok, data
 
     # ---------- query system_id_set/resource_type_id_set, action_id_set
@@ -260,7 +299,14 @@ class Client(object):
     def get_apply_url(self, bk_token, bk_username, data):
         path = "/api/c/compapi/v2/iam/application/"
 
-        ok, message, _data = self._call_esb_api(http_post, path, data, bk_token, bk_username, timeout=5)
+        ok, message, _data = self._call_esb_api(
+            http_post,
+            path,
+            data,
+            bk_token,
+            bk_username,
+            timeout=settings.IAM_SDK_CLIENT_TIMEOUT,
+        )
         if not ok:
             return False, message, ""
 
@@ -268,14 +314,28 @@ class Client(object):
 
     def instance_authorization(self, bk_token, bk_username, data):
         path = "/api/c/compapi/v2/iam/authorization/instance/"
-        ok, message, _data = self._call_esb_api(http_post, path, data, bk_token, bk_username, timeout=5)
+        ok, message, _data = self._call_esb_api(
+            http_post,
+            path,
+            data,
+            bk_token,
+            bk_username,
+            timeout=settings.IAM_SDK_CLIENT_TIMEOUT,
+        )
         if not ok:
             return False, message, ""
         return True, "success", _data.get("token", "")
 
     def path_authorization(self, bk_token, bk_username, data):
         path = "/api/c/compapi/v2/iam/authorization/path/"
-        ok, message, _data = self._call_esb_api(http_post, path, data, bk_token, bk_username, timeout=5)
+        ok, message, _data = self._call_esb_api(
+            http_post,
+            path,
+            data,
+            bk_token,
+            bk_username,
+            timeout=settings.IAM_SDK_CLIENT_TIMEOUT,
+        )
         if not ok:
             return False, message, ""
         return True, "success", _data.get("token", "")
