@@ -3787,7 +3787,8 @@ class Ticket(Model, BaseTicket):
         node_processors = []
         task_processors = []
         for node_status in self.node_status.filter(
-            Q(status__in=Status.CAN_OPERATE_STATUS) | Q(status=FAILED, type=TASK_STATE)
+            Q(status__in=Status.CAN_OPERATE_STATUS) | 
+            Q(status=FAILED, type__in=[TASK_STATE, TASK_SOPS_STATE])
         ):
             # Get all types node processors
             if node_status.type in [SIGN_STATE, APPROVAL_STATE]:
