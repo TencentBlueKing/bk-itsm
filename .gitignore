@@ -8,8 +8,7 @@ django.pot
 *.pyc
 *.gv
 *.sql
-#dev.py
-*.env
+*.env*
 *.sh
 
 frontend/pc/node_modules
