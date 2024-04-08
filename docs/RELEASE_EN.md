@@ -1,4 +1,7 @@
 # Changelog
+## [Version: 2.6.12] - 2024-04-08
+【Fixed】Fixed the issue of insufficient permissions for the assignee when SOPS tasks fail in parallel gateways.
+
 ## [Version: 2.6.11] - 2024-02-29
  [Improved] Fix the problem of uploading abnormality when the attachment is stored as a product library  
  [Fixed] Repair the problem of unregistered the notification center of the containerization environment  
