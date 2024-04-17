@@ -322,7 +322,7 @@
         },
       ];
       this.rules.name = nameRules;
-      this.rules.directory_id = this.checkCommonRules('required').required;
+      this.rules.catalog_id = this.checkCommonRules('required').required;
       this.rules.key = this.checkCommonRules('required').required;
       this.showFieldOption = this.type === 'edit' && !!this.serviceInfo.source;
       this.isBasicFormEditting = this.type === 'new';
