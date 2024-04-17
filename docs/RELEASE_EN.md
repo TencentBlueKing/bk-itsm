@@ -1,4 +1,8 @@
 # Changelog
+## [Version: 2.6.13] - 2024-04-17
+[Fixed] Fixed the issue where the document information fields on the detail page of the repair order were not fully displayed.
+[Fixed] Fixed the issue where the directory field was not validated when creating a service.
+
 ## [Version: 2.6.12] - 2024-04-08
 【Fixed】Fixed the issue of insufficient permissions for the assignee when SOPS tasks fail in parallel gateways.
 
