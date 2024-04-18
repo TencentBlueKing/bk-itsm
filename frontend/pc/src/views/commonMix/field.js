@@ -152,7 +152,6 @@ export default {
                     list[i].showFeild = statusList.some(status => !!status);
                   }
                 }
-                list[i].showFeild = !list[i].showFeild;
               }
             }
           }
