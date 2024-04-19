@@ -113,7 +113,7 @@ export default {
               // 当前节点的类型和expressions的数据一样时，进行处理
               if (item.key === list[i].show_conditions.expressions[j].key) {
                 if (list[i].show_conditions.expressions.length === 1) {
-                  list[i].showFeild = this.conditionSwitch(
+                  list[i].showFeild = !this.conditionSwitch(
                     item,
                     list[i].show_conditions.expressions[j]
                   );
@@ -134,7 +134,7 @@ export default {
                       }
                     }
                     // 判断当前字段与关联字段的关系
-                    list[i].showFeild = statusList.every(status => !!status);
+                    list[i].showFeild = statusList.some(status => !status);
                   } else {
                     // 判断其他字段和关联字段的关系
                     const statusList = [];
@@ -149,7 +149,7 @@ export default {
                         }
                       }
                     }
-                    list[i].showFeild = statusList.some(status => !!status);
+                    list[i].showFeild = statusList.every(status => !status);
                   }
                 }
               }
@@ -217,14 +217,12 @@ export default {
         }
         case 'issuperset': {
           const issupersetList = value.value.split(',');
-          const statusList = issupersetList.map(val => item.val.indexOf(val) === -1);
-          statusInfo = statusList.every(status => !status);
+          statusInfo = issupersetList.includes(item.val);
           break;
         }
         case 'notissuperset': {
           const valnoList = value.value.split(',');
-          const statusnoList = valnoList.map(val => item.val.indexOf(val) === -1);
-          statusInfo = !statusnoList.every(status => !status);
+          statusInfo = !valnoList.includes(item.val);
           break;
         }
         default: {
