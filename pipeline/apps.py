@@ -19,7 +19,7 @@ import redis
 from django.apps import AppConfig
 from django.conf import settings
 from redis.sentinel import Sentinel
-from rediscluster import RedisCluster
+from redis.cluster import RedisCluster
 
 logger = logging.getLogger("root")
 

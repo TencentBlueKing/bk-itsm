@@ -4,15 +4,15 @@
 # 请确保指定的包和版本号，可通过pip安装
 
 # blueapps requirement
-Django==3.2.13
+Django==3.2.25
 PyMySQL==0.6.7
 mysqlclient==2.0.3
-MarkupSafe==1.1.1
-Mako==1.0.6
-requests==2.22.0
-celery==4.4.5
+MarkupSafe==2.0.0
+Mako==1.1.6
+requests==2.27.1
+celery==4.4.6
 django-celery-beat==2.0.0
-django-celery-results==2.0.0
+django-celery-results==2.0.1
 # pi==3.3.1
 python-json-logger==0.1.7
 whitenoise==5.2.0
@@ -45,7 +45,7 @@ django-mptt-admin==2.1.0
 django-nyt==1.2
 django-sekizai==2.0.0
 Markdown==3.2.1
-Pillow==5.2.0
+Pillow==8.4.0
 sorl-thumbnail==12.7.0
 django-simplemde==0.1.2
 martor==1.2.8
@@ -56,23 +56,22 @@ django-multiselectfield==0.1.12
 statsd==3.3.0
 
 # pipeline
-ujson==1.35
+ujson==4.3.0
 pyparsing==2.2.0
-redis==3.5.3
-redis-py-cluster==2.1.3
+redis==4.3.6
 django-timezone-field==4.1.2
 factory_boy==2.11.1
-mistune==0.8.4
-eventlet==0.25.1
-gevent==1.2.2
+mistune==2.0.5
+eventlet==0.33.3
+gevent==22.10.2
 
 # iam
 cachetools==3.1.1
-certifi==2020.4.5.1
+certifi==2023.7.22
 chardet==3.0.4
 curlify==2.2.1
 idna==2.8
-urllib3==1.25.9
+urllib3==1.26.18
 # pycrypto==2.6.1
 
 #others
@@ -91,16 +90,16 @@ typing-extensions==3.7.4.3
 anyjson==0.3.3
 
 #bkouth
-PyJWT==1.6.4
-cryptography==3.3.2
+PyJWT==2.4.0
+cryptography==40.0.2
 
 # prometheus
 django-prometheus==2.1.0
 
 # grpcio
-grpcio==1.27.2
+grpcio==1.48.2
 
-protobuf==3.19.4
+protobuf==3.19.6
 
 # opentelemetry
 opentelemetry-api==1.6.2
@@ -119,12 +118,12 @@ opentelemetry-instrumentation-requests==0.25b2
 
 pyCryptodome==3.14.1
 
-Jinja2==2.11.1
+Jinja2==3.0.3
 jmespath==0.10.0
 requests_toolbelt==0.9.1
 
 apigw-manager[cryptography]==1.0.7
-blueapps[opentelemetry,bkcrypto]==4.8.0
+blueapps[opentelemetry,bkcrypto]==4.11.0
 
 drf-yasg==1.20.0
 
