@@ -1,6 +1,9 @@
 # Changelog
-## [Version: 2.6.14] - 2024-04-22
+## [Version: 2.6.15] - 2024-04-22
 [Fixed] Fixed the issue where the field linkage condition judgment was incorrect.
+
+## [Version: 2.6.14] - 2024-04-21
+[Improved] Upgraded select pip dependencies for improved security
 
 ## [Version: 2.6.13] - 2024-04-17
 [Fixed] Fixed the issue where the document information fields on the detail page of the repair order were not fully displayed.
