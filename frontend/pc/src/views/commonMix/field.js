@@ -134,7 +134,7 @@ export default {
                       }
                     }
                     // 判断当前字段与关联字段的关系
-                    list[i].showFeild = statusList.some(status => !status);
+                    list[i].showFeild = !statusList.every(status => status);
                   } else {
                     // 判断其他字段和关联字段的关系
                     const statusList = [];
@@ -161,6 +161,7 @@ export default {
     conditionSwitch(item, value) {
       let statusInfo = false;
       const typeList = ['CHECKBOX', 'MEMBERS', 'MULTISELECT', 'TREESELECT'];
+      const formValue = typeList.includes(item.type) ? item.val.split(',') : item.val;
       switch (value.condition) {
         case '==': {
           if (typeList.some(type => type === item.type)) {
@@ -217,12 +218,12 @@ export default {
         }
         case 'issuperset': {
           const issupersetList = value.value.split(',');
-          statusInfo = issupersetList.includes(item.val);
+          statusInfo = issupersetList.every(val => formValue.includes(val));
           break;
         }
         case 'notissuperset': {
           const valnoList = value.value.split(',');
-          statusInfo = !valnoList.includes(item.val);
+          statusInfo = valnoList.every(val => !formValue.includes(val));
           break;
         }
         default: {
