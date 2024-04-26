@@ -13,6 +13,7 @@
   "dependencies": {
     "@blueking/bkcharts": "^2.0.6",
     "@blueking/bkui-form": "0.0.31",
+    "@blueking/login-modal": "^1.0.1",
     "@blueking/notice-component-vue2": "^2.0.1",
     "@blueking/user-selector": "^1.0.5-beta.2",
     "@toast-ui/editor-plugin-code-syntax-highlight": "^1.0.0",

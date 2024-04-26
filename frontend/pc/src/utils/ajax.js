@@ -24,9 +24,8 @@ import Vue from 'vue';
 import axios from 'axios';
 import bus from './bus.js';
 import { checkDataType } from './getDataType.js';
-import isCrossOriginIFrame from './isCrossOriginIFrame.js';
-const isCrossOrigin = isCrossOriginIFrame();
-const topWindow = isCrossOrigin ? window : window.top;
+import { showLoginModal } from '@blueking/login-modal';
+
 
 const instance = axios.create({
   validateStatus: (status) => status >= 200 && status <= 505,
@@ -82,9 +81,11 @@ instance.interceptors.response.use(
     if (response.config.url === 'init/') {
       if (response.status === 401) {
         const { login_url } = response.data;
-        const url = `${login_url.split('c_url=')[0]}c_url=${encodeURIComponent(location.href)}`;
-        response.data.login_url = url;
-        window.open(url, '_self');
+        const successUrl = `${window.location.origin}/login_success.html`;
+        let [loginUrl] = login_url.split('?');
+        loginUrl = `${loginUrl}?c_url=${encodeURIComponent(successUrl)}`;
+
+        showLoginModal({ loginUrl });
         return;
       }
       if ('IS_ITSM_ADMIN' in response.data.data) {
@@ -123,14 +124,11 @@ instance.interceptors.response.use(
         case 401: {
           // 登录控制
           const data = response.data;
-          if (data.has_plain) {
-            topWindow.BLUEKING.corefunc.open_login_dialog(
-              data.login_url,
-              data.width,
-              data.height,
-              response.config.method
-            );
-          }
+          const successUrl = `${window.location.origin}/login_success.html`;
+          let [loginUrl] = data.login_url.split('?');
+          loginUrl = `${loginUrl}?c_url=${encodeURIComponent(successUrl)}`;
+
+          showLoginModal({ loginUrl });
           break;
         }
         case 403: {
