@@ -244,7 +244,7 @@ class ReleaseVersionLogManager(models.Manager):
         ver_logs = content.strip().split("##")[1:]
 
         # 用于解析markdown的工具
-        mk = mistune.Markdown()
+        mk = mistune.create_markdown()
 
         # 遍历从文件中读取的日志信息并存入数据库
         for outer_index, item in enumerate(ver_logs):
