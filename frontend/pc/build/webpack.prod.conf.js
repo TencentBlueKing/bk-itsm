@@ -44,7 +44,7 @@ module.exports = merge(webpackBase, {
         }),
         new HtmlWebpackPlugin({
             filename: 'assets/login_success.html',
-            template: './src/assets/html/login_success.html',
+            template: 'login_success.html',
         }),
         new CleanWebpackPlugin({
             cleanOnceBeforeBuildPatterns: ['./assets/**'],
