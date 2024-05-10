@@ -1,4 +1,7 @@
 # Changelog
+## [Version: 2.6.16] - 2024-05-08
+[Fixed] Fix the issue with the initialization exception in the version log.
+
 ## [Version: 2.6.15] - 2024-04-22
 [Fixed] Fixed the issue where the field linkage condition judgment was incorrect.
 
