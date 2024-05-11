@@ -1,4 +1,8 @@
 # Changelog
+[Version: 2.6.17] - 2024-05-11
+[Fixed] Resolved XSS vulnerability in work order rich text
+[Improved] Unified login window interactions
+
 ## [Version: 2.6.16] - 2024-05-08
 [Fixed] Fix the issue with the initialization exception in the version log.
 
