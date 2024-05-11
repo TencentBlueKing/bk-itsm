@@ -330,6 +330,10 @@ SOURCE_CHOICES = [
     ("CUSTOM_API", "自定义API"),
 ]
 
+XSS_FIELD_TYPE = [
+    "RICHTEXT"
+]
+
 LAYOUT_CHOICES = [
     ("COL_6", "半行"),
     ("COL_12", "整行"),
