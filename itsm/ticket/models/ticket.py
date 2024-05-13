@@ -240,7 +240,7 @@ class SignTask(Model):
         ("FINISHED", "已完成"),
     ]
 
-    status_id = models.IntegerField(_("状态ID"))
+    status_id = models.IntegerField(_("状态ID"), db_index=True)
     order = models.IntegerField(_("顺序"), default=DEFAULT_ORDER)
     status = models.CharField(
         _("任务状态"), max_length=LEN_SHORT, choices=TASK_STATUS_CHOICES, default="WAIT"
@@ -5061,7 +5061,7 @@ class StatusTransitLog(models.Model):
 class AttentionUsers(models.Model):
     """单据关注人"""
 
-    ticket_id = models.IntegerField(_("单号"))
+    ticket_id = models.IntegerField(_("单号"), db_index=True)
     follower = models.CharField(_("关注人"), max_length=LEN_LONG)
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
 

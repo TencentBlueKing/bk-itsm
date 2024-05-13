@@ -336,7 +336,7 @@ class TicketGlobalVariable(models.Model):
     value = jsonfield.JSONField(_("变量值"), default=EMPTY_DICT)
 
     state_id = models.IntegerField(_("关联节点"), null=True, blank=True)
-    ticket_id = models.IntegerField(_("关联单据"), null=True, blank=True)
+    ticket_id = models.IntegerField(_("关联单据"), null=True, blank=True, db_index=True)
 
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
     update_at = models.DateTimeField(_("更新时间"), auto_now=True)
