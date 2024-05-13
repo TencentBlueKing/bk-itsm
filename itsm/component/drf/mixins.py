@@ -61,6 +61,10 @@ class ApiGenericMixin(object):
         if response.status_code == status.HTTP_204_NO_CONTENT and request.method == "DELETE":
             response.status_code = status.HTTP_200_OK
 
+        # trace_id
+        if hasattr(request, "otel_trace_id") and isinstance(request.data, dict):
+            response.data['trace_id'] = request.otel_trace_id
+
         return super(ApiGenericMixin, self).finalize_response(request, response, *args, **kwargs)
 
 
