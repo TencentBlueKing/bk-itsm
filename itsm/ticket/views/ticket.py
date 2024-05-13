@@ -81,7 +81,7 @@ from itsm.component.constants import (
     OPEN,
     GENERAL,
     ORGANIZATION,
-    SUSPENDED,
+    SUSPENDED, LEN_X_LONG,
 )
 from itsm.component.constants.flow import EXPORT_SUPPORTED_TYPE
 from itsm.component.dlls.component import ComponentLibrary
@@ -1243,6 +1243,10 @@ class TicketModelViewSet(ModelViewSet):
         close_status = request.data.get("current_status")
         if close_status not in ticket.status_instance.to_over_status_keys:
             raise ValidationError(_("设置的关闭状态不在正确状态范围之内"))
+    
+        desc = request.data.get("desc") or ""
+        if len(desc) > LEN_X_LONG:
+            raise ValidationError(_("关单失败，原因描述超过 {len}  字符").format(len=LEN_X_LONG))
 
         ticket.close(
             close_status=close_status,
