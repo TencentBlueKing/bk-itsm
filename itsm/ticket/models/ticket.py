@@ -27,7 +27,6 @@ import copy
 import functools
 import json
 import time
-from collections import defaultdict
 from datetime import datetime
 from itertools import chain
 
@@ -3378,23 +3377,13 @@ class Ticket(Model, BaseTicket):
 
             message = _(log.message)
             if log.type == SYSTEM_OPERATE:
-                message = message.format_map(
-                    defaultdict(
-                        str, 
-                        name=log.from_state_name, 
-                        detail_message=log.detail_message
-                    )
-                )
+                message = message.replace("{name}", log.from_state_name)
+                message = message.replace("{detail_message}", log.detail_message)
             else:
-                message = message.format_map(
-                    defaultdict(
-                        str,
-                        operator=log.operator,
-                        name=log.from_state_name,
-                        action=_(log.action).lower(),
-                        detail_message=log.detail_message,
-                    )
-                )
+                message = message.replace("{name}", log.from_state_name)
+                message = message.replace("{detail_message}", log.detail_message)
+                message = message.replace("{operator}", log.operator)
+                message = message.replace("{action}", log.action)
 
             state_info.update(
                 operator=log.operator,
@@ -3432,13 +3421,15 @@ class Ticket(Model, BaseTicket):
                 end_log = self.logs.get(
                     is_valid=True, from_state_id=self.end_state["id"]
                 )
+                message = end_log.message.replace("{operator}", end_log.operator)
+                message = message.replace("{detail_message}", end_log.detail_message)
                 state_list.append(
                     {
                         "name": _("结束"),
                         "operator": "system",
                         "operate_at": end_log.operate_at.strftime("%Y-%m-%d %H:%M:%S"),
                         "fields": [],
-                        "message": end_log.message,
+                        "message": message,
                         "action": "",
                     }
                 )
