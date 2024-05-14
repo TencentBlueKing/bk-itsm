@@ -6,6 +6,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin")
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const path = require('path')
+const CopyPlugin = require("copy-webpack-plugin")
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 module.exports = merge(webpackBase, {
@@ -42,14 +44,16 @@ module.exports = merge(webpackBase, {
             template: 'index.html',
             inject: true
         }),
-        new HtmlWebpackPlugin({
-            filename: 'assets/login_success.html',
-            template: 'login_success.html',
-        }),
         new CleanWebpackPlugin({
             cleanOnceBeforeBuildPatterns: ['./assets/**'],
             verbose: true
-        })
+        }),
+        new CopyPlugin([
+            {
+                from: path.resolve(__dirname, '../login_success.html'),
+                to: path.resolve(__dirname, '../../../static/assets')
+            }
+        ]),
     ],
     optimization: {
         minimizer: [
