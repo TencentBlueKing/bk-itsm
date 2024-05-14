@@ -27,6 +27,7 @@ import copy
 import functools
 import json
 import time
+from collections import defaultdict
 from datetime import datetime
 from itertools import chain
 
@@ -3377,15 +3378,22 @@ class Ticket(Model, BaseTicket):
 
             message = _(log.message)
             if log.type == SYSTEM_OPERATE:
-                message = message.format(
-                    name=log.from_state_name, detail_message=log.detail_message
+                message = message.format_map(
+                    defaultdict(
+                        str, 
+                        name=log.from_state_name, 
+                        detail_message=log.detail_message
+                    )
                 )
             else:
-                message = message.format(
-                    operator=log.operator,
-                    name=log.from_state_name,
-                    action=_(log.action).lower(),
-                    detail_message=log.detail_message,
+                message = message.format_map(
+                    defaultdict(
+                        str,
+                        operator=log.operator,
+                        name=log.from_state_name,
+                        action=_(log.action).lower(),
+                        detail_message=log.detail_message,
+                    )
                 )
 
             state_info.update(
