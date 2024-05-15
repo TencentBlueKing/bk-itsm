@@ -1,5 +1,12 @@
 # Changelog
-[Version: 2.6.17] - 2024-05-11
+## [Version: 2.6.18] - 2024-05-15
+[Fixed] Resolved the issue with unprocessed node fields during joint validation
+[Fixed] Fixed the issue where there was no redirection after login
+[Fixed] Fixed the interface anomaly caused by non-existent variables on the print page
+[Improved] Added length restriction for work order closure reasons
+[Improved] Optimized indexes in the ticket table
+
+## [Version: 2.6.17] - 2024-05-11
 [Fixed] Resolved XSS vulnerability in work order rich text
 [Improved] Unified login window interactions
 
