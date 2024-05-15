@@ -75,7 +75,7 @@ def field_validate(field, state_fields, key_value, **kwargs):
         raise serializers.ValidationError(_("标题不能超过120个字符"))
 
     choice_validate(field, field_obj, key_value, **kwargs)
-    regex_validate(field, field_obj, kwargs.get("ticket", None))
+    regex_validate(field, field_obj, kwargs.get("ticket", None), key_value)
     custom_regex_validate(field, field_obj)
 
 
@@ -232,22 +232,24 @@ def custom_regex_validate(field, field_obj):
         raise serializers.ValidationError(_("自定义正则出现异常， error = {}".format(e)))
 
 
-def validate_expression(field, expression, ticket):
+def validate_expression(field, expression, ticket, key_value=None):
     VALIDATE_TYPE_MAP = {
         "DATE": validate_date_expression,
         "INT": validate_int_expression,
         "DATETIME": validate_datetime_expression,
     }
     try:
-        return VALIDATE_TYPE_MAP[expression.type](field, expression, ticket)
+        return VALIDATE_TYPE_MAP[expression.type](field, expression, ticket, key_value)
     except Exception:
         return False
 
 
-def validate_int_expression(field, expression, ticket):
+def validate_int_expression(field, expression, ticket, key_value=None):
     source = field["value"]
     if expression.source == "field":
         target_value = ticket.fields.get(key=expression.key).value
+        if not target_value and isinstance(key_value, dict):
+            target_value = key_value.get(f"params_{expression.key}")
     else:
         target_value = expression.value
 
@@ -255,7 +257,7 @@ def validate_int_expression(field, expression, ticket):
     return BoolRule(exp).test()
 
 
-def validate_datetime_expression(field, expression, ticket):
+def validate_datetime_expression(field, expression, ticket, key_value=None):
     source_timestamp = datetime.datetime.timestamp(
         datetime.datetime.strptime(field["value"], "%Y-%m-%d %H:%M:%S")
     )
@@ -264,6 +266,8 @@ def validate_datetime_expression(field, expression, ticket):
             target_value = ticket.create_at.strftime("%Y-%m-%d %H:%M:%S")
         else:
             target_value = ticket.fields.get(key=expression.key).value
+            if not target_value and isinstance(key_value, dict):
+                target_value = key_value.get(f"params_{expression.key}")
     elif expression.source == "system":
         if expression.key == "system_time":
             target_value = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -279,7 +283,7 @@ def validate_datetime_expression(field, expression, ticket):
     return BoolRule(exp).test()
 
 
-def validate_date_expression(field, expression, ticket):
+def validate_date_expression(field, expression, ticket, key_value=None):
     source_timestamp = datetime.datetime.timestamp(
         datetime.datetime.strptime(field["value"], "%Y-%m-%d")
     )
@@ -288,6 +292,8 @@ def validate_date_expression(field, expression, ticket):
             target_value = ticket.create_at
         else:
             target_value = ticket.fields.get(key=expression.key).value
+            if not target_value and isinstance(key_value, dict):
+                target_value = key_value.get(f"params_{expression.key}")
     elif expression.source == "system":
         if expression.key == "system_time":
             target_value = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -302,7 +308,7 @@ def validate_date_expression(field, expression, ticket):
     return BoolRule(exp).test()
 
 
-def regex_validate(field, field_obj, ticket=None):
+def regex_validate(field, field_obj, ticket=None, key_value=None):
     regex = field_obj.regex
 
     regex_list = []
@@ -321,7 +327,7 @@ def regex_validate(field, field_obj, ticket=None):
         if rule.expressions:
             results = []
             for expression in rule.expressions:
-                results.append(validate_expression(field, expression, ticket))
+                results.append(validate_expression(field, expression, ticket, key_value))
 
             expression_type = {"and": all, "or": any}
             if not expression_type.get(rule.type, any)(results):

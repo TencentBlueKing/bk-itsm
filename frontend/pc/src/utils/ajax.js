@@ -81,7 +81,7 @@ instance.interceptors.response.use(
     if (response.config.url === 'init/') {
       if (response.status === 401) {
         const { login_url } = response.data;
-        const successUrl = `${window.location.origin}${window.SITE_URL}account/login_success`;
+        const successUrl = `${window.location.origin}${window.SITE_URL}static/assets/login_success.html`;
         let [loginUrl] = login_url.split('?');
         loginUrl = `${loginUrl}?c_url=${encodeURIComponent(successUrl)}`;
 
@@ -124,7 +124,7 @@ instance.interceptors.response.use(
         case 401: {
           // 登录控制
           const data = response.data;
-          const successUrl = `${window.location.origin}/login_success.html`;
+          const successUrl = `${window.location.origin}${window.SITE_URL}static/assets/login_success.html`;
           let [loginUrl] = data.login_url.split('?');
           loginUrl = `${loginUrl}?c_url=${encodeURIComponent(successUrl)}`;
 
