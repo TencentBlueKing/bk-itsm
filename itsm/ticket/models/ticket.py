@@ -240,7 +240,7 @@ class SignTask(Model):
         ("FINISHED", "已完成"),
     ]
 
-    status_id = models.IntegerField(_("状态ID"))
+    status_id = models.IntegerField(_("状态ID"), db_index=True)
     order = models.IntegerField(_("顺序"), default=DEFAULT_ORDER)
     status = models.CharField(
         _("任务状态"), max_length=LEN_SHORT, choices=TASK_STATUS_CHOICES, default="WAIT"
@@ -3377,16 +3377,13 @@ class Ticket(Model, BaseTicket):
 
             message = _(log.message)
             if log.type == SYSTEM_OPERATE:
-                message = message.format(
-                    name=log.from_state_name, detail_message=log.detail_message
-                )
+                message = message.replace("{name}", log.from_state_name)
+                message = message.replace("{detail_message}", log.detail_message)
             else:
-                message = message.format(
-                    operator=log.operator,
-                    name=log.from_state_name,
-                    action=_(log.action).lower(),
-                    detail_message=log.detail_message,
-                )
+                message = message.replace("{name}", log.from_state_name)
+                message = message.replace("{detail_message}", log.detail_message)
+                message = message.replace("{operator}", log.operator)
+                message = message.replace("{action}", log.action)
 
             state_info.update(
                 operator=log.operator,
@@ -3424,13 +3421,15 @@ class Ticket(Model, BaseTicket):
                 end_log = self.logs.get(
                     is_valid=True, from_state_id=self.end_state["id"]
                 )
+                message = end_log.message.replace("{operator}", end_log.operator)
+                message = message.replace("{detail_message}", end_log.detail_message)
                 state_list.append(
                     {
                         "name": _("结束"),
                         "operator": "system",
                         "operate_at": end_log.operate_at.strftime("%Y-%m-%d %H:%M:%S"),
                         "fields": [],
-                        "message": end_log.message,
+                        "message": message,
                         "action": "",
                     }
                 )
@@ -5061,7 +5060,7 @@ class StatusTransitLog(models.Model):
 class AttentionUsers(models.Model):
     """单据关注人"""
 
-    ticket_id = models.IntegerField(_("单号"))
+    ticket_id = models.IntegerField(_("单号"), db_index=True)
     follower = models.CharField(_("关注人"), max_length=LEN_LONG)
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
 
