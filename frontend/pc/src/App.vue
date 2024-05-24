@@ -22,10 +22,10 @@
 
 <template>
   <div id="app" class="bk-app" @click="hiddenTree" v-bkloading="{ isLoading: loading }">
-    <notice-component v-if="showNotice && !$route.meta.iframe" :api-url="apiUrl" @show-alert-change="handleNoticeChange" />
+    <notice-component v-if="showNotice && !isSubNav && !$route.meta.iframe" :api-url="apiUrl" @show-alert-change="handleNoticeChange" />
     <template v-if="isShowView">
       <!-- has navigation-->
-      <navigation v-if="!$route.meta.iframe" :class="{ 'show-notice': showNotice }">
+      <navigation v-if="!isSubNav && !$route.meta.iframe" :class="{ 'show-notice': showNotice }">
         <div
           v-bkloading="{ isLoading: localLoading }"
           class="bk-app-content">
@@ -72,6 +72,7 @@
   import permissionApply from '@/components/common/layout/permissionApply.vue';
   import permission from '@/mixins/permission.js';
   import { errorHandler } from './utils/errorHandler';
+  import { subEnv } from '@blueking/sub-saas';
 
   export default {
     name: 'app',
@@ -99,6 +100,7 @@
           type: 'project', // 无权限类型: project、other
           permission: [],
         },
+        isSubNav: subEnv,
       };
     },
     computed: {
