@@ -84,7 +84,7 @@ Vue.use(Router);
 // https://github.com/webpack/webpack/releases/tag/v2.4.0
 
 // 在蓝盾项目，包含iframe的路径无需拼接rootPath
-const isIframe = window.location.path.indexOf('iframe') > -1;
+const isIframe = window.location.hash.indexOf('iframe') > -1;
 const base = isIframe ? '' : rootPath;
 
 const routes = [
