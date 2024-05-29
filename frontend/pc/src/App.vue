@@ -72,7 +72,7 @@
   import permissionApply from '@/components/common/layout/permissionApply.vue';
   import permission from '@/mixins/permission.js';
   import { errorHandler } from './utils/errorHandler';
-  import { subEnv } from '@blueking/sub-saas';
+  import { subEnv } from '@blueking/sub-saas/dist/main.js';
 
   export default {
     name: 'app',
