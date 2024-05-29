@@ -29,7 +29,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import bus from '../utils/bus';
 import routerModules from './modules/index.js';
-import { rootPath, connectToMain } from '@blueking/sub-saas';
+import { rootPath, connectToMain } from '@blueking/sub-saas/dist/main.js';
 
 // 首页
 const Home = () => import('../views/home/index.vue');
