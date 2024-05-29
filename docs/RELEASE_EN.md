@@ -1,4 +1,8 @@
 # Changelog
+## [Version: 2.6.19] - 2024-05-29
+【Fixed】Fixed the issue where logout was not effective
+【Improved】Support for iframe loading mode implemented
+
 ## [Version: 2.6.18] - 2024-05-15
 [Fixed] Resolved the issue with unprocessed node fields during joint validation
 [Fixed] Fixed the issue where there was no redirection after login
