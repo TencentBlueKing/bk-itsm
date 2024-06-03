@@ -33,7 +33,7 @@
       "
     >
       <template v-if="logInfo">
-        <div slot="header">
+        <div slot="header" class="slide-title">
           {{ logInfo.from_state_name || logInfo.message }}
         </div>
         <div class="p20" slot="content">
@@ -188,11 +188,17 @@
 
 <style lang="scss" scoped>
 @import "../../../../../scss/mixins/clearfix.scss";
+.slide-title {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
 .bk-timeline-user-content {
     font-size: 12px;
     .bk-area-show-back {
         padding: 4px 8px;
         .opt-info {
+            word-break: break-all;
             color: #63656e;
         }
     }
