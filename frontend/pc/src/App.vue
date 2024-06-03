@@ -90,6 +90,7 @@
     mixins: [permission],
     data() {
       return {
+        enableNoticeCenter: window.NOTICE_CENTER_SWITCH === 'on',
         loading: false,
         localLoading: false,
         isRouterAlive: true,
