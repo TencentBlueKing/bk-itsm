@@ -4070,11 +4070,14 @@ class Ticket(Model, BaseTicket):
             for data in content["form_data"]:
                 scheme = data["scheme"]
                 label = data.get("label")
+                if label and "【" not in label:
+                    label = "【{}】".format(label)
+                    
                 detail = []
                 if isinstance(data["value"], str):
                     if label and data["value"]:
                         text_content.append(
-                            "{}: {}".format(label, data["value"])
+                            "{}\n{}".format(label, data["value"])
                         )
                     continue
                 for attr in data["value"]:
