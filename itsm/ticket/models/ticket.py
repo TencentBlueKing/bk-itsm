@@ -4074,7 +4074,7 @@ class Ticket(Model, BaseTicket):
                 if isinstance(data["value"], str):
                     if label and data["value"]:
                         text_content.append(
-                            "{}:\n{}".format(label, data.get("label") or data["value"])
+                            "{}: {}".format(label, data["value"])
                         )
                     continue
                 for attr in data["value"]:
@@ -4111,7 +4111,7 @@ class Ticket(Model, BaseTicket):
                             )
                     detail.append(", ".join(single))
                 text_content.append("{}:\n{}".format(label, "\n".join(detail)))
-            return "\n".join(text_content)
+            return "\n" + ("\n".join(text_content))
         except Exception as err:
             logger.exception(
                 "create_moa_ticket parser CUSTOM-FORM error, msg is {}".format(err)
