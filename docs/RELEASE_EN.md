@@ -1,4 +1,11 @@
 # Changelog
+## [Version: 2.6.20] - 2024-06-6
+【Fixed】Fixed the issue where the time control position on the Operations Analysis page was calculated inaccurately.
+【Fixed】Removed the comment type switch icon from the document comment edit popup.
+【Improved】Optimized the style for long characters in the transaction log.
+【Improved】Optimized the placeholder text for the personnel selector.
+【Improved】Added maximum height to the ticket detail table fields.
+
 ## [Version: 2.6.19] - 2024-05-29
 【Fixed】Fixed the issue where logout was not effective
 【Improved】Support for iframe loading mode implemented
