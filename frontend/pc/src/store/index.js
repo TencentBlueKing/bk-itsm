@@ -123,7 +123,7 @@ export default new Vuex.Store({
   // 公共 store
   state: {
     language: "zh-cn",
-    showNotice: window.NOTICE_CENTER_SWITCH === 'on',
+    showNotice: false,
     // 任务执行后刷新任务记录列表
     taskHistoryRefresh: false,
     // 缓存人员选择器数据

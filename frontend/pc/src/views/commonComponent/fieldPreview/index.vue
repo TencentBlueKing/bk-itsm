@@ -27,7 +27,8 @@
         <span class="bk-li-left">{{item.name}}：</span>
         <div class="bk-form-content bk-over-more" style="margin-left: 0px; overflow: hidden; width: 100%;">
           <bk-table :data="item.value"
-            :size="'small'">
+            :size="'small'"
+            :max-height="450">
             <template v-for="title in item.choice">
               <bk-table-column :label="title.name" :key="title.key">
                 <template slot-scope="props">

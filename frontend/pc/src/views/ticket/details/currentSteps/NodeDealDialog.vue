@@ -42,6 +42,7 @@
               :placeholder="$t(`m.newCommon['请输入终止原因']`)"
               :type="'textarea'"
               :rows="3"
+              :maxlength="1000"
               v-model="formData.terminate_message">
             </bk-input>
           </bk-form-item>

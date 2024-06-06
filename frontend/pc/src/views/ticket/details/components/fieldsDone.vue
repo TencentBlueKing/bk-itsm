@@ -30,8 +30,10 @@
         <span class="bk-itsm-icon icon-edit-bold isOn"></span>
       </div>
       <div class="bk-form-content bk-over-more" style="margin-left: 0px;" v-if="item.value">
-        <bk-table :data="getParseValue(item.value)"
-          :size="'small'">
+        <bk-table
+          :data="getParseValue(item.value)"
+          :size="'small'"
+          :max-height="450">
           <template v-for="title in item.choice">
             <bk-table-column :label="title.name" :key="title.key">
               <template slot-scope="props">
