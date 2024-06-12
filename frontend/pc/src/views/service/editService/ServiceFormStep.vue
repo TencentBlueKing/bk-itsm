@@ -119,6 +119,7 @@
       :mask-close="false"
       :title="$t(`m['创建服务']`)"
       :auto-close="false"
+      :loading="isSubmitting"
       @confirm="onBasicFormSubmit"
       @cancel="onBasicFormCancel">
       <bk-form
@@ -473,22 +474,27 @@
             this.detailLoading = false;
           });
       },
-      onBasicFormSubmit() {
-        if (this.isSubmitting) {
-          return;
-        }
-        this.$refs.basicForm.validate().then(async () => {
+      async onBasicFormSubmit() {
+        try {
+          if (this.isSubmitting) {
+            return;
+          }
+          this.isSubmitting = true;
+          console.log(this.isSubmitting);
+          await this.$refs.basicForm.validate();
           const params = JSON.parse(JSON.stringify(this.formData));
           params.id = this.serviceId || undefined;
           params.project_key = this.$store.state.project.id;
-          this.isSubmitting = true;
           if (this.type === 'edit') {
             await this.updateServiceInfo(params);
           } else {
             await this.createService(params);
           }
+        } catch (e) {
+          console.error(e);
+        } finally {
           this.isSubmitting = false;
-        });
+        }
       },
       onBasicFormCancel() {
         if (this.type === 'new') {
@@ -518,7 +524,7 @@
       },
       // 创建服务
       createService(params) {
-        this.$store.dispatch('serviceEntry/createService', params).then(res => {
+        return this.$store.dispatch('serviceEntry/createService', params).then(res => {
           this.$bkMessage({
             message: this.$t('m.deployPage["保存成功"]'),
             theme: 'success',
@@ -542,7 +548,7 @@
       },
       // 修改服务
       updateServiceInfo(params) {
-        this.$store.dispatch('serviceEntry/updateService', params).then(res => {
+        return this.$store.dispatch('serviceEntry/updateService', params).then(res => {
           this.$bkMessage({
             message: this.$t('m.serviceConfig["修改成功"]'),
             theme: 'success',
