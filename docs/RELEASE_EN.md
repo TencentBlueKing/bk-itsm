@@ -1,5 +1,11 @@
 # Changelog
-## [Version: 2.6.20] - 2024-06-6
+## [Version: 2.6.21] - 2024-06-12
+【Fixed】Fixed the issue where the default project could not be edited.
+【Fixed】Fixed the issue where multiple identical services could be created by repeatedly clicking the Create Service button.
+【Fixed】Fixed the issue where the search parameter key was incorrect when filtering the service list by type.
+【Fixed】Added a maximum character limit of 1000 to the reason form in the close and suspend document operation pop-ups.
+
+## [Version: 2.6.20] - 2024-06-06
 【Fixed】Fixed the issue where the time control position on the Operations Analysis page was calculated inaccurately.
 【Fixed】Removed the comment type switch icon from the document comment edit popup.
 【Fix】Remove personnel information from the work order interface.

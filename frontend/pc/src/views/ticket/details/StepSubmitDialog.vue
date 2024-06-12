@@ -56,6 +56,7 @@
               :placeholder="$t(`m.newCommon['请输入挂起原因']`)"
               :type="'textarea'"
               :rows="3"
+              :maxlength="1000"
               v-model="formInfo.suspend_message"
             >
             </bk-input>
@@ -91,6 +92,7 @@
               :placeholder="$t(`m.newCommon['请输入关闭原因']`)"
               :type="'textarea'"
               :rows="3"
+              :maxlength="1000"
               v-model="formInfo.close_message"
             >
             </bk-input>
