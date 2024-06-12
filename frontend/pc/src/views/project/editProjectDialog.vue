@@ -70,7 +70,6 @@
 </template>
 <script>
   import { deepClone } from '@/utils/util';
-  import { errorHandler } from '@/utils/errorHandler.js';
   import i18n from '@/i18n/index.js';
 
   export default {
@@ -101,7 +100,7 @@
         projectRules: {
           name: [
             {
-              required: true,
+              validator: val => val.trim().length > 0,
               message: '必填项',
               trigger: 'blur',
             },
@@ -172,7 +171,7 @@
               await this.$store.dispatch(url, this.projectForm);
               this.$emit('confirm', this.projectForm.key);
             } catch (e) {
-              errorHandler(e, this);
+              console.error(e);
             } finally {
               this.editProjectPending = false;
             }
