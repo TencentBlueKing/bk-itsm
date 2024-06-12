@@ -312,7 +312,7 @@
     created() {
       const nameRules = [
         {
-          required: true,
+          validator: val => val.trim().length > 0,
           message: this.$t('m.treeinfo["字段必填"]'),
           trigger: 'blur',
         },
