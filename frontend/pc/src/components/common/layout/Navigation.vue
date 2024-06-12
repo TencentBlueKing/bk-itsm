@@ -479,7 +479,7 @@
         this.$router.push({ name: 'ProjectList' });
       },
       onLogOut() {
-        location.href = `${window.login_url}?is_from_logout=1&c_url=${window.location.href}`;
+        location.href = `${window.login_url}?is_from_logout=1&c_url=${encodeURIComponent(window.location.href)}`;
       },
       // 切换项目
       onSelectProject(val) {
