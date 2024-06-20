@@ -135,6 +135,7 @@ def index(request):
             "DOC_URL": settings.BK_DOC_URL,
             "SOPS_URL": settings.SOPS_SITE_URL,
             "NOTICE_CENTER_SWITCH": notice_center_switch_value,
+            "BKPAAS_SHARED_RES_URL": settings.BKPAAS_SHARED_RES_URL,
         },
     )
 
