@@ -955,5 +955,6 @@ NOTIFY_ROUTER_NAME = os.getenv("BKAPP_NOTIFY_ROUTER_NAME", "router")
 IAM_SDK_CLIENT_TIMEOUT = int(os.getenv("BKAPP_IAM_SDK_CLIENT_TIMEOUT", 20))
 
 
-# 公共 header / footer
+# 公共配置
 BK_SHARED_RES_URL = os.getenv("BKPAAS_SHARED_RES_URL") or os.getenv("BKAPP_SHARED_RES_URL")
+BK_PLATFORM_NAME = os.getenv("BKAPP_PLATFORM_NAME", "Tencent BlueKing")
