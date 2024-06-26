@@ -349,8 +349,9 @@ class Service(ObjectManagerMixin, Model):
 
         # 组织角色
         for organization in UserRole.get_user_roles(username)["organization"]:
+            organization_id = ',' + organization + ','
             conditions.append(
-                Q(display_type="ORGANIZATION") & Q(display_role__contains=organization)
+                Q(display_type="ORGANIZATION") & Q(display_role__contains=organization_id)
             )
 
         # 通用角色
