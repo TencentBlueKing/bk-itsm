@@ -2690,4 +2690,5 @@ export const m = {
   ':': ':',
   '单据已由processor处理,您无需操作': 'The ticket has been processed by {processor} and you do not need to operate',
   我知道了: 'I See',
+  蓝鲸: 'BlueKing',
 };

@@ -1,4 +1,7 @@
 # Changelog
+## [Version: 2.6.22] - 2024-06-24
+【Improved】Global project settings are editable.
+
 ## [Version: 2.6.21] - 2024-06-12
 【Fixed】Fixed the issue where the default project could not be edited.
 【Fixed】Fixed the issue where multiple identical services could be created by repeatedly clicking the Create Service button.

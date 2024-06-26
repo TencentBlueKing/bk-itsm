@@ -63,7 +63,7 @@
   </div>
 </template>
 <script>
-  import { mapState } from 'vuex';
+  import { mapActions, mapState } from 'vuex';
   import NoticeComponent from '@blueking/notice-component-vue2';
   import '@blueking/notice-component-vue2/dist/style.css';
   import bus from './utils/bus';
@@ -147,6 +147,7 @@
         }
       });
       this.loading = true;
+      await this.getGlobalConfig();
       await this.getPermissionMeta();
       // await this.loadProjectInfo()
       await this.getManagePermission();
@@ -169,6 +170,9 @@
       this.getPageFooter();
     },
     methods: {
+      ...mapActions([
+        'getGlobalConfig',
+      ]),
       getPageFooter() {
         this.$store.dispatch('common/getPageFooter').then((res) => {
           this.$store.commit('common/setPageFooter', res.data);

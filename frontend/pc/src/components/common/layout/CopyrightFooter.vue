@@ -21,16 +21,28 @@
   -->
 
 <template>
-  <footer id="page-footer-wrapper" v-html="footer"></footer>
+  <footer id="page-footer-wrapper">
+    <template v-if="bkSharedResUrl">
+      <p class="link-list" v-html="platformInfo.i18n.footerInfoHTML"></p>
+      <p class="copyright" v-html="platformInfo.footerCopyrightContent"></p>
+    </template>
+    <p v-else v-html="footer" class="common-footer"></p>
+  </footer>
 </template>
 <script>
   import { mapState } from 'vuex';
 
   export default {
     name: 'CopyrightFooter',
+    data() {
+      return {
+        bkSharedResUrl: window.BK_SHARED_RES_URL,
+      };
+    },
     computed: {
       ...mapState({
         footer: state => state.common.footer,
+        platformInfo: state => state.platformInfo,
       }),
     },
   };
@@ -45,18 +57,24 @@
         text-align: center;
     }
     .link-list {
-        margin-bottom: 6px;
+      margin-bottom: 6px;
+      font-size: 12px;
+      text-align: center;
     }
     .link-item {
         display: inline-block;
-        margin-left: -4px;
         padding: 0 4px;
         line-height: 1;
         color: #3480fe;
-        border-right: 1px solid #3480fe;
-        &:last-child {
-            border-right: none;
+    }
+    .common-footer {
+      .link-item {
+        color: #3480fe;
+        margin-left: -4px;
+        &:not(:last-child) {
+          border-right: 1px solid #3480fe;
         }
+      }
     }
     .desc {
         margin-bottom: 8px;
