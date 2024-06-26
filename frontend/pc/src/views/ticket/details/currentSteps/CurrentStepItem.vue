@@ -199,12 +199,20 @@
               </template>
             </div>
             <!-- 字段列表 -->
-            <field-info
-              v-else
-              ref="fieldInfo"
-              :fields="nodeInfo.fields"
-              :all-field-list="allFieldList">
-            </field-info>
+            <template v-else>
+              <process-form-plugin
+                v-if="isLessCode"
+                v-model="lessCodeDate"
+                ref="formField"
+                :fields="nodeInfo.fields">
+              </process-form-plugin>
+              <field-info
+                v-else
+                ref="fieldInfo"
+                :fields="nodeInfo.fields"
+                :all-field-list="allFieldList">
+              </field-info>
+            </template>
           </div>
           <div class="bk-form-btn" v-if="nodeInfo.type !== 'TASK'">
             <!-- 响应后才能处理 -->
@@ -349,6 +357,7 @@
     },
     data() {
       return {
+        lessCodeDate: {},
         constants: [],
         hookedVarList: {},
         pipelineList: [],
@@ -392,6 +401,10 @@
       };
     },
     computed: {
+      // 判断单据是否来着lesscode
+      isLessCode() {
+        return this.$route.query.project_id === 'lessCode' && this.nodeInfo.type === 'NORMAL';
+      },
       // 会签人信息
       currSignProcessorInfo() {
         if (!this.nodeInfo.can_operate && this.nodeInfo.type === 'SIGN') {
@@ -462,6 +475,13 @@
     created() {
       this.initData();
       this.$store.commit('ticket/setHasTicketNodeOptAuth', this.hasNodeOptAuth);
+    },
+    mounted() {
+      if (this.isLessCode) {
+        this.nodeInfo.fields.forEach(item => {
+          this.$set(this.lessCodeDate, item.key, item.value || '');
+        });
+      }
     },
     methods: {
       initData() {
@@ -556,6 +576,12 @@
           && !this.$refs.fieldInfo.checkValue()) {
           return;
         }
+        if (btn.key === 'TRANSITION'
+          && this.$refs.formField && !Object.keys(this.$refs.formField.localValue)
+            .map(item => this.$refs.formField.localValue[item] !== '')
+            .every(ite => ite)) {
+          return;
+        }
         this.openFormInfo.btnInfo = btn;
         this.openFormInfo.title = btn.name;
         // 二次确认弹窗的样式不同
@@ -596,6 +622,9 @@
           const params = {
             state_id: this.nodeInfo.state_id,
             fields: this.nodeInfo.fields.filter(ite => !ite.is_readonly && ite.showFeild).map(item => {
+              if (this.isLessCode) {
+                item.value = this.lessCodeDate[item.key];
+              }
               if (item.type === 'FILE') {
                 item.value = item.value.toString();
               }
