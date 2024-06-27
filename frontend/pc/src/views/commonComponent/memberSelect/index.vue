@@ -64,7 +64,7 @@
       },
       placeholder: {
         type: String,
-        default: i18n.t('m.newCommon["请选择"]'),
+        default: i18n.t('m.newCommon["请输入用户名"]'),
       },
       disabled: {
         type: Boolean,

@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import os
 import datetime
+import re
 
 from blueapps.account.decorators import login_exempt
 from django.conf import settings
@@ -135,6 +136,9 @@ def index(request):
             "DOC_URL": settings.BK_DOC_URL,
             "SOPS_URL": settings.SOPS_SITE_URL,
             "NOTICE_CENTER_SWITCH": notice_center_switch_value,
+            "BK_SHARED_RES_URL": settings.BK_SHARED_RES_URL,
+            "BK_PLATFORM_NAME": settings.BK_PLATFORM_NAME,
+            "VERSION": get_version()
         },
     )
 
@@ -156,6 +160,21 @@ def get_footer(request):
             "message": "success",
         }
     )
+
+
+def get_version():
+    """
+    @summary: 获取版本信息
+    """
+    # 读取文件内容
+    app_desc = os.path.join(settings.PROJECT_ROOT, "app_desc.yaml")
+    with open(app_desc, 'r') as file:
+        content = file.read()
+
+    # 使用正则表达式提取版本号
+    pattern = r'app_version:\s*"([\d.]+)"'
+    match = re.search(pattern, content)
+    return match[1] if match else "2.6"
 
 
 template_name = "wiki/create.html"

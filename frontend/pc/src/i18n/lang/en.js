@@ -1061,6 +1061,7 @@ export const m = {
     '请重新修改以下参数后再重试：': 'Please modify the following parameters and try again:',
     '执行手动修改，需要根据接口要求填写相应参数信息（若无参数要求，可留空或忽略）：': 'To perform manual modification, you need to fill in the corresponding parameter information according to the interface requirements (if there is no parameter requirement, you can leave it blank or ignore):',
     所有评论: 'All comments',
+    请输入用户名: 'Please enter the username',
   },
   serviceConfig: {
     ID: 'ID',
@@ -2689,4 +2690,5 @@ export const m = {
   ':': ':',
   '单据已由processor处理,您无需操作': 'The ticket has been processed by {processor} and you do not need to operate',
   我知道了: 'I See',
+  蓝鲸: 'BlueKing',
 };

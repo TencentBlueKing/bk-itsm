@@ -110,7 +110,7 @@ from itsm.ticket.models import (
     TicketRemark,
 )
 from itsm.ticket.tasks import remark_notify
-from itsm.ticket.utils import compute_list_difference
+from itsm.ticket.utils import compute_list_difference, get_user_profile
 from itsm.workflow.models import WorkflowVersion
 from itsm.ticket.serializers.field import (
     FieldSerializer,
@@ -1041,12 +1041,8 @@ class TicketRetrieveSerializer(TicketSerializer):
 
         data = super(TicketRetrieveSerializer, self).to_representation(inst)
 
-        # 查看单据详情时，补充户身份资料信息
-        try:
-            creator = BkUser.objects.get(username=inst.creator)
-            profile = json.loads(creator.get_property("profile"))
-        except Exception:
-            profile = {"name": "", "phone": "", "departments": []}
+        # 查看单据详情时，补充户身份资料信息，并移除敏感信息
+        profile = get_user_profile(inst.creator)
 
         username = self.context["request"].user.username
         is_itsm_superuser = UserRole.is_itsm_superuser(username)
@@ -1110,11 +1106,7 @@ class MasterProxyTicketSerializer(TicketRetrieveSerializer):
         slave_ticket = Ticket.objects.get(id=pk)
 
         # 查看单据详情时，补充户身份资料信息
-        try:
-            creator = BkUser.objects.get(username=slave_ticket.creator)
-            profile = json.loads(creator.get_property("profile"))
-        except Exception:
-            profile = {"name": "", "phone": "", "departments": []}
+        profile = get_user_profile(slave_ticket.creator)
 
         # 母单代理单据中的所有公共字段都是只读状态
         for table_field in data["table_fields"]:

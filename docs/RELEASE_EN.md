@@ -1,4 +1,25 @@
 # Changelog
+## [Version: 2.6.22] - 2024-06-24
+【Improved】Global project settings are editable.
+
+## [Version: 2.6.21] - 2024-06-12
+【Fixed】Fixed the issue where the default project could not be edited.
+【Fixed】Fixed the issue where multiple identical services could be created by repeatedly clicking the Create Service button.
+【Fixed】Fixed the issue where the search parameter key was incorrect when filtering the service list by type.
+【Fixed】Added a maximum character limit of 1000 to the reason form in the close and suspend document operation pop-ups.
+
+## [Version: 2.6.20] - 2024-06-06
+【Fixed】Fixed the issue where the time control position on the Operations Analysis page was calculated inaccurately.
+【Fixed】Removed the comment type switch icon from the document comment edit popup.
+【Fix】Remove personnel information from the work order interface.
+【Improved】Optimized the style for long characters in the transaction log.
+【Improved】Optimized the placeholder text for the personnel selector.
+【Improved】Added maximum height to the ticket detail table fields.
+
+## [Version: 2.6.19] - 2024-05-29
+【Fixed】Fixed the issue where logout was not effective
+【Improved】Support for iframe loading mode implemented
+
 ## [Version: 2.6.18] - 2024-05-15
 [Fixed] Resolved the issue with unprocessed node fields during joint validation
 [Fixed] Fixed the issue where there was no redirection after login

@@ -24,6 +24,8 @@ import Vue from "vue";
 import Vuex from "vuex";
 import ajax from "../utils/ajax";
 import { jsonp } from "../utils/util";
+import i18n from '@/i18n/index.js';
+import { getPlatformConfig, setShortcutIcon } from '@blueking/platform-config'
 
 import common from "./modules/common";
 import changeType from "./modules/changeType";
@@ -123,7 +125,7 @@ export default new Vuex.Store({
   // 公共 store
   state: {
     language: "zh-cn",
-    showNotice: window.NOTICE_CENTER_SWITCH === 'on',
+    showNotice: false,
     // 任务执行后刷新任务记录列表
     taskHistoryRefresh: false,
     // 缓存人员选择器数据
@@ -266,6 +268,13 @@ export default new Vuex.Store({
       FIRST_STATE_SWITCH: false,
       SMS_COMMENT_SWITCH: false,
     },
+    platformInfo: { // 项目全局配置
+      favicon: `${window.SITE_URL}static/core/images/bk_itsm.png`,
+      name: window.log_name || i18n.t('m[\'流程服务\']'),
+      brandName: window.BK_PLATFORM_NAME || i18n.t('m[\'蓝鲸\']'),
+      version: window.VERSION,
+      i18n: {}
+    },
   },
   // 公共 mutations
   mutations: {
@@ -372,6 +381,9 @@ export default new Vuex.Store({
     },
     changeOpenFunction(state, obj) {
       state.openFunction = obj;
+    },
+    setPlatformInfo (state, content) {
+        state.platformInfo = content
     },
   },
   // 公共 actions
@@ -482,5 +494,25 @@ export default new Vuex.Store({
     startTask({ commit }, params) {
       return ajax.post(`task/start_task/`, params).then((response) => response.data);
     },
+    /**
+     * 获取当前用户的全局设置
+     * @returns {Object}
+     */
+    async getGlobalConfig ({ state, commit }) {
+        // 默认配置
+        const config = { ...state.platformInfo }
+        let resp
+        const bkRepoUrl = window.BK_SHARED_RES_URL
+        if (bkRepoUrl) {
+          resp = await getPlatformConfig(`${bkRepoUrl}/bk_itsm/base.js`, config)
+        } else {
+          resp = await getPlatformConfig(config)
+        }
+        const { i18n, name, brandName } = resp
+        document.title = `${i18n.name || name} | ${i18n.brandName || brandName}`
+        setShortcutIcon(resp.favicon)
+        commit('setPlatformInfo', resp)
+        return resp
+    }
   },
 });

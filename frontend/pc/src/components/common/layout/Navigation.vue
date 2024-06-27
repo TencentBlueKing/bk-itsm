@@ -29,7 +29,7 @@
     :need-menu="sideRouters.length > 0"
     @toggle-click="isSideOpen = $event">
     <template slot="side-icon">
-      <img src="../../../images/itsm-logo.png" alt="" style="width: 36px; height: 36px;">
+      <img :src="platformInfo.appLogo || appLogo" alt="" style="width: 36px; height: 36px;">
     </template>
     <template slot="header">
       <div class="nav-header">
@@ -229,7 +229,7 @@
     mixins: [permission],
     data() {
       return {
-        appName: window.log_name || this.$t('m[\'流程服务\']'),
+        appLogo: require('../../../images/itsm-logo.png'),
         userName: window.username || '--',
         bkDocUrl: window.DOC_URL,
         routerList: ROUTER_LIST.slice(0),
@@ -253,6 +253,7 @@
     },
     computed: {
       ...mapState({
+        platformInfo: state => state.platformInfo,
         openFunction: state => state.openFunction,
         systemPermission: state => state.common.systemPermission,
         projectList: state => state.project.projectList,
@@ -292,6 +293,10 @@
           }
         });
         return list;
+      },
+      appName() {
+        const { name, i18n } = this.platformInfo;
+        return i18n.name || name;
       },
     },
     watch: {
@@ -479,7 +484,7 @@
         this.$router.push({ name: 'ProjectList' });
       },
       onLogOut() {
-        location.href = `${window.login_url}?c_url=${window.location.href}`;
+        location.href = `${window.login_url}?is_from_logout=1&c_url=${encodeURIComponent(window.location.href)}`;
       },
       // 切换项目
       onSelectProject(val) {

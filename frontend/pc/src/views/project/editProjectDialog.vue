@@ -119,8 +119,8 @@
               trigger: 'blur',
             },
             {
-              regex: /^[a-z][a-z0-9-_]+$/,
-              message: '由小写字母，数字，下划线，横线组成，必须以英文字母开头',
+              regex: /^[a-z0-9-_]+$/,
+              message: '由小写字母，数字，下划线，横线组成',
               trigger: 'blur',
             },
             {

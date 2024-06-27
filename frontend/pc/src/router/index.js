@@ -29,6 +29,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import bus from '../utils/bus';
 import routerModules from './modules/index.js';
+import { rootPath, connectToMain } from '@blueking/sub-saas/dist/main.js';
 
 // 首页
 const Home = () => import('../views/home/index.vue');
@@ -81,6 +82,10 @@ Vue.use(Router);
 
 // from webpack 2.4
 // https://github.com/webpack/webpack/releases/tag/v2.4.0
+
+// 在蓝盾项目，包含iframe的路径无需拼接rootPath
+const isIframe = window.location.hash.indexOf('iframe') > -1;
+const base = isIframe ? '' : rootPath;
 
 const routes = [
   {
@@ -290,8 +295,11 @@ const routes = [
 
 const router = new Router({
   mode: 'hash',
+  base,
   routes,
 });
+
+connectToMain(router);
 
 router.beforeEach((to, from, next) => {
   bus.$on('api-error:user-permission-denied', () => {

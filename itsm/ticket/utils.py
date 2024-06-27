@@ -27,6 +27,7 @@ import json
 import jmespath
 import requests
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext as _
 from mako.template import Template
 
@@ -207,3 +208,20 @@ def get_custom_api_data(field):
         raise GetCustomApiDataError("kv_relation配置不正确，error={}".format(e))
 
     return kv_data
+
+
+def get_user_profile(username):
+    """获取用户属性"""
+    try:
+        BkUser = get_user_model()
+        creator = BkUser.objects.get(username=username)
+        user_profile = json.loads(creator.get_property("profile"))
+        profile = {
+            "name": user_profile.get("name") or "",
+            "phone": "",
+            "departments": user_profile.get("name") or [],
+        }
+    except Exception:
+        profile = {"name": "", "phone": "", "departments": []}
+    return profile
+

@@ -22,10 +22,10 @@
 
 <template>
   <div id="app" class="bk-app" @click="hiddenTree" v-bkloading="{ isLoading: loading }">
-    <notice-component v-if="showNotice && !$route.meta.iframe" :api-url="apiUrl" @show-alert-change="handleNoticeChange" />
+    <notice-component v-if="showNotice && !isSubNav && !$route.meta.iframe" :api-url="apiUrl" @show-alert-change="handleNoticeChange" />
     <template v-if="isShowView">
       <!-- has navigation-->
-      <navigation v-if="!$route.meta.iframe" :class="{ 'show-notice': showNotice }">
+      <navigation v-if="!isSubNav && !$route.meta.iframe" :class="{ 'show-notice': showNotice }">
         <div
           v-bkloading="{ isLoading: localLoading }"
           class="bk-app-content">
@@ -63,7 +63,7 @@
   </div>
 </template>
 <script>
-  import { mapState } from 'vuex';
+  import { mapActions, mapState } from 'vuex';
   import NoticeComponent from '@blueking/notice-component-vue2';
   import '@blueking/notice-component-vue2/dist/style.css';
   import bus from './utils/bus';
@@ -72,6 +72,7 @@
   import permissionApply from '@/components/common/layout/permissionApply.vue';
   import permission from '@/mixins/permission.js';
   import { errorHandler } from './utils/errorHandler';
+  import { subEnv } from '@blueking/sub-saas/dist/main.js';
 
   export default {
     name: 'app',
@@ -89,6 +90,7 @@
     mixins: [permission],
     data() {
       return {
+        enableNoticeCenter: window.NOTICE_CENTER_SWITCH === 'on',
         loading: false,
         localLoading: false,
         isRouterAlive: true,
@@ -99,6 +101,7 @@
           type: 'project', // 无权限类型: project、other
           permission: [],
         },
+        isSubNav: subEnv,
       };
     },
     computed: {
@@ -144,6 +147,7 @@
         }
       });
       this.loading = true;
+      await this.getGlobalConfig();
       await this.getPermissionMeta();
       // await this.loadProjectInfo()
       await this.getManagePermission();
@@ -166,6 +170,9 @@
       this.getPageFooter();
     },
     methods: {
+      ...mapActions([
+        'getGlobalConfig',
+      ]),
       getPageFooter() {
         this.$store.dispatch('common/getPageFooter').then((res) => {
           this.$store.commit('common/setPageFooter', res.data);
