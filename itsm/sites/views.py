@@ -25,7 +25,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import os
 import datetime
-import re
 
 from blueapps.account.decorators import login_exempt
 from django.conf import settings
@@ -167,14 +166,10 @@ def get_version():
     @summary: 获取版本信息
     """
     # 读取文件内容
-    app_desc = os.path.join(settings.PROJECT_ROOT, "app_desc.yaml")
+    app_desc = os.path.join(settings.PROJECT_ROOT, "VERSION")
     with open(app_desc, 'r') as file:
         content = file.read()
-
-    # 使用正则表达式提取版本号
-    pattern = r'app_version:\s*"([\d.]+)"'
-    match = re.search(pattern, content)
-    return match[1] if match else "2.6"
+    return content.strip()
 
 
 template_name = "wiki/create.html"
