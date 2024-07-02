@@ -34,11 +34,12 @@
         :property="'key'">
         <bk-input v-model.trim="addTableInfo.formInfo.key"
           :placeholder="$t(`m.systemConfig['请输入编码']`)"
-          :disabled="addTableInfo.formInfo.id !== '' && addTableInfo.formInfo.id !== undefined">
+          :disabled="addTableInfo.formInfo.id !== '' && addTableInfo.formInfo.id !== undefined"
+          @change="change">
         </bk-input>
       </bk-form-item>
       <bk-form-item :label="$t(`m.user['负责人：']`)">
-        <member-select v-model="addTableInfo.formInfo.ownersInputValue"></member-select>
+        <member-select v-model="addTableInfo.formInfo.ownersInputValue" @change="change"></member-select>
       </bk-form-item>
       <bk-form-item
         :label="$t(`m.systemConfig['名称']`)"
@@ -46,19 +47,21 @@
         :property="'name'">
         <bk-input v-model.trim="addTableInfo.formInfo.name"
           maxlength="120"
-          :placeholder="$t(`m.systemConfig['请输入名称']`)">
+          :placeholder="$t(`m.systemConfig['请输入名称']`)"
+          @change="change">
         </bk-input>
       </bk-form-item>
       <bk-form-item
         :label="$t(`m.systemConfig['描述']`)">
         <bk-input type="textarea"
           v-model.trim="addTableInfo.formInfo.desc"
-          :placeholder="$t(`m.systemConfig['请输入描述']`)">
+          :placeholder="$t(`m.systemConfig['请输入描述']`)"
+          @change="change">
         </bk-input>
       </bk-form-item>
       <bk-form-item
         :label="$t(`m.systemConfig['启用状态']`)">
-        <bk-switcher v-model="addTableInfo.formInfo.is_enabled" size="small"></bk-switcher>
+        <bk-switcher v-model="addTableInfo.formInfo.is_enabled" size="small" @change="change"></bk-switcher>
       </bk-form-item>
     </bk-form>
     <!-- button -->
@@ -485,6 +488,9 @@
       },
       onParentChange(tree) {
         this.dictDataTable.formInfo.parentObj = tree;
+      },
+      change() {
+        this.$emit('change');
       },
     },
   };
