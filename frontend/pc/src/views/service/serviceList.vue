@@ -87,7 +87,7 @@
           ref="serviceTable"
           v-bkloading="{ isLoading: isDataLoading }"
           :data="dataList"
-          :size="'small'"
+          :size="setting.size"
           :pagination="pagination"
           @cell-mouse-enter="cellMouseEnter"
           @cell-mouse-leave="cellMouseLeave"
