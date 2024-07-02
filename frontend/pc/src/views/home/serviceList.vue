@@ -41,7 +41,7 @@
                 placement: 'top',
                 delay: [300, 0]
               }"
-              @click.stop="onCollectClick(service)">
+              @click.stop="onCollectClick(service, 'latest')">
             </i>
           </li>
         </ul>
@@ -87,7 +87,7 @@
                   placement: 'top',
                   delay: [300, 0]
                 }"
-                @click.stop="onCollectClick(service)">
+                @click.stop="onCollectClick(service, 'all')">
               </i>
               <div class="name" v-html="service.highlightName"></div>
               <div class="category">{{ service.serviceTypeName }}</div>
@@ -260,16 +260,19 @@
           this.isSearchResultShow = false;
         }
       },
-      onCollectClick(service) {
+      onCollectClick(service, type) {
         const curStatus = service.favorite;
         this.$store.dispatch('service/toggleServiceFavorite', {
           id: service.id,
           favorite: !curStatus,
         }).then((res) => {
           if (res.result) {
-            const serviceItem = this.allList.find(item => item.id === service.id);
             service.favorite = !curStatus; // 修改当前数据的收藏状态
-            this.$set(serviceItem, 'favorite', !curStatus); // 修改当前数据对应的源数据收藏状态
+            const list = type === 'latest' ? this.allList : this.latestList;
+            const serviceItem = list.find(item => item.id === service.id);
+            if (serviceItem) {
+              this.$set(serviceItem, 'favorite', !curStatus); // 修改当前数据对应的源数据收藏状态
+            }
           }
         })
           .catch((res) => {
