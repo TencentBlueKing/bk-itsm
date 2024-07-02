@@ -1190,8 +1190,9 @@
                 display: inline-block;
                 font-size: 14px;
                 transition: transform 0.3s ease-in-out;
+                transform: rotate(180deg);
                 &.closed {
-                    transform: rotate(180deg);
+                    transform: rotate(0deg);
                 }
             }
         }
