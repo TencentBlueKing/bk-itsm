@@ -708,6 +708,7 @@
           this.isImportServiceShow = false;
           this.isCheckImport = false;
           this.getList(1);
+          this.updateDirTree();
         });
       },
       importService() {
