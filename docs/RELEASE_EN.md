@@ -1,4 +1,15 @@
 # Changelog
+## [Version: 2.6.23] - 2024-07-03
+【Improved】Enabled support for clearing the search operation on the left-side field controls of the service form.
+【Improved】Removed the method of referencing common triggers from the task template triggers.
+【Fixed】Fixed the issue where the Message Notification Center was not displayed on the frontend.
+【Fixed】Fixed the issue where the expand/collapse icon on the left-side menu of the service list was displayed incorrectly.
+【Fixed】Added a secondary confirmation pop-up when clicking on the shadow area after editing the data dictionary without saving.
+【Fixed】Fixed the issue where the row height in the service table was not being applied.
+【Fixed】Fixed the issue where the favorite status of the frequently used services and all services cards on the homepage did not synchronize after toggling.
+【Fixed】Fixed the issue where data in the list page was not updated after editing the API.
+【Fixed】Fixed the issue where the left-side directory tree was not updated after service import.
+
 ## [Version: 2.6.22] - 2024-06-24
 【Improved】Global project settings are editable.
 
