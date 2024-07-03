@@ -107,7 +107,8 @@
     <common-trigger-list
       :source-id="changedTemplateInfo.id"
       :step-signal="stepList[step].signal"
-      :template-stage="stepList[step].stage">
+      :template-stage="stepList[step].stage"
+      :citable="false">
     </common-trigger-list>
     <!-- 步骤操作按钮 -->
     <div class="bk-common-step">
