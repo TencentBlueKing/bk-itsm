@@ -87,7 +87,7 @@
           ref="serviceTable"
           v-bkloading="{ isLoading: isDataLoading }"
           :data="dataList"
-          :size="'small'"
+          :size="setting.size"
           :pagination="pagination"
           @cell-mouse-enter="cellMouseEnter"
           @cell-mouse-leave="cellMouseLeave"
@@ -708,6 +708,7 @@
           this.isImportServiceShow = false;
           this.isCheckImport = false;
           this.getList(1);
+          this.updateDirTree();
         });
       },
       importService() {
@@ -1190,8 +1191,9 @@
                 display: inline-block;
                 font-size: 14px;
                 transition: transform 0.3s ease-in-out;
+                transform: rotate(180deg);
                 &.closed {
-                    transform: rotate(180deg);
+                    transform: rotate(0deg);
                 }
             }
         }

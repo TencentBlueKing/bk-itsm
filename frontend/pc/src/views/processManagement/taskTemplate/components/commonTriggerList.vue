@@ -53,8 +53,12 @@
                       <i class="bk-icon icon-delete" @click.stop="delTrigger(item)"></i>
                     </span>
                   </li>
-                  <bk-dropdown-menu trigger="click" style="float: left;">
-                    <div class="bk-trigger-add" slot="dropdown-trigger" :title="$t(`m.taskTemplate['添加触发器']`)">
+                  <bk-dropdown-menu trigger="click" class="trigger-dropdown" :disabled="!citable">
+                    <div
+                      class="bk-trigger-add"
+                      slot="dropdown-trigger"
+                      :title="$t(`m.taskTemplate['添加触发器']`)"
+                      @click="handleAddTrigger">
                       <i class="bk-icon icon-plus"></i>
                     </div>
                     <ul class="bk-dropdown-list" slot="dropdown-content">
@@ -196,6 +200,11 @@
       nodeType: {
         type: String,
         default: '',
+      },
+      // 是否可以引用公共触发器
+      citable: {
+        type: Boolean,
+        default: true,
       },
     },
     data() {
@@ -359,6 +368,11 @@
           trigger.checked = flag;
         });
       },
+      handleAddTrigger() {
+        if (!this.citable) {
+          this.openNew('add');
+        }
+      },
       openNew(type, item = {}) {
         this.originInfoToTrigger = {
           id: this.sourceId,
@@ -490,4 +504,11 @@
     @import '../../publicTrigger/triggerCss/index';
     @import '../taskCss/commonTrigger';
     @import '~@/scss/common-section-card.scss';
+    .trigger-dropdown.bk-dropdown-menu {
+      float: left;
+      cursor: pointer;
+      /deep/ .bk-dropdown-trigger * {
+        cursor: pointer;
+      }
+    }
 </style>

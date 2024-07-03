@@ -23,7 +23,7 @@
 <template>
   <div class="bk-api-content">
     <div class="is-title-back">
-      <p class="bk-come-back" @click="backTab">
+      <p class="bk-come-back" @click="$emit('back')">
         <arrows-left-icon></arrows-left-icon>
         <template>{{ backName }}</template>
       </p>
@@ -131,9 +131,6 @@
       this.initData();
     },
     methods: {
-      backTab() {
-        this.$parent.displayInfo.level_1 = {};
-      },
       changTitle(item, index) {
         this.checkIndex = index;
       },

@@ -29,25 +29,42 @@
         <div class="show-field" @click="handleShowField">
           <i :class="['bk-itsm-icon', isShowField ? 'icon-xiangyou1' : 'icon-xiangzuo1']"></i>
         </div>
-        <div style="    display: flex; height: calc(100% - 100px); flex-direction: column;">
+        <div style="display: flex; height: calc(100% - 100px); flex-direction: column;">
           <div class="field-content">
             <!-- <div class="field-title">控件库</div> -->
             <div class="field-title">
               <span>{{ $t(`m['控件库']`) }}</span>
-              <bk-input class="search-field" size="small" :right-icon="'bk-icon icon-search'" @enter="handleSearchLibrary"></bk-input>
+              <bk-input
+                class="search-field"
+                size="small"
+                :right-icon="'bk-icon icon-search'"
+                :clearable="true"
+                @clear="handleSearchLibrary"
+                @enter="handleSearchLibrary">
+              </bk-input>
             </div>
             <ul class="field-list">
               <li class="field-item" v-for="(field, index) in fieldsLibrary" :key="index" @click="onAddFormClick(field)">
                 <span v-bk-tooltips.light="field.name" class="field-name">{{ field.name }}</span>
               </li>
             </ul>
-            <div v-if="fieldsLibrary.length === 0" class="public-field"><i class="bk-itsm-icon icon-itsm-icon-four-zero" style="font-size: 14px"></i> 已有字段不存在你搜索的内容</div>
+            <div v-if="fieldsLibrary.length === 0" class="public-field">
+              <i class="bk-itsm-icon icon-itsm-icon-four-zero" style="font-size: 14px"></i>
+              控件库不存在你搜索的内容
+            </div>
           </div>
           <div class="field-content">
             <!-- <div class="field-title">已有字段</div> -->
             <div class="field-title">
               <span>{{ $t(`m['已有字段']`) }}</span>
-              <bk-input class="search-field" size="small" :right-icon="'bk-icon icon-search'" @enter="handleSearchField"></bk-input>
+              <bk-input
+                class="search-field"
+                size="small"
+                :right-icon="'bk-icon icon-search'"
+                :clearable="true"
+                @clear="handleSearchField"
+                @enter="handleSearchField">
+              </bk-input>
             </div>
             <ul class="field-list">
               <li class="field-item" v-for="(field, index) in publicFields" :key="index" @click="addField(field)">
