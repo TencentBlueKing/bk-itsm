@@ -151,15 +151,6 @@ Vue.use(bkMagic, {
 
 locale.i18n((key, value) => i18n.t(key, value));
 
-if (window.TAM_PROJECT_ID) {
-  /* eslint-disable-next-line */
-  new Aegis({
-    id: window.TAM_PROJECT_ID,
-    uin: window.USERNAME,
-    reportApiSpeed: true,
-    reportAssetSpeed: true,
-  });
-}
 store.dispatch('getPlatformPreData').then(()=> {
   const app = new Vue({
     el: "#app",

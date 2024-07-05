@@ -32,7 +32,6 @@
             window.log_name = '{{LOG_NAME}}';
             window.use_log = {{USE_LOG}};
             window.iam_code = "{{ BK_IAM_APP_CODE }}";
-            window.TAM_PROJECT_ID = "{{TAM_PROJECT_ID}}";
             window.DEFAULT_PROJECT = "{{DEFAULT_PROJECT}}";
             window.BK_PAAS_ESB_HOST = "{{BK_PAAS_ESB_HOST}}";
             window.NOTICE_CENTER_SWITCH = "{{NOTICE_CENTER_SWITCH}}";
@@ -65,9 +64,6 @@
                 }
             }
         </script>
-        {% if TAM_PROJECT_ID != '' %}
-            <script src="https://cdn-go.cn/aegis/aegis-sdk/latest/aegis.min.js?_bid=3977"></script>
-        {% endif %}
     </head>
     <body>
         <div id="app"></div>
