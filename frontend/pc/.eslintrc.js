@@ -56,8 +56,7 @@ module.exports = {
     LEGACY_APP_MIGRATION_ENABLED: true,
     AJAX_URL_PIRFIX: true,
     GRAFANA_IFRAME_URL: true,
-    gettext: true,
-    Aegis: true
+    gettext: true
   },
   // add your custom rules here
   rules: {
