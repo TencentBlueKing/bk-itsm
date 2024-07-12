@@ -124,6 +124,7 @@
               data-test-id="common-trigger-confirm"
               class="mr10"
               :title="$t(`m.taskTemplate['确定']`)"
+              :disabled="citeList.length === 0"
               @click="citeTrigger">
               {{$t(`m.taskTemplate['确定']`)}}
             </bk-button>
