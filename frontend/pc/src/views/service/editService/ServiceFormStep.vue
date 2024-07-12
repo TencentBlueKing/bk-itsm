@@ -558,10 +558,7 @@
             },
           });
           this.isBasicFormEditting = false;
-        })
-          .catch(res => {
-            errorHandler(res, this);
-          });
+        });
       },
       // 修改服务
       updateServiceInfo(params) {
@@ -572,10 +569,7 @@
           });
           this.isBasicFormEditting = false;
           this.$emit('updateServiceInfo', res.data);
-        })
-          .catch(res => {
-            errorHandler(res, this);
-          });
+        });
       },
       // 关联目录树组件
       async getServiceDirectory() {
