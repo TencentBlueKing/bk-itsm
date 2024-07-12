@@ -100,6 +100,7 @@ class CustomNotifyViewSet(ModelViewSet):
     filter_fields = {
         "notify_type": ["exact"],
         "used_by": ["exact"],
+        "title_template": ["icontains", "contains"],
         "content_template": ["icontains", "contains"],
     }
 

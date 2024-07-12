@@ -1,4 +1,7 @@
 # Changelog
+## [Version: 2.6.24] - 2024-07-12
+【Fixed】Resolved the issue causing an exception when desc is empty while fetching role information.  
+
 ## [Version: 2.6.23] - 2024-07-03
 【Improved】Enabled support for clearing the search operation on the left-side field controls of the service form.  
 【Improved】Removed the method of referencing common triggers from the task template triggers.  

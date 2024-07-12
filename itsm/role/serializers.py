@@ -110,7 +110,7 @@ class UserRoleSerializer(DynamicFieldsModelSerializer):
 
         data["owners"] = normal_name(data.get("owners"))
         data["name"] = _(data["name"])
-        data["desc"] = _(data["desc"])
+        data["desc"] = _(data["desc"] or "")
 
         # 支持动态字段渲染
         if "members" in data:
