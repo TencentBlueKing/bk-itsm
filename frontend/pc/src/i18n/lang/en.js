@@ -253,6 +253,7 @@ export const m = {
     '暂无服务，': 'No service available, ',
   },
   deployPage: {
+    标题: 'Title',
     编辑字段: 'Edit Field',
     字段名称: 'Filed Name',
     字段类型: 'Field Type',
@@ -2478,7 +2479,7 @@ export const m = {
   通知模板: 'Notice template',
   删除成功: 'Deleted',
   暂未开放: 'Not Available',
-  请输入模板内容: 'Enter the template content',
+  请输入标题内容: 'Enter the title content',
   '确认要删除？': 'Are you sure you want to delete?',
   导入: 'Import',
   导出: 'Export',
