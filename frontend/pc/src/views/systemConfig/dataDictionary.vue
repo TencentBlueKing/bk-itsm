@@ -151,6 +151,7 @@
         :is-show.sync="customSettings.isShow"
         :title="customSettings.title"
         :quick-close="true"
+        :transfer="true"
         :width="customSettings.width"
         :before-close="handleBeforeClose">
         <div class="p20" slot="content" v-if="customSettings.isShow">

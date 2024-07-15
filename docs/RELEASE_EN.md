@@ -1,5 +1,11 @@
 # Changelog
 ## [Version: 2.6.24] - 2024-07-12
+【Improved】Optimized the search functionality for the notification template list.  
+【Fixed】Consolidated validation failure messages when creating a new service.  
+【Fixed】Added non-empty validation to the pop-up for referencing common triggers.  
+【Fixed】Removed the SLA filter option from the service list search.  
+【Fixed】Mounted the data dictionary edit side panel to the body.  
+【Fixed】Fixed the issue where the global configuration favicon was not being applied.  
 【Fixed】Resolved the issue causing an exception when desc is empty while fetching role information.  
 
 ## [Version: 2.6.23] - 2024-07-03

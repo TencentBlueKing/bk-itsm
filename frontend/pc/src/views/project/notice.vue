@@ -24,7 +24,7 @@
         <div class="bk-only-search">
           <bk-input
             data-test-id="notice_input_search"
-            :placeholder="$t(`m['请输入模板内容']`)"
+            :placeholder="$t(`m['请输入标题内容']`)"
             :clearable="true"
             :right-icon="'bk-icon icon-search'"
             v-model="searchNotice"
@@ -38,9 +38,10 @@
         :data="noticeList"
         :size="'small'">
         <bk-table-column type="index" label="No." align="center" width="60"></bk-table-column>
+        <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.deployPage['标题']`)" prop="title_template"></bk-table-column>
         <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.deployPage['通知类型']`)" prop="action_name"></bk-table-column>
         <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.slaContent['更新时间']`)" prop="update_at"></bk-table-column>
-        <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.deployPage['更新人']`)" prop="updated_by"></bk-table-column>
+        <bk-table-column :render-header="$renderHeader" :show-overflow-tooltip="true" :label="$t(`m.deployPage['更新人']`)" prop="updated_by" width="150"></bk-table-column>
         <bk-table-column :label="$t(`m.deployPage['操作']`)" width="150">
           <template slot-scope="props">
             <bk-button
@@ -251,7 +252,7 @@
         this.searchToggle = false;
         if (isSearch) {
           this.searchToggle = true;
-          params.content_template__icontains = this.searchNotice;
+          params.title_template__icontains = this.searchNotice;
         } else {
           this.searchNotice = '';
         }
