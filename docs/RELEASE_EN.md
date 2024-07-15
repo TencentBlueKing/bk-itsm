@@ -6,6 +6,7 @@
 【Fixed】Removed the SLA filter option from the service list search.  
 【Fixed】Mounted the data dictionary edit side panel to the body.  
 【Fixed】Fixed the issue where the global configuration favicon was not being applied.  
+【Fixed】Resolved the issue causing an exception when desc is empty while fetching role information.  
 
 ## [Version: 2.6.23] - 2024-07-03
 【Improved】Enabled support for clearing the search operation on the left-side field controls of the service form.  
