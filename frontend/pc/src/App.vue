@@ -96,7 +96,7 @@
         isRouterAlive: true,
         permissinApplyShow: false,
         routerKey: +new Date(),
-        apiUrl: `//${window.location.host}/notice/announcements/`,
+        apiUrl: `//${window.location.host}${window.SITE_URL}notice/announcements/`,
         permissionData: {
           type: 'project', // 无权限类型: project、other
           permission: [],
