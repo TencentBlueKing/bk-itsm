@@ -29,6 +29,7 @@ import logging
 import re
 from datetime import datetime, timedelta
 
+import jmespath
 import jsonschema
 from django.core.cache import cache
 from django.db import transaction
@@ -93,7 +94,7 @@ class AutoStateService(ItsmBaseService):
         for variable in variables:
             TicketGlobalVariable.objects.filter(
                 ticket_id=ticket_id, key=variable["key"]
-            ).update(value=rsp.get(variable["ref_path"], ""))
+            ).update(value=jmespath.search(variable["ref_path"], rsp) or "")
         return variables
 
     @staticmethod

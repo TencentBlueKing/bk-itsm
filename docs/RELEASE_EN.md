@@ -1,5 +1,5 @@
 # Changelog
-## [Version: 2.6.24] - 2024-07-12
+## [Version: 2.6.24] - 2024-07-18
 【Improved】Optimized the search functionality for the notification template list.  
 【Fixed】Consolidated validation failure messages when creating a new service.  
 【Fixed】Added non-empty validation to the pop-up for referencing common triggers.  
@@ -7,6 +7,8 @@
 【Fixed】Mounted the data dictionary edit side panel to the body.  
 【Fixed】Fixed the issue where the global configuration favicon was not being applied.  
 【Fixed】Resolved the issue causing an exception when desc is empty while fetching role information.  
+【Fixed】Fix the issue with the abnormal value retrieval during manual retry of the API node.  
+
 
 ## [Version: 2.6.23] - 2024-07-03
 【Improved】Enabled support for clearing the search operation on the left-side field controls of the service form.  
