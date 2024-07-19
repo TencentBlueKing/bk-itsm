@@ -1,4 +1,7 @@
 # Changelog
+## [Version: 2.6.25] - 2024-07-19
+【Fixed】Fixed the issue where the API request URL for message notifications was incorrect in certain environments.
+
 ## [Version: 2.6.24] - 2024-07-18
 【Improved】Optimized the search functionality for the notification template list.  
 【Fixed】Consolidated validation failure messages when creating a new service.  
