@@ -443,8 +443,8 @@ class AutoStateService(ItsmBaseService):
                 return True
             if poll_time <= 0:
                 logger.error(
-                    "[AutoStateService_schedule] api_request_error, response={}".format(
-                        p_rsp
+                    "[AutoStateService_schedule][{}][{}] api_request_error, response={}".format(
+                        ticket_id, state_id, p_rsp
                     )
                 )
                 self.do_exit_plugins(
