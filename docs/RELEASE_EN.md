@@ -1,4 +1,8 @@
 # Changelog
+## [Version: 2.6.26] - 2024-07-22
+【Fixed】Fix the issue where an interface value of 0 causes process abnormalities.  
+【Fixed】Fix the initialization exception of apigw.  
+
 ## [Version: 2.6.25] - 2024-07-19
 【Fixed】Fixed the issue where the API request URL for message notifications was incorrect in certain environments.
 
