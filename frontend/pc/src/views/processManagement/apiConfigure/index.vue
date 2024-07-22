@@ -39,7 +39,8 @@
           </api-tree>
         </div>
         <div class="bk-directory-table">
-          <api-table v-if="!Object.keys(displayInfo['level_1']).length"
+          <api-table
+            v-show="!Object.keys(displayInfo['level_1']).length"
             ref="apiTable"
             :remote-system="remoteSystem"
             :project-id="projectId"
@@ -50,13 +51,15 @@
             :get-list-error="listError"
             :list-info-ori="listInfo">
           </api-table>
-          <api-content v-else
+          <api-content
+            v-if="Object.keys(displayInfo['level_1']).length > 0"
             :remote-system="remoteSystem"
             :second-level-info="secondLevelInfo"
             :api-detail-info="apiDetailInfo"
             :tree-list="treeList"
             :path-list="pathList"
-            :is-builtin-id-list="isBuiltinIdList">
+            :is-builtin-id-list="isBuiltinIdList"
+            @back="handleBackToList">
           </api-content>
         </div>
       </div>
@@ -304,6 +307,18 @@
           })
           .finally(() => {
           });
+      },
+      handleBackToList() {
+        this.displayInfo.level_1 = {};
+        this.$nextTick(() => {
+          const { pagination, searchInfo } = this.$refs.apiTable;
+          const { current, limit } = pagination;
+          const pageParams = {
+            page: current,
+            page_size: limit,
+          };
+          this.getTableList(this.displayInfo.level_0.id || '', pageParams, searchInfo);
+        });
       },
     },
   };

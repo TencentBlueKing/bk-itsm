@@ -29,6 +29,7 @@ import logging
 import re
 from datetime import datetime, timedelta
 
+import jmespath
 import jsonschema
 from django.core.cache import cache
 from django.db import transaction
@@ -91,9 +92,16 @@ class AutoStateService(ItsmBaseService):
 
     def update_variables(self, rsp, ticket_id, variables, data=None):
         for variable in variables:
+            value = rsp.get(variable["ref_path"])
+            # 兼容手动重试
+            if value is None:
+                value = jmespath.search(variable["ref_path"], rsp)
+            # 默认值
+            if value is None:
+                value = ""
             TicketGlobalVariable.objects.filter(
                 ticket_id=ticket_id, key=variable["key"]
-            ).update(value=rsp.get(variable["ref_path"], ""))
+            ).update(value=value)
         return variables
 
     @staticmethod
@@ -401,8 +409,9 @@ class AutoStateService(ItsmBaseService):
                 return True
 
             logger.info(
-                "\n-------  AutoStateService schedule  times: %s  latest_poll_time %s state_id %s ticket_id"
-                " %s----------\n" % (poll_time, latest_poll_time, state_id, ticket_id)
+                "[AutoStateService_schedule][%s][%s] poll_times: %s  latest_poll_time %s" % (
+                    ticket_id, state_id, poll_time, latest_poll_time
+                )
             )
 
             # 如果为轮询并且时间超过上一次的轮询时间
@@ -413,6 +422,11 @@ class AutoStateService(ItsmBaseService):
                 success_conditions,
                 operate_info,
             )
+            
+            logger.info(
+                "[AutoStateService_schedule][{}][{}]{}".format(ticket_id, state_id, p_rsp)
+            )
+            
             poll_time -= 1
             if p_result:
                 # 返回为True的时候，直接结束
@@ -429,8 +443,8 @@ class AutoStateService(ItsmBaseService):
                 return True
             if poll_time <= 0:
                 logger.error(
-                    "[AutoStateService_schedule] api_request_error, response={}".format(
-                        p_rsp
+                    "[AutoStateService_schedule][{}][{}] api_request_error, response={}".format(
+                        ticket_id, state_id, p_rsp
                     )
                 )
                 self.do_exit_plugins(

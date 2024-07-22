@@ -2340,19 +2340,10 @@ class Ticket(Model, BaseTicket):
         ):
             # 当前状态无法到达关闭的时候，不可以进行关闭操作按钮
             return False
-        if username == self.creator:
-            # 创建人可以直接关闭
-            return True
 
         if self.iam_ticket_manage_auth(username):
             return True
 
-        for _status in self.node_status.filter(
-            Q(status__in=Status.CAN_OPERATE_STATUS) | Q(status=FAILED, type=TASK_STATE)
-        ):
-            if _status.can_operate(username):
-                # 当前节点的操作人也可以进行关闭操作
-                return True
         return False
 
     def update_current_status(self, status):

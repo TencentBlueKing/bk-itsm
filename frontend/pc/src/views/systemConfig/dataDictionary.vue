@@ -151,9 +151,13 @@
         :is-show.sync="customSettings.isShow"
         :title="customSettings.title"
         :quick-close="true"
-        :width="customSettings.width">
+        :transfer="true"
+        :width="customSettings.width"
+        :before-close="handleBeforeClose">
         <div class="p20" slot="content" v-if="customSettings.isShow">
-          <add-data-directory :slide-data="slideData"
+          <add-data-directory
+            :slide-data="slideData"
+            @change="isFormChanged = true"
             @openAddData="openAddData"
             @getList="getList"
             @closeAddData="closeAddData">
@@ -167,6 +171,7 @@
 <script>
   import { errorHandler } from '../../utils/errorHandler';
   import addDataDirectory from './component/addDataDirectory.vue';
+  import useModalCloseConfirmation from '@/utils/use-modal-close-confirmation';
   import Empty from '../../components/common/Empty.vue';
 
   export default {
@@ -203,6 +208,7 @@
         },
         // 侧边栏数据
         slideData: {},
+        isFormChanged: false,
       };
     },
     computed: {
@@ -328,6 +334,7 @@
         this.slideData = { ...item, ownersInputValue: item.owners ? item.owners.split(',') : [] };
         this.customSettings.title = item.id ? this.$t('m.systemConfig["编辑字典"]') : this.$t('m.systemConfig["新增字典"]');
         this.customSettings.isShow = true;
+        this.isFormChanged = false;
       },
       closeAddData() {
         this.customSettings.isShow = false;
@@ -335,6 +342,13 @@
       // 关闭版本提示信息
       closeVersion() {
         this.versionStatus = false;
+      },
+      async handleBeforeClose() {
+        if (this.isFormChanged) {
+          const result = await useModalCloseConfirmation();
+          return result;
+        }
+        return true;
       },
     },
   };

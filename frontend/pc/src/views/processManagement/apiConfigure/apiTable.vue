@@ -334,7 +334,6 @@
         await this.$parent.getRemoteApiDetail(item.id);
       },
       getRemoteSystemData() {
-        debugger;
         this.$parent.getRemoteSystemData();
         const customPaging = {
           page: this.pagination.current,

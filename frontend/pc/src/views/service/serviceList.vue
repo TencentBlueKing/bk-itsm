@@ -87,7 +87,7 @@
           ref="serviceTable"
           v-bkloading="{ isLoading: isDataLoading }"
           :data="dataList"
-          :size="'small'"
+          :size="setting.size"
           :pagination="pagination"
           @cell-mouse-enter="cellMouseEnter"
           @cell-mouse-leave="cellMouseLeave"
@@ -525,13 +525,6 @@
             value: '',
             list: [],
           },
-          {
-            name: this.$t('m.serviceConfig["服务级别"]'),
-            type: 'select',
-            typeKey: 'sla',
-            value: '',
-            list: [],
-          },
         ],
         addList: [],
         lineList: [],
@@ -600,7 +593,6 @@
       }
       this.getServiceTypes();
       this.getList();
-      this.getSlaList();
       this.getServiceDirectory();
     },
     methods: {
@@ -708,6 +700,7 @@
           this.isImportServiceShow = false;
           this.isCheckImport = false;
           this.getList(1);
+          this.updateDirTree();
         });
       },
       importService() {
@@ -880,23 +873,6 @@
           this.serviceTypeList = res.data;
           this.serviceTypesMap = res.data;
           this.moreSearch[1].list = res.data;
-        })
-          .catch(res => {
-            errorHandler(res, this);
-          });
-      },
-      // 服务级别列表
-      getSlaList() {
-        const params = {
-          is_enabled: true,
-          project_key: this.$store.state.project.id,
-        };
-        this.$store.dispatch('slaManagement/getProtocolsList', { params }).then(res => {
-          this.slaList = res.data;
-          this.moreSearch[2].list = res.data;
-          this.moreSearch[2].list.forEach(item => {
-            this.$set(item, 'key', item.id);
-          });
         })
           .catch(res => {
             errorHandler(res, this);
@@ -1190,8 +1166,9 @@
                 display: inline-block;
                 font-size: 14px;
                 transition: transform 0.3s ease-in-out;
+                transform: rotate(180deg);
                 &.closed {
-                    transform: rotate(180deg);
+                    transform: rotate(0deg);
                 }
             }
         }

@@ -1,34 +1,64 @@
 # Changelog
+## [Version: 2.6.26] - 2024-07-22
+【Fixed】Fix the issue where an interface value of 0 causes process abnormalities.  
+【Fixed】Fix the initialization exception of apigw.  
+
+## [Version: 2.6.25] - 2024-07-19
+【Fixed】Fixed the issue where the API request URL for message notifications was incorrect in certain environments.
+
+## [Version: 2.6.24] - 2024-07-18
+【Improved】Optimized the search functionality for the notification template list.  
+【Fixed】Consolidated validation failure messages when creating a new service.  
+【Fixed】Added non-empty validation to the pop-up for referencing common triggers.  
+【Fixed】Removed the SLA filter option from the service list search.  
+【Fixed】Mounted the data dictionary edit side panel to the body.  
+【Fixed】Fixed the issue where the global configuration favicon was not being applied.  
+【Fixed】Resolved the issue causing an exception when desc is empty while fetching role information.  
+【Fixed】Fix the issue with the abnormal value retrieval during manual retry of the API node.  
+
+
+## [Version: 2.6.23] - 2024-07-03
+【Improved】Enabled support for clearing the search operation on the left-side field controls of the service form.  
+【Improved】Removed the method of referencing common triggers from the task template triggers.  
+【Improved】Remove the permissions of the submitter and node handler in the close order operation.  
+【Fixed】Fixed the issue where the Message Notification Center was not displayed on the frontend.  
+【Fixed】Fixed the issue where the expand/collapse icon on the left-side menu of the service list was displayed incorrectly.  
+【Fixed】Added a secondary confirmation pop-up when clicking on the shadow area after editing the data dictionary without saving.  
+【Fixed】Fixed the issue where the row height in the service table was not being applied.  
+【Fixed】Fixed the issue where the favorite status of the frequently used services and all services cards on the homepage did not synchronize after toggling.  
+【Fixed】Fixed the issue where data in the list page was not updated after editing the API.  
+【Fixed】Fixed the issue where the left-side directory tree was not updated after service import.  
+
 ## [Version: 2.6.22] - 2024-06-24
 【Improved】Global project settings are editable.
 
 ## [Version: 2.6.21] - 2024-06-12
-【Fixed】Fixed the issue where the default project could not be edited.
-【Fixed】Fixed the issue where multiple identical services could be created by repeatedly clicking the Create Service button.
-【Fixed】Fixed the issue where the search parameter key was incorrect when filtering the service list by type.
-【Fixed】Added a maximum character limit of 1000 to the reason form in the close and suspend document operation pop-ups.
+【Fixed】Fixed the issue where the default project could not be edited.  
+【Fixed】Fixed the issue where multiple identical services could be created by repeatedly clicking the Create Service button.  
+【Fixed】Fixed the issue where the search parameter key was incorrect when filtering the service list by type.  
+【Fixed】Added a maximum character limit of 1000 to the reason form in the close and suspend document operation pop-ups.  
 
 ## [Version: 2.6.20] - 2024-06-06
-【Fixed】Fixed the issue where the time control position on the Operations Analysis page was calculated inaccurately.
-【Fixed】Removed the comment type switch icon from the document comment edit popup.
-【Fix】Remove personnel information from the work order interface.
-【Improved】Optimized the style for long characters in the transaction log.
-【Improved】Optimized the placeholder text for the personnel selector.
-【Improved】Added maximum height to the ticket detail table fields.
+【Fixed】Fixed the issue where the time control position on the Operations Analysis page was calculated inaccurately.  
+【Fixed】Removed the comment type switch icon from the document comment edit popup.  
+【Fix】Remove personnel information from the work order interface.  
+【Improved】Optimized the style for long characters in the transaction log.  
+【Improved】Optimized the placeholder text for the personnel selector.  
+【Improved】Added maximum height to the ticket detail table fields.  
 
 ## [Version: 2.6.19] - 2024-05-29
-【Fixed】Fixed the issue where logout was not effective
+【Fixed】Fixed the issue where logout was not effective  
 【Improved】Support for iframe loading mode implemented
 
 ## [Version: 2.6.18] - 2024-05-15
-[Fixed] Resolved the issue with unprocessed node fields during joint validation
-[Fixed] Fixed the issue where there was no redirection after login
-[Fixed] Fixed the interface anomaly caused by non-existent variables on the print page
-[Improved] Added length restriction for work order closure reasons
-[Improved] Optimized indexes in the ticket table
+[Fixed] Resolved the issue with unprocessed node fields during joint validation  
+[Fixed] Fixed the issue where there was no redirection after login  
+[Fixed] Fixed the interface anomaly caused by non-existent variables on the print page  
+[Improved] Added length restriction for work order closure reasons  
+[Improved] Optimized indexes in the ticket table  
 
 ## [Version: 2.6.17] - 2024-05-11
-[Fixed] Resolved XSS vulnerability in work order rich text
+[Fixed] Resolved XSS vulnerability in work order rich text  
 [Improved] Unified login window interactions
 
 ## [Version: 2.6.16] - 2024-05-08
@@ -41,19 +71,19 @@
 [Improved] Upgraded select pip dependencies for improved security
 
 ## [Version: 2.6.13] - 2024-04-17
-[Fixed] Fixed the issue where the document information fields on the detail page of the repair order were not fully displayed.
+[Fixed] Fixed the issue where the document information fields on the detail page of the repair order were not fully displayed.  
 [Fixed] Fixed the issue where the directory field was not validated when creating a service.
 
 ## [Version: 2.6.12] - 2024-04-08
 【Fixed】Fixed the issue of insufficient permissions for the assignee when SOPS tasks fail in parallel gateways.
 
 ## [Version: 2.6.11] - 2024-02-29
- [Improved] Fix the problem of uploading abnormality when the attachment is stored as a product library  
+ [Improved] Fix the problem of uploading abnormality when the attachment is stored as a product library    
  [Fixed] Repair the problem of unregistered the notification center of the containerization environment  
  [Fixed] Repair the role of the initialization of the introduction authority center is an issue of abnormal emptiness  
 
 ## [Version: 2.6.10] - 2024-02-04
- [Improved] Allow to configure the timeout of permission center sdk & skip auto-authorization for resources created by admin.    
+ [Improved] Allow to configure the timeout of permission center sdk & skip auto-authorization for resources created by admin.   
  [Fixed] Fix the problem that the import process is abnormal when it is a user group.  
  [Improved] Front-end access to message notification center
 

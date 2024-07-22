@@ -22,7 +22,7 @@
 
 <template>
   <div id="app" class="bk-app" @click="hiddenTree" v-bkloading="{ isLoading: loading }">
-    <notice-component v-if="showNotice && !isSubNav && !$route.meta.iframe" :api-url="apiUrl" @show-alert-change="handleNoticeChange" />
+    <notice-component v-if="enableNoticeCenter && !isSubNav && !$route.meta.iframe" :api-url="apiUrl" @show-alert-change="handleNoticeChange" />
     <template v-if="isShowView">
       <!-- has navigation-->
       <navigation v-if="!isSubNav && !$route.meta.iframe" :class="{ 'show-notice': showNotice }">
@@ -96,7 +96,7 @@
         isRouterAlive: true,
         permissinApplyShow: false,
         routerKey: +new Date(),
-        apiUrl: `//${window.location.host}/notice/announcements/`,
+        apiUrl: `//${window.location.host}${window.SITE_URL}notice/announcements/`,
         permissionData: {
           type: 'project', // 无权限类型: project、other
           permission: [],
