@@ -271,7 +271,7 @@ export default new Vuex.Store({
     platformInfo: { // 项目全局配置
       favicon: `${window.SITE_URL}static/core/images/bk_itsm.png`,
       name: window.log_name || i18n.t('m[\'流程服务\']'),
-      brandName: window.BK_PLATFORM_NAME || i18n.t('m[\'蓝鲸\']'),
+      brandName: window.BK_PLATFORM_NAME || i18n.t('m[\'蓝鲸智云\']'),
       version: window.VERSION,
       i18n: {}
     },
