@@ -22,7 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+import re
 
 # 开发框架公用方法
 # 1. 页面输入内容转义（防止xss攻击）
@@ -89,3 +89,7 @@ def texteditor_escape(str_escape):
 def cmp(a, b):
     """适配py2的cmp方法"""
     return (a > b) - (a < b)
+
+
+def strip_tags(value):
+    return re.sub(r'<[^>]*?>', '', value)

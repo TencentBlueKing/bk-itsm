@@ -85,7 +85,7 @@ instance.interceptors.response.use(
         let [loginUrl] = login_url.split('?');
         loginUrl = `${loginUrl}?c_url=${encodeURIComponent(successUrl)}`;
 
-        showLoginModal({ loginUrl });
+        window.open(loginUrl, '_self');
         return;
       }
       if ('IS_ITSM_ADMIN' in response.data.data) {

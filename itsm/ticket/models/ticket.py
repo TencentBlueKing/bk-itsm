@@ -3082,8 +3082,8 @@ class Ticket(Model, BaseTicket):
         filter_field_query_set = self.fields.filter(key__in=fields_map.keys())
         for ticket_field in filter_field_query_set:
             ticket_field.value = fields_map[ticket_field.key]["value"]
-            # 针对富文本类型进行 xss 过滤 
-            if ticket_field.type in XSS_FIELD_TYPE:
+            # 针对字符串类型进行 xss 过滤 
+            if isinstance(ticket_field.value, str):
                 ticket_field.value = texteditor_escape(ticket_field.value)
 
             ticket_field.choice = fields_map[ticket_field.key].get("choice", [])
