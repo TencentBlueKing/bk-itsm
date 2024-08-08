@@ -1,8 +1,10 @@
 # Changelog
+## [Version: 2.6.28] - 2024-08-08
+【Fixed】Fix the XSS vulnerability in form submission.
+
 ## [Version: 2.6.27] - 2024-08-07
 【Improved】Login in Full-Screen Mode during Project Initialization  
 【Improved】Project Title Specification Adjustment  
-【Fixed】Fix the XSS vulnerability in form submission.
 
 
 ## [Version: 2.6.26] - 2024-07-22

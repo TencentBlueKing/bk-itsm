@@ -45,7 +45,7 @@ from common.cipher import AESVerification
 from common.redis import Cache
 from dateutil.relativedelta import relativedelta
 
-from common.utils import texteditor_escape, strip_tags
+from common.utils import texteditor_escape
 from itsm.component.constants import (
     ACTION_CHOICES,
     ACTION_DICT,
@@ -3084,10 +3084,7 @@ class Ticket(Model, BaseTicket):
             ticket_field.value = fields_map[ticket_field.key]["value"]
             # 针对字符串类型进行 xss 过滤 
             if isinstance(ticket_field.value, str):
-                if ticket_field.type in XSS_FIELD_TYPE:
-                    ticket_field.value = texteditor_escape(ticket_field.value)
-                else:
-                    ticket_field.value = strip_tags(ticket_field.value)
+                ticket_field.value = texteditor_escape(ticket_field.value)
 
             ticket_field.choice = fields_map[ticket_field.key].get("choice", [])
             language_config = (
