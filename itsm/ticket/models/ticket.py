@@ -143,7 +143,7 @@ from itsm.component.constants import (
     BK_PLUGIN_STATE,
     SUSPENDED,
     SHOW_BY_CONDITION,
-    VARIABLE_LEADER, XSS_FIELD_TYPE,
+    VARIABLE_LEADER,
 )
 from itsm.component.constants.trigger import (
     CREATE_TICKET,
@@ -3082,8 +3082,8 @@ class Ticket(Model, BaseTicket):
         filter_field_query_set = self.fields.filter(key__in=fields_map.keys())
         for ticket_field in filter_field_query_set:
             ticket_field.value = fields_map[ticket_field.key]["value"]
-            # 针对富文本类型进行 xss 过滤 
-            if ticket_field.type in XSS_FIELD_TYPE:
+            # 针对字符串类型进行 xss 过滤 
+            if isinstance(ticket_field.value, str):
                 ticket_field.value = texteditor_escape(ticket_field.value)
 
             ticket_field.choice = fields_map[ticket_field.key].get("choice", [])
