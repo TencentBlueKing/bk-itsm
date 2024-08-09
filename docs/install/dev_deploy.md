@@ -99,7 +99,7 @@ DATABASES = {
 
 ## 创建并初始化数据库  
 
-1) 在 mysql 中创建名为 bk_sops 的数据库
+1) 在 mysql 中创建名为 bk_itsm 的数据库
 ```sql
 CREATE DATABASE `bk_itsm` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 ```
