@@ -22,10 +22,10 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-from django.utils.translation import ugettext as _
-from settings import BK_IAM_SYSTEM_ID
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
-BK_IAM_SYSTEM_ID = BK_IAM_SYSTEM_ID
+BK_IAM_SYSTEM_ID = settings.BK_IAM_SYSTEM_ID
 ACTIONS = [
     {
         "id": "project_create",
@@ -520,7 +520,7 @@ RESOURCES = [
     {"id": "task_template", "name": _("任务模版"), "parent_id": None},
 ]
 
-BK_IAM_SYSTEM_NAME = "流程服务"
+BK_IAM_SYSTEM_NAME = _("流程服务")
 
 HTTP_499_IAM_FORBIDDEN = 499
 
