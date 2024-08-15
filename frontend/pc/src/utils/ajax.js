@@ -81,9 +81,8 @@ instance.interceptors.response.use(
     if (response.config.url === 'init/') {
       if (response.status === 401) {
         const { login_url } = response.data;
-        const successUrl = `${window.location.origin}${window.SITE_URL}static/assets/login_success.html`;
         let [loginUrl] = login_url.split('?');
-        loginUrl = `${loginUrl}?c_url=${encodeURIComponent(successUrl)}`;
+        loginUrl = `${loginUrl}?c_url=${encodeURIComponent(location.href)}`;
 
         window.open(loginUrl, '_self');
         return;
