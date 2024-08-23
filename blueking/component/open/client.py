@@ -43,7 +43,6 @@ try:
 except BaseException:
     pass
 
-
 logger = logging.getLogger("component")
 
 
@@ -119,11 +118,25 @@ class BaseComponentClient(object):
             data = json.dumps(_data)
         return params, data
 
-    def build_auth_header(self, enable_app_secret=False):
+    def build_auth_header(self, method, params, data, enable_app_secret=False):
         """build auth header"""
-        auth_header = dict(bk_app_code=self.app_code)
+
+        def extract_auth_keys(source, auth_header):
+            """process the case when auth key is in params or data"""
+
+            return {
+                key: source[key]
+                for key in auth_header
+                if key in source and source[key] is not None
+            }
+
+        auth_header = dict(bk_app_code=self.app_code, **self.common_args)
         if enable_app_secret:
             auth_header["bk_app_secret"] = self.app_secret
+        if method == "GET":
+            auth_header.update(extract_auth_keys(params, auth_header))
+        elif method == "POST":
+            auth_header.update(extract_auth_keys(data, auth_header))
         return auth_header
 
     def request(self, method, url, params=None, data=None, **kwargs):
@@ -135,11 +148,7 @@ class BaseComponentClient(object):
         if self.language:
             headers["blueking-language"] = self.language
 
-        auth_header = self.build_auth_header(enable_app_secret=True)
-        if self.common_args.get("bk_token"):
-            auth_header["bk_token"] = self.common_args["bk_token"]
-        else:
-            auth_header["bk_username"] = self.common_args["bk_username"]
+        auth_header = self.build_auth_header(method, params, data, True)
         headers["X-Bkapi-Authorization"] = json.dumps(auth_header)
 
         logger.debug(
@@ -150,7 +159,7 @@ class BaseComponentClient(object):
             data,
             headers,
         )
-        resp = requests.request(
+        return requests.request(
             method,
             url,
             params=params,
@@ -160,7 +169,6 @@ class BaseComponentClient(object):
             headers=headers,
             **kwargs
         )
-        return resp
 
     def __getattr__(self, key):
         if key not in self.available_collections:
