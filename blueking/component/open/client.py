@@ -163,7 +163,7 @@ class BaseComponentClient(object):
             method,
             url,
             params=params,
-            data=data,
+            data=json.dumps(data),
             verify=False,
             timeout=20,
             headers=headers,
