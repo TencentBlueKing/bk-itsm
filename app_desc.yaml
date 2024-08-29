@@ -1,5 +1,5 @@
 spec_version: 2
-app_version: "2.6.30"
+app_version: "2.7.0"
 app:
     region: default
     bk_app_code: bk_itsm
