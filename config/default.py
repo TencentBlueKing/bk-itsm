@@ -958,3 +958,6 @@ IAM_SDK_CLIENT_TIMEOUT = int(os.getenv("BKAPP_IAM_SDK_CLIENT_TIMEOUT", 20))
 # 公共配置
 BK_SHARED_RES_URL = os.getenv("BKPAAS_SHARED_RES_URL") or os.getenv("BKAPP_SHARED_RES_URL")
 BK_PLATFORM_NAME = os.getenv("BKAPP_PLATFORM_NAME", "")
+
+# 本地开发环境跳转豁免配置
+SKIP_SECURE = os.getenv("SKIP_SECURE", False)
