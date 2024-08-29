@@ -1,6 +1,6 @@
 # Changelog
 ## [Version: 2.7.0] - 2024-08-29
-【优化】apigw鉴权信息迁移到header
+【优化】esb鉴权信息迁移到header，支持版本 open-paas/esb >= 2.12.20
 
 ## [Version: 2.6.30] - 2024-08-15
 【修复】项目初始化时登录后重定向url异常修复  

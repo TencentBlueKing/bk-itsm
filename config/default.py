@@ -960,4 +960,4 @@ BK_SHARED_RES_URL = os.getenv("BKPAAS_SHARED_RES_URL") or os.getenv("BKAPP_SHARE
 BK_PLATFORM_NAME = os.getenv("BKAPP_PLATFORM_NAME", "")
 
 # 本地开发环境跳转豁免配置
-SKIP_SECURE = os.getenv("SKIP_SECURE", False)
+BKAPP_SKIP_SECURE = os.getenv("BKAPP_SKIP_SECURE", False)
