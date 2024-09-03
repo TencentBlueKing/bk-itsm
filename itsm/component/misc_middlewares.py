@@ -263,6 +263,10 @@ class HttpResponseIndexRedirect(HttpResponseRedirect):
 class HttpsMiddleware(MiddlewareMixin):
     def process_request(self, request):
         if settings.RUN_VER == "ieod":
+            # 本地开发环境跳转豁免
+            if settings.BKAPP_SKIP_SECURE:
+                return None
+            
             # 对于openapi 跳转豁免
             if request.path.startswith(EXEMPT_HTTPS_REDIRECT):
                 return None

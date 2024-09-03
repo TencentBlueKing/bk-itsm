@@ -1,4 +1,6 @@
 # Changelog
+## [Version: 2.7.0] - 2024-08-29
+【Improved】Migrated the authentication information to header when calling esb, support open-paas/esb >= 2.12.20
 
 ## [Version: 2.6.30] - 2024-08-15
 【Fixed】Fixed the URL Redirection Issue after Login during Project Initialization
