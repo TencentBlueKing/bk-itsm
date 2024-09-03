@@ -1,0 +1,10 @@
+source:
+    # 测试代码（扫描时排除）
+    test_source:
+        filepath_regex: [".*/tests/.*"]
+    # 工具或框架自动生成的且在代码库中的代码（扫描时排除）
+    auto_generate_source:
+        filepath_regex: [".*/migrations/.*", ".*/config/.*"]
+    # 直接以源码形式存在的第三方代码（扫描时排除）
+    third_party_source:
+        filepath_regex: ["support-files/.*", "scripts/.*", "blueking/.*"]
