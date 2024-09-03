@@ -7,4 +7,4 @@ source:
         filepath_regex: [".*/migrations/.*", ".*/config/.*"]
     # 直接以源码形式存在的第三方代码（扫描时排除）
     third_party_source:
-        filepath_regex: ["support-files/.*", "scripts/.*", "blueking/.*", "pipeline/.*"]
+        filepath_regex: ["support-files/.*", "scripts/.*", "blueking/.*", "pipeline/.*", "frontend/.*"]
