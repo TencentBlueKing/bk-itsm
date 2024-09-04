@@ -73,14 +73,16 @@ def fix_migrate_error(sender, **kwarg):
                 dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
                 if migration not in rows:
                     cursor.execute(
-                        'INSERT INTO `django_migrations` (`app`, `name`, `applied`) VALUES ("{}", "{}", "{}");'.format(  # noqa
+                        "INSERT INTO `django_migrations` (`app`, `name`, `applied`) "
+                        'VALUES ("{}", "{}", "{}");'.format(  # noqa
                             "workflow", migration, dt
                         )
                     )
                 else:
                     if value not in rows:
                         cursor.execute(
-                            'INSERT INTO `django_migrations` (`app`, `name`, `applied`) VALUES ("{}", "{}", "{}");'.format(  # noqa
+                            "INSERT INTO `django_migrations` (`app`, `name`, `applied`) "
+                            'VALUES ("{}", "{}", "{}");'.format(  # noqa
                                 "workflow", value, dt
                             )
                         )

@@ -407,7 +407,10 @@ SMS_CONTENT_COMMON = WEIXIN_CONTENT_COMMON = """
   单号：<a href="${ticket_url}">${sn}</a>
  ${message}"""
 
-GENERAL_CONTENT_DONE = SMS_CONTENT_DONE = WEIXIN_CONTENT_DONE = """您的需求(${title})已经处理完成，现邀请您为我们的服务进行评价。您的反馈对我们非常重要！感谢回复与建议，祝您工作愉快！
+GENERAL_CONTENT_DONE = SMS_CONTENT_DONE = WEIXIN_CONTENT_DONE = """您的需求(${title})已经处理完成，
+现邀请您为我们的服务进行评价。
+您的反馈对我们非常重要！
+感谢回复与建议，祝您工作愉快！
 ${ticket_url}"""  # noqa
 
 GENERAL_CONTENT_FOLLOW = SMS_CONTENT_FOLLOW = WEIXIN_CONTENT_FOLLOW = """你有一条${service_type_name}工单需要关注

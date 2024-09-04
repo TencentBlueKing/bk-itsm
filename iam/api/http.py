@@ -106,7 +106,10 @@ def _http_request(
         if not logger.isEnabledFor(logging.DEBUG) and len(content) > 200:
             content = content[:200] + b"......"
 
-        message_format = "request: [method=`%s`, url=`%s`, data=`%s`] response: [status_code=`%s`, request_id=`%s`, content=`%s`]"  # noqa
+        message_format = (
+            "request: [method=`%s`, url=`%s`, data=`%s`] "
+            "response: [status_code=`%s`, request_id=`%s`, content=`%s`]"
+        )  # noqa
         if resp.status_code != 200:
             logger.error(
                 message_format

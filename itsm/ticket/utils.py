@@ -224,4 +224,3 @@ def get_user_profile(username):
     except Exception:
         profile = {"name": "", "phone": "", "departments": []}
     return profile
-

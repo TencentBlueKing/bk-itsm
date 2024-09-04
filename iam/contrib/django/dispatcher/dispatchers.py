@@ -27,13 +27,18 @@ from iam.resource.provider import ResourceProvider
 from iam.resource.utils import get_page_obj, get_filter_obj
 from iam.exceptions import AuthInvalidOperation
 
-from iam.contrib.django.dispatcher.exceptions import InvalidPageException, KeywordTooShortException
+from iam.contrib.django.dispatcher.exceptions import (
+    InvalidPageException,
+    KeywordTooShortException,
+)
 
 logger = logging.getLogger("iam")
 
 
 def fail_response(code, message, request_id):
-    response = JsonResponse({"code": code, "result": False, "message": message, "data": None})
+    response = JsonResponse(
+        {"code": code, "result": False, "message": message, "data": None}
+    )
     response["X-Request-Id"] = request_id
     return response
 
@@ -52,14 +57,21 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
 
     def register(self, provider_type, provider):
         if not issubclass(type(provider), ResourceProvider):
-            raise AuthInvalidOperation("provider must be subclass of iam.resource.provider.ResourceProvider")
+            raise AuthInvalidOperation(
+                "provider must be subclass of iam.resource.provider.ResourceProvider"
+            )
 
         if provider_type in self._provider:
-            raise AuthInvalidOperation("provider {} already been registered".format(provider_type))
+            raise AuthInvalidOperation(
+                "provider {} already been registered".format(provider_type)
+            )
 
         self._provider[provider_type] = provider
 
-    def as_view(self, decorators=[]):
+    def as_view(self, decorators=None):
+        if decorators is None:
+            decorators = []
+
         @csrf_exempt
         def view(request):
             return self._dispatch(request)
@@ -78,45 +90,69 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
         auth_allowed = self.iam.is_basic_auth_allowed(self.system, auth)
 
         if not auth_allowed:
-            logger.error("resource request({}) auth failed with auth param: {}".format(request_id, auth))
+            logger.error(
+                "resource request({}) auth failed with auth param: {}".format(
+                    request_id, auth
+                )
+            )
             return fail_response(401, "basic auth failed", request_id)
 
         # load json data
         try:
             data = json.loads(request.body)
         except Exception:
-            logger.error("resource request({}) failed with invalid body: {}".format(request_id, request.body))
+            logger.error(
+                "resource request({}) failed with invalid body: {}".format(
+                    request_id, request.body
+                )
+            )
             return fail_response(400, "reqeust body is not a valid json", request_id)
 
         # check basic params
         method = data.get("method")
         resource_type = data.get("type")
         if not (method and resource_type):
-            logger.error("resource request({}) failed with invalid data: {}".format(request_id, data))
+            logger.error(
+                "resource request({}) failed with invalid data: {}".format(
+                    request_id, data
+                )
+            )
             return fail_response(400, "method and type is required field", request_id)
 
         # check resource type
         if resource_type not in self._provider:
             logger.error(
-                "resource request({}) failed with unsupport resource type: {}".format(request_id, resource_type)
+                "resource request({}) failed with unsupport resource type: {}".format(
+                    request_id, resource_type
+                )
             )
-            return fail_response(404, "unsupport resource type: {}".format(resource_type), request_id)
+            return fail_response(
+                404, "unsupport resource type: {}".format(resource_type), request_id
+            )
 
         # check method and process
         processor = getattr(self, "_dispatch_{}".format(method), None)
         if not processor:
-            logger.error("resource request({}) failed with unsupport method: {}".format(request_id, method))
+            logger.error(
+                "resource request({}) failed with unsupport method: {}".format(
+                    request_id, method
+                )
+            )
             return fail_response(404, "unsupport method: {}".format(method), request_id)
 
         logger.info(
-            "resource request({}) with filter: {}, page: {}".format(request_id, data.get("filter"), data.get("page"))
+            "resource request({}) with filter: {}, page: {}".format(
+                request_id, data.get("filter"), data.get("page")
+            )
         )
         try:
             return processor(request, data, request_id)
         except InvalidPageException as e:
             return fail_response(422, str(e), request_id)
         except Exception as e:
-            logger.exception("resource request({}) failed with exception: {}".format(request_id, e))
+            logger.exception(
+                "resource request({}) failed with exception: {}".format(request_id, e)
+            )
             return fail_response(500, str(e), request_id)
 
     def _get_options(self, request):
@@ -154,7 +190,9 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
     def _dispatch_list_instance(self, request, data, request_id):
         options = self._get_options(request)
 
-        filter_obj = get_filter_obj(data.get("filter"), ["parent", "search", "resource_type_chain"])
+        filter_obj = get_filter_obj(
+            data.get("filter"), ["parent", "search", "resource_type_chain"]
+        )
         page_obj = get_page_obj(data.get("page"))
 
         provider = self._provider[data["type"]]
@@ -204,7 +242,9 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
         filter_obj = get_filter_obj(data.get("filter"), ["parent", "keyword"])
 
         if filter_obj.keyword is None or len(filter_obj.keyword) < 2:
-            raise KeywordTooShortException("the length of keyword should be greater than or equals to 2")
+            raise KeywordTooShortException(
+                "the length of keyword should be greater than or equals to 2"
+            )
 
         page_obj = get_page_obj(data.get("page"))
 
@@ -216,7 +256,11 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
 
         search_function = getattr(provider, "search_instance", None)
         if not (search_function and callable(search_function)):
-            return fail_response(404, "resource type: {} not support search instance".format(data["type"]), request_id)
+            return fail_response(
+                404,
+                "resource type: {} not support search instance".format(data["type"]),
+                request_id,
+            )
 
         result = provider.search_instance(filter_obj, page_obj, **options)
 

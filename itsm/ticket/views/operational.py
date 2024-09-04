@@ -35,8 +35,13 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from dateutil.relativedelta import relativedelta
-from itsm.component.constants import CLAIM_OPERATE, DISTRIBUTE_OPERATE, SERVICE_LIST, \
-    TRANSITION_OPERATE, SYSTEM_OPERATE
+from itsm.component.constants import (
+    CLAIM_OPERATE,
+    DISTRIBUTE_OPERATE,
+    SERVICE_LIST,
+    TRANSITION_OPERATE,
+    SYSTEM_OPERATE,
+)
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.drf.pagination import CustomPageNumberPagination
 from itsm.component.exceptions import ParamError
@@ -49,8 +54,14 @@ from itsm.component.utils.misc import (
     transform_single_username,
 )
 from itsm.component.utils.user_count import user_count, get_user_statistics
-from itsm.ticket.models import Ticket, TicketComment, TicketEventLog, TicketField, TicketStatus, \
-    TicketOrganization
+from itsm.ticket.models import (
+    Ticket,
+    TicketComment,
+    TicketEventLog,
+    TicketField,
+    TicketStatus,
+    TicketOrganization,
+)
 from itsm.ticket.serializers import (
     CommentSerializer,
     OperationalDataTicketSerializer,
@@ -85,7 +96,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
     filter_fields = {
         "create_at": ["lte", "gte", "lt", "gt"],
     }
-    ordering_fields = ('create_at', 'priority_order', 'current_status_order')
+    ordering_fields = ("create_at", "priority_order", "current_status_order")
 
     @action(detail=False, methods=["get"])
     def overview_count(self, request, *args, **kwargs):
@@ -96,9 +107,13 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         return Response(
             {
                 "count": project_analysis.get_ticket_count(),
-                "service_count": 1 if service_id else project_analysis.get_service_count(),
+                "service_count": 1
+                if service_id
+                else project_analysis.get_service_count(),
                 "biz_count": project_analysis.get_biz_count(),
-                "user_count": project_analysis.get_ticket_user_count() if service_id else user_count(project_key=project_key),
+                "user_count": project_analysis.get_ticket_user_count()
+                if service_id
+                else user_count(project_key=project_key),
             }
         )
 
@@ -106,8 +121,12 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
     def compared_same_week(self, request):
         now = datetime.now()
         # 今天零点
-        zero_now = now - timedelta(hours=now.hour, minutes=now.minute, seconds=now.second,
-                                   microseconds=now.microsecond)
+        zero_now = now - timedelta(
+            hours=now.hour,
+            minutes=now.minute,
+            seconds=now.second,
+            microseconds=now.microsecond,
+        )
         # 本周第一天和今天
         this_week_start = zero_now - timedelta(days=zero_now.weekday())
         this_week_end = now
@@ -121,37 +140,60 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         this_scope = (this_week_start, this_week_end)
         last_scope = (last_week_start, last_week_end)
 
-        this_week_project_analysis = ProjectOperationalData(service_id, this_scope, project_key)
-        last_week_project_analysis = ProjectOperationalData(service_id, last_scope, project_key)
+        this_week_project_analysis = ProjectOperationalData(
+            service_id, this_scope, project_key
+        )
+        last_week_project_analysis = ProjectOperationalData(
+            service_id, last_scope, project_key
+        )
 
         this_week_ticket_count = this_week_project_analysis.get_ticket_count()
         last_week_ticket_count = last_week_project_analysis.get_ticket_count()
         ticket_ratio = round(
-            (this_week_ticket_count - last_week_ticket_count) / (last_week_ticket_count or 1) * 100,
-            2)
+            (this_week_ticket_count - last_week_ticket_count)
+            / (last_week_ticket_count or 1)
+            * 100,
+            2,
+        )
 
-        this_week_service_count = 1 if service_id else this_week_project_analysis.get_service_count()
-        last_week_service_count = 1 if service_id else last_week_project_analysis.get_service_count()
+        this_week_service_count = (
+            1 if service_id else this_week_project_analysis.get_service_count()
+        )
+        last_week_service_count = (
+            1 if service_id else last_week_project_analysis.get_service_count()
+        )
         service_ratio = round(
-            (this_week_service_count - last_week_service_count) / (
-                    last_week_service_count or 1) * 100, 2
+            (this_week_service_count - last_week_service_count)
+            / (last_week_service_count or 1)
+            * 100,
+            2,
         )
 
         this_week_biz_count = this_week_project_analysis.get_biz_count()
         last_week_biz_count = last_week_project_analysis.get_biz_count()
         biz_ratio = round(
-            (this_week_biz_count - last_week_biz_count) / (last_week_biz_count or 1) * 100, 2)
+            (this_week_biz_count - last_week_biz_count)
+            / (last_week_biz_count or 1)
+            * 100,
+            2,
+        )
 
         this_week_user_count = (
-            this_week_project_analysis.get_ticket_user_count() if service_id else user_count(
-                this_week=this_scope, project_key=project_key)
+            this_week_project_analysis.get_ticket_user_count()
+            if service_id
+            else user_count(this_week=this_scope, project_key=project_key)
         )
         last_week_user_count = (
-            last_week_project_analysis.get_ticket_user_count() if service_id else user_count(
-                last_week=last_scope, project_key=project_key)
+            last_week_project_analysis.get_ticket_user_count()
+            if service_id
+            else user_count(last_week=last_scope, project_key=project_key)
         )
         user_ratio = round(
-            (this_week_user_count - last_week_user_count) / (last_week_user_count or 1) * 100, 2)
+            (this_week_user_count - last_week_user_count)
+            / (last_week_user_count or 1)
+            * 100,
+            2,
+        )
 
         return Response(
             {
@@ -198,24 +240,30 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         if service_name:
             services = services.filter(name__icontains=service_name)
         services = services.values("id", "name", "key")
-        service_dict = {service["id"]: {"name": service["name"], "key": service["key"]} for service
-                        in services}
+        service_dict = {
+            service["id"]: {"name": service["name"], "key": service["key"]}
+            for service in services
+        }
 
         service_category = ServiceCategory.objects.all().values("key", "name")
-        category_dict = {category["key"]: category["name"] for category in service_category}
+        category_dict = {
+            category["key"]: category["name"] for category in service_category
+        }
 
         order = kwargs.pop("order_by")
 
         ticket_info = (
             self.queryset.filter(**kwargs)
-                .filter(service_id__in=service_dict.keys())
-                .values("service_id")
-                .annotate(
+            .filter(service_id__in=service_dict.keys())
+            .values("service_id")
+            .annotate(
                 count=Count("id"),
                 creator_count=Count("creator", distinct=True),
-                biz_count=Count(Case(When(bk_biz_id__gt=-1, then='bk_biz_id')), distinct=True),
+                biz_count=Count(
+                    Case(When(bk_biz_id__gt=-1, then="bk_biz_id")), distinct=True
+                ),
             )
-                .order_by(order)
+            .order_by(order)
         )
 
         service_info = []
@@ -226,11 +274,15 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
                 {
                     "service_id": ticket["service_id"],
                     "service_name": service_dict[ticket["service_id"]]["name"],
-                    "category": category_dict[service_dict[ticket["service_id"]]["key"]],
+                    "category": category_dict[
+                        service_dict[ticket["service_id"]]["key"]
+                    ],
                     "count": ticket["count"],
                     "creator_count": ticket["creator_count"],
                     "biz_count": ticket["biz_count"],
-                    "ratio": "{}%".format(round(ticket["count"] / ticket_count * 100, 2)),
+                    "ratio": "{}%".format(
+                        round(ticket["count"] / ticket_count * 100, 2)
+                    ),
                 }
             )
         return self.get_paginated_response(service_info)
@@ -253,8 +305,10 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
         ticket_info = (
             queryset.values("bk_biz_id")
-                .annotate(count=Count("id"), service_count=Count("service_id", distinct=True))
-                .order_by(order)
+            .annotate(
+                count=Count("id"), service_count=Count("service_id", distinct=True)
+            )
+            .order_by(order)
         )
         ticket_info = self.paginate_queryset(ticket_info)
         biz_info = []
@@ -277,15 +331,24 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         kwargs = filter_serializer.validated_data
         order = kwargs.pop("order_by")
         service_category = ServiceCategory.objects.all().values("key", "name")
-        category_dict = {category["key"]: category["name"] for category in service_category}
+        category_dict = {
+            category["key"]: category["name"] for category in service_category
+        }
 
-        ticket_info = self.queryset.filter(**kwargs).values("service_type").annotate(
-            count=Count("id")).order_by(order)
+        ticket_info = (
+            self.queryset.filter(**kwargs)
+            .values("service_type")
+            .annotate(count=Count("id"))
+            .order_by(order)
+        )
         if project_key:
             ticket_info = ticket_info.filter(project_key=project_key)
         category_info = [
-            {"service_type": category_dict[ticket["service_type"]], "count": ticket["count"]} for
-            ticket in ticket_info
+            {
+                "service_type": category_dict[ticket["service_type"]],
+                "count": ticket["count"],
+            }
+            for ticket in ticket_info
         ]
 
         return Response(category_info)
@@ -298,19 +361,26 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         kwargs = filter_serializer.validated_data
         not_running_status = ["FINISHED", "TERMINATED", "REVOKED"]
         ticket_info = (
-            self.queryset.filter(**kwargs).values("current_status").annotate(
-                count=Count("id")).order_by("-count")
+            self.queryset.filter(**kwargs)
+            .values("current_status")
+            .annotate(count=Count("id"))
+            .order_by("-count")
         )
         if project_key:
             ticket_info = ticket_info.filter(project_key=project_key)
         category_info = {}
         for ticket in ticket_info:
             if ticket["current_status"] in not_running_status:
-                category_info[ticket["current_status"]] = {"status": ticket["current_status"],
-                                                           "count": ticket["count"]}
+                category_info[ticket["current_status"]] = {
+                    "status": ticket["current_status"],
+                    "count": ticket["count"],
+                }
                 continue
             if "RUNNING" not in category_info:
-                category_info["RUNNING"] = {"status": "RUNNING", "count": ticket["count"]}
+                category_info["RUNNING"] = {
+                    "status": "RUNNING",
+                    "count": ticket["count"],
+                }
             else:
                 category_info["RUNNING"]["count"] += ticket["count"]
 
@@ -365,29 +435,36 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         kwargs.pop("timedelta")
         max_ids = (
             TicketOrganization.objects.filter(
-                create_at__gte=kwargs["create_at__gte"], create_at__lte=kwargs["create_at__lte"]
+                create_at__gte=kwargs["create_at__gte"],
+                create_at__lte=kwargs["create_at__lte"],
             )
-                .values("username", "first_level_id")
-                .annotate(id=Max("id"))
-                .order_by("username")
+            .values("username", "first_level_id")
+            .annotate(id=Max("id"))
+            .order_by("username")
         )
-        max_ids = [ticket['id'] for ticket in max_ids]
+        max_ids = [ticket["id"] for ticket in max_ids]
         user_organization = TicketOrganization.objects.filter(id__in=max_ids).only(
             "username", "first_level_name", "family"
         )
         user_info = {}
         for user in user_organization:
             if user.username not in user_info:
-                user_info[user.username] = [{"name": user.first_level_name, "family": user.family}]
+                user_info[user.username] = [
+                    {"name": user.first_level_name, "family": user.family}
+                ]
             else:
                 user_info[user.username].append(
-                    {"name": user.first_level_name, "family": user.family})
-                
+                    {"name": user.first_level_name, "family": user.family}
+                )
+
         project_query = Q(project_key=project_key) if project_key else Q()
 
         ticket_info = (
-            self.queryset.filter(project_query).filter(**kwargs).values("creator").annotate(count=Count("id")).order_by(
-                "-count")[:10]
+            self.queryset.filter(project_query)
+            .filter(**kwargs)
+            .values("creator")
+            .annotate(count=Count("id"))
+            .order_by("-count")[:10]
         )
         top_creator = [
             {
@@ -415,13 +492,13 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
         ticket_info = (
             TicketOrganization.objects.filter(**kwargs)
-                .values(level_dict[level][0], level_dict[level][1])
-                .annotate(count=Count("id"))
-                .order_by("-count")
+            .values(level_dict[level][0], level_dict[level][1])
+            .annotate(count=Count("id"))
+            .order_by("-count")
         )
         top_creator = [
-            {"organization": ticket[level_dict[level][1]], "count": ticket["count"]} for ticket in
-            ticket_info[:10]
+            {"organization": ticket[level_dict[level][1]], "count": ticket["count"]}
+            for ticket in ticket_info[:10]
         ]
 
         return Response(top_creator)
@@ -444,13 +521,18 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             return time_params
 
         try:
-            time_params[params_key + "__gte"] = time_params[params_key + "__gte"] + " 00:00:00"
-            time_params[params_key + "__lte"] = time_params[params_key + "__lte"] + " 23:59:59"
+            time_params[params_key + "__gte"] = (
+                time_params[params_key + "__gte"] + " 00:00:00"
+            )
+            time_params[params_key + "__lte"] = (
+                time_params[params_key + "__lte"] + " 23:59:59"
+            )
             return time_params
         except KeyError:
             raise ValidationError(
-                _("日期范围输入有误，请重新输入，例如：{}__gte=2019-01-01, {}__lte=2019-01-02").format(params_key,
-                                                                                     params_key)
+                _("日期范围输入有误，请重新输入，例如：{}__gte=2019-01-01, {}__lte=2019-01-02").format(
+                    params_key, params_key
+                )
             )
 
     @staticmethod
@@ -465,23 +547,27 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         try:
             if create_at_params.get("create_at__gte"):
                 create_at_params["create_at__gte"] = datetime.strptime(
-                    create_at_params["create_at__gte"], "%Y-%m")
+                    create_at_params["create_at__gte"], "%Y-%m"
+                )
             else:
                 create_at_params["create_at__gte"] = queryset.first().create_at
 
             if create_at_params.get("create_at__lte"):
                 create_at_params["create_at__lte"] = datetime.strptime(
-                    create_at_params["create_at__lte"], "%Y-%m")
+                    create_at_params["create_at__lte"], "%Y-%m"
+                )
             else:
                 create_at_params["create_at__lte"] = queryset.last().create_at
 
         except ValueError:
             raise ValidationError(
-                _("日期范围输入有误，请重新输入，例如：create_at__gte=2019-01, create_at__lte=2019-02"))
+                _("日期范围输入有误，请重新输入，例如：create_at__gte=2019-01, create_at__lte=2019-02")
+            )
 
         # 左开右闭
-        create_at_params["create_at__lt"] = create_at_params.pop("create_at__lte") + relativedelta(
-            months=1)
+        create_at_params["create_at__lt"] = create_at_params.pop(
+            "create_at__lte"
+        ) + relativedelta(months=1)
 
         return create_at_params
 
@@ -512,10 +598,9 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             ticket_ids = []
             valid_tickets = []
             for key, value in list(fields.items()):
-                tickets = TicketField.objects.filter(key=key,
-                                                     _value__in=value.split(",")).values_list(
-                    "ticket_id", flat=True
-                )
+                tickets = TicketField.objects.filter(
+                    key=key, _value__in=value.split(",")
+                ).values_list("ticket_id", flat=True)
                 ticket_ids.append(tickets)
 
             if ticket_ids:
@@ -539,8 +624,12 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
                 query_set = query_set.filter(sn__icontains=sn)
 
             if request.query_params.get("update_at__gte"):
-                update_at__gte = request.query_params.get("update_at__gte").replace("&nbsp;", " ")
-                query_set = query_set.filter(update_at__gt=update_at__gte).order_by("-update_at")
+                update_at__gte = request.query_params.get("update_at__gte").replace(
+                    "&nbsp;", " "
+                )
+                query_set = query_set.filter(update_at__gt=update_at__gte).order_by(
+                    "-update_at"
+                )
 
             if request.query_params.get("is_draft"):
                 is_draft = request.query_params.get("is_draft")
@@ -582,7 +671,9 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         workflow_id = request.query_params.get("workflow_id")
         if workflow_id:
             workflow = get_object_or_404(self.queryset, pk=workflow_id)
-            workflow_serializer = self.serializer_class(workflow, context={"query_type": "detail"})
+            workflow_serializer = self.serializer_class(
+                workflow, context={"query_type": "detail"}
+            )
             return Response(workflow_serializer.data)
 
         return self.list(request, *args, **kwargs)
@@ -616,14 +707,18 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
         queryset = (
             self.queryset.filter(**create_at_params)
-                .values("service_type")
-                .order_by("service_type")
-                .annotate(count=Count("id"))
+            .values("service_type")
+            .order_by("service_type")
+            .annotate(count=Count("id"))
         )
         values = {value["service_type"]: value["count"] for value in queryset}
 
         return Response(
-            [{"service": service, "count": values.get(service, 0)} for service in SERVICE_LIST])
+            [
+                {"service": service, "count": values.get(service, 0)}
+                for service in SERVICE_LIST
+            ]
+        )
 
     @action(detail=False, methods=["get"])
     def month_ticket_category(self, request, *args, **kwargs):
@@ -642,10 +737,10 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
         filter_result = list(
             queryset.filter(service_type=service_type)
-                .extra(select={"date": "date_format(create_at, '%%Y-%%m')"})
-                .values("date", "service_type")
-                .order_by("date")
-                .annotate(count=Count("id"))
+            .extra(select={"date": "date_format(create_at, '%%Y-%%m')"})
+            .values("date", "service_type")
+            .order_by("date")
+            .annotate(count=Count("id"))
         )
 
         return Response(filter_result)
@@ -663,11 +758,15 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
         queryset = queryset.filter(service_type=service_type)
         ticket_status = list(
-            TicketStatus.objects.filter(service_type=service_type).values_list("key", flat=True))
+            TicketStatus.objects.filter(service_type=service_type).values_list(
+                "key", flat=True
+            )
+        )
 
         filter_result = list(
-            queryset.values("current_status").annotate(count=Count("current_status")).order_by(
-                "current_status")
+            queryset.values("current_status")
+            .annotate(count=Count("current_status"))
+            .order_by("current_status")
         )
 
         filter_result_keys = [item["current_status"] for item in filter_result]
@@ -675,7 +774,9 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             filter_result.extend(
                 [
                     {"current_status": status, "count": 0}
-                    for status in list(set(ticket_status).difference(filter_result_keys))
+                    for status in list(
+                        set(ticket_status).difference(filter_result_keys)
+                    )
                 ]
             )
 
@@ -714,8 +815,9 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             return Response()
 
         create_at_params = self.get_month_params(queryset, request)
-        month_list = get_month_list(create_at_params["create_at__gte"],
-                                    create_at_params["create_at__lt"])
+        month_list = get_month_list(
+            create_at_params["create_at__gte"], create_at_params["create_at__lt"]
+        )
 
         date_ratio = [{"date": month, "ratio": 1} for month in month_list]
 
@@ -724,20 +826,22 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         # 每月创建的单据
         month_create_count = list(
             queryset.extra(select={"date": "date_format(create_at, '%%Y-%%m')"})
-                .values("date", "service_type")
-                .order_by("date", "service_type")
-                .annotate(create_count=Count("create_at"))
+            .values("date", "service_type")
+            .order_by("date", "service_type")
+            .annotate(create_count=Count("create_at"))
         )
 
         # 每月创建且在当月结束的单据
         month_end_count = list(
             queryset.extra(
                 select={"date": "date_format(create_at, '%%Y-%%m')"},
-                where=['date_format(create_at, "%%Y-%%m") = date_format(end_at, "%%Y-%%m")'],
+                where=[
+                    'date_format(create_at, "%%Y-%%m") = date_format(end_at, "%%Y-%%m")'
+                ],
             )
-                .values("date", "service_type")
-                .order_by("date", "service_type")
-                .annotate(end_count=Count("create_at"))
+            .values("date", "service_type")
+            .order_by("date", "service_type")
+            .annotate(end_count=Count("create_at"))
         )
         # sql:
         # SELECT (date_format(create_at, '%Y-%m')) AS `date`,
@@ -755,9 +859,9 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         # 整体
         whole_month_create_count = list(
             queryset.extra(select={"date": "date_format(create_at, '%%Y-%%m')"})
-                .values("date")
-                .order_by("date")
-                .annotate(create_count=Count("create_at"))
+            .values("date")
+            .order_by("date")
+            .annotate(create_count=Count("create_at"))
         )
         # sql:
         # SELECT (date_format(create_at, '%Y-%m')) AS `date`,
@@ -776,11 +880,13 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         whole_month_end_count = list(
             queryset.extra(
                 select={"date": "date_format(create_at, '%%Y-%%m')"},
-                where=['date_format(create_at, "%%Y-%%m") = date_format(end_at, "%%Y-%%m")'],
+                where=[
+                    'date_format(create_at, "%%Y-%%m") = date_format(end_at, "%%Y-%%m")'
+                ],
             )
-                .values("date")
-                .order_by("date")
-                .annotate(end_count=Count("create_at"))
+            .values("date")
+            .order_by("date")
+            .annotate(end_count=Count("create_at"))
         )
         for item in whole_month_end_count:
             item.update({"service_type": "whole"})
@@ -788,10 +894,15 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         end_count = month_end_count + whole_month_end_count
         for create in create_count:
             for end in end_count:
-                if create["service_type"] == end["service_type"] and create["date"] == end["date"]:
+                if (
+                    create["service_type"] == end["service_type"]
+                    and create["date"] == end["date"]
+                ):
                     try:
                         create["ratio"] = "%.2f" % (
-                                (float(end["end_count"]) / float(create["create_count"])) * 100)
+                            (float(end["end_count"]) / float(create["create_count"]))
+                            * 100
+                        )
                     except ZeroDivisionError:
                         create["ratio"] = "%.2f" % 100
 
@@ -803,16 +914,27 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             if set(month_list).difference([value["date"] for value in values]):
                 values.extend(
                     [
-                        {"date": month, "ratio": 100, "create_count": 0, "service_type": key, }
-                        for month in set(month_list).difference([value["date"] for value in values])
+                        {
+                            "date": month,
+                            "ratio": 100,
+                            "create_count": 0,
+                            "service_type": key,
+                        }
+                        for month in set(month_list).difference(
+                            [value["date"] for value in values]
+                        )
                     ]
                 )
                 values.sort(key=lambda x: x["date"])
 
         if set(SERVICE_LIST + ["whole"]).difference(list(filter_datas.keys())):
             filter_datas.update(
-                {service: date_ratio for service in
-                 set(SERVICE_LIST + ["whole"]).difference(list(filter_datas.keys()))}
+                {
+                    service: date_ratio
+                    for service in set(SERVICE_LIST + ["whole"]).difference(
+                        list(filter_datas.keys())
+                    )
+                }
             )
 
         return Response(filter_datas)
@@ -821,7 +943,8 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         detail=False,
         methods=["get"],
         queryset=TicketEventLog.objects.all().exclude(
-            Q(message__in=[u"流程结束.", u"流程开始."]) | Q(source=SYSTEM_OPERATE)),
+            Q(message__in=["流程结束.", "流程开始."]) | Q(source=SYSTEM_OPERATE)
+        ),
     )
     def ticket_processor_rank(self, request, *args, **kwargs):
         """工单处理量/认领量/派单量"""
@@ -831,25 +954,25 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         queryset = self.queryset.filter(**operate_at_params)
         process_list = (
             queryset.filter(type=TRANSITION_OPERATE)
-                .values("operator")
-                .order_by("operator")
-                .annotate(count=Count("id"))
-                .order_by("-count")[:10]
+            .values("operator")
+            .order_by("operator")
+            .annotate(count=Count("id"))
+            .order_by("-count")[:10]
         )
         claim_list = (
             queryset.filter(type=CLAIM_OPERATE)
-                .values("operator")
-                .order_by("operator")
-                .annotate(count=Count("id"))
-                .order_by("-count")[:10]
+            .values("operator")
+            .order_by("operator")
+            .annotate(count=Count("id"))
+            .order_by("-count")[:10]
         )
 
         distribute_list = (
             queryset.filter(type=DISTRIBUTE_OPERATE)
-                .values("operator")
-                .order_by("operator")
-                .annotate(count=Count("id"))
-                .order_by("-count")[:10]
+            .values("operator")
+            .order_by("operator")
+            .annotate(count=Count("id"))
+            .order_by("-count")[:10]
         )
 
         for item in process_list:
@@ -862,7 +985,12 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             item.update({"operator": transform_single_username(item["operator"])})
 
         return Response(
-            {"processors": process_list, "claimers": claim_list, "distributors": distribute_list, })
+            {
+                "processors": process_list,
+                "claimers": claim_list,
+                "distributors": distribute_list,
+            }
+        )
 
     @action(detail=False, methods=["get"])
     def ticket_score(self, request, *args, **kwargs):
@@ -873,10 +1001,12 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             return Response()
 
         create_at_params = self.get_month_params(queryset, request)
-        create_at_params["create_at__gte"] = create_at_params["create_at__gte"].strftime(
-            "%Y-%m-%d %H:%M:%S")
+        create_at_params["create_at__gte"] = create_at_params[
+            "create_at__gte"
+        ].strftime("%Y-%m-%d %H:%M:%S")
         create_at_params["create_at__lt"] = create_at_params["create_at__lt"].strftime(
-            "%Y-%m-%d %H:%M:%S")
+            "%Y-%m-%d %H:%M:%S"
+        )
 
         service_type = request.query_params.get("service_type", "")
         if service_type and service_type not in SERVICE_LIST:
@@ -892,7 +1022,9 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             )
         else:
             records = dictfetchall(
-                connection, ticket_score_sql, create_at_params["create_at__gte"],
+                connection,
+                ticket_score_sql,
+                create_at_params["create_at__gte"],
                 create_at_params["create_at__lt"],
             )
 
@@ -908,12 +1040,15 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             return Response()
 
         create_at_params = self.get_month_params(queryset, request)
-        month_list = get_month_list(create_at_params["create_at__gte"],
-                                    create_at_params["create_at__lt"])
-        create_at_params["create_at__gte"] = create_at_params["create_at__gte"].strftime(
-            "%Y-%m-%d %H:%M:%S")
+        month_list = get_month_list(
+            create_at_params["create_at__gte"], create_at_params["create_at__lt"]
+        )
+        create_at_params["create_at__gte"] = create_at_params[
+            "create_at__gte"
+        ].strftime("%Y-%m-%d %H:%M:%S")
         create_at_params["create_at__lt"] = create_at_params["create_at__lt"].strftime(
-            "%Y-%m-%d %H:%M:%S")
+            "%Y-%m-%d %H:%M:%S"
+        )
 
         service_type = request.query_params.get("service_type", "")
         if service_type and service_type not in SERVICE_LIST:
@@ -936,11 +1071,15 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             )
         else:
             solve_records = dictfetchall(
-                connection, solve_sql, create_at_params["create_at__gte"],
+                connection,
+                solve_sql,
+                create_at_params["create_at__gte"],
                 create_at_params["create_at__lt"],
             )
             response_records = dictfetchall(
-                connection, response_sql, create_at_params["create_at__gte"],
+                connection,
+                response_sql,
+                create_at_params["create_at__gte"],
                 create_at_params["create_at__lt"],
             )
 
@@ -948,23 +1087,30 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             solve_records.extend(
                 [
                     {"date": month, "ratio": 0, "count": 0, "total": 0}
-                    for month in
-                    set(month_list).difference([record["date"] for record in solve_records])
+                    for month in set(month_list).difference(
+                        [record["date"] for record in solve_records]
+                    )
                 ]
             )
         if set(month_list).difference([record["date"] for record in response_records]):
             response_records.extend(
                 [
                     {"date": month, "ratio": 0, "count": 0, "total": 0}
-                    for month in
-                    set(month_list).difference([record["date"] for record in response_records])
+                    for month in set(month_list).difference(
+                        [record["date"] for record in response_records]
+                    )
                 ]
             )
 
         solve_records.sort(key=lambda x: x["date"])
         response_records.sort(key=lambda x: x["date"])
 
-        return Response({"solve_records": solve_records, "response_records": response_records, })
+        return Response(
+            {
+                "solve_records": solve_records,
+                "response_records": response_records,
+            }
+        )
 
     @action(detail=False, methods=["get"])
     def new_tickets(self, request, *args, **kwargs):
@@ -981,10 +1127,10 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
         filter_result = list(
             queryset.extra(select={"day": "date(create_at)"})
-                .values("day")
-                .distinct()
-                .order_by("day")
-                .annotate(count=Count("create_at"))
+            .values("day")
+            .distinct()
+            .order_by("day")
+            .annotate(count=Count("create_at"))
         )
 
         if not create_at_params:
@@ -996,15 +1142,22 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             )
         else:
             days = get_days(
-                begin=datetime.strptime(create_at_params["create_at__gte"].split(" ")[0],
-                                        "%Y-%m-%d"),
-                end=datetime.strptime(create_at_params["create_at__lte"].split(" ")[0], "%Y-%m-%d"),
+                begin=datetime.strptime(
+                    create_at_params["create_at__gte"].split(" ")[0], "%Y-%m-%d"
+                ),
+                end=datetime.strptime(
+                    create_at_params["create_at__lte"].split(" ")[0], "%Y-%m-%d"
+                ),
             )
 
         filter_result_days = [item["day"] for item in filter_result]
         if set(days).difference(filter_result_days):
-            filter_result.extend([{"day": day, "count": 0} for day in
-                                  list(set(days).difference(filter_result_days))])
+            filter_result.extend(
+                [
+                    {"day": day, "count": 0}
+                    for day in list(set(days).difference(filter_result_days))
+                ]
+            )
 
         filter_result.sort(key=lambda x: x["day"])
         return Response(filter_result)

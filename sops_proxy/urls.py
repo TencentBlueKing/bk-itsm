@@ -25,12 +25,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.conf.urls import url
 
-from sops_proxy.views import dispatch_query, dispatch_static, SopsProxy
+from sops_proxy.views import SopsProxy
 
 urlpatterns = [
     # 插件静态资源（jsonp）转发
     # url(r"^static/(?P<path>.*)$", dispatch_static),
     # 插件请求（ajax）转发
     # url(r"^(?P<path>.*)$", dispatch_query),
-    url(r'^(?P<path>.*)$', SopsProxy.as_view()),
+    url(r"^(?P<path>.*)$", SopsProxy.as_view()),
 ]
