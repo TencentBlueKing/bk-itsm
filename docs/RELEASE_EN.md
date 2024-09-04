@@ -1,4 +1,11 @@
 # Changelog
+
+## [Version: 2.6.30] - 2024-08-15
+【Fixed】Fixed the URL Redirection Issue after Login during Project Initialization
+
+## [Version: 2.6.29] - 2024-08-14
+【Fixed】Fix the internationalization issue in permission application content.  
+
 ## [Version: 2.6.28] - 2024-08-08
 【Fixed】Fix the XSS vulnerability in form submission.
 
