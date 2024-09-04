@@ -42,11 +42,7 @@ class IAMAuthorizationHelper(object):
         self.read_action = read_action
         self.update_action = update_action
         self.delete_action = delete_action
-
-        if filter_key_mapping is None:
-            self.filter_key_mapping = {}
-        else:
-            self.filter_key_mapping = filter_key_mapping
+        self.filter_key_mapping = filter_key_mapping or {}
 
     @abc.abstractmethod
     def get_subject(self, bundle):
