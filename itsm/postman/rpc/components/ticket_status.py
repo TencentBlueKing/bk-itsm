@@ -47,22 +47,29 @@ class GetTicketStatus(BaseComponent):
             ticket_id = self.data.get("ticket_id")
             if ticket_id:
                 ticket = Ticket.objects.get(id=ticket_id)
-                cleaned_data.update(current_status=ticket.current_status,
-                                    service_type=ticket.service_type)
+                cleaned_data.update(
+                    current_status=ticket.current_status,
+                    service_type=ticket.service_type,
+                )
 
             return cleaned_data
 
     def handle(self):
         if "service_type" in self.form_data:
             ticket_status = TicketStatus.objects.get(
-                key=self.form_data["current_status"], service_type=self.form_data["service_type"]
+                key=self.form_data["current_status"],
+                service_type=self.form_data["service_type"],
             )
-            payload = TicketStatusOptionSerializer(ticket_status.to_status, many=True).data
+            payload = TicketStatusOptionSerializer(
+                ticket_status.to_status, many=True
+            ).data
         else:
             payload = []
             ticket_status_dict = OrderedDict()
             # 获取所有非结束的工单状态
-            ticket_statuses = TicketStatus.objects.filter(is_over=False).order_by("order")
+            ticket_statuses = TicketStatus.objects.filter(is_over=False).order_by(
+                "order"
+            )
 
             # 将相同key的单据状态合并
             for ticket_status in ticket_statuses:
@@ -76,7 +83,9 @@ class GetTicketStatus(BaseComponent):
                         "other_info_list": [other_info],
                     }
                 else:
-                    ticket_status_dict[ticket_status.key]["other_info_list"].append(other_info)
+                    ticket_status_dict[ticket_status.key]["other_info_list"].append(
+                        other_info
+                    )
 
             for key, info in ticket_status_dict.items():
                 name_dict = defaultdict(set)
@@ -88,7 +97,10 @@ class GetTicketStatus(BaseComponent):
                     for name, service_types in name_dict.items()
                 ]
                 payload.append(
-                    {"key": key, "name": ",".join(name_list), }
+                    {
+                        "key": key,
+                        "name": ",".join(name_list),
+                    }
                 )
 
         self.response.payload = payload
@@ -96,7 +108,9 @@ class GetTicketStatus(BaseComponent):
     @staticmethod
     def get_service_type_display_name(service_types):
         """友好显示服务类型"""
-        if len(set(SERVICE_CATEGORY.keys()).difference(service_types)):
-            return ",".join(_(SERVICE_CATEGORY[service_type]) for service_type in service_types)
+        if len(set(SERVICE_CATEGORY.keys()).difference(service_types)) > 0:
+            return ",".join(
+                _(SERVICE_CATEGORY[service_type]) for service_type in service_types
+            )
         else:
             return _("所有服务类型")

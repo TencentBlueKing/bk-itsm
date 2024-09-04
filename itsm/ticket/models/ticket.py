@@ -143,7 +143,7 @@ from itsm.component.constants import (
     BK_PLUGIN_STATE,
     SUSPENDED,
     SHOW_BY_CONDITION,
-    VARIABLE_LEADER, XSS_FIELD_TYPE,
+    VARIABLE_LEADER,
 )
 from itsm.component.constants.trigger import (
     CREATE_TICKET,
@@ -3082,7 +3082,7 @@ class Ticket(Model, BaseTicket):
         filter_field_query_set = self.fields.filter(key__in=fields_map.keys())
         for ticket_field in filter_field_query_set:
             ticket_field.value = fields_map[ticket_field.key]["value"]
-            # 针对字符串类型进行 xss 过滤 
+            # 针对字符串类型进行 xss 过滤
             if isinstance(ticket_field.value, str):
                 ticket_field.value = texteditor_escape(ticket_field.value)
 
@@ -3783,8 +3783,8 @@ class Ticket(Model, BaseTicket):
         node_processors = []
         task_processors = []
         for node_status in self.node_status.filter(
-            Q(status__in=Status.CAN_OPERATE_STATUS) | 
-            Q(status=FAILED, type__in=[TASK_STATE, TASK_SOPS_STATE])
+            Q(status__in=Status.CAN_OPERATE_STATUS)
+            | Q(status=FAILED, type__in=[TASK_STATE, TASK_SOPS_STATE])
         ):
             # Get all types node processors
             if node_status.type in [SIGN_STATE, APPROVAL_STATE]:
@@ -4063,13 +4063,11 @@ class Ticket(Model, BaseTicket):
                 label = data.get("label")
                 if label and "【" not in label:
                     label = "【{}】".format(label)
-                    
+
                 detail = []
                 if isinstance(data["value"], str):
                     if label and data["value"]:
-                        text_content.append(
-                            "{}\n{}".format(label, data["value"])
-                        )
+                        text_content.append("{}\n{}".format(label, data["value"]))
                     continue
                 for attr in data["value"]:
                     single = []

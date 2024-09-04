@@ -24,8 +24,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import copy
-import json
-
 from collections import OrderedDict
 from datetime import datetime
 
@@ -35,9 +33,8 @@ from rest_framework import serializers
 from rest_framework.fields import JSONField, empty
 
 from common.log import logger
+from common.utils import html_escape
 from itsm.auth_iam.utils import IamRequest
-from itsm.component.drf.serializers import AuthModelSerializer
-from itsm.component.utils.client_backend_query import get_bk_users
 from itsm.component.constants import (
     ACTION_CHOICES,
     ALL_ACTION_CHOICES,
@@ -76,6 +73,7 @@ from itsm.component.constants import (
     SUSPENDED,
 )
 from itsm.component.dlls.component import ComponentLibrary
+from itsm.component.drf.serializers import AuthModelSerializer
 from itsm.component.exceptions import TriggerValidateError
 from itsm.component.utils.basic import (
     better_time_or_none,
@@ -83,12 +81,12 @@ from itsm.component.utils.basic import (
     generate_random_sn,
 )
 from itsm.component.utils.client_backend_query import get_biz_names, get_template_list
+from itsm.component.utils.client_backend_query import get_bk_users
 from itsm.component.utils.misc import (
     transform_single_username,
     transform_username,
     get_transform_username_dict,
 )
-from common.utils import html_escape
 from itsm.postman.serializers import TaskStateApiInfoSerializer
 from itsm.service.validators import service_validate
 from itsm.sla_engine.constants import HANDLE_TIMEOUT, RUNNING as SLA_RUNNING, PAUSED
@@ -109,17 +107,17 @@ from itsm.ticket.models import (
     SlaTicketHighlight,
     TicketRemark,
 )
-from itsm.ticket.tasks import remark_notify
-from itsm.ticket.utils import compute_list_difference, get_user_profile
-from itsm.workflow.models import WorkflowVersion
 from itsm.ticket.serializers.field import (
     FieldSerializer,
     FieldSimpleSerializer,
     TableFieldSerializer,
     TaskFieldSerializer,
 )
+from itsm.ticket.tasks import remark_notify
+from itsm.ticket.utils import compute_list_difference, get_user_profile
 from itsm.ticket.validators import CreateTicketValidator, StateOperateValidator
 from itsm.ticket_status.models import TicketStatus
+from itsm.workflow.models import WorkflowVersion
 
 BkUser = get_user_model()
 

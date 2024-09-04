@@ -29,14 +29,24 @@ logger = logging.getLogger("iam")
 @six.add_metaclass(abc.ABCMeta)
 class IAMAuthorizationHelper(object):
     def __init__(
-        self, system, create_action, read_action, update_action, delete_action, filter_key_mapping={},
+        self,
+        system,
+        create_action,
+        read_action,
+        update_action,
+        delete_action,
+        filter_key_mapping=None,
     ):
         self.system = system
         self.create_action = create_action
         self.read_action = read_action
         self.update_action = update_action
         self.delete_action = delete_action
-        self.filter_key_mapping = filter_key_mapping
+
+        if filter_key_mapping is None:
+            self.filter_key_mapping = {}
+        else:
+            self.filter_key_mapping = filter_key_mapping
 
     @abc.abstractmethod
     def get_subject(self, bundle):
@@ -89,13 +99,27 @@ class IAMCreateAuthorizationMixin(object):
         action = Action(self.helper.create_action)
         resources = self.helper.get_create_detail_resources(bundle)
 
-        request = Request(system, subject, action, resources, self.helper.get_create_detail_environment(bundle),)
+        request = Request(
+            system,
+            subject,
+            action,
+            resources,
+            self.helper.get_create_detail_environment(bundle),
+        )
 
         allowed = self.iam.is_allowed(request)
-        logger.debug("tastypie create_detail is_allowed request({}) result: {}".format(request.to_dict(), allowed))
+        logger.debug(
+            "tastypie create_detail is_allowed request({}) result: {}".format(
+                request.to_dict(), allowed
+            )
+        )
 
         if not allowed:
-            raise ImmediateHttpResponse(IAMAuthFailedResponse(AuthFailedException(system, subject, action, resources)))
+            raise ImmediateHttpResponse(
+                IAMAuthFailedResponse(
+                    AuthFailedException(system, subject, action, resources)
+                )
+            )
 
         return allowed
 
@@ -110,13 +134,27 @@ class IAMUpdateAuthorizationMixin(object):
         action = Action(self.helper.update_action)
         resources = self.helper.get_update_detail_resources(bundle)
 
-        request = Request(system, subject, action, resources, self.helper.get_update_detail_environment(bundle),)
+        request = Request(
+            system,
+            subject,
+            action,
+            resources,
+            self.helper.get_update_detail_environment(bundle),
+        )
 
         allowed = self.iam.is_allowed(request)
-        logger.debug("tastypie update_detail is_allowed request({}) result: {}".format(request.to_dict(), allowed))
+        logger.debug(
+            "tastypie update_detail is_allowed request({}) result: {}".format(
+                request.to_dict(), allowed
+            )
+        )
 
         if not allowed:
-            raise ImmediateHttpResponse(IAMAuthFailedResponse(AuthFailedException(system, subject, action, resources)))
+            raise ImmediateHttpResponse(
+                IAMAuthFailedResponse(
+                    AuthFailedException(system, subject, action, resources)
+                )
+            )
 
         return allowed
 
@@ -131,13 +169,27 @@ class IAMDeleteAuthorizationMixin(object):
         action = Action(self.helper.delete_action)
         resources = self.helper.get_delete_detail_resources(bundle)
 
-        request = Request(system, subject, action, resources, self.helper.get_delete_detail_environment(bundle),)
+        request = Request(
+            system,
+            subject,
+            action,
+            resources,
+            self.helper.get_delete_detail_environment(bundle),
+        )
 
         allowed = self.iam.is_allowed(request)
-        logger.debug("tastypie delete_detail is_allowed request({}) result: {}".format(request.to_dict(), allowed))
+        logger.debug(
+            "tastypie delete_detail is_allowed request({}) result: {}".format(
+                request.to_dict(), allowed
+            )
+        )
 
         if not allowed:
-            raise ImmediateHttpResponse(IAMAuthFailedResponse(AuthFailedException(system, subject, action, resources)))
+            raise ImmediateHttpResponse(
+                IAMAuthFailedResponse(
+                    AuthFailedException(system, subject, action, resources)
+                )
+            )
 
         return allowed
 
@@ -149,13 +201,27 @@ class IAMReadDetailAuthorizationMixin(object):
         action = Action(self.helper.read_action)
         resources = self.helper.get_read_detail_resources(bundle)
 
-        request = Request(system, subject, action, resources, self.helper.get_read_detail_environment(bundle),)
+        request = Request(
+            system,
+            subject,
+            action,
+            resources,
+            self.helper.get_read_detail_environment(bundle),
+        )
 
         allowed = self.iam.is_allowed(request)
-        logger.debug("tastypie read_detail is_allowed request({}) result: {}".format(request.to_dict(), allowed))
+        logger.debug(
+            "tastypie read_detail is_allowed request({}) result: {}".format(
+                request.to_dict(), allowed
+            )
+        )
 
         if not allowed:
-            raise ImmediateHttpResponse(IAMAuthFailedResponse(AuthFailedException(system, subject, action, resources)))
+            raise ImmediateHttpResponse(
+                IAMAuthFailedResponse(
+                    AuthFailedException(system, subject, action, resources)
+                )
+            )
 
         return allowed
 
@@ -173,14 +239,18 @@ class IAMReadOnlyAuthorization(ReadOnlyAuthorization):
 
 
 class ReadOnlyCompleteListIAMAuthorization(
-    IAMReadDetailAuthorizationMixin, IAMReadOnlyAuthorization,
+    IAMReadDetailAuthorizationMixin,
+    IAMReadOnlyAuthorization,
 ):
     def read_list(self, object_list, bundle):
         return object_list
 
 
 class CustomCreateCompleteListIAMAuthorization(
-    IAMUpdateAuthorizationMixin, IAMDeleteAuthorizationMixin, IAMReadDetailAuthorizationMixin, IAMAuthorization,
+    IAMUpdateAuthorizationMixin,
+    IAMDeleteAuthorizationMixin,
+    IAMReadDetailAuthorizationMixin,
+    IAMAuthorization,
 ):
     def read_list(self, object_list, bundle):
         return object_list
@@ -216,5 +286,9 @@ class StrictListIAMAuthorization(
             environment=self.get_read_list_environment(bundle),
         )
         f = self.iam.make_filter(request, key_mapping=self.helper.filter_key_mapping)
-        logger.debug("tastypie read_list make_filter request({}) result: {}".format(request.to_dict(), f))
+        logger.debug(
+            "tastypie read_list make_filter request({}) result: {}".format(
+                request.to_dict(), f
+            )
+        )
         return object_list.filter(f)

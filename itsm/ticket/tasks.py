@@ -166,7 +166,13 @@ def weekly_statical():
         new_services = [service.name for service in namedtuplefetchall(cursor)]
 
     # 增加的业务信息
-    sql_bizs_last_week_ago = "select bk_biz_id from ticket_ticket where create_at > '%s' and is_deleted = false group by bk_biz_id "  # noqa
+    sql_bizs_last_week_ago = (
+        "select bk_biz_id "
+        "from ticket_ticket "
+        "where create_at > '%s' "
+        "and is_deleted = false "
+        "group by bk_biz_id "
+    )  # noqa
     new_bizs = []  # 新增的业务
     with connection.cursor() as cursor:
         cursor.execute(sql_bizs_last_week_ago)

@@ -29,7 +29,10 @@ from iam.contrib.iam_migration.conf import MIGRATION_TEMPLATE_NAME
 
 class Command(BaseCommand):
 
-    help = "Create new migration for specific iam migration json file e.g. python manage.py iam_makemigrations migration.json"
+    help = (
+        "Create new migration for specific iam migration json file "
+        "e.g. python manage.py iam_makemigrations migration.json"
+    )
 
     def add_arguments(self, parser):
         parser.add_argument("migration_json", nargs="?", type=str)
@@ -40,7 +43,9 @@ class Command(BaseCommand):
             sys.stderr.write("please provide a migration json file name\n")
             exit(1)
 
-        json_path = getattr(settings, "BK_IAM_MIGRATION_JSON_PATH", "support-files/iam/")
+        json_path = getattr(
+            settings, "BK_IAM_MIGRATION_JSON_PATH", "support-files/iam/"
+        )
         file_path = os.path.join(settings.BASE_DIR, json_path, json_file)
 
         if not os.path.exists(file_path):
@@ -62,7 +67,11 @@ class Command(BaseCommand):
 
         migration_name = self.migration_name(last_migration_name)
         migration_file = "{}.py".format(
-            os.path.join(settings.BASE_DIR, "iam/contrib/iam_migration/migrations", migration_name,)
+            os.path.join(
+                settings.BASE_DIR,
+                "iam/contrib/iam_migration/migrations",
+                migration_name,
+            )
         )
 
         with codecs.open(migration_file, mode="w", encoding="utf-8") as fp:
@@ -83,7 +92,9 @@ class Command(BaseCommand):
         time = datetime.now().strftime("%Y%m%d%H%M")
 
         if not system_id:
-            self.stderr.write("You must set BK_IAM_SYSTEM_ID in django settings before make migrations")
+            self.stderr.write(
+                "You must set BK_IAM_SYSTEM_ID in django settings before make migrations"
+            )
             exit(1)
 
         if not last_migration_name:
@@ -91,4 +102,6 @@ class Command(BaseCommand):
 
         code = "%04d" % (int(last_migration_name[:4]) + 1)
 
-        return "{code}_{system_id}_{time}".format(code=code, system_id=system_id, time=time)
+        return "{code}_{system_id}_{time}".format(
+            code=code, system_id=system_id, time=time
+        )

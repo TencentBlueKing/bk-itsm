@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 # celery 任务示例
-# 
+#
 # 本地启动celery命令: python  manage.py  celery  worker  --settings=settings
 # 周期性任务还需要启动celery调度命令：python  manage.py  celerybeat --settings=settings
 
@@ -76,25 +76,24 @@ def _db_fix_for_blueapps_after_2_6_0():
     """
     blueapps的数据升级
     """
-    migrations = (
-        ('account', '0002_init_superuser'),
-        ('account', '0003_verifyinfo')
-    )
+    migrations = (("account", "0002_init_superuser"), ("account", "0003_verifyinfo"))
     if settings.RUN_VER != "open":
-        logger.Exception("当前运行环境为:{}，不支持db_fix_for_blueapps_after_2_6_0方法".format(
-            settings.RUN_VER))
+        logger.Exception(
+            "当前运行环境为:{}，不支持db_fix_for_blueapps_after_2_6_0方法".format(settings.RUN_VER)
+        )
         return
     try:
         with connection.cursor() as cursor:
-            cursor.execute('SELECT `app`, `name` FROM django_migrations;')
+            cursor.execute("SELECT `app`, `name` FROM django_migrations;")
             rows = cursor.fetchall()
             for migration in migrations:
                 if migration in rows:
                     continue
                 dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
                 cursor.execute(
-                    "INSERT INTO `django_migrations` (`app`, `name`, `applied`) VALUES (\"{}\", \"{}\", \"{}\");".format(
-                        migration[0], migration[1], dt))
+                    "INSERT INTO `django_migrations` (`app`, `name`, `applied`) "
+                    'VALUES ("{}", "{}", "{}");'.format(migration[0], migration[1], dt)
+                )
     except BaseException as err:
         logger.Exception(str(err))
 
@@ -116,12 +115,16 @@ def _db_fix_for_workflow_to_2_5_9():
                 task_config = [
                     dict(
                         task_schema_id=schema_id,
-                        create_task_state=task_settings['create_task_state'],
-                        execute_task_state=task_settings['execute_task_state'],
-                        execute_can_create=task_settings.get('execute_can_create', False),
-                        need_task_finished=task_settings.get('need_task_finished', False),
+                        create_task_state=task_settings["create_task_state"],
+                        execute_task_state=task_settings["execute_task_state"],
+                        execute_can_create=task_settings.get(
+                            "execute_can_create", False
+                        ),
+                        need_task_finished=task_settings.get(
+                            "need_task_finished", False
+                        ),
                     )
-                    for schema_id in task_settings.get('task_schema_ids', [])
+                    for schema_id in task_settings.get("task_schema_ids", [])
                 ]
                 workflow.create_task(task_config)
             except BaseException as err:
@@ -135,12 +138,12 @@ def _db_fix_for_workflow_to_2_5_9():
 @task
 def _db_fix_for_service_catalog():
     """服务目录添加前置路径"""
-    print('start execute _db_fix_for_service_catalog')
+    print("start execute _db_fix_for_service_catalog")
     for s_c in ServiceCatalog.objects.all():
         s_c.route = list(s_c.get_ancestors(include_self=True).values("id", "name"))
         s_c.save(update_fields=("route",))
-        print('fix: s_c: %s' % s_c.id)
-    print('finish execute _db_fix_for_service_catalog')
+        print("fix: s_c: %s" % s_c.id)
+    print("finish execute _db_fix_for_service_catalog")
 
 
 @task
@@ -161,16 +164,22 @@ def _db_fix_for_attachments():
         fields = Field._objects.filter(type="FILE").select_related("workflow", "state")
         for field in fields:
             base_file_path = os.path.join(
-                "workflow_{workflow_id}_{state_id}".format(workflow_id=field.workflow_id, state_id=field.state_id),
+                "workflow_{workflow_id}_{state_id}".format(
+                    workflow_id=field.workflow_id, state_id=field.state_id
+                ),
                 field.key,
             )
             new_choice = {}
             if isinstance(field.choice, dict):
                 continue
             for file in field.choice:
-                unique_key = hashlib.md5("{}{}".format(datetime.datetime.now(), file["name"]).encode())
+                unique_key = hashlib.md5(
+                    "{}{}".format(datetime.datetime.now(), file["name"]).encode()
+                )
                 file_path = os.path.join(base_file_path, file["name"])
-                new_choice[unique_key.hexdigest()] = dict(name=file["name"], path=file_path)
+                new_choice[unique_key.hexdigest()] = dict(
+                    name=file["name"], path=file_path
+                )
             field.choice = new_choice
         bulk_update(fields, update_fields=["choice"])
 
@@ -190,32 +199,47 @@ def _db_fix_for_attachments():
                 if isinstance(field["choice"], dict):
                     continue
                 for file in field["choice"]:
-                    unique_key = hashlib.md5("{}{}".format(datetime.datetime.now(), file["name"]).encode())
+                    unique_key = hashlib.md5(
+                        "{}{}".format(datetime.datetime.now(), file["name"]).encode()
+                    )
                     file_path = os.path.join(base_file_path, file["name"])
-                    new_choice[unique_key.hexdigest()] = dict(name=file["name"], path=file_path)
+                    new_choice[unique_key.hexdigest()] = dict(
+                        name=file["name"], path=file_path
+                    )
                 field["choice"] = new_choice
         bulk_update(flows, update_fields=["fields"])
 
     def update_ticket_fields():
-        ticket_fields = TicketField._objects.filter(type="FILE").select_related("ticket")
+        ticket_fields = TicketField._objects.filter(type="FILE").select_related(
+            "ticket"
+        )
         for field in ticket_fields:
             if field.choice:
-                for item in WorkflowVersion._objects.get(id=field.ticket.flow_id).fields.values():
+                for item in WorkflowVersion._objects.get(
+                    id=field.ticket.flow_id
+                ).fields.values():
                     if item["key"] == field.key:
                         field.choice = item["choice"]
                         break
 
             field_value = {}
             base_file_path = os.path.join(
-                "{ticket_id}_{state_id}".format(ticket_id=field.ticket_id, state_id=field.state_id), field.key,
+                "{ticket_id}_{state_id}".format(
+                    ticket_id=field.ticket_id, state_id=field.state_id
+                ),
+                field.key,
             )
             for ticket_file in field.value.split(","):
                 if not ticket_file:
                     continue
 
-                unique_key = hashlib.md5("{}{}".format(datetime.datetime.now(), ticket_file).encode())
+                unique_key = hashlib.md5(
+                    "{}{}".format(datetime.datetime.now(), ticket_file).encode()
+                )
                 file_path = os.path.join(base_file_path, ticket_file)
-                field_value[unique_key.hexdigest()] = dict(path=file_path, name=ticket_file)
+                field_value[unique_key.hexdigest()] = dict(
+                    path=file_path, name=ticket_file
+                )
             field._value = json.dumps(field_value)
         bulk_update(ticket_fields, update_fields=["_value", "choice"])
 
@@ -235,7 +259,9 @@ def _db_fix_from_2_1_x_to_2_2_1():
         return
     task_start = datetime.datetime.now()
     SystemSettings.objects.create(
-        key="_db_fix_from_2_1_x_to_2_2_1", value="start: %s" % task_start, type="DATETIME",
+        key="_db_fix_from_2_1_x_to_2_2_1",
+        value="start: %s" % task_start,
+        type="DATETIME",
     )
 
     kwargs = build_field_kwargs()
@@ -247,26 +273,41 @@ def _db_fix_from_2_1_x_to_2_2_1():
     Service.objects.upgrade_services_flow(**kwargs)
     Workflow.objects.upgrade_workflow(for_migrate=True, **kwargs)
 
-    bad_states = [state.id for state in State.objects.all() if state.followers_type in ["", None, "OPEN"]]
+    bad_states = [
+        state.id
+        for state in State.objects.all()
+        if state.followers_type in ["", None, "OPEN"]
+    ]
     State.objects.filter(pk__in=bad_states).update(followers_type="EMPTY")
 
     Workflow._objects.filter(flow_type=DEFAULT_STRING).update(flow_type=F("service"))
 
     DefaultField.objects.update(related_fields={})
 
-    end_tickets = Ticket.objects.filter(current_status__in=["FINISHED", "TERMINATED"]).values_list("id", flat=True)
-    TicketField.objects.filter(ticket_id__in=end_tickets, source_type="API").update(source_type="CUSTOM")
+    end_tickets = Ticket.objects.filter(
+        current_status__in=["FINISHED", "TERMINATED"]
+    ).values_list("id", flat=True)
+    TicketField.objects.filter(ticket_id__in=end_tickets, source_type="API").update(
+        source_type="CUSTOM"
+    )
 
-    end_tickets = Ticket.objects.filter(current_status__in=["FINISHED", "TERMINATED"]).values_list("id", flat=True)
-    TicketField.objects.filter(ticket_id__in=end_tickets, source_type="API").update(source_type="CUSTOM")
+    end_tickets = Ticket.objects.filter(
+        current_status__in=["FINISHED", "TERMINATED"]
+    ).values_list("id", flat=True)
+    TicketField.objects.filter(ticket_id__in=end_tickets, source_type="API").update(
+        source_type="CUSTOM"
+    )
 
     TicketEventLog.objects.filter(message__in=["流程开始", "单据流程结束"]).update(source="SYS")
 
     task_end = datetime.datetime.now()
     SystemSettings.objects.filter(key="_db_fix_from_2_1_x_to_2_2_1").update(
-        value="start: %s, end: %s, use: %s" % (task_start, task_end, (task_end - task_start))
+        value="start: %s, end: %s, use: %s"
+        % (task_start, task_end, (task_end - task_start))
     )
-    logger.info("-------------------db_fix_from_2_1_x_to_2_2_1: finished ------------------------\n")
+    logger.info(
+        "-------------------db_fix_from_2_1_x_to_2_2_1: finished ------------------------\n"
+    )
 
 
 @task
@@ -278,16 +319,18 @@ def _db_fix_from_1_1_22_to_2_1_x():
         return
 
     SystemSettings.objects.create(
-        key="_db_fix_from_1_1_22_to_2_1_16", value=datetime.datetime.now(), type="DATETIME",
+        key="_db_fix_from_1_1_22_to_2_1_16",
+        value=datetime.datetime.now(),
+        type="DATETIME",
     )
     logger.info("_db_fix_from_1_1_22_to_2_1_x start")
     try:
         _fix_ticket_title()
         _update_logs_type()
         _db_fix_after_2_0_3()
-        Ticket.objects.filter(is_draft=False, current_status="FINISHED", end_at__isnull=True).update(
-            end_at=F("update_at")
-        )
+        Ticket.objects.filter(
+            is_draft=False, current_status="FINISHED", end_at__isnull=True
+        ).update(end_at=F("update_at"))
         for log in TicketEventLog.objects.filter(type="CLAIM", deal_time=0):
             log.update_deal_time()
         _db_fix_after_2_0_7()
@@ -325,7 +368,9 @@ def _db_fix_after_2_0_3():
             "fix_workflow_snapshot={}\n"
             "fix_ticket_eventlog={}\n"
             "fix_invite_comment={}\n"
-            "fix_followers={}\n".format(version, cnt0, cnt1, cnt2, cnt3, cnt4, cnt5, cnt6)
+            "fix_followers={}\n".format(
+                version, cnt0, cnt1, cnt2, cnt3, cnt4, cnt5, cnt6
+            )
         )
         logger.info("db_fix_after_2_0_3 success!")
     except Exception as e:
@@ -350,10 +395,14 @@ def _db_fix_after_2_0_7():
         fix_end_logs()
 
         end = datetime.datetime.now()
-        print(("_db_fix_after_2_0_7 end-start: %s - %s = %s" % (end, start, end - start)))
+        print(
+            ("_db_fix_after_2_0_7 end-start: %s - %s = %s" % (end, start, end - start))
+        )
         logger.info("db_fix_after_2_0_7 success!")
     except Exception as e:
-        logger.error("db_fix_after_2_0_7 fail! version: %s, error: %s" % (version, str(e)))
+        logger.error(
+            "db_fix_after_2_0_7 fail! version: %s, error: %s" % (version, str(e))
+        )
 
 
 @task
@@ -361,7 +410,8 @@ def _db_fix_after_2_0_9():
     try:
         cnt = 0
         for ticket in Ticket.objects.filter(
-            current_status__in=["DISTRIBUTING", "DISTRIBUTING-RECEIVING"], current_assignor_type="PERSON",
+            current_status__in=["DISTRIBUTING", "DISTRIBUTING-RECEIVING"],
+            current_assignor_type="PERSON",
         ):
             flag = 0
             if not ticket.current_assignor.startswith(","):
@@ -426,9 +476,9 @@ def _db_fix_after_2_1_x():
 @task
 def _db_fix_after_2_0_14():
     try:
-        Ticket.objects.filter(current_status="FINISHED", current_processors_type="OPEN").update(
-            current_processors_type=""
-        )
+        Ticket.objects.filter(
+            current_status="FINISHED", current_processors_type="OPEN"
+        ).update(current_processors_type="")
         logger.info("db_fix_after_2_0_14 success!")
     except Exception as e:
         logger.error("db_fix_after_2_0_14 fail! error: %s" % str(e))
@@ -437,7 +487,9 @@ def _db_fix_after_2_0_14():
 @task
 def _db_fix_after_2_1_1():
     try:
-        TicketEventLog.objects.filter(message__contains="驳回").update(type=REJECT_OPERATE)
+        TicketEventLog.objects.filter(message__contains="驳回").update(
+            type=REJECT_OPERATE
+        )
         logger.info("db_fix_after_2_1_1 success!")
     except Exception as e:
         logger.error("db_fix_after_2_1_1 fail! error: %s" % str(e))
@@ -460,7 +512,9 @@ def _fix_ticket_title():
 @task
 def _update_logs_type():
     try:
-        TicketEventLog.objects.filter(message__contains="】终止，原因:【").update(type="TERMINATE", is_valid=True)
+        TicketEventLog.objects.filter(message__contains="】终止，原因:【").update(
+            type="TERMINATE", is_valid=True
+        )
         logger.info("update_logs_type success!")
     except Exception as e:
         logger.error("update_logs_type fail! error: %s" % str(e))
@@ -469,8 +523,12 @@ def _update_logs_type():
 @task
 def _db_fix_sla():
     try:
-        choices = OldSla.objects.values("name", "level", "resp_time", "deal_time", "id", "desc", "key", "is_builtin")
-        need_fix_query = TicketField.objects.filter(key="fault_level", create_at__gte="2019-05-25 00:00:00")
+        choices = OldSla.objects.values(
+            "name", "level", "resp_time", "deal_time", "id", "desc", "key", "is_builtin"
+        )
+        need_fix_query = TicketField.objects.filter(
+            key="fault_level", create_at__gte="2019-05-25 00:00:00"
+        )
         need_fix_query.update(choice=choices)
         choices_dict = {str(choice["id"]): choice["key"] for choice in choices}
         for field in need_fix_query:
@@ -496,9 +554,9 @@ def _db_fix_after_2_1_9():
 @task
 def _db_fix_ticket_end_at_after_2_0_5():
     try:
-        Ticket.objects.filter(is_draft=False, current_status="FINISHED", end_at__isnull=True).update(
-            end_at=F("update_at")
-        )
+        Ticket.objects.filter(
+            is_draft=False, current_status="FINISHED", end_at__isnull=True
+        ).update(end_at=F("update_at"))
         logger.info("_db_fix_ticket_end_at_after_2_0_5 success")
     except Exception as e:
         logger.error("_db_fix_ticket_end_at_after_2_0_5 fail!, error: %s" % str(e))
