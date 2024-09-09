@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import datetime
 import logging
+import json
 
 from common.redis import Cache
 from itsm.sla_engine.constants import (
@@ -117,7 +118,7 @@ class SlaTaskAction(object):
 
         # 查看当前ac_key对应的时间集合
         ac_time = datetime.datetime.strftime(next_action_time, "%Y-%m-%d %H:%M")
-        ac_value = [self.action.id]
+        ac_value = json.dumps([self.action.id])
         # 插入数据到redis
         self.redis_inst.hsetnx(name=ac_time, key=self.ac_key, value=ac_value)
         self.redis_inst.sadd(self.ac_key, ac_time)
