@@ -1753,7 +1753,7 @@ export const m = {
     取消: 'Cancel',
     当前版本: 'Current',
     产品文档: 'Documentation',
-    版本日志: 'Release note',
+    版本日志: 'Release Note',
     问题反馈: 'Feedback',
     '【': '[',
     '】版本更新明细': '] Details Of Version Updates',
