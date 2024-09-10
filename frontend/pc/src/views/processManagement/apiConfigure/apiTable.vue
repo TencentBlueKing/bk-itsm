@@ -526,7 +526,7 @@
         }
       },
       exportFlow(item) {
-        window.open(`${window.SITE_URL}api/postman/remote_api/${item.id}/exports/`);
+        this.$store.dispatch('apiRemote/export_api', item.id);
       },
       async handleBeforeClose() {
         if (this.isFormChanged) {

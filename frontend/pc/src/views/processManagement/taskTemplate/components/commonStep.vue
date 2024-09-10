@@ -272,10 +272,10 @@
             if (isDraft) {
               return;
             }
-            if (this.step === 2) {
-              this.$parent.backTab();
-              return;
-            }
+            // if (this.step === 2) {
+            //   this.$parent.backTab();
+            //   return;
+            // }
             const stepIndex = type === 'previous' ? this.step - 1 : this.step + 1;
             const temp = {
               id: stepIndex + 1,

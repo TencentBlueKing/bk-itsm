@@ -166,7 +166,7 @@ instance.interceptors.response.use(
       };
     }
 
-    if (response.request.responseURL.includes('/api/plugin_service/')) {
+    if (response.request.responseURL.includes('/api/plugin_service/') || response.headers['content-type'] === 'application/octet-stream; charset=utf-8') {
       return response;
     }
 
