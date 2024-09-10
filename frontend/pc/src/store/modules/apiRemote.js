@@ -21,6 +21,7 @@
  */
 
 import ajax from "../../utils/ajax";
+import { fileDownload } from "../../utils/util";
 
 export default {
   namespaced: true,
@@ -123,6 +124,16 @@ export default {
         const res = response.data;
         return res;
       });
+    },
+    export_api({}, id) {
+        return ajax.get(`postman/remote_api/${id}/exports/`, {
+          transitional: {
+            forcedJSONParsing: false,
+          },
+          responseType: 'blob'
+        }).then((response) => {
+            fileDownload(response);
+        })
     },
     // http://dev.paas-poc.o.qcloud.com:8000/api/postman/remote_api/1/run_api/
     run_remote_api({ commit, state, dispatch }, params) {

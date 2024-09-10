@@ -466,3 +466,34 @@ export function transCustomFormToTable (formStr) {
 
   return tables;
 }
+
+
+export function fileDownload (res) {
+    let filename
+    const disposition = res.headers['content-disposition'].split(',')
+    const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+    const matches = filenameRegex.exec(disposition)
+    if (matches !== null && matches[1]) {
+        filename = decodeURIComponent(matches[1].replace(/(^utf-8)|['"]/g, ''))
+    }
+    const blob = new Blob([res.data], { type: 'text/plain;charset=UTF-8' })
+    if (typeof window.navigator.msSaveBlob !== 'undefined') {
+        // hack old IE
+        window.navigator.msSaveBlob(blob, filename)
+    } else {
+        const eleLink = document.createElement('a')
+        const blobURL = window.URL.createObjectURL(blob)
+        eleLink.style.display = 'none'
+        eleLink.href = blobURL
+        eleLink.setAttribute('download', filename)
+
+        // hack HTML5 download attribute
+        if (typeof eleLink.download === 'undefined') {
+            eleLink.setAttribute('target', '_blank')
+        }
+        document.body.appendChild(eleLink)
+        eleLink.click()
+        document.body.removeChild(eleLink)
+        window.URL.revokeObjectURL(blobURL)
+    }
+  };
