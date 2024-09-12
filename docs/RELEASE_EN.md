@@ -1,6 +1,10 @@
 # Changelog
 ## [Version: 2.7.0] - 2024-08-29
-【Improved】Migrated the authentication information to header when calling esb, support open-paas/esb >= 2.12.20
+【Improved】Migrated the authentication information to header when calling esb, support open-paas/esb >= 2.12.20  
+【Fixed】The navigation bar style has been standardized according to the design specifications.  
+【Fixed】Modified the implementation method for exporting common API files.  
+【Fixed】Fixed the issue where searching on the document list in non-home pages resulted in an error.  
+【Fixed】Optimized the return path when clicking ‘Previous’ during task template editing.  
 
 ## [Version: 2.6.30] - 2024-08-15
 【Fixed】Fixed the URL Redirection Issue after Login during Project Initialization
