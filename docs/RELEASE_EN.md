@@ -1,6 +1,7 @@
 # Changelog
 ## [Version: 2.7.0] - 2024-08-29
 【Improved】Migrated the authentication information to header when calling esb, support open-paas/esb >= 2.12.20  
+【Improved】Adjust default items when adding an Approval Node in the process.
 【Fixed】The navigation bar style has been standardized according to the design specifications.  
 【Fixed】Modified the implementation method for exporting common API files.  
 【Fixed】Fixed the issue where searching on the document list in non-home pages resulted in an error.  
