@@ -237,9 +237,11 @@
             {{$t(`m['节点处理人为空时，直接跳过且不视为异常']`) }}
           </bk-checkbox>
           <bk-checkbox
+            v-model="formInfo.enable_terminate_ticket_when_rejected"
+            :checked="formInfo.enable_terminate_ticket_when_rejected"
             :true-value="true"
             :false-value="false"
-            v-model="formInfo.enable_terminate_ticket_when_rejected">
+            :before-change="handleTerminateRejectedChange">
             {{$t(`m['审批节点最终结果为拒绝时，自动终止单据']`) }}
           </bk-checkbox>
         </bk-form-item>
@@ -411,7 +413,7 @@
           is_multi: true,
           processors: [],
           is_allow_skip: false,
-          enable_terminate_ticket_when_rejected: false,
+          enable_terminate_ticket_when_rejected: true,
         },
         nodeTagList: [],
         allCondition: [],
@@ -488,7 +490,7 @@
         }
         this.formInfo.is_sequential = this.configur.is_sequential;
         this.formInfo.is_allow_skip = this.configur.is_allow_skip;
-        this.formInfo.enable_terminate_ticket_when_rejected = this.configur.extras.enable_terminate_ticket_when_rejected;
+        this.formInfo.enable_terminate_ticket_when_rejected = ('enable_terminate_ticket_when_rejected') in this.configur.extras ? this.configur.extras.enable_terminate_ticket_when_rejected : true;
         this.formInfo.processors = this.configur.processors ? this.configur.processors.split(',') : [];
         this.formInfo.ticket_type = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.type : 'keep';
         this.formInfo.ticket_key = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.name : '';
@@ -589,6 +591,24 @@
         }
         this.excludeProcessor = [...['EMPTY', 'API'], ...excludeProcessor];
       },
+      handleTerminateRejectedChange() {
+        if (this.formInfo.enable_terminate_ticket_when_rejected) {
+          return new Promise((resolve) => {
+            this.$bkInfo({
+              title: '确认取消设置？',
+              subTitle: '取消后，当审批人拒绝后，单据继续往下执行，请谨慎操作！',
+              confirmFn: () => {
+                resolve(true);
+              },
+              cancelFn: () => {
+                resolve(false);
+              },
+            });
+          });
+        }
+
+        return true;
+      },
       // 确认
       async submitNode() {
         const validates = [this.$refs.nodeInfoForm.validate()];
@@ -602,7 +622,6 @@
             finish_condition: this.finishCondition,
             is_multi: false,
             is_allow_skip: false,
-            enable_terminate_ticket_when_rejected: false,
           };
           // 基本信息
           params.name = this.formInfo.name;
