@@ -236,14 +236,21 @@
             v-model="formInfo.is_allow_skip">
             {{$t(`m['节点处理人为空时，直接跳过且不视为异常']`) }}
           </bk-checkbox>
-          <bk-checkbox
-            v-model="formInfo.enable_terminate_ticket_when_rejected"
-            :checked="formInfo.enable_terminate_ticket_when_rejected"
-            :true-value="true"
-            :false-value="false"
-            :before-change="handleTerminateRejectedChange">
-            {{$t(`m['审批节点最终结果为拒绝时，自动终止单据']`) }}
-          </bk-checkbox>
+          <bk-popconfirm
+            title="确认取消设置？"
+            content="取消后，当审批人拒绝后，单据继续往下执行，请谨慎操作！"
+            width="288"
+            trigger="click"
+            :disabled="!formInfo.enable_terminate_ticket_when_rejected"
+            @confirm="formInfo.enable_terminate_ticket_when_rejected = false">
+            <bk-checkbox
+              :value="formInfo.enable_terminate_ticket_when_rejected"
+              :true-value="true"
+              :false-value="false"
+              :before-change="handleTerminateRejectedChange">
+              {{$t(`m['审批节点最终结果为拒绝时，自动终止单据']`) }}
+            </bk-checkbox>
+          </bk-popconfirm>
         </bk-form-item>
       </bk-form>
       <field-config
@@ -592,22 +599,13 @@
         this.excludeProcessor = [...['EMPTY', 'API'], ...excludeProcessor];
       },
       handleTerminateRejectedChange() {
-        if (this.formInfo.enable_terminate_ticket_when_rejected) {
-          return new Promise((resolve) => {
-            this.$bkInfo({
-              title: '确认取消设置？',
-              subTitle: '取消后，当审批人拒绝后，单据继续往下执行，请谨慎操作！',
-              confirmFn: () => {
-                resolve(true);
-              },
-              cancelFn: () => {
-                resolve(false);
-              },
-            });
-          });
+        if (!this.formInfo.enable_terminate_ticket_when_rejected) {
+          setTimeout(() => {
+            this.formInfo.enable_terminate_ticket_when_rejected = true;
+          }, 100);
         }
 
-        return true;
+        return false;
       },
       // 确认
       async submitNode() {
