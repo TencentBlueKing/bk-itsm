@@ -22,7 +22,7 @@
 
 <template>
   <div v-if="item.showFeild">
-    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :ext-cls="'bk-ext-item'" :desc="item.tips" desc-type="icon">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :ext-cls="'bk-ext-item'" :desc="{ content: item.tips, allowHTML: false }" desc-type="icon">
       <div @click="item.checkValue = false" class="member-form-item">
         <member-select :class="{ 'bk-border-error': item.checkValue }"
           v-model="selectedItems"

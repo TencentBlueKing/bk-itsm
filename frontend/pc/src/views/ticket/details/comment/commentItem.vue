@@ -11,7 +11,8 @@
         v-if="curComment.update_log.length"
         v-bk-tooltips="{
           placement: 'top-start',
-          content: curComment.update_log
+          content: curComment.update_log,
+          allowHTML: false
         }"
         class="edited">
         <span>{{ $t('m["已被编辑"]') }}</span>

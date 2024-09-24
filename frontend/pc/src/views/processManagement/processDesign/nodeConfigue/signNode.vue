@@ -58,7 +58,7 @@
         </bk-form-item>
       </bk-form>
     </basic-card>
-    
+
     <basic-card class="mt20" :card-label="$t(`m.treeinfo['字段配置']`)">
       <field-config
         ref="field"
@@ -66,7 +66,7 @@
         :configur="configur">
       </field-config>
     </basic-card>
-        
+
     <basic-card
       class="mt20"
       v-bkloading="{ isLoading: getConditionFlag }"
@@ -263,6 +263,7 @@
             disabled: true,
             content: '',
             placements: ['top'],
+            allowHTML: false,
           },
         },
         emptyExpression: {
@@ -279,6 +280,7 @@
             disabled: false,
             content: this.$t('m.treeinfo[\'请先选择条件\']'),
             placements: ['top'],
+            allowHTML: false,
           },
         },
         nodeInfoRule: {
@@ -347,6 +349,7 @@
                 disabled: true,
                 content: '',
                 placements: ['top'],
+                allowHTML: false,
               };
               return { ...expression, tooltipInfo };
             });

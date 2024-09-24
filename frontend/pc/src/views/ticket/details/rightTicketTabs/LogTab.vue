@@ -30,7 +30,13 @@
         data-test-id="ticket_timeline_viewLog"
         ext-cls="log-time-line"
         :list="list"
-        @select="handleSelect"></bk-timeline>
+        @select="handleSelect">
+        <template v-for="(item, index) in list">
+          <div :key="index" :slot="`title${index}`" class="bk-timeline-title has-event" @click="handleSelect(item)">
+            <span>{{item.tag}}</span>
+          </div>
+        </template>
+      </bk-timeline>
       <div v-if="isShowComment" class="process-detail">
         <div class="process-content">
           <img :src="imgUrl" alt="单据结束" />
@@ -150,14 +156,15 @@
           .then((res) => {
             this.list = [];
             res.data.forEach((item) => {
+              const message = item.message;
               const line = {};
-              line.content = item.message;
+              line.content = message;
               line.tag = item.operate_at;
-              if (item.message !== this.flowStartText) {
+              if (message !== this.flowStartText) {
                 // item.content = item.message
                 // item.tag = item.operate_at
                 item.content = item.operate_at;
-                item.tag = item.message;
+                item.tag = message;
                 item.type = 'primary';
                 item.showMore = false;
                 item.filled = true;

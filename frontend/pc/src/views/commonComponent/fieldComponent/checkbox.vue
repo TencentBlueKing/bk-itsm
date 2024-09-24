@@ -24,7 +24,7 @@
   <div v-if="item.showFeild && !loading">
     <bk-form-item :label="item.name"
       :required="item.validate_type === 'REQUIRE'"
-      :desc="item.tips"
+      :desc="{ content: item.tips, allowHTML: false }"
       :ext-cls="'bk-line-height'"
       desc-type="icon">
       <bk-checkbox-group :ref="item.key" :value="selects" @change="selected">

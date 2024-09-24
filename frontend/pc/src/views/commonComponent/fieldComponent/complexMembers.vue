@@ -22,7 +22,7 @@
 
 <template>
   <div v-if="item.showFeild">
-    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="{ content: item.tips, allowHTML: false }" desc-type="icon">
       <!-- 一级处理人 -->
       <div class="bk-form-width">
         <bk-select v-model="formData.levelOne"

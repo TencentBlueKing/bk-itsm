@@ -22,7 +22,7 @@
 
 <template>
   <div v-if="item.showFeild">
-    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" style="font-size: 0" desc-type="icon">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="{ content: item.tips, allowHTML: false }" style="font-size: 0" desc-type="icon">
       <rich-text-editor
         v-model="item.val"
         :full-title="item.name"

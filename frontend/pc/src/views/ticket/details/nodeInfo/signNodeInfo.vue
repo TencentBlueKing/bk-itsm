@@ -28,7 +28,7 @@
           <template v-slot:header="{ item }">
             <div class="bk-timeline-user-header">
               <span class="bk-inline-block bk-default-width"
-                v-bk-tooltips.top="item.message">{{ item.message}}</span>
+                v-bk-tooltips.top="{ content: item.message, allowHTML: false }">{{ item.message}}</span>
               <span class="bk-inline-block button" v-if="item.tag !== 'processors'">
                 <span class="bk-inline-block isOn auto" @click="item.showMore = !item.showMore"
                   v-if="!item.showMore">{{ $t('m.newCommon["展开"]') }}
