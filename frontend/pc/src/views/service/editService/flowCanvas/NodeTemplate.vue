@@ -33,6 +33,7 @@
     v-bk-tooltips="{
       placement: 'auto',
       content: node.name,
+      allowHTML: false,
       theme: 'light'
     }">
     <div v-if="node.type === 'START'" class="startpoint" data-test-id="startNode">

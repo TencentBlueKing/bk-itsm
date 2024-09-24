@@ -22,7 +22,7 @@
 
 <template>
   <div v-if="item.showFeild">
-    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="{ content: item.tips, allowHTML: false }" desc-type="icon">
       <div class="bk-search-tree bk-form-width"
         :class="{ 'bk-border-error': item.checkValue }"
         v-bk-clickoutside="closeTree">

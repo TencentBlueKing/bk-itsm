@@ -385,6 +385,7 @@
             disabled: true,
             content: '',
             placements: ['top'],
+            allowHTML: false,
           },
         },
         emptyExpression: {
@@ -401,6 +402,7 @@
             disabled: false,
             content: this.$t('m.treeinfo[\'请先选择条件\']'),
             placements: ['top'],
+            allowHTML: false,
           },
         },
         isShowSignSwitch: false,

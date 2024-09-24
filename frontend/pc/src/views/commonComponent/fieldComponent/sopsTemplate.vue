@@ -38,7 +38,7 @@
         </bk-form-item>
         <bk-form-item :label="item.name" v-if="item.sopsContent.createWay === 'template'"
           :required="item.validate_type === 'REQUIRE'"
-          :desc="item.tips"
+          :desc="{ content: item.tips, allowHTML: false }"
           :ext-cls="'bk-line-height'"
           :property="'id'"
           :error-display-type="'normal'">

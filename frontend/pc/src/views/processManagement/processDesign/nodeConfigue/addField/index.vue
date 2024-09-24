@@ -339,7 +339,7 @@
             @change="$emit('change')">
           </textarea>
           <p class="bk-label-tips">
-            <span v-bk-tooltips.top="(formInfo.tips || $t(`m.treeinfo['字段释疑填填看哦']`))">
+            <span v-bk-tooltips.top="{ content: (formInfo.tips || $t(`m.treeinfo['字段释疑填填看哦']`)), allowHTML: false }">
               {{ $t('m.treeinfo["效果预览"]') }}
             </span>
           </p>

@@ -24,7 +24,7 @@
   <div v-if="item.showFeild">
     <bk-form-item :label="item.name"
       :required="item.validate_type === 'REQUIRE'"
-      :desc="item.tips"
+      :desc="{ content: item.tips, allowHTML: false }"
       desc-type="icon">
       <bk-input :class="{ 'bk-border-error': item.checkValue }"
         v-model="item.val"
