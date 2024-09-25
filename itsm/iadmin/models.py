@@ -145,8 +145,8 @@ class CustomNotice(models.Model):
         _("项目key"), max_length=LEN_SHORT, null=False, default=PUBLIC_PROJECT_PROJECT_KEY
     )
 
-    auth_resource = {"resource_type": "flow_element", "resource_type_name": "流程元素"}
-    resource_operations = ["flow_element_manage"]
+    auth_resource = {"resource_type": "project", "resource_type_name": "项目"}
+    resource_operations = ["system_settings_manage"]
 
     class Meta:
         app_label = "iadmin"
@@ -335,8 +335,8 @@ class Data(models.Model):
 
     objects = DataManager()
 
-    auth_resource = {"resource_type": "flow_element", "resource_type_name": "流程元素"}
-    resource_operations = ["flow_element_manage"]
+    auth_resource = {"resource_type": "project", "resource_name": _("项目")}
+    resource_operations = ["system_settings_manage"]
 
     class Meta:
         app_label = "iadmin"

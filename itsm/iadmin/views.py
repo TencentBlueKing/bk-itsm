@@ -95,7 +95,10 @@ class CustomNotifyViewSet(ModelViewSet):
     serializer_class = CustomNotifySerializer
     queryset = CustomNotice.objects.all()
     pagination_class = None
+    
     permission_classes = (CustomNotifyPermit,)
+    permission_free_actions = ["variable_list", "action_type"]
+    permission_action_default = "system_settings_manage"
 
     filter_fields = {
         "notify_type": ["exact"],

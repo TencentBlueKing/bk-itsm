@@ -65,6 +65,7 @@ from itsm.service.models import (
     ServiceSla,
 )
 from itsm.component.drf import permissions as perm
+from itsm.service.permissions import ServicePermit
 from itsm.service.serializers import (
     CatalogServiceEditSerializer,
     CatalogServiceSerializer,
@@ -149,6 +150,12 @@ class ServiceCatalogViewSet(component_viewsets.ModelViewSet):
         "-create_at", "level"
     )
     permission_classes = (perm.IamAuthProjectViewPermit,)
+    permission_action_mapping = {
+        "create": "catalog_create",
+        "update": "catalog_edit",
+        "destroy": "catalog_delete",
+    }
+    
     filter_fields = {
         "id": ["exact", "in"],
         "key": ["exact", "in"],
@@ -357,8 +364,14 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
 
     serializer_class = ServiceSerializer
     queryset = Service.objects.all()
-    permission_classes = component_viewsets.AuthModelViewSet.permission_classes
+    permission_classes = (ServicePermit,)
     permission_free_actions = ["retrieve"]
+    permission_action_default = "service_manage"
+    permission_action_mapping = {
+        "create": "service_create",
+        "imports": "service_create",
+        "clone": "service_create",
+    }
 
     ordering_fields = ("name", "create_at", "update_at")
     ordering = ("-create_at",)
@@ -476,7 +489,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
         serializer = ServiceSerializer(services, many=True, context=context)
         return Response(serializer.data)
 
-    @action(detail=True, methods=["post"], permission_classes=())
+    @action(detail=True, methods=["post"])
     def import_from_template(self, request, *args, **kwargs):
         """
         从基础模型导入
@@ -493,7 +506,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
 
         return Response()
 
-    @action(detail=True, methods=["post"], permission_classes=())
+    @action(detail=True, methods=["post"])
     def import_from_service(self, request, *args, **kwargs):
         service = self.get_object()
 
@@ -572,7 +585,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
         service.sla_validate()
         return Response()
 
-    @action(detail=True, methods=["post"], permission_classes=())
+    @action(detail=True, methods=["post"])
     def save_configs(self, request, *args, **kwargs):
         """
         {
@@ -637,7 +650,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
         state = State.objects.get(id=state_id)
         return state
 
-    @action(detail=True, methods=["get"], permission_classes=())
+    @action(detail=True, methods=["get"])
     def export(self, request, *args, **kwargs):
         instance = self.get_object()
         # 统一导入导出格式为列表数据
@@ -654,7 +667,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
 
         return response
 
-    @action(detail=True, methods=["post"], permission_classes=())
+    @action(detail=True, methods=["post"])
     def clone(self, request, *args, **kwargs):
         instance = self.get_object()
         tag_data = instance.tag_data()

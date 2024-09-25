@@ -45,6 +45,12 @@ class RemoteApiPermit(perm.IamAuthProjectViewPermit):
                 if project_key == PUBLIC_PROJECT_PROJECT_KEY:
                     apply_actions = ["public_api_view"]
                     return self.iam_auth(request, apply_actions)
+                else:
+                    # 项目
+                    apply_actions = ["system_settings_manage"]
+                    return self.has_project_view_permission(
+                        request, project_key, apply_actions
+                    )
         return True
 
     def has_object_permission(self, request, view, obj):
@@ -59,7 +65,7 @@ class RemoteApiPermit(perm.IamAuthProjectViewPermit):
             else:
                 # 项目
                 project_key = obj.remote_system.project_key
-                apply_actions = ["project_view"]
+                apply_actions = ["system_settings_manage"]
                 return self.has_project_view_permission(
                     request, project_key, apply_actions
                 )

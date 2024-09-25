@@ -26,9 +26,13 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from django.utils.translation import ugettext as _
 from rest_framework import permissions
 
+from itsm.auth_iam.utils import IamRequest
 from itsm.component.drf import permissions as perm
+from itsm.component.drf.exception import ValidationError
+from itsm.component.drf.permissions import IamAuthPermit
+from itsm.project.models import Project
 from itsm.role.models import UserRole
-from itsm.service.models import CatalogService
+from itsm.service.models import CatalogService, Service
 
 
 class IsObjManager(perm.IsManager):
@@ -95,3 +99,54 @@ class ServiceDeletePermit(permissions.BasePermission):
             return not CatalogService.objects.filter(service_id=request.parser_context['kwargs'].get('pk')).exists()
 
         return True
+
+
+class ServicePermit(IamAuthPermit):
+    """
+    服务鉴权
+    """
+    service_clone_action = ["clone", "import_from_service", "import_from_template"]
+
+    def has_permission(self, request, view):
+        # 服务快捷操作
+        if view.action in self.service_clone_action:
+            obj = view.get_object()
+            project = Project.objects.filter(pk=obj.project_key).first()
+            return super().has_object_permission(request, view, project)
+        
+        # 批量删除
+        if view.action == "batch_delete":
+            id_list = [i for i in request.data.get("id").split(",") if i.isdigit()]
+            services = Service.objects.filter(pk__in=id_list)
+            if not services:
+                raise ValidationError(_("服务 ID 不存在"))
+            resources = []
+            project_key = None
+            for service in services:
+                if not project_key:
+                    project_key = service.project_key
+                elif service.project_key != project_key:
+                    raise ValidationError(_("服务所属项目不一致"))
+
+                resources.append({
+                    "resource_id": service.id,
+                    "resource_type": "service",
+                    "creator": getattr(service, "creator", ""),
+                })
+            
+            iam_client = IamRequest(request)
+            allowed = iam_client.batch_resource_multi_actions_allowed(
+                actions=["service_manage"],
+                resources=resources,
+                project_key=project_key
+                
+            )
+            return all([i["service_manage"] for i in allowed.values()])
+            
+        return super().has_permission(request, view)
+    
+    def has_object_permission(self, request, view, obj, **kwargs):
+        if view.action in self.service_clone_action:
+            """针对 clone 类操作，不需要检测实例对象权限"""
+            return True
+        return super().has_object_permission(request, view, obj, **kwargs)

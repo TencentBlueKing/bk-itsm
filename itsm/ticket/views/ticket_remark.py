@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.ticket.models import TicketRemark, Ticket
+from itsm.ticket.permissions import RemarkPermissionValidate
 from itsm.ticket.serializers import TicketRemarkSerializer
 
 
@@ -28,6 +29,7 @@ class TicketRemarkModelViewSet(ModelViewSet):
         "-create_at", "level"
     )
     serializer_class = TicketRemarkSerializer
+    permission_classes = (RemarkPermissionValidate,)
 
     def list(self, request, *args, **kwargs):
         # 后面这个接口要重构一部分

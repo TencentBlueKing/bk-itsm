@@ -316,6 +316,28 @@ class CommentPermissionValidate(permissions.BasePermission):
         return False
 
 
+class RemarkPermissionValidate(permissions.BasePermission):
+    def __init__(self):
+        self.message = _("抱歉，您无权处理该单据的评论信息")
+
+    def has_object_permission(self, request, view, obj):
+
+        username = request.user.username
+
+        if UserRole.is_itsm_superuser(username):
+            return True
+        
+        if username == obj.creator:
+            return True
+
+        # 提单人或邀请评价才能从web评价
+        ticket = Ticket.objects.get(id=obj.ticket_id)
+        if ticket.can_operate(request.user.username):
+            return True
+
+        return False
+
+
 class OperationalDataPermission(permissions.BasePermission):
     """运营数据权限，ITSM管理员，工单统计管理员"""
 

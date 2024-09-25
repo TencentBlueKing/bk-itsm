@@ -92,6 +92,7 @@ class RemoteSystemViewSet(ModelViewSet):
     serializer_class = RemoteSystemSerializer
     queryset = RemoteSystem.objects.all()
     permission_classes = (IamAuthProjectViewPermit,)
+    permission_action_default = "system_settings_manage"
     pagination_class = None
 
     filter_fields = {

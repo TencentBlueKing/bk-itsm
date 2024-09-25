@@ -573,9 +573,9 @@
             "operation": "upsert_action",
             "data": {
                 "id": "system_settings_manage",
-                "name": "系统配置管理",
-                "name_en": "Manage System Settings",
-                "description": "全局基础配置管理。如不同模块的启停配置，接口日志查看，附件存储目录管理。",
+                "name": "项目管理",
+                "name_en": "Project Manage",
+                "description": "项目基础配置管理",
                 "description_en": "",
                 "type": "view",
                 "related_resource_types": [
@@ -2114,18 +2114,6 @@
                                     "id": "sla_agreement_delete"
                                 }
                             ]
-                        },
-                        {
-                            "name": "设置",
-                            "name_en": "Setting",
-                            "actions": [
-                                {
-                                    "id": "settings_view"
-                                },
-                                {
-                                    "id": "settings_manage"
-                                }
-                            ]
                         }
                     ]
                 },
@@ -2294,7 +2282,19 @@
                                     "id": "role_manage"
                                 }
                             ]
-                        }
+                        },
+                        {
+                            "name": "设置",
+                            "name_en": "Setting",
+                            "actions": [
+                                {
+                                    "id": "settings_view"
+                                },
+                                {
+                                    "id": "settings_manage"
+                                }
+                            ]
+                        }                        
                     ]
                 }
             ]

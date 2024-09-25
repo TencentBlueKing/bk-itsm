@@ -90,7 +90,7 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
     }
 
     permission_classes = (WorkflowTriggerPermit,)
-    permission_free_actions = ["list"]
+    permission_free_actions = ["list", "create_or_update_rules"]
 
     def get_queryset(self):
 

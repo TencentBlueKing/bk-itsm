@@ -68,6 +68,7 @@ from itsm.component.utils.graph import dfs_paths
 from itsm.postman.models import RemoteApiInstance
 from itsm.trigger.api import copy_triggers_by_source
 from itsm.trigger.models import Trigger
+from itsm.service.models import Service
 from itsm.workflow import managers
 from .base import Model
 from .field import Field, Table
@@ -171,8 +172,8 @@ class Workflow(WorkflowBase):
 
     objects = managers.WorkflowManager()
 
-    auth_resource = {"resource_type": "workflow", "resource_type_name": "流程"}
-    resource_operations = ["workflow_manage", "workflow_deploy"]
+    auth_resource = {"resource_type": "service", "resource_type_name": "服务"}
+    resource_operations = ["service_manage"]
 
     class Meta:
         app_label = "workflow"
@@ -182,6 +183,17 @@ class Workflow(WorkflowBase):
 
     def __unicode__(self):
         return "{}({})".format(self.name, self.pk)
+    
+    def get_iam_resource(self):
+        """获取 workflow 关联的服务对象"""
+        workflow_version = WorkflowVersion.objects.filter(workflow_id=self.id).last()
+        if not workflow_version:
+            raise ValueError(_("服务初始化流程版本异常"))
+
+        service = Service.objects.filter(workflow=workflow_version.id).last()
+        if not service:
+            raise ValueError(_("服务初始化异常"))
+        return service
 
     def tag_data(self, operator="", message="", need_tag_task=False):
         """创建新的流程版本"""

@@ -75,8 +75,8 @@ class Model(models.Model):
     objects = managers.Manager()
     _objects = models.Manager()
 
-    auth_resource = {"resource_type": "flow_element", "resource_type_name": "流程元素"}
-    resource_operations = ["flow_element_manage"]
+    auth_resource = {"resource_type": "project", "resource_type_name": "项目"}
+    resource_operations = ["system_settings_manage"]
 
     class Meta:
         app_label = "postman"
@@ -232,8 +232,8 @@ class RemoteApi(ObjectManagerMixin, Model):
     is_builtin = models.BooleanField(_("是否内置API"), default=False)
     read_only = models.BooleanField(_("只读"), default=False)
 
-    auth_resource = {"resource_type": "public_api", "resource_type_name": "公共api"}
-    resource_operations = ["public_api_view", "public_api_manage"]
+    auth_resource = {"resource_type": "project", "resource_type_name": "项目"}
+    resource_operations = ["system_settings_manage"]
 
     class Meta:
         app_label = "postman"

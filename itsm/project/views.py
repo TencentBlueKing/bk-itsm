@@ -62,6 +62,13 @@ class ProjectViewSet(component_viewsets.AuthModelViewSet):
         "name": ["exact", "contains", "startswith", "icontains"],
     }
 
+    permission_free_actions = ["all"]
+    permission_action_default = ["project_edit"]
+    permission_action_mapping = {
+        "retrieve": ["project_view"],
+        "update_project_record": ["project_view"]
+    }
+
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
