@@ -46,14 +46,15 @@
               @click="onServiceCreatePermissonCheck">
               {{$t(`m.serviceConfig['新增']`)}}
             </bk-button>
-            <bk-button :theme="'default'"
-              class="mr10"
+            <bk-button
+              v-cursor="{ active: !hasPermission(['service_create'], $store.state.project.projectAuthActions) }"
+              :class="['mr10', { 'btn-permission-disable': !hasPermission(['service_create'], $store.state.project.projectAuthActions) }]"
               data-test-id="service_button_batchImportService"
               :title="$t(`m['导入']`)"
               @click="importService">
               {{$t(`m['导入']`)}}
             </bk-button>
-            <bk-button :theme="'default'"
+            <bk-button
               data-test-id="service_button_batchDeleteService"
               :title="$t(`m.serviceConfig['批量删除']`)"
               :disabled="!checkList.length"
@@ -324,6 +325,17 @@
                     </bk-button>
                   </template>
                   <bk-button
+                    v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                    style="font-size: 12px;"
+                    v-cursor
+                    text
+                    theme="primary"
+                    class="btn-permission-disable"
+                    @click="onServicePermissonCheck(['service_manage'], props.row)">
+                    {{ $t('m["导出"]') }}
+                  </bk-button>
+                  <bk-button
+                    v-else
                     style="font-size: 12px; display: block"
                     data-test-id="service_button_deleteService3"
                     theme="primary"
@@ -704,7 +716,18 @@
         });
       },
       importService() {
-        this.isImportServiceShow = true;
+        if (!this.hasPermission(['service_create'], this.$store.state.project.projectAuthActions)) {
+          const projectInfo = this.$store.state.project.projectInfo;
+          const resourceData = {
+            project: [{
+              id: projectInfo.key,
+              name: projectInfo.name,
+            }],
+          };
+          this.applyForPermission(['service_create'], this.$store.state.project.projectAuthActions, resourceData);
+        } else {
+          this.isImportServiceShow = true;
+        }
       },
       exportService(row) {
         window.open(`${window.SITE_URL}api/service/projects/${row.id}/export/`);

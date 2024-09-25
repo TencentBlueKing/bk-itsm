@@ -389,6 +389,7 @@ const ticketListMixins = {
     handleSearch(params) {
       this.lastSearchParams = params;
       this.searchToggle = true;
+      this.pagination.current = 1;
       this.getTicketList();
     },
     deteleSearchResult(type, index) {

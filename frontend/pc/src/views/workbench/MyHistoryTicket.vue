@@ -22,7 +22,7 @@
 
 <template>
   <div class="my-created-ticket-page">
-    <nav-title :title-name="$t(`m['我的经办']`)"></nav-title>
+    <nav-title :title-name="$t(`m['我的已办']`)"></nav-title>
     <history-list from="myHistoryTicket"></history-list>
   </div>
 </template>

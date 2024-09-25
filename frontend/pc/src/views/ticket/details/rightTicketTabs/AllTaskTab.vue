@@ -34,21 +34,21 @@
       </bk-table-column>
       <bk-table-column :label="$t(`m.task['任务名称']`)" :render-header="$renderHeader" :show-overflow-tooltip="true">
         <template slot-scope="props">
-          <span v-bk-tooltips.top="props.row.name" class="task-name">
+          <span v-bk-tooltips.top="{ content: props.row.name, allowHTML: false }" class="task-name">
             {{ props.row.name || "--" }}
           </span>
         </template>
       </bk-table-column>
       <bk-table-column :label="$t(`m.task['处理人']`)" :render-header="$renderHeader" :show-overflow-tooltip="true">
         <template slot-scope="props">
-          <span v-bk-tooltips.top="props.row.processor_users">{{
+          <span v-bk-tooltips.top="{ content: props.row.processor_users, allowHTML: false }">{{
             props.row.processor_users || "--"
           }}</span>
         </template>
       </bk-table-column>
       <bk-table-column :label="$t(`m.task['任务类型']`)" :render-header="$renderHeader" :show-overflow-tooltip="true">
         <template slot-scope="props">
-          <span v-bk-tooltips.top="props.row.processor_users">{{
+          <span v-bk-tooltips.top="{ content: props.row.processor_users, allowHTML: false }">{{
             getTaskTypeName(props.row.component_type) || "--"
           }}</span>
         </template>

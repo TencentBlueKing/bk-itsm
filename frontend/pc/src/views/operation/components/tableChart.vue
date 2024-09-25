@@ -52,7 +52,8 @@
               v-bk-tooltips="{
                 content: props.row.organization_full,
                 position: 'top',
-                theme: 'light'
+                theme: 'light',
+                allowHTML: false
               }">
               {{ props.row.organization }}
             </span>

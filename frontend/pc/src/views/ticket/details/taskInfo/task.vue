@@ -175,7 +175,7 @@
         <bk-table-column :label="$t(`m.task['任务名称']`)">
           <template slot-scope="props">
             <span
-              v-bk-tooltips.top="props.row.name"
+              v-bk-tooltips.top="{ content: props.row.name, allowHTML: false }"
               class="task-name"
               @click="dealTaskSlider(props.row, 'SEE')"
             >
@@ -185,7 +185,7 @@
         </bk-table-column>
         <bk-table-column :label="$t(`m.task['处理人']`)">
           <template slot-scope="props">
-            <span v-bk-tooltips.top="props.row.processor_users">{{
+            <span v-bk-tooltips.top="{ content: props.row.processor_users, allowHTML: false }">{{
               props.row.processor_users || "--"
             }}</span>
           </template>
