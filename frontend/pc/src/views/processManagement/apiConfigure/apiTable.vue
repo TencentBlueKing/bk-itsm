@@ -26,15 +26,18 @@
       <p class="bk-api-title">{{ $t(`m.systemConfig["API列表"]`) }}</p>
       <div class="bk-api-button">
         <bk-dropdown-menu class="mr10 access-btn" @show="dropdownShow" @hide="dropdownHide" ref="apiDropdown" :disabled="disableImport">
-          <div class="dropdown-trigger-btn" style="padding-left: 12px;" slot="dropdown-trigger">
+          <div
+            slot="dropdown-trigger"
+            class="dropdown-trigger-btn"
+            style="padding-left: 12px;">
             <span style="font-size: 14px;">{{ $t(`m.systemConfig['API接入']`)}}</span>
             <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
           </div>
           <ul class="bk-dropdown-list" slot="dropdown-content">
             <li>
               <a href="javascript:;"
-                v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
-                :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
+                v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+                :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
                 :title="$t(`m.systemConfig['接入API']`)"
                 data-test-id="api_a_apiTableAccessApi"
                 @click="openShade('JOIN')">
@@ -44,8 +47,8 @@
             <li>
               <a href="javascript:;"
                 data-test-id="api_a_apiTableCreateApi"
-                v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
-                :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
+                v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+                :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
                 :title="$t(`m.systemConfig['新增API']`)"
                 @click="openShade('ADD')">
                 {{$t(`m.systemConfig['新增API']`)}}
@@ -53,14 +56,14 @@
             </li>
           </ul>
         </bk-dropdown-menu>
-        <bk-button :theme="'default'"
+        <bk-button
           data-test-id="api_button_apiTableuploadApi"
+          :theme="'default'"
           :disabled="disableImport"
-          v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
-          :class="{ 'btn-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
-          :title="$t(`m.systemConfig['点击上传']`)"
-          class="mr10 bk-btn-file">
-          <input :disabled="disableImport" :type="!projectId && !hasPermission(['public_api_create']) ? 'button' : 'file'" :value="fileVal" class="bk-input-file" @change="handleFile" @click="hasImportPermission">
+          v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+          :class="['mr10 bk-btn-file', { 'btn-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }]"
+          :title="$t(`m.systemConfig['点击上传']`)">
+          <input :disabled="disableImport" :type="!hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) ? 'button' : 'file'" :value="fileVal" class="bk-input-file" @change="handleFile" @click="hasImportPermission">
           {{$t(`m.systemConfig['导入']`)}}
         </bk-button>
         <bk-button :theme="'default'"
@@ -353,18 +356,23 @@
       },
       // 新增
       openShade(type) {
-        if (!this.projectId) {
-          if (!this.hasPermission(['public_api_create'])) {
-            this.applyForPermission(['public_api_create'], [], {});
-            return;
-          }
+        if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
+          const projectInfo = this.$store.state.project.projectInfo;
+          const resourceData = {
+            project: [{
+              id: projectInfo.key,
+              name: projectInfo.name,
+            }],
+          };
+          this.applyForPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions, resourceData);
+        } else {
+          this.typeInfo = type;
+          this.entryInfo.title = type === 'ADD'
+            ? this.$t('m.systemConfig["新增接口"]') : this.$t('m.systemConfig["接入接口"]');
+          this.$refs.apiDropdown.hide();
+          this.entryInfo.show = !this.entryInfo.show;
+          this.isFormChanged = false;
         }
-        this.typeInfo = type;
-        this.entryInfo.title = type === 'ADD'
-          ? this.$t('m.systemConfig["新增接口"]') : this.$t('m.systemConfig["接入接口"]');
-        this.$refs.apiDropdown.hide();
-        this.entryInfo.show = !this.entryInfo.show;
-        this.isFormChanged = false;
       },
       dropdownShow() {
         this.isDropdownShow = true;
@@ -485,10 +493,15 @@
       },
       //
       hasImportPermission() {
-        if (!this.projectId) {
-          if (!this.hasPermission(['public_api_create'])) {
-            this.applyForPermission(['public_api_create'], [], {});
-          }
+        if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
+          const projectInfo = this.$store.state.project.projectInfo;
+          const resourceData = {
+            project: [{
+              id: projectInfo.key,
+              name: projectInfo.name,
+            }],
+          };
+          this.applyForPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions, resourceData);
         }
       },
       // 上传文件模板
