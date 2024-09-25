@@ -29,6 +29,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import os
 
+import pymysql
+
+pymysql.install_as_MySQLdb()
+
 # V3判断环境的环境变量为BKPAAS_ENVIRONMENT
 if 'BKPAAS_ENVIRONMENT' in os.environ:
     ENVIRONMENT = os.getenv('BKPAAS_ENVIRONMENT', 'dev')

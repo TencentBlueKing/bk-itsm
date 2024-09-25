@@ -5,8 +5,7 @@
 
 # blueapps requirement
 Django==3.2.25
-PyMySQL==0.6.7
-mysqlclient==2.0.3
+PyMySQL==1.0.2
 MarkupSafe==2.0.0
 Mako==1.1.6
 requests==2.27.1
@@ -123,7 +122,7 @@ jmespath==0.10.0
 requests_toolbelt==0.9.1
 
 apigw-manager[cryptography]==1.1.8
-blueapps[opentelemetry,bkcrypto]==4.13.2
+blueapps[opentelemetry,bkcrypto]==4.14.0
 
 drf-yasg==1.20.0
 
