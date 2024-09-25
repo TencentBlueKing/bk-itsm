@@ -30,6 +30,7 @@ from itsm.component.constants import PUBLIC_PROJECT_PROJECT_KEY
 from itsm.component.drf.permissions import IamAuthPermit
 from itsm.role.models import UserRole
 from itsm.service.models import Service
+from itsm.workflow.models import Workflow
 
 
 class IsTableAdmin(permissions.BasePermission):
@@ -87,24 +88,25 @@ class BaseWorkflowElementIamAuth(IamAuthPermit):
     """
 
     def has_permission(self, request, view):
-        # apply_actions = ["service_manage", "service_view"]
-        #
-        # # 节点和字段的查看，首先必须有当前流程的管理权限
-        # if not view.action == 'list':
-        #     # 非列表请求，通过object鉴权
-        #     return True
-        #
-        # workflow_id = request.query_params.get("workflow")
-        # if workflow_id is None:
-        #     return False
-        # try:
-        #     flow = Workflow.objects.get(id=workflow_id)
-        # except Workflow.DoesNotExist:
-        #     return False
-        # service_obj = flow.service
-        #
-        # return self.iam_auth(request, apply_actions, service_obj)
-        return True
+        apply_actions = ["service_manage"]
+
+        # 节点和字段的查看，首先必须有当前流程的管理权限
+        if not view.action in ["list", "batch_update"]:
+            # 非列表请求，通过object鉴权
+            return True
+
+        workflow_id = request.query_params.get("workflow")
+        if workflow_id is None:
+            if hasattr(view, "get_iam_resource_id"):
+                workflow_id = view.get_iam_resource_id()
+            if not workflow_id:
+                return False
+        
+        try:
+            flow = Workflow.objects.get(id=workflow_id)
+        except Workflow.DoesNotExist:
+            return False
+        return self.iam_auth(request, apply_actions, flow.get_iam_resource())
 
     def has_object_permission(self, request, view, obj):
         """
@@ -114,27 +116,15 @@ class BaseWorkflowElementIamAuth(IamAuthPermit):
         :param obj:
         :return:
         """
-        # apply_actions = ["service_manage", "service_view"]
-        # service_obj = obj.workflow
-        # return self.iam_auth(request, apply_actions, service_obj)
-        return True
+        apply_actions = ["service_manage"]
+        service_obj = obj.workflow.get_iam_resource()
+        return self.iam_auth(request, apply_actions, service_obj)
 
 
-class ServiceViewPermit(IamAuthPermit):
-    def has_permission(self, request, view):
-        return True
-
+class WorkflowIamAuth(IamAuthPermit):
     def has_object_permission(self, request, view, obj, **kwargs):
-        # if view.action in ["deploy", "update"]:
-        #     apply_actions = ["service_manage", "service_view"]
-        #     service_obj = obj.service
-        #     return self.iam_auth(request, apply_actions, service_obj)
-
-        return True
-
-
-class WorkflowIamAuth(ServiceViewPermit):
-    pass
+        apply_actions = ["service_manage"]
+        return self.iam_auth(request, apply_actions, obj.get_iam_resource())
 
 
 class VersionDeletePermit(permissions.BasePermission):
@@ -165,15 +155,14 @@ class VersionDeletePermit(permissions.BasePermission):
         return True
 
 
-class FlowVersionIamAuth(ServiceViewPermit):
+class FlowVersionIamAuth(IamAuthPermit):
     def has_object_permission(self, request, view, obj):
-        # if request.method in permissions.SAFE_METHODS:
-        #     return True
-        #
-        # apply_actions = ["service_manage", "service_view"]
-        # service_obj = Workflow.objects.get(obj.workflow_id).service
-        # return self.iam_auth(request, apply_actions, service_obj)
-        return True
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        apply_actions = ["service_manage"]
+        service_obj = Workflow.objects.get(obj.workflow_id)
+        return self.iam_auth(request, apply_actions, service_obj)
 
 
 class IsSuperuser(permissions.BasePermission):

@@ -44,6 +44,9 @@ class UserRoleValidator(object):
         access = value.get("access", "")
         project_key = value.get("project_key", DEFAULT_PROJECT_PROJECT_KEY)
         members = list_by_separator(value.get("members", ""))
+        
+        if self.role.id != value.get("id"):
+            raise serializers.ValidationError(_("角色 ID 异常"))
 
         if not RoleType.objects.filter(type=role_type).exists():
             raise serializers.ValidationError(_("{}角色类型不存在").format(role_type))

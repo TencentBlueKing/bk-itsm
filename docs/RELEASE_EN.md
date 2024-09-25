@@ -7,6 +7,8 @@
 【Fixed】Fixed the issue where searching on the document list in non-home pages resulted in an error.  
 【Fixed】Optimized the return path when clicking ‘Previous’ during task template editing.  
 【Fixed】Fixed XSS vulnerability in tooltips component.  
+【Fixed】Fix the issue with authentication anomalies in certain modules.  
+
 
 ## [Version: 2.6.30] - 2024-08-15
 【Fixed】Fixed the URL Redirection Issue after Login during Project Initialization

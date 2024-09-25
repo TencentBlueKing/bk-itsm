@@ -134,10 +134,10 @@ ACTIONS = [
     },
     {
         "id": "system_settings_manage",
-        "name": _("系统配置管理"),
+        "name": _("项目管理"),
         "relate_resources": ["project"],
         "relate_actions": ["project_view"],
-        "resource_topo": ["project", "system_settings"],
+        "resource_topo": ["project"],
     },
     {
         "id": "ticket_view",

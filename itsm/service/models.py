@@ -523,8 +523,8 @@ class ServiceCatalog(BaseMpttModel):
 
     objects = managers.ServiceCatalogManager()
 
-    auth_resource = {"resource_type": "system_settings", "resource_name": _("流程元素")}
-    resource_operations = ["system_settings_manage"]
+    auth_resource = {"resource_type": "project", "resource_name": _("项目")}
+    resource_operations = ["catalog_create", "catalog_edit", "catalog_delete"]
 
     class Meta:
         app_label = "service"
@@ -909,8 +909,8 @@ class SysDict(ObjectManagerMixin, Model):
     )  # 应用场景: 部分系统内置数据字典, 不在数据字段管理页面显示
     objects = managers.SysDictManager()
 
-    auth_resource = {"resource_type": "flow_element", "resource_name": _("流程元素")}
-    resource_operations = ["flow_element_manage"]
+    auth_resource = {"resource_type": "project", "resource_name": _("项目")}
+    resource_operations = ["system_settings_manage"]
 
     def __unicode__(self):
         return self.name
@@ -1030,8 +1030,8 @@ class DictData(BaseMpttModel):
         related_name="children",
     )
 
-    auth_resource = {"resource_type": "flow_element", "resource_name": _("流程元素")}
-    resource_operations = ["flow_element_manage"]
+    auth_resource = {"resource_type": "project", "resource_name": _("项目")}
+    resource_operations = ["system_settings_manage"]
 
     def __unicode__(self):
         return "{}({})".format(self.name, self.key)

@@ -125,7 +125,7 @@ class IamRequest(object):
         获取批量资源的权限
         :return:
         """
-        if settings.ENVIRONMENT == "dev":
+        if settings.ENVIRONMENT == "dev" and settings.IAM_SKIP_AUTH:
             # dev 环境不走权限中心
             actions_result = {action: True for action in actions}
             return {

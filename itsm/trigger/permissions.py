@@ -57,6 +57,12 @@ class WorkflowTriggerPermit(IamAuthPermit):
             return True
 
         if view.action in ["clone", "create"]:
+            # 通过流程配置需要有对应服务的管理权限
+            if request.data.get("source_type") == SOURCE_WORKFLOW:
+                workflow = Workflow.objects.get(id=request.data.get("source_id"))
+                apply_actions = ["service_manage"]
+                return self.iam_auth(request, apply_actions, workflow.get_iam_resource())
+            
             # 其他的引用和创建，都需要尽心给流程元素的鉴权:
             return self.iam_create_auth(request, apply_actions=["triggers_create"])
 
@@ -66,9 +72,24 @@ class WorkflowTriggerPermit(IamAuthPermit):
         # 关联实例的请求，需要针对对象进行鉴权
         if view.action in getattr(view, "permission_free_actions", []):
             return True
-        if view.action in ["create_or_update_rules", "update", "destroy"]:
-            return True
-
-        apply_actions = ["triggers_manage"]
+        
+        if view.action in ["retrieve"]:
+            apply_actions = ["triggers_view"]
+        else:
+            # 通过流程配置需要有对应服务的管理权限
+            is_workflow = False
+            workflow_id = None
+            if request.data.get("source_type") == SOURCE_WORKFLOW:
+                is_workflow = True
+                workflow_id = request.data.get("source_id")
+            elif obj.source_type == SOURCE_WORKFLOW:
+                is_workflow = True
+                workflow_id = obj.source_id
+            
+            if is_workflow:
+                workflow = Workflow.objects.get(id=workflow_id)
+                apply_actions = ["service_manage"]
+                return self.iam_auth(request, apply_actions, workflow.get_iam_resource())
+            apply_actions = ["triggers_manage"]
 
         return self.iam_auth(request, apply_actions, obj)

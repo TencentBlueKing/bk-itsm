@@ -29,7 +29,9 @@ from django.utils.translation import ugettext as _
 from rest_framework import permissions
 
 from common.mymako import render_mako
-from itsm.component.drf.permissions import IamAuthWithoutResourcePermit
+from itsm.component.constants import PUBLIC_PROJECT_PROJECT_KEY
+from itsm.component.drf.permissions import IamAuthWithoutResourcePermit, IamAuthPermit
+from itsm.project.models import Project
 from itsm.role.models import UserRole
 
 
@@ -131,18 +133,38 @@ class SystemSettingPermit(IamAuthWithoutResourcePermit):
         return self.iam_auth(request, apply_actions)
 
 
-class CustomNotifyPermit(IamAuthWithoutResourcePermit):
+class CustomNotifyPermit(IamAuthPermit):
     def has_permission(self, request, view):
-        if view.action in ["variable_list", "action_type"]:
+        if view.action in getattr(view, "permission_free_actions", []):
             return True
-        apply_actions = []
-        if view.action == "list":
-            if "project_key" not in request.query_params:
-                apply_actions = ["notification_view", "platform_manage_access"]
-        return self.iam_auth(request, apply_actions)
-
-    def has_object_permission(self, request, view, obj):
-        if obj.project_key == "public":
+        
+        # 获取项目标识
+        if view.action in ["list"]:
+            project_key = request.query_params.get("project_key", PUBLIC_PROJECT_PROJECT_KEY)
+        elif view.action in ["destroy"]:
+            instance = view.get_object()
+            project_key = instance.project_key
+        else:
+            project_key = request.data.get("project_key", PUBLIC_PROJECT_PROJECT_KEY)
+            
+        # 平台管理
+        if project_key == PUBLIC_PROJECT_PROJECT_KEY:
             apply_actions = ["notification_view", "platform_manage_access"]
             return self.iam_auth(request, apply_actions)
-        return True
+        
+        # 项目管理
+        project = Project.objects.get(pk=project_key)
+        apply_actions = ["system_settings_manage"]
+        return self.iam_auth(request, apply_actions, project)
+
+    def has_object_permission(self, request, view, obj, **kwargs):
+        # 平台管理：通知配置
+        if obj.project_key == PUBLIC_PROJECT_PROJECT_KEY:
+            apply_actions = ["notification_view", "platform_manage_access"]
+            if view.action in ["update", "delete"]:
+                apply_actions.append("notification_manage")
+            return self.iam_auth(request, apply_actions)
+        
+        # 项目：通知配置
+        project = Project.objects.filter(pk=obj.project_key).first()
+        return super().has_object_permission(request, view, project, **kwargs)

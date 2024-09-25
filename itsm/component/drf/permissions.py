@@ -89,37 +89,52 @@ class IamAuthPermit(permissions.BasePermission):
 
     def has_permission(self, request, view):
         # 不关联实例的资源，任何请求都要提前鉴权
-        # 当前系统内，如果没有project_view的权限，无法进入系统
         if view.action in getattr(view, "permission_free_actions", []):
             return True
 
-        # apply_actions = ["project_view"]
-        apply_actions = []
-        resource_type = getattr(view.queryset.model, "auth_resource", {}).get(
-            "resource_type"
-        )
-
-        if view.action == "create":
-            apply_actions.append("{}_create".format(resource_type))
+        apply_actions = self.get_view_iam_actions(view)
+        
+        # 项目下创建资源
+        if view.action in ["create", "imports"]:
+            if not apply_actions:
+                resource_type = getattr(view.queryset.model, "auth_resource", {}).get(
+                    "resource_type"
+                )
+                apply_actions.append("{}_create".format(resource_type))
             if "project_key" in request.data:
                 return self.iam_create_auth(request, apply_actions)
-
         return True
 
     def has_object_permission(self, request, view, obj, **kwargs):
         # 关联实例的请求，需要针对对象进行鉴权
         if view.action in getattr(view, "permission_free_actions", []):
             return True
-
-        apply_actions = obj.resource_operations
+        
+        # 获取视图权限action
+        apply_actions = self.get_view_iam_actions(view)
         return self.iam_auth(request, apply_actions, obj)
+    
+    @staticmethod
+    def get_view_iam_actions(view):
+        # 获取视图权限action
+        apply_actions = []
+        if hasattr(view, "permission_action_mapping"):
+            apply_actions = view.permission_action_mapping.get(view.action)
 
+        # 默认动作
+        if not apply_actions and hasattr(view, "permission_action_default"):
+            apply_actions = view.permission_action_default
+
+        if isinstance(apply_actions, str):
+            apply_actions = [apply_actions]
+        return apply_actions
+        
     def iam_auth(self, request, apply_actions, obj=None):
 
         resources = []
         if obj:
             if isinstance(obj, Project):
-                resource_id = (str(getattr(obj, "key")),)
+                resource_id = str(getattr(obj, "key"))
             else:
                 resource_id = str(getattr(obj, "id"))
 
@@ -144,10 +159,12 @@ class IamAuthPermit(permissions.BasePermission):
         if resources:
             if hasattr(obj, "project_key"):
                 project_key = getattr(obj, "project_key")
+            elif isinstance(obj, Project):
+                project_key = str(getattr(obj, "key"))
             auth_actions = iam_client.batch_resource_multi_actions_allowed(
                 set(apply_actions), resources, project_key=project_key
             )
-            auth_actions = auth_actions.get(resources[0]["resource_id"], {})
+            auth_actions = auth_actions.get(str(resources[0]["resource_id"]), {})
         else:
             auth_actions = iam_client.resource_multi_actions_allowed(apply_actions, [])
 
@@ -240,11 +257,12 @@ class IamAuthPermit(permissions.BasePermission):
         """
         认证结果解析
         """
-        denied_actions = []
-        for action, result in auth_actions.items():
-            if action in actions and result is False:
-                denied_actions.append(action)
-        return len(denied_actions) == 0
+        for action in actions:
+            if action not in auth_actions:
+                return False
+            elif auth_actions[action] is False:
+                return False
+        return True
 
     @staticmethod
     def is_safe_method(request, view):
@@ -279,9 +297,15 @@ class IamAuthWithoutResourcePermit(IamAuthPermit):
 
 class IamAuthProjectViewPermit(IamAuthPermit):
     def has_object_permission(self, request, view, obj):
+        apply_actions = self.get_view_iam_actions(view)
+        
         if hasattr(obj, "project_key"):
             project_key = obj.project_key
-            apply_actions = ["project_view"]
+            if not apply_actions and view.action in ["create", "update", "destroy"]:
+                apply_actions = ["system_settings_manage"]
+                
+            # 项目管理必须有查看权限
+            apply_actions.append("project_view")
             return self.has_project_view_permission(request, project_key, apply_actions)
 
         return True

@@ -54,7 +54,7 @@ class Model(models.Model):
     _objects = models.Manager()
     objects = managers.Manager()
 
-    resource_operations = ["flow_element_manage"]
+    resource_operations = ["system_settings_manage"]
 
     class Meta:
         app_label = "postman"

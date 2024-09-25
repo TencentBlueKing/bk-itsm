@@ -45,8 +45,8 @@ class Model(models.Model):
     _objects = models.Manager()
     objects = managers.Manager()
 
-    auth_resource = {"resource_type": "flow_element", "resource_type_name": "流程元素"}
-    resource_operations = ["flow_element_manage"]
+    auth_resource = {"resource_type": "project", "resource_type_name": "项目"}
+    resource_operations = ["system_settings_manage"]
 
     class Meta:
         app_label = 'workflow'

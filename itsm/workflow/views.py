@@ -198,22 +198,6 @@ class WorkflowViewSet(
         self.queryset = self.queryset.exclude(flow_type="internal")
         return self.queryset
 
-    def perform_create(self, serializer):
-        """创建时补充基础Model中的字段"""
-        user = serializer.context.get("request").user
-        username = getattr(user, "username", "guest")
-
-        serializer.save(
-            creator=username, updated_by=username, engine_version=DEFAULT_ENGINE_VERSION
-        )
-
-    def perform_destroy(self, instance):
-        """自定义删除前行为"""
-        Trigger.objects.filter(
-            source_type=SOURCE_WORKFLOW, source_id=instance.id
-        ).delete()
-        super(WorkflowViewSet, self).perform_destroy(instance)
-
     @action(detail=False, methods=["get"])
     def get_global_choices(self, request):
         """查询全局选项列表信息"""
@@ -553,6 +537,11 @@ class TransitionViewSet(BaseWorkflowElementViewSet):
         "check_needed": ["exact", "in"],
     }
 
+    def get_iam_resource_id(self):
+        if self.action == "batch_update":
+            return self.request.data.get("workflow_id")
+        return None
+    
     def perform_destroy(self, instance):
         # 从开始节点出来的连线只能由一条, 且不能被删除
         if instance.from_state.type == START_STATE:

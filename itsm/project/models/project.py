@@ -64,13 +64,10 @@ class Project(Model):
         "field_create",
         "user_group_create",
         "triggers_create",
-        "sla_calendar_create",
-        "sla_agreement_create",
-        "settings_view",
-        "settings_manage",
         "catalog_create",
         "catalog_edit",
         "catalog_delete",
+        "system_settings_manage"
     ]
 
     auth_resource = {"resource_type": "project", "resource_type_name": "项目"}
