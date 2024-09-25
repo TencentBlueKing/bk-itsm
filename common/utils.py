@@ -22,7 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-import re
+from django.conf import settings
 
 # 开发框架公用方法
 # 1. 页面输入内容转义（防止xss攻击）
@@ -91,5 +91,17 @@ def cmp(a, b):
     return (a > b) - (a < b)
 
 
-def strip_tags(value):
-    return re.sub(r'<[^>]*?>', '', value)
+def notice_receiver_filter(receivers):
+    """
+    通知名单过滤
+    """
+    if not receivers:
+        return receivers
+    
+    receiver_type = "list"
+    if isinstance(receivers, str):
+        receiver_type = "str"
+        receivers = receivers.strip().split(",")
+    
+    receivers = [i for i in receivers if i not in settings.NOTICE_IGNORE_LIST]
+    return receivers if receiver_type == "list" else ",".join(receivers)

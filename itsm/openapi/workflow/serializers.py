@@ -60,7 +60,6 @@ class WorkflowSerializer(serializers.Serializer):
                 'end_at',
                 'update_at',
                 'notify',
-                'extras',
                 'updated_by',
                 'service',
                 'axis',

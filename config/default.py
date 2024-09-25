@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import base64
 import datetime
 import importlib
+import os
 from urllib.parse import urljoin, urlparse
 
 from blueapps.conf.default_settings import *  # noqa
@@ -959,5 +960,7 @@ IAM_SDK_CLIENT_TIMEOUT = int(os.getenv("BKAPP_IAM_SDK_CLIENT_TIMEOUT", 20))
 BK_SHARED_RES_URL = os.getenv("BKPAAS_SHARED_RES_URL") or os.getenv("BKAPP_SHARED_RES_URL")
 BK_PLATFORM_NAME = os.getenv("BKAPP_PLATFORM_NAME", "")
 
-# 本地开发环境跳转豁免配置
-BKAPP_SKIP_SECURE = os.getenv("BKAPP_SKIP_SECURE", False)
+# 通知过滤
+NOTICE_IGNORE_LIST = os.getenv("BKAPP_NOTICE_IGNORE_LIST", [])
+if isinstance(NOTICE_IGNORE_LIST, str):
+    NOTICE_IGNORE_LIST = [i.lower().strip() for i in NOTICE_IGNORE_LIST.split(",")]

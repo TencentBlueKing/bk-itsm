@@ -29,6 +29,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from common.log import logger
+from common.utils import notice_receiver_filter
 from itsm.component.constants import GENERAL_NOTICE
 from itsm.component.esb.esbclient import client_backend
 from itsm.component.exceptions import ComponentCallError
@@ -39,7 +40,7 @@ from weixin.core.settings import WEIXIN_APP_EXTERNAL_HOST
 class BaseNotifier(object):
     def __init__(self, title, receivers, message, notify_type=GENERAL_NOTICE):
         self.title = title
-        self.receivers = receivers
+        self.receivers = notice_receiver_filter(receivers)
         self.message = message
         self.notify_type = notify_type
 
