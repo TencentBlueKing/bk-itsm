@@ -771,7 +771,7 @@ class WorkflowVersion(WorkflowBase):
         state = self.get_state(state_id)
         all_fields = map(lambda field_id: self.get_field(field_id), state["fields"])
 
-        return list(filter(lambda f: f["is_valid"], all_fields))
+        return list(filter(lambda f: f and f["is_valid"], all_fields))
 
     def get_first_state_fields(self):
         return self.get_state_fields(self.first_state["id"])

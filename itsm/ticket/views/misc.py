@@ -108,6 +108,9 @@ class CommentViewSet(component_viewsets.NormalModelViewSet):
         "stars": ["exact"],
     }
     ordering_fields = "__all__"
+    
+    def list(self, request, *args, **kwargs):
+        return Response()
 
     @action(detail=False, methods=["get"])
     def get_comment(self, request):

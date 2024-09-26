@@ -3828,14 +3828,6 @@ class Ticket(Model, BaseTicket):
                 slave.current_processors = node_processors
             bulk_update(slaves, update_fields=["current_processors"])
 
-    def set_history_operators(self, current_operator):
-        """设置历史处理人"""
-        history_operators = [user for user in self.updated_by.split(",") if user]
-        if current_operator not in history_operators:
-            history_operators.append(current_operator)
-        self.updated_by = dotted_name(",".join(set(history_operators)))
-        self.save(update_fields=("updated_by",))
-
     def do_in_sign_state(self, node_status, fields, operator, source):
         """
         In sign node action
@@ -3904,8 +3896,8 @@ class Ticket(Model, BaseTicket):
 
         # Update ticket priority, processors, history operators
         self.update_priority()
-        # self.set_current_processors()
-        self.set_history_operators(operator)
+        from itsm.ticket.tasks import ticket_set_history_operators
+        ticket_set_history_operators.delay(self.id, operator)
 
         # Update sla task
         # if self._sla_tasks:

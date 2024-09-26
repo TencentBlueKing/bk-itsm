@@ -631,7 +631,7 @@ class TicketModelViewSet(ModelViewSet):
                 }
             )
         except ComponentCallError as error:
-            logger.warning("send email execption: %s" % error)
+            logger.warning(f"[send email] ticket_url=>{ticket_url}, execption=>{error}")
             return Response(
                 {
                     "result": False,

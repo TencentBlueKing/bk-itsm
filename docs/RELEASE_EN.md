@@ -1,5 +1,6 @@
 # Changelog
 ## [Version: 2.7.0] - 2024-08-29
+【Feature】Notification recipient blacklist filtering.  
 【Improved】Migrated the authentication information to header when calling esb, support open-paas/esb >= 2.12.20  
 【Improved】Adjust default items when adding an Approval Node in the process.
 【Fixed】The navigation bar style has been standardized according to the design specifications.  
@@ -8,6 +9,12 @@
 【Fixed】Optimized the return path when clicking ‘Previous’ during task template editing.  
 【Fixed】Fixed XSS vulnerability in tooltips component.  
 【Fixed】Fix the issue with authentication anomalies in certain modules.  
+【Fixed】Resolved the issue of APM deployment without data.  
+【Fixed】Resolved authentication exceptions in some modules.  
+【Fixed】Resolved the issue where the service visibility range was not effective.  
+【Fixed】Resolved the issue of abnormal display of parent comments in the work order comments.  
+【Fixed】Resolved the issue of inaccurate end time in operation analysis.  
+【Fixed】Resolved the deadlock issue in the parallel gateway.  
 
 
 ## [Version: 2.6.30] - 2024-08-15

@@ -854,7 +854,8 @@ class TicketLogManager(LogsManager):
             to_state_id=to_state_id,
         )
 
-        ticket.set_history_operators(log_operator)
+        from itsm.ticket.tasks import ticket_set_history_operators
+        ticket_set_history_operators.delay(ticket.id, log_operator)
 
         return log
 

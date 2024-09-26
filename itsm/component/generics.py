@@ -120,12 +120,12 @@ def exception_handler(exc, context):
         else:
             # 调试模式
             logger.error(traceback.format_exc())
-            print(traceback.format_exc())
-            if settings.RUN_MODE != 'PRODUCT':
-                raise exc
             # 正式环境，屏蔽500
             data.update(
-                {'code': ResponseCodeStatus.SERVER_500_ERROR, 'message': exc.message, }
+                {
+                    'code': ResponseCodeStatus.SERVER_500_ERROR, 
+                    'message': getattr(exc, "message", str(exc))
+                }
             )
 
         return Response(data, status=status.HTTP_200_OK)

@@ -1,27 +1,14 @@
 # -*- coding: utf-8 -*-
+from django.http import Http404
+from django.utils.translation import ugettext as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from itsm.component.drf import viewsets as component_viewsets
+from itsm.component.drf.viewsets import ModelViewSet
+from itsm.component.exceptions import ValidateError
 from itsm.ticket.models import TicketRemark, Ticket
 from itsm.ticket.permissions import RemarkPermissionValidate
 from itsm.ticket.serializers import TicketRemarkSerializer
-
-
-class ModelViewSet(component_viewsets.ModelViewSet):
-    """按需改造DRF默认的ModelViewSet类"""
-
-    def perform_create(self, serializer):
-        """创建时补充基础Model中的字段"""
-        user = serializer.context.get("request").user
-        username = getattr(user, "username", "guest")
-        return serializer.save(creator=username, updated_by=username)
-
-    def perform_update(self, serializer):
-        """更新时补充基础Model中的字段"""
-        user = serializer.context.get("request").user
-        username = getattr(user, "username", "guest")
-        serializer.save(updated_by=username)
 
 
 class TicketRemarkModelViewSet(ModelViewSet):
@@ -34,6 +21,8 @@ class TicketRemarkModelViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         # 后面这个接口要重构一部分
         ticket_id = request.query_params.get("ticket_id", "")
+        if not ticket_id:
+            raise ValidateError(_("ticket_id 不能为空"))
         show_type = request.query_params.get("show_type", "PUBLIC")
 
         ticket = Ticket.objects.get(id=ticket_id)
@@ -59,7 +48,14 @@ class TicketRemarkModelViewSet(ModelViewSet):
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
+    
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            return super().retrieve(request, *args, **kwargs)
+        except Http404:
+            """兼容父级评论删除情况"""
+            return Response([])
+    
     @action(detail=False, methods=["get"])
     def tree_view(self, request):
         """评论视图"""
