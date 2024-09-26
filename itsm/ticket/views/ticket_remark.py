@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
+
+from django.utils.translation import ugettext as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from itsm.component.drf import viewsets as component_viewsets
+from itsm.component.exceptions import ValidateError
 from itsm.ticket.models import TicketRemark, Ticket
 from itsm.ticket.permissions import RemarkPermissionValidate
 from itsm.ticket.serializers import TicketRemarkSerializer
+
 
 
 class ModelViewSet(component_viewsets.ModelViewSet):
@@ -34,6 +38,8 @@ class TicketRemarkModelViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         # 后面这个接口要重构一部分
         ticket_id = request.query_params.get("ticket_id", "")
+        if not ticket_id:
+            raise ValidateError(_("ticket_id 不能为空"))
         show_type = request.query_params.get("show_type", "PUBLIC")
 
         ticket = Ticket.objects.get(id=ticket_id)
