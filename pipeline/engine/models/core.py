@@ -496,9 +496,11 @@ class PipelineProcess(models.Model):
         data_service.set_object(self._context_key(), self.top_pipeline.context)
         data_service.set_object(self._data_key(), self.top_pipeline.data)
 
-        self.__class__.objects.filter(id=self.parent_id).update(
-            ack_num=models.F("ack_num") + 1
-        )
+        with transaction.atomic():
+            parent = self.__class__.objects.select_for_update().get(id=self.parent_id)
+            parent.ack_num += 1
+            parent.save()
+
         can_wake_up = False
 
         with transaction.atomic():

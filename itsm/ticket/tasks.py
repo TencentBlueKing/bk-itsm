@@ -35,7 +35,7 @@ from celery import Task
 from celery.schedules import crontab
 from celery.task import periodic_task, task
 from django.db.models import Q
-from django.db import connection
+from django.db import connection, transaction
 from django.utils.translation import ugettext as _
 
 from common.log import logger
@@ -519,3 +519,15 @@ def consume_notify():
     for item in range(1, end):
         user = email_notify.lpop("notify_queue")
         send_message(user, queryset)
+
+
+@task
+def ticket_set_history_operators(ticket_id, current_operator):
+    """设置历史处理人"""
+    with transaction.atomic():
+        ticket = Ticket.objects.select_for_update().get(pk=ticket_id)
+        history_operators = [user for user in ticket.updated_by.split(",") if user]
+        if current_operator not in history_operators:
+            history_operators.append(current_operator)
+        ticket.updated_by = dotted_name(",".join(set(history_operators)))
+        ticket.save(update_fields=("updated_by",))
