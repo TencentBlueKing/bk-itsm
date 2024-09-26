@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from functools import reduce
 
 from django.db import connection
@@ -231,7 +231,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         project_key = request.query_params.get("project_key", None)
         filter_serializer = StatisticsSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
-        kwargs = filter_serializer.validated_data
+        kwargs = self.combine_date(filter_serializer.validated_data)
 
         services = Service.objects.filter()
         service_name = kwargs.pop("service_name", "")
@@ -292,7 +292,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         project_key = request.query_params.get("project_key", None)
         filter_serializer = StatisticsSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
-        kwargs = filter_serializer.validated_data
+        kwargs = self.combine_date(filter_serializer.validated_data)
         biz_id = kwargs.pop("biz_id", "")
         biz_names = get_biz_names()
         order = kwargs.pop("order_by")
@@ -328,7 +328,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         project_key = request.query_params.get("project_key", None)
         filter_serializer = StatisticsSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
-        kwargs = filter_serializer.validated_data
+        kwargs = self.combine_date(filter_serializer.validated_data)
         order = kwargs.pop("order_by")
         service_category = ServiceCategory.objects.all().values("key", "name")
         category_dict = {
@@ -358,7 +358,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         project_key = request.query_params.get("project_key", None)
         filter_serializer = BaseFilterSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
-        kwargs = filter_serializer.validated_data
+        kwargs = self.combine_date(filter_serializer.validated_data)
         not_running_status = ["FINISHED", "TERMINATED", "REVOKED"]
         ticket_info = (
             self.queryset.filter(**kwargs)
@@ -431,7 +431,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         project_key = request.query_params.get("project_key", None)
         filter_serializer = ServiceStatisticsFilterSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
-        kwargs = filter_serializer.validated_data
+        kwargs = self.combine_date(filter_serializer.validated_data)
         kwargs.pop("timedelta")
         max_ids = (
             TicketOrganization.objects.filter(
@@ -481,7 +481,8 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
     def distribute_statistics(self, request):
         filter_serializer = TicketOrganizationSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
-        kwargs = filter_serializer.validated_data
+        kwargs = self.combine_date(filter_serializer.validated_data)
+            
         level_dict = {
             1: ("first_level_id", "first_level_name"),
             2: ("second_level_id", "second_level_name"),
@@ -1161,3 +1162,9 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
         filter_result.sort(key=lambda x: x["day"])
         return Response(filter_result)
+    
+    @staticmethod
+    def combine_date(kwargs):
+        if kwargs.get("create_at__lte"):
+            kwargs["create_at__lte"] = datetime.combine(kwargs["create_at__lte"], time(23, 59, 59))
+        return kwargs
