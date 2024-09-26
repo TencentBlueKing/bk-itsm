@@ -53,7 +53,7 @@ class ModelViewSet(ApiGenericMixin, viewsets.ModelViewSet):
 
         user = serializer.context.get('request').user
         username = getattr(user, 'username', 'guest')
-        serializer.save(creator=username, updated_by=username)
+        return serializer.save(creator=username, updated_by=username)
 
     def perform_update(self, serializer):
         """更新时补充基础Model中的字段

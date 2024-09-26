@@ -4,28 +4,11 @@ from django.utils.translation import ugettext as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from itsm.component.drf import viewsets as component_viewsets
+from itsm.component.drf.viewsets import ModelViewSet
 from itsm.component.exceptions import ValidateError
 from itsm.ticket.models import TicketRemark, Ticket
 from itsm.ticket.permissions import RemarkPermissionValidate
 from itsm.ticket.serializers import TicketRemarkSerializer
-
-
-
-class ModelViewSet(component_viewsets.ModelViewSet):
-    """按需改造DRF默认的ModelViewSet类"""
-
-    def perform_create(self, serializer):
-        """创建时补充基础Model中的字段"""
-        user = serializer.context.get("request").user
-        username = getattr(user, "username", "guest")
-        return serializer.save(creator=username, updated_by=username)
-
-    def perform_update(self, serializer):
-        """更新时补充基础Model中的字段"""
-        user = serializer.context.get("request").user
-        username = getattr(user, "username", "guest")
-        serializer.save(updated_by=username)
 
 
 class TicketRemarkModelViewSet(ModelViewSet):
