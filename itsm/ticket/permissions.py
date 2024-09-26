@@ -22,6 +22,8 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import operator
+from functools import reduce
 
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -60,6 +62,20 @@ class TicketPermissionValidate(permissions.BasePermission):
 
     def __init__(self):
         self.message = _("抱歉，您无权查看该单据")
+    
+    def has_permission(self, request, view):
+        """工单创建权限"""
+        if view.action != "create":
+            return True
+        
+        service_id = request.data.get("service_id")
+        if not service_id:
+            return False
+        
+        queryset = Service.objects.filter(pk=service_id, is_valid=True)
+        conditions = Service.permission_filter(request.user.username)
+        queryset = queryset.filter(reduce(operator.or_, conditions))
+        return queryset.exists()
 
     def has_object_permission(self, request, view, obj):
 
