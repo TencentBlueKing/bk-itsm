@@ -440,7 +440,7 @@ CACHES.update(
 # Django 项目配置 - 其他
 # ==============================================================================
 CSRF_COOKIE_PATH = "/"
-CSRF_COOKIE_NAME = "bkitsm_csrftoken"
+CSRF_COOKIE_NAME = os.environ.get("BKAPP_CSRF_COOKIE_NAME", "bkitsm_csrftoken")
 SESSION_COOKIE_NAME = "bkitsm_sessionid"
 
 # Template

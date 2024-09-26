@@ -137,7 +137,8 @@ def index(request):
             "NOTICE_CENTER_SWITCH": notice_center_switch_value,
             "BK_SHARED_RES_URL": settings.BK_SHARED_RES_URL,
             "BK_PLATFORM_NAME": settings.BK_PLATFORM_NAME,
-            "VERSION": get_version()
+            "VERSION": get_version(),
+            "CSRF_COOKIE_NAME": settings.CSRF_COOKIE_NAME,
         },
     )
 

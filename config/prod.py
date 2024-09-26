@@ -99,7 +99,7 @@ REST_FRAMEWORK.update(
 )
 
 MEDIA_URL = "%smedia/" % SITE_URL
-CSRF_COOKIE_NAME = "bkitsm_csrftoken"
+CSRF_COOKIE_NAME = os.environ.get("BKAPP_CSRF_COOKIE_NAME", "bkitsm_csrftoken")
 # ==============================================================================
 # 加载环境差异化配置
 # ==============================================================================
