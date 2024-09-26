@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from django.http import Http404
 from django.utils.translation import ugettext as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -48,7 +48,14 @@ class TicketRemarkModelViewSet(ModelViewSet):
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
+    
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            return super().retrieve(request, *args, **kwargs)
+        except Http404:
+            """兼容父级评论删除情况"""
+            return Response([])
+    
     @action(detail=False, methods=["get"])
     def tree_view(self, request):
         """评论视图"""
