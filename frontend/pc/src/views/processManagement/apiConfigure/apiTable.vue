@@ -67,8 +67,9 @@
           {{$t(`m.systemConfig['导入']`)}}
         </bk-button>
         <bk-button :theme="'default'"
+          v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
           data-test-id="api_button_apiTableBatchDeleteApi"
-          class="mr10 batch-remove-btn"
+          :class="['mr10 batch-remove-btn', { 'btn-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }]"
           :title="$t(`m.systemConfig['批量移除']`)"
           :disabled="!checkList.length"
           @click="deleteCheck">
@@ -110,8 +111,8 @@
           <!-- :disabled="props.row.is_builtin || !!props.row.count" -->
           <span class="bk-lable-primary"
             data-test-id="api_span_apiTableViewDetail"
-            v-cursor="{ active: !projectId && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
-            :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
+            v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+            :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
             :title="props.row.name"
             @click="entryOne(props.row)">
             {{props.row.name || '--'}}
@@ -162,22 +163,17 @@
           </bk-button>
           <bk-button theme="primary" text
             data-test-id="api_button_apiTableEditApi"
-            v-cursor="{ active: !projectId
-              && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
-            :class="{ 'text-permission-disable': !projectId
-              && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
+            v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+            :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
             :title="$t(`m.systemConfig['编辑']`)"
-            :disabled="(projectId || hasPermission(['public_api_manage'], props.row.auth_actions))
-              && (props.row.is_builtin || !!props.row.count)"
+            :disabled="props.row.is_builtin || !!props.row.count"
             @click="entryOne(props.row)">
             {{ $t('m.systemConfig["编辑"]') }}
           </bk-button>
           <bk-button theme="primary" text
             data-test-id="api_button_apiTableDeleteApi"
-            v-cursor="{ active: !projectId
-              && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
-            :class="{ 'text-permission-disable': !projectId
-              && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
+            v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+            :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
             :title="$t(`m.systemConfig['移除']`)"
             :disabled="props.row.is_builtin"
             @click="openDelete(props.row)">
@@ -322,14 +318,8 @@
     methods: {
       async entryOne(item) {
         // 公共api
-        if (!this.projectId && !this.hasPermission(['public_api_manage'], item.auth_actions)) {
-          const resourceData = {
-            public_api: [{
-              id: item.id,
-              name: item.name,
-            }],
-          };
-          this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData);
+        if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
+          this.applyProjectManagePerm();
           return;
         }
         this.$parent.displayInfo.level_1 = item;
@@ -354,17 +344,20 @@
       changTitle(item, index) {
         this.checkIndex = index;
       },
+      applyProjectManagePerm() {
+        const projectInfo = this.$store.state.project.projectInfo;
+        const resourceData = {
+          project: [{
+            id: projectInfo.key,
+            name: projectInfo.name,
+          }],
+        };
+        this.applyForPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions, resourceData);
+      },
       // 新增
       openShade(type) {
         if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
-          const projectInfo = this.$store.state.project.projectInfo;
-          const resourceData = {
-            project: [{
-              id: projectInfo.key,
-              name: projectInfo.name,
-            }],
-          };
-          this.applyForPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions, resourceData);
+          this.applyProjectManagePerm();
         } else {
           this.typeInfo = type;
           this.entryInfo.title = type === 'ADD'
@@ -426,17 +419,9 @@
       },
       // 二次弹窗确认
       openDelete(item) {
-        if (!this.projectId) {
-          if (!this.hasPermission(['public_api_manage'], item.auth_actions)) {
-            const resourceData = {
-              public_api: [{
-                id: item.id,
-                name: item.name,
-              }],
-            };
-            this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData);
-            return;
-          }
+        if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
+          this.applyProjectManagePerm();
+          return;
         }
         this.$bkInfo({
           type: 'warning',
@@ -465,6 +450,10 @@
         });
       },
       deleteCheck() {
+        if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
+          this.applyProjectManagePerm();
+          return;
+        }
         this.$bkInfo({
           type: 'warning',
           title: this.$t('m.systemConfig["确认移除服务？"]'),
@@ -494,14 +483,7 @@
       //
       hasImportPermission() {
         if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
-          const projectInfo = this.$store.state.project.projectInfo;
-          const resourceData = {
-            project: [{
-              id: projectInfo.key,
-              name: projectInfo.name,
-            }],
-          };
-          this.applyForPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions, resourceData);
+          this.applyProjectManagePerm();
         }
       },
       // 上传文件模板

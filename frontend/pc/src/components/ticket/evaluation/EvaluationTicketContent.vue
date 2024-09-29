@@ -241,18 +241,19 @@
         }
         const id = this.ticketInfo.comment_id;
 
-        this.$emit('beforeSubmit');
+        this.$emit('updatePendingStatus', true);
         this.$store.dispatch('evaluation/postEvaluation', { params, id }).then(() => {
+          this.$emit('submitSuccess');
           this.$bkMessage({
             message: this.$t('m.newCommon["评价成功"]'),
             theme: 'success',
           });
         })
           .catch((res) => {
+            this.$emit('updatePendingStatus', false);
             errorHandler(res, this);
           })
           .finally(() => {
-            this.$emit('submitSuccess');
             this.scoreInfo.clickSecond = false;
           });
       },
@@ -336,7 +337,7 @@
           id = this.ticketInfo.id;
         }
 
-        this.$emit('beforeSubmit');
+        this.$emit('updatePendingStatus', true);
         this.$store.dispatch(url, { params, id }).then(() => {
           this.$bkMessage({
             message: this.$t('m.newCommon["发送成功"]'),
@@ -345,6 +346,7 @@
           this.$emit('submitSuccess');
         })
           .catch(() => {
+            this.$emit('updatePendingStatus', false);
             errorHandler(this);
           })
           .finally(() => {

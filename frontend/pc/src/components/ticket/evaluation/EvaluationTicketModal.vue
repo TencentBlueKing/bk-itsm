@@ -35,7 +35,7 @@
         :satisfact-info="satisfactInfo"
         :ticket-info="ticketInfo"
         :is-show-submit-btn="false"
-        @beforeSubmit="onBeforeSubmit"
+        @updatePendingStatus="onUpdatePendingStatus"
         @submitSuccess="onSubmitSuccess">
       </evaluation-ticket-content>
     </div>
@@ -117,8 +117,8 @@
         this.submitting = false;
         this.$emit('submitSuccess');
       },
-      onBeforeSubmit() {
-        this.submitting = true;
+      onUpdatePendingStatus(status = true) {
+        this.submitting = status;
       },
     },
   };
