@@ -42,8 +42,8 @@
                 <li>
                   <a href="javascript:;"
                     data-test-id="api_a_accessApi"
-                    v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
-                    :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
+                    v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+                    :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
                     :title="$t(`m.systemConfig['系统接入']`)"
                     @click="openDictionary('JION')">
                     {{ $t(`m.systemConfig['系统接入']`) }}
@@ -52,8 +52,8 @@
                 <li>
                   <a href="javascript:;"
                     data-test-id="api_a_createApi"
-                    v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
-                    :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
+                    v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+                    :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
                     :title="$t(`m.systemConfig['系统新增']`)"
                     @click="openDictionary('ADD')">
                     {{$t(`m.systemConfig['系统新增']`)}}
@@ -90,15 +90,15 @@
                       <li
                         v-if="!item.is_builtin"
                         data-test-id="api_li_deleteApiDirectory"
-                        v-cursor="{ active: !projectId && hasPermission(['public_api_manage']) }"
-                        :class="{ 'text-permission-disable': !projectId && hasPermission(['public_api_manage']) }"
+                        v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+                        :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
                         @click.stop="openDelete(item)">
                         <span>{{ $t('m.systemConfig["删除"]') }}</span>
                       </li>
                       <li
                         data-test-id="api_li_editApiDirectory"
-                        v-cursor="{ active: !projectId && hasPermission(['public_api_manage']) }"
-                        :class="{ 'text-permission-disable': !projectId && hasPermission(['public_api_manage']) }"
+                        v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+                        :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
                         @click.stop="openDictionary('CHANGE' ,item)">
                         <span>{{ $t('m.systemConfig["编辑"]') }}</span>
                       </li>
@@ -443,24 +443,16 @@
         });
       },
       openDictionary(type, item) {
-        if (!this.projectId) {
-          let reqPerm = ['public_api_create'];
-          let crtPerm = [];
-          let resourceData = {};
-          if (!['JION', 'ADD'].includes(type)) {
-            reqPerm = ['public_api_manage'];
-            crtPerm = item.auth_actions;
-            resourceData = {
-              public_api: [{
-                id: item.id,
-                name: item.name,
-              }],
-            };
-          }
-          if (crtPerm && !this.hasPermission(reqPerm, crtPerm)) {
-            this.applyForPermission(reqPerm, crtPerm, resourceData);
-            return;
-          }
+        if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
+          const projectInfo = this.$store.state.project.projectInfo;
+          const resourceData = {
+            project: [{
+              id: projectInfo.key,
+              name: projectInfo.name,
+            }],
+          };
+          this.applyForPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions, resourceData);
+          return;
         }
         this.dictDataTable.showDialog = true;
         this.dictDataTable.type = type;
@@ -492,6 +484,17 @@
       },
       // 二次弹窗确认
       openDelete(item) {
+        if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
+          const projectInfo = this.$store.state.project.projectInfo;
+          const resourceData = {
+            project: [{
+              id: projectInfo.key,
+              name: projectInfo.name,
+            }],
+          };
+          this.applyForPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions, resourceData);
+          return;
+        }
         this.$bkInfo({
           type: 'warning',
           title: this.$t('m.systemConfig["确认移除系统？"]'),
@@ -551,7 +554,6 @@
             .bk-group-li {
                 color: #4b8fff;
                 background-color: #e1ecff;
-                
             }
 
             .bk-group-name {

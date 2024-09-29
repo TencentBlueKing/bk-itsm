@@ -15,8 +15,11 @@
         </li>
       </ul>
       <div class="bk-only-btn">
-        <bk-button theme="primary"
+        <bk-button
           data-test-id="notice_button_create"
+          theme="primary"
+          v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+          :class="{ 'btn-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
           @click="addNotice">
           <i class="bk-itsm-icon icon-itsm-icon-one-five"></i>
           {{ $t(`m.deployPage['新增']`) }}
@@ -45,12 +48,16 @@
         <bk-table-column :label="$t(`m.deployPage['操作']`)" width="150">
           <template slot-scope="props">
             <bk-button
+              v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+              :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
               theme="primary"
               text
               @click="editNotice(props.row)">
               {{ $t('m.deployPage["编辑"]') }}
             </bk-button>
             <bk-button
+              v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+              :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
               theme="primary"
               text
               @click="deleteNotice(props.row)">
@@ -314,10 +321,18 @@
       },
       // 新增配置
       addNotice() {
+        if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
+          this.applyProjectPerm();
+          return;
+        }
         this.isEdit = false;
         this.isShowEdit = true;
       },
       editNotice(row) {
+        if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
+          this.applyProjectPerm();
+          return;
+        }
         this.editNoticeId = row.id;
         this.formData.noticeUserBy = row.used_by;
         this.handleSelectUserBy(row.used_by);
@@ -330,6 +345,10 @@
         this.isShowEdit = true;
       },
       deleteNotice(row) {
+        if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
+          this.applyProjectPerm();
+          return;
+        }
         this.$bkInfo({
           title: this.$t('m["确认要删除？"]'),
           confirmLoading: true,
@@ -346,6 +365,16 @@
       },
       closeEditor() {
         this.isShowEdit = false;
+      },
+      applyProjectPerm() {
+        const projectInfo = this.$store.state.project.projectInfo;
+        const resourceData = {
+          project: [{
+            id: projectInfo.key,
+            name: projectInfo.name,
+          }],
+        };
+        this.applyForPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions, resourceData);
       },
     },
   };

@@ -166,7 +166,11 @@
                       :title="type.name"
                       :key="typeIndex">
                       {{ type.name }}
-                      <i v-show="tableHoverId === row.id" @click="handleChange('key', row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
+                      <i
+                        v-show="tableHoverId === row.id && hasPermission(['service_manage'], [...row.auth_actions, ...$store.state.project.projectAuthActions])"
+                        class="bk-itsm-icon icon-itsm-icon-six"
+                        @click="handleChange('key', row)">
+                      </i>
                     </span>
                   </template>
                 </template>
@@ -216,7 +220,14 @@
                 </template>
               </template>
               <template v-else-if="field.id === 'bounded_catalogs'">
-                <span v-if="row.id !== changeFrom.bounded_catalogs" :title="row.bounded_catalogs[0]">{{ row.bounded_catalogs[0] || '--' }}<i v-show="tableHoverId === row.id" @click="handleChange('catalog_id', row)" class="bk-itsm-icon icon-itsm-icon-six"></i></span>
+                <span v-if="row.id !== changeFrom.bounded_catalogs" :title="row.bounded_catalogs[0]">
+                  {{ row.bounded_catalogs[0] || '--' }}
+                  <i
+                    v-show="tableHoverId === row.id && hasPermission(['service_manage'], [...row.auth_actions, ...$store.state.project.projectAuthActions])"
+                    class="bk-itsm-icon icon-itsm-icon-six"
+                    @click="handleChange('catalog_id', row)">
+                  </i>
+                </span>
                 <div v-else class="hover-show-icon">
                   <bk-cascade
                     :list="dirList"
