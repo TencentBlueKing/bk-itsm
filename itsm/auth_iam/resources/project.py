@@ -63,9 +63,11 @@ class ProjectResourceProvider(ItsmResourceProvider):
 
     def search_instance(self, filter, page, **options):
         """
-        项目暂时不支持任何搜索
+        根据项目名称进行搜索，同时匹配 key 和 name 字段
         """
-        queryset = self.queryset.filter(key__contains=filter.keyword)
+        queryset = self.queryset.filter(
+            Q(name__icontains=filter.keyword) | Q(key__icontains=filter.keyword)
+        )
         count = queryset.count()
         results = [
             {"id": project.key, "display_name": project.name}
