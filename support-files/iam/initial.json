@@ -350,6 +350,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -374,6 +377,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -398,6 +404,10 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view",
+                    "service_view"
+                ],                   
                 "version": 1
             }
         },
@@ -590,6 +600,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                
                 "version": 1
             }
         },
@@ -682,7 +695,7 @@
             "operation": "upsert_action",
             "data": {
                 "id": "operational_data_view",
-                "name": "运营数据查看",
+                "name": "统计分析访问",
                 "name_en": "View Operational Data",
                 "description": "查看运营数据的权限",
                 "description_en": "",
@@ -774,6 +787,9 @@
                         "system_id": "bk_itsm",
                         "id": "field"
                     }
+                ],
+                "related_actions": [
+                    "project_view"
                 ]
             }
         },
@@ -798,6 +814,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -822,6 +841,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -846,6 +868,10 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view",
+                    "field_view"
+                ],                    
                 "version": 1
             }
         },
@@ -870,6 +896,10 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view",
+                    "field_view"
+                ],                   
                 "version": 1
             }
         },
@@ -932,6 +962,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -956,6 +989,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -980,6 +1016,10 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view",
+                    "triggers_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1072,6 +1112,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1096,6 +1139,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1120,6 +1166,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1182,6 +1231,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1206,6 +1258,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1230,6 +1285,10 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view",
+                    "user_group_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1254,6 +1313,10 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view",
+                    "user_group_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1278,6 +1341,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1999,6 +2065,9 @@
                 "description_en": "",
                 "type": "manage",
                 "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],
                 "version": 1
             }
         },
@@ -2012,6 +2081,25 @@
                 "description_en": "",
                 "type": "manage",
                 "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],                
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "public_task_template_manage",
+                "name": "任务模板管理",
+                "name_en": "Task Template Manage",
+                "description": "任务模板管理",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],                
                 "version": 1
             }
         },
@@ -2110,56 +2198,26 @@
                                     "id": "triggers_manage"
                                 }
                             ]
-                        },
-                        {
-                            "name": "SLA",
-                            "name_en": "SLA",
-                            "actions": [
-                                {
-                                    "id": "sla_calendar_view"
-                                },
-                                {
-                                    "id": "sla_calendar_create"
-                                },
-                                {
-                                    "id": "sla_calendar_edit"
-                                },
-                                {
-                                    "id": "sla_calendar_delete"
-                                },
-                                {
-                                    "id": "sla_agreement_view"
-                                },
-                                {
-                                    "id": "sla_agreement_create"
-                                },
-                                {
-                                    "id": "sla_agreement_edit"
-                                },
-                                {
-                                    "id": "sla_agreement_delete"
-                                }
-                            ]
                         }
                     ]
                 },
                 {
-                    "name": "其他",
-                    "name_en": "Others",
-                    "actions": [
-                        {
-                            "id": "operational_data_view"
-                        },
-                        {
-                            "id": "platform_manage_access"
-                        }
-                    ]
-                },
-                {
-                    "name": "平台",
+                    "name": "平台管理",
                     "name_en": "Administration",
                     "actions": [],
                     "sub_groups": [
+                        {
+                            "name": "菜单",
+                            "name_en": "Menu",
+                            "actions": [
+                                {
+                                    "id": "operational_data_view"
+                                },
+                                {
+                                    "id": "platform_manage_access"
+                                }
+                            ]                            
+                        },
                         {
                             "name": "公共配置",
                             "name_en": "Public Config",
@@ -2169,6 +2227,9 @@
                                 },
                                 {
                                     "id": "public_apis_manage"
+                                },
+                                {
+                                    "id": "public_task_template_manage"
                                 }
                             ]
                         },
@@ -2220,18 +2281,6 @@
                                 },
                                 {
                                     "id": "ticket_state_manage"
-                                }
-                            ]
-                        },
-                        {
-                            "name": "SLA 优先级",
-                            "name_en": "SLA Priority",
-                            "actions": [
-                                {
-                                    "id": "sla_priority_view"
-                                },
-                                {
-                                    "id": "sla_priority_manage"
                                 }
                             ]
                         }
@@ -2564,7 +2613,49 @@
                                 "required": true
                             }
                         ]
-                    }
+                    },
+                    {
+                        "name": "SLA",
+                        "name_en": "SLA",
+                        "actions": [
+                            {
+                                "id": "sla_calendar_view"
+                            },
+                            {
+                                "id": "sla_calendar_create"
+                            },
+                            {
+                                "id": "sla_calendar_edit"
+                            },
+                            {
+                                "id": "sla_calendar_delete"
+                            },
+                            {
+                                "id": "sla_agreement_view"
+                            },
+                            {
+                                "id": "sla_agreement_create"
+                            },
+                            {
+                                "id": "sla_agreement_edit"
+                            },
+                            {
+                                "id": "sla_agreement_delete"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "SLA 优先级",
+                        "name_en": "SLA Priority",
+                        "actions": [
+                            {
+                                "id": "sla_priority_view"
+                            },
+                            {
+                                "id": "sla_priority_manage"
+                            }
+                        ]
+                    }                    
                 ]
             }
         }
