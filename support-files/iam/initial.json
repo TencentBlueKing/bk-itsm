@@ -2381,7 +2381,49 @@
                                     "id": "public_api_create"
                                 }
                             ]
-                        }
+                        },
+                        {
+                            "name": "SLA",
+                            "name_en": "SLA",
+                            "actions": [
+                                {
+                                    "id": "sla_calendar_view"
+                                },
+                                {
+                                    "id": "sla_calendar_create"
+                                },
+                                {
+                                    "id": "sla_calendar_edit"
+                                },
+                                {
+                                    "id": "sla_calendar_delete"
+                                },
+                                {
+                                    "id": "sla_agreement_view"
+                                },
+                                {
+                                    "id": "sla_agreement_create"
+                                },
+                                {
+                                    "id": "sla_agreement_edit"
+                                },
+                                {
+                                    "id": "sla_agreement_delete"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "SLA 优先级",
+                            "name_en": "SLA Priority",
+                            "actions": [
+                                {
+                                    "id": "sla_priority_view"
+                                },
+                                {
+                                    "id": "sla_priority_manage"
+                                }
+                            ]
+                        }                             
                     ]
                 }
             ]
@@ -2613,49 +2655,7 @@
                                 "required": true
                             }
                         ]
-                    },
-                    {
-                        "name": "SLA",
-                        "name_en": "SLA",
-                        "actions": [
-                            {
-                                "id": "sla_calendar_view"
-                            },
-                            {
-                                "id": "sla_calendar_create"
-                            },
-                            {
-                                "id": "sla_calendar_edit"
-                            },
-                            {
-                                "id": "sla_calendar_delete"
-                            },
-                            {
-                                "id": "sla_agreement_view"
-                            },
-                            {
-                                "id": "sla_agreement_create"
-                            },
-                            {
-                                "id": "sla_agreement_edit"
-                            },
-                            {
-                                "id": "sla_agreement_delete"
-                            }
-                        ]
-                    },
-                    {
-                        "name": "SLA 优先级",
-                        "name_en": "SLA Priority",
-                        "actions": [
-                            {
-                                "id": "sla_priority_view"
-                            },
-                            {
-                                "id": "sla_priority_manage"
-                            }
-                        ]
-                    }                    
+                    }
                 ]
             }
         }
