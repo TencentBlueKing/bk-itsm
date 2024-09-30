@@ -1919,8 +1919,8 @@
             "operation": "upsert_action",
             "data": {
                 "id": "task_template_manage",
-                "name": "任务模板管理",
-                "name_en": "Manage Task Template",
+                "name": "任务模板管理（已弃用）",
+                "name_en": "Manage Task Template（deprecated）",
                 "description": "任务模板管理",
                 "description_en": "",
                 "type": "manage",
