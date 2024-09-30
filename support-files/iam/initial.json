@@ -1956,9 +1956,9 @@
             "operation": "upsert_action",
             "data": {
                 "id": "public_api_manage",
-                "name": "公共API 管理",
-                "name_en": "Manage Public API",
-                "description": "公共API 管理",
+                "name": "公共API 管理（已弃用）",
+                "name_en": "Manage Public API（deprecated）",
+                "description": "公共API配置",
                 "description_en": "",
                 "type": "manage",
                 "related_resource_types": [
@@ -1983,6 +1983,32 @@
                 "name": "平台管理访问",
                 "name_en": "Access Platform Access",
                 "description": "平台管理访问",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "public_fields_manage",
+                "name": "公共字段管理",
+                "name_en": "Public Fields Manage",
+                "description": "公共字段管理",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "public_apis_manage",
+                "name": "公共API管理",
+                "name_en": "Public APIs Manage",
+                "description": "公共API管理",
                 "description_en": "",
                 "type": "manage",
                 "related_resource_types": [],
@@ -2135,35 +2161,14 @@
                     "actions": [],
                     "sub_groups": [
                         {
-                            "name": "公共字段",
-                            "name_en": "Public Fields",
+                            "name": "公共配置",
+                            "name_en": "Public Config",
                             "actions": [
                                 {
-                                    "id": "public_field_create"
+                                    "id": "public_fields_manage"
                                 },
                                 {
-                                    "id": "public_field_edit"
-                                },
-                                {
-                                    "id": "public_field_delete"
-                                },
-                                {
-                                    "id": "public_field_view"
-                                }
-                            ]
-                        },
-                        {
-                            "name": "公共API",
-                            "name_en": "Public API",
-                            "actions": [
-                                {
-                                    "id": "public_api_view"
-                                },
-                                {
-                                    "id": "public_api_manage"
-                                },
-                                {
-                                    "id": "public_api_create"
+                                    "id": "public_apis_manage"
                                 }
                             ]
                         },
@@ -2294,7 +2299,40 @@
                                     "id": "settings_manage"
                                 }
                             ]
-                        }                        
+                        },
+                        {
+                            "name": "公共字段",
+                            "name_en": "Public Fields",
+                            "actions": [
+                                {
+                                    "id": "public_field_create"
+                                },
+                                {
+                                    "id": "public_field_edit"
+                                },
+                                {
+                                    "id": "public_field_delete"
+                                },
+                                {
+                                    "id": "public_field_view"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "公共API",
+                            "name_en": "Public API",
+                            "actions": [
+                                {
+                                    "id": "public_api_view"
+                                },
+                                {
+                                    "id": "public_api_manage"
+                                },
+                                {
+                                    "id": "public_api_create"
+                                }
+                            ]
+                        }
                     ]
                 }
             ]
