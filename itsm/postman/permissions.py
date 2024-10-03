@@ -43,7 +43,7 @@ class IsObjManager(perm.IsManager):
 
 class RemoteApiPermit(WorkflowElementManagePermission):
     def has_permission(self, request, view):
-        if view.action == "create":
+        if view.action in getattr(view, "permission_create_action", ["create"]):
             if "remote_system" in request.data:
                 remote_system_id = request.data["remote_system"]
                 project_key = RemoteSystem.objects.get(id=remote_system_id).project_key

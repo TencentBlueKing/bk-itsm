@@ -183,7 +183,7 @@ class WorkflowElementManagePermission(IamAuthPermit):
         if view.action in getattr(view, "permission_free_actions", []):
             return True
         
-        if view.action == "create":
+        if view.action in getattr(view, "permission_create_action", ["create"]):
             project_key = request.data.get("project_key")
             if not project_key:
                 return False
@@ -196,11 +196,6 @@ class WorkflowElementManagePermission(IamAuthPermit):
             # 项目管理
             apply_actions = self.get_view_iam_actions(view)
             return self.iam_create_auth(request, apply_actions)
-        
-        # 有配置权限则按无实例进行鉴权
-        apply_actions = self.get_view_iam_actions(view)
-        if apply_actions:
-            return self.iam_auth(request, apply_actions)
         return True
 
     def has_object_permission(self, request, view, obj, **kwargs):
@@ -215,8 +210,9 @@ class WorkflowElementManagePermission(IamAuthPermit):
 
         # 项目管理
         apply_actions = self.get_view_iam_actions(view)
-        project = Project.objects.get(pk=obj.project_key)
-        return self.iam_auth(request, apply_actions, project)
+        if getattr(view, "permission_resource_is_project", None):
+            obj = Project.objects.get(pk=obj.project_key)
+        return self.iam_auth(request, apply_actions, obj)
 
 
 class TaskSchemaPermit(IamAuthPermit):

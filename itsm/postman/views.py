@@ -98,6 +98,7 @@ class RemoteSystemViewSet(ModelViewSet):
     permission_action_platform = "public_apis_manage"
     # 项目管理
     permission_action_default = "system_settings_manage"
+    permission_resource_is_project = True
     permission_free_actions = ["list", "all", "get_systems", "get_components"]
     
     pagination_class = None
@@ -189,6 +190,8 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
     queryset = RemoteApi.objects.all()
     
     permission_classes = (RemoteApiPermit,)
+    permission_resource_is_project = True
+    permission_create_action = ["create", "imports"]
     permission_free_actions = ["retrieve"]
 
     filter_fields = {
