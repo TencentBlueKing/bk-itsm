@@ -28,6 +28,7 @@ from rest_framework import permissions
 
 from itsm.component.constants import PUBLIC_PROJECT_PROJECT_KEY
 from itsm.component.drf.permissions import IamAuthPermit
+from itsm.project.models import Project
 from itsm.role.models import UserRole
 from itsm.service.models import Service
 from itsm.workflow.models import Workflow
@@ -195,7 +196,11 @@ class WorkflowElementManagePermission(IamAuthPermit):
             # 项目管理
             apply_actions = self.get_view_iam_actions(view)
             return self.iam_create_auth(request, apply_actions)
-
+        
+        # 有配置权限则按无实例进行鉴权
+        apply_actions = self.get_view_iam_actions(view)
+        if apply_actions:
+            return self.iam_auth(request, apply_actions)
         return True
 
     def has_object_permission(self, request, view, obj, **kwargs):
@@ -210,7 +215,8 @@ class WorkflowElementManagePermission(IamAuthPermit):
 
         # 项目管理
         apply_actions = self.get_view_iam_actions(view)
-        return self.iam_auth(request, apply_actions, obj)
+        project = Project.objects.get(pk=obj.project_key)
+        return self.iam_auth(request, apply_actions, project)
 
 
 class TaskSchemaPermit(IamAuthPermit):

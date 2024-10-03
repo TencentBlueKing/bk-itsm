@@ -45,7 +45,19 @@ from itsm.auth_iam.utils import IamRequest
 from itsm.component.constants import DEFAULT_PROJECT_PROJECT_KEY
 
 
-class AuthModelSerializer(serializers.ModelSerializer):
+class BaseModelSerializer(serializers.ModelSerializer):
+    
+    def to_internal_value(self, data):
+        data = super().to_internal_value(data)
+        if self.instance:
+            # update
+            if hasattr(self.Meta, "create_only_fields"):
+                for x in self.Meta.create_only_fields:
+                    data.pop(x, None)
+        return data
+
+    
+class AuthModelSerializer(BaseModelSerializer):
     """
     权限中心接入每个资源权限内容序列化
     """
@@ -105,15 +117,6 @@ class AuthModelSerializer(serializers.ModelSerializer):
             instance_permissions = self.resource_permissions.get(resource_id, {})
             data.update(
                 auth_actions=[action for action, result in instance_permissions.items() if result])
-        return data
-
-    def to_internal_value(self, data):
-        data = super().to_internal_value(data)
-        if self.instance:
-            # update
-            if hasattr(self.Meta, "create_only_fields"):
-                for x in self.Meta.create_only_fields:
-                    data.pop(x, None)
         return data
 
 

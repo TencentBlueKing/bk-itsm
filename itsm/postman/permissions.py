@@ -25,7 +25,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from itsm.component.constants import PUBLIC_PROJECT_PROJECT_KEY
 from itsm.component.drf import permissions as perm
-from itsm.postman.models import RemoteSystem
+from itsm.component.exceptions import ValidateError
+from itsm.postman.models import RemoteSystem, RemoteApi
+from django.utils.translation import ugettext as _
+
+from itsm.project.models import Project
+from itsm.workflow.permissions import WorkflowElementManagePermission
 
 
 class IsObjManager(perm.IsManager):
@@ -36,37 +41,52 @@ class IsObjManager(perm.IsManager):
     pass
 
 
-class RemoteApiPermit(perm.IamAuthProjectViewPermit):
+class RemoteApiPermit(WorkflowElementManagePermission):
     def has_permission(self, request, view):
         if view.action == "create":
             if "remote_system" in request.data:
                 remote_system_id = request.data["remote_system"]
                 project_key = RemoteSystem.objects.get(id=remote_system_id).project_key
+                # 平台公共API管理
                 if project_key == PUBLIC_PROJECT_PROJECT_KEY:
-                    apply_actions = ["public_api_view"]
-                    return self.iam_auth(request, apply_actions)
-                else:
-                    # 项目
-                    apply_actions = ["system_settings_manage"]
-                    return self.has_project_view_permission(
-                        request, project_key, apply_actions
-                    )
+                    return self.iam_auth(request, ["public_apis_manage"])
+                
+                # 项目管理
+                apply_actions = ["system_settings_manage"]
+                project = Project.objects.get(pk=project_key)
+                return self.iam_auth(request, apply_actions, project)
+            
+        if view.action == "batch_delete":
+            api_ids = request.data["id"].split(",")
+            api_instances = RemoteApi.objects.filter(pk__in=api_ids)
+            project_keys = set([i.remote_system.project_key for i in api_instances])
+            if len(project_keys) != 1:
+                raise ValidateError(_("API 所属项目异常"))
+            project_key = project_keys.pop()
+            
+            # 平台公共API管理
+            if project_key == PUBLIC_PROJECT_PROJECT_KEY:
+                return self.iam_auth(request, ["public_apis_manage"])
+            
+            # 项目
+            project = Project.objects.get(pk=project_key)
+            return self.iam_auth(request, ["system_settings_manage"], project)
+            
         return True
 
-    def has_object_permission(self, request, view, obj):
-        if obj is not None:
-            # 如果是公共api需要单独鉴权
+    def has_object_permission(self, request, view, obj, **kwargs):
+        if view.action in getattr(view, "permission_free_actions", []):
+            return True
+
+        if obj:
+            # 平台公共 API 管理
             if obj.remote_system.project_key == PUBLIC_PROJECT_PROJECT_KEY:
                 if view.action == "retrieve":
-                    apply_actions = []
-                else:
-                    apply_actions = ["public_api_manage"]
-                return self.iam_auth(request, apply_actions, obj)
-            else:
-                # 项目
-                project_key = obj.remote_system.project_key
-                apply_actions = ["system_settings_manage"]
-                return self.has_project_view_permission(
-                    request, project_key, apply_actions
-                )
+                    return True
+                return self.iam_auth(request, ["public_apis_manage"])
+            
+            # 项目管理
+            project_key = obj.remote_system.project_key
+            project = Project.objects.get(pk=project_key)
+            return self.iam_auth(request, ["system_settings_manage"], project)
         return True

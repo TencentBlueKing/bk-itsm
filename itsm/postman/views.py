@@ -37,6 +37,7 @@ from common.log import logger
 from itsm.component.constants import ResponseCodeStatus, PUBLIC_PROJECT_PROJECT_KEY
 from itsm.component.dlls.component import ComponentLibrary
 from itsm.component.drf import viewsets as component_viewsets
+from itsm.component.drf.exception import ValidationError
 from itsm.component.drf.mixins import DynamicListModelMixin
 from itsm.component.drf.permissions import IamAuthProjectViewPermit
 from itsm.component.esb.backend_component import bk
@@ -52,6 +53,7 @@ from itsm.postman.serializers import (
     RemoteApiSerializer,
     RemoteSystemSerializer,
 )
+from itsm.workflow.permissions import WorkflowElementManagePermission
 
 
 class ModelViewSet(component_viewsets.ModelViewSet):
@@ -91,8 +93,13 @@ class RemoteSystemViewSet(ModelViewSet):
 
     serializer_class = RemoteSystemSerializer
     queryset = RemoteSystem.objects.all()
-    permission_classes = (IamAuthProjectViewPermit,)
+    permission_classes = (WorkflowElementManagePermission,)
+    # 平台管理
+    permission_action_platform = "public_apis_manage"
+    # 项目管理
     permission_action_default = "system_settings_manage"
+    permission_free_actions = ["list", "all", "get_systems", "get_components"]
+    
     pagination_class = None
 
     filter_fields = {
@@ -180,7 +187,9 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
 
     serializer_class = RemoteApiSerializer
     queryset = RemoteApi.objects.all()
+    
     permission_classes = (RemoteApiPermit,)
+    permission_free_actions = ["retrieve"]
 
     filter_fields = {
         "is_activated": ["exact"],
@@ -244,8 +253,17 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
 
         will_deleted = self.queryset.filter(id__in=id_list)
         real_deleted = list(will_deleted.values_list("id", flat=True))
-        will_deleted.delete()
+        
+        # 判断输入的接口实例
+        if will_deleted.count() != len(real_deleted):
+            raise ValidationError(_("接口数量异常，请刷新后重试"))
+        
+        # 检测实例所属项目是否一致
+        project_keys = [i.remote_system.project_key for i in will_deleted]
+        if len(set(project_keys)) != 1:
+            raise ValidationError(_("接口数量异常，请刷新后重试"))
 
+        will_deleted.delete()
         return Response(real_deleted)
 
     @action(detail=True, methods=["get"])

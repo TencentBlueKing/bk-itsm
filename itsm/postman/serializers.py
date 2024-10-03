@@ -39,14 +39,14 @@ from itsm.component.constants import (
     LEN_XX_LONG,
     PUBLIC_PROJECT_PROJECT_KEY,
 )
-from itsm.component.drf.serializers import DynamicFieldsModelSerializer
+from itsm.component.drf.serializers import DynamicFieldsModelSerializer, BaseModelSerializer
 from itsm.component.exceptions import ParamError
 from itsm.component.utils.basic import normal_name, dotted_name
 from itsm.postman.models import RemoteApi, RemoteApiInstance, RemoteSystem
 from itsm.workflow.models import Field, State
 
 
-class RemoteSystemSerializer(serializers.ModelSerializer):
+class RemoteSystemSerializer(BaseModelSerializer):
     """API系统序列化"""
 
     name = serializers.CharField(
@@ -90,6 +90,7 @@ class RemoteSystemSerializer(serializers.ModelSerializer):
             "project_key",
         )
         read_only_fields = ("creator", "updated_by")
+        create_only_fields = ["project_key"]
 
     def to_internal_value(self, data):
         # 新增系统时,system_id为空
@@ -175,6 +176,7 @@ class RemoteApiSerializer(DynamicFieldsModelSerializer):
             "is_builtin",
         )
         read_only_fields = ("creator", "updated_by")
+        create_only_fields = ["remote_system"]
 
     def to_internal_value(self, data):
         data = super(RemoteApiSerializer, self).to_internal_value(data)
