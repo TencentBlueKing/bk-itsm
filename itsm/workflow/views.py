@@ -1098,7 +1098,11 @@ class TaskSchemaViewSet(DynamicListModelMixin, component_viewsets.ModelViewSet):
         "is_draft": ["exact"],
         "can_edit": ["exact"],
     }
-    permission_classes = (TaskSchemaPermit,)
+    permission_classes = (WorkflowElementManagePermission,)
+    permission_action_platform = "public_task_template_manage"
+    permission_create_action = ["create", "clone"]
+    permission_resource_is_project = True
+    
     pagination_class = None
 
     def update(self, request, *args, **kwargs):
@@ -1171,4 +1175,8 @@ class TaskFieldSchemaViewSet(BaseFieldViewSet):
         "stage": ["exact"],
         "task_schema_id": ["exact"],
     }
+    permission_classes = (WorkflowElementManagePermission,)
+    permission_action_platform = "public_task_template_manage"
+    permission_create_action = ["create", "clone"]
+    permission_resource_is_project = True
     pagination_class = None

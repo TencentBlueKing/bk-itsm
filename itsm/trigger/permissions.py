@@ -24,8 +24,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django.http import Http404
+
 from itsm.component.drf.permissions import IamAuthPermit
-from itsm.component.constants.trigger import SOURCE_WORKFLOW
+from itsm.component.constants.trigger import SOURCE_WORKFLOW, SOURCE_TASK
 from itsm.workflow.models import Workflow
 
 
@@ -58,10 +59,16 @@ class WorkflowTriggerPermit(IamAuthPermit):
 
         if view.action in ["clone", "create"]:
             # 通过流程配置需要有对应服务的管理权限
-            if request.data.get("source_type") == SOURCE_WORKFLOW:
+            source_type = request.data.get("source_type")
+            if source_type == SOURCE_WORKFLOW:
                 workflow = Workflow.objects.get(id=request.data.get("source_id"))
                 apply_actions = ["service_manage"]
                 return self.iam_auth(request, apply_actions, workflow.get_iam_resource())
+            
+            # 通过任务模板创建
+            if source_type == SOURCE_TASK:
+                apply_actions = ["public_task_template_manage"]
+                return self.iam_auth(request, apply_actions)
             
             # 其他的引用和创建，都需要尽心给流程元素的鉴权:
             return self.iam_create_auth(request, apply_actions=["triggers_create"])

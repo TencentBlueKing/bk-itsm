@@ -44,7 +44,7 @@ from itsm.component.constants import (
     LEN_XX_LONG,
     SOURCE_TASK,
     LEN_SHORT,
-    TASK_TYPE,
+    TASK_TYPE, PUBLIC_PROJECT_PROJECT_KEY,
 )
 from itsm.workflow.models import Model, BaseField
 from itsm.workflow.managers import TaskSchemaManager, TaskSchemaFieldManager
@@ -84,6 +84,10 @@ class TaskSchema(Model):
         verbose_name = _("任务模型")
         verbose_name_plural = _("任务模型")
         ordering = ("-id",)
+    
+    @property
+    def project_key(self):
+        return PUBLIC_PROJECT_PROJECT_KEY
 
     def __unicode__(self):
         return "{}({})".format(self.name, self.component_type)
@@ -141,6 +145,10 @@ class TaskFieldSchema(BaseField):
     sequence = models.IntegerField(_("序号"), default=0)
 
     objects = TaskSchemaFieldManager()
+
+    @property
+    def project_key(self):
+        return PUBLIC_PROJECT_PROJECT_KEY
 
     class Meta:
         app_label = "workflow"

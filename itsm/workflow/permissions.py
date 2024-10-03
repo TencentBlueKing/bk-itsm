@@ -184,9 +184,7 @@ class WorkflowElementManagePermission(IamAuthPermit):
             return True
         
         if view.action in getattr(view, "permission_create_action", ["create"]):
-            project_key = request.data.get("project_key")
-            if not project_key:
-                return False
+            project_key = request.data.get("project_key", PUBLIC_PROJECT_PROJECT_KEY)
             
             # 平台管理
             if project_key == PUBLIC_PROJECT_PROJECT_KEY:
