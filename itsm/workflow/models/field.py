@@ -216,10 +216,11 @@ class TemplateField(BaseField):
 
     objects = managers.TemplateFieldManager()
 
-    auth_resource = {"resource_type": "field", "resource_type_name": "字段"}
+    # 项目管理
+    auth_resource = {"resource_type": "field", "resource_type_name": _("字段")}
     resource_operations = ["field_view", "field_edit", "field_delete"]
-    public_field_resource_operations = ["public_field_view", "public_field_edit",
-                                        "public_field_delete"]
+    # 平台管理
+    public_field_resource_operations = ["public_fields_manage"]
 
     need_auth_grant = True
 

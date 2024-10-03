@@ -290,19 +290,14 @@ class TemplateFieldSerializer(AuthModelSerializer):
         request = self.context["request"]
 
         iam_client = IamRequest(request)
-
-        filed_info = {
-            "resource_id": instance.id,
-            "resource_name": instance.name,
-            "resource_type": "public_field",
-            "resource_type_name": "公共字段",
-        }
-        apply_actions = self.Meta.model.public_field_resource_operations
-        auth_actions = iam_client.batch_resource_multi_actions_allowed(
-            apply_actions, [filed_info]
-        ).get(str(instance.id), {})
+        permission_action_platform = self.context["view"].permission_action_platform["manage"]
+        auth_result = iam_client.resource_multi_actions_allowed(
+            [permission_action_platform], []
+        )
         auth_actions = [
-            action_id for action_id, result in auth_actions.items() if result
+            action_id 
+            for action_id in self.Meta.model.public_field_resource_operations 
+            if auth_result.get(permission_action_platform)
         ]
         data["auth_actions"] = auth_actions
         return data
