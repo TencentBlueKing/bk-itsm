@@ -76,10 +76,19 @@
                 "id": "platform_manage_access"
             },
             {
+                "id": "public_field_create"
+            },
+            {
                 "id": "public_fields_manage"
             },
             {
+                "id": "public_api_create"
+            },
+            {
                 "id": "public_apis_manage"
+            },
+            {
+                "id": "task_template_create"
             },
             {
                 "id": "public_task_template_manage"
