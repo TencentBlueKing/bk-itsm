@@ -176,7 +176,7 @@ class IsSuperuser(permissions.BasePermission):
         return UserRole.is_itsm_superuser(request.user.username)
 
 
-class PublicElementManagePermission(IamAuthPermit):
+class WorkflowElementManagePermission(IamAuthPermit):
     def has_permission(self, request, view):
         # 免鉴权需要明确声明
         if view.action in getattr(view, "permission_free_actions", []):
@@ -189,7 +189,7 @@ class PublicElementManagePermission(IamAuthPermit):
             
             # 平台管理
             if project_key == PUBLIC_PROJECT_PROJECT_KEY:
-                apply_actions = [view.permission_action_platform["create"]]
+                apply_actions = [view.permission_action_platform]
                 return self.iam_auth(request, apply_actions)
             
             # 项目管理
@@ -205,7 +205,7 @@ class PublicElementManagePermission(IamAuthPermit):
         
         # 平台管理
         if obj.project_key == PUBLIC_PROJECT_PROJECT_KEY:
-            apply_actions = [view.permission_action_platform["manage"]]
+            apply_actions = [view.permission_action_platform]
             return self.iam_auth(request, apply_actions)
 
         # 项目管理

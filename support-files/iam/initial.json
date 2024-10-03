@@ -2260,19 +2260,10 @@
                             "name_en": "Public Config",
                             "actions": [
                                 {
-                                    "id": "public_field_create"
-                                },
-                                {
                                     "id": "public_fields_manage"
                                 },
                                 {
-                                    "id": "public_api_create"
-                                },
-                                {
                                     "id": "public_apis_manage"
-                                },
-                                {
-                                    "id": "task_template_create"
                                 },
                                 {
                                     "id": "public_task_template_manage"
@@ -2415,6 +2406,9 @@
                                     "id": "public_api_view"
                                 },
                                 {
+                                    "id": "public_api_create"
+                                },
+                                {
                                     "id": "public_api_manage"
                                 }
                             ]
@@ -2455,6 +2449,9 @@
                             "actions": [
                                 {
                                     "id": "task_template_view"
+                                },
+                                {
+                                    "id": "task_template_create"
                                 },
                                 {
                                     "id": "task_template_manage"
@@ -2681,6 +2678,10 @@
                         "actions": [
                             {
                                 "id": "public_field_view",
+                                "required": true
+                            },
+                            {
+                                "id": "public_field_create",
                                 "required": true
                             },
                             {

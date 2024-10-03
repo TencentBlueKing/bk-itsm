@@ -109,7 +109,7 @@ from itsm.workflow.permissions import (
     WorkflowIamAuth,
     FlowVersionIamAuth,
     VersionDeletePermit,
-    TaskSchemaPermit, PublicElementManagePermission,
+    TaskSchemaPermit, WorkflowElementManagePermission,
 )
 from itsm.workflow.utils import translate_constant_2, get_notify_type_choice
 from itsm.workflow.validators import (
@@ -739,13 +739,10 @@ class TemplateFieldViewSet(component_viewsets.ModelViewSet):
 
     queryset = TemplateField.objects.all()
     serializer_class = TemplateFieldSerializer
-    permission_classes = (PublicElementManagePermission,)
+    permission_classes = (WorkflowElementManagePermission,)
     permission_free_actions = ["list", "mix_list"]
     # 平台管理
-    permission_action_platform = {
-        "create": "public_field_create",
-        "manage": "public_fields_manage"
-    }
+    permission_action_platform = "public_fields_manage"
     # 项目管理
     permission_action_mapping = {
         "create": "field_create",

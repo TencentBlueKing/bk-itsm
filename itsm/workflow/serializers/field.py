@@ -291,7 +291,7 @@ class TemplateFieldSerializer(AuthModelSerializer):
         request = self.context["request"]
 
         iam_client = IamRequest(request)
-        permission_action_platform = self.context["view"].permission_action_platform["manage"]
+        permission_action_platform = self.context["view"].permission_action_platform
         auth_result = iam_client.resource_multi_actions_allowed(
             [permission_action_platform], []
         )
