@@ -1759,6 +1759,9 @@
                 "description_en": "",
                 "type": "create",
                 "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],
                 "version": 1
             }
         },
@@ -1977,6 +1980,9 @@
                 "description_en": "",
                 "type": "create",
                 "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],
                 "version": 1
             }
         },
@@ -2019,6 +2025,9 @@
                 "description_en": "",
                 "type": "create",
                 "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],
                 "version": 1
             }
         },
@@ -2251,25 +2260,22 @@
                             "name_en": "Public Config",
                             "actions": [
                                 {
+                                    "id": "public_field_create"
+                                },
+                                {
                                     "id": "public_fields_manage"
+                                },
+                                {
+                                    "id": "public_api_create"
                                 },
                                 {
                                     "id": "public_apis_manage"
                                 },
                                 {
-                                    "id": "public_task_template_manage"
-                                }
-                            ]
-                        },
-                        {
-                            "name": "全局设置",
-                            "name_en": "Global Settings",
-                            "actions": [
-                                {
-                                    "id": "global_settings_view"
+                                    "id": "task_template_create"
                                 },
                                 {
-                                    "id": "global_settings_manage"
+                                    "id": "public_task_template_manage"
                                 }
                             ]
                         },
@@ -2306,6 +2312,18 @@
                                 },
                                 {
                                     "id": "ticket_state_manage"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "全局设置",
+                            "name_en": "Global Settings",
+                            "actions": [
+                                {
+                                    "id": "global_settings_view"
+                                },
+                                {
+                                    "id": "global_settings_manage"
                                 }
                             ]
                         }
@@ -2379,9 +2397,6 @@
                             "name_en": "Public Fields",
                             "actions": [
                                 {
-                                    "id": "public_field_create"
-                                },
-                                {
                                     "id": "public_field_edit"
                                 },
                                 {
@@ -2401,9 +2416,6 @@
                                 },
                                 {
                                     "id": "public_api_manage"
-                                },
-                                {
-                                    "id": "public_api_create"
                                 }
                             ]
                         },
@@ -2443,9 +2455,6 @@
                             "actions": [
                                 {
                                     "id": "task_template_view"
-                                },
-                                {
-                                    "id": "task_template_create"
                                 },
                                 {
                                     "id": "task_template_manage"
