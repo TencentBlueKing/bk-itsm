@@ -550,6 +550,9 @@ PLATFORM_PERMISSION = [
     "ticket_state_view",
     "ticket_state_manage",
     "platform_manage_access",
+    "public_fields_manage",
+    "public_apis_manage",
+    "public_task_template_manage",
 ]
 
 IAM_SEARCH_INSTANCE_CACHE_TIME = 10 * 60  # 缓存5分钟
