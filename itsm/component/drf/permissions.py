@@ -22,6 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import copy
 
 from django.utils.translation import ugettext as _
 from rest_framework import permissions
@@ -127,6 +128,8 @@ class IamAuthPermit(permissions.BasePermission):
 
         if isinstance(apply_actions, str):
             apply_actions = [apply_actions]
+        else:
+            apply_actions = copy.deepcopy(apply_actions)
         return apply_actions
         
     def iam_auth(self, request, apply_actions, obj=None):

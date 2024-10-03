@@ -55,7 +55,7 @@ class AuthModelSerializer(serializers.ModelSerializer):
 
         self.resource_permissions = {}
         if self.instance and self.context.get("request"):
-            self.resource_permissions = self.get_resource_permission()
+            self.resource_permissions = self.get_resource_permission() or {}
 
     def get_resource_permission(self):
         """
@@ -69,7 +69,7 @@ class AuthModelSerializer(serializers.ModelSerializer):
         )
         resource_type = self.Meta.model.auth_resource.get('resource_type', None)
         if resource_type is None:
-            return []
+            return {}
 
         instance = instance_list[0]
         project_key = DEFAULT_PROJECT_PROJECT_KEY
@@ -90,7 +90,7 @@ class AuthModelSerializer(serializers.ModelSerializer):
                 self.Meta.model.resource_operations, resources, project_key=project_key)
         except BaseException:
             logger.exception("get auth permission error, resource is %s" % resource_type)
-            return []
+            return {}
 
     def to_representation(self, instance):
         data = super(AuthModelSerializer, self).to_representation(instance)
@@ -105,6 +105,15 @@ class AuthModelSerializer(serializers.ModelSerializer):
             instance_permissions = self.resource_permissions.get(resource_id, {})
             data.update(
                 auth_actions=[action for action, result in instance_permissions.items() if result])
+        return data
+
+    def to_internal_value(self, data):
+        data = super().to_internal_value(data)
+        if self.instance:
+            # update
+            if hasattr(self.Meta, "create_only_fields"):
+                for x in self.Meta.create_only_fields:
+                    data.pop(x, None)
         return data
 
 
@@ -132,3 +141,4 @@ class DynamicFieldsModelSerializer(AuthModelSerializer):
             existing = set(self.fields)
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
+

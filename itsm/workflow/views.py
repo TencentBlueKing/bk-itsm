@@ -109,8 +109,7 @@ from itsm.workflow.permissions import (
     WorkflowIamAuth,
     FlowVersionIamAuth,
     VersionDeletePermit,
-    TemplateFieldPermissionValidate,
-    TaskSchemaPermit,
+    TaskSchemaPermit, PublicElementManagePermission,
 )
 from itsm.workflow.utils import translate_constant_2, get_notify_type_choice
 from itsm.workflow.validators import (
@@ -740,8 +739,21 @@ class TemplateFieldViewSet(component_viewsets.ModelViewSet):
 
     queryset = TemplateField.objects.all()
     serializer_class = TemplateFieldSerializer
-    # permission_classes = (IamAuthWithoutResourcePermit,)
-    permission_classes = (TemplateFieldPermissionValidate,)
+    permission_classes = (PublicElementManagePermission,)
+    permission_free_actions = ["list", "mix_list"]
+    # 平台管理
+    permission_action_platform = {
+        "create": "public_field_create",
+        "manage": "public_fields_manage"
+    }
+    # 项目管理
+    permission_action_mapping = {
+        "create": "field_create",
+        "retrieve": "field_view",
+        "destroy": "field_delete",
+        "update": "field_edit",
+    }
+    
     filter_fields = {
         "id": ["in"],
         "key": ["exact", "in", "contains", "startswith"],
@@ -828,6 +840,8 @@ class TemplateFieldViewSet(component_viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+        if instance.is_builtin:
+            raise ValidationError(_("内置字段不能删除"))
 
         template_field_can_destroy(instance)
 
@@ -1024,7 +1038,6 @@ class TransitionTemplateViewSet(BaseWorkflowElementViewSet):
 class TableViewSet(component_viewsets.ModelViewSet):
     """基础模型视图"""
 
-    # permission_classes = (IamAuthWithoutResourcePermit,)
     queryset = Table.objects.filter(is_builtin=True).order_by("-create_at")
     serializer_class = TableSerializer
     filter_fields = {
@@ -1156,7 +1169,6 @@ class TaskFieldSchemaViewSet(BaseFieldViewSet):
     queryset = TaskFieldSchema.objects.all().order_by("sequence")
 
     serializer_class = TaskFieldSchemaSerializer
-    # permission_classes = (IamAuthWithoutResourcePermit,)
     filter_fields = {
         "name": ["exact", "in", "contains"],
         "stage": ["exact"],
