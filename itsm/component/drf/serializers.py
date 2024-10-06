@@ -144,4 +144,3 @@ class DynamicFieldsModelSerializer(AuthModelSerializer):
             existing = set(self.fields)
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
-

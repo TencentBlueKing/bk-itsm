@@ -78,7 +78,6 @@ from itsm.component.constants import (
     ONLY_BACKEND_SIGNALS,
     SOURCE_TICKET,
     SOURCE_TASK,
-    SOURCE_WORKFLOW,
     PUBLIC_PROJECT_PROJECT_KEY,
 )
 from itsm.component.drf import viewsets as component_viewsets
@@ -109,7 +108,7 @@ from itsm.workflow.permissions import (
     WorkflowIamAuth,
     FlowVersionIamAuth,
     VersionDeletePermit,
-    TaskSchemaPermit, WorkflowElementManagePermission,
+    WorkflowElementManagePermission,
 )
 from itsm.workflow.utils import translate_constant_2, get_notify_type_choice
 from itsm.workflow.validators import (
