@@ -45,6 +45,7 @@ from itsm.component.decorators import (
     validate_filepath_settings,
     validate_files_name,
 )
+from itsm.component.drf.permissions import IamAuthPermit
 from itsm.component.utils.response import Fail, Success
 from itsm.iadmin.models import SystemSettings
 from weixin.core.decorators import weixin_login_exempt
@@ -55,6 +56,8 @@ store = settings.STORE
 
 def clean_cache(request):
     """清理缓存"""
+    perm = IamAuthPermit()
+    perm.iam_auth(request, ["global_settings_manage"])
 
     try:
         cursor = connection.cursor()
