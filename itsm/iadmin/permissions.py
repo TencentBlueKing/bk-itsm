@@ -27,6 +27,7 @@ from functools import wraps
 
 from django.utils.translation import ugettext as _
 from rest_framework import permissions
+from rest_framework.exceptions import MethodNotAllowed
 
 from common.mymako import render_mako
 from itsm.component.constants import PUBLIC_PROJECT_PROJECT_KEY
@@ -149,6 +150,9 @@ class CustomNotifyPermit(IamAuthPermit):
             
         # 平台管理
         if project_key == PUBLIC_PROJECT_PROJECT_KEY:
+            # 平台管理限制创建新通知规则
+            if view.action == "create":
+                raise MethodNotAllowed(request.method)
             apply_actions = ["notification_view", "platform_manage_access"]
             return self.iam_auth(request, apply_actions)
         
@@ -160,8 +164,12 @@ class CustomNotifyPermit(IamAuthPermit):
     def has_object_permission(self, request, view, obj, **kwargs):
         # 平台管理：通知配置
         if obj.project_key == PUBLIC_PROJECT_PROJECT_KEY:
+            # 平台管理限制删除
+            if view.action in ["destroy"]:
+                raise MethodNotAllowed(request.method)
+            
             apply_actions = ["notification_view", "platform_manage_access"]
-            if view.action in ["update", "delete"]:
+            if view.action in ["update"]:
                 apply_actions.append("notification_manage")
             return self.iam_auth(request, apply_actions)
         

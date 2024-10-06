@@ -109,8 +109,7 @@ from itsm.workflow.permissions import (
     WorkflowIamAuth,
     FlowVersionIamAuth,
     VersionDeletePermit,
-    TemplateFieldPermissionValidate,
-    TaskSchemaPermit,
+    TaskSchemaPermit, WorkflowElementManagePermission,
 )
 from itsm.workflow.utils import translate_constant_2, get_notify_type_choice
 from itsm.workflow.validators import (
@@ -740,8 +739,18 @@ class TemplateFieldViewSet(component_viewsets.ModelViewSet):
 
     queryset = TemplateField.objects.all()
     serializer_class = TemplateFieldSerializer
-    # permission_classes = (IamAuthWithoutResourcePermit,)
-    permission_classes = (TemplateFieldPermissionValidate,)
+    permission_classes = (WorkflowElementManagePermission,)
+    permission_free_actions = ["list", "mix_list"]
+    # 平台管理
+    permission_action_platform = "public_fields_manage"
+    # 项目管理
+    permission_action_mapping = {
+        "create": "field_create",
+        "retrieve": "field_view",
+        "destroy": "field_delete",
+        "update": "field_edit",
+    }
+    
     filter_fields = {
         "id": ["in"],
         "key": ["exact", "in", "contains", "startswith"],
@@ -828,6 +837,8 @@ class TemplateFieldViewSet(component_viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+        if instance.is_builtin:
+            raise ValidationError(_("内置字段不能删除"))
 
         template_field_can_destroy(instance)
 
@@ -1024,7 +1035,6 @@ class TransitionTemplateViewSet(BaseWorkflowElementViewSet):
 class TableViewSet(component_viewsets.ModelViewSet):
     """基础模型视图"""
 
-    # permission_classes = (IamAuthWithoutResourcePermit,)
     queryset = Table.objects.filter(is_builtin=True).order_by("-create_at")
     serializer_class = TableSerializer
     filter_fields = {
@@ -1088,7 +1098,11 @@ class TaskSchemaViewSet(DynamicListModelMixin, component_viewsets.ModelViewSet):
         "is_draft": ["exact"],
         "can_edit": ["exact"],
     }
-    permission_classes = (TaskSchemaPermit,)
+    permission_classes = (WorkflowElementManagePermission,)
+    permission_action_platform = "public_task_template_manage"
+    permission_create_action = ["create", "clone"]
+    permission_resource_is_project = True
+    
     pagination_class = None
 
     def update(self, request, *args, **kwargs):
@@ -1156,10 +1170,13 @@ class TaskFieldSchemaViewSet(BaseFieldViewSet):
     queryset = TaskFieldSchema.objects.all().order_by("sequence")
 
     serializer_class = TaskFieldSchemaSerializer
-    # permission_classes = (IamAuthWithoutResourcePermit,)
     filter_fields = {
         "name": ["exact", "in", "contains"],
         "stage": ["exact"],
         "task_schema_id": ["exact"],
     }
+    permission_classes = (WorkflowElementManagePermission,)
+    permission_action_platform = "public_task_template_manage"
+    permission_create_action = ["create", "clone"]
+    permission_resource_is_project = True
     pagination_class = None

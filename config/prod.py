@@ -92,11 +92,6 @@ if ALLOW_CSRF:
     # CORS_ORIGIN_WHITELIST = CSRF_WHITELIST
     CORS_ORIGIN_ALLOW_ALL = True
 
-# disable web browsable api in production
-# http://masnun.com/2016/04/20/django-rest-framework-remember-to-disable-web-browsable-api-in-production.html
-REST_FRAMEWORK.update(
-    {"DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",)}
-)
 
 MEDIA_URL = "%smedia/" % SITE_URL
 CSRF_COOKIE_NAME = os.environ.get("BKAPP_CSRF_COOKIE_NAME", "bkitsm_csrftoken")

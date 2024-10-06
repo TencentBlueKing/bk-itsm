@@ -32,7 +32,7 @@ from itsm.component.constants import (
     TRIGGER_SOURCE_TYPE,
     EMPTY_LIST,
     EMPTY_DICT,
-    OPT_TYPE_CHOICE, LEN_SHORT,
+    OPT_TYPE_CHOICE, LEN_SHORT, PUBLIC_PROJECT_PROJECT_KEY,
 )
 from itsm.component.drf.serializers import AuthModelSerializer
 from itsm.trigger.models import Trigger, TriggerRule, ActionSchema, Action
@@ -51,11 +51,12 @@ class TriggerSerializer(AuthModelSerializer):
     source_id = serializers.IntegerField(required=True)
     source_table_id = serializers.IntegerField(required=False, allow_null=True)
     project_key = serializers.CharField(required=True, max_length=LEN_SHORT)
-
+    
     class Meta:
         model = Trigger
         fields = model.FIELDS + model.DISPLAY_FIELDS
         read_only_fields = model.DISPLAY_FIELDS
+        create_only_fields = ["project_key", "source_id", "source_type"]
 
     def to_internal_value(self, data):
         """
@@ -65,6 +66,9 @@ class TriggerSerializer(AuthModelSerializer):
         if source_table_id:
             # 仅配置了source_table_id的时候，才真正的对应的table id记录
             data['source_table_id'] = source_table_id
+        
+        # project_key
+        data["project_key"] = data["project_key"] or PUBLIC_PROJECT_PROJECT_KEY
 
         internal_data = super(TriggerSerializer, self).to_internal_value(data)
         if internal_data.get('is_draft') is True:

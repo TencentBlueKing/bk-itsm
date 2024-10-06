@@ -28,6 +28,7 @@ from rest_framework import permissions
 
 from itsm.component.constants import PUBLIC_PROJECT_PROJECT_KEY
 from itsm.component.drf.permissions import IamAuthPermit
+from itsm.project.models import Project
 from itsm.role.models import UserRole
 from itsm.service.models import Service
 from itsm.workflow.models import Workflow
@@ -176,51 +177,39 @@ class IsSuperuser(permissions.BasePermission):
         return UserRole.is_itsm_superuser(request.user.username)
 
 
-class TemplateFieldPermissionValidate(IamAuthPermit):
+class WorkflowElementManagePermission(IamAuthPermit):
     def has_permission(self, request, view):
-        # 不关联实例的资源，任何请求都要提前鉴权
-        # 当前系统内，如果没有project_view的权限，无法进入系统
+        # 免鉴权需要明确声明
         if view.action in getattr(view, "permission_free_actions", []):
             return True
-
-        apply_actions = []
-        resource_type = getattr(view.queryset.model, "auth_resource", {}).get(
-            "resource_type"
-        )
-
-        if view.action == "create":
-            if request.data.get("project_key", None) == PUBLIC_PROJECT_PROJECT_KEY:
-                apply_actions.append("public_field_create")
+        
+        if view.action in getattr(view, "permission_create_action", ["create"]):
+            project_key = request.data.get("project_key", PUBLIC_PROJECT_PROJECT_KEY)
+            
+            # 平台管理
+            if project_key == PUBLIC_PROJECT_PROJECT_KEY:
+                apply_actions = [view.permission_action_platform]
                 return self.iam_auth(request, apply_actions)
-            else:
-                apply_actions.append("{}_create".format(resource_type))
-            if "project_key" in request.data:
-                return self.iam_create_auth(request, apply_actions)
-
+            
+            # 项目管理
+            apply_actions = self.get_view_iam_actions(view)
+            return self.iam_create_auth(request, apply_actions)
         return True
 
     def has_object_permission(self, request, view, obj, **kwargs):
         # 关联实例的请求，需要针对对象进行鉴权
         if view.action in getattr(view, "permission_free_actions", []):
             return True
+        
+        # 平台管理
+        if obj.project_key == PUBLIC_PROJECT_PROJECT_KEY:
+            apply_actions = [view.permission_action_platform]
+            return self.iam_auth(request, apply_actions)
 
-        fields_action_map = {
-            "retrieve": ["field_view"],
-            "destroy": ["field_delete"],
-            "update": ["field_edit"],
-        }
-
-        public_fields_action_map = {
-            "retrieve": ["public_field_view"],
-            "destroy": ["public_field_delete"],
-            "update": ["public_field_edit"],
-        }
-        apply_actions = []
-        if view.action in ["retrieve", "destroy", "update"]:
-            apply_actions = fields_action_map[view.action]
-            if obj.project_key == PUBLIC_PROJECT_PROJECT_KEY:
-                apply_actions = public_fields_action_map[view.action]
-
+        # 项目管理
+        apply_actions = self.get_view_iam_actions(view)
+        if getattr(view, "permission_resource_is_project", None):
+            obj = Project.objects.get(pk=obj.project_key)
         return self.iam_auth(request, apply_actions, obj)
 
 

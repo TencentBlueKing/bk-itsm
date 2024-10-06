@@ -350,6 +350,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -374,6 +377,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -398,6 +404,10 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view",
+                    "service_view"
+                ],                   
                 "version": 1
             }
         },
@@ -590,6 +600,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                
                 "version": 1
             }
         },
@@ -682,7 +695,7 @@
             "operation": "upsert_action",
             "data": {
                 "id": "operational_data_view",
-                "name": "运营数据查看",
+                "name": "统计分析访问",
                 "name_en": "View Operational Data",
                 "description": "查看运营数据的权限",
                 "description_en": "",
@@ -774,6 +787,9 @@
                         "system_id": "bk_itsm",
                         "id": "field"
                     }
+                ],
+                "related_actions": [
+                    "project_view"
                 ]
             }
         },
@@ -798,6 +814,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -822,6 +841,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -846,6 +868,10 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view",
+                    "field_view"
+                ],                    
                 "version": 1
             }
         },
@@ -870,6 +896,10 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view",
+                    "field_view"
+                ],                   
                 "version": 1
             }
         },
@@ -932,6 +962,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -956,6 +989,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -980,6 +1016,10 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view",
+                    "triggers_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1072,6 +1112,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1096,6 +1139,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1120,6 +1166,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1182,6 +1231,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1206,6 +1258,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1230,6 +1285,10 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view",
+                    "user_group_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1254,6 +1313,10 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view",
+                    "user_group_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1278,6 +1341,9 @@
                         ]
                     }
                 ],
+                "related_actions": [
+                    "project_view"
+                ],                   
                 "version": 1
             }
         },
@@ -1559,6 +1625,9 @@
                 "description_en": "",
                 "type": "view",
                 "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],
                 "version": 1
             }
         },
@@ -1572,6 +1641,10 @@
                 "description_en": "",
                 "type": "manage",
                 "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access",
+                    "sla_priority_view"
+                ],
                 "version": 1
             }
         },
@@ -1686,6 +1759,9 @@
                 "description_en": "",
                 "type": "create",
                 "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],
                 "version": 1
             }
         },
@@ -1699,6 +1775,9 @@
                 "description_en": "",
                 "type": "view",
                 "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],
                 "version": 1
             }
         },
@@ -1712,6 +1791,10 @@
                 "description_en": "",
                 "type": "manage",
                 "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access",
+                    "global_settings_view"
+                ],
                 "version": 1
             }
         },
@@ -1725,6 +1808,9 @@
                 "description_en": "",
                 "type": "view",
                 "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],
                 "version": 1
             }
         },
@@ -1738,6 +1824,10 @@
                 "description_en": "",
                 "type": "manage",
                 "related_resource_types": [],
+                "related_actions": [
+                    "notification_view",
+                    "platform_manage_access"
+                ],                     
                 "version": 1
             }
         },
@@ -1780,6 +1870,9 @@
                 "description_en": "",
                 "type": "view",
                 "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],                    
                 "version": 1
             }
         },
@@ -1793,6 +1886,10 @@
                 "description_en": "",
                 "type": "manage",
                 "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access",
+                    "ticket_state_view"
+                ],                
                 "version": 1
             }
         },
@@ -1853,8 +1950,8 @@
             "operation": "upsert_action",
             "data": {
                 "id": "task_template_manage",
-                "name": "任务模板管理",
-                "name_en": "Manage Task Template",
+                "name": "任务模板管理（已弃用）",
+                "name_en": "Manage Task Template（deprecated）",
                 "description": "任务模板管理",
                 "description_en": "",
                 "type": "manage",
@@ -1883,6 +1980,9 @@
                 "description_en": "",
                 "type": "create",
                 "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],
                 "version": 1
             }
         },
@@ -1925,6 +2025,9 @@
                 "description_en": "",
                 "type": "create",
                 "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],
                 "version": 1
             }
         },
@@ -1956,9 +2059,9 @@
             "operation": "upsert_action",
             "data": {
                 "id": "public_api_manage",
-                "name": "公共API 管理",
-                "name_en": "Manage Public API",
-                "description": "公共API 管理",
+                "name": "公共API 管理（已弃用）",
+                "name_en": "Manage Public API（deprecated）",
+                "description": "公共API配置",
                 "description_en": "",
                 "type": "manage",
                 "related_resource_types": [
@@ -1986,6 +2089,54 @@
                 "description_en": "",
                 "type": "manage",
                 "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "public_fields_manage",
+                "name": "公共字段管理",
+                "name_en": "Public Fields Manage",
+                "description": "公共字段管理",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "public_apis_manage",
+                "name": "公共API管理",
+                "name_en": "Public APIs Manage",
+                "description": "公共API管理",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],                
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "public_task_template_manage",
+                "name": "任务模板管理",
+                "name_en": "Task Template Manage",
+                "description": "任务模板管理",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [],
+                "related_actions": [
+                    "platform_manage_access"
+                ],                
                 "version": 1
             }
         },
@@ -2084,48 +2235,6 @@
                                     "id": "triggers_manage"
                                 }
                             ]
-                        },
-                        {
-                            "name": "SLA",
-                            "name_en": "SLA",
-                            "actions": [
-                                {
-                                    "id": "sla_calendar_view"
-                                },
-                                {
-                                    "id": "sla_calendar_create"
-                                },
-                                {
-                                    "id": "sla_calendar_edit"
-                                },
-                                {
-                                    "id": "sla_calendar_delete"
-                                },
-                                {
-                                    "id": "sla_agreement_view"
-                                },
-                                {
-                                    "id": "sla_agreement_create"
-                                },
-                                {
-                                    "id": "sla_agreement_edit"
-                                },
-                                {
-                                    "id": "sla_agreement_delete"
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "name": "其他",
-                    "name_en": "Others",
-                    "actions": [
-                        {
-                            "id": "operational_data_view"
-                        },
-                        {
-                            "id": "platform_manage_access"
                         }
                     ]
                 },
@@ -2135,47 +2244,29 @@
                     "actions": [],
                     "sub_groups": [
                         {
-                            "name": "公共字段",
-                            "name_en": "Public Fields",
+                            "name": "菜单",
+                            "name_en": "Menu",
                             "actions": [
                                 {
-                                    "id": "public_field_create"
+                                    "id": "operational_data_view"
                                 },
                                 {
-                                    "id": "public_field_edit"
-                                },
-                                {
-                                    "id": "public_field_delete"
-                                },
-                                {
-                                    "id": "public_field_view"
+                                    "id": "platform_manage_access"
                                 }
-                            ]
+                            ]                            
                         },
                         {
-                            "name": "公共API",
-                            "name_en": "Public API",
+                            "name": "公共配置",
+                            "name_en": "Public Config",
                             "actions": [
                                 {
-                                    "id": "public_api_view"
+                                    "id": "public_fields_manage"
                                 },
                                 {
-                                    "id": "public_api_manage"
+                                    "id": "public_apis_manage"
                                 },
                                 {
-                                    "id": "public_api_create"
-                                }
-                            ]
-                        },
-                        {
-                            "name": "全局设置",
-                            "name_en": "Global Settings",
-                            "actions": [
-                                {
-                                    "id": "global_settings_view"
-                                },
-                                {
-                                    "id": "global_settings_manage"
+                                    "id": "public_task_template_manage"
                                 }
                             ]
                         },
@@ -2192,20 +2283,17 @@
                             ]
                         },
                         {
-                            "name": "任务模板",
-                            "name_en": "Task Template",
+                            "name": "优先级",
+                            "name_en": "Priority",
                             "actions": [
                                 {
-                                    "id": "task_template_view"
+                                    "id": "sla_priority_view"
                                 },
                                 {
-                                    "id": "task_template_create"
-                                },
-                                {
-                                    "id": "task_template_manage"
+                                    "id": "sla_priority_manage"
                                 }
                             ]
-                        },
+                        },                        
                         {
                             "name": "单据状态",
                             "name_en": "Ticket State",
@@ -2219,14 +2307,14 @@
                             ]
                         },
                         {
-                            "name": "SLA 优先级",
-                            "name_en": "SLA Priority",
+                            "name": "全局设置",
+                            "name_en": "Global Settings",
                             "actions": [
                                 {
-                                    "id": "sla_priority_view"
+                                    "id": "global_settings_view"
                                 },
                                 {
-                                    "id": "sla_priority_manage"
+                                    "id": "global_settings_manage"
                                 }
                             ]
                         }
@@ -2294,7 +2382,82 @@
                                     "id": "settings_manage"
                                 }
                             ]
-                        }                        
+                        },
+                        {
+                            "name": "公共字段",
+                            "name_en": "Public Fields",
+                            "actions": [
+                                {
+                                    "id": "public_field_edit"
+                                },
+                                {
+                                    "id": "public_field_delete"
+                                },
+                                {
+                                    "id": "public_field_view"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "公共API",
+                            "name_en": "Public API",
+                            "actions": [
+                                {
+                                    "id": "public_api_view"
+                                },
+                                {
+                                    "id": "public_api_create"
+                                },
+                                {
+                                    "id": "public_api_manage"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "SLA",
+                            "name_en": "SLA",
+                            "actions": [
+                                {
+                                    "id": "sla_calendar_view"
+                                },
+                                {
+                                    "id": "sla_calendar_create"
+                                },
+                                {
+                                    "id": "sla_calendar_edit"
+                                },
+                                {
+                                    "id": "sla_calendar_delete"
+                                },
+                                {
+                                    "id": "sla_agreement_view"
+                                },
+                                {
+                                    "id": "sla_agreement_create"
+                                },
+                                {
+                                    "id": "sla_agreement_edit"
+                                },
+                                {
+                                    "id": "sla_agreement_delete"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "任务模板",
+                            "name_en": "Task Template",
+                            "actions": [
+                                {
+                                    "id": "task_template_view"
+                                },
+                                {
+                                    "id": "task_template_create"
+                                },
+                                {
+                                    "id": "task_template_manage"
+                                }
+                            ]
+                        }
                     ]
                 }
             ]
@@ -2515,6 +2678,10 @@
                         "actions": [
                             {
                                 "id": "public_field_view",
+                                "required": true
+                            },
+                            {
+                                "id": "public_field_create",
                                 "required": true
                             },
                             {

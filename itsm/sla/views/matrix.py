@@ -30,6 +30,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
+from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
 
 from itsm.component.constants import PRIORITY, PX_URGENCY, PY_IMPACT, ResponseCodeStatus
@@ -55,6 +56,12 @@ class PriorityMatrixViewSet(ModelViewSet):
     filter_fields = {
         'service_type': ['exact', 'in'],
     }
+    
+    def create(self, request, *args, **kwargs):
+        raise MethodNotAllowed(request.method)
+
+    def destroy(self, request, *args, **kwargs):
+        raise MethodNotAllowed(request.method)
 
     @action(detail=False, methods=['put'])
     def batch_update(self, request):

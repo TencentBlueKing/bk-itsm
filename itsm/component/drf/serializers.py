@@ -45,7 +45,19 @@ from itsm.auth_iam.utils import IamRequest
 from itsm.component.constants import DEFAULT_PROJECT_PROJECT_KEY
 
 
-class AuthModelSerializer(serializers.ModelSerializer):
+class BaseModelSerializer(serializers.ModelSerializer):
+    
+    def to_internal_value(self, data):
+        data = super().to_internal_value(data)
+        if self.instance:
+            # update
+            if hasattr(self.Meta, "create_only_fields"):
+                for x in self.Meta.create_only_fields:
+                    data.pop(x, None)
+        return data
+
+    
+class AuthModelSerializer(BaseModelSerializer):
     """
     权限中心接入每个资源权限内容序列化
     """
@@ -55,7 +67,7 @@ class AuthModelSerializer(serializers.ModelSerializer):
 
         self.resource_permissions = {}
         if self.instance and self.context.get("request"):
-            self.resource_permissions = self.get_resource_permission()
+            self.resource_permissions = self.get_resource_permission() or {}
 
     def get_resource_permission(self):
         """
@@ -69,7 +81,7 @@ class AuthModelSerializer(serializers.ModelSerializer):
         )
         resource_type = self.Meta.model.auth_resource.get('resource_type', None)
         if resource_type is None:
-            return []
+            return {}
 
         instance = instance_list[0]
         project_key = DEFAULT_PROJECT_PROJECT_KEY
@@ -90,7 +102,7 @@ class AuthModelSerializer(serializers.ModelSerializer):
                 self.Meta.model.resource_operations, resources, project_key=project_key)
         except BaseException:
             logger.exception("get auth permission error, resource is %s" % resource_type)
-            return []
+            return {}
 
     def to_representation(self, instance):
         data = super(AuthModelSerializer, self).to_representation(instance)
@@ -132,3 +144,4 @@ class DynamicFieldsModelSerializer(AuthModelSerializer):
             existing = set(self.fields)
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
+

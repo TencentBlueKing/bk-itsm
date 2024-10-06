@@ -27,6 +27,7 @@ import copy
 from collections import OrderedDict
 from datetime import datetime
 
+from blueapps.contrib.xss.utils import texteditor_escape
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
@@ -1562,6 +1563,8 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
         receivers = ",".join(
             compute_list_difference(instance.users, validated_data["users"])
         )
+        validated_data["content"] = texteditor_escape(validated_data["content"])
+
         instance.update_log.append(
             "{}于{}更新了该评论".format(
                 update_by, datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -1583,6 +1586,7 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
         parent_node = TicketRemark.objects.get(id=parent_id)
         validated_data["parent_id"] = parent_id
         validated_data["ticket_id"] = parent_node.ticket_id
+        validated_data["content"] = texteditor_escape(validated_data["content"])
         validated_data.pop("parent")
         instance = super(TicketRemarkSerializer, self).create(validated_data)
 
