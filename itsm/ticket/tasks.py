@@ -516,7 +516,7 @@ def consume_notify():
 
     queryset = Ticket.objects.filter(current_status="RUNNING", is_deleted=False)
 
-    for item in range(1, end):
+    for _ in range(1, end):
         user = email_notify.lpop("notify_queue")
         send_message(user, queryset)
 
