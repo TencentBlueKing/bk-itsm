@@ -784,8 +784,7 @@
       // 创建多个触发器规则（响应条件）
       createRespond(value) {
         const params = value;
-        const id = this.originInfoToTrigger.id;
-        this.$store.dispatch('trigger/createRespond', { id, params }).then((res) => {
+        this.$store.dispatch('trigger/createRespond', { id: this.triggerInfo.id, params }).then((res) => {
           this.backInfo.responseList = res.data;
           // 触发条件
           this.createTriggerCondition();
