@@ -191,7 +191,6 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
     permission_classes = (RemoteApiPermit,)
     permission_resource_is_project = True
     permission_create_action = ["create", "imports"]
-    permission_free_actions = ["retrieve"]
 
     filter_fields = {
         "is_activated": ["exact"],
