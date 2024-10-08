@@ -47,12 +47,12 @@
           <div class="bk-normal-search">
             <bk-button
               data-test-id="taskTemplate-button-create"
-              v-cursor="{ active: !hasPermission(['task_template_create']) }"
+              v-cursor="{ active: !hasPermission(['public_task_template_manage'], curPerms) }"
               :theme="'primary'"
               :title="$t(`m.systemConfig['新增']`)"
               icon="plus"
               :class="['mr10', 'plus-cus', {
-                'btn-permission-disable': !hasPermission(['task_template_create'])
+                'btn-permission-disable': !hasPermission(['public_task_template_manage'], curPerms)
               }]"
               @click="addTemplate">
               {{$t(`m.systemConfig['新增']`)}}
@@ -75,9 +75,9 @@
                   <i class="bk-icon icon-info-circle"></i>
                   <span>{{$t(`m.taskTemplate['尚未创建任一任务模板，']`)}}</span>
                   <span
-                    v-cursor="{ active: !hasPermission(['task_template_create']) }"
+                    v-cursor="{ active: !hasPermission(['public_task_template_manage'], curPerms) }"
                     :class="['bk-primary', {
-                      'text-permission-disable': !hasPermission(['task_template_create'])
+                      'text-permission-disable': !hasPermission(['public_task_template_manage'], curPerms)
                     }]"
                     @click="addTemplate">
                     {{$t(`m.taskTemplate['立即创建']`)}}
@@ -267,6 +267,9 @@
       globalChoise() {
         return this.$store.state.common.configurInfo;
       },
+      curPerms() {
+        return this.$store.state.common.systemPermission;
+      },
     },
     async mounted() {
       await this.initData();
@@ -296,14 +299,8 @@
           });
       },
       cloneTemplate(item) {
-        if (!this.hasPermission(['task_template_manage'], item.auth_actions)) {
-          const resourceData = {
-            task_template: [{
-              id: item.id,
-              name: item.name,
-            }],
-          };
-          this.applyForPermission(['task_template_manage'], item.auth_actions, resourceData);
+        if (!this.hasPermission(['public_task_template_manage'], this.curPerms)) {
+          this.applyForPermission(['public_task_template_manage'], this.curPerms, {});
           return;
         }
         if (item.component_type === 'SOPS') {
@@ -328,14 +325,8 @@
         });
       },
       deleteTemplate(item) {
-        if (!this.hasPermission(['task_template_manage'], item.auth_actions)) {
-          const resourceData = {
-            task_template: [{
-              id: item.id,
-              name: item.name,
-            }],
-          };
-          this.applyForPermission(['task_template_manage'], item.auth_actions, resourceData);
+        if (!this.hasPermission(['public_task_template_manage'], this.curPerms)) {
+          this.applyForPermission(['public_task_template_manage'], this.curPerms, {});
           return;
         }
         if (item.is_builtin) {
@@ -363,22 +354,16 @@
       },
       // 编辑列表数据
       editTemplate(item) {
-        if (!this.hasPermission(['task_template_view'], item.auth_actions)) {
-          const resourceData = {
-            task_template: [{
-              id: item.id,
-              name: item.name,
-            }],
-          };
-          this.applyForPermission(['task_template_view'], item.auth_actions, resourceData);
+        if (!this.hasPermission(['public_task_template_manage'], this.curPerms)) {
+          this.applyForPermission(['public_task_template_manage'], this.curPerms, {});
           return;
         }
         this.changeStep(item);
       },
       // 新增模板
       addTemplate() {
-        if (!this.hasPermission(['task_template_create'])) {
-          this.applyForPermission(['task_template_create'], [], {});
+        if (!this.hasPermission(['public_task_template_manage'], this.curPerms)) {
+          this.applyForPermission(['public_task_template_manage'], this.curPerms, {});
           return;
         }
         this.firstStepInfo.desc = '';

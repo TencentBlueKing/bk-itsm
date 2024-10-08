@@ -379,14 +379,17 @@
         }
         return status;
       },
+      viewFieldPerm() {
+        return this.projectId ? ['field_view'] : ['public_fields_manage'];
+      },
       createFieldPerm() {
-        return this.projectId ? ['field_create'] : ['public_field_create'];
+        return this.projectId ? ['field_create'] : ['public_fields_manage'];
       },
       editFieldPerm() {
-        return this.projectId ? ['field_edit'] : ['public_field_edit'];
+        return this.projectId ? ['field_edit'] : ['public_fields_manage'];
       },
       deleteFieldPerm() {
-        return this.projectId ? ['field_delete'] : ['public_field_delete'];
+        return this.projectId ? ['field_delete'] : ['public_fields_manage'];
       },
       sliderStatus() {
         return this.$store.state.common.slideStatus;
@@ -395,7 +398,7 @@
         return this.$store.state.common.configurInfo;
       },
       curPermission() {
-        return this.projectId ? this.$store.state.project.projectAuthActions : [];
+        return this.projectId ? this.$store.state.project.projectAuthActions : this.$store.state.common.systemPermission;
       },
     },
     mounted() {
