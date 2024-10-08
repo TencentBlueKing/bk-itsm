@@ -232,11 +232,21 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
 
             return serializer.data
 
+        trigger = self.get_object()
+        rules = TriggerRule.objects.filter(trigger_id=trigger.id)
+        actions_schemas = []
+        for rule in rules:
+            if not rule.action_schemas:
+                continue
+            actions_schemas.extend(rule.action_schemas)
+            
         schemas = []
         with transaction.atomic():
             for _data in request.data:
                 try:
                     instance = ActionSchema.objects.get(id=_data.get("id", 0))
+                    if instance.id not in actions_schemas:
+                        raise ValidationError(_("Schema ID 异常"))
                     schema = _single_update(_data, instance)
                 except ActionSchema.DoesNotExist:
                     schema = _single_create(_data)
