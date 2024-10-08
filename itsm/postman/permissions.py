@@ -88,5 +88,8 @@ class RemoteApiPermit(WorkflowElementManagePermission):
             # 项目管理
             project_key = obj.remote_system.project_key
             project = Project.objects.get(pk=project_key)
-            return self.iam_auth(request, ["system_settings_manage"], project)
+            apply_actions = ["system_settings_manage"]
+            if view.action == "retrieve":
+                apply_actions = ["project_view"]
+                return self.iam_auth(request, apply_actions, project)
         return True
