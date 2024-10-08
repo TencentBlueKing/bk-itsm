@@ -64,6 +64,7 @@ def add_common_actions(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ('auth_iam', '0002_insert_common_actions'),
+        ('iam_migration', '0013_update'),
     ]
 
     operations = [migrations.RunPython(add_common_actions)]
