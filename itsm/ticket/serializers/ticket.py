@@ -27,14 +27,13 @@ import copy
 from collections import OrderedDict
 from datetime import datetime
 
-from blueapps.contrib.xss.utils import texteditor_escape
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 from rest_framework.fields import JSONField, empty
 
 from common.log import logger
-from common.utils import html_escape
+from common.utils import html_escape, texteditor_escape
 from itsm.auth_iam.utils import IamRequest
 from itsm.component.constants import (
     ACTION_CHOICES,
@@ -1563,7 +1562,9 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
         receivers = ",".join(
             compute_list_difference(instance.users, validated_data["users"])
         )
-        validated_data["content"] = texteditor_escape(validated_data["content"])
+        validated_data["content"] = texteditor_escape(
+            validated_data["content"], is_support_img=False
+        )
 
         instance.update_log.append(
             "{}于{}更新了该评论".format(
@@ -1586,7 +1587,9 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
         parent_node = TicketRemark.objects.get(id=parent_id)
         validated_data["parent_id"] = parent_id
         validated_data["ticket_id"] = parent_node.ticket_id
-        validated_data["content"] = texteditor_escape(validated_data["content"])
+        validated_data["content"] = texteditor_escape(
+            validated_data["content"], is_support_img=False
+        )
         validated_data.pop("parent")
         instance = super(TicketRemarkSerializer, self).create(validated_data)
 

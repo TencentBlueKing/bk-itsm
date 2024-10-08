@@ -22,10 +22,10 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-from blueapps.contrib.xss.utils import texteditor_escape
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
+from common.utils import texteditor_escape
 from itsm.component.constants import LEN_LONG, LEN_NORMAL
 from itsm.component.utils.client_backend_query import get_bk_users
 from itsm.component.utils.human import get_time
@@ -126,7 +126,9 @@ class CommentSerializer(serializers.ModelSerializer):
         if instance.stars != 0:
             raise serializers.ValidationError(_("该单据已经被评论，请勿重复评论"))
         
-        validated_data["comments"] = texteditor_escape(validated_data["comments"])
+        validated_data["comments"] = texteditor_escape(
+            validated_data["comments"], is_support_img=False
+        )
         return super(CommentSerializer, self).update(instance, validated_data)
 
     def to_representation(self, instance):
