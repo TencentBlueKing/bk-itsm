@@ -51,6 +51,7 @@ from itsm.trigger.serializers import (
 from .api import import_trigger
 from .validators import BulkTriggerRuleValidator
 from .permissions import WorkflowTriggerPermit
+from ..component.drf.exception import ValidationError
 
 
 class ComponentApiViewSet(component_viewsets.APIView):
@@ -90,7 +91,7 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
     }
 
     permission_classes = (WorkflowTriggerPermit,)
-    permission_free_actions = ["list", "create_or_update_rules"]
+    permission_free_actions = ["list"]
 
     def get_queryset(self):
 
@@ -191,6 +192,8 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
                 _data.update({"trigger_id": instance.id})
                 try:
                     rule_instance = TriggerRule.objects.get(id=_data.get("id", 0))
+                    if rule_instance.trigger_id != instance.id:
+                        raise ValidationError(_("触发器规则 ID 匹配异常"))
                     rule = _single_update(_data, rule_instance)
                 except TriggerRule.DoesNotExist:
                     rule = _single_create(_data)
