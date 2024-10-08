@@ -86,7 +86,7 @@ class WorkflowTriggerPermit(IamAuthPermit):
             # 通过流程配置需要有对应服务的管理权限
             is_workflow = False
             workflow_id = None
-            if request.data.get("source_type") == SOURCE_WORKFLOW:
+            if obj.source_type == SOURCE_WORKFLOW:
                 is_workflow = True
                 workflow_id = request.data.get("source_id")
             elif obj.source_type == SOURCE_WORKFLOW:
