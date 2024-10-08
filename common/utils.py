@@ -71,13 +71,17 @@ def url_escape(url):
     return url
 
 
-def texteditor_escape(str_escape):
+def texteditor_escape(str_escape, is_support_img=True):
     """
     富文本处理
     @param str_escape: 要检测的字符串
+    @param is_support_img: 是否支持图片
     """
     try:
-        parser = XssHtml()
+        allow_tags = []
+        if not is_support_img:
+            allow_tags = [i for i in XssHtml.allow_tags if i not in ["img"]]
+        parser = XssHtml(allows=allow_tags)
         parser.feed(str_escape)
         parser.close()
         return parser.get_html()
