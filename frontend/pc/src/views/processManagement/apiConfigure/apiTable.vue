@@ -36,8 +36,8 @@
           <ul class="bk-dropdown-list" slot="dropdown-content">
             <li>
               <a href="javascript:;"
-                v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
-                :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+                v-cursor="{ active: !hasPermission(targetPerms, curPerms) }"
+                :class="{ 'text-permission-disable': !hasPermission(targetPerms, curPerms) }"
                 :title="$t(`m.systemConfig['接入API']`)"
                 data-test-id="api_a_apiTableAccessApi"
                 @click="openShade('JOIN')">
@@ -47,8 +47,8 @@
             <li>
               <a href="javascript:;"
                 data-test-id="api_a_apiTableCreateApi"
-                v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
-                :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+                v-cursor="{ active: !hasPermission(targetPerms, curPerms) }"
+                :class="{ 'text-permission-disable': !hasPermission(targetPerms, curPerms) }"
                 :title="$t(`m.systemConfig['新增API']`)"
                 @click="openShade('ADD')">
                 {{$t(`m.systemConfig['新增API']`)}}
@@ -60,16 +60,16 @@
           data-test-id="api_button_apiTableuploadApi"
           :theme="'default'"
           :disabled="disableImport"
-          v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
-          :class="['mr10 bk-btn-file', { 'btn-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }]"
+          v-cursor="{ active: !hasPermission(targetPerms, curPerms) }"
+          :class="['mr10 bk-btn-file', { 'btn-permission-disable': !hasPermission(targetPerms, curPerms) }]"
           :title="$t(`m.systemConfig['点击上传']`)">
-          <input :disabled="disableImport" :type="!hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) ? 'button' : 'file'" :value="fileVal" class="bk-input-file" @change="handleFile" @click="hasImportPermission">
+          <input :disabled="disableImport" :type="!hasPermission(targetPerms, curPerms) ? 'button' : 'file'" :value="fileVal" class="bk-input-file" @change="handleFile" @click="hasImportPermission">
           {{$t(`m.systemConfig['导入']`)}}
         </bk-button>
         <bk-button :theme="'default'"
-          v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+          v-cursor="{ active: !hasPermission(targetPerms, curPerms) }"
           data-test-id="api_button_apiTableBatchDeleteApi"
-          :class="['mr10 batch-remove-btn', { 'btn-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }]"
+          :class="['mr10 batch-remove-btn', { 'btn-permission-disable': !hasPermission(targetPerms, curPerms) }]"
           :title="$t(`m.systemConfig['批量移除']`)"
           :disabled="!checkList.length"
           @click="deleteCheck">
@@ -111,8 +111,8 @@
           <!-- :disabled="props.row.is_builtin || !!props.row.count" -->
           <span class="bk-lable-primary"
             data-test-id="api_span_apiTableViewDetail"
-            v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
-            :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+            v-cursor="{ active: !hasPermission(targetPerms, curPerms) }"
+            :class="{ 'text-permission-disable': !hasPermission(targetPerms, curPerms) }"
             :title="props.row.name"
             @click="entryOne(props.row)">
             {{props.row.name || '--'}}
@@ -163,8 +163,8 @@
           </bk-button>
           <bk-button theme="primary" text
             data-test-id="api_button_apiTableEditApi"
-            v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
-            :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+            v-cursor="{ active: !props.row.is_builtin && !props.row.count && !hasPermission(targetPerms, curPerms) }"
+            :class="{ 'text-permission-disable': !props.row.is_builtin && !props.row.count && !hasPermission(targetPerms, curPerms) }"
             :title="$t(`m.systemConfig['编辑']`)"
             :disabled="props.row.is_builtin || !!props.row.count"
             @click="entryOne(props.row)">
@@ -172,8 +172,8 @@
           </bk-button>
           <bk-button theme="primary" text
             data-test-id="api_button_apiTableDeleteApi"
-            v-cursor="{ active: !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
-            :class="{ 'text-permission-disable': !hasPermission(['system_settings_manage'], $store.state.project.projectAuthActions) }"
+            v-cursor="{ active: !props.row.is_builtin && !hasPermission(targetPerms, curPerms) }"
+            :class="{ 'text-permission-disable': !props.row.is_builtin && !hasPermission(targetPerms, curPerms) }"
             :title="$t(`m.systemConfig['移除']`)"
             :disabled="props.row.is_builtin"
             @click="openDelete(props.row)">
@@ -309,17 +309,18 @@
       disableImport() {
         return Number(this.remoteSystem) === 0;
       },
-    },
-    watch: {
-    },
-    mounted() {
-
+      targetPerms() {
+        return this.projectId ? ['system_settings_manage'] : ['public_apis_manage'];
+      },
+      curPerms() {
+        return this.projectId ? this.$store.state.project.projectAuthActions : this.$store.state.common.systemPermission;
+      },
     },
     methods: {
       async entryOne(item) {
         // 公共api
-        if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
-          this.applyProjectManagePerm();
+        if (!this.hasPermission(this.targetPerms, this.curPerms)) {
+          this.applyPerm();
           return;
         }
         this.$parent.displayInfo.level_1 = item;
@@ -344,20 +345,23 @@
       changTitle(item, index) {
         this.checkIndex = index;
       },
-      applyProjectManagePerm() {
-        const projectInfo = this.$store.state.project.projectInfo;
-        const resourceData = {
-          project: [{
-            id: projectInfo.key,
-            name: projectInfo.name,
-          }],
-        };
-        this.applyForPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions, resourceData);
+      applyPerm() {
+        let resourceData = {};
+        if (this.projectId) {
+          const projectInfo = this.$store.state.project.projectInfo;
+          resourceData = {
+            project: [{
+              id: projectInfo.key,
+              name: projectInfo.name,
+            }],
+          };
+        }
+        this.applyForPermission(this.targetPerms, this.curPerms, resourceData);
       },
       // 新增
       openShade(type) {
-        if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
-          this.applyProjectManagePerm();
+        if (!this.hasPermission(this.targetPerms, this.curPerms)) {
+          this.applyPerm();
         } else {
           this.typeInfo = type;
           this.entryInfo.title = type === 'ADD'
@@ -413,14 +417,14 @@
       },
       disabledFn(item) {
         if (!this.projectId) {
-          return this.hasPermission(['public_api_manage'], item.auth_actions) && !item.is_builtin;
+          return this.hasPermission(this.targetPerms, this.curPerms) && !item.is_builtin;
         }
         return !item.is_builtin;
       },
       // 二次弹窗确认
       openDelete(item) {
-        if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
-          this.applyProjectManagePerm();
+        if (!this.hasPermission(this.targetPerms, this.curPerms)) {
+          this.applyPerm();
           return;
         }
         this.$bkInfo({
@@ -450,8 +454,8 @@
         });
       },
       deleteCheck() {
-        if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
-          this.applyProjectManagePerm();
+        if (!this.hasPermission(this.targetPerms, this.curPerms)) {
+          this.applyPerm();
           return;
         }
         this.$bkInfo({
@@ -482,8 +486,8 @@
       },
       //
       hasImportPermission() {
-        if (!this.hasPermission(['system_settings_manage'], this.$store.state.project.projectAuthActions)) {
-          this.applyProjectManagePerm();
+        if (!this.hasPermission(this.targetPerms, this.curPerms)) {
+          this.applyPerm();
         }
       },
       // 上传文件模板
