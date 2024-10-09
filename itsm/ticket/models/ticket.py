@@ -227,6 +227,7 @@ from itsm.component.utils.client_backend_query import (
 from platform_config import BaseTicket
 
 from .basic import Model
+from ..utils import filter_sensitive_info
 from ...auth_iam.utils import IamRequest
 
 
@@ -1399,6 +1400,12 @@ class Ticket(Model, BaseTicket):
     def __unicode__(self):
         return "{}({})".format(self.title, self.sn)
 
+    def get_meta(self, is_filter_sensitive_info=True):
+        """获取单据 meta 信息"""
+        if not is_filter_sensitive_info:
+            return self.meta
+        return filter_sensitive_info(self.meta)
+    
     @property
     def task_schemas(self):
         # todo 测试后删除

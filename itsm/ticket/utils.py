@@ -22,7 +22,9 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import copy
 import json
+from typing import Dict
 
 import jmespath
 import requests
@@ -224,3 +226,10 @@ def get_user_profile(username):
     except Exception:
         profile = {"name": "", "phone": "", "departments": []}
     return profile
+
+
+def filter_sensitive_info(ticket_meta: Dict):
+    meta = copy.deepcopy(ticket_meta)
+    meta.pop("headers", None)
+    meta.pop("callback_url", None)
+    return meta
