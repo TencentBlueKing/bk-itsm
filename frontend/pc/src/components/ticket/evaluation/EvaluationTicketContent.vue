@@ -250,11 +250,11 @@
           });
         })
           .catch((res) => {
-            this.$emit('updatePendingStatus', false);
             errorHandler(res, this);
           })
           .finally(() => {
             this.scoreInfo.clickSecond = false;
+            this.$emit('updatePendingStatus', false);
           });
       },
       openSendPhone() {
@@ -346,11 +346,11 @@
           this.$emit('submitSuccess');
         })
           .catch(() => {
-            this.$emit('updatePendingStatus', false);
             errorHandler(this);
           })
           .finally(() => {
             this.scoreInfo.clickSecond = false;
+            this.$emit('updatePendingStatus', false);
           });
       },
     },
