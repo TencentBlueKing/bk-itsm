@@ -575,7 +575,7 @@ class TicketModelViewSet(ModelViewSet):
                 if fail_numbers
                 else "success",
                 "data": links,
-                "code": "SEND_SMS_FAILED",
+                "code": "OK" if len(fail_numbers) == 0 else "SEND_SMS_FAILED",
             }
         )
 

@@ -965,3 +965,6 @@ BK_PLATFORM_NAME = os.getenv("BKAPP_PLATFORM_NAME", "")
 NOTICE_IGNORE_LIST = os.getenv("BKAPP_NOTICE_IGNORE_LIST", [])
 if isinstance(NOTICE_IGNORE_LIST, str):
     NOTICE_IGNORE_LIST = [i.lower().strip() for i in NOTICE_IGNORE_LIST.split(",")]
+
+# SMS 邀请评价限额
+TICKET_INVITE_SMS_COUNT = int(os.getenv("BKAPP_TICKET_INVITE_SMS_COUNT", 10))

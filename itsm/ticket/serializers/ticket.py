@@ -114,7 +114,7 @@ from itsm.ticket.serializers.field import (
     TaskFieldSerializer,
 )
 from itsm.ticket.tasks import remark_notify
-from itsm.ticket.utils import compute_list_difference, get_user_profile
+from itsm.ticket.utils import compute_list_difference, get_user_profile, filter_sensitive_info
 from itsm.ticket.validators import CreateTicketValidator, StateOperateValidator
 from itsm.ticket_status.models import TicketStatus
 from itsm.workflow.models import WorkflowVersion
@@ -675,7 +675,7 @@ class TicketList(object):
             )
             supervisors = supervisors.split(",") if supervisors else []
             real_supervisors = supervisors + [inst["creator"]]
-            inst["meta"] = real_ticket["meta"]
+            inst["meta"] = filter_sensitive_info(real_ticket["meta"])
 
             current_status = real_ticket["current_status"]
             # 等待审批的条件为在审批节点 并且 单据处在非挂起状态
@@ -874,16 +874,15 @@ class TicketSerializer(AuthModelSerializer):
         # 当前步骤、单据状态、优先级来源母单
         master_ticket = inst.get_master_ticket()
         master_or_self_ticket = master_ticket if master_ticket else inst
-
-        if "headers" in master_or_self_ticket.meta:
-            master_or_self_ticket.meta.pop("headers")
+        
+        meta = master_or_self_ticket.get_meta()
 
         data.update(
             current_status=master_or_self_ticket.current_status,
             current_status_display=master_or_self_ticket.current_status_display,
             current_steps=master_or_self_ticket.brief_current_steps,
             priority_name=master_or_self_ticket.priority_name,
-            meta=master_or_self_ticket.meta,
+            meta=meta
         )
 
         can_comment = inst.can_comment(username) or is_email_invite_token

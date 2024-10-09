@@ -22,7 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+from django.conf import settings
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
@@ -30,7 +30,7 @@ from common.log import logger
 from itsm.component.utils.basic import Regex
 from itsm.component.utils.client_backend_query import get_bk_users
 from itsm.role.models import UserRole
-from itsm.ticket.models import Ticket, TicketComment
+from itsm.ticket.models import Ticket, TicketComment, TicketCommentInvite
 
 
 def days_validate(days):
@@ -102,6 +102,14 @@ def sms_invite_validate(ticket, numbers, invitor):
 
     if not ticket.can_comment(invitor):
         raise serializers.ValidationError(_('抱歉，您无权发送评价邀请'))
+    
+    if settings.TICKET_INVITE_SMS_COUNT:
+        if len(numbers) > settings.TICKET_INVITE_SMS_COUNT:
+            raise serializers.ValidationError(_("SMS 发送评价邀请超过限额"))
+
+        invite_count = TicketCommentInvite.objects.filter(comment__ticket__id=ticket.id).count()
+        if invite_count > settings.TICKET_INVITE_SMS_COUNT:
+            raise serializers.ValidationError(_("SMS 发送评价邀请超过限额"))
 
     for number in numbers:
         try:
