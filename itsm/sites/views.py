@@ -133,6 +133,7 @@ def index(request):
             "BK_PAAS_ESB_HOST": settings.BK_PAAS_ESB_HOST,
             "TAM_PROJECT_ID": settings.TAM_PROJECT_ID,
             "DOC_URL": settings.BK_DOC_URL,
+            "BK_DOC_CENTER_HOST": settings.BK_DOC_CENTER_HOST,
             "SOPS_URL": settings.SOPS_SITE_URL,
             "NOTICE_CENTER_SWITCH": notice_center_switch_value,
             "BK_SHARED_RES_URL": settings.BK_SHARED_RES_URL,
