@@ -345,8 +345,8 @@
           });
           this.$emit('submitSuccess');
         })
-          .catch(() => {
-            errorHandler(this);
+          .catch((res) => {
+            errorHandler(res, this);
           })
           .finally(() => {
             this.scoreInfo.clickSecond = false;
