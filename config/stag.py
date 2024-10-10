@@ -96,7 +96,7 @@ for _setting in dir(ver_settings):
         locals()[_setting] = getattr(ver_settings, _setting)
 
 ENGINE_REGION = os.environ.get("BKPAAS_ENGINE_REGION", "open")
-if ENGINE_REGION == "default":
+if ENGINE_REGION == "default" and RUN_VER != "ieod":
     default_settings = importlib.import_module(
         "adapter.config.sites.%s.ver_settings" % "v3"
     )
