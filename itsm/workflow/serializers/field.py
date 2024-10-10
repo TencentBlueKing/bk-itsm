@@ -173,7 +173,7 @@ class TemplateFieldSerializer(AuthModelSerializer):
             "project_key",
         ) + model.FIELDS
         read_only_fields = ("is_builtin", "key") + model.FIELDS
-        create_only_fields = ("is_builtin", "key", )
+        create_only_fields = ("is_builtin", "key", "project_key", )
 
     def __init__(self, *args, **kwargs):
         validator_class = kwargs.pop("validator_class", TemplateFieldValidator)

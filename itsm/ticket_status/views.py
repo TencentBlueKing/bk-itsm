@@ -201,6 +201,8 @@ class TicketStatusViewSet(ModelViewSet):
 class StatusTransitViewSet(ModelViewSet):
     serializer_class = StatusTransitSerializer
     queryset = StatusTransit.objects.all()
+    permission_classes = (TicketStatusPermit,)
+    permission_free_actions = ["is_auto", "get_auto_detail"]
     pagination_class = None
 
     filter_fields = {

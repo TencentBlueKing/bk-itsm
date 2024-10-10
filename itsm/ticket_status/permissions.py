@@ -59,7 +59,11 @@ class IsAdmin(permissions.BasePermission):
 
 class TicketStatusPermit(IamAuthPermit):
     def has_permission(self, request, view):
-        if view.action == "get_configs":
+        # 关联实例的请求，需要针对对象进行鉴权
+        if view.action in getattr(view, "permission_free_actions", []):
+            return True
+        
+        if view.action in ["get_configs"]:
             apply_actions = ["ticket_state_view", "platform_manage_access"]
         elif view.action in ["overall_ticket_statuses", "list", "next_over_status"]:
             return True
