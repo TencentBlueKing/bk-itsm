@@ -1,5 +1,5 @@
 # Changelog
-## [Version: 2.7.0] - 2024-08-29
+## [Version: 2.7.0] - 2024-10-10
 【Feature】Notification recipient blacklist filtering.  
 【Improved】Migrated the authentication information to header when calling esb, support open-paas/esb >= 2.12.20  
 【Improved】Changed “My Tasks” to “My Completed” in the navigation bar.  
