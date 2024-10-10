@@ -30,7 +30,7 @@ from blueapps.account.decorators import login_exempt
 from django.conf import settings
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.http import require_GET
 from mako.template import Template
 
@@ -116,6 +116,15 @@ def index(request):
         ).value
     except SystemSettings.DoesNotExist:
         notice_center_switch_value = "off"
+    
+    # 文档地址转换
+    doc_lang = "EN"
+    lang = get_language()
+    if lang in ["zh-cn", "zh-hans"]:
+        doc_lang = "ZH"
+    
+    version = get_version()
+    doc_url = settings.BK_DOC_URL.format(lang=doc_lang, version=get_major_minor_version(version))
 
     return render(
         request,
@@ -132,13 +141,13 @@ def index(request):
             "BK_USER_MANAGE_HOST": BK_USER_MANAGE_HOST,
             "BK_PAAS_ESB_HOST": settings.BK_PAAS_ESB_HOST,
             "TAM_PROJECT_ID": settings.TAM_PROJECT_ID,
-            "DOC_URL": settings.BK_DOC_URL,
+            "DOC_URL": doc_url,
             "BK_DOC_CENTER_HOST": settings.BK_DOC_CENTER_HOST,
             "SOPS_URL": settings.SOPS_SITE_URL,
             "NOTICE_CENTER_SWITCH": notice_center_switch_value,
             "BK_SHARED_RES_URL": settings.BK_SHARED_RES_URL,
             "BK_PLATFORM_NAME": settings.BK_PLATFORM_NAME,
-            "VERSION": get_version(),
+            "VERSION": version,
             "BKAPP_CSRF_COOKIE_NAME": settings.CSRF_COOKIE_NAME,
         },
     )
@@ -172,6 +181,14 @@ def get_version():
     with open(app_desc, 'r') as file:
         content = file.read()
     return content.strip()
+
+
+def get_major_minor_version(version_string):
+    # 使用 split() 方法分割字符串
+    parts = version_string.split('.')
+    # 取前两个部分并用 '.' 连接
+    major_minor = '.'.join(parts[:2])
+    return major_minor
 
 
 template_name = "wiki/create.html"

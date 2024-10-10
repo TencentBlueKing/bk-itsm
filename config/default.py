@@ -873,7 +873,7 @@ BK_DOC_CENTER_HOST = os.getenv(
     os.getenv("BK_DOCS_URL_PREFIX", "{}o/bk_docs_center".format(BK_PAAS_HOST)),
 )
 BK_DOC_URL = "{}{}".format(
-    BK_DOC_CENTER_HOST, "/markdown/ITSM/UserGuide/Introduce/README.md"
+    BK_DOC_CENTER_HOST, "/markdown/{lang}/ITSM/{version}/UserGuide/Introduce/README.md"
 )
 
 BK_IEOD_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
