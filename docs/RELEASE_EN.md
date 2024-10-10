@@ -1,16 +1,17 @@
 # Changelog
-## [Version: 2.7.0] - 2024-08-29
+## [Version: 2.7.0] - 2024-10-10
 【Feature】Notification recipient blacklist filtering.  
 【Improved】Migrated the authentication information to header when calling esb, support open-paas/esb >= 2.12.20  
+【Improved】Changed “My Tasks” to “My Completed” in the navigation bar.  
 【Improved】Adjust default items when adding an Approval Node in the process.
+【Improved】Adjusted platform management permissions to be instance-free authentication.  
 【Fixed】The navigation bar style has been standardized according to the design specifications.  
 【Fixed】Modified the implementation method for exporting common API files.  
 【Fixed】Fixed the issue where searching on the document list in non-home pages resulted in an error.  
 【Fixed】Optimized the return path when clicking ‘Previous’ during task template editing.  
 【Fixed】Fixed XSS vulnerability in tooltips component.  
-【Fixed】Fix the issue with authentication anomalies in certain modules.  
-【Fixed】Resolved the issue of APM deployment without data.  
 【Fixed】Resolved authentication exceptions in some modules.  
+【Fixed】Resolved the issue of APM deployment without data.  
 【Fixed】Resolved the issue where the service visibility range was not effective.  
 【Fixed】Resolved the issue of abnormal display of parent comments in the work order comments.  
 【Fixed】Resolved the issue of inaccurate end time in operation analysis.  
