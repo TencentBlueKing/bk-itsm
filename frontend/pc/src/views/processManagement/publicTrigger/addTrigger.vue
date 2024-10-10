@@ -751,6 +751,7 @@
         this.btnLoading = true;
         this.$store.dispatch('trigger/createTriggerRule', params).then((res) => {
           this.backInfo.triggerInfo = res.data;
+          this.triggerInfo.id = res.data.id;
           // 响应条件
           const value = this.responseParams();
           this.createRespond(value);
