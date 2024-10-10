@@ -972,6 +972,7 @@ export const m = {
     提交: 'Submit ',
     '手机号码：': 'Phone Number: ',
     '请输入，多个用英文逗号分隔': 'Separated by comma ',
+    '满意度评价邀请已发送，等待用户评价': 'Satisfaction evaluation invitation has been sent, awaiting user feedback’: ‘Satisfaction evaluation invitation has been sent, awaiting user feedback.',
     提交后系统会发送信息至需求方进行满意度评价: 'The system will send message to requester for rating after submission,',
     你已发送过满意度评价短信给: 'You have sent a rate message to  ',
     '单据处理未完成或没有评价权限，不能评价！': 'Sorry, the ticket is not completed or you don\'t have rate permission!',

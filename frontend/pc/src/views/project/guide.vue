@@ -72,12 +72,12 @@
             {
               text: this.$t('m[\'第一次使用流程服务？ 一键带你快速入门\']'),
               btn: this.$t('m[\'产品文档\']'),
-              href: 'https://bk.tencent.com/docs/document/6.0/145/6592',
+              href: window.DOC_URL,
             },
             {
               text: this.$t('m[\'了解更详细的流程服务产品架构和功能介绍，点击查阅产品白皮书\']'),
               btn: this.$t('m[\'产品文档\']'),
-              href: 'https://bk.tencent.com/docs/document/6.0/145/6592',
+              href: window.DOC_URL,
             },
           ],
         },
