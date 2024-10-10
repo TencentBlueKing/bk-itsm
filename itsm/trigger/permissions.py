@@ -88,15 +88,18 @@ class WorkflowTriggerPermit(IamAuthPermit):
             workflow_id = None
             if obj.source_type == SOURCE_WORKFLOW:
                 is_workflow = True
-                workflow_id = request.data.get("source_id")
-            elif obj.source_type == SOURCE_WORKFLOW:
-                is_workflow = True
                 workflow_id = obj.source_id
             
             if is_workflow:
                 workflow = Workflow.objects.get(id=workflow_id)
                 apply_actions = ["service_manage"]
                 return self.iam_auth(request, apply_actions, workflow.get_iam_resource())
+            
+            # 通过任务模板创建
+            if obj.source_type == SOURCE_TASK:
+                apply_actions = ["public_task_template_manage"]
+                return self.iam_auth(request, apply_actions)
+            
             apply_actions = ["triggers_manage"]
 
         return self.iam_auth(request, apply_actions, obj)

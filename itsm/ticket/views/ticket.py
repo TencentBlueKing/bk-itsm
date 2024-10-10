@@ -368,7 +368,6 @@ class TicketModelViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         service = Service.objects.get(id=data["service_id"])
-        print("----- create ticket get service")
 
         # 是否开启代提单
         meta = data.get("meta", {})
@@ -379,13 +378,16 @@ class TicketModelViewSet(ModelViewSet):
 
         # creator(实际提单人)和updated_by在serializer.to_internal_value(data)中获取
         instance = serializer.save(meta=meta)
-        print("----- create ticket do_after_create begin")
+        logger.info(f"[TICKET] create ticket do_after_create begin ticket_id=>{instance.id}")
+        
         instance.do_after_create(
             request.data["fields"], request.data.get("from_ticket_id", None)
         )
-        print("----- create ticket do_after_create end")
+        logger.info(f"[TICKET] create ticket do_after_create end ticket_id=>{instance.id}")
+        
         start_pipeline.apply_async([instance])
-        print("----- create ticket start_pipeline end")
+        logger.info(f"[TICKET] create ticket start_pipeline end ticket_id=>{instance.id}")
+        
         return Response({"sn": instance.sn, "id": instance.id}, status=201)
 
     @action(detail=True, methods=["get"])

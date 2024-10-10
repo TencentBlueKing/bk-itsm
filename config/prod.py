@@ -109,7 +109,7 @@ BK_IAM_RESOURCE_API_HOST = os.getenv(
 
 # 如果是容器化环境，则覆盖配置
 ENGINE_REGION = os.environ.get("BKPAAS_ENGINE_REGION", "open")
-if ENGINE_REGION == "default":
+if ENGINE_REGION == "default" and RUN_VER != "ieod":
     default_settings = importlib.import_module(
         "adapter.config.sites.%s.ver_settings" % "v3"
     )
