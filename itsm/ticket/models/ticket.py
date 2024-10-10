@@ -2179,10 +2179,6 @@ class Ticket(Model, BaseTicket):
         )
 
     def iam_ticket_manage_auth(self, username):
-        # 本地开发环境，不校验单据管理权限
-        if settings.ENVIRONMENT == "dev":
-            return True
-
         iam_client = IamRequest(username=username)
         resource_info = {
             "resource_id": str(self.service_id),

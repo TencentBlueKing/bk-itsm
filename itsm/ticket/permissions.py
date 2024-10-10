@@ -90,7 +90,6 @@ class TicketPermissionValidate(permissions.BasePermission):
             "send_sms",
             "send_email",
             "master_or_slave",
-            "add_follower",
             "can_exception_distribute",
             "get_ticket_output",
             "get_step_process_info",
@@ -155,10 +154,6 @@ class TicketPermissionValidate(permissions.BasePermission):
         return any([obj.can_operate(username)])
 
     def iam_ticket_manage_auth(self, request, obj):
-        # 本地开发环境，不校验单据管理权限
-        if settings.ENVIRONMENT == "dev":
-            return True
-
         iam_client = IamRequest(request)
         resource_info = {
             "resource_id": str(obj.service_id),

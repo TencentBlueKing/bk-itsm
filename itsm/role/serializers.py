@@ -87,8 +87,9 @@ class UserRoleSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = UserRole
         fields = (
-        "id", "role_type", "name", "members", "project_key", "owners", "access", "desc", "role_key",
-        "creator", "is_builtin")
+            "id", "role_type", "name", "members", "project_key", "owners", "access", 
+            "desc", "role_key", "creator", "is_builtin")
+        create_only_fields = ("project_key", "is_builtin", "creator")
 
     def __init__(self, *args, **kwargs):
         super(UserRoleSerializer, self).__init__(*args, **kwargs)
