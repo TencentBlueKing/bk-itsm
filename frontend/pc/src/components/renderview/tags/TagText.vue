@@ -27,7 +27,7 @@
       <p class="text-block" v-for="(item, index) in value" :key="index">
         <label v-if="item.label" class="label">
           {{ item.label }}
-          <i v-if="item.desc || desc" v-bk-tooltips="{ content: item.desc || desc, allowHtml: false }" class="bk-itsm-icon icon-itsm-icon-help"></i>
+          <i v-if="item.desc || desc" v-bk-tooltips="{ content: item.desc || desc, allowHTML: false }" class="bk-itsm-icon icon-itsm-icon-help"></i>
         </label>
         <span class="value">{{ item.value }}</span>
       </p>
@@ -35,7 +35,7 @@
     <p v-else>
       <label v-if="label" class="label">
         {{ label }}
-        <i v-if="desc" v-bk-tooltips="{ content: desc, allowHtml: false }" class="bk-itsm-icon icon-itsm-icon-help"></i>
+        <i v-if="desc" v-bk-tooltips="{ content: desc, allowHTML: false }" class="bk-itsm-icon icon-itsm-icon-help"></i>
       </label>
       <span class="value">{{ value }}</span>
     </p>
