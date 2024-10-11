@@ -67,20 +67,9 @@
                   :class="['service-item', { active: selectedService && selectedService.id === service.id }]"
                   :key="service.id"
                   @click="onSelectService(service)">
-                  <div
-                    v-html="service.name"
-                    v-bk-tooltips="{
-                      allowHtml: true,
-                      placement: 'top',
-                      boundary: 'window',
-                      extCls: 'service-title-desc-tooltip',
-                      width: 354,
-                      delay: [500, 0],
-                      content: `#serviceTips_${service.id}`
-                    }"
-                    class="service-name">
+                  <div class="service-name">
+                    {{ service.name }}
                   </div>
-                  <div :id="`serviceTips_${service.id}`" class="service-tooltip-content"><h4 v-html="service.name"></h4><pre>{{service.desc}}</pre></div>
                   <div class="active-tag">
                     <i class="bk-itsm-icon icon-itsm-icon-fill-fit"></i>
                   </div>

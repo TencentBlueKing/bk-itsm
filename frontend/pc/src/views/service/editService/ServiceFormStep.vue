@@ -45,7 +45,15 @@
             </div>
             <ul class="field-list">
               <li class="field-item" v-for="(field, index) in fieldsLibrary" :key="index" @click="onAddFormClick(field)">
-                <span v-bk-tooltips.light="field.name" class="field-name">{{ field.name }}</span>
+                <span
+                  v-bk-tooltips="{
+                    allowHTML: false,
+                    theme: 'light',
+                    content: field.name
+                  }"
+                  class="field-name">
+                  {{ field.name }}
+                </span>
               </li>
             </ul>
             <div v-if="fieldsLibrary.length === 0" class="public-field">
@@ -68,7 +76,11 @@
             </div>
             <ul class="field-list">
               <li class="field-item" v-for="(field, index) in publicFields" :key="index" @click="addField(field)">
-                <span class="field-name" v-bk-tooltips.light="field.name">{{ field.name }}</span>
+                <span
+                  class="field-name"
+                  v-bk-tooltips.light="{ allowHTML: false, content: field.name }">
+                  {{ field.name }}
+                </span>
               </li>
             </ul>
             <div v-if="publicFields.length === 0" class="public-field"><i class="bk-itsm-icon icon-itsm-icon-four-zero" style="font-size: 14px"></i> 已有字段不存在你搜索的内容</div>
