@@ -125,14 +125,6 @@
         // 组织架构
         organizationList: [],
         updateDate: +new Date(),
-        tooltipConfig: {
-          allowHtml: true,
-          trigger: 'click',
-          theme: 'light',
-          content: '#tooltipHtml',
-          placement: 'top',
-          extCls: 'bk-processor-wrapper',
-        },
         // 手动触发器下拉框状态
         isDropdownShow: false,
         basicInDomHeight: 54, // 基本信息初始高度
