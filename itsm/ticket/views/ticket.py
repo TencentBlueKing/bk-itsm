@@ -371,10 +371,12 @@ class TicketModelViewSet(ModelViewSet):
 
         # 是否开启代提单
         meta = data.get("meta", {})
-        if service.can_ticket_agency:
-            username = getattr(request.user, "username", "guest")
-            if username != data.get("creator"):
+        username = getattr(request.user, "username", "guest")
+        if username != data.get("creator"):
+            if service.can_ticket_agency:
                 meta = dict(meta, ticket_agent=username)
+            else:
+                raise ValidationError(_("用户登录态异常"))
 
         # creator(实际提单人)和updated_by在serializer.to_internal_value(data)中获取
         instance = serializer.save(meta=meta)
