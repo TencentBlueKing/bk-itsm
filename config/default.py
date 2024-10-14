@@ -109,6 +109,7 @@ INSTALLED_APPS += (
     "blueapps.opentelemetry.instrument_app",
     "itsm.plugin_service",
     "bk_notice_sdk",
+    "pipeline.contrib.engine_admin",
 )
 
 INSTALLED_APPS = ("itsm.helper",) + INSTALLED_APPS
