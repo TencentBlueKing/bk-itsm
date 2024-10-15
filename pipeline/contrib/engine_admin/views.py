@@ -69,7 +69,7 @@ def _check_api_permission(func):
 
 @_check_api_permission
 def render_index(request, *args, **kwargs):
-    return render(request, "engine_admin/index.html",
+    return render(request, "eri_admin_index.html",
                   {"BKAPP_CSRF_COOKIE_NAME": settings.CSRF_COOKIE_NAME})
 
 
