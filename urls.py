@@ -47,6 +47,8 @@ urlpatterns = [
     url(r"^monitor/", include("itsm.monitor.urls")),
     # 各种入口：微信/wiki/首页等
     url(r"^", include("itsm.sites.urls")),
+    # eri admin
+    url(r"^eri/admin/", include("pipeline.contrib.engine_admin.urls"))
 ]
 
 handler404 = "error_pages.views.error_404"
