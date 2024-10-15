@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title> bamboo-engine-admin-frontend </title>
+    <link href="{% static 'css/app.2bc2043.css' %}" rel="stylesheet"></head>
+    <body>
+        <div id="app"></div>
+        <script>
+            var SITE_URL = '{{SITE_URL}}'
+            var BK_STATIC_URL = '{{BK_STATIC_URL}}/'
+            var REMOTE_STATIC_URL = ''
+            var APP_CODE = '{{APP_CODE}}'
+        </script>
+        <script>
+            var pathname = window.location.pathname
+            var SITE_URL = pathname.endsWith('/') ? pathname : pathname + '/'
+            function getCookie(name) {
+                var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+                return (arr = document.cookie.match(reg)) ? unescape(arr[2]) : null;
+            }
+        </script>
+    <script type="text/javascript" src="{% static 'js/runtime.114327c.js' %}"></script><script type="text/javascript" src="{% static 'js/vue-lib.dc44a51.js' %}"></script><script type="text/javascript" src="{% static 'js/app.0a38c7a.js' %}"></script></body>
+</html>

@@ -1,4 +1,7 @@
 # Changelog
+## [Version: 2.7.1] - 2024-10-15
+【新增】pipeline管理工具集成
+
 ## [Version: 2.7.0] - 2024-10-10
 【新增】通知人员黑名单过滤  
 【优化】esb鉴权信息迁移到header，支持版本 open-paas/esb >= 2.12.20  
