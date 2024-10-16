@@ -1,6 +1,8 @@
 # Changelog
 ## [Version: 2.7.1] - 2024-10-15
 【Feature】Integrated pipeline management tool.
+【Fix】Ensure compatibility for third-party applications transmitting JSON content.  
+
 
 ## [Version: 2.7.0] - 2024-10-10
 【Feature】Notification recipient blacklist filtering.  
