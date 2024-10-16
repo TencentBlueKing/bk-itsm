@@ -12,6 +12,7 @@
             var BK_STATIC_URL = '{{BK_STATIC_URL}}/'
             var REMOTE_STATIC_URL = ''
             var APP_CODE = '{{APP_CODE}}'
+            var CSRF_TOKEN_NAME = '{{ BKAPP_CSRF_COOKIE_NAME }}'
         </script>
         <script>
             var pathname = window.location.pathname
@@ -20,6 +21,7 @@
                 var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
                 return (arr = document.cookie.match(reg)) ? unescape(arr[2]) : null;
             }
+            window.BKAPP_CSRF_COOKIE_NAME = CSRF_TOKEN_NAME
         </script>
     <script type="text/javascript" src="{% static 'js/runtime.114327c.js' %}"></script><script type="text/javascript" src="{% static 'js/vue-lib.dc44a51.js' %}"></script><script type="text/javascript" src="{% static 'js/app.0a38c7a.js' %}"></script></body>
 </html>
