@@ -969,3 +969,6 @@ if isinstance(NOTICE_IGNORE_LIST, str):
 
 # SMS 邀请评价限额
 TICKET_INVITE_SMS_COUNT = int(os.getenv("BKAPP_TICKET_INVITE_SMS_COUNT", 10))
+
+# eri admin
+PIPELINE_ENGINE_ADMIN_API_PERMISSION = "itsm.helper.permissions.check_permission_success"
