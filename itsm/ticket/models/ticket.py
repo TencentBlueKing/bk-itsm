@@ -654,8 +654,8 @@ class Status(Model):
                     [
                         _(role.name)
                         for role in UserRole.objects.filter(
-                            id__in=processors.split(",")
-                        )
+                        id__in=processors.split(",")
+                    )
                     ]
                 ),
             )
@@ -1405,7 +1405,7 @@ class Ticket(Model, BaseTicket):
         if not is_filter_sensitive_info:
             return self.meta
         return filter_sensitive_info(self.meta)
-    
+
     @property
     def task_schemas(self):
         # todo 测试后删除
@@ -1915,8 +1915,8 @@ class Ticket(Model, BaseTicket):
         return (
             self.current_status
             in TicketStatus.objects.filter(
-                service_type=self.service_type, is_over=False
-            ).values_list("key", flat=True)
+            service_type=self.service_type, is_over=False
+        ).values_list("key", flat=True)
             and self.current_status != SUSPEND
         )
 
@@ -2256,8 +2256,8 @@ class Ticket(Model, BaseTicket):
             [
                 status.can_operate(username)
                 for status in self.node_status.filter(
-                    status__in=Status.CAN_OPERATE_STATUS
-                )
+                status__in=Status.CAN_OPERATE_STATUS
+            )
             ]
         )
 
@@ -2273,8 +2273,8 @@ class Ticket(Model, BaseTicket):
             or username in self.task_operators
             or self.can_operate(username)
             or AttentionUsers.objects.filter(
-                ticket_id=self.id, follower=username
-            ).exists()
+            ticket_id=self.id, follower=username
+        ).exists()
         ):
             # 与单据操作相关的人，都是可以查看的
             return True
@@ -2336,10 +2336,10 @@ class Ticket(Model, BaseTicket):
         if (
             self.is_over
             or not StatusTransit.objects.filter(
-                service_type=self.service_type,
-                from_status__key=self.current_status,
-                to_status__is_over=True,
-            ).exists()
+            service_type=self.service_type,
+            from_status__key=self.current_status,
+            to_status__is_over=True,
+        ).exists()
         ):
             # 当前状态无法到达关闭的时候，不可以进行关闭操作按钮
             return False
@@ -3085,9 +3085,20 @@ class Ticket(Model, BaseTicket):
         filter_field_query_set = self.fields.filter(key__in=fields_map.keys())
         for ticket_field in filter_field_query_set:
             ticket_field.value = fields_map[ticket_field.key]["value"]
-            # 针对非附件类型的组件进行 xss 过滤
-            if isinstance(ticket_field.value, str) and ticket_field.type != "FILE":
-                ticket_field.value = texteditor_escape(ticket_field.value)
+            if isinstance(ticket_field.value, str):
+                need_escape = True
+                # 附件不做xss处理
+                if ticket_field.type == "FILE":
+                    need_escape = False
+                # 如果文本是 json 格式，则不额外处理
+                if ticket_field.type == "TEXT":
+                    try:
+                        json.loads(ticket_field.value)
+                        need_escape = False
+                    except Exception:
+                        pass
+                if need_escape:
+                    ticket_field.value = texteditor_escape(ticket_field.value)
 
             ticket_field.choice = fields_map[ticket_field.key].get("choice", [])
             language_config = (
@@ -3175,7 +3186,7 @@ class Ticket(Model, BaseTicket):
 
                     for user in f_value.split(","):
                         # 历史数据中多选人员选择字段存入了中文名: miya(miya)，暂时兼容
-                        username = user[0 : user.find("(")] if "(" in user else user
+                        username = user[0: user.find("(")] if "(" in user else user
                         var_pros = "{},{}".format(var_pros, username)
 
                     # 取到第一个处理人则停止解析
@@ -3253,13 +3264,13 @@ class Ticket(Model, BaseTicket):
             action_type = (
                 SYSTEM_OPERATE
                 if state.type
-                in [
-                    TASK_STATE,
-                    TASK_SOPS_STATE,
-                    TASK_DEVOPS_STATE,
-                    WEBHOOK_STATE,
-                    BK_PLUGIN_STATE,
-                ]
+                   in [
+                       TASK_STATE,
+                       TASK_SOPS_STATE,
+                       TASK_DEVOPS_STATE,
+                       WEBHOOK_STATE,
+                       BK_PLUGIN_STATE,
+                   ]
                 else TRANSITION_OPERATE
             )
 
