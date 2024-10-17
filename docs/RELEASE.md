@@ -1,7 +1,7 @@
 # Changelog
 ## [Version: 2.7.1] - 2024-10-15
-【新增】pipeline管理工具集成
-【修复】兼容第三方应用传递 json 内容
+【新增】pipeline管理工具集成  
+【优化】多行文本兼容 JSON、Markdown 格式  
 
 ## [Version: 2.7.0] - 2024-10-10
 【新增】通知人员黑名单过滤  

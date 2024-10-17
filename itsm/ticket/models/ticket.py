@@ -143,7 +143,7 @@ from itsm.component.constants import (
     BK_PLUGIN_STATE,
     SUSPENDED,
     SHOW_BY_CONDITION,
-    VARIABLE_LEADER,
+    VARIABLE_LEADER, FIELD_IGNORE_ESCAPE,
 )
 from itsm.component.constants.trigger import (
     CREATE_TICKET,
@@ -3085,20 +3085,8 @@ class Ticket(Model, BaseTicket):
         filter_field_query_set = self.fields.filter(key__in=fields_map.keys())
         for ticket_field in filter_field_query_set:
             ticket_field.value = fields_map[ticket_field.key]["value"]
-            if isinstance(ticket_field.value, str):
-                need_escape = True
-                # 附件不做xss处理
-                if ticket_field.type == "FILE":
-                    need_escape = False
-                # 如果文本是 json 格式，则不额外处理
-                if ticket_field.type == "TEXT":
-                    try:
-                        json.loads(ticket_field.value)
-                        need_escape = False
-                    except Exception:
-                        pass
-                if need_escape:
-                    ticket_field.value = texteditor_escape(ticket_field.value)
+            if isinstance(ticket_field.value, str) and ticket_field.type not in FIELD_IGNORE_ESCAPE:
+                ticket_field.value = texteditor_escape(ticket_field.value)
 
             ticket_field.choice = fields_map[ticket_field.key].get("choice", [])
             language_config = (
