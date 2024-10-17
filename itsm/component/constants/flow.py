@@ -330,8 +330,9 @@ SOURCE_CHOICES = [
     ("CUSTOM_API", "自定义API"),
 ]
 
-XSS_FIELD_TYPE = [
-    "RICHTEXT"
+FIELD_IGNORE_ESCAPE = [
+    "FILE",
+    "TEXT"
 ]
 
 LAYOUT_CHOICES = [
