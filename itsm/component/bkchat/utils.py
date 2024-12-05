@@ -11,6 +11,7 @@ from config.default import CLOSE_NOTIFY
 from itsm.component.constants import APPROVE_RESULT, API, RUNNING, SHOW_BY_CONDITION
 from itsm.component.exceptions import ComponentCallError
 from itsm.component.utils.conversion import show_conditions_validate, format_exp_value
+from itsm.meta.models import ContextService
 from itsm.ticket.models import Ticket, Status, TicketField, SignTask
 
 # 当前运行环境
@@ -113,6 +114,13 @@ def send_fast_approval_message(title, content, receivers, ticket, state_id):
 
     # 更新详情url
     ticket.generate_ticket_url(state_id, receivers)
+
+    # 如果ticket的service_id在黑名单中则不发送快速通知
+    context_service = ContextService()
+    service_approval_blacklist = context_service.get_context_value_list(key="service_approval_blacklist")
+    if str(ticket.service_id) in service_approval_blacklist:
+        logger.info(f"[fast_approval] service id is in service_approval_blacklist=>{ticket_id}")
+        return
     
     # 接收人过滤
     receivers = notice_receiver_filter(receivers)

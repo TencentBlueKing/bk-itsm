@@ -28,6 +28,7 @@ import logging
 from django.conf import settings
 from django.core.cache import cache
 from itsm.component.constants import PROCESS_COUNT
+from itsm.meta.models import ContextService
 from itsm.ticket.models import Ticket, Status
 from pipeline.component_framework.component import Component
 
@@ -56,12 +57,20 @@ class ItsmApprovalService(ItsmSignService):
         state_id = data.inputs.state_id
         ticket = Ticket.objects.get(id=ticket_id)
 
+        # 调用ticket的do_before_enter_sign_state方法，获取变量、条件、code_key
+        # 在这个方法里会发送bkchat快速审批消息，以及通知
         variables, finish_condition, code_key = ticket.do_before_enter_sign_state(
             state_id, by_flow=self.by_flow
         )
         is_multi = ticket.flow.get_state(state_id)["is_multi"]
         user_count = str(self.get_user_count(ticket_id, state_id)) if is_multi else "1"
-        ticket.create_moa_ticket(state_id)
+
+        # 如果service_id不在service_approval_blacklist中，则创建moa单据
+        context_service = ContextService()
+        service_approval_blacklist = context_service.get_context_value_list(
+            "service_approval_blacklist")
+        if str(ticket.service_id) not in service_approval_blacklist:
+            ticket.create_moa_ticket(state_id)
 
         # 如果是普通的审批节点，则自动生成条件
         if not is_multi:
