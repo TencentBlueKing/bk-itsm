@@ -37,6 +37,7 @@ from django.conf import settings
 
 from common.log import logger
 from common.pxfilter import XssHtml
+from itsm.meta.models import ContextService
 
 
 def html_escape(html, is_json=False):
@@ -107,5 +108,7 @@ def notice_receiver_filter(receivers):
         receiver_type = "str"
         receivers = receivers.strip().split(",")
     
-    receivers = [i for i in receivers if i not in settings.NOTICE_IGNORE_LIST]
+    context_service = ContextService()
+    notice_blacklist = context_service.get_context_value_list("notice_blacklist")
+    receivers = [i for i in receivers if i not in notice_blacklist]
     return receivers if receiver_type == "list" else ",".join(receivers)

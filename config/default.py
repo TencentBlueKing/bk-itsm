@@ -110,7 +110,8 @@ INSTALLED_APPS += (
     "blueapps.opentelemetry.instrument_app",
     "itsm.plugin_service",
     "bk_notice_sdk",
-    "pipeline.contrib.engine_admin"
+    "pipeline.contrib.engine_admin",
+    "itsm.meta",
 )
 
 INSTALLED_APPS = ("itsm.helper",) + INSTALLED_APPS
@@ -962,10 +963,6 @@ IAM_SDK_CLIENT_TIMEOUT = int(os.getenv("BKAPP_IAM_SDK_CLIENT_TIMEOUT", 20))
 BK_SHARED_RES_URL = os.getenv("BKPAAS_SHARED_RES_URL") or os.getenv("BKAPP_SHARED_RES_URL")
 BK_PLATFORM_NAME = os.getenv("BKAPP_PLATFORM_NAME", "")
 
-# 通知过滤
-NOTICE_IGNORE_LIST = os.getenv("BKAPP_NOTICE_IGNORE_LIST", [])
-if isinstance(NOTICE_IGNORE_LIST, str):
-    NOTICE_IGNORE_LIST = [i.lower().strip() for i in NOTICE_IGNORE_LIST.split(",")]
 
 # SMS 邀请评价限额
 TICKET_INVITE_SMS_COUNT = int(os.getenv("BKAPP_TICKET_INVITE_SMS_COUNT", 10))
