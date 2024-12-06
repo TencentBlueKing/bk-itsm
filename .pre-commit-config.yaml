@@ -19,10 +19,3 @@ repos:
       - id: commitlint
         stages: [commit-msg]
         additional_dependencies: ['@commitlint/config-conventional']
-  - repo: local
-    hooks:
-      - id: check-migrate
-        name: check migrate
-        entry: python scripts/check_migrate/check_migrate.py
-        language: system
-        types: [python]

@@ -22,7 +22,6 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-from django.conf import settings
 
 # 开发框架公用方法
 # 1. 页面输入内容转义（防止xss攻击）
@@ -37,6 +36,7 @@ from django.conf import settings
 
 from common.log import logger
 from common.pxfilter import XssHtml
+from itsm.meta.models import ContextService
 
 
 def html_escape(html, is_json=False):
@@ -56,7 +56,7 @@ def html_escape(html, is_json=False):
     html = html.replace(">", "&gt;")
     # 单双引号转换
     if not is_json:
-        html = html.replace(' ', "&nbsp;")
+        html = html.replace(" ", "&nbsp;")
         html = html.replace('"', "&quot;")
         html = html.replace("'", "&#39;")
     return html
@@ -65,7 +65,7 @@ def html_escape(html, is_json=False):
 def url_escape(url):
     url = url.replace("<", "")
     url = url.replace(">", "")
-    url = url.replace(' ', "")
+    url = url.replace(" ", "")
     url = url.replace('"', "")
     url = url.replace("'", "")
     return url
@@ -101,11 +101,13 @@ def notice_receiver_filter(receivers):
     """
     if not receivers:
         return receivers
-    
+
     receiver_type = "list"
     if isinstance(receivers, str):
         receiver_type = "str"
         receivers = receivers.strip().split(",")
-    
-    receivers = [i for i in receivers if i not in settings.NOTICE_IGNORE_LIST]
+
+    context_service = ContextService()
+    notice_blacklist = context_service.get_context_value_list("notice_blacklist")
+    receivers = [i for i in receivers if i not in notice_blacklist]
     return receivers if receiver_type == "list" else ",".join(receivers)
