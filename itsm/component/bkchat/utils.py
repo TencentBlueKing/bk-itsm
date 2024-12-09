@@ -120,7 +120,7 @@ def send_fast_approval_message(title, content, receivers, ticket, state_id):
     )
     if str(ticket.service_id) in service_approval_blacklist:
         logger.info(
-            f"[fast_approval] service id is in service_approval_blacklist=>{ticket_id}"
+            f"[fast_approval] service id is in service_approval_blacklist, ticket_id=>{ticket_id}"
         )
         return
 
