@@ -76,24 +76,3 @@ class ContextService:
             unique_values = list(set(item.strip() for item in context_value.split(",")))
             return unique_values
         return []
-
-    @staticmethod
-    def notice_receiver_filter(receivers):
-        """通知名单过滤"""
-        if not receivers:
-            return receivers
-
-        if isinstance(receivers, str):
-            receivers = receivers.strip().split(",")
-
-        # 对黑名单的内容进行去重
-        notice_blacklist = ContextService.get_context_value_list("notice_blacklist")
-        filtered_receivers = [i for i in receivers if i not in notice_blacklist]
-        return (
-            filtered_receivers
-            if isinstance(receivers, list)
-            else ",".join(filtered_receivers)
-        )
-
-
-context_service = ContextService()
