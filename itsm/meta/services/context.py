@@ -24,27 +24,43 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django.core.cache import cache
-from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 from itsm.component.constants import CACHE_5MIN
+from itsm.meta.models import Context
+from common.log import logger
 
 
-class Context(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    key = models.CharField(max_length=255, unique=True)
-    value = models.TextField(blank=True)
+class ContextService:
+    @staticmethod
+    def get_context_value(key):
+        """返回context_value，若不存在则返回None"""
+        cache_key = f"meta_context_{key}"
+        context_value = cache.get(cache_key)
 
-    def __str__(self):
-        return self.key
+        # 如果缓存中没有找到值
+        if context_value is None:
+            try:
+                # 尝试从数据库中获取值
+                context_value = Context.objects.get(key=key).value
+            except Context.DoesNotExist:
+                logger.info(f"数据库中key为'{key}'的上下文配置不存在")
+                context_value = None
+            except Exception as e:
+                logger.error(f"获取key为'{key}'的上下文配置时发生错误: {str(e)}")
+                context_value = None
 
-    class Meta:
-        db_table = "meta_context"
+            # 将获取到的值存入缓存
+            cache.set(cache_key, context_value, CACHE_5MIN)
 
+        return context_value
 
-@receiver(post_save, sender=Context)
-def update_cache(sender, instance, **kwargs):
-    cache_key = f"meta_context_{instance.key}"
-    cache.set(cache_key, instance.value, CACHE_5MIN)
+    @staticmethod
+    def get_context_value_list(key):
+        """返回list类型的context_value，若不存在则返回空列表"""
+        context_value = ContextService.get_context_value(key)
+
+        if context_value:
+            # 分割字符串，去除空白字符，并去重
+            unique_values = list(set(item.strip() for item in context_value.split(",")))
+            return unique_values
+        return []

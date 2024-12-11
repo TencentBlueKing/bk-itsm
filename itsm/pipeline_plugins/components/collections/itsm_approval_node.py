@@ -28,7 +28,7 @@ import logging
 from django.conf import settings
 from django.core.cache import cache
 from itsm.component.constants import PROCESS_COUNT
-from itsm.meta.utils import notice_filter_service
+from itsm.meta.services.notice_filter import notice_filter_service
 from itsm.ticket.models import Ticket, Status
 from pipeline.component_framework.component import Component
 

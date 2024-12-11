@@ -10,7 +10,7 @@ from config.default import CLOSE_NOTIFY
 from itsm.component.constants import APPROVE_RESULT, API, RUNNING, SHOW_BY_CONDITION
 from itsm.component.exceptions import ComponentCallError
 from itsm.component.utils.conversion import show_conditions_validate, format_exp_value
-from itsm.meta.utils import notice_filter_service
+from itsm.meta.services.notice_filter import notice_filter_service
 from itsm.ticket.models import Ticket, Status, TicketField, SignTask
 
 # 当前运行环境

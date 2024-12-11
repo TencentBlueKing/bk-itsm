@@ -33,7 +33,7 @@ from itsm.component.constants import GENERAL_NOTICE
 from itsm.component.esb.esbclient import client_backend
 from itsm.component.exceptions import ComponentCallError
 from itsm.component.utils.basic import merge_dict_list
-from itsm.meta.utils import notice_filter_service
+from itsm.meta.services.notice_filter import notice_filter_service
 from weixin.core.settings import WEIXIN_APP_EXTERNAL_HOST
 
 
