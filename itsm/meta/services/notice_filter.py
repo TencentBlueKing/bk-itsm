@@ -32,14 +32,16 @@ class NoticeFilterService:
         if not receivers:
             return receivers
 
+        receiver_type = "list"
         if isinstance(receivers, str):
+            receiver_type = "str"
             receivers = receivers.strip().split(",")
 
         notice_blacklist = ContextService.get_context_value_list("notice_blacklist")
         filtered_receivers = [i for i in receivers if i not in notice_blacklist]
         return (
             filtered_receivers
-            if isinstance(receivers, list)
+            if receiver_type == "list"
             else ",".join(filtered_receivers)
         )
 
