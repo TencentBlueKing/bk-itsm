@@ -1,6 +1,9 @@
 # Changelog
 ## [Version: 2.7.3] - 2024-11-25
+【Feature】Add meta context management, applied to fast approval, MOA, and notification receivers filter.  
 【Fix】API request node POST parameter editing rendering issue.  
+【Fix】"Submit" button was not internationalized, "Return to Ticket List" button text overflow.  
+
 
 ## [Version: 2.7.2] - 2024-11-18
 【Feature】Add a popup confirmation when deleting lines on the canvas.  

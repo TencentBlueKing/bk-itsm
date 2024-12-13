@@ -5,7 +5,7 @@ author: 蓝鲸智云
 category: 办公应用
 introduction: 流程服务是蓝鲸推出的轻量级ITSM，通过可自定义设计的流程模块，覆盖IT服务中的不同管理活动或应用场景。帮助企业用户规范内部管理流程，提升沟通及管理效率。
 introduction_en: bk_itsm is a lightweight ITSM created by Blueking. It covers different application scenarios in IT services through customizable workflows and help enterprise users to implement standardize IT workflow, improve communication and management efficiency.
-version: 2.7.1
+version: 2.7.3
 language: python
 is_use_celery: True
 is_use_celery_with_gevent: False
