@@ -7545,8 +7545,8 @@ msgstr ""
 #~ msgid "打回"
 #~ msgstr "return"
 
-#~ msgid "提交"
-#~ msgstr "Submit"
+msgid "提交"
+msgstr "Submit"
 
 #~ msgid "分派"
 #~ msgstr "Assign"
