@@ -1,4 +1,9 @@
 # Changelog
+## [Version: 2.7.4] - 2025-02-18
+【Improved】Remove the preview entry next to the link field. 
+【Fix】Fixed the issue of duplicate API calls on the document details page. 
+【Fix】Fixed the issue with form field validation in the line configuration condition relationship. 
+
 ## [Version: 2.7.3] - 2024-11-25
 【Feature】Add meta context management, applied to fast approval, MOA, and notification receivers filter.  
 【Fix】API request node POST parameter editing rendering issue.  

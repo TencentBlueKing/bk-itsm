@@ -284,6 +284,7 @@
   import commonMix from '../../../commonMix/common.js';
   import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
   import { errorHandler } from '../../../../utils/errorHandler';
+  import { isEmpty } from '@/utils/util';
 
   export default {
     components: {
@@ -580,7 +581,7 @@
       submitLine() {
         if (this.lineInfo.condition_type === 'by_field') {
           this.lineInfo.expressions.forEach((item) => {
-            item.checkInfo = item.expressions.some(node => (!node.condition || !node.key || (Array.isArray(node.value) ? !node.value.length : !node.value)));
+            item.checkInfo = item.expressions.some(node => (isEmpty(node.condition) || isEmpty(node.key) || isEmpty(node.value)));
           });
           const checkStatus = this.lineInfo.expressions.some(item => item.checkInfo);
           if (checkStatus) {
