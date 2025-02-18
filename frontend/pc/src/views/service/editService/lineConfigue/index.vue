@@ -290,6 +290,7 @@
   import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
   import commonMix from '@/views/commonMix/common.js';
   import commonTriggerList from '@/views/processManagement/taskTemplate/components/commonTriggerList';
+  import { isEmpty } from '@/utils/util';
   import { errorHandler } from '@/utils/errorHandler';
 
   export default {
@@ -592,7 +593,7 @@
       submitLine() {
         if (this.lineInfo.condition_type === 'by_field') {
           this.lineInfo.expressions.forEach((item) => {
-            item.checkInfo = item.expressions.some(node => (!node.condition || !node.key || (Array.isArray(node.value) ? !node.value.length : !node.value)));
+            item.checkInfo = item.expressions.some(node => (isEmpty(node.condition) || isEmpty(node.key) || isEmpty(node.value)));
           });
           const checkStatus = this.lineInfo.expressions.some(item => item.checkInfo);
           if (checkStatus) {
