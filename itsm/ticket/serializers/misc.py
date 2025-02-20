@@ -62,7 +62,11 @@ class TemplateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(_("该模板名字已存在"))
         if self.context["view"].action == "update":
             if (
-                TicketTemplate.objects.filter(name=attrs.get("name"), creator=creator, service=attrs.get("service"))
+                TicketTemplate.objects.filter(
+                    name=attrs.get("name"),
+                    creator=creator,
+                    service=attrs.get("service"),
+                )
                 .exclude(id=pk)
                 .exists()
             ):
@@ -86,13 +90,17 @@ class StateDraftSerializer(serializers.ModelSerializer):
         creator = self.context["request"].user.username
         if self.context["view"].action == "create":
             if TicketStateDraft.objects.filter(
-                ticket_id=attrs.get("ticket_id"), creator=creator, state_id=attrs.get("state_id")
+                ticket_id=attrs.get("ticket_id"),
+                creator=creator,
+                state_id=attrs.get("state_id"),
             ).exists():
                 raise serializers.ValidationError(_("该模板名字已存在"))
         if self.context["view"].action == "update":
             if (
                 TicketStateDraft.objects.filter(
-                    ticket_id=attrs.get("ticket_id"), creator=creator, state_id=attrs.get("state_id")
+                    ticket_id=attrs.get("ticket_id"),
+                    creator=creator,
+                    state_id=attrs.get("state_id"),
                 )
                 .exclude(id=self.context["view"].kwargs.get("pk"))
                 .exists()
@@ -106,7 +114,9 @@ class CommentSerializer(serializers.ModelSerializer):
     """工单评价序列化"""
 
     stars = serializers.IntegerField(required=True, max_value=6, min_value=1)
-    comments = serializers.CharField(required=False, max_length=LEN_LONG, allow_null=True, allow_blank=True)
+    comments = serializers.CharField(
+        required=False, max_length=LEN_LONG, allow_null=True, allow_blank=True
+    )
 
     class Meta:
         model = TicketComment
@@ -125,16 +135,20 @@ class CommentSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         if instance.stars != 0:
             raise serializers.ValidationError(_("该单据已经被评论，请勿重复评论"))
-        
+
         validated_data["comments"] = texteditor_escape(
-            validated_data["comments"], is_support_img=False
+            validated_data["comments"], unsupported_tags=["img"]
         )
         return super(CommentSerializer, self).update(instance, validated_data)
 
     def to_representation(self, instance):
         data = super(CommentSerializer, self).to_representation(instance)
-        data["has_invited"] = ",".join(instance.invite.all().values_list("receiver", flat=True))
-        data["creator"] = get_bk_users(format="dict", users=[data["creator"]]).get(data["creator"], data["creator"])
+        data["has_invited"] = ",".join(
+            instance.invite.all().values_list("receiver", flat=True)
+        )
+        data["creator"] = get_bk_users(format="dict", users=[data["creator"]]).get(
+            data["creator"], data["creator"]
+        )
         return data
 
 
@@ -165,7 +179,9 @@ class FollowerNotifyLogSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super(FollowerNotifyLogSerializer, self).to_representation(instance)
-        data["creator_zh"] = get_bk_users(format="dict", users=[instance.creator]).get(instance.creator, "")
+        data["creator_zh"] = get_bk_users(format="dict", users=[instance.creator]).get(
+            instance.creator, ""
+        )
         data["create_at"] = "{}".format(get_time(instance.create_at))
         data["group"] = transform_username(
             UserRole.get_users_by_type(

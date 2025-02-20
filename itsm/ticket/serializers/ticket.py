@@ -114,7 +114,11 @@ from itsm.ticket.serializers.field import (
     TaskFieldSerializer,
 )
 from itsm.ticket.tasks import remark_notify
-from itsm.ticket.utils import compute_list_difference, get_user_profile, filter_sensitive_info
+from itsm.ticket.utils import (
+    compute_list_difference,
+    get_user_profile,
+    filter_sensitive_info,
+)
 from itsm.ticket.validators import CreateTicketValidator, StateOperateValidator
 from itsm.ticket_status.models import TicketStatus
 from itsm.workflow.models import WorkflowVersion
@@ -874,7 +878,7 @@ class TicketSerializer(AuthModelSerializer):
         # 当前步骤、单据状态、优先级来源母单
         master_ticket = inst.get_master_ticket()
         master_or_self_ticket = master_ticket if master_ticket else inst
-        
+
         meta = master_or_self_ticket.get_meta()
 
         data.update(
@@ -882,7 +886,7 @@ class TicketSerializer(AuthModelSerializer):
             current_status_display=master_or_self_ticket.current_status_display,
             current_steps=master_or_self_ticket.brief_current_steps,
             priority_name=master_or_self_ticket.priority_name,
-            meta=meta
+            meta=meta,
         )
 
         can_comment = inst.can_comment(username) or is_email_invite_token
@@ -1562,7 +1566,7 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
             compute_list_difference(instance.users, validated_data["users"])
         )
         validated_data["content"] = texteditor_escape(
-            validated_data["content"], is_support_img=False
+            validated_data["content"], unsupported_tags=["a", "img"]
         )
 
         instance.update_log.append(
@@ -1587,7 +1591,7 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
         validated_data["parent_id"] = parent_id
         validated_data["ticket_id"] = parent_node.ticket_id
         validated_data["content"] = texteditor_escape(
-            validated_data["content"], is_support_img=False
+            validated_data["content"], unsupported_tags=["a", "img"]
         )
         validated_data.pop("parent")
         instance = super(TicketRemarkSerializer, self).create(validated_data)
