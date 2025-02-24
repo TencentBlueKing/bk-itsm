@@ -47,25 +47,52 @@ weixin_account = WeixinAccount()
 def get_user(request):
     user = None
     user_id = request.session.get('weixin_user_id')
+    logger.info('get_user: %s', user_id)
     if user_id:
         try:
             user = BkWeixinUser.objects.get(pk=user_id)
         except BkWeixinUser.DoesNotExist:
             user = None
+    logger.info('get_user: %s, user=%s', user_id, user)
     return user or AnonymousUser()
 
 
+def get_user_by_wx_userid(wx_userid):
+    """直接通过用户管理来获取企微对应的蓝鲸账户"""
+    from itsm.component.esb.esbclient import client_backend
+    resp = client_backend.usermanage.retrieve_user(
+        {"fields": "username,display_name,email,id,code",  "lookup_field": "wx_userid", "id": wx_userid}
+    )
+    logger.info('get_user_by_wxuserid: %s -> %s', wx_userid, resp)
+    return resp
+        
+
 def get_bk_user(request):
     bkuser = None
+    logger.info('get_bk_user: weixin_user=%s', request.weixin_user.__dict__)
     if request.weixin_user and not isinstance(request.weixin_user, AnonymousUser):
         user_model = get_user_model()
-        try:
-            user_property = UserProperty.objects.get(key='wx_userid',
-                                                     value=request.weixin_user.userid)
-        except UserProperty.DoesNotExist:
-            logger.warning('user[wx_userid=%s] not in UserProperty' % request.weixin_user.userid)
-        else:
-            bkuser = user_model.objects.get(username=user_property.user.username)
+        # PATCHED: 由于开发框架的升级，应用登录后不会保存wx_userid的信息，导致无法获取到蓝鲸用户
+        # try:
+        #    user_property = UserProperty.objects.get(key='wx_userid',
+        #                                             value=request.weixin_user.userid)
+        #    logger.info('get_bk_user, user_property: %s', user_property.__dict__)
+        # except UserProperty.DoesNotExist:
+        #    logger.warning('user[wx_userid=%s] not in UserProperty' % request.weixin_user.userid)
+        # else:
+        #    bkuser = user_model.objects.get(username=user_property.user.username)
+        user_info = get_user_by_wx_userid(request.weixin_user.userid)
+        # PATCHED: 第一次登录需要创建用户，同时避免了用户一定要绑定并访问一次itsm才能使用移动端
+        bkuser, created = user_model.objects.get_or_create(
+            username=user_info.get('username'),
+            defaults={
+                "nick_name": user_info.get("display_name"),
+                "is_staff": True
+            }
+        )
+        logger.info('get_bk_user from weixin user: %s -> %s: %s', request.weixin_user.userid, bkuser, created)
+
+    logger.info('get_bk_user: %s', bkuser.__dict__)
     return bkuser or AnonymousUser()
 
 
@@ -88,6 +115,7 @@ class WeixinProxyPatchMiddleware(MiddlewareMixin):
     def process_request(self, request):
 
         # 非微信访问，跳过中间件
+        logger.info('is_weixin_visit: %s', weixin_account.is_weixin_visit(request))
         if not weixin_account.is_weixin_visit(request):
             setattr(request, 'source', WEB)
             setattr(request, 'is_weixin', False)
@@ -95,14 +123,19 @@ class WeixinProxyPatchMiddleware(MiddlewareMixin):
 
         if settings.X_FORWARDED_WEIXIN_HOST in request.META:
             request.META['HTTP_X_FORWARDED_HOST'] = request.META[settings.X_FORWARDED_WEIXIN_HOST]
-            setattr(request, 'is_weixin', True)
-            setattr(request, 'source', MOBILE)
-            return None
+        
+        # PATCHED: 兜底设置为企微访问
+        setattr(request, 'is_weixin', True)
+        setattr(request, 'source', MOBILE)
+        
+        return None
 
 
 class WeixinAuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request):
 
+        logger.info('WeixinAuthenticationMiddleware -> request.is_weixin: %s',
+                    getattr(request, 'is_weixin', False))
         if not getattr(request, 'is_weixin', False):
             return None
 
@@ -142,6 +175,8 @@ class WeixinLoginMiddleware(MiddlewareMixin):
     def process_view(self, request, view, args, kwargs):
         """process_view."""
 
+        logger.info('WeixinLoginMiddleware -> request.is_weixin: %s', 
+                    getattr(request, 'is_weixin', False))
         if not getattr(request, 'is_weixin', False):
             return None
 
@@ -150,9 +185,13 @@ class WeixinLoginMiddleware(MiddlewareMixin):
 
         # 豁免微信登录装饰器
         if getattr(view, 'weixin_login_exempt', False):
+            logger.info('WeixinLoginMiddleware -> weixin_login_exempt: %s, %s', 
+                        view.__dict__, getattr(view, 'weixin_login_exempt', None))
             return None
 
         # 验证OK
+        logger.info('WeixinLoginMiddleware -> request.weixin_user.is_authenticated: %s -> %s', 
+                    view.__dict__, request.weixin_user.is_authenticated)
         if request.weixin_user.is_authenticated:
             # 必须绑定微信到蓝鲸 - 返回状态码 438
             if isinstance(request.user, AnonymousUser):
@@ -162,4 +201,6 @@ class WeixinLoginMiddleware(MiddlewareMixin):
             return None
 
         # 微信登录失效或者未通过验证，直接重定向到微信登录
+        logger.info('WeixinLoginMiddleware -> check weixin login failed, start redirect %s', 
+                    request.get_full_path())
         return weixin_account.redirect_weixin_login(request)

@@ -33,6 +33,7 @@ import urllib.parse
 import urllib.request
 
 from django.http import HttpResponse, HttpResponseRedirect
+from django.middleware.csrf import rotate_token
 
 from common.log import logger
 from . import settings as weixin_settings
@@ -75,10 +76,18 @@ class WeixinAccount(WeixinAccountSingleton):
         """
         是否来自微信访问
         """
+        # PATCHED： 调试
+        WEIXIN_APP_EXTERNAL_HOST = weixin_settings.WEIXIN_APP_EXTERNAL_HOST
+        logger.info('USE_WEIXIN: %s, path: %s, get_host(): %s, WEIXIN_APP_EXTERNAL_HOST: %s', 
+                    weixin_settings.USE_WEIXIN, request.path, 
+                    request.get_host(), WEIXIN_APP_EXTERNAL_HOST)
+
         if (
             weixin_settings.USE_WEIXIN
             and request.path.startswith(weixin_settings.WEIXIN_SITE_URL)
-            and request.get_host() == weixin_settings.WEIXIN_APP_EXTERNAL_HOST
+            # PATCH: 这里需要根据代理调整，没有配置代理的情况下回导致无法识别为微信登录
+            # and request.get_host() == weixin_settings.WEIXIN_APP_EXTERNAL_HOST
+            # and WEIXIN_APP_EXTERNAL_HOST and request.get_host() in WEIXIN_APP_EXTERNAL_HOST
         ):
             return True
         return False
@@ -115,12 +124,18 @@ class WeixinAccount(WeixinAccountSingleton):
         url = urllib.parse.urlparse(request.build_absolute_uri())
         path = weixin_settings.WEIXIN_LOGIN_URL
         query = urllib.parse.urlencode({'c_url': request.get_full_path()})
-        # callback_url = urlparse.urlunsplit((url.scheme, url.netloc, path, query, url.fragment))
-        callback_url = urllib.parse.urlunsplit(
-            (url.scheme, weixin_settings.WEIXIN_APP_EXTERNAL_HOST, path, query, url.fragment)
-        )
+        
+        callback_url = urlparse.urlunsplit((url.scheme, url.netloc, path, query, url.fragment))
+        logger.info('weixin_callback_url: %s', callback_url)
+        if weixin_settings.WEIXIN_APP_EXTERNAL_HOST:
+            callback_url = urllib.parse.urlunsplit(
+                (url.scheme, weixin_settings.WEIXIN_APP_EXTERNAL_HOST, path, query, url.fragment)
+            )
+            
         state = self.set_weixin_oauth_state(request)
         redirect_uri = self.get_oauth_redirect_url(callback_url, state)
+        logger.info('WEIXIN_APP_EXTERNAL_HOST=%s, callback_url=%s, state=%s, redirect_uri=%s', 
+                    weixin_settings.WEIXIN_APP_EXTERNAL_HOST, callback_url, state, redirect_uri)
         return HttpResponseRedirect(redirect_uri)
 
     def verify_weixin_oauth_state(self, request, expires_in=60):
@@ -210,6 +225,8 @@ class WeixinAccount(WeixinAccountSingleton):
         """
         微信登录后回调
         """
+        logger.info('微信登录回调')
+
         if not self.is_weixin_visit(request):
             # TODO 改造为友好页面
             return HttpResponse("非微信访问，或应用未启动微信访问")
@@ -236,6 +253,9 @@ class WeixinAccount(WeixinAccountSingleton):
         # 设置session
         request.session['weixin_user_id'] = user.id
         setattr(request, 'weixin_user', user)
+
+        # need csrftoken
+        rotate_token(request)
 
         # 跳转到用户实际访问URL
         callback_url = self.get_callback_url(request)

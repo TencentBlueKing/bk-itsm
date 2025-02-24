@@ -38,7 +38,9 @@ def weixin_login_exempt(view_func):
 
     wrapped_view.weixin_login_exempt = True
     # return wraps(view_func, assigned=available_attrs(view_func))(wrapped_view)
-    return wraps(view_func)
+    # PATCHED: 这里有bug
+    # return wraps(view_func)
+    return wraps(wrapped_view)
 
 
 def weixin_login_required(view_func):
