@@ -124,18 +124,23 @@ class WeixinAccount(WeixinAccountSingleton):
         url = urllib.parse.urlparse(request.build_absolute_uri())
         path = weixin_settings.WEIXIN_LOGIN_URL
         query = urllib.parse.urlencode({'c_url': request.get_full_path()})
-        
-        callback_url = urlparse.urlunsplit((url.scheme, url.netloc, path, query, url.fragment))
-        logger.info('weixin_callback_url: %s', callback_url)
+
         if weixin_settings.WEIXIN_APP_EXTERNAL_HOST:
             callback_url = urllib.parse.urlunsplit(
                 (url.scheme, weixin_settings.WEIXIN_APP_EXTERNAL_HOST, path, query, url.fragment)
             )
-            
+            logger.info('redirect_weixin_login:  callback_url=%s, WEIXIN_APP_EXTERNAL_HOST=%s',
+                callback_url, weixin_settings.WEIXIN_APP_EXTERNAL_HOST)
+        else:
+            callback_url = urllib.parse.urlunsplit(
+                (url.scheme, url.netloc, path, query, url.fragment))
+            logger.info('redirect_weixin_login:  url=%s, path=%s, query=%s, callback_url=%s',
+                        url, path, query, callback_url, weixin_settings.WEIXIN_APP_EXTERNAL_HOST)
+
         state = self.set_weixin_oauth_state(request)
         redirect_uri = self.get_oauth_redirect_url(callback_url, state)
-        logger.info('WEIXIN_APP_EXTERNAL_HOST=%s, callback_url=%s, state=%s, redirect_uri=%s', 
-                    weixin_settings.WEIXIN_APP_EXTERNAL_HOST, callback_url, state, redirect_uri)
+        logger.info('redirect_weixin_login: callback_url=%s, state=%s, redirect_uri=%s', 
+                    callback_url, state, redirect_uri)
         return HttpResponseRedirect(redirect_uri)
 
     def verify_weixin_oauth_state(self, request, expires_in=60):

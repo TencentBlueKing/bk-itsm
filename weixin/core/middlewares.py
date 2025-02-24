@@ -175,9 +175,9 @@ class WeixinLoginMiddleware(MiddlewareMixin):
     def process_view(self, request, view, args, kwargs):
         """process_view."""
 
-        logger.info('WeixinLoginMiddleware -> request.is_weixin: %s', 
-                    getattr(request, 'is_weixin', False))
         if not getattr(request, 'is_weixin', False):
+            logger.info('%s -> request.is_weixin: %s',
+                        request.get_full_path(), getattr(request, 'is_weixin', False))
             return None
 
         # 微信路径默认取消蓝鲸登录
@@ -185,14 +185,14 @@ class WeixinLoginMiddleware(MiddlewareMixin):
 
         # 豁免微信登录装饰器
         if getattr(view, 'weixin_login_exempt', False):
-            logger.info('WeixinLoginMiddleware -> weixin_login_exempt: %s, %s', 
-                        view.__dict__, getattr(view, 'weixin_login_exempt', None))
+            logger.info('%s -> weixin_login_exempt: %s', 
+                        request.get_full_path(), getattr(view, 'weixin_login_exempt', None))
             return None
 
         # 验证OK
-        logger.info('WeixinLoginMiddleware -> request.weixin_user.is_authenticated: %s -> %s', 
-                    view.__dict__, request.weixin_user.is_authenticated)
         if request.weixin_user.is_authenticated:
+            logger.info('%s -> request.weixin_user.is_authenticated: %s',
+                        request.get_full_path(), request.weixin_user.is_authenticated)
             # 必须绑定微信到蓝鲸 - 返回状态码 438
             if isinstance(request.user, AnonymousUser):
                 return render_mako_context(request, '/weixin/438.html',
@@ -201,6 +201,6 @@ class WeixinLoginMiddleware(MiddlewareMixin):
             return None
 
         # 微信登录失效或者未通过验证，直接重定向到微信登录
-        logger.info('WeixinLoginMiddleware -> check weixin login failed, start redirect %s', 
+        logger.info('check weixin login failed, start redirect: %s', 
                     request.get_full_path())
         return weixin_account.redirect_weixin_login(request)
