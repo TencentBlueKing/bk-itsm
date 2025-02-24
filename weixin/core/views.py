@@ -25,33 +25,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from .accounts import WeixinAccount
 from .decorators import weixin_login_exempt
-from common.log import logger
-
-def print_request_info(request):
-    """打印调试"""
-
-    try:
-        body = request.body
-        body_str = body.decode("utf-8")
-    except UnicodeDecodeError:
-        body_str = "非文本数据"
-
-    logger.info("debug，打印完整请求信息: \n %s", {
-        "full_url": request.build_absolute_uri(),
-        "scheme": request.scheme,
-        "method": request.method,
-        "path": request.path,
-        "full_path": request.get_full_path(),
-        "query_params": request.GET.dict(),
-        "body": body_str,
-        "headers": dict(request.headers),
-    })
 
 
 @weixin_login_exempt
 def login(request):
     """微信登录"""
-    print('weixin login')
-    logger.info('enter weixin login')
-    print_request_info(request)
     return WeixinAccount().login(request)
