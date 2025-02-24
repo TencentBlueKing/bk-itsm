@@ -69,7 +69,7 @@ def get_user_by_wx_userid(wx_userid):
 
 def get_bk_user(request):
     bkuser = None
-    logger.info('get_bk_user: weixin_user=%s', request.weixin_user.__dict__)
+    logger.info('get_bk_user: weixin_user=%s', request.weixin_user)
     if request.weixin_user and not isinstance(request.weixin_user, AnonymousUser):
         user_model = get_user_model()
         # PATCHED: 由于开发框架的升级，应用登录后不会保存wx_userid的信息，导致无法获取到蓝鲸用户
@@ -92,7 +92,7 @@ def get_bk_user(request):
         )
         logger.info('get_bk_user from weixin user: %s -> %s: %s', request.weixin_user.userid, bkuser, created)
 
-    logger.info('get_bk_user: %s', bkuser.__dict__)
+    logger.info('get_bk_user: %s', bkuser)
     return bkuser or AnonymousUser()
 
 

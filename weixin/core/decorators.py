@@ -33,6 +33,7 @@ from .accounts import WeixinAccount
 
 def weixin_login_exempt(view_func):
     """登录豁免,被此装饰器修饰的action可以不校验登录."""
+    @wraps(view_func)
     def wrapped_view(*args, **kwargs):
         return view_func(*args, **kwargs)
 
@@ -40,7 +41,7 @@ def weixin_login_exempt(view_func):
     # return wraps(view_func, assigned=available_attrs(view_func))(wrapped_view)
     # PATCHED: 这里有bug
     # return wraps(view_func)
-    return wraps(wrapped_view)
+    return wrapped_view
 
 
 def weixin_login_required(view_func):
