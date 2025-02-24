@@ -78,7 +78,7 @@ class WeixinAccount(WeixinAccountSingleton):
         """
         # PATCHED： 调试
         WEIXIN_APP_EXTERNAL_HOST = weixin_settings.WEIXIN_APP_EXTERNAL_HOST
-        logger.info('USE_WEIXIN: %s, path: %s, get_host(): %s, WEIXIN_APP_EXTERNAL_HOST: %s', 
+        logger.debug('USE_WEIXIN: %s, path: %s, get_host(): %s, WEIXIN_APP_EXTERNAL_HOST: %s', 
                     weixin_settings.USE_WEIXIN, request.path, 
                     request.get_host(), WEIXIN_APP_EXTERNAL_HOST)
 
@@ -135,7 +135,7 @@ class WeixinAccount(WeixinAccountSingleton):
             callback_url = urllib.parse.urlunsplit(
                 (url.scheme, url.netloc, path, query, url.fragment))
             logger.info('redirect_weixin_login:  url=%s, path=%s, query=%s, callback_url=%s',
-                        url, path, query, callback_url, weixin_settings.WEIXIN_APP_EXTERNAL_HOST)
+                        url, path, query, callback_url)
 
         state = self.set_weixin_oauth_state(request)
         redirect_uri = self.get_oauth_redirect_url(callback_url, state)

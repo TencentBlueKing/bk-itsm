@@ -47,7 +47,6 @@ weixin_account = WeixinAccount()
 def get_user(request):
     user = None
     user_id = request.session.get('weixin_user_id')
-    logger.info('get_user: %s', user_id)
     if user_id:
         try:
             user = BkWeixinUser.objects.get(pk=user_id)
@@ -69,7 +68,6 @@ def get_user_by_wx_userid(wx_userid):
 
 def get_bk_user(request):
     bkuser = None
-    logger.info('get_bk_user: weixin_user=%s', request.weixin_user)
     if request.weixin_user and not isinstance(request.weixin_user, AnonymousUser):
         user_model = get_user_model()
         # PATCHED: 由于开发框架的升级，应用登录后不会保存wx_userid的信息，导致无法获取到蓝鲸用户
@@ -90,9 +88,8 @@ def get_bk_user(request):
                 "is_staff": True
             }
         )
-        logger.info('get_bk_user from weixin user: %s -> %s: %s', request.weixin_user.userid, bkuser, created)
-
-    logger.info('get_bk_user: %s', bkuser)
+    logger.info('get_bk_user from weixin user: %s -> %s', 
+                request.weixin_user, bkuser)
     return bkuser or AnonymousUser()
 
 
@@ -182,6 +179,8 @@ class WeixinLoginMiddleware(MiddlewareMixin):
 
         # 微信路径默认取消蓝鲸登录
         setattr(view, 'login_exempt', True)
+        # todo: disable csrf
+        setattr(request, '_dont_enforce_csrf_checks', True)
 
         # 豁免微信登录装饰器
         if getattr(view, 'weixin_login_exempt', False):
@@ -191,13 +190,14 @@ class WeixinLoginMiddleware(MiddlewareMixin):
 
         # 验证OK
         if request.weixin_user.is_authenticated:
-            logger.info('%s -> request.weixin_user.is_authenticated: %s',
-                        request.get_full_path(), request.weixin_user.is_authenticated)
+            logger.info('%s -> request.weixin_user.is_authenticated: %s, request.user=%s',
+                        request.get_full_path(), request.weixin_user.is_authenticated, request.user)
             # 必须绑定微信到蓝鲸 - 返回状态码 438
             if isinstance(request.user, AnonymousUser):
                 return render_mako_context(request, '/weixin/438.html',
                                            {"CUSTOM_TITLE": settings.CUSTOM_TITLE})
 
+            logger.info('weixin_login success: %s', request.path)
             return None
 
         # 微信登录失效或者未通过验证，直接重定向到微信登录
