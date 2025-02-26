@@ -12,7 +12,7 @@ specific language governing permissions and limitations under the License.
 """
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class ComponentInTemplate(models.Model):
@@ -20,7 +20,9 @@ class ComponentInTemplate(models.Model):
     template_id = models.CharField(_("模板ID"), max_length=32)
     node_id = models.CharField(_("节点ID"), max_length=32)
     is_sub = models.BooleanField(_("是否子流程引用"), default=False)
-    subprocess_stack = models.TextField(_("子流程堆栈"), default="[]", help_text=_("JSON 格式的列表"))
+    subprocess_stack = models.TextField(
+        _("子流程堆栈"), default="[]", help_text=_("JSON 格式的列表")
+    )
     version = models.CharField(_("插件版本"), max_length=255, default="legacy")
 
     class Meta:
@@ -36,9 +38,13 @@ class ComponentExecuteData(models.Model):
     instance_id = models.CharField(_("实例ID"), max_length=32)
     node_id = models.CharField(_("节点ID"), max_length=32)
     is_sub = models.BooleanField(_("是否子流程引用"), default=False)
-    subprocess_stack = models.TextField(_("子流程堆栈"), default="[]", help_text=_("JSON 格式的列表"))
+    subprocess_stack = models.TextField(
+        _("子流程堆栈"), default="[]", help_text=_("JSON 格式的列表")
+    )
     started_time = models.DateTimeField(_("标准插件执行开始时间"))
-    archived_time = models.DateTimeField(_("标准插件执行结束时间"), null=True, blank=True)
+    archived_time = models.DateTimeField(
+        _("标准插件执行结束时间"), null=True, blank=True
+    )
     elapsed_time = models.IntegerField(_("标准插件执行耗时(s)"), null=True, blank=True)
     status = models.BooleanField(_("是否执行成功"), default=False)
     is_skip = models.BooleanField(_("是否跳过"), default=False)
@@ -65,7 +71,12 @@ class TemplateInPipeline(models.Model):
         verbose_name_plural = _("Pipeline模板引用数据")
 
     def __unicode__(self):
-        return "{}_{}_{}_{}".format(self.template_id, self.atom_total, self.subprocess_total, self.gateways_total)
+        return "{}_{}_{}_{}".format(
+            self.template_id,
+            self.atom_total,
+            self.subprocess_total,
+            self.gateways_total,
+        )
 
 
 class InstanceInPipeline(models.Model):
@@ -79,4 +90,9 @@ class InstanceInPipeline(models.Model):
         verbose_name_plural = _("Pipeline实例引用数据")
 
     def __unicode__(self):
-        return "{}_{}_{}_{}".format(self.instance_id, self.atom_total, self.subprocess_total, self.gateways_total)
+        return "{}_{}_{}_{}".format(
+            self.instance_id,
+            self.atom_total,
+            self.subprocess_total,
+            self.gateways_total,
+        )

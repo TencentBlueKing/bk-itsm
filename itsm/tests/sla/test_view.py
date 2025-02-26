@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 
+import mock
 from django.test import TestCase, override_settings
 
 from itsm.sla.models import Sla
@@ -16,7 +17,11 @@ class TestSlaProtocolsView(TestCase):
         self.assertIsInstance(rsp.data["data"], dict)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_put_protocols(self):
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.has_permission")
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_put_protocols(self, patch_iam_auth, patch_has_permission):
+        patch_iam_auth.return_value = True
+        patch_has_permission.return_value = True
         data = {
             "name": "7*24",
             "is_enabled": True,
@@ -33,7 +38,9 @@ class TestSlaProtocolsView(TestCase):
         self.assertEqual(rsp.data["result"], True)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_post_protocols(self):
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.has_permission")
+    def test_post_protocols(self, patch_has_permission):
+        patch_has_permission.return_value = True
         data = {
             "name": "7*24",
             "is_enabled": True,
@@ -47,7 +54,9 @@ class TestSlaProtocolsView(TestCase):
 
         rsp = self.client.post(path=url, data=data, content_type="application/json")
         self.assertEqual(rsp.data["result"], False)
-        self.assertEqual(rsp.data["message"], "参数验证失败: 服务协议名称：[7*24] 已存在")
+        self.assertEqual(
+            rsp.data["message"], "参数验证失败: 服务协议名称：[7*24] 已存在"
+        )
 
         data["name"] = "5*24"
         url = "/api/sla/protocols/"
@@ -65,7 +74,9 @@ class TestSchedulesView(TestCase):
         self.assertIsInstance(rsp.data["data"], list)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_post_chedules(self):
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.has_permission")
+    def test_post_chedules(self, patch_has_permission):
+        patch_has_permission.return_value = True
         url = "/api/sla/schedules/"
         data = {
             "name": "测试服务名称",
@@ -127,7 +138,9 @@ class TestPriorityMatrix(TestCase):
         self.assertEqual(rsp.data["data"], "1")
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_matrix_of_service_type(self):
+    @mock.patch("itsm.sla.permissions.SlaMatrixPermit.has_permission")
+    def test_matrix_of_service_type(self, patch_has_permission):
+        patch_has_permission.return_value = True
         url = "/api/sla/matrixs/matrix_of_service_type/"
         data = {"service_type": "request"}
         rsp = self.client.post(

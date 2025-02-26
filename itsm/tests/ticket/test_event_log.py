@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import json
 
+import mock
 from django.test import TestCase, override_settings
 
 from itsm.service.models import CatalogService
@@ -33,16 +34,22 @@ from itsm.ticket.models import TicketEventLog
 
 
 class TicketEventLogTestCase(TestCase):
-
     def setUp(self) -> None:
-        CatalogService.objects.create(service_id=1, is_deleted=False, catalog_id=2, creator="admin")
+        CatalogService.objects.create(
+            service_id=1, is_deleted=False, catalog_id=2, creator="admin"
+        )
         TicketEventLog.objects.all().delete()
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
-    def test_get_index_ticket_event_log(self):
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.ticket.permissions.TicketPermissionValidate.has_permission")
+    def test_get_index_ticket_event_log(self, patch_has_permission):
+        patch_has_permission.return_value = True
         url = "/api/ticket/receipts/"
-        resp = self.client.post(path=url, data=json.dumps(CREATE_TICKET_PARAMS),
-                                content_type="application/json")
+        resp = self.client.post(
+            path=url,
+            data=json.dumps(CREATE_TICKET_PARAMS),
+            content_type="application/json",
+        )
 
         sn = resp.data["data"]["sn"]
 

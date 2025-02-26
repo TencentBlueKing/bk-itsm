@@ -31,9 +31,30 @@ from django.test import TestCase, override_settings
 
 class WorkflowSerializerTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.workflow.permissions.WorkflowIamAuth.has_object_permission")
+    @mock.patch(
+        "itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_object_permission"
+    )
+    @mock.patch("itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_permission")
     @mock.patch("itsm.workflow.serializers.workflow.transform_single_username")
-    def test_serializer(self, transform_single_username):
+    @mock.patch("itsm.trigger.permissions.WorkflowTriggerPermit.has_permission")
+    @mock.patch("itsm.trigger.permissions.WorkflowTriggerPermit.has_object_permission")
+    def test_serializer(
+        self,
+        patch_workflow_trigger_permit_has_object_permission,
+        patch_workflow_trigger_permit_has_permission,
+        transform_single_username,
+        patch_has_permission,
+        patch_base_workflow_element_iam_auth_has_object_permission,
+        patch_workflow_iam_auth_has_object_permission,
+    ):
+        patch_workflow_trigger_permit_has_object_permission.return_value = True
+        patch_workflow_trigger_permit_has_permission.return_value = True
         transform_single_username.return_value = "admin(管理员)"
+        patch_has_permission.return_value = True
+        patch_base_workflow_element_iam_auth_has_object_permission.return_value = True
+        patch_workflow_iam_auth_has_object_permission.return_value = True
+
         workflow_name = "test_now_{}".format(datetime.now().strftime("%Y%m%d%H%M%S"))
         create_data = {
             "name": workflow_name,
@@ -196,9 +217,15 @@ class WorkflowSerializerTest(TestCase):
                 ],
             }
         ]
+
+        list_triggers_url = "/api/trigger/triggers/"
+        list_triggers_rsp = self.client.get(
+            path=list_triggers_url, data=None, content_type="application/json"
+        )
+        print(json.loads(list_triggers_rsp.content.decode("utf-8")))
         schemas_url = (
             "/api/trigger/triggers/{}/create_or_update_action_schemas/".format(
-                workflow_id
+                list_triggers_rsp.data["data"][0]["id"]
             )
         )
         schemas_rsp = self.client.post(
@@ -219,8 +246,8 @@ class WorkflowSerializerTest(TestCase):
                 "action_schemas": schemas_rsp.data["data"],
             }
         ]
-        rule_url = "/api/trigger/triggers/{}/create_or_update_action_schemas/".format(
-            workflow_id
+        rule_url = "/api/trigger/triggers/{}/create_or_update_rules/".format(
+            list_triggers_rsp.data["data"][0]["id"]
         )
         rule_rsp = self.client.post(
             path=rule_url, data=rule_data, content_type="application/json"

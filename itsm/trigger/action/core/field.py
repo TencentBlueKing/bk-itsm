@@ -28,14 +28,19 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import copy
 import datetime
 import re
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.core.exceptions import ValidationError
 from mako.template import Template
 
 from common.log import logger
 from itsm.role.models import UserRole
 from itsm.postman.models import RemoteApi
-from itsm.component.constants import DEFAULT_BK_BIZ_ID, EMPTY_DICT, PROCESSOR_CHOICES, PERSON
+from itsm.component.constants import (
+    DEFAULT_BK_BIZ_ID,
+    EMPTY_DICT,
+    PROCESSOR_CHOICES,
+    PERSON,
+)
 from itsm.component.utils.basic import list_by_separator, dotted_name, normal_name
 
 VAR_STR_MATCH = re.compile(r"\$\{\s*[\w\|]+\s*\}")
@@ -47,7 +52,7 @@ class BaseField:
     """
 
     enabled_field_types = []
-    default_field_type = 'STRING'
+    default_field_type = "STRING"
 
     def __init__(
         self,
@@ -64,7 +69,7 @@ class BaseField:
         is_tips=False,
         tips="",
     ):
-        """ 
+        """
         {
             "type": "STRING|TEXT|SELECT|MULTISELECT|MEMBERS|",
             "choice": [],
@@ -78,7 +83,7 @@ class BaseField:
         # 代码规范兼容
         if choice is None:
             choice = []
-        
+
         self.type = self.default_field_type
         self.choice = choice
         self.name = name
@@ -112,7 +117,11 @@ class BaseField:
         return clean_data
 
     def set_field_type(self, field_type):
-        self.type = field_type if field_type in self.enabled_field_types else self.default_field_type
+        self.type = (
+            field_type
+            if field_type in self.enabled_field_types
+            else self.default_field_type
+        )
 
     def get_field_schema(self, key):
         return {
@@ -135,7 +144,7 @@ class BaseField:
 
 class ApiSourceField(BaseField):
     enabled_field_types = ["API"]
-    default_field_type = 'API'
+    default_field_type = "API"
 
     def validate(self, value):
         """根据字段内容进行校验"""
@@ -148,8 +157,8 @@ class ApiSourceField(BaseField):
     def to_internal_data(self, value, context=None, **kwargs):
         """
         :param value: 输入值
-        :param context: 
-        :return: 
+        :param context:
+        :return:
         """
         parse_tool = ParamParseTool(context)
         return self.validate(parse_tool(param=value, **kwargs))
@@ -157,7 +166,7 @@ class ApiSourceField(BaseField):
 
 class ApiInfoField(BaseField):
     enabled_field_types = ["API_INFO"]
-    default_field_type = 'API_INFO'
+    default_field_type = "API_INFO"
 
     def validate(self, value):
         """根据字段内容进行校验"""
@@ -167,9 +176,9 @@ class ApiInfoField(BaseField):
     def to_internal_data(self, value, context=None, **kwargs):
         """
         根据输入格式来对数据做渲染
-        :param value: 
-        :param context: 
-        :return: 
+        :param value:
+        :param context:
+        :return:
         """
         parse_tool = ParamParseTool(context)
 
@@ -212,11 +221,11 @@ class ApiInfoField(BaseField):
             return clean_data
 
         def _datetime_clean(_value):
-            return _value.strftime('%Y-%m-%d %H:%M:%S')
+            return _value.strftime("%Y-%m-%d %H:%M:%S")
 
         def _date_clean(_value):
-            return _value.strftime('%Y-%m-%d')
-        
+            return _value.strftime("%Y-%m-%d")
+
         def _leaf_clean(_value):
             result = self.validate(parse_tool(param=_value, **kwargs))
             if isinstance(result, datetime.datetime):
@@ -242,7 +251,7 @@ class MemberField(BaseField):
     """
 
     enabled_field_types = ["MEMBERS", "MULTI_MEMBERS"]
-    default_field_type = 'MEMBERS'
+    default_field_type = "MEMBERS"
 
     def __init__(self, name, **kwargs):
         self.convert_to_users = kwargs.pop("convert_to_users", True)
@@ -255,9 +264,9 @@ class MemberField(BaseField):
     def to_internal_data(self, value, context=None, **kwargs):
 
         if self.convert_to_users:
-            return self._convert_to_users(value['value'], context, **kwargs)
+            return self._convert_to_users(value["value"], context, **kwargs)
         else:
-            members = self._direct_convert(value['value'], context, **kwargs)
+            members = self._direct_convert(value["value"], context, **kwargs)
 
         if kwargs.get("display"):
             return self.display_convert(members)
@@ -271,10 +280,14 @@ class MemberField(BaseField):
         bk_biz_id = context.get("bk_biz_id", DEFAULT_BK_BIZ_ID)
         for member in copy.deepcopy(member_value):
             member["value"] = UserRole.get_users_by_type(
-                bk_biz_id, member['value']['member_type'], member['value']['members']
+                bk_biz_id, member["value"]["member_type"], member["value"]["members"]
             )
             parse_people = parse_tool(param=member)
-            members.extend(parse_people if isinstance(parse_people, list) else list_by_separator(parse_people))
+            members.extend(
+                parse_people
+                if isinstance(parse_people, list)
+                else list_by_separator(parse_people)
+            )
         return members
 
     def _direct_convert(self, member_value, context, **kwargs):
@@ -282,14 +295,17 @@ class MemberField(BaseField):
         members = []
         parse_tool = ParamParseTool(context)
         for member in member_value:
-            parse_value = {"ref_type": member['ref_type'], "value": member['value']['members']}
-            member['value']['members'] = dotted_name(parse_tool(param=parse_value))
-            if member['value']['member_type'] in ['VARIABLE', "EMPTY"]:
-                member['value']['member_type'] = 'PERSON'
-            if self.type == 'MEMBERS':
-                members = member['value']
+            parse_value = {
+                "ref_type": member["ref_type"],
+                "value": member["value"]["members"],
+            }
+            member["value"]["members"] = dotted_name(parse_tool(param=parse_value))
+            if member["value"]["member_type"] in ["VARIABLE", "EMPTY"]:
+                member["value"]["member_type"] = "PERSON"
+            if self.type == "MEMBERS":
+                members = member["value"]
                 break
-            members.append(member['value'])
+            members.append(member["value"])
         return members
 
     def display_convert(self, members):
@@ -304,13 +320,15 @@ class MemberField(BaseField):
     def get_members_display(member):
         members_type = dict(PROCESSOR_CHOICES)
 
-        if member['member_type'] == PERSON:
-            display_value = normal_name(member['members'])
+        if member["member_type"] == PERSON:
+            display_value = normal_name(member["members"])
         else:
             display_value = ",".join(
-                UserRole.objects.filter(id__in=list_by_separator(member['members'])).values_list("name", flat=True)
+                UserRole.objects.filter(
+                    id__in=list_by_separator(member["members"])
+                ).values_list("name", flat=True)
             )
-        return ("{}:{}").format(members_type.get(member['member_type']), display_value)
+        return ("{}:{}").format(members_type.get(member["member_type"]), display_value)
 
 
 class SelectField(BaseField):
@@ -319,7 +337,7 @@ class SelectField(BaseField):
     """
 
     enabled_field_types = ["SELECT", "RADIO"]
-    default_field_type = 'SELECT'
+    default_field_type = "SELECT"
 
     def validate(self):
         return True
@@ -336,7 +354,7 @@ class MultiSelectField(BaseField):
     """多项选择字段"""
 
     enabled_field_types = ["MULTISELECT", "CHECKBOX"]
-    default_field_type = 'MULTISELECT'
+    default_field_type = "MULTISELECT"
 
     def validate(self):
         return True
@@ -355,14 +373,14 @@ class StringField(BaseField):
     """
 
     enabled_field_types = ["STRING", "TEXT"]
-    default_field_type = 'STRING'
+    default_field_type = "STRING"
 
     def validate(self):
         return True
 
     def to_internal_data(self, value, context=None, **kwargs):
         """
-        { 
+        {
         "key": "content",
         "value": "工单编号:${sn} 标题：${title}",
         "ref_type": "import"
@@ -421,8 +439,8 @@ class DatetimeField(BaseField):
 
 class SubComponentField(BaseField):
     """
-        时间格式
-        """
+    时间格式
+    """
 
     enabled_field_types = ["SUBCOMPONENT"]
     default_field_type = "SUBCOMPONENT"
@@ -449,22 +467,28 @@ class SubComponentField(BaseField):
             clean_data = sub_action.to_representation_data()
             if flat:
                 sub_component_data.extend(clean_data)
-            sub_component_data.append({"code": sub_action.code, "name": sub_action.name, "fields": clean_data})
+            sub_component_data.append(
+                {"code": sub_action.code, "name": sub_action.name, "fields": clean_data}
+            )
 
         return sub_component_data
 
     def get_field_schema(self, key):
         """
-            子响应函数组的格式返回
-            :param key: 
-            :return: 
-            """
+        子响应函数组的格式返回
+        :param key:
+        :return:
+        """
         schema = super(SubComponentField, self).get_field_schema(key)
-        schema['sub_components'] = []
+        schema["sub_components"] = []
         for _component in self.sub_components:
             sub_component_field_schema = _component.get_inputs()
-            schema['sub_components'].append(
-                dict(key=_component.code, name=_component.name, field_schema=sub_component_field_schema)
+            schema["sub_components"].append(
+                dict(
+                    key=_component.code,
+                    name=_component.name,
+                    field_schema=sub_component_field_schema,
+                )
             )
         return schema
 
@@ -496,11 +520,13 @@ class ParamParseTool:
 
     def __call__(self, *args, **kwargs):
         param = kwargs.get("param", EMPTY_DICT)
-        parse_method = getattr(self, "{}_parse".format(param.get('ref_type', 'direct')), self.direct_parse)
+        parse_method = getattr(
+            self, "{}_parse".format(param.get("ref_type", "direct")), self.direct_parse
+        )
         if parse_method is None:
-            return param['value']
+            return param["value"]
         kwargs.update(param_key=param.get("key"))
-        return parse_method(param['value'], **kwargs)
+        return parse_method(param["value"], **kwargs)
 
     def import_parse(self, value, **kwargs):
         try:
@@ -516,7 +542,11 @@ class ParamParseTool:
         display = kwargs.get("display", False)
         if len(reference_keys) == 1:
             # 只引用了一个参数的使用
-            key = "{}__display".format(reference_keys[0]) if display else reference_keys[0]
+            key = (
+                "{}__display".format(reference_keys[0])
+                if display
+                else reference_keys[0]
+            )
             return self.context.get(key) or self.context.get(reference_keys[0])
         if display:
             return ",".join(
@@ -526,7 +556,9 @@ class ParamParseTool:
                     if key in self.context
                 ]
             )
-        return ",".join([self.context.get(key) for key in reference_keys if key in self.context])
+        return ",".join(
+            [self.context.get(key) for key in reference_keys if key in self.context]
+        )
 
     def direct_parse(self, value, **kwargs):
         if isinstance(value, str) and VAR_STR_MATCH.findall(value):
@@ -534,5 +566,7 @@ class ParamParseTool:
 
         display = kwargs.get("display", False)
         if display:
-            return self.context.get("{}__display".format(kwargs.get("param_key"))) or value
+            return (
+                self.context.get("{}__display".format(kwargs.get("param_key"))) or value
+            )
         return value

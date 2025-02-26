@@ -43,6 +43,34 @@ ITSM is an upper layer SaaS application based on the Tencent Blueking product sy
 - [API_Request_Sandbox_Instructions](docs/install/api_sandbox_guide.md)
 - [ITSM Access Guidelines](docs/wiki/access.md)
 
+## Unit Testing
+- When performing unit tests locally, it is recommended to use the following environment variable configuration. Ensure that MySQL and Redis are properly set up.
+- It is advisable to execute the tests using the integrated Django Test feature in PyCharm, which loads the `.env` file. Set the target to `itsm.tests`.
+```.dotenv
+RUN_ENV=open
+APP_CODE=bk_itsm
+APP_ID=bk_itsm
+RUN_VER=open
+SECRET_KEY=12345678-1234-5678-1234-123456789012
+APP_TOKEN=12345678-1234-5678-1234-123456789012
+BK_PAAS_HOST=http://127.0.0.1
+BK_IAM_V3_INNER_HOST=127.0.0.1
+BK_IAM_INNER_HOST=http://127.0.0.1:8080
+BROKER_URL=redis://localhost:6379/0
+USE_IAM=false
+BKAPP_REDIS_HOST=localhost
+BKAPP_BK_IAM_SYSTEM_ID=itsm
+BKAPP_IAM_INITIAL_FILE=dev
+BKAPP_REDIS_PORT=6379
+BKAPP_REDIS_PASSWORD=
+BK_MYSQL_NAME=bk_itsm_ci
+BK_MYSQL_USER=root
+BK_MYSQL_PASSWORD=root
+BK_MYSQL_HOST=localhost
+BK_MYSQL_PORT=3306
+BK_MYSQL_TEST_NAME=bk_itsm_ci_test
+```
+
 ## Version plan
 - [RELEASE](docs/RELEASE_EN.md)
 [(Chinese Documents Available)](docs/RELEASE.md)

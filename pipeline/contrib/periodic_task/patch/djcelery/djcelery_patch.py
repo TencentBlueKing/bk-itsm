@@ -14,7 +14,7 @@ specific language governing permissions and limitations under the License.
 import datetime
 import logging
 
-from anyjson import dumps, loads
+import json
 
 from celery import current_app, schedules
 from celery.utils.log import get_logger
@@ -54,7 +54,9 @@ def djcelry_upgrade():
                     return
 
                 # insert djcelery migration record
-                cursor.execute("select * from `django_migrations` where app='djcelery' and name='0001_initial';")
+                cursor.execute(
+                    "select * from `django_migrations` where app='djcelery' and name='0001_initial';"
+                )
                 row = cursor.fetchall()
                 if not row:
                     cursor.execute(
@@ -86,10 +88,12 @@ class TzAwareModelEntry(ModelEntry):
             logger.warning("Disabling %s", self.name)
             self._disable(model)
         try:
-            self.args = loads(model.args or "[]")
-            self.kwargs = loads(model.kwargs or "{}")
+            self.args = json.loads(model.args or "[]")
+            self.kwargs = json.loads(model.kwargs or "{}")
         except ValueError:
-            logging.error("Failed to serialize arguments for %s.", self.name, exc_info=1)
+            logging.error(
+                "Failed to serialize arguments for %s.", self.name, exc_info=1
+            )
             logging.warning("Disabling %s", self.name)
             self._disable(model)
 
@@ -123,12 +127,15 @@ class TzAwareModelEntry(ModelEntry):
             fields[t[2]] = None
 
         fields[model_field] = model_schedule
-        fields["args"] = dumps(fields.get("args") or [])
-        fields["kwargs"] = dumps(fields.get("kwargs") or {})
+        fields["args"] = json.dumps(fields.get("args") or [])
+        fields["kwargs"] = json.dumps(fields.get("kwargs") or {})
         fields["queue"] = options.get("queue")
         fields["exchange"] = options.get("exchange")
         fields["routing_key"] = options.get("routing_key")
-        obj, _ = DjCeleryPeriodicTask._default_manager.update_or_create(name=name, defaults=fields,)
+        obj, _ = DjCeleryPeriodicTask._default_manager.update_or_create(
+            name=name,
+            defaults=fields,
+        )
         return cls(obj)
 
 
@@ -136,7 +143,9 @@ class TzAwareModelEntry(ModelEntry):
 def create_or_update_task(cls, name, **schedule_dict):
     if "schedule" not in schedule_dict:
         try:
-            schedule_dict["schedule"] = DjCeleryPeriodicTask._default_manager.get(name=name).schedule
+            schedule_dict["schedule"] = DjCeleryPeriodicTask._default_manager.get(
+                name=name
+            ).schedule
         except DjCeleryPeriodicTask.DoesNotExist:
             pass
     cls.Entry.from_entry(name, **schedule_dict)

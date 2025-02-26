@@ -28,7 +28,7 @@ from collections import Counter
 from six.moves import map, range
 
 from django.core.validators import RegexValidator
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from itsm.component.constants import (
@@ -97,15 +97,21 @@ def matrix_data_validator(matrix_data, matrix_type):
         matrix_type_msg = "影响范围"
     for data in matrix_data:
         if data.get("id") is None:
-            raise serializers.ValidationError(_("参数错误，%s数据缺少参数id") % matrix_type_msg)
+            raise serializers.ValidationError(
+                _("参数错误，%s数据缺少参数id") % matrix_type_msg
+            )
         if data.get("is_enabled") is None:
             raise serializers.ValidationError(
                 _("参数错误，%s数据缺少参数is_enabled") % matrix_type_msg
             )
         if data.get("name") is None:
-            raise serializers.ValidationError(_("参数错误，%s数据缺少参数name") % matrix_type_msg)
+            raise serializers.ValidationError(
+                _("参数错误，%s数据缺少参数name") % matrix_type_msg
+            )
         if data.get("key") is None:
-            raise serializers.ValidationError(_("参数错误，%s数据缺少参数key") % matrix_type_msg)
+            raise serializers.ValidationError(
+                _("参数错误，%s数据缺少参数key") % matrix_type_msg
+            )
 
 
 def priority_matrix_validator(priority_matrix):
@@ -116,7 +122,9 @@ def priority_matrix_validator(priority_matrix):
         if priority.get("priority") is None:
             raise ParamError(_("参数错误，优先级数据缺少参数priority"))
         if not PriorityMatrix.objects.filter(id=priority.get("id")).exists():
-            raise ParamError(_("参数错误，不存在id为[%s]的优先级对象") % priority.get("id"))
+            raise ParamError(
+                _("参数错误，不存在id为[%s]的优先级对象") % priority.get("id")
+            )
 
 
 def priority_validate(impact_data, urgency_data, priority_matrix):
@@ -182,7 +190,9 @@ class ScheduleValidator(object):
         if self.instance:
             # 如果是更新，内置的名称不能更新
             if self.instance.is_builtin and value.get("name") != self.instance.name:
-                raise ParamError(_("内置服务模式：[%s] 的名称不能修改") % self.instance.name)
+                raise ParamError(
+                    _("内置服务模式：[%s] 的名称不能修改") % self.instance.name
+                )
 
             schedule_obj = schedule_obj.exclude(id=self.instance.id)
         if schedule_obj.filter(
@@ -203,7 +213,9 @@ class ScheduleValidator(object):
                     if max(day.get("start_date"), other_day.get("start_date")) < min(
                         day.get("end_date"), other_day.get("end_date")
                     ):
-                        raise ParamError(_("{}时间段设置有冲突，请检查").format(day_type_msg))
+                        raise ParamError(
+                            _("{}时间段设置有冲突，请检查").format(day_type_msg)
+                        )
 
         holidays = value.get("holidays")
         workdays = value.get("workdays")
@@ -254,7 +266,9 @@ class DayValidator(object):
         if not holiday.get("name"):
             raise serializers.ValidationError(_("请输入节假日名称"))
         if holiday.get("start_date") > holiday.get("end_date"):
-            raise ParamError(_("节假日期：[%s]的时间范围设置错误") % holiday.get("name"))
+            raise ParamError(
+                _("节假日期：[%s]的时间范围设置错误") % holiday.get("name")
+            )
 
     def workday_validate(self, workday):
         """特定工作日校验"""
@@ -322,7 +336,9 @@ class SlaValidator(object):
         if self.instance:
             # 如果是更新，内置的名称不能更新
             if self.instance.is_builtin and value.get("name") != self.instance.name:
-                raise ParamError(_("内置服务协议：[%s] 的名称不能修改" % self.instance.name))
+                raise ParamError(
+                    _("内置服务协议：[%s] 的名称不能修改" % self.instance.name)
+                )
 
             sla_obj = sla_obj.exclude(id=self.instance.id)
         if sla_obj.filter(name=value.get("name"), project_key=project_key).exists():
@@ -349,8 +365,14 @@ class SlaTimerRuleValidator(object):
         if expressions:
             for expression in expressions:
                 if expression.get("operator") is None:
-                    raise serializers.ValidationError(_("参数错误，计时规则条件表达式缺少operator"))
+                    raise serializers.ValidationError(
+                        _("参数错误，计时规则条件表达式缺少operator")
+                    )
                 if expression.get("name") is None:
-                    raise serializers.ValidationError(_("参数错误，计时规则条件表达式缺少name"))
+                    raise serializers.ValidationError(
+                        _("参数错误，计时规则条件表达式缺少name")
+                    )
                 if expression.get("value") is None:
-                    raise serializers.ValidationError(_("参数错误，计时规则条件表达式缺少value"))
+                    raise serializers.ValidationError(
+                        _("参数错误，计时规则条件表达式缺少value")
+                    )

@@ -27,7 +27,7 @@ import datetime
 import re
 
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from pipeline.utils.boolrule import BoolRule
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -62,7 +62,9 @@ def field_validate(field, state_fields, key_value, **kwargs):
     field_obj = state_fields.get(field["key"], None)
 
     if field_obj is None:
-        raise serializers.ValidationError(_("【{}】字段不存在，请联系管理员").format(field["key"]))
+        raise serializers.ValidationError(
+            _("【{}】字段不存在，请联系管理员").format(field["key"])
+        )
 
     field_obj = bunchify(field_obj)
 
@@ -104,7 +106,9 @@ def required_validate(field, field_obj, key_value, skip_readonly=False):
 
     if field_obj.type in ["CUSTOMTABLE", "TABLE"]:
         if not field["value"]:
-            raise serializers.ValidationError(_("【{}】为必填项").format(field_obj.name))
+            raise serializers.ValidationError(
+                _("【{}】为必填项").format(field_obj.name)
+            )
         # 表格类型字段的必填校验
 
         field_column_schema = (
@@ -124,7 +128,9 @@ def required_validate(field, field_obj, key_value, skip_readonly=False):
             for column, value in row.items():
                 if column in required_columns and not value:
                     raise serializers.ValidationError(
-                        _("表格字段【{field_name}】的第【{index}】行【{column_name}】为必填项").format(
+                        _(
+                            "表格字段【{field_name}】的第【{index}】行【{column_name}】为必填项"
+                        ).format(
                             field_name=field_obj.name,
                             index=index + 1,
                             column_name=required_columns[column],
@@ -154,14 +160,18 @@ def choice_validate(field, field_obj, key_value, **kwargs):
     choice = get_choice(field_obj, key_value, **kwargs)
 
     if not choice:
-        raise serializers.ValidationError(_("【%s】选项不存在，请联系管理员") % field_obj.key)
+        raise serializers.ValidationError(
+            _("【%s】选项不存在，请联系管理员") % field_obj.key
+        )
 
     # 更新choice
     field["choice"] = choice
 
     if field_obj.type == "TREESELECT":
         if not choice:
-            raise serializers.ValidationError(_("数据字典不存在，请检查字典编码: %s") % field_obj.key)
+            raise serializers.ValidationError(
+                _("数据字典不存在，请检查字典编码: %s") % field_obj.key
+            )
         key_choice = [str(item["id"]) for _choice in choice for item in walk(_choice)]
     else:
         key_choice = [str(item["key"]) for item in choice]
@@ -229,7 +239,9 @@ def custom_regex_validate(field, field_obj):
         if not re.match(r"{}".format(custom_regex), str(field["value"])):
             raise serializers.ValidationError(_("用户输入的值不符合自定义正则规则"))
     except Exception as e:
-        raise serializers.ValidationError(_("自定义正则出现异常， error = {}".format(e)))
+        raise serializers.ValidationError(
+            _("自定义正则出现异常， error = {}".format(e))
+        )
 
 
 def validate_expression(field, expression, ticket, key_value=None):
@@ -327,7 +339,9 @@ def regex_validate(field, field_obj, ticket=None, key_value=None):
         if rule.expressions:
             results = []
             for expression in rule.expressions:
-                results.append(validate_expression(field, expression, ticket, key_value))
+                results.append(
+                    validate_expression(field, expression, ticket, key_value)
+                )
 
             expression_type = {"and": all, "or": any}
             if not expression_type.get(rule.type, any)(results):
@@ -390,7 +404,9 @@ class RegexValidator(Regex):
             value = datetime.datetime.strptime(value, "%Y-%m-%d")
         except ValueError:
             raise serializers.ValidationError(
-                _("【{}】{} 不匹配日期格式{}").format(self.field_name, value, "%Y-%m-%d")
+                _("【{}】{} 不匹配日期格式{}").format(
+                    self.field_name, value, "%Y-%m-%d"
+                )
             )
 
         if self.validate_type == "after_date" and value < datetime.datetime.now():

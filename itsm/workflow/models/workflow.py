@@ -30,7 +30,7 @@ import jsonfield
 from django.db import models, transaction
 from django.db.models import Q
 from django.forms import model_to_dict
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 
 from itsm.component.constants import (
@@ -96,10 +96,14 @@ class WorkflowBase(ObjectManagerMixin, Model):
     )
     is_draft = models.BooleanField(_("是否为草稿"), default=True)
     is_builtin = models.BooleanField(_("是否为系统内置"), default=False)
-    is_task_needed = models.NullBooleanField(_("是否需要关联子任务"), default=False, null=True)
+    is_task_needed = models.BooleanField(
+        _("是否需要关联子任务"), default=False, null=True
+    )
     owners = models.CharField(_("负责人"), max_length=LEN_XX_LONG, default=EMPTY_STRING)
 
-    notify = models.ManyToManyField("workflow.Notify", help_text=_("可关联多种通知方式"))
+    notify = models.ManyToManyField(
+        "workflow.Notify", help_text=_("可关联多种通知方式")
+    )
     notify_rule = models.CharField(
         _("通知规则"), max_length=LEN_SHORT, choices=NOTIFY_RULE_CHOICES, default="NONE"
     )
@@ -112,7 +116,10 @@ class WorkflowBase(ObjectManagerMixin, Model):
     is_iam_used = models.BooleanField(_("是否使用IAM角色"), default=False)
     is_supervise_needed = models.BooleanField(_("是否需要督办"), default=False)
     supervise_type = models.CharField(
-        _("督办人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+        _("督办人类型"),
+        max_length=LEN_SHORT,
+        choices=PROCESSOR_CHOICES,
+        default="EMPTY",
     )
     supervisor = models.CharField(
         _("督办列表"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True
@@ -125,7 +132,9 @@ class WorkflowBase(ObjectManagerMixin, Model):
     )
 
     # deprecated fields
-    master = jsonfield.JSONField(_("主分支列表"), default=EMPTY_LIST, null=True, blank=True)
+    master = jsonfield.JSONField(
+        _("主分支列表"), default=EMPTY_LIST, null=True, blank=True
+    )
     extras = jsonfield.JSONField(
         _("其他配置信息"),
         default={
@@ -183,7 +192,7 @@ class Workflow(WorkflowBase):
 
     def __unicode__(self):
         return "{}({})".format(self.name, self.pk)
-    
+
     def get_iam_resource(self):
         """获取 workflow 关联的服务对象"""
         workflow_version = WorkflowVersion.objects.filter(workflow_id=self.id).last()
@@ -506,9 +515,9 @@ class Workflow(WorkflowBase):
         if missing_field:
             field_desc = [REQUIRED_FIELD[field] for field in missing_field]
             raise ValidationError(
-                _("检测到您的流程已经发生改变，现流程版本中缺少【{}】信息，请补充完整后重新配置sla").format(
-                    ",".join(field_desc)
-                )
+                _(
+                    "检测到您的流程已经发生改变，现流程版本中缺少【{}】信息，请补充完整后重新配置sla"
+                ).format(",".join(field_desc))
             )
 
     def get_notifiy_objs(self, notify_list):
@@ -546,8 +555,12 @@ class WorkflowVersion(WorkflowBase):
 
     workflow_id = models.IntegerField(_("流程模板ID"))
 
-    fields = jsonfield.JSONField(_("字段快照字典"), default=EMPTY_DICT, null=True, blank=True)
-    states = jsonfield.JSONField(_("状态快照字典"), default=EMPTY_DICT, null=True, blank=True)
+    fields = jsonfield.JSONField(
+        _("字段快照字典"), default=EMPTY_DICT, null=True, blank=True
+    )
+    states = jsonfield.JSONField(
+        _("状态快照字典"), default=EMPTY_DICT, null=True, blank=True
+    )
     transitions = jsonfield.JSONField(
         _("流转快照字典"), default=EMPTY_DICT, null=True, blank=True
     )
@@ -887,5 +900,7 @@ class WorkflowVersion(WorkflowBase):
         if missing_field:
             field_desc = [REQUIRED_FIELD[field] for field in missing_field]
             raise ValidationError(
-                _("流程版本中缺少【{}】信息，请补充完整后再进行服务协议的关联").format(",".join(field_desc))
+                _("流程版本中缺少【{}】信息，请补充完整后再进行服务协议的关联").format(
+                    ",".join(field_desc)
+                )
             )

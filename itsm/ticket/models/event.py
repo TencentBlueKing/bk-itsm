@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import (
     EMPTY_INT,
@@ -44,33 +44,53 @@ from itsm.workflow.models import Event
 class TicketEventLog(Event):
     """单据操作日志表"""
 
-    SOURCE_TYPE = [(WEB, _('页面操作')), (MOBILE, _('移动端操作')), (SYS, _('系统操作')), (SYSTEM_OPERATE, _('自动执行'))]
+    SOURCE_TYPE = [
+        (WEB, _("页面操作")),
+        (MOBILE, _("移动端操作")),
+        (SYS, _("系统操作")),
+        (SYSTEM_OPERATE, _("自动执行")),
+    ]
 
     # id = models.BigAutoField(u'日志大于2^31-1，默认id无法继续创建')
-    ticket = models.ForeignKey('ticket.Ticket', help_text=_('关联工单'), related_name='logs', on_delete=models.CASCADE)
-    is_valid = models.BooleanField(_('是否有效流程节点'), default=True)
-    deal_time = models.IntegerField(_('处理时间'), default=0)
+    ticket = models.ForeignKey(
+        "ticket.Ticket",
+        help_text=_("关联工单"),
+        related_name="logs",
+        on_delete=models.CASCADE,
+    )
+    is_valid = models.BooleanField(_("是否有效流程节点"), default=True)
+    deal_time = models.IntegerField(_("处理时间"), default=0)
     # 日志固化角色人员， 若角色新增人员，无法添加到快照中，需要手动添加
-    processors_snap = models.CharField(_('处理人快照'), max_length=LEN_XX_LONG, default=EMPTY_STRING, null=True, blank=True)
-    source = models.CharField(_('日志来源'), max_length=LEN_SHORT, choices=SOURCE_TYPE, default=WEB)
-    status = models.IntegerField(_('节点处理状态'), default=EMPTY_INT)
+    processors_snap = models.CharField(
+        _("处理人快照"),
+        max_length=LEN_XX_LONG,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
+    )
+    source = models.CharField(
+        _("日志来源"), max_length=LEN_SHORT, choices=SOURCE_TYPE, default=WEB
+    )
+    status = models.IntegerField(_("节点处理状态"), default=EMPTY_INT)
 
     objects = managers.TicketLogManager()
 
     class Meta:
-        app_label = 'ticket'
-        verbose_name = _('单据流转日志')
-        verbose_name_plural = _('单据流转日志')
-        ordering = ('id',)
+        app_label = "ticket"
+        verbose_name = _("单据流转日志")
+        verbose_name_plural = _("单据流转日志")
+        ordering = ("id",)
         index_together = (("operate_at", "operator", "is_deleted"),)
 
     def __unicode__(self):
-        return '{}({})'.format(self.ticket, self.from_state_id)
+        return "{}({})".format(self.ticket, self.from_state_id)
 
     def update_deal_time(self):
 
         log_ids = list(
-            TicketEventLog.objects.filter(ticket_id=self.ticket_id).order_by('id').values_list('id', flat=True)
+            TicketEventLog.objects.filter(ticket_id=self.ticket_id)
+            .order_by("id")
+            .values_list("id", flat=True)
         )
         last_log_index = log_ids.index(self.id) - 1
 
@@ -99,9 +119,13 @@ class TicketEventLog(Event):
     @classmethod
     def fix_deal_time(cls, *args, **kwargs):
         """为之前的单据添加处理事件"""
-        print('\nfix history ticket deal_time')
+        print("\nfix history ticket deal_time")
         try:
-            for log in TicketEventLog.objects.all().exclude(message__in=['流程开始', '单据流程结束']).exclude(type='UNSUSPEND'):
+            for log in (
+                TicketEventLog.objects.all()
+                .exclude(message__in=["流程开始", "单据流程结束"])
+                .exclude(type="UNSUSPEND")
+            ):
                 log.update_deal_time()
         except Exception as e:
-            print('\nfix history ticket deal_time exception: %s' % e)
+            print("\nfix history ticket deal_time exception: %s" % e)

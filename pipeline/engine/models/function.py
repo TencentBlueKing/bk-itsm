@@ -15,7 +15,7 @@ import logging
 import traceback
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from pipeline.engine.conf import function_switch
 
@@ -31,11 +31,15 @@ class FunctionSwitchManager(models.Manager):
                 if switch["name"] not in name_set:
                     s_to_be_created.append(
                         FunctionSwitch(
-                            name=switch["name"], description=switch["description"], is_active=switch["is_active"]
+                            name=switch["name"],
+                            description=switch["description"],
+                            is_active=switch["is_active"],
                         )
                     )
                 else:
-                    self.filter(name=switch["name"]).update(description=switch["description"])
+                    self.filter(name=switch["name"]).update(
+                        description=switch["description"]
+                    )
             self.bulk_create(s_to_be_created)
         except Exception:
             logger.error("function switch init failed: %s" % traceback.format_exc())

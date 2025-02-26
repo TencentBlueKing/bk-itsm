@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from mako.template import Template
 from rest_framework import serializers
 from rest_framework.decorators import action
@@ -108,7 +108,7 @@ class CommentViewSet(component_viewsets.NormalModelViewSet):
         "stars": ["exact"],
     }
     ordering_fields = "__all__"
-    
+
     def list(self, request, *args, **kwargs):
         return Response()
 

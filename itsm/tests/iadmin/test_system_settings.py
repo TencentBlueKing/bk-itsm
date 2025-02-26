@@ -26,12 +26,15 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 __author__ = "蓝鲸智云"
 __copyright__ = "Copyright © 2012-2020 Tencent BlueKing. All Rights Reserved."
 
+import mock
 from django.test import TestCase, override_settings
 
 
 class SystemSettingsTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_configrations(self):
+    @mock.patch("itsm.iadmin.permissions.SystemSettingPermit.has_permission")
+    def test_configrations(self, patch_has_permission):
+        patch_has_permission.return_value = True
         url = "/api/iadmin/system_settings/configrations/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         self.assertEqual(rsp.status_code, 200)
@@ -39,7 +42,9 @@ class SystemSettingsTest(TestCase):
         self.assertIsInstance(rsp.data, dict)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_change_settings(self):
+    @mock.patch("itsm.iadmin.permissions.SystemSettingPermit.has_permission")
+    def test_change_settings(self, patch_has_permission):
+        patch_has_permission.return_value = True
         url = "/api/iadmin/system_settings/3/"
         data = {"key": "FIRST_STATE_SWITCH", "type": "FUNCTION", "value": "off"}
         rsp = self.client.put(path=url, data=data, content_type="application/json")

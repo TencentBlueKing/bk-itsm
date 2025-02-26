@@ -24,6 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import copy
 
+import mock
 from django.test import TestCase, override_settings
 
 from itsm.tests.data.datas import DATA
@@ -48,7 +49,15 @@ class WorkflowViewTest(TestCase):
         self.assertEqual(rsp.data["data"]["regex_choice"], [("EMPTY", "")])
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_variables(self):
+    @mock.patch("itsm.component.utils.misc.transform_single_username")
+    @mock.patch("itsm.component.utils.client_backend_query.get_bk_users")
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_variables(
+        self, patch_iam_auth, patch_get_bk_users, patch_transform_single_username
+    ):
+        patch_iam_auth.return_value = True
+        patch_get_bk_users.return_value = {"admin": "admin(admin)"}
+        patch_transform_single_username.return_value = "admin(admin)"
         url = "/api/workflow/templates/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         url = "/api/workflow/templates/{}/variables/".format(rsp.data["data"][0]["id"])
@@ -58,7 +67,15 @@ class WorkflowViewTest(TestCase):
         self.assertIsInstance(rsp.data["data"], list)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_create_accept_transitions(self):
+    @mock.patch("itsm.component.utils.misc.transform_single_username")
+    @mock.patch("itsm.component.utils.client_backend_query.get_bk_users")
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_create_accept_transitions(
+        self, patch_iam_auth, patch_get_bk_users, patch_transform_single_username
+    ):
+        patch_iam_auth.return_value = True
+        patch_get_bk_users.return_value = {"admin": "admin(admin)"}
+        patch_transform_single_username.return_value = "admin(admin)"
         url = "/api/workflow/templates/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         url = "/api/workflow/templates/{}/create_accept_transitions/".format(
@@ -70,7 +87,15 @@ class WorkflowViewTest(TestCase):
         self.assertIsInstance(rsp.data["data"], list)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_deploy(self):
+    @mock.patch("itsm.component.utils.misc.transform_single_username")
+    @mock.patch("itsm.component.utils.client_backend_query.get_bk_users")
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_deploy(
+        self, patch_iam_auth, patch_get_bk_users, patch_transform_single_username
+    ):
+        patch_iam_auth.return_value = True
+        patch_get_bk_users.return_value = {"admin": "admin(admin)"}
+        patch_transform_single_username.return_value = "admin(admin)"
         url = "/api/workflow/templates/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         url = "/api/workflow/templates/{}/deploy/".format(rsp.data["data"][0]["id"])
@@ -91,7 +116,15 @@ class WorkflowViewTest(TestCase):
         self.assertEqual(rsp.status_code, 200)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_table(self):
+    @mock.patch("itsm.component.utils.misc.transform_single_username")
+    @mock.patch("itsm.component.utils.client_backend_query.get_bk_users")
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_table(
+        self, patch_iam_auth, patch_get_bk_users, patch_transform_single_username
+    ):
+        patch_iam_auth.return_value = True
+        patch_get_bk_users.return_value = {"admin": "admin(admin)"}
+        patch_transform_single_username.return_value = "admin(admin)"
         url = "/api/workflow/templates/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         url = "/api/workflow/templates/{}/table/".format(rsp.data["data"][0]["id"])
@@ -103,7 +136,17 @@ class WorkflowViewTest(TestCase):
 
 class StateViewTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_exports(self):
+    @mock.patch("itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_permission")
+    @mock.patch(
+        "itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_object_permission"
+    )
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_exports(
+        self, patch_iam_auth, patch_has_object_permission, patch_has_permission
+    ):
+        patch_iam_auth.return_value = True
+        patch_has_object_permission.return_value = True
+        patch_has_permission.return_value = True
         url = "/api/workflow/states/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         url = "/api/workflow/states/{}/variables/".format(rsp.data["data"][0]["id"])
@@ -114,7 +157,21 @@ class StateViewTest(TestCase):
         self.assertIsInstance(rsp.data["data"], list)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_group_variables(self):
+    @mock.patch("itsm.workflow.permissions.WorkflowIamAuth.has_object_permission")
+    @mock.patch(
+        "itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_object_permission"
+    )
+    @mock.patch("itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_permission")
+    def test_group_variables(
+        self,
+        patch_has_permission,
+        patch_base_workflow_element_iam_auth_has_object_permission,
+        patch_workflow_iam_auth_has_object_permission,
+    ):
+        patch_has_permission.return_value = True
+        patch_base_workflow_element_iam_auth_has_object_permission.return_value = True
+        patch_workflow_iam_auth_has_object_permission.return_value = True
+
         workflow_data = copy.deepcopy(DATA)
         workflow, _, _ = Workflow.objects.restore(workflow_data)
         version = workflow.create_version()
@@ -141,7 +198,17 @@ class StateViewTest(TestCase):
         self.assertIsInstance(rsp.data["data"], list)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_sign_variables(self):
+    @mock.patch("itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_permission")
+    @mock.patch(
+        "itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_object_permission"
+    )
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_sign_variables(
+        self, patch_iam_auth, patch_has_object_permission, patch_has_permission
+    ):
+        patch_iam_auth.return_value = True
+        patch_has_object_permission.return_value = True
+        patch_has_permission.return_value = True
         url = "/api/workflow/states/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         url = "/api/workflow/states/{}/sign_variables/".format(
@@ -154,7 +221,17 @@ class StateViewTest(TestCase):
         self.assertIsInstance(rsp.data["data"], list)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_pre_states(self):
+    @mock.patch("itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_permission")
+    @mock.patch(
+        "itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_object_permission"
+    )
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_pre_states(
+        self, patch_iam_auth, patch_has_object_permission, patch_has_permission
+    ):
+        patch_iam_auth.return_value = True
+        patch_has_object_permission.return_value = True
+        patch_has_permission.return_value = True
         url = "/api/workflow/states/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         url = "/api/workflow/states/{}/pre_states/".format(rsp.data["data"][0]["id"])
@@ -165,7 +242,17 @@ class StateViewTest(TestCase):
         self.assertIsInstance(rsp.data["data"], list)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_post_states(self):
+    @mock.patch("itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_permission")
+    @mock.patch(
+        "itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_object_permission"
+    )
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_post_states(
+        self, patch_iam_auth, patch_has_object_permission, patch_has_permission
+    ):
+        patch_iam_auth.return_value = True
+        patch_has_object_permission.return_value = True
+        patch_has_permission.return_value = True
         url = "/api/workflow/states/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         url = "/api/workflow/states/{}/post_states/".format(rsp.data["data"][0]["id"])
@@ -176,7 +263,17 @@ class StateViewTest(TestCase):
         self.assertIsInstance(rsp.data["data"], list)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_add_fields_from_table(self):
+    @mock.patch("itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_permission")
+    @mock.patch(
+        "itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_object_permission"
+    )
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_add_fields_from_table(
+        self, patch_iam_auth, patch_has_object_permission, patch_has_permission
+    ):
+        patch_iam_auth.return_value = True
+        patch_has_object_permission.return_value = True
+        patch_has_permission.return_value = True
         url = "/api/workflow/states/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         url = "/api/workflow/states/{}/add_fields_from_table/".format(
@@ -192,7 +289,17 @@ class StateViewTest(TestCase):
         self.assertEqual(rsp.data["message"], "success")
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_clone(self):
+    @mock.patch("itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_permission")
+    @mock.patch(
+        "itsm.workflow.permissions.BaseWorkflowElementIamAuth.has_object_permission"
+    )
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_clone(
+        self, patch_iam_auth, patch_has_object_permission, patch_has_permission
+    ):
+        patch_iam_auth.return_value = True
+        patch_has_object_permission.return_value = True
+        patch_has_permission.return_value = True
         url1 = "/api/workflow/states/"
         rsp1 = self.client.get(path=url1, data=None, content_type="application/json")
         url = "/api/workflow/states/{}/clone/".format(rsp1.data["data"][0]["id"])
@@ -270,7 +377,9 @@ class WorkflowVersionViewTest(TestCase):
 
 class TaskSchemaViewTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_variables(self):
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_variables(self, patch_iam_auth):
+        patch_iam_auth.return_value = True
         url = "/api/workflow/task_schemas/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
 

@@ -28,7 +28,7 @@ from collections import OrderedDict
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.fields import JSONField, empty
 
@@ -114,7 +114,11 @@ from itsm.ticket.serializers.field import (
     TaskFieldSerializer,
 )
 from itsm.ticket.tasks import remark_notify
-from itsm.ticket.utils import compute_list_difference, get_user_profile, filter_sensitive_info
+from itsm.ticket.utils import (
+    compute_list_difference,
+    get_user_profile,
+    filter_sensitive_info,
+)
 from itsm.ticket.validators import CreateTicketValidator, StateOperateValidator
 from itsm.ticket_status.models import TicketStatus
 from itsm.workflow.models import WorkflowVersion
@@ -374,9 +378,11 @@ class StatusSerializer(serializers.ModelSerializer):
             sla_timeout=sla_task_info["sla_timeout"],
             sla_status=sla_task_info["sla_status"],
             sla_task_status=sla_task_info["task_status"],
-            sla_deadline=sla_task_info["deadline"].strftime("%Y-%m-%d %H:%M:%S")
-            if sla_task_info["deadline"]
-            else "--",
+            sla_deadline=(
+                sla_task_info["deadline"].strftime("%Y-%m-%d %H:%M:%S")
+                if sla_task_info["deadline"]
+                else "--"
+            ),
         )
 
         return data
@@ -691,9 +697,11 @@ class TicketList(object):
                         "name", "--"
                     ),
                     current_steps=steps.get(real_ticket["id"], []),
-                    priority_name=inst["meta"]["priority"]["name"]
-                    if "priority" in inst["meta"]
-                    else "--",
+                    priority_name=(
+                        inst["meta"]["priority"]["name"]
+                        if "priority" in inst["meta"]
+                        else "--"
+                    ),
                     create_at=inst["create_at"].strftime("%Y-%m-%d %H:%M:%S"),
                     current_processors=inst.get("current_processors", ""),
                     can_comment=self.can_comment(inst, comments, is_email_invite_token),
@@ -797,9 +805,7 @@ class TicketSerializer(AuthModelSerializer):
         tickets = (
             [self.instance]
             if isinstance(self.instance, Ticket)
-            else []
-            if self.instance is None
-            else self.instance
+            else [] if self.instance is None else self.instance
         )
 
         for inst in tickets:
@@ -811,9 +817,7 @@ class TicketSerializer(AuthModelSerializer):
         tickets = (
             [self.instance]
             if isinstance(self.instance, Ticket)
-            else []
-            if self.instance is None
-            else self.instance
+            else [] if self.instance is None else self.instance
         )
         ticket_ids = [ticket.id for ticket in tickets]
         followers = AttentionUsers.objects.filter(ticket_id__in=ticket_ids).values(
@@ -874,7 +878,7 @@ class TicketSerializer(AuthModelSerializer):
         # 当前步骤、单据状态、优先级来源母单
         master_ticket = inst.get_master_ticket()
         master_or_self_ticket = master_ticket if master_ticket else inst
-        
+
         meta = master_or_self_ticket.get_meta()
 
         data.update(
@@ -882,7 +886,7 @@ class TicketSerializer(AuthModelSerializer):
             current_status_display=master_or_self_ticket.current_status_display,
             current_steps=master_or_self_ticket.brief_current_steps,
             priority_name=master_or_self_ticket.priority_name,
-            meta=meta
+            meta=meta,
         )
 
         can_comment = inst.can_comment(username) or is_email_invite_token
@@ -956,7 +960,9 @@ class TicketSerializer(AuthModelSerializer):
                     service_type=service.key, is_start=True
                 ).key
             except TicketStatus.DoesNotExist:
-                raise serializers.ValidationError({_("工单状态"): _("工单状态不存在，请检查")})
+                raise serializers.ValidationError(
+                    {_("工单状态"): _("工单状态不存在，请检查")}
+                )
 
             state_processors = data.get("meta", {}).get("state_processors", {})
             for state_id, state_processor in state_processors.items():
@@ -1185,7 +1191,9 @@ class UnmergeTicketsSerializer(serializers.Serializer):
                 )
 
             if ticket_to_ticket.related_status == "RUNNING":
-                raise serializers.ValidationError({_("母子单"): _("正在解绑中... 请勿重复执行")})
+                raise serializers.ValidationError(
+                    {_("母子单"): _("正在解绑中... 请勿重复执行")}
+                )
         return value
 
 
@@ -1469,11 +1477,11 @@ class TicketExportSerializer(serializers.Serializer):
                     "current_status": instance.get_current_status_display(),
                     "current_steps": instance.get_current_state_name(),
                     "current_processors_type": instance.get_current_role_display(),
-                    "current_processors": transform_username(
-                        instance.get_current_processors()
-                    )
-                    if instance.get_current_processors()
-                    else "--",
+                    "current_processors": (
+                        transform_username(instance.get_current_processors())
+                        if instance.get_current_processors()
+                        else "--"
+                    ),
                 }
             )
 

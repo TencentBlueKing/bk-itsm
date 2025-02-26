@@ -1,5 +1,5 @@
 spec_version: 2
-app_version: "2.7.3"
+app_version: "2.8.1"
 app:
     region: default
     bk_app_code: bk_itsm
@@ -35,6 +35,9 @@ modules:
             - key: GUNICORN_THREAD_NUM
               value: 10
               description: GunicornThread数量
+            - key: C_FORCE_ROOT
+              value: 1
+              description: celery5 fit
         scripts:
             pre_release_hook: "bash ./bin/pre-release"
         processes:
@@ -47,11 +50,11 @@ modules:
                 plan: 4C1G5R
                 replicas: 1
             pworker:
-                command: python manage.py celery worker -n prefork@%h -P threads -c 10 -l info --maxtasksperchild=100
+                command: python manage.py celery worker -n prefork@%h -P threads -c 10 -l info --max-tasks-per-child=100
                 plan: 4C2G5R
                 replicas: 5
             gworker:
-                command: python manage.py celery worker -P gevent -n gevent@%h -c 4 -l info --maxtasksperchild=100
+                command: python manage.py celery worker -P gevent -n gevent@%h -c 4 -l info --max-tasks-per-child=100
                 plan: 4C2G5R
                 replicas: 5
         svc_discovery:

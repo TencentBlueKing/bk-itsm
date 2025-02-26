@@ -97,7 +97,11 @@ class ServiceTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
     @mock.patch("itsm.component.utils.misc.get_bk_users")
-    def test_create_service(self, patch_misc_get_bk_users, path_get_bk_users):
+    @mock.patch("itsm.service.permissions.ServicePermit.has_permission")
+    def test_create_service(
+        self, patch_has_permission, patch_misc_get_bk_users, path_get_bk_users
+    ):
+        patch_has_permission.return_value = True
         patch_misc_get_bk_users.return_value = {}
         path_get_bk_users.return_value = {}
         url = "/api/service/projects/"
@@ -120,7 +124,11 @@ class ServiceTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
     @mock.patch("itsm.component.utils.misc.get_bk_users")
-    def test_import(self, patch_misc_get_bk_users, path_get_bk_users):
+    @mock.patch("itsm.service.permissions.ServicePermit.has_permission")
+    def test_import(
+        self, patch_has_permission, patch_misc_get_bk_users, path_get_bk_users
+    ):
+        patch_has_permission.return_value = True
         patch_misc_get_bk_users.return_value = {}
         path_get_bk_users.return_value = {}
         url = "/api/service/projects/"
@@ -184,7 +192,17 @@ class ServiceTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
     @mock.patch("itsm.component.utils.misc.get_bk_users")
-    def test_save_configs(self, patch_misc_get_bk_users, path_get_bk_users):
+    @mock.patch("itsm.service.permissions.ServicePermit.has_permission")
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_save_configs(
+        self,
+        patch_iam_auth,
+        patch_has_permission,
+        patch_misc_get_bk_users,
+        path_get_bk_users,
+    ):
+        patch_iam_auth.return_value = True
+        patch_has_permission.return_value = True
         patch_misc_get_bk_users.return_value = {}
         path_get_bk_users.return_value = {}
         url = "/api/service/projects/"
@@ -204,7 +222,17 @@ class ServiceTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
     @mock.patch("itsm.component.utils.misc.get_bk_users")
-    def test_favorite(self, patch_misc_get_bk_users, path_get_bk_users):
+    @mock.patch("itsm.service.permissions.ServicePermit.has_permission")
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_favorite(
+        self,
+        patch_iam_auth,
+        patch_has_permission,
+        patch_misc_get_bk_users,
+        path_get_bk_users,
+    ):
+        patch_iam_auth.return_value = True
+        patch_has_permission.return_value = True
         patch_misc_get_bk_users.return_value = {}
         path_get_bk_users.return_value = {}
         url = "/api/service/projects/"
@@ -233,7 +261,11 @@ class ServiceTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
     @mock.patch("itsm.component.utils.misc.get_bk_users")
-    def test_clone(self, patch_misc_get_bk_users, path_get_bk_users):
+    @mock.patch("itsm.service.permissions.ServicePermit.has_permission")
+    def test_clone(
+        self, patch_has_permission, patch_misc_get_bk_users, path_get_bk_users
+    ):
+        patch_has_permission.return_value = True
         patch_misc_get_bk_users.return_value = {}
         path_get_bk_users.return_value = {}
 
@@ -252,7 +284,17 @@ class ServiceTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
     @mock.patch("itsm.component.utils.misc.get_bk_users")
-    def test_export_and_import(self, patch_misc_get_bk_users, path_get_bk_users):
+    @mock.patch("itsm.service.permissions.ServicePermit.has_permission")
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_export_and_import(
+        self,
+        patch_iam_auth,
+        patch_has_permission,
+        patch_misc_get_bk_users,
+        path_get_bk_users,
+    ):
+        patch_iam_auth.return_value = True
+        patch_has_permission.return_value = True
         patch_misc_get_bk_users.return_value = {}
         path_get_bk_users.return_value = {}
         url = "/api/service/projects/"

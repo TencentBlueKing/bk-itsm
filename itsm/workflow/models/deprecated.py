@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import jsonfield
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import (
     DEFAULT_STRING,
@@ -43,28 +43,40 @@ from itsm.workflow.models.field import BaseField
 
 class WorkflowSnap(models.Model):
     """实例化工作流
-        废弃：迁移至WorkflowVersion
+    废弃：迁移至WorkflowVersion
     """
 
     snapshot_time = models.DateTimeField(_("快照创建时间"), auto_now_add=True)
 
     workflow_id = models.IntegerField(_("工作流ID"))
 
-    fields = jsonfield.JSONField(_("字段快照字典"), default=EMPTY_DICT, null=True, blank=True)
-    states = jsonfield.JSONField(_("状态快照字典"), default=EMPTY_DICT, null=True, blank=True)
-    transitions = jsonfield.JSONField(_("流转快照字典"), default=EMPTY_DICT, null=True, blank=True)
+    fields = jsonfield.JSONField(
+        _("字段快照字典"), default=EMPTY_DICT, null=True, blank=True
+    )
+    states = jsonfield.JSONField(
+        _("状态快照字典"), default=EMPTY_DICT, null=True, blank=True
+    )
+    transitions = jsonfield.JSONField(
+        _("流转快照字典"), default=EMPTY_DICT, null=True, blank=True
+    )
 
     # 记录主分支数据
-    master = jsonfield.JSONField(_("主分支列表"), default=EMPTY_LIST, null=True, blank=True)
+    master = jsonfield.JSONField(
+        _("主分支列表"), default=EMPTY_LIST, null=True, blank=True
+    )
 
-    notify = models.ManyToManyField('workflow.Notify', help_text=_("可关联多种通知方式"))
-    notify_rule = models.CharField(_("通知规则"), max_length=LEN_SHORT, choices=NOTIFY_RULE_CHOICES, default="NONE")
+    notify = models.ManyToManyField(
+        "workflow.Notify", help_text=_("可关联多种通知方式")
+    )
+    notify_rule = models.CharField(
+        _("通知规则"), max_length=LEN_SHORT, choices=NOTIFY_RULE_CHOICES, default="NONE"
+    )
     notify_freq = models.IntegerField(_("重试间隔(s)"), default=EMPTY_INT)
 
     objects = managers.WorkflowSnapManager()
 
     class Meta:
-        app_label = 'workflow'
+        app_label = "workflow"
         verbose_name = _("工作流快照")
         verbose_name_plural = _("工作流快照")
 
@@ -75,8 +87,12 @@ class WorkflowSnap(models.Model):
 class DefaultField(BaseField):
     """初始环节内置字段表: deprecated"""
 
-    flow_type = models.CharField(_("流程分类"), max_length=LEN_NORMAL, default=DEFAULT_STRING)
-    category = models.CharField(_("字段归类，面向业务逻辑，比如服务类型（change|event）"), max_length=LEN_MIDDLE)
+    flow_type = models.CharField(
+        _("流程分类"), max_length=LEN_NORMAL, default=DEFAULT_STRING
+    )
+    category = models.CharField(
+        _("字段归类，面向业务逻辑，比如服务类型（change|event）"), max_length=LEN_MIDDLE
+    )
 
     objects = models.Manager()
 

@@ -27,16 +27,62 @@ import json
 import mock
 from django.test import TestCase, override_settings
 
+from blueapps.core.celery.celery import app
 from itsm.service.models import CatalogService
-from itsm.ticket.models import Ticket
+from itsm.ticket.models import Ticket, AttentionUsers
+from pipeline.engine.models import FunctionSwitch
 
 
 class TicketViewTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def setUp(self):
+        Ticket.objects.all().delete()
+        # CatalogService.objects.all().delete()
+        self.patcher_has_permission = mock.patch(
+            "itsm.ticket.permissions.TicketPermissionValidate.has_permission",
+            return_value=True,
+        )
+        self.patcher_has_object_permission = mock.patch(
+            "itsm.ticket.permissions.TicketPermissionValidate.has_object_permission",
+            return_value=True,
+        )
+        self.patcher_batch_resource_multi_actions_allowed = mock.patch(
+            "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
+            return_value={"1": {"ticket_view": True}},
+        )
+        self.patcher_transform_username = mock.patch(
+            "itsm.component.utils.misc.transform_username",
+            return_value={"admin": "admin(admin)"},
+        )
+        self.patcher_transform_single_username = mock.patch(
+            "itsm.component.utils.misc.transform_single_username",
+            return_value="admin(admin)",
+        )
+        self.patcher_get_bk_users = mock.patch(
+            "itsm.component.utils.client_backend_query.get_bk_users",
+            return_value="admin(admin)",
+        )
+        self.patcher_get_user_departments = mock.patch(
+            "itsm.component.utils.client_backend_query.get_user_departments",
+            return_value=["1"],
+        )
+
+        self.patch_get_bk_users = self.patcher_get_bk_users.start()
+        self.patch_transform_single_username = (
+            self.patcher_transform_single_username.start()
+        )
+        self.patch_transform_username = self.patcher_transform_username.start()
+        self.patch_has_permission = self.patcher_has_permission.start()
+        self.patch_has_object_permission = self.patcher_has_object_permission.start()
+        self.patch_batch_resource_multi_actions_allowed = (
+            self.patcher_batch_resource_multi_actions_allowed.start()
+        )
+        self.patch_get_user_departments = self.patcher_get_user_departments.start()
+
         CatalogService.objects.create(
             service_id=1, is_deleted=False, catalog_id=2, creator="admin"
         )
+        FunctionSwitch.objects.init_db()
         data = {
             "catalog_id": 3,
             "service_id": 1,
@@ -77,8 +123,15 @@ class TicketViewTest(TestCase):
         self.assertEqual(rsp.data["message"], "success")
 
     def tearDown(self):
-        Ticket.objects.all().delete()
+        self.patcher_has_permission.stop()
+        self.patcher_has_object_permission.stop()
+        self.patcher_batch_resource_multi_actions_allowed.stop()
+        self.patcher_transform_username.stop()
+        self.patcher_transform_single_username.stop()
+        self.patcher_get_bk_users.stop()
+        self.patcher_get_user_departments.stop()
         CatalogService.objects.all().delete()
+        Ticket.objects.all().delete()
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.role.models.get_user_departments")
@@ -212,27 +265,6 @@ class TicketViewTest(TestCase):
         url = "/api/ticket/receipts/export_group_by_service/?export_fields=sn&service_id__in=1&service_fields=eyI2IjpbInRpdGxlIl19"  # noqa
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         self.assertEqual(rsp.status_code, 200)
-
-    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    @mock.patch("itsm.role.models.get_user_departments")
-    @mock.patch("itsm.ticket.serializers.ticket.transform_single_username")
-    @mock.patch("itsm.component.utils.client_backend_query.get_bk_users")
-    def test_print_ticket(
-        self, get_user_departments, transform_single_username, get_bk_users
-    ):
-        get_user_departments.return_value = ["1"]
-        get_bk_users.return_value = ["1"]
-        transform_single_username.return_value = "admin(管理员)"
-        url = "/api/ticket/receipts/"
-        rsp = self.client.get(path=url, data=None, content_type="application/json")
-
-        url = "/api/ticket/receipts/{}/print_ticket/".format(
-            rsp.data["data"]["items"][0]["id"]
-        )
-        rsp = self.client.get(path=url, data=None, content_type="application/json")
-        self.assertEqual(rsp.status_code, 200)
-        self.assertEqual(rsp.data["message"], "success")
-        self.assertIsInstance(rsp.data["data"], dict)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_get_global_choices(self):
@@ -390,23 +422,6 @@ class TicketViewTest(TestCase):
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.role.models.get_user_departments")
-    @mock.patch("itsm.component.utils.client_backend_query.get_bk_users")
-    def test_tickets_processors(self, get_user_departments, get_bk_users):
-        get_user_departments.return_value = ["1"]
-        get_bk_users.return_value = ["1"]
-        url = "/api/ticket/receipts/"
-        rsp = self.client.get(path=url, data=None, content_type="application/json")
-
-        url = "/api/ticket/receipts/tickets_processors/?ids={}".format(
-            rsp.data["data"]["items"][0]["id"]
-        )
-        rsp = self.client.get(path=url, data=None, content_type="application/json")
-        self.assertEqual(rsp.status_code, 200)
-        self.assertEqual(rsp.data["message"], "success")
-        self.assertIsInstance(rsp.data["data"], dict)
-
-    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    @mock.patch("itsm.role.models.get_user_departments")
     def test_tickets_can_operate(self, get_user_departments):
         get_user_departments.return_value = ["1"]
         url = "/api/ticket/receipts/"
@@ -449,12 +464,157 @@ class TicketViewTest(TestCase):
         self.assertIsInstance(rsp.data["data"], dict)
 
 
+class TicketPrintAndProcessorsTest(TestCase):
+    def setUp(self):
+        app.conf.update(CELERY_ALWAYS_EAGER=True)
+        Ticket.objects.all().delete()
+        AttentionUsers.objects.all().delete()
+
+        CatalogService.objects.create(
+            service_id=1, is_deleted=False, catalog_id=2, creator="admin"
+        )
+
+    def tearDown(self):
+        Ticket.objects.all().delete()
+        AttentionUsers.objects.all().delete()
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    @mock.patch("itsm.ticket.serializers.ticket.transform_single_username")
+    @mock.patch("itsm.component.utils.client_backend_query.get_bk_users")
+    @mock.patch("itsm.ticket.permissions.TicketPermissionValidate.has_permission")
+    def test_print_ticket(
+        self,
+        patch_has_permission,
+        get_user_departments,
+        transform_single_username,
+        get_bk_users,
+    ):
+        patch_has_permission.return_value = True
+        get_user_departments.return_value = ["1"]
+        get_bk_users.return_value = ["1"]
+        transform_single_username.return_value = "admin(管理员)"
+
+        data = {
+            "catalog_id": 3,
+            "service_id": 1,
+            "service_type": "request",
+            "fields": [
+                {
+                    "type": "STRING",
+                    "id": 1,
+                    "key": "title",
+                    "value": "test_ticket",
+                    "choice": [],
+                },
+                {
+                    "type": "STRING",
+                    "id": 5,
+                    "key": "apply_content",
+                    "value": "测试内容",
+                },
+                {
+                    "type": "STRING",
+                    "key": "ZHIDINGSHENPIREN",
+                    "value": "test",
+                },
+                {
+                    "type": "STRING",
+                    "key": "apply_reason",
+                    "value": "test",
+                },
+            ],
+            "creator": "admin",
+            "attention": True,
+        }
+        url = "/api/ticket/receipts/"
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
+
+        url = "/api/ticket/receipts/{}/print_ticket/".format(rsp.data["data"]["id"])
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], dict)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.component.utils.misc.transform_username")
+    @mock.patch("itsm.component.utils.misc.transform_single_username")
+    @mock.patch("itsm.component.utils.client_backend_query.get_bk_users")
+    @mock.patch("itsm.role.models.get_user_departments")
+    @mock.patch("itsm.ticket.permissions.TicketPermissionValidate.has_permission")
+    def test_tickets_processors(
+        self,
+        patch_has_permission,
+        get_user_departments,
+        patch_get_bk_users,
+        patch_transform_single_username,
+        patch_transform_username,
+    ):
+        patch_has_permission.return_value = True
+        get_user_departments.return_value = ["1"]
+        patch_get_bk_users.return_value = {"admin": "admin(admin)"}
+        patch_transform_single_username.return_value = "admin(admin)"
+        patch_transform_username.return_value = "admin(admin)"
+
+        data = {
+            "catalog_id": 3,
+            "service_id": 1,
+            "service_type": "request",
+            "fields": [
+                {
+                    "type": "STRING",
+                    "id": 1,
+                    "key": "title",
+                    "value": "test_ticket",
+                    "choice": [],
+                },
+                {
+                    "type": "STRING",
+                    "id": 5,
+                    "key": "apply_content",
+                    "value": "测试内容",
+                },
+                {
+                    "type": "STRING",
+                    "key": "ZHIDINGSHENPIREN",
+                    "value": "test",
+                },
+                {
+                    "type": "STRING",
+                    "key": "apply_reason",
+                    "value": "test",
+                },
+            ],
+            "creator": "admin",
+            "attention": True,
+        }
+        url = "/api/ticket/receipts/"
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
+
+        url = "/api/ticket/receipts/tickets_processors/?ids={}".format(
+            rsp.data["data"]["id"]
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], dict)
+
+
 class OperationalDataViewTest(TestCase):
     data_filter = "create_at__gte=2021-01-01&create_at__lte=2031-01-01"
     month_filter = "create_at__gte=2021-01&create_at__lte=2031-01"
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def setUp(self):
+        self.patcher = mock.patch(
+            "itsm.component.drf.permissions.IamAuthPermit.iam_auth"
+        )
+        self.mock_iam_auth = self.patcher.start()
+        self.mock_iam_auth.return_value = True
         CatalogService.objects.create(
             service_id=1, is_deleted=False, catalog_id=2, creator="admin"
         )
@@ -500,6 +660,7 @@ class OperationalDataViewTest(TestCase):
     def tearDown(self):
         Ticket.objects.all().delete()
         CatalogService.objects.all().delete()
+        self.patcher.stop()
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_overview_count(self):

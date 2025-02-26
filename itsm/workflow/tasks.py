@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from celery.schedules import crontab
-from celery.task import periodic_task
+from blueapps.contrib.celery_tools.periodic import periodic_task
 
 from common.log import logger
 from itsm.component.constants import PUBLIC_PROJECT_PROJECT_KEY

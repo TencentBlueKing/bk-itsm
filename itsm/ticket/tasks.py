@@ -31,12 +31,12 @@ from functools import reduce
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from celery import Task
+from celery import Task, shared_task
 from celery.schedules import crontab
-from celery.task import periodic_task, task
+from blueapps.contrib.celery_tools.periodic import periodic_task
 from django.db.models import Q
 from django.db import connection, transaction
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from common.log import logger
 from common.mymako import render_mako_tostring
@@ -78,7 +78,9 @@ def auto_comment():
         logger.info(_("添加默认评价"))
         TicketComment.objects.filter(
             stars=0, create_at__lte=now - timedelta(days=AUTO_COMMENT_DAYS)
-        ).update(**{"stars": 4, "comments": "系统默认评价：满意！", "creator": "系统评价"})
+        ).update(
+            **{"stars": 4, "comments": "系统默认评价：满意！", "creator": "系统评价"}
+        )
 
 
 @periodic_task(run_every=crontab(hour=0, minute=0, day_of_week=1))
@@ -185,14 +187,16 @@ def weekly_statical():
 
     message = render_mako_tostring("weekly_statical_report.html", locals())
 
-    notifier = EmailNotifier(title="流程服务统计周报", receivers=receivers, message=message)
+    notifier = EmailNotifier(
+        title="流程服务统计周报", receivers=receivers, message=message
+    )
     try:
         notifier.send()
     except ComponentCallError as error:
         logger.info("统计日报发送失败, 组件错误： %s" % str(error))
 
 
-@task
+@shared_task
 def start_pipeline(ticket, **kwargs):
     ticket.start(**kwargs)
 
@@ -225,7 +229,7 @@ class ClonePipelineCallback(Task):
         ).update(related_status="UNBIND_FAILED")
 
 
-@task(base=ClonePipelineCallback)
+@shared_task(base=ClonePipelineCallback)
 def clone_pipeline(ticket, parent_ticket):
     ticket.clone_pipeline(parent_ticket)
 
@@ -248,7 +252,7 @@ def dispatch_retry_notify_event(ticket, state_id, receivers):
     retry_notify.apply_async(args=[ticket, state_id, receivers], countdown=countdown)
 
 
-@task
+@shared_task
 def retry_notify(ticket, state_id, receivers):
     # 每次发通知前查看一下当前单据的最新状态，并更新之后的单据对象
     ticket.refresh_from_db()
@@ -257,7 +261,9 @@ def retry_notify(ticket, state_id, receivers):
     # 需要停止发送消息的状态列表
     status = ["REVOKED", "TERMINATED", "FINISHED"]
     if ticket.current_status in status or not ticket.is_current_step(state_id):
-        logger.info(_("当前任务已过期, ticket_id={}, state_id={}".format(ticket.id, state_id)))
+        logger.info(
+            _("当前任务已过期, ticket_id={}, state_id={}".format(ticket.id, state_id))
+        )
     else:
         # 当前状态存在，才发送通知
         logger.info(
@@ -266,10 +272,10 @@ def retry_notify(ticket, state_id, receivers):
         ticket.notify(state_id, receivers)
 
 
-@task
+@shared_task
 def notify_task(ticket, receivers, message, action, **kwargs):
     """发送通知"""
-    task_id = kwargs.get("task_id")
+    task_id = kwargs.pop("task_id", None)
 
     # 关闭通知服务
     if CLOSE_NOTIFY == "close":
@@ -297,7 +303,7 @@ def notify_task(ticket, receivers, message, action, **kwargs):
             logger.exception("send email exception: %s" % str(e))
 
 
-@task
+@shared_task
 def notify_fast_approval_task(ticket, state_id, receivers):
     """发送快速审批通知"""
 
@@ -417,7 +423,7 @@ def build_auto_transit_rules(ticket, auto_transits):
     return rules
 
 
-@task
+@shared_task
 def remark_notify(ticket_id, creator, message, receivers):
     ticket = Ticket.objects.get(id=ticket_id)
     title = "{0}在单据{1}({2})下评论@了您".format(creator, ticket.title, ticket.sn)
@@ -516,12 +522,12 @@ def consume_notify():
 
     queryset = Ticket.objects.filter(current_status="RUNNING", is_deleted=False)
 
-    for _ in range(1, end):
+    for i in range(1, end):
         user = email_notify.lpop("notify_queue")
         send_message(user, queryset)
 
 
-@task
+@shared_task
 def ticket_set_history_operators(ticket_id, current_operator):
     """设置历史处理人"""
     with transaction.atomic():

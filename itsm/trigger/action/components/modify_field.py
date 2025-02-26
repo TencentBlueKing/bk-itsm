@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.trigger.action.core.component import BaseComponent
 from itsm.trigger.action.core import SelectField, CascadeField, BaseForm
@@ -38,8 +38,15 @@ class FieldForms(BaseForm):
     发送通知的输入数据格式
     """
 
-    field_key = SelectField(name=_("修改的字段"), source_type="RPC", source_uri="table_fields", use_variable=False)
-    field_value = CascadeField(name=_("设置的字段值"), source_type="FIELD", source_uri="field_key")
+    field_key = SelectField(
+        name=_("修改的字段"),
+        source_type="RPC",
+        source_uri="table_fields",
+        use_variable=False,
+    )
+    field_value = CascadeField(
+        name=_("设置的字段值"), source_type="FIELD", source_uri="field_key"
+    )
 
 
 class ModifyPublicFieldComponent(BaseComponent):
@@ -53,7 +60,9 @@ class ModifyPublicFieldComponent(BaseComponent):
         try:
             dst_ticket = Ticket.objects.get(sn=self.context.get("ticket_sn"))
         except Ticket.DoesNotExist:
-            self.data.set_outputs("message", _("对应的单据【%s】不存在") % self.context.get("ticket_sn"))
+            self.data.set_outputs(
+                "message", _("对应的单据【%s】不存在") % self.context.get("ticket_sn")
+            )
             return False
         dst_ticket.refresh_from_db()
         dst_field_key = self.data.get_one_of_inputs("field_key")
@@ -66,7 +75,7 @@ class ModifyPublicFieldComponent(BaseComponent):
             self.data.set_outputs("field_key__display", first_field.name)
             self.data.set_outputs("field_value__display", first_field.display_value)
 
-        if dst_field_key in ['bk_biz_id', "current_status", "title"]:
+        if dst_field_key in ["bk_biz_id", "current_status", "title"]:
             setattr(dst_ticket, dst_field_key, dst_field_value)
             dst_ticket.save(update_fields=[dst_field_key])
         return True

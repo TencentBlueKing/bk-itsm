@@ -29,7 +29,7 @@ from itertools import chain
 import jsonfield
 from django.db import models, transaction
 from django.db.models import Q
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import (
     DEFAULT_STRING,
@@ -93,7 +93,11 @@ class State(Model):
     )
     name = models.CharField(_("状态名"), max_length=LEN_NORMAL)
     desc = models.CharField(
-        _("状态描述"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True, blank=True
+        _("状态描述"),
+        max_length=LEN_NORMAL,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
     )
     type = models.CharField(
         _("状态类型"),
@@ -111,16 +115,24 @@ class State(Model):
         _("处理人列表"), default=EMPTY_STRING, null=True, blank=True
     )
     assignors_type = models.CharField(
-        _("派单人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+        _("派单人类型"),
+        max_length=LEN_SHORT,
+        choices=PROCESSOR_CHOICES,
+        default="EMPTY",
     )
     assignors = models.TextField(
         _("派单人列表"), default=EMPTY_STRING, null=True, blank=True
     )
     can_deliver = models.BooleanField(_("能否转单"), default=False)
     delivers_type = models.CharField(
-        _("转单人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+        _("转单人类型"),
+        max_length=LEN_SHORT,
+        choices=PROCESSOR_CHOICES,
+        default="EMPTY",
     )
-    delivers = models.TextField(_("转单人列表"), default=EMPTY_STRING, null=True, blank=True)
+    delivers = models.TextField(
+        _("转单人列表"), default=EMPTY_STRING, null=True, blank=True
+    )
 
     distribute_type = models.CharField(
         _("分配方式"),
@@ -129,7 +141,9 @@ class State(Model):
         default="PROCESS",
     )
 
-    notify = models.ManyToManyField("workflow.Notify", help_text=_("可关联多种通知方式"))
+    notify = models.ManyToManyField(
+        "workflow.Notify", help_text=_("可关联多种通知方式")
+    )
     notify_rule = models.CharField(
         _("通知规则"), max_length=LEN_SHORT, choices=NOTIFY_RULE_CHOICES, default="NONE"
     )
@@ -148,27 +162,42 @@ class State(Model):
     is_builtin = models.BooleanField(_("是否为系统内置"), default=False)
 
     # 是否允许在单据处理人为空时跳过
-    is_allow_skip = models.BooleanField(_("是否允许在单据处理人为空时跳过"), default=False)
+    is_allow_skip = models.BooleanField(
+        _("是否允许在单据处理人为空时跳过"), default=False
+    )
 
     # 会签及任务控制
     is_sequential = models.BooleanField(_("是否是串行任务"), default=False)
     finish_condition = jsonfield.JSONField(_("可向下调度的条件"), default=EMPTY_DICT)
 
     variables = jsonfield.JSONField(_("变量"), default=EMPTY_VARIABLE, null=True)
-    axis = jsonfield.JSONCharField(_("节点的坐标轴"), max_length=128, default=EMPTY_DICT)
+    axis = jsonfield.JSONCharField(
+        _("节点的坐标轴"), max_length=128, default=EMPTY_DICT
+    )
     api_instance_id = models.IntegerField(
         _("api实例主键"), default=0, null=True, blank=True
     )
     extras = jsonfield.JSONCharField(
-        _("额外信息"), max_length=LEN_XXX_LONG, default=EMPTY_DICT, null=True, blank=True
+        _("额外信息"),
+        max_length=LEN_XXX_LONG,
+        default=EMPTY_DICT,
+        null=True,
+        blank=True,
     )
 
     # deprecated fields
     followers_type = models.CharField(
-        _("关注人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+        _("关注人类型"),
+        max_length=LEN_SHORT,
+        choices=PROCESSOR_CHOICES,
+        default="EMPTY",
     )
     followers = models.CharField(
-        _("关注人列表"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True
+        _("关注人列表"),
+        max_length=LEN_LONG,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
     )
 
     label = models.CharField(_("标签记录"), max_length=LEN_LONG, default="EMPTY")

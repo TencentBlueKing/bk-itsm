@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from itsm.component.constants import DEFAULT_PROJECT_PROJECT_KEY
@@ -44,7 +44,7 @@ class UserRoleValidator(object):
         access = value.get("access", "")
         project_key = value.get("project_key", DEFAULT_PROJECT_PROJECT_KEY)
         members = list_by_separator(value.get("members", ""))
-        
+
         if getattr(self.role, "id", None) != value.get("id"):
             raise serializers.ValidationError(_("角色 ID 异常"))
 

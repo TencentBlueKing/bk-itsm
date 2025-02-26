@@ -16,6 +16,7 @@ pip install -r requirements.txt
 pip install -r requirements.dev.txt
 pip install -r requirements_open.txt
 pip install black
+pip install coverage
 
 # 删除遗留数据库，并新建一个空的本地数据库
 CREATE_DB_SQL="

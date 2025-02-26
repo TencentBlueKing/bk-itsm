@@ -27,7 +27,7 @@ __author__ = "蓝鲸智云"
 __copyright__ = "Copyright © 2012-2020 Tencent BlueKing. All Rights Reserved."
 
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from mptt.managers import TreeManager
 from mptt.models import MPTTModel
 from itsm.component.db import managers

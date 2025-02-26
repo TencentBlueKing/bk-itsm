@@ -27,15 +27,15 @@ __author__ = "蓝鲸智云"
 __copyright__ = "Copyright © 2012-2020 Tencent BlueKing. All Rights Reserved."
 
 import json
+
 import mock
 from blueapps.core.celery.celery import app
-
-from django.test import TestCase, override_settings
 from django.core.cache import cache
+from django.test import TestCase, override_settings
 
+from itsm.component.constants import APPROVAL_STATE
 from itsm.service.models import CatalogService, Service
 from itsm.ticket.models import Ticket, Status, AttentionUsers
-from itsm.component.constants import APPROVAL_STATE
 
 
 class TicketTest(TestCase):
@@ -53,7 +53,9 @@ class TicketTest(TestCase):
         AttentionUsers.objects.all().delete()
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_create_ticket(self):
+    @mock.patch("itsm.ticket.permissions.TicketPermissionValidate.has_permission")
+    def test_create_ticket(self, patch_has_permission):
+        patch_has_permission.return_value = True
         data = {
             "catalog_id": 3,
             "service_id": 1,
@@ -94,9 +96,28 @@ class TicketTest(TestCase):
         self.assertEqual(rsp.data["message"], "success")
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed")
     @mock.patch("itsm.role.models.get_user_departments")
-    def test_list(self, patch_get_user_departments):
+    @mock.patch("itsm.ticket.permissions.TicketPermissionValidate.has_permission")
+    @mock.patch(
+        "itsm.ticket.permissions.TicketPermissionValidate.has_object_permission"
+    )
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_list(
+        self,
+        patch_iam_auth,
+        patch_has_object_permission,
+        patch_has_permission,
+        patch_get_user_departments,
+        patch_batch_resource_multi_actions_allowed,
+    ):
+        patch_iam_auth.return_value = True
+        patch_has_object_permission.return_value = True
+        patch_has_permission.return_value = True
         patch_get_user_departments.return_value = {}
+        patch_batch_resource_multi_actions_allowed.return_value = {
+            "1": {"ticket_view": True}
+        }
         data = {
             "catalog_id": 3,
             "service_id": 1,
@@ -142,9 +163,18 @@ class TicketTest(TestCase):
         self.assertEqual(["admin"], list_rsp.data["data"]["items"][0]["followers"])
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideTestMiddleware",))
+    @mock.patch("itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed")
     @mock.patch("itsm.role.models.get_user_departments")
-    def test_list_follower(self, patch_get_user_departments):
+    def test_list_follower(
+        self, patch_get_user_departments, patch_batch_resource_multi_actions_allowed
+    ):
         patch_get_user_departments.return_value = {}
+        patch_batch_resource_multi_actions_allowed.return_value = {
+            "1": {"ticket_view": True}
+        }
+
+        # 当前测试使用test用户为admin用户提单，需要允许代提单
+        Service.objects.filter(id=1).update(can_ticket_agency=True)
         data = {
             "catalog_id": 3,
             "service_id": 1,
@@ -228,7 +258,22 @@ class TicketTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
     @mock.patch("itsm.component.utils.misc.get_bk_users")
-    def test_retrieve(self, patch_misc_get_bk_users, path_get_bk_users):
+    @mock.patch("itsm.ticket.permissions.TicketPermissionValidate.has_permission")
+    @mock.patch(
+        "itsm.ticket.permissions.TicketPermissionValidate.has_object_permission"
+    )
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_retrieve(
+        self,
+        patch_iam_auth,
+        patch_has_object_permission,
+        patch_has_permission,
+        patch_misc_get_bk_users,
+        path_get_bk_users,
+    ):
+        patch_iam_auth.return_value = True
+        patch_has_object_permission.return_value = True
+        patch_has_permission.return_value = True
         patch_misc_get_bk_users.return_value = {}
         path_get_bk_users.return_value = {}
         data = {
@@ -279,9 +324,25 @@ class TicketTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
     @mock.patch("itsm.component.utils.misc.get_bk_users")
-    def test_add_follower(self, patch_misc_get_bk_users, path_get_bk_users):
+    @mock.patch("itsm.ticket.permissions.TicketPermissionValidate.has_permission")
+    @mock.patch(
+        "itsm.ticket.permissions.TicketPermissionValidate.has_object_permission"
+    )
+    def test_add_follower(
+        self,
+        patch_has_object_permission,
+        patch_has_permission,
+        patch_misc_get_bk_users,
+        path_get_bk_users,
+    ):
+        patch_has_object_permission.return_value = True
+        patch_has_permission.return_value = True
         patch_misc_get_bk_users.return_value = {}
         path_get_bk_users.return_value = {}
+
+        # 当前测试使用admin用户为test用户提单，需要允许代提单
+        Service.objects.filter(id=1).update(can_ticket_agency=True)
+
         data = {
             "catalog_id": 3,
             "service_id": 1,
@@ -339,7 +400,22 @@ class TicketTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
     @mock.patch("itsm.component.utils.misc.get_bk_users")
-    def test_delete_follower(self, patch_misc_get_bk_users, path_get_bk_users):
+    @mock.patch("itsm.ticket.permissions.TicketPermissionValidate.has_permission")
+    @mock.patch(
+        "itsm.ticket.permissions.TicketPermissionValidate.has_object_permission"
+    )
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_delete_follower(
+        self,
+        patch_iam_auth,
+        patch_has_object_permission,
+        patch_has_permission,
+        patch_misc_get_bk_users,
+        path_get_bk_users,
+    ):
+        patch_iam_auth.return_value = True
+        patch_has_object_permission.return_value = True
+        patch_has_permission.return_value = True
         patch_misc_get_bk_users.return_value = {}
         path_get_bk_users.return_value = {}
         data = {
@@ -397,11 +473,27 @@ class TicketTest(TestCase):
         self.assertEqual(ticket_id, list_rsp.data["data"]["id"])
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideTestMiddleware",))
+    @mock.patch("itsm.auth_iam.utils.IamRequest.resource_multi_actions_allowed")
     @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
     @mock.patch("itsm.component.utils.misc.get_bk_users")
-    def test_operate(self, patch_misc_get_bk_users, path_get_bk_users):
+    def test_operate(
+        self,
+        patch_misc_get_bk_users,
+        path_get_bk_users,
+        patch_resource_multi_actions_allowed,
+    ):
         patch_misc_get_bk_users.return_value = {}
         path_get_bk_users.return_value = {}
+        patch_resource_multi_actions_allowed.return_value = {"ticket_management": True}
+
+        # 打印调试信息
+        print(
+            "Mocked resource_multi_actions_allowed:",
+            patch_resource_multi_actions_allowed.return_value,
+        )
+
+        # 当前测试使用test用户为admin用户提单，需要允许代提单
+        Service.objects.filter(id=1).update(can_ticket_agency=True)
         data = {
             "catalog_id": 3,
             "service_id": 1,
@@ -526,12 +618,26 @@ class TicketTest(TestCase):
     @override_settings(
         MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",), ENVIRONMENT="dev"
     )
+    @mock.patch("itsm.auth_iam.utils.IamRequest")
     @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
     @mock.patch("itsm.component.utils.misc.get_bk_users")
-    @mock.patch("itsm.auth_iam.utils.IamRequest")
+    @mock.patch("itsm.ticket.permissions.TicketPermissionValidate.has_permission")
+    @mock.patch(
+        "itsm.ticket.permissions.TicketPermissionValidate.has_object_permission"
+    )
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
     def test_exception_distribute(
-        self, patch_misc_get_bk_users, path_get_bk_users, patch_iam_request
+        self,
+        patch_iam_auth,
+        patch_has_object_permission,
+        patch_has_permission,
+        patch_misc_get_bk_users,
+        path_get_bk_users,
+        patch_iam_request,
     ):
+        patch_iam_auth.return_value = True
+        patch_has_object_permission.return_value = True
+        patch_has_permission.return_value = True
         patch_misc_get_bk_users.return_value = {}
         path_get_bk_users.return_value = {}
         patch_iam_request.resource_multi_actions_allowed.return_value = {

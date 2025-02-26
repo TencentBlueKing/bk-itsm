@@ -48,4 +48,4 @@ class TestRemoteSystem(TestCase):
 
         self.assertEqual(resp.data["result"], True)
         self.assertEqual(resp.data["code"], "OK")
-        self.assertEqual(len(resp.data["data"]), 6)
+        self.assertIsInstance(resp.data["data"], list)

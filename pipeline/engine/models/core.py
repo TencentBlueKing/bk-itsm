@@ -17,10 +17,10 @@ import logging
 import traceback
 
 from celery import current_app
-from celery.task.control import revoke
+
 from django.db import models, transaction
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from pipeline.conf import settings as pipeline_settings
 from pipeline.constants import PIPELINE_DEFAULT_PRIORITY
@@ -34,6 +34,7 @@ from pipeline.engine.utils import ActionResult, Stack, calculate_elapsed_time
 from pipeline.log.models import LogEntry
 from pipeline.utils.uniqid import node_uniqid, uniqid
 
+revoke = current_app.control.revoke
 logger = logging.getLogger("celery")
 
 RERUN_MAX_LIMIT = pipeline_settings.PIPELINE_RERUN_MAX_TIMES
@@ -230,13 +231,21 @@ class PipelineProcess(models.Model):
     current_node_id = models.CharField(
         _("当前推进到的节点的 ID"), max_length=32, default="", db_index=True
     )
-    destination_id = models.CharField(_("遇到该 ID 的节点就停止推进"), max_length=32, default="")
+    destination_id = models.CharField(
+        _("遇到该 ID 的节点就停止推进"), max_length=32, default=""
+    )
     parent_id = models.CharField(_("父 process 的 ID"), max_length=32, default="")
     ack_num = models.IntegerField(_("收到子节点 ACK 的数量"), default=0)
     need_ack = models.IntegerField(_("需要收到的子节点 ACK 的数量"), default=-1)
-    is_alive = models.BooleanField(_("该 process 是否还有效"), default=True, db_index=True)
-    is_sleep = models.BooleanField(_("该 process 是否正在休眠"), default=False, db_index=True)
-    is_frozen = models.BooleanField(_("该 process 是否被冻结"), default=False, db_index=True)
+    is_alive = models.BooleanField(
+        _("该 process 是否还有效"), default=True, db_index=True
+    )
+    is_sleep = models.BooleanField(
+        _("该 process 是否正在休眠"), default=False, db_index=True
+    )
+    is_frozen = models.BooleanField(
+        _("该 process 是否被冻结"), default=False, db_index=True
+    )
     snapshot = models.ForeignKey(ProcessSnapshot, null=True, on_delete=models.SET_NULL)
 
     objects = ProcessManager()
@@ -689,7 +698,9 @@ class NodeRelationship(models.Model):
     def __unicode__(self):
         return str(
             "#{} -({})-> #{}".format(
-                self.ancestor_id, self.distance, self.descendant_id,
+                self.ancestor_id,
+                self.distance,
+                self.descendant_id,
             )
         )
 
@@ -1165,7 +1176,10 @@ class ScheduleService(models.Model):
     SCHEDULE_ID_SPLIT_DIVISION = 32
 
     id = models.CharField(
-        _("ID 节点ID+version"), max_length=NAME_MAX_LENGTH, unique=True, primary_key=True
+        _("ID 节点ID+version"),
+        max_length=NAME_MAX_LENGTH,
+        unique=True,
+        primary_key=True,
     )
     activity_id = models.CharField(_("节点 ID"), max_length=32, db_index=True)
     process_id = models.CharField(_("Pipeline 进程 ID"), max_length=32)
@@ -1176,7 +1190,9 @@ class ScheduleService(models.Model):
     service_act = IOField(verbose_name=_("待调度服务"))
     is_finished = models.BooleanField(_("是否已完成"), default=False)
     version = models.CharField(_("Activity 的版本"), max_length=32, db_index=True)
-    is_scheduling = models.BooleanField(_("是否正在被调度"), default=False, db_index=True)
+    is_scheduling = models.BooleanField(
+        _("是否正在被调度"), default=False, db_index=True
+    )
 
     objects = ScheduleServiceManager()
 

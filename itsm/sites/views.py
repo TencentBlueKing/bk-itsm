@@ -30,7 +30,7 @@ from blueapps.account.decorators import login_exempt
 from django.conf import settings
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.utils.translation import ugettext as _, get_language
+from django.utils.translation import gettext as _, get_language
 from django.views.decorators.http import require_GET
 from mako.template import Template
 
@@ -71,9 +71,9 @@ def init(request):
                 "chname": request.user.get_property("chname"),
                 "username": request.user.username,
                 "all_access": UserRole.get_access_by_user(request.user.username),
-                "IS_ITSM_ADMIN": 1
-                if UserRole.is_itsm_superuser(request.user.username)
-                else 0,
+                "IS_ITSM_ADMIN": (
+                    1 if UserRole.is_itsm_superuser(request.user.username) else 0
+                ),
                 "need_target": False,  # 不需要强制跳转无权限页
                 "location": "",
             },
@@ -116,15 +116,17 @@ def index(request):
         ).value
     except SystemSettings.DoesNotExist:
         notice_center_switch_value = "off"
-    
+
     # 文档地址转换
     doc_lang = "EN"
     lang = get_language()
     if lang in ["zh-cn", "zh-hans"]:
         doc_lang = "ZH"
-    
+
     version = get_version()
-    doc_url = settings.BK_DOC_URL.format(lang=doc_lang, version=get_major_minor_version(version))
+    doc_url = settings.BK_DOC_URL.format(
+        lang=doc_lang, version=get_major_minor_version(version)
+    )
 
     return render(
         request,
@@ -178,16 +180,16 @@ def get_version():
     """
     # 读取文件内容
     app_desc = os.path.join(settings.PROJECT_ROOT, "VERSION")
-    with open(app_desc, 'r') as file:
+    with open(app_desc, "r") as file:
         content = file.read()
     return content.strip()
 
 
 def get_major_minor_version(version_string):
     # 使用 split() 方法分割字符串
-    parts = version_string.split('.')
+    parts = version_string.split(".")
     # 取前两个部分并用 '.' 连接
-    major_minor = '.'.join(parts[:2])
+    major_minor = ".".join(parts[:2])
     return major_minor
 
 

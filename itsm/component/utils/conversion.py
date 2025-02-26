@@ -26,7 +26,7 @@ import copy
 import json
 import re
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from mako.template import Template
 
 from itsm.component.exceptions import ParamError

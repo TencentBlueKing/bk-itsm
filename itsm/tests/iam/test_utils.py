@@ -61,6 +61,7 @@ class TestIamUtils(TestCase):
         ]
         actions = ["project_view"]
         settings.ENVIRONMENT = "dev"
+        settings.IAM_SKIP_AUTH = True
         data = self.request.batch_resource_multi_actions_allowed(
             actions=actions, resources=resources
         )
