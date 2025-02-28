@@ -54,7 +54,9 @@ class SubstituteVal(object):
                 val = getattr(val, part) if hasattr(val, part) else val[part]
 
         except KeyError:
-            raise MissingVariableException("no value supplied for {}".format(self._path))
+            raise MissingVariableException(
+                "no value supplied for {}".format(self._path)
+            )
 
         return val
 
@@ -65,7 +67,9 @@ class SubstituteVal(object):
 # Grammar definition
 pathDelimiter = "."
 # match gcloud's variable
-identifier = Combine(Optional("${") + Optional("_") + Word(alphas, alphanums + "_") + Optional("}"))
+identifier = Combine(
+    Optional("${") + Optional("_") + Word(alphas, alphanums + "_") + Optional("}")
+)
 # identifier = Word(alphas, alphanums + "_")
 propertyPath = delimitedList(identifier, pathDelimiter, combine=True)
 
@@ -76,7 +80,10 @@ in_ = Keyword("in", caseless=True)
 lparen = Suppress("(")
 rparen = Suppress(")")
 
-binaryOp = oneOf("== != < > >= <= in notin issuperset notissuperset", caseless=True)("operator")
+binaryOp = oneOf(
+    "== != < > >= <= in notin issuperset notissuperset contains notcontains",
+    caseless=True,
+)("operator")
 
 E = CaselessLiteral("E")
 numberSign = Word("+-", exact=1)
@@ -86,7 +93,9 @@ realNumber = Combine(
     + Optional(E + Optional(numberSign) + Word(nums))
 )
 
-integer = Combine(Optional(numberSign) + Word(nums) + Optional(E + Optional("+") + Word(nums)))
+integer = Combine(
+    Optional(numberSign) + Word(nums) + Optional(E + Optional("+") + Word(nums))
+)
 
 # str_ = quotedString.addParseAction(removeQuotes)
 str_ = QuotedString('"') | QuotedString("'")
@@ -104,7 +113,8 @@ propertyVal = simpleVals | (lparen + Group(delimitedList(simpleVals)) + rparen)
 
 boolExpression = Forward()
 boolCondition = Group(
-    (Group(propertyVal)("lval") + binaryOp + Group(propertyVal)("rval")) | (lparen + boolExpression + rparen)
+    (Group(propertyVal)("lval") + binaryOp + Group(propertyVal)("rval"))
+    | (lparen + boolExpression + rparen)
 )
 boolExpression << boolCondition + ZeroOrMore((and_ | or_) + boolExpression)
 
@@ -198,7 +208,9 @@ class BoolRule(object):
                 return
 
             try:
-                self._tokens = boolExpression.parseString(self._query, parseAll=self.strict)
+                self._tokens = boolExpression.parseString(
+                    self._query, parseAll=self.strict
+                )
             except ParseException:
                 raise
 
@@ -260,6 +272,10 @@ class BoolRule(object):
                 passed = set(lval).issuperset(set(rval))
             elif operator == "notissuperset":
                 passed = not set(lval).issuperset(set(rval))
+            elif operator == "contains":
+                passed = rval in lval
+            elif operator == "notcontains":
+                passed = rval not in lval
             else:
                 raise UnknownOperatorException("Unknown operator '{}'".format(operator))
 
