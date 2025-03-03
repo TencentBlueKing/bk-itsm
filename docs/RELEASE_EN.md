@@ -3,7 +3,8 @@
 【Improved】Remove the preview entry next to the link field.   
 【Fix】Fixed the issue of duplicate API calls on the document details page.   
 【Fix】Fixed the issue with form field validation in the line configuration condition relationship.  
-【Fix】Fixed the XSS vulnerability in the comment API on the ticket page by filtering out the `a` tags. 
+【Fix】Fixed the XSS vulnerability in the comment API on the ticket page by filtering out the `a` tags.   
+【Improved】Optimize the logic for ExclusiveGateway `contains` string condition.  
 
 ## [Version: 2.7.3] - 2024-11-25
 【Feature】Add meta context management, applied to fast approval, MOA, and notification receivers filter.  
