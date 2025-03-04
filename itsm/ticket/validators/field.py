@@ -62,7 +62,7 @@ def field_validate(field, state_fields, key_value, **kwargs):
     field_obj = state_fields.get(field["key"], None)
 
     if field_obj is None:
-        raise serializers.ValidationError(_("【{}】字段不存在，请联系管理员").format(field["key"]))
+        return
 
     field_obj = bunchify(field_obj)
 
@@ -327,7 +327,9 @@ def regex_validate(field, field_obj, ticket=None, key_value=None):
         if rule.expressions:
             results = []
             for expression in rule.expressions:
-                results.append(validate_expression(field, expression, ticket, key_value))
+                results.append(
+                    validate_expression(field, expression, ticket, key_value)
+                )
 
             expression_type = {"and": all, "or": any}
             if not expression_type.get(rule.type, any)(results):

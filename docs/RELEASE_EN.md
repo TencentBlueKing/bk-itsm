@@ -1,4 +1,8 @@
 # Changelog
+## [Version: 2.7.5] - 2025-03-04
+【Improved】Optimize the issue of OpenAPI returning an error when extra fields are passed during ticket creation.  
+
+
 ## [Version: 2.7.4] - 2025-02-18
 【Improved】Remove the preview entry next to the link field.   
 【Fix】Fixed the issue of duplicate API calls on the document details page.   
