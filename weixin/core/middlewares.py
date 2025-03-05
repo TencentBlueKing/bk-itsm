@@ -52,7 +52,7 @@ def get_user(request):
             user = BkWeixinUser.objects.get(pk=user_id)
         except BkWeixinUser.DoesNotExist:
             user = None
-    logger.info('get_user: %s, user=%s', user_id, user)
+    logger.debug('get_user: %s, user=%s', user_id, user)
     return user or AnonymousUser()
 
 
@@ -62,7 +62,7 @@ def get_user_by_wx_userid(wx_userid):
     resp = client_backend.usermanage.retrieve_user(
         {"fields": "username,display_name,email,id,code",  "lookup_field": "wx_userid", "id": wx_userid}
     )
-    logger.info('get_user_by_wxuserid: %s -> %s', wx_userid, resp)
+    logger.debug('get_user_by_wxuserid: %s -> %s', wx_userid, resp)
     return resp
         
 
@@ -88,7 +88,7 @@ def get_bk_user(request):
                 "is_staff": True
             }
         )
-    logger.info('get_bk_user from weixin user: %s -> %s', 
+    logger.debug('get_bk_user from weixin user: %s -> %s', 
                 request.weixin_user, bkuser)
     return bkuser or AnonymousUser()
 
@@ -112,7 +112,7 @@ class WeixinProxyPatchMiddleware(MiddlewareMixin):
     def process_request(self, request):
 
         # 非微信访问，跳过中间件
-        logger.info('is_weixin_visit: %s', weixin_account.is_weixin_visit(request))
+        logger.debug('is_weixin_visit: %s', weixin_account.is_weixin_visit(request))
         if not weixin_account.is_weixin_visit(request):
             setattr(request, 'source', WEB)
             setattr(request, 'is_weixin', False)
@@ -131,7 +131,7 @@ class WeixinProxyPatchMiddleware(MiddlewareMixin):
 class WeixinAuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request):
 
-        logger.info('WeixinAuthenticationMiddleware -> request.is_weixin: %s',
+        logger.debug('WeixinAuthenticationMiddleware -> request.is_weixin: %s',
                     getattr(request, 'is_weixin', False))
         if not getattr(request, 'is_weixin', False):
             return None
@@ -173,7 +173,7 @@ class WeixinLoginMiddleware(MiddlewareMixin):
         """process_view."""
 
         if not getattr(request, 'is_weixin', False):
-            logger.info('%s -> request.is_weixin: %s',
+            logger.debug('%s -> request.is_weixin: %s',
                         request.get_full_path(), getattr(request, 'is_weixin', False))
             return None
 
@@ -184,23 +184,23 @@ class WeixinLoginMiddleware(MiddlewareMixin):
 
         # 豁免微信登录装饰器
         if getattr(view, 'weixin_login_exempt', False):
-            logger.info('%s -> weixin_login_exempt: %s', 
+            logger.debug('%s -> weixin_login_exempt: %s', 
                         request.get_full_path(), getattr(view, 'weixin_login_exempt', None))
             return None
 
         # 验证OK
         if request.weixin_user.is_authenticated:
-            logger.info('%s -> request.weixin_user.is_authenticated: %s, request.user=%s',
+            logger.debug('%s -> request.weixin_user.is_authenticated: %s, request.user=%s',
                         request.get_full_path(), request.weixin_user.is_authenticated, request.user)
             # 必须绑定微信到蓝鲸 - 返回状态码 438
             if isinstance(request.user, AnonymousUser):
                 return render_mako_context(request, '/weixin/438.html',
                                            {"CUSTOM_TITLE": settings.CUSTOM_TITLE})
 
-            logger.info('weixin_login success: %s', request.path)
+            logger.debug('weixin_login success: %s', request.path)
             return None
 
         # 微信登录失效或者未通过验证，直接重定向到微信登录
-        logger.info('check weixin login failed, start redirect: %s', 
+        logger.debug('check weixin login failed, start redirect: %s', 
                     request.get_full_path())
         return weixin_account.redirect_weixin_login(request)

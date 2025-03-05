@@ -129,17 +129,17 @@ class WeixinAccount(WeixinAccountSingleton):
             callback_url = urllib.parse.urlunsplit(
                 (url.scheme, weixin_settings.WEIXIN_APP_EXTERNAL_HOST, path, query, url.fragment)
             )
-            logger.info('redirect_weixin_login:  callback_url=%s, WEIXIN_APP_EXTERNAL_HOST=%s',
+            logger.debug('redirect_weixin_login:  callback_url=%s, WEIXIN_APP_EXTERNAL_HOST=%s',
                 callback_url, weixin_settings.WEIXIN_APP_EXTERNAL_HOST)
         else:
             callback_url = urllib.parse.urlunsplit(
                 (url.scheme, url.netloc, path, query, url.fragment))
-            logger.info('redirect_weixin_login:  url=%s, path=%s, query=%s, callback_url=%s',
+            logger.debug('redirect_weixin_login:  url=%s, path=%s, query=%s, callback_url=%s',
                         url, path, query, callback_url)
 
         state = self.set_weixin_oauth_state(request)
         redirect_uri = self.get_oauth_redirect_url(callback_url, state)
-        logger.info('redirect_weixin_login: callback_url=%s, state=%s, redirect_uri=%s', 
+        logger.debug('redirect_weixin_login: callback_url=%s, state=%s, redirect_uri=%s', 
                     callback_url, state, redirect_uri)
         return HttpResponseRedirect(redirect_uri)
 
@@ -230,7 +230,7 @@ class WeixinAccount(WeixinAccountSingleton):
         """
         微信登录后回调
         """
-        logger.info('微信登录回调')
+        logger.debug('微信登录回调')
 
         if not self.is_weixin_visit(request):
             # TODO 改造为友好页面

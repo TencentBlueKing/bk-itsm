@@ -77,7 +77,7 @@ urllib3==1.26.18
 raven==6.1.0
 ddtrace==0.14.1
 gunicorn==19.6.0
-bkstorages==1.0.1
+bkstorages==1.0.8
 pytz==2019.3
 suds-jurko==0.6
 mock==3.0.5

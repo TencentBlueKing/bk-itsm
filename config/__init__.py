@@ -87,3 +87,10 @@ PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT, PROJECT_MODULE_NAME = os.path.split(PROJECT_PATH)
 BASE_DIR = PROJECT_ROOT
 PYTHON_BIN = os.path.dirname(sys.executable)
+
+
+# 导入环境变量
+try:
+    from .env import *
+except ImportError:
+    pass
