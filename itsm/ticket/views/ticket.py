@@ -86,6 +86,7 @@ from itsm.component.constants import (
 from itsm.component.constants.flow import EXPORT_SUPPORTED_TYPE
 from itsm.component.dlls.component import ComponentLibrary
 from itsm.component.drf import viewsets as component_viewsets
+from itsm.component.esb.backend_component import bk
 from itsm.component.drf.pagination import CustomPageNumberPagination
 from itsm.component.exceptions import (
     ComponentCallError,
@@ -167,6 +168,12 @@ from itsm.ticket.views.sql_file import get_my_deal_tickets_sql
 from itsm.ticket_status.models import TicketStatus
 from itsm.sla_engine.serializers import SlaTaskSerializer
 from itsm.sla_engine.models import SlaTask
+
+from itsm.component.utils.bk_bunch import (  # noqa
+    Bunch,
+    bunchify,  # noqa
+    unbunchify,  # noqa
+)  # noqa
 
 
 class ModelViewSet(component_viewsets.ModelViewSet):
@@ -458,6 +465,106 @@ class TicketModelViewSet(ModelViewSet):
         }
 
         return Response(api_instance.get_api_choice(kv_relation, params))
+
+    @action(detail=False, methods=["post"])
+    def table_field_choices(self, request):
+        """
+        自定义表格下拉框选项拉取接口
+        """
+
+        api = request.data.pop("api", {})
+        path = api.get("path")
+        ref_path = api.get("ref_path", None) or 'data'
+        if not (api and path):
+            return Response(
+                {
+                    "result": False,
+                    "code": ResponseCodeStatus.OK,
+                    "message": _("path不能为空，请检查"),
+                    "data": [],
+                }
+            )
+
+        # render params to query_params by marko template ${var}
+        params = api.get("params", {})
+
+        try:
+            if params:
+                query_params = json.dumps(params)
+                query_params = Template(query_params).render(**request.data)
+                query_params = json.loads(query_params)
+            else:
+                query_params = {}
+        except: # noqa
+            query_params = params
+            
+        bk_api_config = {
+            'system_domain': api.get("domain") or settings.BK_COMPONENT_API_URL,
+            'path': path,
+            'method': api.get("method") or 'GET',
+            'map_code': '',
+            'rsp_data': ref_path,
+            'before_req': '',
+            'query_params': query_params
+        }
+
+        rsp = bk.http(config=bk_api_config)
+        # rsp = {
+        #     "result": True,
+        #     "message": "ok",
+        #     "data": {"data": [{"key": "aaa", "name": "aaa"}]},
+        #     "code": 0
+        # }
+
+        api_protocol_keys = {"code", "data", "message", "result"}
+        if not api_protocol_keys.issubset(set(rsp.keys())):
+            return Response({
+                "result": False,
+                "code": ResponseCodeStatus.OK,
+                "message": _("接口返回协议不符合规范，请确保接口协议符合蓝鲸规范。详见: Github->API功能使用说明"),
+                "data": [],
+            })
+
+        rsp_data = rsp["data"].get(bk_api_config["rsp_data"]) or []
+        kv_relation = api.get("kv_relations", None)
+        if not kv_relation:
+            return Response({
+                "result": True,
+                "code": ResponseCodeStatus.OK,
+                "message": "success",
+                "data": [
+                    {"key": index, "name": str(item)}
+                    for index, item in enumerate(rsp_data)
+                ],
+            })
+
+        data = []
+        try:
+            for item in rsp_data:
+                exec(
+                    "key = unbunchify(bunchify(item).{key})".format(
+                        key=kv_relation["key"]
+                    )
+                )
+                exec(
+                    "name = unbunchify(bunchify(item).{name})".format(
+                        name=kv_relation["name"]
+                    )
+                )
+                data.append({"key": locals()["key"], "name": locals()["name"]})
+            return Response({
+                "result": True,
+                "code": ResponseCodeStatus.OK,
+                "message": "success",
+                "data": data,
+            })
+        except (KeyError, AttributeError):
+            return Response({
+                "result": False,
+                "code": ResponseCodeStatus.OK,
+                "message": _("所选关键字与返回结果不匹配， 请联系管理员"),
+                "data": [],
+            })
 
     @action(detail=False, methods=["get"])
     @cache_response(CACHE_5MIN, key_func=ticket_cache_key)

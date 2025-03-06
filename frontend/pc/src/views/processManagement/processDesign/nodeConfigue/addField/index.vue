@@ -566,7 +566,7 @@
         // 自定义复杂表格
         customTableInfo: {
           list: [
-            { name: '', display: 'input', choice: '', required: false, nameCheck: false, check: false },
+            { name: '', display: 'input', choice: '', required: false, nameCheck: false, check: false, api: '', key: '' },
           ],
         },
         // 前置节点
@@ -635,6 +635,7 @@
     },
     computed: {
       globalChoise() {
+        console.log(this.$store.state.common.configurInfo);
         return this.$store.state.common.configurInfo;
       },
       isShowDataSourcebtn() {
@@ -789,15 +790,17 @@
               });
               this.customTableInfo.list.push({
                 name: node.name,
+                key: node.key,
                 display: node.display,
                 choice: valChoice.join('\n'),
                 required: node.required,
                 nameCheck: false,
                 check: false,
+                api: node.api,
               });
             });
           } else {
-            this.customTableInfo.list.push({ name: '', display: 'input', choice: '', required: false, nameCheck: false, check: false });
+            this.customTableInfo.list.push({ name: '', display: 'input', choice: '', required: false, nameCheck: false, check: false, api: '', key: '' });
           }
         }
         // 标准运维变量
@@ -1233,6 +1236,15 @@
               }
               item.nameCheck = item.name.length === 0 || item.name.length > 120;
               item.check = (!choiceList.length && (item.display === 'select' || item.display === 'multiselect'));
+              if (item.api && (item.display === 'select' || item.display === 'multiselect')) {
+                try {
+                  JSON.parse(item.api);
+                  item.check = false;
+                } catch (e) {
+                  console.warn(`字段${item.name}的api配置不合法`);
+                  item.check = true;
+                }
+              }
             });
             const checkNameStatus = this.customTableInfo.list.some(item => item.nameCheck);
             const checkValueStatus = this.customTableInfo.list.some(item => item.check);
@@ -1250,9 +1262,11 @@
               choiceList = Array.from(new Set(choiceList));
               params.meta.columns.push({
                 name: item.name,
+                key: item.key,
                 display: item.display,
                 choice: item.choice.length ? choiceList : [],
                 required: item.required,
+                api: item.api,
               });
             });
           }
@@ -1324,6 +1338,16 @@
             }
             item.nameCheck = item.name.length === 0 || item.name.length > 120;
             item.check = (!choiceList.length && (item.display === 'select' || item.display === 'multiselect'));
+            if (item.api && (item.display === 'select' || item.display === 'multiselect')) {
+              try {
+                JSON.parse(item.api);
+                item.check = false;
+              } catch (e) {
+                console.warn(`字段${item.name}的api配置不合法`);
+                item.check = true;
+              }
+            }
+
             if (!repeatName.includes(item.name)) {
               repeatName.push(item.name);
             } else {

@@ -58,6 +58,13 @@ __all__ = [
     "BK_PAAS_INNER_HOST",
 ]
 
+
+# 导入环境变量
+try:
+    from .env import *
+except ImportError:
+    pass
+
 # app 基本信息
 
 # SaaS运行版本，如非必要请勿修改
@@ -88,9 +95,3 @@ PROJECT_ROOT, PROJECT_MODULE_NAME = os.path.split(PROJECT_PATH)
 BASE_DIR = PROJECT_ROOT
 PYTHON_BIN = os.path.dirname(sys.executable)
 
-
-# 导入环境变量
-try:
-    from .env import *
-except ImportError:
-    pass

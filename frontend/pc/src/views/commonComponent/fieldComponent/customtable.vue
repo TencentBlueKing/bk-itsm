@@ -22,7 +22,8 @@
 
 <template>
   <div v-if="item.showFeild">
-    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="{ content: item.tips, allowHTML: false }" desc-type="icon">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'"
+      :desc="{ content: item.tips, allowHTML: false }" desc-type="icon">
       <bk-table
         :data="item.val"
         :size="'small'">
@@ -41,8 +42,9 @@
                   v-model="props.row[columnItem.key]"
                   :font-size="'medium'"
                   :popover-min-width="180"
-                  :disabled="disabled">
-                  <bk-option v-for="option in columnItem.choice"
+                  :disabled="disabled"
+                  @change="handleSelectChange(props.$index, columnItem.key, props.row[columnItem.key])">
+                  <bk-option v-for="option in (props.row[`${columnItem.key}_choice`] || columnItem.choice)"
                     :key="option.key"
                     :id="option.key"
                     :name="option.name">
@@ -57,7 +59,7 @@
                   :disabled="disabled"
                   show-select-all
                   v-model="props.row[columnItem.key]">
-                  <bk-option v-for="option in columnItem.choice"
+                  <bk-option v-for="option in (props.row[`${columnItem.key}_choice`] || columnItem.choice)"
                     :key="option.key"
                     :id="option.key"
                     :name="option.name">
@@ -94,19 +96,22 @@
     </bk-form-item>
     <template v-if="item.checkValue">
       <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-      <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+      <p class="bk-task-error" v-else>{{ item.name }}{{ $t('m.newCommon["为必填项！"]') }}</p>
     </template>
   </div>
 </template>
 
 <script>
+  import { errorHandler } from '../../../utils/errorHandler';
+
   export default {
     name: 'CUSTOMTABLE',
     props: {
       item: {
         type: Object,
         required: true,
-        default: () => {},
+        default: () => {
+        },
       },
       isCurrent: {
         type: Boolean,
@@ -120,25 +125,24 @@
     data() {
       return {
         multiSelect: true,
+        watchers: {},  // 用于跟踪已经绑定的监听器
       };
     },
     watch: {
-      'item.val'() {
-        if (this.item.val === '') {
-          this.item.val = [];
-          const obj = {};
-          for (let i = 0; i < this.item.meta.columns.length; i++) {
-            const { key } = this.item.meta.columns[i];
-            obj[key] = '';
+      'item.val': {
+        handler(newVal) {
+          console.log(newVal);
+          if (typeof this.$parent.refresh === 'function') {
+            this.$parent.refresh();
           }
-          this.item.val.push(obj);
-        }
-        if (typeof this.$parent.refresh === 'function') {
-          this.$parent.refresh();
-        }
+          // 重新设置级联监听器
+          // this.setupCascadeWatchers();
+        },
+        deep: true,
       },
     },
     created() {
+      console.log(this.item);
       if (this.item.val === '' || (Array.isArray(this.item.val) && !this.item.val.length)) {
         this.item.val = [];
         const obj = {};
@@ -148,9 +152,8 @@
         }
         this.item.val.push(obj);
       }
-      // 脏数据处理：如果自定义表格中有下拉框，且选中的 key 在 choice.key 中找不到
-      // 尝试把 key 在 choice.name 中找,找到，则把 key 替换成 choice.key
-      // 上诉条件都不满足！则把该项的 value 赋值为空，结合必填校验让用户去重新选择！
+
+      // 脏数据处理
       this.item.val.forEach((row) => {
         this.item.meta.columns.forEach((column) => {
           if ((column.display === 'multiselect' || column.display === 'select')) {
@@ -162,8 +165,60 @@
           }
         });
       });
+
+      // 拉取 select 数据
+      this.fetchSelectData();
+
+      // 设置每一行的级联监听器
+      // this.setupCascadeWatchers();
     },
     methods: {
+      handleSelectChange(rowIndex, columnKey, newValue) {
+        console.log('handleSelectChange enter:', rowIndex, columnKey, newValue);
+        const columns = this.item.meta.columns;
+        const column = columns.find(column => column.key === columnKey);
+        if (column && column.api) {
+          const apiObj = JSON.parse(column.api);
+          if (apiObj.cascade) {
+            const watcherKey = `${rowIndex}-${column.key}`;
+            if (!this.watchers[watcherKey]) {
+              this.watchers[watcherKey] = this.$watch(`item.val.${rowIndex}.${column.key}`, (newValue) => {
+                const cascadeColumn = this.item.meta.columns.find(c => c.key === apiObj.cascade);
+                const rowData = this.item.val[rowIndex];
+                if (cascadeColumn && cascadeColumn.api) {
+                  console.log('handleSelectChange cascade', rowIndex, column.key, newValue, rowData, cascadeColumn.api);
+                  const reqParams = {
+                    ...rowData,
+                    api: JSON.parse(cascadeColumn.api),
+                  };
+                  this.$store.dispatch('apiRemote/get_table_select_data', reqParams).then((res) => {
+                    this.$set(this.item.val[rowIndex], `${cascadeColumn.key}_choice`, res.data);
+                  })
+                    .catch((res) => {
+                      errorHandler(res, this);
+                    });
+                }
+              });
+            }
+          }
+        }
+      },
+
+      fetchSelectData() {
+        this.item.meta.columns.forEach((column) => {
+          if (column.api) {
+            const reqParams = {
+              api: JSON.parse(column.api),
+            };
+            this.$store.dispatch('apiRemote/get_table_select_data', reqParams).then((res) => {
+              column.choice = res.data;
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              });
+          }
+        });
+      },
       addOne() {
         const obj = {};
         for (let i = 0; i < this.item.meta.columns.length; i++) {
@@ -171,6 +226,8 @@
           obj[key] = '';
         }
         this.item.val.push(obj);
+        // 为新添加的行设置级联监听器
+        // this.setupCascadeWatcherForRow(this.item.val.length - 1);
       },
       deleteOne(index) {
         if (this.item.val.length === 1) {
@@ -182,13 +239,64 @@
           this.$bkInfo({
             title: '确认要删除此条数据？',
             confirmFn: () => {
-              this.item.val.splice(index.$index, 1);
+              // this.item.val.splice(index.$index, 1);
+              // 移除该行上所有已绑定的监听器
+              const rowIndex = index.$index;
+              this.item.meta.columns.forEach((column) => {
+                if (column.api) {
+                  const apiObj = JSON.parse(column.api);
+                  if (apiObj.cascade) {
+                    const watcherKey = `${rowIndex}-${column.key}`;
+                    if (this.watchers[watcherKey]) {
+                      this.watchers[watcherKey]();
+                      delete this.watchers[watcherKey];
+                    }
+                  }
+                }
+              });
+              // 移除行
+              this.item.val.splice(rowIndex, 1);
             },
           });
         }
       },
+      // IGNORE:暂时用不到
+      setupCascadeWatchers() {
+        this.item.val.forEach((_, rowIndex) => {
+          this.setupCascadeWatcherForRow(rowIndex);
+        });
+      },
+      // IGNORE:暂时用不到
+      setupCascadeWatcherForRow(rowIndex) {
+        console.log('setupCascadeWatcherForRow enter:', rowIndex);
+        this.item.meta.columns.forEach((column) => {
+          if (column.api) {
+            const apiObj = JSON.parse(column.api);
+            if (apiObj.cascade) {
+              const watcherKey = `${rowIndex}-${column.key}`;
+              if (!this.watchers[watcherKey]) {
+                this.watchers[watcherKey] = this.$watch(`item.val.${rowIndex}.${column.key}`, (newValue) => {
+                  const cascadeColumn = this.item.meta.columns.find(c => c.key === apiObj.cascade);
+                  const rowData = this.item.val[rowIndex];
+                  console.log('setupCascadeWatcherForRow cascade watch:', rowIndex, column.key, newValue, rowData, cascadeColumn);
+                  if (cascadeColumn && cascadeColumn.api) {
+                    const reqParams = {
+                      ...rowData,
+                      api: JSON.parse(cascadeColumn.api),
+                    };
+                    this.$store.dispatch('apiRemote/get_table_select_data', reqParams).then((res) => {
+                      this.$set(this.item.val[rowIndex], `${cascadeColumn.key}_choice`, res.data);
+                    })
+                      .catch((res) => {
+                        errorHandler(res, this);
+                      });
+                  }
+                });
+              }
+            }
+          }
+        });
+      },
     },
   };
 </script>
-
-

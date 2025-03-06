@@ -574,7 +574,7 @@
     @include scroller;
 }
 .service-info {
-    width: 62.5%;
+    width: 82.5%;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -645,7 +645,7 @@
     height: 84px;
 }
 .form-panel {
-    width: 62.5%;
+    width: 82.5%;
     // margin-top: 20px;
     margin: 20px auto;
     padding: 20px 100px;
@@ -708,7 +708,7 @@
         }
     }
     .panel-content {
-        width: 80%;
+        width: 90%;
         .template-select {
             width: 50%;
         }
@@ -720,7 +720,7 @@
     }
 }
 .bottom-group {
-    width: 62.5%;
+    width: 82.5%;
     margin: 0 auto;
 }
 .save-template-pop {

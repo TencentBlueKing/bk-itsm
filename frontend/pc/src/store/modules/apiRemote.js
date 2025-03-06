@@ -48,6 +48,13 @@ export default {
         return res;
       });
     },
+    // 获自定义表格取级联字段数据源 （工单）
+    get_table_select_data({ commit, state, dispatch }, params) {
+      return ajax.post(`ticket/receipts/table_field_choices/`, params).then((response) => {
+        const res = response.data;
+        return res;
+      });
+    },
     // 获取级联字段数据源 （流程--单据预览/字段隐藏。。。）
     get_data_workflow({ commit, state, dispatch }, params) {
       return ajax.post(`postman/api_instance/${params.api_instance_id}/field_choices/`, params).then((response) => {

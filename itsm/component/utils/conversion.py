@@ -119,7 +119,7 @@ def build_params_by_mako_template(api_config_query_params, params):
 
 def format_exp_value(field_type, exp_value, show_condition=False):
     """不同类型字段值的格式化"""
-    if exp_value is None:
+    if exp_value in [None, ""]:
         return exp_value
 
     if field_type in ["INT"]:

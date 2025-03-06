@@ -203,11 +203,12 @@ class TemplateFieldSerializer(AuthModelSerializer):
         """
         new_meta = data.get("meta", {})
         for column in new_meta.get("columns", []):
-            column.update(
-                key=get_pinyin_key(column.get("name")),
-            )
+            if not column.get("key"):
+                column.update(
+                    key=get_pinyin_key(column.get("name")),
+                )
             # 忽略展现形式不是下拉框的类型
-            if column.get("display") in ["select", "multiselect"]:
+            if column.get("choice") and column.get("display") in ["select", "multiselect"]:
                 column.update(
                     choice=[
                         {"name": value, "key": get_pinyin_key(value)}

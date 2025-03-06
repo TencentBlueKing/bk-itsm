@@ -87,7 +87,7 @@
     /deep/.bk-add-field {
         & > .bk-form {
             margin: 0 auto;
-            max-width: 600px;
+            max-width: 960px;
             & > .bk-form-item {
                 & > .bk-label {
                     width: 100px !important;
