@@ -67,6 +67,7 @@
   import members from '../../commonComponent/fieldComponent/members.vue';
   import table from '../../commonComponent/fieldComponent/table.vue';
   import customtable from '../../commonComponent/fieldComponent/customtable.vue';
+  import customForm from '../../commonComponent/fieldComponent/customForm.vue';
   import editor from '../../commonComponent/fieldComponent/editor.vue';
   import tree from '../../commonComponent/fieldComponent/tree.vue';
   import file from '../../commonComponent/fieldComponent/file.vue';
@@ -103,6 +104,7 @@
       'CW-CASCADE': cascade,
       'CW-SOPS_TEMPLATE': sopsTemplate,
       'CW-DEVOPS_TEMPLATE': devopsTemplate,
+      'CW-CUSTOM-FORM': customForm,
     },
     mixins: [apiFieldsWatch, commonMix],
     props: {
