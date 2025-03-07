@@ -349,7 +349,7 @@
       <!-- 公共字段不需要填写条件隐藏' -->
       <template v-if="!(addOrigin.isOther && addOrigin.addOriginInfo.type === 'publicField') && (changeInfo.meta && changeInfo.meta.code !== 'APPROVE_RESULT')">
         <bk-form-item
-          :label="$t(`m.treeinfo['是否设置字段隐藏条件']`)"
+          :label="$t(`m.treeinfo['字段隐藏']`)"
           :ext-cls="'bk-mt20-item'">
           <bk-switcher v-model="formInfo.show_type"
             size="small"

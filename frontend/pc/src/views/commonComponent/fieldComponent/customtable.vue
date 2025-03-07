@@ -33,6 +33,9 @@
               <template v-if="columnItem.display === 'input'">
                 <bk-input
                   :clearable="true"
+                  :font-size="'normal'"
+                  behavior="simplicity"
+                  size="small"
                   v-model="props.row[columnItem.key]"
                   :disabled="disabled"></bk-input>
               </template>
@@ -40,8 +43,10 @@
                 <bk-select
                   searchable
                   v-model="props.row[columnItem.key]"
-                  :font-size="'medium'"
+                  :font-size="'normal'"
                   :popover-min-width="180"
+                  behavior="simplicity"
+                  size="small"
                   :disabled="disabled"
                   @change="handleSelectChange(props.$index, columnItem.key, props.row[columnItem.key])">
                   <bk-option v-for="option in (props.row[`${columnItem.key}_choice`] || columnItem.choice)"
@@ -55,7 +60,9 @@
                 <bk-select searchable
                   multiple
                   :popover-min-width="180"
-                  :font-size="'medium'"
+                  :font-size="'normal'"
+                  behavior="simplicity"
+                  size="small"
                   :disabled="disabled"
                   show-select-all
                   v-model="props.row[columnItem.key]">
@@ -86,6 +93,9 @@
           <template slot-scope="props">
             <bk-button theme="primary" text @click="addOne" :disabled="disabled">
               {{ $t('m.newCommon["添加"]') }}
+            </bk-button>
+            <bk-button theme="primary" text @click="cloneOne(props.$index)" :disabled="disabled">
+              克隆
             </bk-button>
             <bk-button theme="primary" text @click="deleteOne(props)" :disabled="disabled">
               {{ $t('m.newCommon["删除"]') }}
@@ -130,19 +140,19 @@
     },
     watch: {
       'item.val': {
-        handler(newVal) {
-          console.log(newVal);
+        // handler(newVal) {
+        handler() {
+          // console.log(newVal);
           if (typeof this.$parent.refresh === 'function') {
             this.$parent.refresh();
           }
           // 重新设置级联监听器
-          // this.setupCascadeWatchers();
+          this.setupCascadeWatchers();
         },
         deep: true,
       },
     },
     created() {
-      console.log(this.item);
       if (this.item.val === '' || (Array.isArray(this.item.val) && !this.item.val.length)) {
         this.item.val = [];
         const obj = {};
@@ -185,7 +195,7 @@
               this.watchers[watcherKey] = this.$watch(`item.val.${rowIndex}.${column.key}`, (newValue) => {
                 const cascadeColumn = this.item.meta.columns.find(c => c.key === apiObj.cascade);
                 const rowData = this.item.val[rowIndex];
-                if (cascadeColumn && cascadeColumn.api) {
+                if (cascadeColumn && cascadeColumn.api && rowData) {
                   console.log('handleSelectChange cascade', rowIndex, column.key, newValue, rowData, cascadeColumn.api);
                   const reqParams = {
                     ...rowData,
@@ -193,6 +203,8 @@
                   };
                   this.$store.dispatch('apiRemote/get_table_select_data', reqParams).then((res) => {
                     this.$set(this.item.val[rowIndex], `${cascadeColumn.key}_choice`, res.data);
+                    // 重置级联下拉框的当前值
+                    this.$set(this.item.val[rowIndex], cascadeColumn.key, cascadeColumn.display === 'multiselect' ? [] : '');
                   })
                     .catch((res) => {
                       errorHandler(res, this);
@@ -229,6 +241,12 @@
         // 为新添加的行设置级联监听器
         // this.setupCascadeWatcherForRow(this.item.val.length - 1);
       },
+      cloneOne(index) {
+        const obj = { ...this.item.val[index] };
+        this.item.val.splice(index + 1, 0, obj);
+        // 为新克隆的行设置级联监听器
+        this.setupCascadeWatcherForRow(index + 1);
+      },
       deleteOne(index) {
         if (this.item.val.length === 1) {
           this.$bkMessage({
@@ -260,13 +278,13 @@
           });
         }
       },
-      // IGNORE:暂时用不到
+      // fix: 第一次无法没有触发级联
       setupCascadeWatchers() {
         this.item.val.forEach((_, rowIndex) => {
           this.setupCascadeWatcherForRow(rowIndex);
         });
       },
-      // IGNORE:暂时用不到
+
       setupCascadeWatcherForRow(rowIndex) {
         console.log('setupCascadeWatcherForRow enter:', rowIndex);
         this.item.meta.columns.forEach((column) => {
@@ -279,13 +297,15 @@
                   const cascadeColumn = this.item.meta.columns.find(c => c.key === apiObj.cascade);
                   const rowData = this.item.val[rowIndex];
                   console.log('setupCascadeWatcherForRow cascade watch:', rowIndex, column.key, newValue, rowData, cascadeColumn);
-                  if (cascadeColumn && cascadeColumn.api) {
+                  if (cascadeColumn && cascadeColumn.api && rowData) {
                     const reqParams = {
                       ...rowData,
                       api: JSON.parse(cascadeColumn.api),
                     };
                     this.$store.dispatch('apiRemote/get_table_select_data', reqParams).then((res) => {
                       this.$set(this.item.val[rowIndex], `${cascadeColumn.key}_choice`, res.data);
+                      // 重置级联下拉框的当前值
+                      this.$set(this.item.val[rowIndex], cascadeColumn.key, cascadeColumn.display === 'multiselect' ? [] : '');
                     })
                       .catch((res) => {
                         errorHandler(res, this);

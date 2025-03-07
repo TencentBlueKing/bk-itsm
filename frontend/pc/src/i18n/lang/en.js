@@ -1432,7 +1432,7 @@ export const m = {
     调出快速添加节点菜单: 'Quick Menu',
     提单: 'Submit Ticket',
     隐藏条件: 'Hidden Conditions',
-    是否设置字段隐藏条件: 'Hide Control',
+    字段隐藏: 'Hide Control',
     整行: 'Whole Line ',
     隐藏字段: 'Hidden Fields',
     '字段默认为显示。当满足以下配置条件时，该字段将会被隐藏。': 'This field will be hidden when the following conditions are met. Default is display',

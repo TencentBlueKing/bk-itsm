@@ -574,7 +574,7 @@
     @include scroller;
 }
 .service-info {
-    width: 82.5%;
+    width: 90%;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -645,7 +645,7 @@
     height: 84px;
 }
 .form-panel {
-    width: 82.5%;
+    width: 90%;
     // margin-top: 20px;
     margin: 20px auto;
     padding: 20px 100px;
@@ -720,7 +720,7 @@
     }
 }
 .bottom-group {
-    width: 82.5%;
+    width: 90%;
     margin: 0 auto;
 }
 .save-template-pop {
