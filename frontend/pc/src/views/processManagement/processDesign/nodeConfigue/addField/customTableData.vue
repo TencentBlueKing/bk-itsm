@@ -31,13 +31,18 @@
         :placeholder="$t(`m.treeinfo['请输入名称']`)"
         v-model="item.name">
       </bk-input>
+      <bk-input :ext-cls="'bk-custom-input'"
+        :clearable="true"
+        placeholder="请输入Key"
+        v-model="item.key">
+      </bk-input>
       <bk-checkbox style="float: left; margin-right: 10px; line-height: 32px;"
         :true-value="trueStatus"
         :false-value="falseStatus"
         v-model="item.required">
         {{ $t(`m.treeinfo['必填']`) }}
       </bk-checkbox>
-      <bk-select :ext-cls="'bk-custom-small'"
+      <bk-select :ext-cls="'bk-custom-tiny'" style="width:64px;"
         v-model="item.display"
         :clearable="false"
         searchable>
@@ -47,12 +52,18 @@
           :name="option.name">
         </bk-option>
       </bk-select>
-      <textarea style="width: 180px; min-height: 32px;"
+      <textarea style="width: 100px; min-height: 24px;"
         class="bk-form-textarea bk-textarea-tanble"
         :placeholder="$t(`m.treeinfo['请输入，Enter分隔']`)"
         :disabled="item.display !== 'select' && item.display !== 'multiselect'"
         v-model.trim="item.choice">
-            </textarea>
+      </textarea>
+      <textarea style="width: 100px; min-height: 24px;"
+        class="bk-form-textarea bk-textarea-tanble"
+        placeholder="请输入api配置"
+        :disabled="item.display !== 'select' && item.display !== 'multiselect'"
+        v-model.trim="item.api">
+      </textarea>
       <div class="bk-custom-icon">
         <i class="bk-itsm-icon icon-flow-add" @click="addTableData(item, itemIndex)"></i>
         <i class="bk-itsm-icon icon-flow-reduce"
@@ -98,8 +109,10 @@
       addTableData(item, index) {
         const valueInfo = {
           name: '',
+          key: '',
           display: 'input',
           choice: '',
+          api: '',
           required: false,
         };
         this.customTableInfo.list.splice(index + 1, 0, valueInfo);
@@ -130,6 +143,11 @@
         }
         .bk-custom-small {
             flex: 1;
+            margin-right: 5px;
+        }
+        .bk-custom-tiny {
+            flex: 1;
+            width: 100px;
             margin-right: 5px;
         }
         .bk-custom-icon {
