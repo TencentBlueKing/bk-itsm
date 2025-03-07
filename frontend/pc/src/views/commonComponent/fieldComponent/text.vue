@@ -26,7 +26,7 @@
       <bk-input :class="{ 'bk-border-error': item.checkValue }"
         :placeholder="item.desc"
         :type="'textarea'"
-        :rows="8"
+        :rows="4"
         v-model="item.val"
         :disabled="(item.is_readonly && !isCurrent) || disabled"
         @focus="item.checkValue = false">
