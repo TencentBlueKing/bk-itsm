@@ -62,9 +62,7 @@ def field_validate(field, state_fields, key_value, **kwargs):
     field_obj = state_fields.get(field["key"], None)
 
     if field_obj is None:
-        raise serializers.ValidationError(
-            _("【{}】字段不存在，请联系管理员").format(field["key"])
-        )
+        return
 
     field_obj = bunchify(field_obj)
 

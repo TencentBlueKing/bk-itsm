@@ -206,8 +206,10 @@ METHOD_CHOICES = [
     (">=", ">="),
     ("issuperset", "包含"),
     ("notissuperset", "不包含"),
-    ("in", "包含(字符类型)"),
-    ("notin", "不包含(字符类型)"),
+    ("in", " 在值之内(字符)"),
+    ("notin", "不在值之内(字符)"),
+    ("contains", "包含(字符)"),
+    ("notcontains", "不包含(字符)"),
     # ("startswith", u"以某某开头"),
     # ("endswith", u"以某某结尾"),
 ]
@@ -330,10 +332,7 @@ SOURCE_CHOICES = [
     ("CUSTOM_API", "自定义API"),
 ]
 
-FIELD_IGNORE_ESCAPE = [
-    "FILE",
-    "TEXT"
-]
+FIELD_IGNORE_ESCAPE = ["FILE", "TEXT"]
 
 LAYOUT_CHOICES = [
     ("COL_6", "半行"),
