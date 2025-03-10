@@ -2,6 +2,7 @@
 ## [Version: 2.7.5] - 2025-03-04
 【Improved】Optimize the issue of OpenAPI returning an error when extra fields are passed during ticket creation.  
 【Fix】Fix the issue where the custom form fields are not displayed on the bill of lading page.  
+【Improved】Optimize validation logic when saving SOPS nodes.
 
 ## [Version: 2.7.4] - 2025-02-18
 【Improved】Remove the preview entry next to the link field.   
