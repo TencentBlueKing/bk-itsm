@@ -1,0 +1,26 @@
+variables:
+  IMAGE_REPO: swr.cn-north-4.myhuaweicloud.com/srpx/bk-itsm
+
+stages:
+  - dockerBuild
+
+
+dockerBuild:
+  stage: dockerBuild
+  image: docker:18.06.1-ce
+#  only:
+#    - /^(pre|master)$/ 
+  except:
+      - develop
+  variables:
+    # 是否在执行 pipeline 要获取 Git 仓库的源代码
+    GIT_STRATEGY: fetch
+  before_script:
+    - set -ex
+  script:
+    - |
+      imgName=${IMAGE_REPO}:${CI_COMMIT_REF_NAME}-${CI_PIPELINE_ID}
+      chmod +x ./ops/ci/docker-build.sh
+      ./ops/ci/docker-build.sh "$imgName"
+      docker push "$imgName"
+      docker rmi $(docker images --format '{{.Repository}}:{{.Tag}}' $imgName)
