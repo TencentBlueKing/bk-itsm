@@ -80,9 +80,10 @@ in_ = Keyword("in", caseless=True)
 lparen = Suppress("(")
 rparen = Suppress(")")
 
-binaryOp = oneOf("== != < > >= <= in notin issuperset notissuperset", caseless=True)(
-    "operator"
-)
+binaryOp = oneOf(
+    "== != < > >= <= in notin issuperset notissuperset contains notcontains",
+    caseless=True,
+)("operator")
 
 E = CaselessLiteral("E")
 numberSign = Word("+-", exact=1)
@@ -271,6 +272,10 @@ class BoolRule(object):
                 passed = set(lval).issuperset(set(rval))
             elif operator == "notissuperset":
                 passed = not set(lval).issuperset(set(rval))
+            elif operator == "contains":
+                passed = rval in lval
+            elif operator == "notcontains":
+                passed = rval not in lval
             else:
                 raise UnknownOperatorException("Unknown operator '{}'".format(operator))
 

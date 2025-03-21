@@ -137,7 +137,7 @@ class CommentSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(_("该单据已经被评论，请勿重复评论"))
 
         validated_data["comments"] = texteditor_escape(
-            validated_data["comments"], is_support_img=False
+            validated_data["comments"], unsupported_tags=["img"]
         )
         return super(CommentSerializer, self).update(instance, validated_data)
 

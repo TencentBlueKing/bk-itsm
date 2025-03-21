@@ -114,7 +114,7 @@
       <span class="bk-li-left" :title="item.name">{{item.name}}：</span>
       <span class="bk-li-right bk-li-right-link">
         <span class="bk-pot-after bk-li-link" :title="item.value" @click="goToLink(item.value)">{{ item.value }}</span>
-        <i class="bk-itsm-icon commonicon-icon icon-itsm-icon-three link-view" @click="openLickInIframe(item)"></i>
+        <!-- <i class="bk-itsm-icon commonicon-icon icon-itsm-icon-three link-view" @click="openLickInIframe(item)"></i> -->
         <i class="bk-itsm-icon commonicon-icon icon-itsm-icon-copy link-copy" v-bk-copy="item.value"></i>
       </span>
     </div>

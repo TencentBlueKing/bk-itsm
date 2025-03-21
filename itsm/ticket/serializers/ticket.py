@@ -1570,7 +1570,7 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
             compute_list_difference(instance.users, validated_data["users"])
         )
         validated_data["content"] = texteditor_escape(
-            validated_data["content"], is_support_img=False
+            validated_data["content"], unsupported_tags=["a", "img"]
         )
 
         instance.update_log.append(
@@ -1595,7 +1595,7 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
         validated_data["parent_id"] = parent_id
         validated_data["ticket_id"] = parent_node.ticket_id
         validated_data["content"] = texteditor_escape(
-            validated_data["content"], is_support_img=False
+            validated_data["content"], unsupported_tags=["a", "img"]
         )
         validated_data.pop("parent")
         instance = super(TicketRemarkSerializer, self).create(validated_data)

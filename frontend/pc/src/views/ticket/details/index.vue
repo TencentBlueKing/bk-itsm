@@ -279,8 +279,6 @@
                 query: Object.assign({}, this.$route.query, { step_id: stepIdList.toString() }),
               });
             }
-          } else {
-            this.initData();
           }
         },
         immediate: true,
