@@ -236,21 +236,28 @@
             v-model="formInfo.is_allow_skip">
             {{$t(`m['节点处理人为空时，直接跳过且不视为异常']`) }}
           </bk-checkbox>
-          <bk-popconfirm
-            title="确认取消设置？"
-            content="取消后，当审批人拒绝后，单据继续往下执行，请谨慎操作！"
-            width="288"
-            trigger="click"
-            :disabled="!formInfo.enable_terminate_ticket_when_rejected"
-            @confirm="formInfo.enable_terminate_ticket_when_rejected = false">
-            <bk-checkbox
-              :value="formInfo.enable_terminate_ticket_when_rejected"
-              :true-value="true"
-              :false-value="false"
-              :before-change="handleTerminateRejectedChange">
-              {{$t(`m['审批节点最终结果为拒绝时，自动终止单据']`) }}
-            </bk-checkbox>
-          </bk-popconfirm>
+
+          <bk-checkbox
+            :value="formInfo.enable_terminate_ticket_when_rejected"
+            :true-value="true"
+            :false-value="false"
+            :before-change="handleTerminateRejectedChange">
+            <bk-popconfirm
+              title="确认取消设置？"
+              content="取消后，当审批人拒绝后，单据继续往下执行，请谨慎操作！"
+              width="288"
+              trigger="click"
+              :disabled="!formInfo.enable_terminate_ticket_when_rejected"
+              @confirm="formInfo.enable_terminate_ticket_when_rejected = false">
+              <span>{{$t(`m['审批节点最终结果为拒绝时，自动终止单据']`) }}</span>
+            </bk-popconfirm>
+          </bk-checkbox>
+          <bk-checkbox
+            v-model="formInfo.enable_auto_approve_if_previously_approved"
+            :true-value="true"
+            :false-value="false">
+            {{$t(`m['已审批过的自动同意（历史节点中审批通过时，无需手动审批，系统将自动同意）']`) }}
+          </bk-checkbox>
         </bk-form-item>
       </bk-form>
       <field-config
@@ -423,6 +430,7 @@
           processors: [],
           is_allow_skip: false,
           enable_terminate_ticket_when_rejected: true,
+          enable_auto_approve_if_previously_approved: false
         },
         nodeTagList: [],
         allCondition: [],
@@ -499,7 +507,8 @@
         }
         this.formInfo.is_sequential = this.configur.is_sequential;
         this.formInfo.is_allow_skip = this.configur.is_allow_skip;
-        this.formInfo.enable_terminate_ticket_when_rejected = ('enable_terminate_ticket_when_rejected') in this.configur.extras ? this.configur.extras.enable_terminate_ticket_when_rejected : true;
+        this.formInfo.enable_terminate_ticket_when_rejected = ('enable_terminate_ticket_when_rejected' in this.configur.extras) ? this.configur.extras.enable_terminate_ticket_when_rejected : true;
+        this.formInfo.enable_auto_approve_if_previously_approved = ('enable_auto_approve_if_previously_approved' in this.configur.extras) ? this.configur.extras.enable_auto_approve_if_previously_approved : false;
         this.formInfo.processors = this.configur.processors ? this.configur.processors.split(',') : [];
         this.formInfo.ticket_type = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.type : 'keep';
         this.formInfo.ticket_key = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.name : '';
@@ -666,6 +675,7 @@
           params.ticket_type = this.formInfo.ticket_type;
           params.extras = {
             enable_terminate_ticket_when_rejected: this.formInfo.enable_terminate_ticket_when_rejected,
+            enable_auto_approve_if_previously_approved: this.formInfo.enable_auto_approve_if_previously_approved,
             ticket_status: {
               name: this.formInfo.ticket_key,
               type: this.formInfo.ticket_type,

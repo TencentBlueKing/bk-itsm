@@ -490,9 +490,6 @@ class SopsStateValidator(object):
     def __call__(self, value):
         if not value["extras"]["sops_info"]["template_id"]:
             raise ParamError(_("请选择标准运维流程模板"))
-        for constant in value["extras"]["sops_info"]["constants"]:
-            if not constant.get("value"):
-                raise ParamError(_("【{}】参数不能为空").format(constant.get("name")))
 
 
 class DevSopsStateValidator(object):

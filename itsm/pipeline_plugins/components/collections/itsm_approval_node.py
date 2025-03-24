@@ -27,13 +27,14 @@ import logging
 
 from django.conf import settings
 from django.core.cache import cache
-from itsm.component.constants import PROCESS_COUNT
-from itsm.meta.services.notice_filter import notice_filter_service
-from itsm.ticket.models import Ticket, Status
-from pipeline.component_framework.component import Component
 
+from itsm.component.constants import PROCESS_COUNT, APPROVAL_STATE
+from itsm.component.utils.bunch import bunchify
+from itsm.meta.services.notice_filter import notice_filter_service
+from itsm.ticket.models import Ticket, Status, SignTask
+from pipeline.component_framework.component import Component
 from .itsm_sign import ItsmSignService
-from .tasks import auto_approve
+from .tasks import auto_approve, auto_approve_by_approved_user
 
 logger = logging.getLogger("celery")
 
@@ -106,10 +107,18 @@ class ItsmApprovalService(ItsmSignService):
             auto_approve.apply_async(
                 (node_status.id, "system", activity_id, callback_data),
                 countdown=settings.AUTO_APPROVE_TIME,
-            )  # 20秒之后自动回调
+            )  # AUTO_APPROVE_TIME秒之后自动回调
             return True
 
-        if self.is_auto_approve(ticket, node_status):
+        # 检测流程和节点级别是否开启了自动过单
+        is_flow_auto_approve = self.is_auto_approve(ticket, node_status)
+        is_node_auto_approve, intersecting_processors = self.is_approved_auto_approve(
+            ticket, state_id, node_status
+        )
+
+        # 只有当流程级别的自动过单开启且提单人不在历史审批人交集中时才使用流程级别的自动过单
+        # 这里只是给提单人的审批任务进行了自动过单
+        if is_flow_auto_approve and (ticket.creator not in intersecting_processors):
             msg = "检测到当前处理人包含提单人，系统自动过单"
             callback_data = {
                 "fields": ticket.get_approve_fields(state_id, msg),
@@ -127,7 +136,56 @@ class ItsmApprovalService(ItsmSignService):
             auto_approve.apply_async(
                 (node_status.id, ticket.creator, activity_id, callback_data),
                 countdown=settings.AUTO_APPROVE_TIME,
-            )  # 20秒之后自动回调
+            )  # AUTO_APPROVE_TIME秒之后自动回调
+
+        # 如果节点级别开启了自动审批通过
+        if is_node_auto_approve and intersecting_processors:
+            msg = "检测到当前处理人已审批同意过此单据，系统自动过单"
+            activity_id = ticket.activity_for_state(state_id)
+            # 如果不是多人审批
+            if not is_multi:
+                #  只取一个processor
+                processor = intersecting_processors[0]
+                callback_data = {
+                    "ticket_id": ticket_id,
+                    "fields": ticket.get_approve_fields(state_id, msg),
+                    "state_id": state_id,
+                    "operator": processor,
+                    "source": "SYS",
+                }
+                logger.info(
+                    "检测到当前节点开启了已审批同意用户自动同意，即将准备自动过单，非多人审批场景, ticket_id={}, state_id={}, callback_data={}".format(
+                        ticket.id, state_id, callback_data
+                    )
+                )
+                auto_approve_by_approved_user.apply_async(
+                    (node_status.id, processor, activity_id, callback_data),
+                    countdown=settings.AUTO_APPROVE_TIME,  # AUTO_APPROVE_TIME秒之后自动回调
+                )
+            # 如果是多人审批
+            else:
+                logger.info(
+                    "多人审批场景，ticket_id={}, state_id={}, intersecting_processors={}".format(
+                        ticket.id, state_id, intersecting_processors
+                    )
+                )
+                for processor in intersecting_processors:
+                    callback_data = {
+                        "ticket_id": ticket_id,
+                        "fields": ticket.get_approve_fields(state_id, msg),
+                        "state_id": state_id,
+                        "operator": processor,
+                        "source": "SYS",
+                    }
+                    logger.info(
+                        "检测到当前节点开启了已审批同意用户自动同意，即将准备自动过单，多人审批场景, ticket_id={}, state_id={}, callback_data={}".format(
+                            ticket.id, state_id, callback_data
+                        )
+                    )
+                    auto_approve_by_approved_user.apply_async(
+                        (node_status.id, processor, activity_id, callback_data),
+                        countdown=settings.AUTO_APPROVE_TIME,  # AUTO_APPROVE_TIME秒之后自动回调
+                    )
 
         return True
 
@@ -143,6 +201,32 @@ class ItsmApprovalService(ItsmSignService):
         if ticket.flow.is_auto_approve and ticket.creator in processors:
             return True
         return False
+
+    def is_approved_auto_approve(self, ticket, state_id, node_status):
+        state = bunchify(ticket.state(state_id))
+        if state.get("extras") and state.extras.get(
+            "enable_auto_approve_if_previously_approved"
+        ):
+            # 获取当前节点审批人
+            current_processors = node_status.get_processors()
+
+            # 获取之前审批通过的审批人
+            approval_status = Status.objects.filter(
+                ticket_id=ticket.id, type=APPROVAL_STATE
+            )
+            signed_tasks = SignTask.objects.filter(
+                status_id__in=list(approval_status.values_list("id", flat=True)),
+                is_passed=True,
+            )
+            approved_processors = list(signed_tasks.values_list("processor", flat=True))
+
+            # 取出他们的交集
+            intersecting_processors = list(
+                set(current_processors).intersection(set(approved_processors))
+            )
+            return True, intersecting_processors
+        else:
+            return False, []
 
     @staticmethod
     def get_finish_condition(user_count):
