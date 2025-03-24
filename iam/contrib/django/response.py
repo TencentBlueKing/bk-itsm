@@ -12,7 +12,7 @@ specific language governing permissions and limitations under the License.
 """
 
 from django.http.response import JsonResponse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from iam.contrib.http import HTTP_AUTH_FORBIDDEN_CODE
 
@@ -26,5 +26,5 @@ class IAMAuthFailedResponse(JsonResponse):
             "data": None,
             "permission": exc.perms_apply_data(),
         }
-        kwargs['status'] = kwargs.get("status", 499)
+        kwargs["status"] = kwargs.get("status", 499)
         super(IAMAuthFailedResponse, self).__init__(*args, **kwargs)

@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django.conf import settings
-from django.conf.urls import url
+from django.urls import re_path
 from rest_framework.routers import DefaultRouter
 
 from iam import IAM
@@ -46,7 +46,12 @@ from itsm.auth_iam.resources.flow_version import WorkflowVersionResourceProvider
 from itsm.auth_iam.views import ResourceViewSet, PermissionViewSet
 from itsm.auth_iam.resources import ProjectResourceProvider
 
-iam = IAM(settings.APP_CODE, settings.SECRET_KEY, settings.BK_IAM_INNER_HOST, settings.BK_PAAS_HOST)
+iam = IAM(
+    settings.APP_CODE,
+    settings.SECRET_KEY,
+    settings.BK_IAM_INNER_HOST,
+    settings.BK_PAAS_HOST,
+)
 
 routers = DefaultRouter(trailing_slash=True)
 
@@ -70,5 +75,5 @@ dispatcher.register("service_type", ServiceTypeResourceProvider())
 dispatcher.register("task_template", TaskSchemaResourceProvider())
 dispatcher.register("public_api", PublicApiResourceProvider())
 urlpatterns = routers.urls + [
-    url(r'^resources/v1/$', dispatcher.as_view([login_exempt])),
+    re_path(r"^resources/v1/$", dispatcher.as_view([login_exempt])),
 ]

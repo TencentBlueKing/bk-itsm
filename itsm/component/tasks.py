@@ -23,9 +23,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from celery import task
+from celery import shared_task
 from celery.schedules import crontab
-from celery.task import periodic_task
+from blueapps.contrib.celery_tools.periodic import periodic_task
 from django.core.cache import cache
 from django.conf import settings
 from itsm.component.constants import CACHE_10MIN, CACHE_5MIN
@@ -36,7 +36,7 @@ from itsm.component.exceptions import ComponentCallError
 adapter_api = settings.ADAPTER_API
 
 
-@task
+@shared_task
 def update_user_cache(cache_key, ret_type="list", name_type="bk_username", users=None):
     """更新用户缓存"""
     bk_users = None
@@ -56,7 +56,7 @@ def update_user_cache(cache_key, ret_type="list", name_type="bk_username", users
     return bk_users
 
 
-@task
+@shared_task
 def update_bk_business(cache_key, bk_biz_id, role_type):
     """更新CMDB缓存"""
 
@@ -81,7 +81,7 @@ def update_bk_business(cache_key, bk_biz_id, role_type):
     return result if result else []
 
 
-@task
+@shared_task
 def update_user_departments(cache_key, username, id_only):
     """更新组织缓存"""
 

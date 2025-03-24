@@ -27,7 +27,7 @@ import re
 
 import six
 from django.db.models import Q
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from common.log import logger
 from itsm.component.constants import (
@@ -155,7 +155,9 @@ def related_states_validate(field_key, workflow_states):
             filter_key in task_api_instance.req_body
             or filter_key in task_api_instance.req_params
         ):
-            raise ParamError(_("该字段正在被【{}】节点引用，请先取消引用").format(task_state.name))
+            raise ParamError(
+                _("该字段正在被【{}】节点引用，请先取消引用").format(task_state.name)
+            )
 
     sops_states = StateExtrasSerializer(
         workflow_states.filter(type=TASK_SOPS_STATE, is_draft=False), many=True
@@ -172,7 +174,9 @@ def related_states_validate(field_key, workflow_states):
             ]
         )
         if field_key in keys:
-            raise ParamError(_("该字段正在被【{}】节点引用，请先取消引用").format(state["name"]))
+            raise ParamError(
+                _("该字段正在被【{}】节点引用，请先取消引用").format(state["name"])
+            )
 
 
 def related_transitions_validate(field_key, workflow_transitions):
@@ -195,7 +199,11 @@ def related_transitions_validate(field_key, workflow_transitions):
             for inside_exp in outside_exp["expressions"]:
                 keys.append(inside_exp["key"])
         if field_key in keys:
-            raise ParamError(_("该字段正作为【{}】线条的判断条件，请先取消引用").format(transition["name"]))
+            raise ParamError(
+                _("该字段正作为【{}】线条的判断条件，请先取消引用").format(
+                    transition["name"]
+                )
+            )
 
 
 def show_conditions_validate(field_key, workflow_fields):
@@ -211,7 +219,11 @@ def show_conditions_validate(field_key, workflow_fields):
         if field_key in [
             exp["key"] for exp in condition["show_conditions"]["expressions"]
         ]:
-            raise ParamError(_("该字段正作为【{}】字段的显示条件，请先取消引用").format(condition["name"]))
+            raise ParamError(
+                _("该字段正作为【{}】字段的显示条件，请先取消引用").format(
+                    condition["name"]
+                )
+            )
 
 
 def related_field_validate(field_key, workflow_fields):
@@ -223,7 +235,9 @@ def related_field_validate(field_key, workflow_fields):
     related_fields = RelatedFieldSerializer(workflow_fields, many=True).data
     for field in related_fields:
         if field_key in field["related_fields"].get("rely_on", []):
-            raise ParamError(_("该字段正在被【{}】字段引用，请先取消引用").format(field["name"]))
+            raise ParamError(
+                _("该字段正在被【{}】字段引用，请先取消引用").format(field["name"])
+            )
 
 
 def template_fields_exists_validate(fields):
@@ -236,7 +250,9 @@ def template_fields_exists_validate(fields):
     )
     if set(fields).difference(template_fields):
         raise ParamError(
-            _("{}公共字段不存在，请联系管理员").format(list(set(fields).difference(template_fields)))
+            _("{}公共字段不存在，请联系管理员").format(
+                list(set(fields).difference(template_fields))
+            )
         )
 
 
@@ -248,7 +264,9 @@ def table_remove_fiels_validate(fields, table):
     table_fields = list(table.fields.values_list("id", flat=True))
     if not set(fields).issubset(table_fields):
         raise ParamError(
-            _("{}公共字段不存在，请联系管理员").format(list(set(table_fields).difference(fields)))
+            _("{}公共字段不存在，请联系管理员").format(
+                list(set(table_fields).difference(fields))
+            )
         )
 
 
@@ -313,7 +331,9 @@ class WorkflowPipelineValidator(object):
         if draft_triggers and source_type == SOURCE_WORKFLOW:
             raise WorkFlowInvalidError(
                 [],
-                _("{source_type}【{source_name}】内的触发器【{trigger_name}】为草稿状态，无法部署").format(
+                _(
+                    "{source_type}【{source_name}】内的触发器【{trigger_name}】为草稿状态，无法部署"
+                ).format(
                     source_type=source_type_dict.get(source_type),
                     source_name=source_instance.name,
                     trigger_name=",".join(draft_triggers),
@@ -336,7 +356,9 @@ class WorkflowPipelineValidator(object):
         ).values_list("name", flat=True)
         if draft_tasks:
             raise WorkFlowInvalidError(
-                [], _("流程内引用的任务模版【%s】为草稿状态，无法部署") % ",".join(draft_tasks)
+                [],
+                _("流程内引用的任务模版【%s】为草稿状态，无法部署")
+                % ",".join(draft_tasks),
             )
 
         for task in TaskSchema.objects.filter(id__in=task_schema_ids):
@@ -399,7 +421,11 @@ class WorkflowPipelineValidator(object):
         ]
         conditions.extend(
             [
-                {"condition": item.show_conditions, "name": item.name, "obj_type": "字段"}
+                {
+                    "condition": item.show_conditions,
+                    "name": item.name,
+                    "obj_type": "字段",
+                }
                 for item in self.instance.fields.all()
                 if item.show_conditions
             ]
@@ -441,13 +467,17 @@ class WorkflowPipelineValidator(object):
             invalid_state_ids = [
                 int(self.states_map[k]) for arg in error.args for k, v in arg.items()
             ]
-            raise WorkFlowInvalidError(invalid_state_ids, _("当前流程画布连线不合理，请重新确认. "))
+            raise WorkFlowInvalidError(
+                invalid_state_ids, _("当前流程画布连线不合理，请重新确认. ")
+            )
         except ConvergeMatchError as error:
             invalid_state_ids = [int(self.states_map[error.gateway_id])]
             raise WorkFlowInvalidError(invalid_state_ids, str(error))
         except StreamValidateError as error:
             invalid_state_ids = [int(self.states_map[error.node_id])]
-            raise WorkFlowInvalidError(invalid_state_ids, _("当前节点画布连线不合理，请重新确认. "))
+            raise WorkFlowInvalidError(
+                invalid_state_ids, _("当前节点画布连线不合理，请重新确认. ")
+            )
         except Exception as error:
             logger.exception(str(error))
             raise WorkFlowInvalidError([], str(error))
@@ -568,7 +598,9 @@ class FieldValidator(object):
                 flow_id=value.get("workflow").id, key=value.get("key")
             ).exists()
         ):
-            raise ParamError(_("当前流程已存在唯一标识【{}】，请重新输入").format(value.get("key")))
+            raise ParamError(
+                _("当前流程已存在唯一标识【{}】，请重新输入").format(value.get("key"))
+            )
 
     @staticmethod
     def custom_table_validate(value):
@@ -611,7 +643,9 @@ class FieldValidator(object):
         choice = value.get("choice", [])
         if not choice:
             raise ParamError(
-                _("【{0}】请输入自定义数据，换行分隔。").format(SELECT_TYPE_CHOICES[value.get("type")])
+                _("【{0}】请输入自定义数据，换行分隔。").format(
+                    SELECT_TYPE_CHOICES[value.get("type")]
+                )
             )
         for field in choice:
             name = field.get("name")
@@ -632,7 +666,9 @@ class FieldValidator(object):
         if not name:
             raise ParamError(_("请输入选项值"))
         if len(name) > LEN_MIDDLE:
-            raise ParamError(_("自定义数据【{}】长度不能大于{}个字符").format(name, LEN_MIDDLE))
+            raise ParamError(
+                _("自定义数据【{}】长度不能大于{}个字符").format(name, LEN_MIDDLE)
+            )
 
     def field_key_validate(self, key):
         """
@@ -641,7 +677,9 @@ class FieldValidator(object):
         self.field_common_validate(key)
         if not re.match("^[_a-zA-Z0-9]*$", key) or len(key) > LEN_MIDDLE:
             raise ParamError(
-                _("自定义数据key值【{}】仅支持【英文、数字和下划线】，长度小于128字符，请重新输入").format(key)
+                _(
+                    "自定义数据key值【{}】仅支持【英文、数字和下划线】，长度小于128字符，请重新输入"
+                ).format(key)
             )
 
     @staticmethod
@@ -690,7 +728,11 @@ class TemplateFieldValidator(FieldValidator):
             ).exists():
                 if value.get("key") in [FIELD_TITLE, FIELD_BIZ]:
                     raise ParamError(_("title, bk_biz_id 为内置唯一标识，请重新输入"))
-                raise ParamError(_("当前项目字段库已存在唯一标识【{}】，请重新输入").format(value.get("key")))
+                raise ParamError(
+                    _("当前项目字段库已存在唯一标识【{}】，请重新输入").format(
+                        value.get("key")
+                    )
+                )
 
     def name_validate(self, value):
         fields = TemplateField.objects.filter(
@@ -701,7 +743,9 @@ class TemplateFieldValidator(FieldValidator):
         if self.instance:
             fields = fields.exclude(id=self.instance.id)
         if fields.exists():
-            raise ParamError(_("字段库已存在名称【{}】，请重新输入").format(value.get("name")))
+            raise ParamError(
+                _("字段库已存在名称【{}】，请重新输入").format(value.get("name"))
+            )
 
 
 def template_field_can_destroy(instance):
@@ -710,7 +754,9 @@ def template_field_can_destroy(instance):
 
     if tables:
         table_names = ",".join([table.name for table in tables])
-        raise ValidationError(_("字段已被基础模型[{}]引用，无法删除".format(table_names)))
+        raise ValidationError(
+            _("字段已被基础模型[{}]引用，无法删除".format(table_names))
+        )
 
 
 class StatePollValidator(object):
@@ -838,13 +884,17 @@ class TransitionValidator(object):
                     and self.to_state.label == EMPTY
                 ):
                     if self.from_state.label.rfind(NORMAL_STATE_LABEL_PREFIX) == -1:
-                        raise TransitionError(_("待连接的聚合网关与当前节点不在同一个工作区域内"))
+                        raise TransitionError(
+                            _("待连接的聚合网关与当前节点不在同一个工作区域内")
+                        )
             if (
                 self.from_state.type == COVERAGE_STATE == self.to_state.type
                 and find_sub_string(self.from_state.label, ROUTER_STATE_LABEL_PREFIX)
                 == GLOBAL_LABEL
             ):
-                raise TransitionError(_("待连接的聚合网关与当前节点不在同一个工作区域内"))
+                raise TransitionError(
+                    _("待连接的聚合网关与当前节点不在同一个工作区域内")
+                )
             return
 
         # 以下label不相等且可能多入多出的情况

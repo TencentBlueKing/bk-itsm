@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -95,7 +95,7 @@ class CustomNotifyViewSet(ModelViewSet):
     serializer_class = CustomNotifySerializer
     queryset = CustomNotice.objects.all()
     pagination_class = None
-    
+
     permission_classes = (CustomNotifyPermit,)
     permission_free_actions = ["variable_list", "action_type"]
     permission_action_default = "system_settings_manage"

@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 
-from django.conf.urls import include, url
+from django.urls import include, re_path
 
 
 __author__ = "蓝鲸智云"
@@ -38,35 +38,35 @@ from itsm.gateway.views import get_batch_users
 
 urlpatterns = [
     # 流程管理模块
-    url(r"^workflow/", include("itsm.workflow.urls")),
+    re_path(r"^workflow/", include("itsm.workflow.urls")),
     # 单据模块
-    url(r"^ticket/", include("itsm.ticket.urls")),
+    re_path(r"^ticket/", include("itsm.ticket.urls")),
     # 任务模块
-    url(r"^task/", include("itsm.task.urls")),
+    re_path(r"^task/", include("itsm.task.urls")),
     # 服务模块
-    url(r"^service/", include("itsm.service.urls")),
+    re_path(r"^service/", include("itsm.service.urls")),
     # sla模块
-    url(r"^sla/", include("itsm.sla.urls")),
+    re_path(r"^sla/", include("itsm.sla.urls")),
     # postman
-    url(r"^postman/", include("itsm.postman.urls")),
+    re_path(r"^postman/", include("itsm.postman.urls")),
     # 角色模块
-    url(r"^role/", include("itsm.role.urls")),
+    re_path(r"^role/", include("itsm.role.urls")),
     # iadmin
-    url(r"^iadmin/", include("itsm.iadmin.urls")),
+    re_path(r"^iadmin/", include("itsm.iadmin.urls")),
     # 网关转发模块，目前主要用于转发esb侧的接口调用
-    url(r"^gateway/", include("itsm.gateway.urls")),
+    re_path(r"^gateway/", include("itsm.gateway.urls")),
     # "杂种"模块，没有model，且不知道放哪里合适，就放到这个模块吧！
-    url(r"^misc/", include("itsm.misc.urls")),
+    re_path(r"^misc/", include("itsm.misc.urls")),
     # 单据状态模块
-    url(r"^ticket_status/", include("itsm.ticket_status.urls")),
+    re_path(r"^ticket_status/", include("itsm.ticket_status.urls")),
     # Trigger Module
-    url(r"^trigger/", include("itsm.trigger.urls")),
+    re_path(r"^trigger/", include("itsm.trigger.urls")),
     # iam
-    url(r"^iam/", include("itsm.auth_iam.urls")),
+    re_path(r"^iam/", include("itsm.auth_iam.urls")),
     # iam
-    url(r"^project/", include("itsm.project.urls")),
+    re_path(r"^project/", include("itsm.project.urls")),
     # 人员选择器
-    url(r"^c/compapi/v2/usermanage/fs_list_users/$", get_batch_users),
+    re_path(r"^c/compapi/v2/usermanage/fs_list_users/$", get_batch_users),
     # 蓝鲸插件服务
-    url(r"^plugin_service/", include("itsm.plugin_service.urls")),
+    re_path(r"^plugin_service/", include("itsm.plugin_service.urls")),
 ]

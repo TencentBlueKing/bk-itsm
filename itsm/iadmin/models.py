@@ -30,7 +30,7 @@ import jsonfield
 import mistune
 from django.db import models
 from django.db.models import QuerySet
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from config.default import PROJECT_ROOT
 from itsm.component.constants import (
@@ -69,7 +69,10 @@ class Model(models.Model):
 
     _objects = models.Manager()
 
-    auth_resource = {"resource_type": "system_settings", "resource_type_name": "系统配置"}
+    auth_resource = {
+        "resource_type": "system_settings",
+        "resource_type_name": "系统配置",
+    }
     resource_operations = ["system_settings_manage"]
 
     class Meta:
@@ -87,7 +90,9 @@ class Model(models.Model):
 class SystemSettings(Model):
     type = models.CharField(_("类型"), max_length=LEN_NORMAL)
     key = models.CharField(_("关键字唯一标识"), max_length=LEN_NORMAL, unique=True)
-    value = models.TextField(_("系统设置值"), default=EMPTY_STRING, null=True, blank=True)
+    value = models.TextField(
+        _("系统设置值"), default=EMPTY_STRING, null=True, blank=True
+    )
 
     objects = managers.Manager()
 
@@ -122,7 +127,9 @@ class CustomNotice(models.Model):
         default="",
         null=True,
         blank=True,
-        help_text=_("工单字段的值可以作为参数写到模板中，格式如：【ITSM】${service}管理单【${action}】提醒"),
+        help_text=_(
+            "工单字段的值可以作为参数写到模板中，格式如：【ITSM】${service}管理单【${action}】提醒"
+        ),
     )
     content_template = models.TextField(
         _("内容模板"),
@@ -132,7 +139,10 @@ class CustomNotice(models.Model):
         help_text=_("工单字段的值可以作为参数写到模板中，格式如：单号:${sn}"),
     )
     action = models.CharField(
-        _("通知模板类型"), max_length=LEN_SHORT, choices=ACTION_CHOICES, default="default"
+        _("通知模板类型"),
+        max_length=LEN_SHORT,
+        choices=ACTION_CHOICES,
+        default="default",
     )
     notify_type = models.CharField(_("通知方式"), max_length=LEN_SHORT, default="EMAIL")
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
@@ -142,7 +152,10 @@ class CustomNotice(models.Model):
     version = models.CharField(_("版本"), max_length=LEN_SHORT, default="V1")
 
     project_key = models.CharField(
-        _("项目key"), max_length=LEN_SHORT, null=False, default=PUBLIC_PROJECT_PROJECT_KEY
+        _("项目key"),
+        max_length=LEN_SHORT,
+        null=False,
+        default=PUBLIC_PROJECT_PROJECT_KEY,
     )
 
     auth_resource = {"resource_type": "project", "resource_type_name": "项目"}
@@ -331,7 +344,9 @@ class Data(models.Model):
     type = models.CharField(
         _("类型"), choices=TYPE_CHOICES, default="string", max_length=LEN_SHORT
     )
-    expire_at = models.DateTimeField(_("过期时间"), null=True, blank=True, db_index=True)
+    expire_at = models.DateTimeField(
+        _("过期时间"), null=True, blank=True, db_index=True
+    )
 
     objects = DataManager()
 

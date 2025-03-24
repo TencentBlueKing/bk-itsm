@@ -13,7 +13,7 @@ specific language governing permissions and limitations under the License.
 
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class LogEntryManager(models.Manager):
@@ -26,7 +26,12 @@ class LogEntryManager(models.Manager):
         for entry in entries:
             plain_entries.append(
                 "[%s %s] %s, exception: %s"
-                % (entry.logged_at.strftime("%Y-%m-%d %H:%M:%S"), entry.level_name, entry.message, entry.exception)
+                % (
+                    entry.logged_at.strftime("%Y-%m-%d %H:%M:%S"),
+                    entry.level_name,
+                    entry.message,
+                    entry.exception,
+                )
             )
         return "\n".join(plain_entries)
 

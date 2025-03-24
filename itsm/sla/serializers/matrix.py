@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from bulk_update.helper import bulk_update
@@ -37,7 +37,13 @@ class PriorityMatrixSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PriorityMatrix
-        fields = ('id', 'service_type', 'urgency', 'impact', 'priority',) + model.DISPLAY_FIELDS
+        fields = (
+            "id",
+            "service_type",
+            "urgency",
+            "impact",
+            "priority",
+        ) + model.DISPLAY_FIELDS
 
         read_only_fields = model.DISPLAY_FIELDS
 
@@ -48,22 +54,24 @@ class MatrixListSerializer(serializers.ListSerializer):
     def update(self, instance, validated_data, other_types=None):
         """批量更新，返回更新的数量"""
 
-        item_hash = {item['id']: item for item in validated_data}
+        item_hash = {item["id"]: item for item in validated_data}
 
         priorities = []
         for p in PriorityMatrix.objects.filter(pk__in=list(item_hash.keys())):
-            p.priority = item_hash[p.id]['priority']
+            p.priority = item_hash[p.id]["priority"]
             priorities.append(p)
 
         # 其他类型更新
         other_types = [] if other_types is None else other_types
         for other_type in other_types:
             for i in validated_data:
-                p = PriorityMatrix.objects.get(service_type=other_type, urgency=i["urgency"], impact=i["impact"])
-                p.priority = i['priority']
+                p = PriorityMatrix.objects.get(
+                    service_type=other_type, urgency=i["urgency"], impact=i["impact"]
+                )
+                p.priority = i["priority"]
                 priorities.append(p)
 
-        return bulk_update(priorities, update_fields=['priority'])
+        return bulk_update(priorities, update_fields=["priority"])
 
 
 class MatrixUpdateSerializer(serializers.ModelSerializer):
@@ -76,15 +84,10 @@ class MatrixUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PriorityMatrix
         list_serializer_class = MatrixListSerializer
-        fields = (
-            'id',
-            'priority',
-            'impact',
-            'urgency'
-        )
+        fields = ("id", "priority", "impact", "urgency")
 
     def validate_priority(self, value):
-        priority_set = SysDict.get_data_by_key(PRIORITY, 'sets')
+        priority_set = SysDict.get_data_by_key(PRIORITY, "sets")
         priority_set.add(EMPTY_STRING)
 
         if value not in priority_set:

@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import LEN_NORMAL
 from itsm.component.utils.basic import get_random_key
@@ -35,10 +35,10 @@ class Model(models.Model):
     """基础字段"""
 
     DISPLAY_FIELDS = (
-        'creator',
-        'create_at',
-        'updated_by',
-        'update_at',
+        "creator",
+        "create_at",
+        "updated_by",
+        "update_at",
     )
 
     creator = models.CharField(_("创建人"), max_length=LEN_NORMAL)
@@ -79,6 +79,6 @@ class Model(models.Model):
             retry += 1
         else:
             # 尝试60次一直重复，则放弃生成key
-            return '##Err##'
+            return "##Err##"
 
         return key

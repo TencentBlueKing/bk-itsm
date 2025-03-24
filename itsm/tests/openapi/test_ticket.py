@@ -364,7 +364,9 @@ class TicketOpenTest(TestCase):
 
         resp = self.client.post(url, json.dumps(data), content_type="application/json")
         self.assertEqual(resp.data["result"], False)
-        self.assertEqual(resp.data["message"], "参数验证失败: sn=11111对应的单据不存在!")
+        self.assertEqual(
+            resp.data["message"], "参数验证失败: sn=11111对应的单据不存在!"
+        )
 
         data["sn"] = sn
         resp = self.client.post(url, json.dumps(data), content_type="application/json")
@@ -381,7 +383,9 @@ class TicketOpenTest(TestCase):
         resp = self.client.post(url, json.dumps(data), content_type="application/json")
 
         self.assertEqual(resp.data["result"], False)
-        self.assertEqual(resp.data["message"], "参数验证失败: 单据评价记录未存在，无法评价!")
+        self.assertEqual(
+            resp.data["message"], "参数验证失败: 单据评价记录未存在，无法评价!"
+        )
 
         TicketComment.objects.get_or_create(ticket_id=ticket.id, creator=ticket.creator)
 
@@ -397,4 +401,6 @@ class TicketOpenTest(TestCase):
         resp = self.client.post(url, json.dumps(data), content_type="application/json")
 
         self.assertEqual(resp.data["result"], False)
-        self.assertEqual(resp.data["message"], "参数验证失败: 该单据已经被评论，请勿重复评论")
+        self.assertEqual(
+            resp.data["message"], "参数验证失败: 该单据已经被评论，请勿重复评论"
+        )

@@ -28,7 +28,7 @@ import time
 from functools import reduce
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from common.log import logger
 from itsm.component.esb.esbclient import client_backend
@@ -129,7 +129,9 @@ class PathTypeValidators(object):
             ).values_list("name", flat=True)
             if service_values.exists():
                 raise OrganizationStructureFunctionSwitchValidateError(
-                    _("以下服务正在使用组织架构功能，请更改再关闭：{}").format(",".join(service_values))
+                    _("以下服务正在使用组织架构功能，请更改再关闭：{}").format(
+                        ",".join(service_values)
+                    )
                 )
 
     @staticmethod
@@ -149,14 +151,18 @@ class PathTypeValidators(object):
                 id__in=all_ticket_ids, current_status=PROCESS_RUNNING
             ).exists()
             if active_ticket:
-                raise ChildTicketSwitchValidateError(_("存在未完成的含有母子单的单据，请处理后再关闭"))
+                raise ChildTicketSwitchValidateError(
+                    _("存在未完成的含有母子单的单据，请处理后再关闭")
+                )
 
     @staticmethod
     def validate_task_switch(value):
         if value.get("value") == SWITCH_OFF:
             active_task = Task.objects.filter(status__in=ACTIVE_TASK_STATUS).exists()
             if active_task:
-                raise TaskSwitchValidateError(_("存在含有未完成任务的单据，请处理后再关闭"))
+                raise TaskSwitchValidateError(
+                    _("存在含有未完成任务的单据，请处理后再关闭")
+                )
 
     @staticmethod
     def validate_trigger_switch(value):
@@ -166,7 +172,9 @@ class PathTypeValidators(object):
                 source_type__in=quoted_status
             ).exists()
             if active_trigger:
-                raise TriggerSwitchValidateError(_("存在被引用的触发器，请处理后再关闭"))
+                raise TriggerSwitchValidateError(
+                    _("存在被引用的触发器，请处理后再关闭")
+                )
 
     @staticmethod
     def validate_other(value):
