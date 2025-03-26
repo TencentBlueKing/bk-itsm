@@ -116,13 +116,13 @@ def index(request):
         ).value
     except SystemSettings.DoesNotExist:
         notice_center_switch_value = "off"
-    
+
     # 文档地址转换
     doc_lang = "EN"
     lang = get_language()
     if lang in ["zh-cn", "zh-hans"]:
         doc_lang = "ZH"
-    
+
     version = get_version()
     doc_url = settings.BK_DOC_URL.format(lang=doc_lang, version=get_major_minor_version(version))
 
@@ -149,6 +149,7 @@ def index(request):
             "BK_PLATFORM_NAME": settings.BK_PLATFORM_NAME,
             "VERSION": version,
             "BKAPP_CSRF_COOKIE_NAME": settings.CSRF_COOKIE_NAME,
+            "BKAPP_CI_ENABLED": settings.BKAPP_CI_ENABLED,
         },
     )
 
