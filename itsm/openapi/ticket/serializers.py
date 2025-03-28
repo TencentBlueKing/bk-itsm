@@ -239,12 +239,15 @@ class SimpleLogsSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         data = super(SimpleLogsSerializer, self).to_representation(instance)
-        data["message"] = data["message"].format(
-            operator=instance.operator,
-            name=instance.from_state_name,
-            detail_message=instance.detail_message,
-            action=instance.action,
-        )
+        try:
+            data["message"] = data["message"].format(
+                operator=instance.operator,
+                name=instance.from_state_name,
+                detail_message=instance.detail_message,
+                action=instance.action,
+            )
+        except KeyError:
+            data["message"] = data["message"]
         return data
 
 
