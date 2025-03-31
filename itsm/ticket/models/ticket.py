@@ -1184,6 +1184,7 @@ class Status(Model):
 
     @property
     def processed_user(self):
+        # 优化判断逻辑
         processed = self.ticket.logs.filter(from_state_id=self.state_id).values_list(
             "operator", flat=True
         )
