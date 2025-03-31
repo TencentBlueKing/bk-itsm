@@ -59,4 +59,3 @@ modules:
                 -   bk_app_code: "bk_itsm"
         bkmonitor:
             port: 5001
-
