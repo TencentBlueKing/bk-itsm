@@ -1184,13 +1184,11 @@ class Status(Model):
 
     @property
     def processed_user(self):
-        # 优化判断逻辑
         processed = self.ticket.logs.filter(from_state_id=self.state_id).values_list(
             "operator", flat=True
         )
-        return ",".join(
-            set(self.processors.strip(",").split(",")) & set(list(processed))
-        )
+        processors = self.get_processors()
+        return ",".join(set(processors) & set(list(processed)))
 
     # ======================================= SLA功能接口 =====================================
 
@@ -3216,6 +3214,7 @@ class Ticket(Model, BaseTicket):
                 return leaders, PERSON
 
             if pros_type == ASSIGN_LEADER:
+                # 这种情况传参过来的pros是一个state_id
                 obj = Status.objects.get(ticket_id=ticket.id, state_id=int(pros))
                 leaders = get_user_leader(obj.processed_user)
                 leaders = dotted_name(",".join(leaders)) if leaders else ""
