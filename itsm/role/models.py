@@ -394,6 +394,7 @@ class UserRole(ObjectManagerMixin, Model):
         if user_type == "ASSIGN_LEADER":
             if ticket is not None:
                 # 获取节点处理人的leader
+                # 这种情况传参过来的pros是一个state_id
                 status = ticket.node_status.get(state_id=int(users))
                 return get_user_leader(status.processed_user)
 
