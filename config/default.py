@@ -806,6 +806,9 @@ INIT_DEVOPS_TEMPLATE = os.environ.get("INIT_DEVOPS_TEMPLATE", False)
 # 是否显示蓝盾节点
 BKAPP_CI_ENABLED = os.environ.get("BKAPP_CI_ENABLED", "") == "1"
 
+# 请求蓝盾接口的前端cookie的key
+BK_CI_COOKIE_NAME = "bk_ticket" if os.getenv("RUN_VER") == "ieod" else "bk_token"
+
 # 权限中心 SaaS host
 BK_IAM_APP_CODE = os.getenv("BK_IAM_V3_APP_CODE", "bk_iam")
 BK_IAM_SAAS_HOST = os.environ.get(

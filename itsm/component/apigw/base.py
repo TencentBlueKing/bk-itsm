@@ -25,7 +25,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
 
+import os
 import requests
+import json
 from requests.exceptions import HTTPError, ReadTimeout
 from itsm.component.exceptions import RemoteCallError
 
@@ -97,19 +99,29 @@ class APIResource:
         """
         request_url = self.get_request_url(request_data)
         params = {"access_token": self.access_token}
+        headers = {
+            "Content-Type": "application/json",
+            "X-Bkapi-Authorization": json.dumps({
+                "bk_app_code": os.environ.get("BKPAAS_APP_ID", ""),
+                "bk_app_secret": os.environ.get("BKPAAS_APP_SECRET", ""),
+                "access_token": self.access_token,
+                "bk_username": self.user,
+            })
+        }
+
         try:
             if self.method == "GET":
                 params.update(request_data)
-                result = self.session.get(url=request_url, params=params, verify=False, timeout=self.TIMEOUT)
+                result = self.session.get(url=request_url, headers=headers, params=params,
+                                          verify=False, timeout=self.TIMEOUT)
             else:
-                headers = {"X-DEVOPS-UID": self.user}
                 result = self.session.post(
                     url=request_url,
-                    params=params,
-                    verify=False,
-                    timeout=self.TIMEOUT,
-                    json=request_data,
                     headers=headers,
+                    params=params,
+                    json=request_data,
+                    verify=False,
+                    timeout=self.TIMEOUT
                 )
         except ReadTimeout:
             raise RemoteCallError("{}接口返回结果超时".format(request_url))
@@ -117,7 +129,8 @@ class APIResource:
         try:
             result.raise_for_status()
         except HTTPError as e:
-            logger.exception("【模块：%s】请求APIGW错误：%s，请求url: %s " % (self.module_name, e, request_url))
+            logger.exception(
+                "【模块：%s】请求APIGW错误：%s，请求url: %s " % (self.module_name, e, request_url))
             raise RemoteCallError("{} 调用失败:{}".format(request_url, str(e.response.content)))
 
         result_json = result.json()

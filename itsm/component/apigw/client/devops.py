@@ -23,8 +23,16 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+import os
+import json
+import logging
+
+logger = logging.getLogger(__name__)
+
+from pipeline.conf import settings
+from requests.exceptions import HTTPError, ReadTimeout
 from itsm.component.apigw.base import APIResource
-from django.conf import settings
+from itsm.component.exceptions import RemoteCallError
 
 CLIENT_URL = settings.DEVOPS_CLIENT_URL
 
@@ -52,6 +60,69 @@ class DevOps(APIResource):
         请求方法，仅支持GET或POST
         """
         raise NotImplementedError
+
+    def perform_request(self, request_data):
+        """
+        发起http请求
+        """
+        if not request_data.get(settings.BK_CI_COOKIE_NAME):
+            return super().perform_request(request_data)
+
+        request_url = self.get_request_url(request_data)
+        params = {}
+
+        try:
+            if self.method == "GET":
+                headers = {
+                    "Content-Type": "application/json",
+                    "X-Bkapi-Authorization": json.dumps({
+                        "bk_app_code": os.environ.get("BKPAAS_APP_ID", ""),
+                        "bk_app_secret": os.environ.get("BKPAAS_APP_SECRET", ""),
+                        settings.BK_CI_COOKIE_NAME: request_data.pop(settings.BK_CI_COOKIE_NAME),
+                    })
+                }
+
+                params.update(request_data)
+                result = self.session.get(url=request_url, params=params, headers=headers,
+                                          verify=False,
+                                          timeout=self.TIMEOUT)
+            else:
+                headers = {
+                    "Content-Type": "application/json",
+                    "X-Bkapi-Authorization": json.dumps({
+                        "bk_app_code": os.environ.get("BKPAAS_APP_ID", ""),
+                        "bk_app_secret": os.environ.get("BKPAAS_APP_SECRET", ""),
+                        "access_token": self.access_token,
+                        "bk_username": self.user,
+                    })
+                }
+
+                result = self.session.post(
+                    url=request_url,
+                    params=params,
+                    verify=False,
+                    timeout=self.TIMEOUT,
+                    json=request_data,
+                    headers=headers,
+                )
+        except ReadTimeout:
+            raise RemoteCallError("{}接口返回结果超时".format(request_url))
+
+        try:
+            result.raise_for_status()
+        except HTTPError as e:
+            logger.exception(
+                "【模块：%s】请求APIGW错误：%s，请求url: %s " % (self.module_name, e, request_url))
+            raise RemoteCallError("{} 调用失败:{}".format(request_url, str(e.response.content)))
+
+        result_json = result.json()
+
+        if not self.is_result_success(result_json):
+            raise RemoteCallError("{} 返回结果错误:{}".format(request_url, result_json))
+
+        response_data = self.handle_response(result_json)
+
+        return response_data
 
     def is_result_success(self, response_data):
         return response_data["status"] == 0

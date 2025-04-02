@@ -494,6 +494,7 @@ def get_user_pipeline_list(request):
                 "project_id": request.GET["project_id"],
                 "username": request.user.username,
                 "pageSize": MAX_PAGE_SIZE,
+                settings.BK_CI_COOKIE_NAME: request.COOKIES.get(settings.BK_CI_COOKIE_NAME, "")
             }
         )
     except RemoteCallError as e:
@@ -506,6 +507,7 @@ def get_user_pipeline_list(request):
             "username": request.user.username,
             "page": i + 1,
             "pageSize": MAX_PAGE_SIZE,
+            settings.BK_CI_COOKIE_NAME: request.COOKIES.get(settings.BK_CI_COOKIE_NAME, "")
         }
         for i in range(0, int(res["totalPages"]))
     ]
@@ -520,7 +522,12 @@ def get_user_pipeline_list(request):
 def get_user_projects(request):
     try:
         res = apigw_client.devops.projects_list(
-            {"username": request.user.username, "pageSize": MAX_PAGE_SIZE}
+            {
+                "username": request.user.username,
+                # "username": "admin",
+                "pageSize": MAX_PAGE_SIZE,
+                settings.BK_CI_COOKIE_NAME: request.COOKIES.get(settings.BK_CI_COOKIE_NAME, "")
+            }
         )
         return Success(res).json()
     except RemoteCallError as e:
@@ -537,6 +544,7 @@ def get_pipeline_build_list(request):
                 "pipeline_id": request.GET["pipeline_id"],
                 "page": request.GET["page"],
                 "pageSize": request.GET["page_size"],
+                settings.BK_CI_COOKIE_NAME: request.COOKIES.get(settings.BK_CI_COOKIE_NAME, "")
             }
         )
         return Success(res).json()
@@ -552,6 +560,7 @@ def get_pipeline_build_start_info(request):
                 "username": request.user.username,
                 "project_id": request.GET["project_id"],
                 "pipeline_id": request.GET["pipeline_id"],
+                settings.BK_CI_COOKIE_NAME: request.COOKIES.get(settings.BK_CI_COOKIE_NAME, "")
             }
         )
         return Success(res).json()
@@ -567,6 +576,7 @@ def get_user_pipeline_detail(request):
                 "username": request.user.username,
                 "project_id": request.GET["project_id"],
                 "pipeline_id": request.GET["pipeline_id"],
+                settings.BK_CI_COOKIE_NAME: request.COOKIES.get(settings.BK_CI_COOKIE_NAME, "")
             }
         )
         return Success(res).json()
@@ -602,6 +612,7 @@ def get_user_pipeline_build_status(request):
                 "project_id": request.GET["project_id"],
                 "pipeline_id": request.GET["pipeline_id"],
                 "build_id": request.GET["build_id"],
+                settings.BK_CI_COOKIE_NAME: request.COOKIES.get(settings.BK_CI_COOKIE_NAME, "")
             }
         )
         return Success(res).json()
@@ -618,6 +629,7 @@ def get_user_pipeline_build_detail(request):
                 "project_id": request.GET["project_id"],
                 "pipeline_id": request.GET["pipeline_id"],
                 "build_id": request.GET["build_id"],
+                settings.BK_CI_COOKIE_NAME: request.COOKIES.get(settings.BK_CI_COOKIE_NAME, "")
             }
         )
         return Success(res).json()
@@ -634,6 +646,7 @@ def get_pipeline_build_artifactory(request):
                 "project_id": request.GET["project_id"],
                 "pipeline_id": request.GET["pipeline_id"],
                 "build_id": request.GET["build_id"],
+                settings.BK_CI_COOKIE_NAME: request.COOKIES.get(settings.BK_CI_COOKIE_NAME, "")
             }
         )
         return Success(res).json()
@@ -650,6 +663,7 @@ def get_pipeline_build_artifactory_download_url(request):
                 "project_id": request.GET["project_id"],
                 "artifactoryType": request.GET["artifactory_type"],
                 "path": request.GET["path"],
+                settings.BK_CI_COOKIE_NAME: request.COOKIES.get(settings.BK_CI_COOKIE_NAME, "")
             }
         )
         return Success(res).json()
