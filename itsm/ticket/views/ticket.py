@@ -381,15 +381,15 @@ class TicketModelViewSet(ModelViewSet):
         # creator(实际提单人)和updated_by在serializer.to_internal_value(data)中获取
         instance = serializer.save(meta=meta)
         logger.info(f"[TICKET] create ticket do_after_create begin ticket_id=>{instance.id}")
-        
+
         instance.do_after_create(
             request.data["fields"], request.data.get("from_ticket_id", None)
         )
         logger.info(f"[TICKET] create ticket do_after_create end ticket_id=>{instance.id}")
-        
+
         start_pipeline.apply_async([instance])
         logger.info(f"[TICKET] create ticket start_pipeline end ticket_id=>{instance.id}")
-        
+
         return Response({"sn": instance.sn, "id": instance.id}, status=201)
 
     @action(detail=True, methods=["get"])
@@ -639,7 +639,8 @@ class TicketModelViewSet(ModelViewSet):
             return Response(
                 {
                     "result": False,
-                    "message": _("【{}】发送邮件失败，请检查用户邮件配置是否正确或联系管理员！").format(receiver),
+                    "message": _("【{}】发送邮件失败，请检查用户邮件配置是否正确或联系管理员！").format(
+                        receiver),
                     "data": ticket_url,
                     "code": "SEND_EMAIL_FAILED",
                 }
@@ -719,7 +720,8 @@ class TicketModelViewSet(ModelViewSet):
                 json.loads(base64.b64decode(service_fields)) if service_fields else {}
             )
         except BaseException:
-            raise ValidationError(_("解析导出的提单字段异常：请检查请求参数内容，提单字段需要通过base64编码。"))
+            raise ValidationError(
+                _("解析导出的提单字段异常：请检查请求参数内容，提单字段需要通过base64编码。"))
 
         # 获取字段的展示title，先将所有的字段混合起来
         all_service_field_keys = []
@@ -1247,7 +1249,7 @@ class TicketModelViewSet(ModelViewSet):
         close_status = request.data.get("current_status")
         if close_status not in ticket.status_instance.to_over_status_keys:
             raise ValidationError(_("设置的关闭状态不在正确状态范围之内"))
-    
+
         desc = request.data.get("desc") or ""
         if len(desc) > LEN_X_LONG:
             raise ValidationError(_("关单失败，原因描述超过 {len}  字符").format(len=LEN_X_LONG))
@@ -1432,7 +1434,7 @@ class TicketModelViewSet(ModelViewSet):
         return Response()
 
     def states_response(self, ticket, request, detail=False):
-        state_id = request.query_params.get("state_id")
+        state_id = request.query_params.get("state_id", "")
 
         if ticket.flow.engine_version == DEFAULT_ENGINE_VERSION:
             status = ticket.node_status

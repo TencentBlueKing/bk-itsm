@@ -584,40 +584,40 @@ def get_user_pipeline_detail(request):
         return Fail(str(e), "DEVOPS.GET_PIPELINE_DETAIL").json()
 
 
-@fbv_exception_handler
-def start_user_pipeline(request):
-    try:
-        # {
-        #     "username": request.user.username,
-        #     "project_id": "bkee",
-        #     "pipeline_id": "p-02f36a53fa604c2ca7089544eb374354",
-        #     "APP_CODE": "bk_itsm",
-        #     "RUN_VER": "ce",
-        #     "UI_TYPE": "pc",
-        #     "BRANCH": "no_redis_iam_branch",
-        #     "RELEASE": "no",
-        # }
-        res = apigw_client.devops.pipeline_build_start(request.POST)
-        return Success(res).json()
-    except RemoteCallError as e:
-        return Fail(str(e), "DEVOPS.START_USER_PIPELINE").json()
+# @fbv_exception_handler
+# def start_user_pipeline(request):
+#     try:
+#         # {
+#         #     "username": request.user.username,
+#         #     "project_id": "bkee",
+#         #     "pipeline_id": "p-02f36a53fa604c2ca7089544eb374354",
+#         #     "APP_CODE": "bk_itsm",
+#         #     "RUN_VER": "ce",
+#         #     "UI_TYPE": "pc",
+#         #     "BRANCH": "no_redis_iam_branch",
+#         #     "RELEASE": "no",
+#         # }
+#         res = apigw_client.devops.pipeline_build_start(request.POST)
+#         return Success(res).json()
+#     except RemoteCallError as e:
+#         return Fail(str(e), "DEVOPS.START_USER_PIPELINE").json()
 
 
-@fbv_exception_handler
-def get_user_pipeline_build_status(request):
-    try:
-        res = apigw_client.devops.pipeline_build_status(
-            {
-                "username": request.user.username,
-                "project_id": request.GET["project_id"],
-                "pipeline_id": request.GET["pipeline_id"],
-                "build_id": request.GET["build_id"],
-                settings.BK_CI_COOKIE_NAME: request.COOKIES.get(settings.BK_CI_COOKIE_NAME, "")
-            }
-        )
-        return Success(res).json()
-    except RemoteCallError as e:
-        return Fail(str(e), "DEVOPS.GET_PIPELINE_STATUS").json()
+# @fbv_exception_handler
+# def get_user_pipeline_build_status(request):
+#     try:
+#         res = apigw_client.devops.pipeline_build_status(
+#             {
+#                 "username": request.user.username,
+#                 "project_id": request.GET["project_id"],
+#                 "pipeline_id": request.GET["pipeline_id"],
+#                 "build_id": request.GET["build_id"],
+#                 settings.BK_CI_COOKIE_NAME: request.COOKIES.get(settings.BK_CI_COOKIE_NAME, "")
+#             }
+#         )
+#         return Success(res).json()
+#     except RemoteCallError as e:
+#         return Fail(str(e), "DEVOPS.GET_PIPELINE_STATUS").json()
 
 
 @fbv_exception_handler

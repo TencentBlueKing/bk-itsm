@@ -62,11 +62,11 @@ urlpatterns = [
     ),
     url(r"^devops/get_user_pipeline_detail/$", views.get_user_pipeline_detail),
     url(r"^devops/get_pipeline_build_list/$", views.get_pipeline_build_list),
-    url(r"^devops/start_user_pipeline/$", views.start_user_pipeline),
-    url(
-        r"^devops/get_user_pipeline_build_status/$",
-        views.get_user_pipeline_build_status,
-    ),
+    # url(r"^devops/start_user_pipeline/$", views.start_user_pipeline),
+    # url(
+    #     r"^devops/get_user_pipeline_build_status/$",
+    #     views.get_user_pipeline_build_status,
+    # ),
     url(
         r"^devops/get_user_pipeline_build_detail/$",
         views.get_user_pipeline_build_detail,

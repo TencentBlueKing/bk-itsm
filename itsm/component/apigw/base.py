@@ -98,30 +98,38 @@ class APIResource:
         发起http请求
         """
         request_url = self.get_request_url(request_data)
-        params = {"access_token": self.access_token}
+
+        from itsm.service.models import Service
+
+        updated_by = Service.objects.filter(creator=self.user).first().updated_by
+
+        self.user = updated_by
+
         headers = {
             "Content-Type": "application/json",
             "X-Bkapi-Authorization": json.dumps({
                 "bk_app_code": os.environ.get("BKPAAS_APP_ID", ""),
                 "bk_app_secret": os.environ.get("BKPAAS_APP_SECRET", ""),
-                "access_token": self.access_token,
-                "bk_username": self.user,
-            })
+            }),
+            "X-DEVOPS-UID": self.user,
+        }
+
+        params = {
+            'projectId': request_data.get('project_id', ''),
+            'pipelineId': request_data.get('pipeline_id', ''),
+            'buildId': request_data.get('build_id', ''),
         }
 
         try:
             if self.method == "GET":
-                params.update(request_data)
-                result = self.session.get(url=request_url, headers=headers, params=params,
-                                          verify=False, timeout=self.TIMEOUT)
+                result = self.session.get(
+                    url=request_url, params=params, headers=headers,
+                    verify=False, timeout=self.TIMEOUT
+                )
             else:
                 result = self.session.post(
-                    url=request_url,
-                    headers=headers,
-                    params=params,
-                    json=request_data,
-                    verify=False,
-                    timeout=self.TIMEOUT
+                    url=request_url, params=params, headers=headers,
+                    json=request_data, verify=False, timeout=self.TIMEOUT
                 )
         except ReadTimeout:
             raise RemoteCallError("{}接口返回结果超时".format(request_url))

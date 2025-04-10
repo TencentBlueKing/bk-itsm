@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 from pipeline.conf import settings
 from requests.exceptions import HTTPError, ReadTimeout
 from itsm.component.apigw.base import APIResource
-from itsm.component.exceptions import RemoteCallError
+from itsm.component.exceptions import RemoteCallError, NotAllowedError
 
 CLIENT_URL = settings.DEVOPS_CLIENT_URL
 
@@ -65,11 +65,15 @@ class DevOps(APIResource):
         """
         发起http请求
         """
-        if not request_data.get(settings.BK_CI_COOKIE_NAME):
+        if not request_data.get(settings.BK_CI_COOKIE_NAME, ""):
             return super().perform_request(request_data)
 
         request_url = self.get_request_url(request_data)
-        params = {}
+        params = {
+            'projectId': request_data.get('project_id', ''),
+            'pipelineId': request_data.get('pipeline_id', ''),
+            'buildId': request_data.get('build_id', ''),
+        }
 
         try:
             if self.method == "GET":
@@ -79,32 +83,36 @@ class DevOps(APIResource):
                         "bk_app_code": os.environ.get("BKPAAS_APP_ID", ""),
                         "bk_app_secret": os.environ.get("BKPAAS_APP_SECRET", ""),
                         settings.BK_CI_COOKIE_NAME: request_data.pop(settings.BK_CI_COOKIE_NAME),
-                    })
+                    }),
+                    "X-DEVOPS-UID": self.user
                 }
 
-                params.update(request_data)
                 result = self.session.get(url=request_url, params=params, headers=headers,
                                           verify=False,
                                           timeout=self.TIMEOUT)
             else:
-                headers = {
-                    "Content-Type": "application/json",
-                    "X-Bkapi-Authorization": json.dumps({
-                        "bk_app_code": os.environ.get("BKPAAS_APP_ID", ""),
-                        "bk_app_secret": os.environ.get("BKPAAS_APP_SECRET", ""),
-                        "access_token": self.access_token,
-                        "bk_username": self.user,
-                    })
-                }
-
-                result = self.session.post(
-                    url=request_url,
-                    params=params,
-                    verify=False,
-                    timeout=self.TIMEOUT,
-                    json=request_data,
-                    headers=headers,
-                )
+                raise NotAllowedError("请求方法不允许")
+                # headers = {
+                #     "Content-Type": "application/json",
+                #     "X-Bkapi-Authorization": json.dumps({
+                #         "bk_app_code": os.environ.get("BKPAAS_APP_ID", ""),
+                #         "bk_app_secret": os.environ.get("BKPAAS_APP_SECRET", ""),
+                #         "access_token": self.access_token,
+                #         "bk_username": self.user,
+                #     }),
+                #     "X-DEVOPS-UID": self.user
+                # }
+                # 
+                # 
+                # 
+                # result = self.session.post(
+                #     url=request_url,
+                #     params=params,
+                #     verify=False,
+                #     timeout=self.TIMEOUT,
+                #     json=request_data,
+                #     headers=headers,
+                # )
         except ReadTimeout:
             raise RemoteCallError("{}接口返回结果超时".format(request_url))
 
@@ -133,7 +141,9 @@ class ProjectPipelineList(DevOps):
     获取项目流水线列表
     """
 
-    action = '/v3/apigw-user/projects/{project_id}/pipelines'
+    # action = '/v3/apigw-user/projects/{project_id}/pipelines'
+    action = '/api/devops/bk-dev/v4/apigw-user/projects/{project_id}/pipelines/pipeline_list'
+
     method = 'GET'
 
     def handle_response(self, response_data):
@@ -145,7 +155,8 @@ class ProjectsList(DevOps):
     获取用户项目列表
     """
 
-    action = '/v3/apigw-user/projects'
+    # action = '/v3/apigw-user/projects'
+    action = '/api/devops/bk-dev/v4/apigw-user/projects/project_list'
     method = 'GET'
 
     def is_result_success(self, response_data):
@@ -157,7 +168,8 @@ class PipelineBuildStartInfo(DevOps):
     获取流水线启动信息
     """
 
-    action = '/v3/apigw-user/projects/{project_id}/pipelines/{pipeline_id}/builds/manualStartupInfo'
+    # action = '/v3/apigw-user/projects/{project_id}/pipelines/{pipeline_id}/builds/manualStartupInfo'
+    action = '/api/devops/bk-dev/v4/apigw-user/projects/{project_id}/build_manual_startup_info'
     method = 'GET'
 
 
@@ -165,8 +177,10 @@ class ProjectPipelineDetail(DevOps):
     """
     获取流水线详情
     """
+    # 获取流水线编排（正确）
 
-    action = '/v3/apigw-user/projects/{project_id}/pipelines/{pipeline_id}'
+    # action = '/v3/apigw-user/projects/{project_id}/pipelines/{pipeline_id}'
+    action = '/api/devops/bk-dev/v4/apigw-user/projects/{project_id}/pipelines/pipeline'
     method = 'GET'
 
 
@@ -175,7 +189,8 @@ class PipelineBuildList(DevOps):
     获取流水线构建历史
     """
 
-    action = '/apigw-user/builds/{project_id}/{pipeline_id}/history'
+    # action = '/apigw-user/builds/{project_id}/{pipeline_id}/history'
+    action = '/api/devops/bk-dev/v4/apigw-user/projects/{project_id}/build_histories'
     method = 'GET'
 
 
@@ -184,7 +199,9 @@ class PipelineBuildStart(DevOps):
     启动流水线
     """
 
-    action = '/v3/apigw-user/projects/{project_id}/pipelines/{pipeline_id}/builds/start'
+    # action = '/v3/apigw-user/projects/{project_id}/pipelines/{pipeline_id}/builds/start'
+    # action='/api/devops/bk-dev/v4/apigw-user/projects/{projectId}/build_start'
+    action = '/api/devops/bk-dev/v4/apigw-app/projects/{project_id}/build_start'
     method = 'POST'
 
 
@@ -193,7 +210,9 @@ class PipelineBuildStatus(DevOps):
     获取流水线构建状态
     """
 
-    action = '/v3/apigw-user/projects/{project_id}/pipelines/{pipeline_id}/builds/{build_id}/status'
+    # action = '/v3/apigw-user/projects/{project_id}/pipelines/{pipeline_id}/builds/{build_id}/status'
+    # action='/api/devops/bk-dev/v4/apigw-user/projects/{projectId}/build_status'
+    action = '/api/devops/bk-dev/v4/apigw-app/projects/{project_id}/build_status'
     method = 'GET'
 
     def handle_response(self, response_data):
@@ -226,7 +245,8 @@ class PipelineBuildDetail(DevOps):
     获取流水线构建详情
     """
 
-    action = '/v3/apigw-user/projects/{project_id}/pipelines/{pipeline_id}/builds/{build_id}/detail'
+    # action = '/v3/apigw-user/projects/{project_id}/pipelines/{pipeline_id}/builds/{build_id}/detail'
+    action = '/api/devops/bk-dev/v4/apigw-user/projects/{project_id}/build_detail'
     method = 'GET'
 
 
@@ -235,7 +255,8 @@ class PipelineBuildArtifactoryList(DevOps):
     获取流水线构建产物
     """
 
-    action = '/v2/apigw-user/artifactories/projects/{project_id}/pipelines/{pipeline_id}/builds/{build_id}/search'
+    # action = '/v2/apigw-user/artifactories/projects/{project_id}/pipelines/{pipeline_id}/builds/{build_id}/search'
+    action = '/api/devops/bk-dev/v4/apigw-user/projects/{project_id}/artifactories/file_info'
     method = 'GET'
 
 
@@ -244,7 +265,8 @@ class PipelineBuildArtifactoryThirdPartyDownloadUrl(DevOps):
     获取流水线构建产物第三方下载链接
     """
 
-    action = '/v2/apigw-user/artifactories/projects/{project_id}/thirdPartyDownloadUrl'
+    # action = '/v2/apigw-user/artifactories/projects/{project_id}/thirdPartyDownloadUrl'
+    action = '/api/devops/bk-dev/v4/apigw-user/projects/{project_id}/artifactories/user_download_url'
     method = 'GET'
 
 
