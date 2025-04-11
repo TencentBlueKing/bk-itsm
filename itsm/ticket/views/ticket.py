@@ -1434,7 +1434,7 @@ class TicketModelViewSet(ModelViewSet):
         return Response()
 
     def states_response(self, ticket, request, detail=False):
-        state_id = request.query_params.get("state_id", "")
+        state_id = request.query_params.get("state_id")
 
         if ticket.flow.engine_version == DEFAULT_ENGINE_VERSION:
             status = ticket.node_status

@@ -34,6 +34,7 @@ from itsm.component.constants import (
     TRANSITION_OPERATE,
     NODE_FAILED,
 )
+from itsm.service.models import Service
 from itsm.component.apigw import client as apigw_client
 from itsm.ticket.models import Ticket, TicketGlobalVariable
 from itsm.ticket.serializers import StatusSerializer
@@ -235,6 +236,10 @@ class BkDevOpsService(ItsmBaseService):
 
         # 3.构建流水线启动参数
         build_params = self.prepare_build_params(devops_info, ticket)
+
+        # 新增：服务的最近更新人变为构建流水线的执行人和查询流水线状态的用户
+        updated_by_username = Service.objects.filter(pk=ticket.service_id).first().updated_by
+        build_params['username'] = updated_by_username
 
         # 4.构建 api_info
         api_info = [

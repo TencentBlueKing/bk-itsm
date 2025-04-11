@@ -1,6 +1,6 @@
 # Changelog
-## [Version: 2.7.6] - 2025-03-20
-【Feature】Whether the Blue Shield node is displayed in the service process.
+## [Version: 2.7.6] - 2025-04-11
+【Feature】The community edition supports the Blue Shield plugin.
 
 ## [Version: 2.7.5] - 2025-03-04
 【Improved】Optimize the issue of OpenAPI returning an error when extra fields are passed during ticket creation.  

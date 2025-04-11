@@ -92,27 +92,7 @@ class DevOps(APIResource):
                                           timeout=self.TIMEOUT)
             else:
                 raise NotAllowedError("请求方法不允许")
-                # headers = {
-                #     "Content-Type": "application/json",
-                #     "X-Bkapi-Authorization": json.dumps({
-                #         "bk_app_code": os.environ.get("BKPAAS_APP_ID", ""),
-                #         "bk_app_secret": os.environ.get("BKPAAS_APP_SECRET", ""),
-                #         "access_token": self.access_token,
-                #         "bk_username": self.user,
-                #     }),
-                #     "X-DEVOPS-UID": self.user
-                # }
-                # 
-                # 
-                # 
-                # result = self.session.post(
-                #     url=request_url,
-                #     params=params,
-                #     verify=False,
-                #     timeout=self.TIMEOUT,
-                #     json=request_data,
-                #     headers=headers,
-                # )
+
         except ReadTimeout:
             raise RemoteCallError("{}接口返回结果超时".format(request_url))
 

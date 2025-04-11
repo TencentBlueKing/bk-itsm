@@ -99,12 +99,6 @@ class APIResource:
         """
         request_url = self.get_request_url(request_data)
 
-        from itsm.service.models import Service
-
-        updated_by = Service.objects.filter(creator=self.user).first().updated_by
-
-        self.user = updated_by
-
         headers = {
             "Content-Type": "application/json",
             "X-Bkapi-Authorization": json.dumps({
