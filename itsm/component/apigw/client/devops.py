@@ -122,7 +122,7 @@ class ProjectPipelineList(DevOps):
     """
 
     # action = '/v3/apigw-user/projects/{project_id}/pipelines'
-    action = '/api/devops/bk-dev/v4/apigw-user/projects/{project_id}/pipelines/pipeline_list'
+    action = '/v4/apigw-user/projects/{project_id}/pipelines/pipeline_list'
 
     method = 'GET'
 
@@ -136,7 +136,7 @@ class ProjectsList(DevOps):
     """
 
     # action = '/v3/apigw-user/projects'
-    action = '/api/devops/bk-dev/v4/apigw-user/projects/project_list'
+    action = '/v4/apigw-user/projects/project_list'
     method = 'GET'
 
     def is_result_success(self, response_data):
@@ -149,7 +149,7 @@ class PipelineBuildStartInfo(DevOps):
     """
 
     # action = '/v3/apigw-user/projects/{project_id}/pipelines/{pipeline_id}/builds/manualStartupInfo'
-    action = '/api/devops/bk-dev/v4/apigw-user/projects/{project_id}/build_manual_startup_info'
+    action = '/v4/apigw-user/projects/{project_id}/build_manual_startup_info'
     method = 'GET'
 
 
@@ -157,10 +157,9 @@ class ProjectPipelineDetail(DevOps):
     """
     获取流水线详情
     """
-    # 获取流水线编排（正确）
 
     # action = '/v3/apigw-user/projects/{project_id}/pipelines/{pipeline_id}'
-    action = '/api/devops/bk-dev/v4/apigw-user/projects/{project_id}/pipelines/pipeline'
+    action = '/v4/apigw-user/projects/{project_id}/pipelines/pipeline'
     method = 'GET'
 
 
@@ -170,7 +169,7 @@ class PipelineBuildList(DevOps):
     """
 
     # action = '/apigw-user/builds/{project_id}/{pipeline_id}/history'
-    action = '/api/devops/bk-dev/v4/apigw-user/projects/{project_id}/build_histories'
+    action = '/v4/apigw-user/projects/{project_id}/build_histories'
     method = 'GET'
 
 
@@ -180,8 +179,8 @@ class PipelineBuildStart(DevOps):
     """
 
     # action = '/v3/apigw-user/projects/{project_id}/pipelines/{pipeline_id}/builds/start'
-    # action='/api/devops/bk-dev/v4/apigw-user/projects/{projectId}/build_start'
-    action = '/api/devops/bk-dev/v4/apigw-app/projects/{project_id}/build_start'
+    # action='/v4/apigw-user/projects/{projectId}/build_start'
+    action = '/v4/apigw-app/projects/{project_id}/build_start'
     method = 'POST'
 
 
@@ -191,8 +190,8 @@ class PipelineBuildStatus(DevOps):
     """
 
     # action = '/v3/apigw-user/projects/{project_id}/pipelines/{pipeline_id}/builds/{build_id}/status'
-    # action='/api/devops/bk-dev/v4/apigw-user/projects/{projectId}/build_status'
-    action = '/api/devops/bk-dev/v4/apigw-app/projects/{project_id}/build_status'
+    # action='/v4/apigw-user/projects/{projectId}/build_status'
+    action = '/v4/apigw-app/projects/{project_id}/build_status'
     method = 'GET'
 
     def handle_response(self, response_data):
@@ -226,7 +225,7 @@ class PipelineBuildDetail(DevOps):
     """
 
     # action = '/v3/apigw-user/projects/{project_id}/pipelines/{pipeline_id}/builds/{build_id}/detail'
-    action = '/api/devops/bk-dev/v4/apigw-user/projects/{project_id}/build_detail'
+    action = '/v4/apigw-user/projects/{project_id}/build_detail'
     method = 'GET'
 
 
@@ -236,7 +235,7 @@ class PipelineBuildArtifactoryList(DevOps):
     """
 
     # action = '/v2/apigw-user/artifactories/projects/{project_id}/pipelines/{pipeline_id}/builds/{build_id}/search'
-    action = '/api/devops/bk-dev/v4/apigw-user/projects/{project_id}/artifactories/file_info'
+    action = '/v4/apigw-user/projects/{project_id}/artifactories/file_info'
     method = 'GET'
 
 
@@ -246,7 +245,7 @@ class PipelineBuildArtifactoryThirdPartyDownloadUrl(DevOps):
     """
 
     # action = '/v2/apigw-user/artifactories/projects/{project_id}/thirdPartyDownloadUrl'
-    action = '/api/devops/bk-dev/v4/apigw-user/projects/{project_id}/artifactories/user_download_url'
+    action = '/v4/apigw-user/projects/{project_id}/artifactories/user_download_url'
     method = 'GET'
 
 
