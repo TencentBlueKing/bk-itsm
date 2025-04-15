@@ -179,7 +179,7 @@
                         "description": "", 
                         "properties": {
                           "ip": {
-                            "default": "10.0.0.2", 
+                            "default": "127.0.0.1", 
                             "type": "string", 
                             "description": ""
                           }, 
@@ -218,7 +218,7 @@
                   "description": "", 
                   "properties": {
                     "ip": {
-                      "default": "10.0.0.2", 
+                      "default": "127.0.0.1", 
                       "type": "string", 
                       "description": "IP\u5730\u5740"
                     }, 
