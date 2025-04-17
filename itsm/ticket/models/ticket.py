@@ -1881,7 +1881,7 @@ class Ticket(Model, BaseTicket):
             if status.action_type == SYSTEM_OPERATE:
                 continue
             for processor in status.processors.strip(",").split(","):
-                # 如果处理人为'',将处理人的名称设置为'null'
+                # 如果处理人为'',将处理人的名称设置为'当前节点无处理人'
                 if processor == '':
                     current_processors.setdefault(status.ticket_id, []).append('当前节点无处理人')
                     continue
