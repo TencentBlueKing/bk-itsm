@@ -1865,6 +1865,8 @@ class Ticket(Model, BaseTicket):
                     for department in departments
                 }
             elif processors_type in ["CMDB", "GENERAL"]:
+                # 去掉''值
+                processors = [processor for processor in processors if processor]
                 processors_info = UserRole.get_role_name(
                     processors_type, list(set(processors))
                 )
@@ -1879,6 +1881,10 @@ class Ticket(Model, BaseTicket):
             if status.action_type == SYSTEM_OPERATE:
                 continue
             for processor in status.processors.strip(",").split(","):
+                # 如果处理人为'',将处理人的名称设置为'null'
+                if processor == '':
+                    current_processors.setdefault(status.ticket_id, []).append('当前节点无处理人')
+                    continue
                 real_processor = instantiated_processors[status.processors_type].get(
                     processor, processor
                 )
