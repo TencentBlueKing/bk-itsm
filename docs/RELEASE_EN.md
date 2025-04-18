@@ -1,4 +1,7 @@
 # Changelog
+## [Version: 2.7.6] - 2025-04-18
+【Feature】Use environment variables to configure whether to enable the blue shield node.  
+
 ## [Version: 2.7.5] - 2025-03-04
 【Improved】Optimize the issue of OpenAPI returning an error when extra fields are passed during ticket creation.  
 【Fix】Fix the issue where the custom form fields are not displayed on the bill of lading page.  
