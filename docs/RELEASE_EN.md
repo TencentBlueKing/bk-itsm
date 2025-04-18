@@ -1,6 +1,7 @@
 # Changelog
 ## [Version: 2.7.6] - 2025-04-18
 【Feature】Use environment variables to configure whether to enable the blue shield node.  
+【Fix】The issue of error reporting on the "Current Processors" interface of the ticket list page.  
 
 ## [Version: 2.7.5] - 2025-03-04
 【Improved】Optimize the issue of OpenAPI returning an error when extra fields are passed during ticket creation.  
