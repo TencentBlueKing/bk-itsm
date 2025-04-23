@@ -639,7 +639,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
             for state_id, state_info in states_info.items():
                 if state_info["processors_type"] in ["CMDB", "GENERAL"]:
                     if state_info["processors"] == "":
-                        error_message.append(f"{state_info['name']}的处理人不能为空")
+                        error_message.append(f"【{state_info['name']}】节点的处理人不能为空")
 
             if error_message:
                 raise ParamError(_("\n".join(error_message)))
