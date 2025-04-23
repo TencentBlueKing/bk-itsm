@@ -50,5 +50,12 @@ class NoticeFilterService:
         """获取审批服务黑名单"""
         return ContextService.get_context_value_list("service_approval_blacklist")
 
+    @staticmethod
+    def service_enable_batch_approval_list():
+        """获取批量审批白名单"""
+        return ContextService.get_context_value_list(
+            "service_enable_batch_approval_list"
+        )
+
 
 notice_filter_service = NoticeFilterService()
