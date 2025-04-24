@@ -37,26 +37,6 @@
           </bk-input>
         </bk-form-item>
         <desc-info v-model="basicsFormData.desc"></desc-info>
-        <bk-form-item
-          data-test-id="sopsNode-select-processType"
-          error-display-type="normal"
-          :label="$t(`m['流程类型：']`)"
-          :required="true"
-          :property="'processType'">
-          <bk-select
-            :ext-cls="'bk-form-width bk-form-display'"
-            v-model="basicsFormData.processType"
-            :placeholder="$t(`m['请选择流程类型']`)"
-            searchable
-            @selected="getTemplateList">
-            <bk-option
-              v-for="process in processOptions"
-              :key="process.id"
-              :id="process.id"
-              :name="process.name">
-            </bk-option>
-          </bk-select>
-        </bk-form-item>
         <bk-form-item data-test-id="sopsNode-select-business" error-display-type="normal" :label="$t(`m['关联业务：']`)" :required="true" :property="'projectId'">
           <bk-select
             :ext-cls="'bk-form-width bk-form-display'"
@@ -231,19 +211,9 @@
           templateId: '',
           projectId: '',
           planId: [],
-          processType: '',
+          processType: 'business',
           processors: [],
         },
-        processOptions: [
-          {
-            id: 'business',
-            name: '项目流程',
-          },
-          {
-            id: 'common',
-            name: '公共流程',
-          },
-        ],
         isLoading: false,
         excludeTaskNodesId: [],
         projectList: [],
@@ -353,11 +323,7 @@
           this.excludeTaskNodesId = this.configur.extras.sops_info.exclude_task_nodes_id || [];
           // 项目ID
           this.basicsFormData.projectId = this.configur.extras.sops_info.bk_biz_id.value;
-          if (this.basicsFormData.processType === 'common') {
-            await this.getTemplateList(this.basicsFormData.processType);
-          } else {
-            await this.getProjectTemplateList(this.basicsFormData.projectId);
-          }
+          await this.getProjectTemplateList(this.basicsFormData.projectId);
           await this.getTemplateDetail(this.configur.extras.sops_info.template_id);
           this.basicsFormData.templateId = this.configur.extras.sops_info.template_id;
           this.processorsInfo = {
