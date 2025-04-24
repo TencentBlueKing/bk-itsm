@@ -430,7 +430,7 @@
           processors: [],
           is_allow_skip: false,
           enable_terminate_ticket_when_rejected: true,
-          enable_auto_approve_if_previously_approved: false
+          enable_auto_approve_if_previously_approved: false,
         },
         nodeTagList: [],
         allCondition: [],
