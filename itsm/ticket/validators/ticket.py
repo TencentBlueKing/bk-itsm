@@ -90,7 +90,7 @@ class CreateTicketValidator(object):
         field_hash = {}
 
         required_fields = filter(
-            lambda f: f["validate_type"] == "REQUIRE", state_fields
+            lambda f: f["validate_type"] == "REQUIRE" and not f['default'], state_fields
         )
         required_keys = {f["key"] for f in required_fields}
 
