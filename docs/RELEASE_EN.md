@@ -1,7 +1,10 @@
 # Changelog
 ## [Version: 2.7.6] - 2025-04-18
 【Feature】Use environment variables to configure whether to enable the blue shield node.  
+【Feature】Add new API endpoint `get_ticket_event_logs` for retrieving ticket event logs.  
 【Fix】The issue of error reporting on the "Current Processors" interface of the ticket list page.  
+【Fix】Resolved error in get SOPS node logs.  
+【Fix】Resolved error when required fields with default values were not provided during ticket creation via API.
 
 ## [Version: 2.7.5] - 2025-03-04
 【Improved】Optimize the issue of OpenAPI returning an error when extra fields are passed during ticket creation.  
