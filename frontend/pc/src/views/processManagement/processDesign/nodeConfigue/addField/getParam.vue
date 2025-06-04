@@ -39,7 +39,7 @@
       <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="300">
         <template slot-scope="props">
           <template v-if="isStatic">
-            {{props.row.customValue || '--'}}
+            {{props.row.value || '--'}}
           </template>
           <template v-else-if="isCustom">
             <bk-input
