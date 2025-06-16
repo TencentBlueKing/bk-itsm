@@ -38,5 +38,7 @@ export const errorHandler = (error, instance) => {
   instance.$bkMessage({
     message: msg,
     theme: 'error',
+    ellipsisLine: 3,
+    ellipsisCopy: true,
   });
 };
