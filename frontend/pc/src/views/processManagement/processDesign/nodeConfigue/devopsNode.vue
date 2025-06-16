@@ -301,7 +301,7 @@
           if (this.configur && !this.configur.is_draft) {
             this.basicInfo.nodeName = this.configur.name;
             this.basicInfo.desc = this.configur.desc;
-            this.basicInfo.businessId = res.data.filter(item => item.project_name === this.configur.extras.devops_info.project_id.name)[0].englishName;
+            this.basicInfo.businessId = res.data.filter(item => item.project_id === this.configur.extras.devops_info.project_id.key)[0].englishName;
             this.onSelectBusiness();
             this.basicInfo.pipelineId = this.configur.extras.devops_info.pipeline_id.value;
             this.processorsInfo = {
