@@ -28,7 +28,7 @@ from itertools import chain
 import jsonfield
 from django.db import models
 from django.forms import model_to_dict
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import (
     BASE_MODEL,
@@ -73,33 +73,51 @@ class BaseField(Model):
     is_valid = models.BooleanField(_("是否生效"), default=True)
     display = models.BooleanField(_("是否显示在单据列表中"), default=False)
 
-    source_type = models.CharField(_("数据来源类型"), max_length=LEN_SHORT, choices=SOURCE_CHOICES,
-                                   default="CUSTOM")
-    source_uri = models.CharField(_("接口uri"), max_length=LEN_LONG, default=EMPTY_STRING, null=True,
-                                  blank=True)
-    api_instance_id = models.IntegerField(_('api实例主键'), default=0, null=True, blank=True)
-    kv_relation = jsonfield.JSONCharField(_("源数据的kv关系配置"), default=EMPTY_DICT,
-                                          max_length=LEN_NORMAL)
-    type = models.CharField(_("字段类型"), max_length=LEN_SHORT, choices=TYPE_CHOICES, default="STRING")
+    source_type = models.CharField(
+        _("数据来源类型"),
+        max_length=LEN_SHORT,
+        choices=SOURCE_CHOICES,
+        default="CUSTOM",
+    )
+    source_uri = models.CharField(
+        _("接口uri"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True
+    )
+    api_instance_id = models.IntegerField(
+        _("api实例主键"), default=0, null=True, blank=True
+    )
+    kv_relation = jsonfield.JSONCharField(
+        _("源数据的kv关系配置"), default=EMPTY_DICT, max_length=LEN_NORMAL
+    )
+    type = models.CharField(
+        _("字段类型"), max_length=LEN_SHORT, choices=TYPE_CHOICES, default="STRING"
+    )
 
     key = models.CharField(_("字段标识"), max_length=LEN_LONG)
     name = models.CharField(_("字段名"), max_length=LEN_NORMAL)
 
-    layout = models.CharField(_("布局"), max_length=LEN_SHORT, choices=LAYOUT_CHOICES,
-                              default="COL_6")
+    layout = models.CharField(
+        _("布局"), max_length=LEN_SHORT, choices=LAYOUT_CHOICES, default="COL_6"
+    )
 
-    validate_type = models.CharField(_("校验规则"), max_length=LEN_SHORT, choices=VALIDATE_CHOICES,
-                                     default="REQUIRE")
+    validate_type = models.CharField(
+        _("校验规则"), max_length=LEN_SHORT, choices=VALIDATE_CHOICES, default="REQUIRE"
+    )
 
     show_type = models.IntegerField(
-        _('显示条件类型'), choices=[(SHOW_DIRECTLY, '直接显示'), (SHOW_BY_CONDITION, '根据条件判断')],
-        default=SHOW_DIRECTLY
+        _("显示条件类型"),
+        choices=[(SHOW_DIRECTLY, "直接显示"), (SHOW_BY_CONDITION, "根据条件判断")],
+        default=SHOW_DIRECTLY,
     )
     show_conditions = jsonfield.JSONField(_("字段的显示条件"), default=EMPTY_DICT)
 
-    regex = models.CharField(_("正则校验规则关键字"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True,
-                             blank=True)
-    '''
+    regex = models.CharField(
+        _("正则校验规则关键字"),
+        max_length=LEN_NORMAL,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
+    )
+    """
     regex_config.rule: dict 校验规则
     regex_config.rule.expressions: []dict 表达式
     regex_config.rule.type: string 表达式关系，and/or
@@ -109,19 +127,39 @@ class BaseField(Model):
             "type":"and"
         }
     }
-    '''
-    regex_config = jsonfield.JSONCharField(_('正则校验规则配置'), max_length=LEN_LONG, default=EMPTY_DICT)
-    custom_regex = models.CharField(_("自定义正则规则"), max_length=LEN_MIDDLE, default=EMPTY_STRING,
-                                    null=True, blank=True)
-    desc = models.CharField(_("字段填写说明"), max_length=LEN_MIDDLE, default=EMPTY_STRING, null=True,
-                            blank=True)
-    tips = models.CharField(_("字段展示说明"), max_length=LEN_MIDDLE, default=EMPTY_STRING, null=True,
-                            blank=True)
-    is_tips = models.BooleanField(_('额外提示'), default=False)
-    default = models.CharField(_("默认值"), max_length=LEN_XX_LONG, default=EMPTY_STRING, null=True,
-                               blank=True)
+    """
+    regex_config = jsonfield.JSONCharField(
+        _("正则校验规则配置"), max_length=LEN_LONG, default=EMPTY_DICT
+    )
+    custom_regex = models.CharField(
+        _("自定义正则规则"),
+        max_length=LEN_MIDDLE,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
+    )
+    desc = models.CharField(
+        _("字段填写说明"),
+        max_length=LEN_MIDDLE,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
+    )
+    tips = models.CharField(
+        _("字段展示说明"),
+        max_length=LEN_MIDDLE,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
+    )
+    is_tips = models.BooleanField(_("额外提示"), default=False)
+    default = models.CharField(
+        _("默认值"), max_length=LEN_XX_LONG, default=EMPTY_STRING, null=True, blank=True
+    )
     choice = jsonfield.JSONField(_("选项"), default=EMPTY_LIST)
-    related_fields = jsonfield.JSONField(_("级联字段"), default=EMPTY_DICT, null=True, blank=True)
+    related_fields = jsonfield.JSONField(
+        _("级联字段"), default=EMPTY_DICT, null=True, blank=True
+    )
     meta = jsonfield.JSONField(_("复杂描述信息"), default=EMPTY_DICT)
 
     class Meta:
@@ -145,7 +183,7 @@ class BaseField(Model):
             _exclude.extend(exclude)
 
         for f in chain(opts.concrete_fields, opts.private_fields):
-            if not getattr(f, 'editable', False):
+            if not getattr(f, "editable", False):
                 continue
             if fields and f.name not in fields:
                 continue
@@ -153,18 +191,20 @@ class BaseField(Model):
                 continue
 
             if isinstance(f, models.ForeignKey):
-                data['{}_id'.format(f.name)] = getattr(getattr(self, f.name), 'id', '')
+                data["{}_id".format(f.name)] = getattr(getattr(self, f.name), "id", "")
             else:
-                data[f.name] = getattr(self, f.name, '')
+                data[f.name] = getattr(self, f.name, "")
 
-            if self.source_type == 'API':
+            if self.source_type == "API":
                 api_instance_info = RemoteApiInstance.objects.get(
-                    id=self.api_instance_id).tag_data()
+                    id=self.api_instance_id
+                ).tag_data()
                 remote_api_info = RemoteApi.objects.get(
-                    id=api_instance_info['remote_api']).tag_data()
-                data['api_info'] = {
-                    'api_instance_info': api_instance_info,
-                    'remote_api_info': remote_api_info,
+                    id=api_instance_info["remote_api"]
+                ).tag_data()
+                data["api_info"] = {
+                    "api_instance_info": api_instance_info,
+                    "remote_api_info": remote_api_info,
                 }
 
         return data
@@ -173,19 +213,31 @@ class BaseField(Model):
 class Field(BaseField):
     """字段表"""
 
-    SOURCE = [('CUSTOM', '自定义添加'), ('TABLE', '基础模型添加')]
+    SOURCE = [("CUSTOM", "自定义添加"), ("TABLE", "基础模型添加")]
 
-    workflow = models.ForeignKey('workflow.Workflow', help_text=_("关联流程"), related_name="fields",
-                                 on_delete=models.CASCADE)
-    state = models.ForeignKey('workflow.State', help_text=_("关联流程"), related_name="state_fields",
-                              null=True, blank=True, on_delete=models.CASCADE)
-    source = models.CharField(_('添加方式'), max_length=LEN_SHORT, choices=SOURCE, default='CUSTOM')
+    workflow = models.ForeignKey(
+        "workflow.Workflow",
+        help_text=_("关联流程"),
+        related_name="fields",
+        on_delete=models.CASCADE,
+    )
+    state = models.ForeignKey(
+        "workflow.State",
+        help_text=_("关联流程"),
+        related_name="state_fields",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
+    source = models.CharField(
+        _("添加方式"), max_length=LEN_SHORT, choices=SOURCE, default="CUSTOM"
+    )
 
     objects = managers.FieldManager()
     _objects = models.Manager()
 
     class Meta:
-        app_label = 'workflow'
+        app_label = "workflow"
         verbose_name = _("字段表")
         verbose_name_plural = _("字段表")
 
@@ -211,8 +263,12 @@ class Field(BaseField):
 class TemplateField(BaseField):
     """字段库"""
 
-    flow_type = models.CharField(_("流程分类"), max_length=LEN_NORMAL, default=DEFAULT_STRING)
-    project_key = models.CharField(_("项目key"), max_length=LEN_SHORT, null=False, default=0)
+    flow_type = models.CharField(
+        _("流程分类"), max_length=LEN_NORMAL, default=DEFAULT_STRING
+    )
+    project_key = models.CharField(
+        _("项目key"), max_length=LEN_SHORT, null=False, default=0
+    )
 
     objects = managers.TemplateFieldManager()
 
@@ -248,29 +304,34 @@ class Table(Model):
     基础模型
     """
 
-    fields = models.ManyToManyField(TemplateField, help_text=_('关联的公共字段'), related_name="tables")
-    name = models.CharField(_('模型名称'), max_length=LEN_LONG)
-    desc = models.CharField(_('基础模型描述'), max_length=LEN_LONG, null=True, blank=True)
-    fields_order = jsonfield.JSONField(_('字段排序'), default=[])
+    fields = models.ManyToManyField(
+        TemplateField, help_text=_("关联的公共字段"), related_name="tables"
+    )
+    name = models.CharField(_("模型名称"), max_length=LEN_LONG)
+    desc = models.CharField(
+        _("基础模型描述"), max_length=LEN_LONG, null=True, blank=True
+    )
+    fields_order = jsonfield.JSONField(_("字段排序"), default=[])
 
-    is_builtin = models.BooleanField(_('是否内置字段'), default=False)
+    is_builtin = models.BooleanField(_("是否内置字段"), default=False)
 
-    version = models.CharField(_("Table版本：空"), max_length=LEN_NORMAL, null=True, blank=True,
-                               default=EMPTY)
+    version = models.CharField(
+        _("Table版本：空"), max_length=LEN_NORMAL, null=True, blank=True, default=EMPTY
+    )
 
     objects = managers.TableManager()
 
     class Meta:
-        app_label = 'workflow'
-        verbose_name = _('基础模型')
-        verbose_name_plural = _('基础模型')
+        app_label = "workflow"
+        verbose_name = _("基础模型")
+        verbose_name_plural = _("基础模型")
 
     def __unicode__(self):
         return self.name
 
     def add_fields(self, fields):
         """增加字段"""
-        table_fields = list(self.fields.values_list('id', flat=True))
+        table_fields = list(self.fields.values_list("id", flat=True))
         for field in fields:
             if field not in table_fields:
                 table_fields.append(field)
@@ -279,7 +340,7 @@ class Table(Model):
 
     def remove_fields(self, fields):
         """删除字段"""
-        table_fields = list(self.fields.values_list('id', flat=True))
+        table_fields = list(self.fields.values_list("id", flat=True))
         for field in fields:
             try:
                 table_fields.remove(field)
@@ -291,7 +352,7 @@ class Table(Model):
     def tag_data(self, exclude=None):
         """获取table快照数据"""
 
-        _exclude = list(self.FIELDS) + ['is_builtin', 'fields', 'fields_order']
+        _exclude = list(self.FIELDS) + ["is_builtin", "fields", "fields_order"]
 
         if isinstance(exclude, (list, tuple)):
             _exclude.extend(exclude)
@@ -304,22 +365,29 @@ class Table(Model):
             id_to_key[tf.id] = tf.key
             fields.append(tf.tag_data())
 
-        field_key_order = [id_to_key[field_id] for field_id in self.fields_order if
-                           field_id in id_to_key]
+        field_key_order = [
+            id_to_key[field_id]
+            for field_id in self.fields_order
+            if field_id in id_to_key
+        ]
         data = model_to_dict(self, exclude=_exclude)
-        data.update(fields=fields, fields_order=self.fields_order, field_key_order=field_key_order)
+        data.update(
+            fields=fields,
+            fields_order=self.fields_order,
+            field_key_order=field_key_order,
+        )
 
         return data
 
     def clone(self):
         """返回克隆对象"""
 
-        fields = self.fields.values_list('id', flat=True)
+        fields = self.fields.values_list("id", flat=True)
         self.id = None
         self.save()
 
         version_name = create_version_number()
-        self.name = '{}_{}'.format(self.name, version_name)
+        self.name = "{}_{}".format(self.name, version_name)
         self.fields = fields
         self.version = version_name
         self.save()

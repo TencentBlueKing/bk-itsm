@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       OS: ubuntu-20.04
-      PYTHON: "3.6"
+      PYTHON: "3.11.10"
       RUN_ENV: "open"
       APP_CODE: "bk_itsm"
       APP_ID: "bk_itsm"
@@ -51,7 +51,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@master
       with:
-        python-version: 3.6
+        python-version: 3.11.10
     - name: Setup Mysql
       run: |
         sudo systemctl start mysql.service

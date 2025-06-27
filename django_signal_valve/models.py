@@ -26,13 +26,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import zlib
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 try:
     import pickle as pickle
 except Exception:
     import pickle
-
 
 
 class IOField(models.BinaryField):

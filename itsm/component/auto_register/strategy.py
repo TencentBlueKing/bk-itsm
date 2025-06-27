@@ -26,22 +26,34 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from distutils.version import StrictVersion
 
 import django
-from django.db.models import *
+from django.db.models import *  # noqa: F403
 from django.conf import settings
 
 
 def is_boolean(field):
-    return isinstance(field, (BooleanField, NullBooleanField))
+    return isinstance(field, (BooleanField))
 
 
 def is_string(field):
-    return isinstance(field, (CharField, EmailField, IPAddressField, SlugField, URLField))
+    return isinstance(
+        field, (CharField, EmailField, IPAddressField, SlugField, URLField)
+    )
 
 
 def is_number(field):
-    return isinstance(field, (IntegerField, SmallIntegerField, PositiveIntegerField,
-                              PositiveSmallIntegerField, BigIntegerField,
-                              CommaSeparatedIntegerField, DecimalField, FloatField))
+    return isinstance(
+        field,
+        (
+            IntegerField,
+            SmallIntegerField,
+            PositiveIntegerField,
+            PositiveSmallIntegerField,
+            BigIntegerField,
+            CommaSeparatedIntegerField,
+            DecimalField,
+            FloatField,
+        ),
+    )
 
 
 def is_datetime(field):
@@ -53,7 +65,7 @@ def is_file(field):
 
 
 def is_binary(self, field):
-    if self.django_greater_than('1.6'):
+    if self.django_greater_than("1.6"):
         return isinstance(field, (BinaryField))
     else:
         return False
@@ -69,6 +81,7 @@ class BaseStrategy:
     """
     基础策略， 封装了策略所需要的字段判定方法
     """
+
     type = None
 
     def get_value(self, field_list: list) -> list:
@@ -101,24 +114,36 @@ class ListDisplayStrategy(BaseStrategy):
     type = "list_display"
 
     def is_matched(self, field: Field):
-        return is_string(field) or is_boolean(field) or \
-               is_number(field) or is_datetime(field)
+        return (
+            is_string(field)
+            or is_boolean(field)
+            or is_number(field)
+            or is_datetime(field)
+        )
 
 
 class ListDisplayLinksStrategy(BaseStrategy):
     type = "list_display_links"
 
     def is_matched(self, field: Field):
-        return is_string(field) or is_boolean(field) \
-               or is_number(field) or is_datetime(field)
+        return (
+            is_string(field)
+            or is_boolean(field)
+            or is_number(field)
+            or is_datetime(field)
+        )
 
 
 class ListFilterStrategy(BaseStrategy):
     type = "list_filter"
 
     def is_matched(self, field: Field):
-        return is_string(field) or is_boolean(field) \
-               or is_number(field) or is_datetime(field)
+        return (
+            is_string(field)
+            or is_boolean(field)
+            or is_number(field)
+            or is_datetime(field)
+        )
 
 
 class SearchFieldsStrategy(BaseStrategy):
@@ -132,21 +157,29 @@ class ListPerPageStrategy(BaseStrategy):
     type = "list_per_page"
 
     def get_value(self, field_list):
-        return int(settings.DSA_LIST_PER_PAGE) if hasattr(settings, 'DSA_LIST_PER_PAGE') else 5
+        return (
+            int(settings.DSA_LIST_PER_PAGE)
+            if hasattr(settings, "DSA_LIST_PER_PAGE")
+            else 5
+        )
 
 
 class ListMaxShowAllStrategy(BaseStrategy):
     type = "list_max_show_all"
 
     def get_value(self, field_list):
-        return int(settings.DSA_LIST_MAX_SHOW_ALL) if hasattr(settings,
-                                                              'DSA_LIST_MAX_SHOW_ALL') else 50
+        return (
+            int(settings.DSA_LIST_MAX_SHOW_ALL)
+            if hasattr(settings, "DSA_LIST_MAX_SHOW_ALL")
+            else 50
+        )
 
 
 class StrategyDispatcher(object):
     """
     StrategyDispatcher 负责将不同的方法分派到不同的类中去处理
     """
+
     STRATEGY_CLASS = [
         ListRawIdFieldsStrategy,
         ListDisplayStrategy,
@@ -155,15 +188,16 @@ class StrategyDispatcher(object):
         SearchFieldsStrategy,
         ListPerPageStrategy,
         ListMaxShowAllStrategy,
-        FilterHorizontalStrategy
+        FilterHorizontalStrategy,
     ]
 
-    STRATEGY_DICT = dict(
-        [(_object.type, _object()) for _object in STRATEGY_CLASS])
+    STRATEGY_DICT = dict([(_object.type, _object()) for _object in STRATEGY_CLASS])
 
     def __init__(self, strategy_type):
         if strategy_type not in self.STRATEGY_DICT:
-            raise Exception("The strategy corresponding to Strategy_type does not exist")
+            raise Exception(
+                "The strategy corresponding to Strategy_type does not exist"
+            )
 
         self.strategy_type = strategy_type
 

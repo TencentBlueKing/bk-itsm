@@ -28,7 +28,7 @@ __copyright__ = "Copyright © 2012-2020 Tencent BlueKing. All Rights Reserved."
 
 import jsonfield
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import (
     EMPTY_DICT,
@@ -44,7 +44,8 @@ from itsm.component.constants import (
     LEN_XX_LONG,
     SOURCE_TASK,
     LEN_SHORT,
-    TASK_TYPE, PUBLIC_PROJECT_PROJECT_KEY,
+    TASK_TYPE,
+    PUBLIC_PROJECT_PROJECT_KEY,
 )
 from itsm.workflow.models import Model, BaseField
 from itsm.workflow.managers import TaskSchemaManager, TaskSchemaFieldManager
@@ -57,20 +58,38 @@ class TaskSchema(Model):
     """
 
     fields = (
-    "id", "name", "is_builtin", "component_type", "desc", "is_draft", "can_edit", "owners")
+        "id",
+        "name",
+        "is_builtin",
+        "component_type",
+        "desc",
+        "is_draft",
+        "can_edit",
+        "owners",
+    )
 
     name = models.CharField(_("任务模版的名称"), max_length=LEN_MIDDLE, null=False)
     is_builtin = models.BooleanField(_("是否内置"), default=False)
-    component_type = models.CharField(_("任务组件类型"), choices=TASK_COMPONENT_CHOICE,
-                                      max_length=LEN_NORMAL)
-    desc = models.CharField(_("任务模版的名称"), max_length=LEN_X_LONG, default=EMPTY_STRING, blank=True)
+    component_type = models.CharField(
+        _("任务组件类型"), choices=TASK_COMPONENT_CHOICE, max_length=LEN_NORMAL
+    )
+    desc = models.CharField(
+        _("任务模版的名称"), max_length=LEN_X_LONG, default=EMPTY_STRING, blank=True
+    )
     is_draft = models.BooleanField(_("是否为草稿"), default=True)
     is_enabled = models.BooleanField(_("是否为开启状态"), default=False)
     owners = models.CharField(_("负责人"), max_length=LEN_XX_LONG, default=EMPTY_STRING)
 
-    can_edit = models.BooleanField(_("是否可编辑状态"), help_text=_("当为流程version引用的时候，不可编辑和查看"),
-                                   default=True)
-    inputs = jsonfield.JSONField(_("组件输入信息"), help_text=_("当前组件输入参数引用的参数变量"), default=EMPTY_DICT)
+    can_edit = models.BooleanField(
+        _("是否可编辑状态"),
+        help_text=_("当为流程version引用的时候，不可编辑和查看"),
+        default=True,
+    )
+    inputs = jsonfield.JSONField(
+        _("组件输入信息"),
+        help_text=_("当前组件输入参数引用的参数变量"),
+        default=EMPTY_DICT,
+    )
 
     objects = TaskSchemaManager()
 
@@ -84,7 +103,7 @@ class TaskSchema(Model):
         verbose_name = _("任务模型")
         verbose_name_plural = _("任务模型")
         ordering = ("-id",)
-    
+
     @property
     def project_key(self):
         return PUBLIC_PROJECT_PROJECT_KEY
@@ -104,8 +123,13 @@ class TaskSchema(Model):
                 break
 
         variables = [
-            {"key": _field.key, "type": _field.type, "source": "field", "name": _field.name,
-             "choice": _field.choice}
+            {
+                "key": _field.key,
+                "type": _field.type,
+                "source": "field",
+                "name": _field.name,
+                "choice": _field.choice,
+            }
             for _field in self.all_fields.all()
         ]
 
@@ -113,8 +137,13 @@ class TaskSchema(Model):
         variables.extend(TICKET_GLOBAL_VARIABLES)
         if self.component_type == "SOPS":
             variables.append(
-                {"key": "sops_relate_id", "type": "string", "source": "ticket", "name": "REL单号",
-                 "choice": []}
+                {
+                    "key": "sops_relate_id",
+                    "type": "string",
+                    "source": "ticket",
+                    "name": "REL单号",
+                    "choice": [],
+                }
             )
         # 工单内的信息更新
         variables.extend(self.inputs.get("ticket_variables", []))
@@ -122,14 +151,21 @@ class TaskSchema(Model):
 
     def tag_data(self):
         triggers = []
-        for trigger in Trigger.objects.filter(source_type=SOURCE_TASK, source_id=self.id):
+        for trigger in Trigger.objects.filter(
+            source_type=SOURCE_TASK, source_id=self.id
+        ):
             triggers.append(trigger.tag_data())
         fields = []
         for field in self.all_fields.all():
             fields.append(field.tag_data())
 
-        return dict(id=self.id, name=self.name, component_type=self.component_type,
-                    triggers=triggers, fields=fields)
+        return dict(
+            id=self.id,
+            name=self.name,
+            component_type=self.component_type,
+            triggers=triggers,
+            fields=fields,
+        )
 
     def restore_fields(self, fields):
         TaskFieldSchema.objects.restore(fields, self)
@@ -138,10 +174,18 @@ class TaskSchema(Model):
 class TaskFieldSchema(BaseField):
     """任务对应的表单字段"""
 
-    task_schema = models.ForeignKey(TaskSchema, related_name="all_fields", help_text=_("对应的任务模型"),
-                                    on_delete=models.CASCADE)
-    stage = models.CharField(_("所处阶段"), choices=TASK_STAGE_CHOICE, default="CREATE",
-                             max_length=LEN_NORMAL)
+    task_schema = models.ForeignKey(
+        TaskSchema,
+        related_name="all_fields",
+        help_text=_("对应的任务模型"),
+        on_delete=models.CASCADE,
+    )
+    stage = models.CharField(
+        _("所处阶段"),
+        choices=TASK_STAGE_CHOICE,
+        default="CREATE",
+        max_length=LEN_NORMAL,
+    )
     sequence = models.IntegerField(_("序号"), default=0)
 
     objects = TaskSchemaFieldManager()
@@ -166,12 +210,16 @@ class TaskConfig(Model):
     """
 
     workflow_id = models.IntegerField(_("流程id"), db_index=True)
-    workflow_type = models.CharField(_("流程类型"), choices=TASK_TYPE, max_length=LEN_SHORT)
+    workflow_type = models.CharField(
+        _("流程类型"), choices=TASK_TYPE, max_length=LEN_SHORT
+    )
     task_schema_id = models.IntegerField(_("任务模版id"))
     create_task_state = models.IntegerField(_("任务创建节点"))
     execute_task_state = models.IntegerField(_("任务执行节点"))
     execute_can_create = models.BooleanField(_("执行节点是否可创建"), default=False)
-    need_task_finished = models.BooleanField(_("流转是否需要任务全部完成"), default=False)
+    need_task_finished = models.BooleanField(
+        _("流转是否需要任务全部完成"), default=False
+    )
 
     class Meta:
         app_label = "workflow"

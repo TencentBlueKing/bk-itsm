@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import operator
 from functools import reduce
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.conf import settings
 from rest_framework import permissions
 from rest_framework.serializers import ValidationError
@@ -62,16 +62,16 @@ class TicketPermissionValidate(permissions.BasePermission):
 
     def __init__(self):
         self.message = _("抱歉，您无权查看该单据")
-    
+
     def has_permission(self, request, view):
         """工单创建权限"""
         if view.action != "create":
             return True
-        
+
         service_id = request.data.get("service_id")
         if not service_id:
             return False
-        
+
         queryset = Service.objects.filter(pk=service_id, is_valid=True)
         conditions = Service.permission_filter(request.user.username)
         queryset = queryset.filter(reduce(operator.or_, conditions))
@@ -110,7 +110,9 @@ class TicketPermissionValidate(permissions.BasePermission):
 
         if view.action == "exception_distribute":
             if not iam_ticket_manage_auth:
-                self.message = _("抱歉，您无权执行此操作，因为您该服务没有工单管理的权限")
+                self.message = _(
+                    "抱歉，您无权执行此操作，因为您该服务没有工单管理的权限"
+                )
                 return False
             else:
                 return True
@@ -204,9 +206,9 @@ class TicketPermissionValidate(permissions.BasePermission):
                 str(resource["resource_id"]),
                 {
                     "iam_resource_owner": resource.get("creator", ""),
-                    "_bk_iam_path_": bk_iam_path
-                    if resource["resource_type"] != "project"
-                    else "",
+                    "_bk_iam_path_": (
+                        bk_iam_path if resource["resource_type"] != "project" else ""
+                    ),
                     "name": resource.get("resource_name", ""),
                 },
             )
@@ -337,7 +339,7 @@ class RemarkPermissionValidate(permissions.BasePermission):
 
         if UserRole.is_itsm_superuser(username):
             return True
-        
+
         if username == obj.creator:
             return True
 

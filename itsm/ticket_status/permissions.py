@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import permissions
 
 from itsm.component.drf.permissions import IamAuthPermit
@@ -62,7 +62,7 @@ class TicketStatusPermit(IamAuthPermit):
         # 关联实例的请求，需要针对对象进行鉴权
         if view.action in getattr(view, "permission_free_actions", []):
             return True
-        
+
         if view.action in ["get_configs"]:
             apply_actions = ["ticket_state_view", "platform_manage_access"]
         elif view.action in ["overall_ticket_statuses", "list", "next_over_status"]:

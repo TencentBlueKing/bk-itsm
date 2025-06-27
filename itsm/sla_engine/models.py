@@ -28,7 +28,7 @@ import json
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from jsonfield import JSONField
 from django.db import transaction
 from common.redis import Cache
@@ -72,8 +72,12 @@ class SlaTask(models.Model):
     end_at = models.DateTimeField(_("任务结束计时的时间"), null=True)
     upgrade_at = models.DateTimeField(_("任务升级时间"), null=True)
     last_settlement_time = models.DateTimeField(_("上次结算时间"), null=True)
-    sla_status = models.IntegerField(_("sla状态"), choices=SLA_TIMING_STATUS, default=NORMAL)
-    task_status = models.IntegerField(_("任务状态"), choices=SLA_TASK_STATUS, default=UNACTIVATED)
+    sla_status = models.IntegerField(
+        _("sla状态"), choices=SLA_TIMING_STATUS, default=NORMAL
+    )
+    task_status = models.IntegerField(
+        _("任务状态"), choices=SLA_TASK_STATUS, default=UNACTIVATED
+    )
     is_reply_need = models.BooleanField(_("是否需要响应"), default=False)
     is_replied = models.BooleanField(_("是否已响应"), default=False)
     reply_deadline = models.DateTimeField(_("响应截至时间"), null=True)
@@ -182,13 +186,17 @@ class SlaTask(models.Model):
         """
         响应超时时间
         """
-        return action_time(self.reply_time, self.sla_id, self.ticket.priority, start_time)
+        return action_time(
+            self.reply_time, self.sla_id, self.ticket.priority, start_time
+        )
 
     def handle_timeout_time(self, start_time=None):
         """
         处理超时时间
         """
-        return action_time(self.handle_time, self.sla_id, self.ticket.priority, start_time)
+        return action_time(
+            self.handle_time, self.sla_id, self.ticket.priority, start_time
+        )
 
     @property
     def protocol_name(self):
@@ -221,8 +229,9 @@ class SlaTask(models.Model):
         if not start_time:
             start_time = self.begin_at
 
-        new_duration = action_time_delta(start_time, current_time, self.sla_id,
-                                         self.ticket.priority)
+        new_duration = action_time_delta(
+            start_time, current_time, self.sla_id, self.ticket.priority
+        )
 
         cost_time = self.cost_time + new_duration
         return cost_time
@@ -246,7 +255,11 @@ class SlaTask(models.Model):
             return
 
         # 响应超时
-        if self.is_reply_need and not self.is_replied and current_time > self.reply_deadline:
+        if (
+            self.is_reply_need
+            and not self.is_replied
+            and current_time > self.reply_deadline
+        ):
             self.sla_status = REPLY_TIMEOUT
             self.save()
             return
@@ -276,10 +289,12 @@ class SlaTask(models.Model):
 
             ac_time = action_trigger_time.strftime("%Y-%m-%d %H:%M")
             ac_key = "{ticket_id}-{sla_task_id}-{action_policy_type}".format(
-                ticket_id=self.ticket_id, sla_task_id=self.id, action_policy_type=action_policy.type
+                ticket_id=self.ticket_id,
+                sla_task_id=self.id,
+                action_policy_type=action_policy.type,
             )
             # 任务用到的必要参数
-            
+
             ac_value = json.dumps([action.id for action in action_policy.actions.all()])
 
             # 插入数据到redis
@@ -299,7 +314,9 @@ class SlaTask(models.Model):
             self.reply_cost = self.cost_time
             self.save()
 
-            action_policies = self.action_policies.filter(type__in=[REPLY_WARING, REPLY_TIMEOUT])
+            action_policies = self.action_policies.filter(
+                type__in=[REPLY_WARING, REPLY_TIMEOUT]
+            )
             self.delete_redis_task(action_policies)
 
     @_frozen_check
@@ -319,7 +336,9 @@ class SlaTask(models.Model):
             action_policies = self.action_policies
             # 已响应的去除响应策略
             if self.is_reply_need and self.is_replied:
-                action_policies = action_policies.exclude(type__in=[REPLY_WARING, REPLY_TIMEOUT])
+                action_policies = action_policies.exclude(
+                    type__in=[REPLY_WARING, REPLY_TIMEOUT]
+                )
 
             self._refresh_redis_task(action_policies, resume_at)
 
@@ -361,7 +380,9 @@ class SlaTask(models.Model):
             action_policies = self.action_policies
             # 已响应的去除响应策略
             if self.is_reply_need and self.is_replied:
-                action_policies = action_policies.exclude(type__in=[REPLY_WARING, REPLY_TIMEOUT])
+                action_policies = action_policies.exclude(
+                    type__in=[REPLY_WARING, REPLY_TIMEOUT]
+                )
 
             self.delete_redis_task(action_policies)
             self._refresh_redis_task(action_policies, refresh_at)
@@ -377,11 +398,14 @@ class SlaTask(models.Model):
             # 策略触发时间大于恢复时间，重新入库redis
             if action_trigger_time > refresh_at:
                 ac_key = "{ticket_id}-{sla_task_id}-{action_policy_type}".format(
-                    ticket_id=self.ticket_id, sla_task_id=self.id,
-                    action_policy_type=action_policy.type
+                    ticket_id=self.ticket_id,
+                    sla_task_id=self.id,
+                    action_policy_type=action_policy.type,
                 )
                 # 任务用到的必要参数
-                ac_value = json.dumps([action.id for action in action_policy.actions.all()])
+                ac_value = json.dumps(
+                    [action.id for action in action_policy.actions.all()]
+                )
                 # 插入数据到redis
                 # 按时间记录任务
                 sla_redis_inst.hsetnx(name=ac_time, key=ac_key, value=ac_value)
@@ -390,8 +414,9 @@ class SlaTask(models.Model):
                 sla_redis_inst.sadd(SLA_ACTION_TIME, ac_time)
             else:
                 for action in action_policy.actions.all():
-                    sla_task_action = SlaTaskAction(action, self.ticket, self, action_policy.type,
-                                                    ac_time)
+                    sla_task_action = SlaTaskAction(
+                        action, self.ticket, self, action_policy.type, ac_time
+                    )
                     sla_task_action.alert()
 
     def delete_redis_task(self, action_policies):
@@ -403,7 +428,9 @@ class SlaTask(models.Model):
     def get_ac_keys(self, action_policies):
         ac_keys = [
             "{ticket_id}-{sla_task_id}-{action_policy_type}".format(
-                ticket_id=self.ticket_id, sla_task_id=self.id, action_policy_type=action_policy.type
+                ticket_id=self.ticket_id,
+                sla_task_id=self.id,
+                action_policy_type=action_policy.type,
             )
             for action_policy in action_policies
         ]
@@ -428,31 +455,51 @@ class SlaTask(models.Model):
 class SlaEventLogManager(models.Manager):
     def get_last_start_event(self, sla_task_id):
         """获取最后一次启动计时的事件"""
-        return self.filter(sla_task_id=sla_task_id, tick_flag='START', is_archived=False).last()
+        return self.filter(
+            sla_task_id=sla_task_id, tick_flag="START", is_archived=False
+        ).last()
 
     def get_last_stop_event(self, sla_task_id):
         """获取最后一次停止计时的事件"""
-        return self.filter(sla_task_id=sla_task_id, tick_flag='END', is_archived=False).last()
+        return self.filter(
+            sla_task_id=sla_task_id, tick_flag="END", is_archived=False
+        ).last()
 
     def create_start_event(self, sla_task_id, priority):
         """创建开始事件"""
-        return self.create(sla_task_id=sla_task_id, priority=priority, event_type='START',
-                           tick_flag='START', )
+        return self.create(
+            sla_task_id=sla_task_id,
+            priority=priority,
+            event_type="START",
+            tick_flag="START",
+        )
 
     def create_pause_event(self, sla_task_id, priority):
         """创建暂停事件"""
-        return self.create(sla_task_id=sla_task_id, priority=priority, event_type='PAUSE',
-                           tick_flag='END', )
+        return self.create(
+            sla_task_id=sla_task_id,
+            priority=priority,
+            event_type="PAUSE",
+            tick_flag="END",
+        )
 
     def create_resume_event(self, sla_task_id, priority):
         """创建恢复事件"""
-        return self.create(sla_task_id=sla_task_id, priority=priority, event_type='RESUME',
-                           tick_flag='START', )
+        return self.create(
+            sla_task_id=sla_task_id,
+            priority=priority,
+            event_type="RESUME",
+            tick_flag="START",
+        )
 
     def create_stop_event(self, sla_task_id, priority):
         """创建停止事件"""
-        return self.create(sla_task_id=sla_task_id, priority=priority, event_type='STOP',
-                           tick_flag='END', )
+        return self.create(
+            sla_task_id=sla_task_id,
+            priority=priority,
+            event_type="STOP",
+            tick_flag="END",
+        )
 
 
 class SlaEventLog(models.Model):
@@ -461,16 +508,30 @@ class SlaEventLog(models.Model):
     目前主要有：启动、停止、暂停、恢复
     """
 
-    sla_task_id = models.IntegerField(_("SLA TASK ID"), db_index=True, default=EMPTY_INT)
+    sla_task_id = models.IntegerField(
+        _("SLA TASK ID"), db_index=True, default=EMPTY_INT
+    )
     priority = models.CharField(_("优先级"), max_length=LEN_LONG)
     event_type = models.CharField(
-        _("事件类型"), max_length=LEN_LONG,
-        choices=[('PAUSE', "暂停"), ('RESUME', "恢复"), ('STOP', "停止"), ('START', "启动"), ]
+        _("事件类型"),
+        max_length=LEN_LONG,
+        choices=[
+            ("PAUSE", "暂停"),
+            ("RESUME", "恢复"),
+            ("STOP", "停止"),
+            ("START", "启动"),
+        ],
     )
     is_archived = models.BooleanField(_("是否已归档"), default=False)
     tick_flag = models.CharField(
-        _("计时标志"), max_length=LEN_LONG,
-        choices=[('START', "开始计时"), ('END', "结束计时"), ('KEEP', "保持"), ], default='KEEP'
+        _("计时标志"),
+        max_length=LEN_LONG,
+        choices=[
+            ("START", "开始计时"),
+            ("END", "结束计时"),
+            ("KEEP", "保持"),
+        ],
+        default="KEEP",
     )
     create_time = models.DateTimeField(_("事件发生时间"), auto_now_add=True)
 
@@ -494,15 +555,20 @@ class SlaEventLog(models.Model):
 class SlaActionHistoryManager(models.Manager):
     def get_last_success_action(self, action_id, action_type):
         """获取最后一次成功执行的sla行为"""
-        return self.filter(action_id=action_id, action_type=action_type, status="SUCCESS").first()
+        return self.filter(
+            action_id=action_id, action_type=action_type, status="SUCCESS"
+        ).first()
 
 
 class SlaActionHistory(models.Model):
     """sla行为历史记录"""
 
     action_id = models.IntegerField(_("任务ID"), db_index=True, default=EMPTY_INT)
-    status = models.CharField(_("结果状态"), max_length=LEN_LONG,
-                              choices=[("SUCCESS", _("成功")), ("FAILED", _("失败"))])
+    status = models.CharField(
+        _("结果状态"),
+        max_length=LEN_LONG,
+        choices=[("SUCCESS", _("成功")), ("FAILED", _("失败"))],
+    )
     action_type = models.CharField(_("行为类型"), max_length=LEN_LONG)
     action_detail = JSONField(_("行为详情"), default=EMPTY_DICT)
     create_time = models.DateTimeField(_("动作发生时间"), auto_now_add=True)

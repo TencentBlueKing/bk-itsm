@@ -17,7 +17,7 @@ from abc import abstractmethod
 from copy import deepcopy
 
 from django.db import IntegrityError, models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from pipeline.component_framework.library import ComponentLibrary
 from pipeline.contrib.external_plugins import exceptions
@@ -38,14 +38,18 @@ def package_source(cls):
 class SourceManager(models.Manager):
     def create_source(self, name, packages, from_config, **kwargs):
         create_kwargs = deepcopy(kwargs)
-        create_kwargs.update({"name": name, "packages": packages, "from_config": from_config})
+        create_kwargs.update(
+            {"name": name, "packages": packages, "from_config": from_config}
+        )
         return self.create(**create_kwargs)
 
     def remove_source(self, source_id):
         source = self.get(id=source_id)
 
         if source.from_config:
-            raise exceptions.InvalidOperationException("Can not remove source create from config")
+            raise exceptions.InvalidOperationException(
+                "Can not remove source create from config"
+            )
 
         source.delete()
 
@@ -66,11 +70,15 @@ class SourceManager(models.Manager):
             defaults["packages"] = config["packages"]
 
             try:
-                self.update_or_create(name=config["name"], from_config=True, defaults=defaults)
+                self.update_or_create(
+                    name=config["name"], from_config=True, defaults=defaults
+                )
             except IntegrityError:
                 raise exceptions.InvalidOperationException(
                     'There is a external source named "{source_name}" but not create from config, '
-                    "can not do source update operation".format(source_name=config["name"])
+                    "can not do source update operation".format(
+                        source_name=config["name"]
+                    )
                 )
 
 
@@ -103,11 +111,20 @@ class ExternalPackageSource(models.Model):
         try:
             importer = self.importer()
         except ValueError as e:
-            logger.exception("ExternalPackageSource[name={}] call importer error: {}".format(self.name, e))
+            logger.exception(
+                "ExternalPackageSource[name={}] call importer error: {}".format(
+                    self.name, e
+                )
+            )
             return plugins
         for component in ComponentLibrary.component_list():
-            component_importer = getattr(sys.modules[component.__module__], "__loader__", None)
-            if isinstance(component_importer, type(importer)) and component_importer.name == self.name:
+            component_importer = getattr(
+                sys.modules[component.__module__], "__loader__", None
+            )
+            if (
+                isinstance(component_importer, type(importer))
+                and component_importer.name == self.name
+            ):
                 plugins.append(
                     {
                         "code": component.code,
@@ -130,7 +147,9 @@ class ExternalPackageSource(models.Model):
 
     @staticmethod
     def update_package_source_from_config(source_configs):
-        classified_config = {source_type: [] for source_type in list(source_cls_factory.keys())}
+        classified_config = {
+            source_type: [] for source_type in list(source_cls_factory.keys())
+        }
 
         for config in deepcopy(source_configs):
             classified_config.setdefault(config.pop("type"), []).append(config)

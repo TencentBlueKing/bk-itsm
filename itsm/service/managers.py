@@ -29,7 +29,7 @@ import os
 from django.conf import settings
 from django.db import transaction
 from django.db.models.query import QuerySet
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from common.log import logger
 from itsm.component.constants import (
@@ -210,7 +210,6 @@ class ServiceManager(managers.Manager):
         return {"result": True, "message": "success"}
 
     def upgrade_services_flow(self, **kwargs):
-
         """更新现有服务绑定的流程版本"""
 
         print("-------------------upgrade_services_flow------------------------\n")
@@ -249,7 +248,6 @@ class ServiceManager(managers.Manager):
             WorkflowVersion.objects.upgrade_version(non_bind_flow.id, **kwargs)
 
     def get_or_create_service_and_catalog_from_version(self, *args, **kwargs):
-
         """创建服务条目并绑定到服务目录
         排除草稿流程，仅创建有效流程的服务项
         """

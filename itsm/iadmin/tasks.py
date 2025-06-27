@@ -23,13 +23,13 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from celery import task
+from celery import shared_task
 
 from common.log import logger
 from itsm.iadmin.models import MigrateLogs
 
 
-@task
+@shared_task
 def db_fix_by_version_list(need_exe_func_list, migrate_id):
     """执行需要执行的函数"""
     migrate_log = MigrateLogs.objects.filter(id=migrate_id)
@@ -38,8 +38,8 @@ def db_fix_by_version_list(need_exe_func_list, migrate_id):
     try:
         for item in need_exe_func_list:
             item()
-        migrate_log.update(is_finished=True, is_success=True, note='升级成功')
+        migrate_log.update(is_finished=True, is_success=True, note="升级成功")
         logger.info("db_fix_by_version_list success!")
     except Exception as e:
-        migrate_log.update(is_finished=True, is_success=False, note='升级失败')
-        logger.error('db_fix_by_version_list fail!, error: %s' % str(e))
+        migrate_log.update(is_finished=True, is_success=False, note="升级失败")
+        logger.error("db_fix_by_version_list fail!, error: %s" % str(e))

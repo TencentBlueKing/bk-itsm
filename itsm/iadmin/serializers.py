@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.fields import empty
 
@@ -134,7 +134,9 @@ class CustomNotifySerializer(serializers.ModelSerializer):
             project_key=project_key,
             used_by=used_by,
         ).exists():
-            raise serializers.ValidationError(_("该项目下已存在相同的通知配置，不能重复添加"))
+            raise serializers.ValidationError(
+                _("该项目下已存在相同的通知配置，不能重复添加")
+            )
 
         return super(CustomNotifySerializer, self).create(validated_data=validated_data)
 

@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from common.log import logger
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from itsm.component.drf.exception import ValidationError
 from itsm.component.exceptions import ComponentNotExist
 from itsm.trigger.models import Trigger, ActionSchema
@@ -40,8 +40,8 @@ class TriggerValidator:
 
     def __call__(self, value):
         if not self.instance:
-            self.source_id = value['source_id']
-            self.source_type = value['source_type']
+            self.source_id = value["source_id"]
+            self.source_type = value["source_type"]
         self.name_validate(value)
 
     def name_validate(self, value):
@@ -50,7 +50,7 @@ class TriggerValidator:
         统一类型统一来源对象的name必须唯一
         """
         trigger_query_set = Trigger.objects.filter(
-            name=value['name'], source_type=self.source_type, source_id=self.source_id
+            name=value["name"], source_type=self.source_type, source_id=self.source_id
         )
         if self.instance and trigger_query_set.exclude(id=self.instance.id).exists():
             raise ValidationError(_("存在其他相同名称的触发器，请修改后再提交"))
@@ -70,16 +70,20 @@ class BulkTriggerRuleValidator:
         名称的唯一性校验
         同一个触发器下面如果名称不为空，则不允许相同
         """
-        all_name = [rule['name'] for rule in rules if rule.get("name")]
+        all_name = [rule["name"] for rule in rules if rule.get("name")]
         if len(set(all_name)) < len(all_name):
             raise ValidationError(_("同一个触发器下的规则名称不能重复"))
 
     @staticmethod
     def action_schemas_exist_validate(rules):
         for index, rule in enumerate(rules):
-            action_schemas = rule['action_schemas']
-            if ActionSchema.objects.filter(id__in=action_schemas).count() < len(action_schemas):
-                raise ValidationError(_("第{}个规则下的响应事件部分不存在").format(index + 1))
+            action_schemas = rule["action_schemas"]
+            if ActionSchema.objects.filter(id__in=action_schemas).count() < len(
+                action_schemas
+            ):
+                raise ValidationError(
+                    _("第{}个规则下的响应事件部分不存在").format(index + 1)
+                )
 
 
 class ActionSchemaValidator:
@@ -95,11 +99,17 @@ class ActionSchemaValidator:
 
     def component_validate(self, value):
         try:
-            component_class = ComponentLibrary.get_component_class("trigger", component_code=value["component_type"])
+            component_class = ComponentLibrary.get_component_class(
+                "trigger", component_code=value["component_type"]
+            )
         except ComponentNotExist:
             raise ValidationError("非法的组件类型,请确认组件是否选择正确")
         except BaseException as error:
-            logger.exception("校验错误，instance id {}".format(self.instance.id if self.instance else "None"))
+            logger.exception(
+                "校验错误，instance id {}".format(
+                    self.instance.id if self.instance else "None"
+                )
+            )
             raise ValidationError("组件异常错误：{}".format(str(error)))
 
-        component_class(value['params']).validate_params()
+        component_class(value["params"]).validate_params()

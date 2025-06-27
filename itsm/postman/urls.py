@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.conf.urls import url
+from django.urls import re_path
 from rest_framework.routers import DefaultRouter
 
 from itsm.postman.views import (
@@ -36,13 +36,13 @@ from itsm.postman.views import (
 
 routers = DefaultRouter(trailing_slash=True)
 
-routers.register(r'api_instance', ApiInstanceViewsSet, basename="api_instance")
+routers.register(r"api_instance", ApiInstanceViewsSet, basename="api_instance")
 
-routers.register(r'remote_system', RemoteSystemViewSet, basename='remote_system')
+routers.register(r"remote_system", RemoteSystemViewSet, basename="remote_system")
 
-routers.register(r'remote_api', RemoteApiViewSet, basename='remote_api')
+routers.register(r"remote_api", RemoteApiViewSet, basename="remote_api")
 
 # APIView不能通过routers.register()的方式注入路由
 urlpatterns = routers.urls + [
-    url(r'^rpc_api/$', RpcApiViewSet.as_view()),
+    re_path(r"^rpc_api/$", RpcApiViewSet.as_view()),
 ]

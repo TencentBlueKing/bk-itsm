@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from django import forms
 
@@ -39,8 +39,12 @@ class GetTicketFields(BaseComponent):
     code = TABLE_FIELDS
 
     class Form(BaseComponentForm):
-        trigger_source_id = forms.IntegerField(label=_("触发器源id"), required=True, initial="trigger source id")
-        trigger_source_type = forms.CharField(label=_("触发器源类型"), required=True, initial="trigger source type")
+        trigger_source_id = forms.IntegerField(
+            label=_("触发器源id"), required=True, initial="trigger source id"
+        )
+        trigger_source_type = forms.CharField(
+            label=_("触发器源类型"), required=True, initial="trigger source type"
+        )
 
         def clean(self):
             """数据清理"""
@@ -49,14 +53,18 @@ class GetTicketFields(BaseComponent):
 
     def handle(self):
         payload = []
-        if self.form_data.get("trigger_source_type") != 'workflow':
+        if self.form_data.get("trigger_source_type") != "workflow":
             self.response.payload = payload
             return
 
         try:
-            current_workflow = Workflow.objects.get(id=self.form_data.get("trigger_source_id"))
+            current_workflow = Workflow.objects.get(
+                id=self.form_data.get("trigger_source_id")
+            )
         except Workflow.DoesNotExist:
             raise
-        payload = TemplateFieldSerializer(current_workflow.public_table_fields, many=True).data
+        payload = TemplateFieldSerializer(
+            current_workflow.public_table_fields, many=True
+        ).data
 
         self.response.payload = payload

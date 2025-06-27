@@ -30,7 +30,7 @@ import jmespath
 import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from mako.template import Template
 
 from common.log import logger
@@ -101,6 +101,9 @@ def build_message(_notify, task_id, ticket, message, action, **kwargs):
         custom_notify = get_custom_notify(ticket, action, _notify.type, used_by="TASK")
     else:
         custom_notify = get_custom_notify(ticket, action, _notify.type)
+
+    if task_id is not None:
+        kwargs["task_id"] = task_id
 
     # 获取单据上下文
     context = ticket.get_notify_context()

@@ -23,13 +23,18 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.fields import empty
 
 from itsm.component.constants import DAY_TYPE_CHOICES, LEN_MIDDLE, LEN_SHORT
 from itsm.sla.models import Day, Duration, Schedule
-from itsm.sla.validators import DayValidator, DurationValidator, ScheduleValidator, name_validator
+from itsm.sla.validators import (
+    DayValidator,
+    DurationValidator,
+    ScheduleValidator,
+    name_validator,
+)
 
 from .basic import ModelSerializer
 from ...component.drf.serializers import AuthModelSerializer
@@ -42,7 +47,7 @@ class DurationSerializer(ModelSerializer):
 
     class Meta:
         model = Duration
-        fields = ('id', 'name', 'start_time', 'end_time')
+        fields = ("id", "name", "start_time", "end_time")
 
     def run_validation(self, data=empty):
         self.validators = [DurationValidator(self.instance)]
@@ -54,7 +59,9 @@ class DaySerializer(ModelSerializer):
 
     id = serializers.CharField(required=False, max_length=LEN_SHORT, allow_null=True)
 
-    day_of_week = serializers.CharField(required=False, max_length=LEN_SHORT, allow_null=True)
+    day_of_week = serializers.CharField(
+        required=False, max_length=LEN_SHORT, allow_null=True
+    )
 
     start_date = serializers.DateField(required=False, allow_null=True)
 
@@ -62,7 +69,7 @@ class DaySerializer(ModelSerializer):
 
     type_of_day = serializers.CharField(
         required=True,
-        error_messages={'blank': _("日期类型不能为空")},
+        error_messages={"blank": _("日期类型不能为空")},
         max_length=LEN_SHORT,
         # choices=DAY_TYPE_CHOICES
     )
@@ -78,12 +85,20 @@ class DaySerializer(ModelSerializer):
 
     class Meta:
         model = Day
-        fields = ('id', 'name', 'type_of_day', 'day_of_week', 'start_date', 'end_date', 'duration')
+        fields = (
+            "id",
+            "name",
+            "type_of_day",
+            "day_of_week",
+            "start_date",
+            "end_date",
+            "duration",
+        )
 
     def create(self, validated_data):
         duration = [
-            Duration.objects.create(**duration_params) for duration_params in
-            validated_data.pop("duration", [])
+            Duration.objects.create(**duration_params)
+            for duration_params in validated_data.pop("duration", [])
         ]
         day = super(DaySerializer, self).create(validated_data)
         if duration:
@@ -97,7 +112,9 @@ class DaySerializer(ModelSerializer):
         if not duration:
             return instance
 
-        duration = [Duration.objects.create(**duration_params) for duration_params in duration]
+        duration = [
+            Duration.objects.create(**duration_params) for duration_params in duration
+        ]
         instance.duration.set(duration)
         instance.save()
         return instance
@@ -112,7 +129,7 @@ class ScheduleSerializer(AuthModelSerializer, ModelSerializer):
 
     name = serializers.CharField(
         required=True,
-        error_messages={'blank': _("服务模式名称不能为空")},
+        error_messages={"blank": _("服务模式名称不能为空")},
         # validators=[name_validator],
         max_length=LEN_MIDDLE,
     )
@@ -126,13 +143,21 @@ class ScheduleSerializer(AuthModelSerializer, ModelSerializer):
         model = Schedule
         related_fields = ("days", "workdays", "holidays")
         fields = (
-        'id', 'name', 'is_enabled', 'is_builtin', 'days', 'workdays', 'holidays', 'project_key')
+            "id",
+            "name",
+            "is_enabled",
+            "is_builtin",
+            "days",
+            "workdays",
+            "holidays",
+            "project_key",
+        )
 
     def create(self, validated_data):
         ScheduleValidator(self.instance)(validated_data)
-        days = validated_data.pop('days', [])
-        workdays = validated_data.pop('workdays', [])
-        holidays = validated_data.pop('holidays', [])
+        days = validated_data.pop("days", [])
+        workdays = validated_data.pop("workdays", [])
+        holidays = validated_data.pop("holidays", [])
 
         schedule = super(ScheduleSerializer, self).create(validated_data)
 
@@ -148,7 +173,9 @@ class ScheduleSerializer(AuthModelSerializer, ModelSerializer):
 
     def update(self, instance, validated_data):
 
-        rel_fields = {key: validated_data.pop(key, []) for key in self.Meta.related_fields}
+        rel_fields = {
+            key: validated_data.pop(key, []) for key in self.Meta.related_fields
+        }
 
         instance = super(ScheduleSerializer, self).update(instance, validated_data)
 
@@ -158,22 +185,28 @@ class ScheduleSerializer(AuthModelSerializer, ModelSerializer):
     def set_days(self, days, schedule):
         if not days:
             return
-        days = [self.fields.fields['days'].child.create(day_params) for day_params in days]
-        schedule.days.set(days) 
+        days = [
+            self.fields.fields["days"].child.create(day_params) for day_params in days
+        ]
+        schedule.days.set(days)
 
     def set_workdays(self, workdays, schedule):
         if not workdays:
             return
-        workdays = [self.fields.fields['workdays'].child.create(day_params) for day_params in
-                    workdays]
+        workdays = [
+            self.fields.fields["workdays"].child.create(day_params)
+            for day_params in workdays
+        ]
 
         schedule.workdays.set(workdays)
 
     def set_holidays(self, holidays, schedule):
         if not holidays:
             return
-        holidays = [self.fields.fields['holidays'].child.create(day_params) for day_params in
-                    holidays]
+        holidays = [
+            self.fields.fields["holidays"].child.create(day_params)
+            for day_params in holidays
+        ]
         schedule.holidays.set(holidays)
 
     def run_validation(self, data=empty):
@@ -194,7 +227,9 @@ class ScheduleDayRelationSerializer(serializers.Serializer):
 
     def to_internal_value(self, data):
         days = data.pop("days", [])
-        data['days'] = [self.fields.fields['days'].child.to_internal_value(day) for day in days]
+        data["days"] = [
+            self.fields.fields["days"].child.to_internal_value(day) for day in days
+        ]
         return data
 
     def to_representation(self, instance):
@@ -203,7 +238,9 @@ class ScheduleDayRelationSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         days = validated_data.pop("days", [])
         try:
-            add_method = getattr(self, "add_{}s".format(validated_data['type_of_day'].lower()))
+            add_method = getattr(
+                self, "add_{}s".format(validated_data["type_of_day"].lower())
+            )
         except AttributeError:
             raise serializers.ValidationError(_("不存在的日期类型"))
         add_method(days, instance)
@@ -211,11 +248,11 @@ class ScheduleDayRelationSerializer(serializers.Serializer):
 
     def add_workdays(self, workdays, schedule):
         for day_params in workdays:
-            schedule.workdays.add(self.fields.fields['days'].child.create(day_params))
+            schedule.workdays.add(self.fields.fields["days"].child.create(day_params))
 
     def add_holidays(self, holidays, schedule):
         for day_params in holidays:
-            schedule.holidays.add(self.fields.fields['days'].child.create(day_params))
+            schedule.holidays.add(self.fields.fields["days"].child.create(day_params))
 
     def create(self, validated_data):
         pass

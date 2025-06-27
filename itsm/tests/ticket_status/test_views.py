@@ -79,7 +79,9 @@ class TicketStatusTest(TestCase):
         }
         rsp = self.client.post(path=url, data=data, content_type="application/json")
         self.assertEqual(rsp.status_code, 200)
-        self.assertEqual(rsp.data["message"], "0:设置为起始状态的工单状态不存在，请联系管理员")
+        self.assertEqual(
+            rsp.data["message"], "0:设置为起始状态的工单状态不存在，请联系管理员"
+        )
         self.assertEqual(rsp.data["result"], False)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
@@ -127,7 +129,9 @@ class TicketStatusTest(TestCase):
         config = TicketStatusConfig.objects.get(id=1)
         config.init_ticket_status_config()
         self.assertEqual(config.service_type_name, "变更管理")
-        self.assertEqual(config.ticket_status, "新/处理中/已解决/待确认/挂起/已完成/已终止/已撤销")
+        self.assertEqual(
+            config.ticket_status, "新/处理中/已解决/待确认/挂起/已完成/已终止/已撤销"
+        )
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_ticket_status_model(self):
@@ -215,7 +219,9 @@ class TransitTest(TestCase):
         data.pop("to_status")
         rsp = self.client.post(path=url, data=data, content_type="application/json")
         self.assertEqual(rsp.status_code, 200)
-        self.assertEqual(rsp.data["message"], "0:流转目标的单据状态不存在，请联系管理员")
+        self.assertEqual(
+            rsp.data["message"], "0:流转目标的单据状态不存在，请联系管理员"
+        )
         self.assertEqual(rsp.data["result"], False)
 
         data = {"to_status": 6, "threshold": "1", "threshold_unit": "m"}

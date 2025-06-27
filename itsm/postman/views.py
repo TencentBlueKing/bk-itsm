@@ -29,7 +29,7 @@ import json
 from django.db.models import Q
 from django.forms.forms import DeclarativeFieldsMetaclass
 from django.http import HttpResponse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -99,7 +99,7 @@ class RemoteSystemViewSet(ModelViewSet):
     permission_action_default = "system_settings_manage"
     permission_resource_is_project = True
     permission_free_actions = ["list", "all", "get_systems", "get_components"]
-    
+
     pagination_class = None
 
     filter_fields = {
@@ -187,7 +187,7 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
 
     serializer_class = RemoteApiSerializer
     queryset = RemoteApi.objects.all()
-    
+
     permission_classes = (RemoteApiPermit,)
     permission_resource_is_project = True
     permission_create_action = ["create", "imports"]
@@ -254,11 +254,11 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
 
         will_deleted = self.queryset.filter(id__in=id_list)
         real_deleted = list(will_deleted.values_list("id", flat=True))
-        
+
         # 判断输入的接口实例
         if will_deleted.count() != len(real_deleted):
             raise ValidationError(_("接口数量异常，请刷新后重试"))
-        
+
         # 检测实例所属项目是否一致
         project_keys = [i.remote_system.project_key for i in will_deleted]
         if len(set(project_keys)) != 1:
@@ -277,10 +277,10 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
         data = api.tag_data()
 
         response = HttpResponse(content_type="application/octet-stream; charset=utf-8")
-        response[
-            "Content-Disposition"
-        ] = "attachment; filename=bk_itsm_api_{}_{}.json".format(
-            api.func_name, datetime.datetime.now().strftime("%Y%m%d%H%M")
+        response["Content-Disposition"] = (
+            "attachment; filename=bk_itsm_api_{}_{}.json".format(
+                api.func_name, datetime.datetime.now().strftime("%Y%m%d%H%M")
+            )
         )
 
         # 统一导入导出格式为列表数据

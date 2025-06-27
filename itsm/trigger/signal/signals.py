@@ -31,5 +31,5 @@ from itsm.trigger.signal.dispatcher import TriggerSignal
 
 # 统一用一个信号来接收，然后统一分配具体的事项
 trigger_signal = TriggerSignal()
-action_finish = Signal(providing_args=("action_id", "result", "error_message"))
-post_action_finish = Signal(providing_args=("instance",))
+action_finish = Signal()  # providing_args=("action_id", "result", "error_message")
+post_action_finish = Signal()  # providing_args=("instance",)

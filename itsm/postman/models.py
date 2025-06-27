@@ -31,7 +31,7 @@ import jsonschema
 from django.conf import settings
 from django.db import models
 from django.forms import model_to_dict
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from common.log import logger
 from itsm.component.constants import (
@@ -103,14 +103,22 @@ class RemoteSystem(Model):
         _("系统描述"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True
     )
     owners = models.CharField(
-        _("系统责任人"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True, blank=True
+        _("系统责任人"),
+        max_length=LEN_NORMAL,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
     )
     contact_information = models.TextField(_("联系方式"), blank=True)
     is_builtin = models.BooleanField(_("是否内置系统"), default=False)
 
     # 公共配置信息
     domain = models.CharField(
-        _("系统域名"), max_length=LEN_XX_LONG, default=EMPTY_STRING, null=True, blank=True
+        _("系统域名"),
+        max_length=LEN_XX_LONG,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
     )
     is_activated = models.BooleanField(_("是否启用"), default=False)
     headers = jsonfield.JSONField(
@@ -279,7 +287,9 @@ class RemoteApi(ObjectManagerMixin, Model):
                 try:
                     cls.restore_api(api, "system", True)
                 except Exception as e:
-                    logger.info("创建默认api失败：%s api name %s" % (str(e), api["name"]))
+                    logger.info(
+                        "创建默认api失败：%s api name %s" % (str(e), api["name"])
+                    )
 
     def tag_data(self):
         """Api数据"""
@@ -413,9 +423,9 @@ class RemoteApiInstance(Model):
             "rsp_data": self.rsp_data,
             "map_code": self.map_code,
             "before_req": self.before_req,
-            "query_params": self.req_body
-            if remote_api.method == "POST"
-            else self.req_params,
+            "query_params": (
+                self.req_body if remote_api.method == "POST" else self.req_params
+            ),
         }
 
     def get_api_choice(self, kv_relation, params):
@@ -467,7 +477,9 @@ class RemoteApiInstance(Model):
             return {
                 "result": False,
                 "code": ResponseCodeStatus.OK,
-                "message": _("接口返回协议不符合规范，请确保接口协议符合蓝鲸规范。详见: Github->API功能使用说明"),
+                "message": _(
+                    "接口返回协议不符合规范，请确保接口协议符合蓝鲸规范。详见: Github->API功能使用说明"
+                ),
                 "data": [],
             }
 
@@ -475,7 +487,10 @@ class RemoteApiInstance(Model):
             if rsp.get("code") == API_PERMISSION_ERROR_CODE:
                 raise IamPermissionDenied(
                     data=rsp["permission"],
-                    detail=_("用户没有对应的第三方系统接口【%s】权限" % api_config.get("path")),
+                    detail=_(
+                        "用户没有对应的第三方系统接口【%s】权限"
+                        % api_config.get("path")
+                    ),
                 )
             return rsp
 

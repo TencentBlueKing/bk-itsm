@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from __future__ import absolute_import, unicode_literals
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from itsm.component.exceptions import ParamError
@@ -52,16 +52,22 @@ def openapi_operate_validate(username, ticket, state_id=None, action_type=None):
         status = ticket.status(state_id)
 
         if not status:
-            raise serializers.ValidationError(_("抱歉，没有找到该节点：{}").format(state_id))
+            raise serializers.ValidationError(
+                _("抱歉，没有找到该节点：{}").format(state_id)
+            )
         if status.status == "FINISHED":
-            raise serializers.ValidationError(_("抱歉，当前节点：{} 已经结束").format(state_id))
+            raise serializers.ValidationError(
+                _("抱歉，当前节点：{} 已经结束").format(state_id)
+            )
         if not status.can_operate(username, action_type):
             raise serializers.ValidationError(
                 _("抱歉，{}不能操作该节点（没有权限或操作类型不支持）").format(username)
             )
     else:
         if not ticket.can_operate(username):
-            raise serializers.ValidationError(_("抱歉，{}无权操作该单据").format(username))
+            raise serializers.ValidationError(
+                _("抱歉，{}无权操作该单据").format(username)
+            )
 
 
 def openapi_suspend_validate(ticket):
@@ -90,7 +96,9 @@ def edit_field_validate(ticket, field, **kwargs):
         field_obj.key in ["title", "impact", "urgency", "priority"]
         or field_obj.state_id == ticket.first_state_id
     ):
-        raise ParamError(_("只允许修改提单节点的字段和内置字段, key={}".format(field["key"])))
+        raise ParamError(
+            _("只允许修改提单节点的字段和内置字段, key={}".format(field["key"]))
+        )
 
     key_value = {
         "params_%s" % field["key"]: format_exp_value(field["type"], field["_value"])

@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from collections import OrderedDict, defaultdict
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import STATUS, SERVICE_CATEGORY
 from itsm.component.dlls.component import BaseComponentForm

@@ -28,19 +28,19 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # AttributeError: 'Thread' object has no attribute '_children'
 # This probably happens due to a bug in multiprocessing.dummy (see here and here) that existed
 # before python 2.7.5 and 3.3.2.
-# 
+#
 # Solution A - Upgrade Python
-# 
+#
 # Solution B - Modify dummy
 # multiprocessing/dummy/__init__.py, edit the start method within the DummyProcess class as follows
 # if hasattr(self._parent, '_children'):  # add this line
 #    self._parent._children[self] = None  # indent this existing line
-# 
-# 
+#
+#
 # Solution C - Monkey Patch
 # Let's make it available in our namespace:
 # from multiprocessing import dummy as __mp_dummy
-# 
+#
 #  Now we can define a replacement and patch DummyProcess:
 # def __DummyProcess_start_patch(self):  # pulled from an updated version of Python
 #     assert self._parent is __mp_dummy.current_process()  # modified to avoid further imports
@@ -53,7 +53,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from multiprocessing.dummy import Pool as ThreadPool
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 # 线程池容量上限

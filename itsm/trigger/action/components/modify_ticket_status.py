@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import FIELD_STATUS
 from itsm.trigger.action.core.component import BaseComponent
@@ -37,7 +37,9 @@ __register_ignore__ = False
 
 def get_ticket_status_names():
     """Get all ticket status display name"""
-    status_names = TicketStatus.objects.get_overall_status_names(exclude_keys=["SUSPENDED"])
+    status_names = TicketStatus.objects.get_overall_status_names(
+        exclude_keys=["SUSPENDED"]
+    )
     return [{"key": key, "name": name} for key, name in status_names.items()]
 
 
@@ -68,20 +70,27 @@ class ModifyTicketStatusComponent(BaseComponent):
         dst_status = self.data.get_one_of_inputs("dst_status")
         print("dst_status is {}".format(dst_status))
         # Whether follow status transit rule
-        from_status = TicketStatus.objects.get(service_type=dst_ticket.service_type, key=dst_ticket.current_status)
-        all_status_info = from_status.from_transits.values("to_status__key", "to_status__name")
+        from_status = TicketStatus.objects.get(
+            service_type=dst_ticket.service_type, key=dst_ticket.current_status
+        )
+        all_status_info = from_status.from_transits.values(
+            "to_status__key", "to_status__name"
+        )
 
         for to_status_info in all_status_info:
-            if to_status_info['to_status__key'] == dst_status:
+            if to_status_info["to_status__key"] == dst_status:
 
                 # Update status from ticket
                 dst_ticket.current_status = dst_status
-                dst_ticket.save(update_fields=['current_status'])
+                dst_ticket.save(update_fields=["current_status"])
 
                 # Update status from field
                 dst_ticket.fields.filter(key=FIELD_STATUS).update(_value=dst_status)
                 return True
 
         # TODO 更新错误信息
-        self.data.set_outputs('message', _('工单状态无法更新为%s, 不满足状态流转规则, 请联系管理员! ' % dst_status))
+        self.data.set_outputs(
+            "message",
+            _("工单状态无法更新为%s, 不满足状态流转规则, 请联系管理员! " % dst_status),
+        )
         return False

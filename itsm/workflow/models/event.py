@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import jsonfield
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import (
     EMPTY_DICT,
@@ -47,19 +47,40 @@ class Event(models.Model):
     from_state_id = models.IntegerField(_("当前状态ID"))
     transition_id = models.IntegerField(_("流转ID"), null=True, blank=True)
     to_state_id = models.IntegerField(_("下一个状态ID"), null=True, blank=True)
-    type = models.CharField(_("流转事件类型"), max_length=LEN_SHORT, choices=OPERATE_CHOICES, default=TRANSITION_OPERATE)
-    processors_type = models.CharField(_("处理人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="OPEN")
-    processors = models.CharField(_("处理人列表"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True)
-    form_data = jsonfield.JSONField(_("表单快照字典"), default=EMPTY_DICT, null=True, blank=True)
+    type = models.CharField(
+        _("流转事件类型"),
+        max_length=LEN_SHORT,
+        choices=OPERATE_CHOICES,
+        default=TRANSITION_OPERATE,
+    )
+    processors_type = models.CharField(
+        _("处理人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="OPEN"
+    )
+    processors = models.CharField(
+        _("处理人列表"),
+        max_length=LEN_LONG,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
+    )
+    form_data = jsonfield.JSONField(
+        _("表单快照字典"), default=EMPTY_DICT, null=True, blank=True
+    )
 
     operate_at = models.DateTimeField(_("操作时间"), auto_now_add=True)
-    operator = models.CharField(_("操作人"), max_length=LEN_NORMAL, null=True, blank=True)
-    message = models.CharField(_("日志概述"), max_length=LEN_X_LONG, null=True, blank=True)
+    operator = models.CharField(
+        _("操作人"), max_length=LEN_NORMAL, null=True, blank=True
+    )
+    message = models.CharField(
+        _("日志概述"), max_length=LEN_X_LONG, null=True, blank=True
+    )
     is_deleted = models.BooleanField(_("是否软删除"), default=False, db_index=True)
 
     # 新增
     action = models.CharField(_("动作"), max_length=LEN_NORMAL, blank=True)
-    detail_message = models.CharField(_("详细信息"), max_length=LEN_X_LONG, null=True, blank=True)
+    detail_message = models.CharField(
+        _("详细信息"), max_length=LEN_X_LONG, null=True, blank=True
+    )
     from_state_name = models.CharField(_("任务name"), max_length=LEN_NORMAL, blank=True)
 
     _objects = models.Manager()

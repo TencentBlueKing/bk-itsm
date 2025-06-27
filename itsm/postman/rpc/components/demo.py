@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django import forms
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.dlls.component import BaseComponentForm
 from itsm.postman.rpc.core.component import BaseComponent

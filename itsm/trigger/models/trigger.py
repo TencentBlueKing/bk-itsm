@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import datetime
 from itertools import chain
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 import jsonfield
 
 from itsm.component.dlls.component import ComponentLibrary
@@ -77,8 +77,12 @@ class ActionSchema(TriggerBaseModel):
     )
     can_repeat = models.BooleanField(_("是否可以重复执行"), default=False)
 
-    params = jsonfield.JSONField(_("配置参数"), help_text=_("当前响应事件配置的参数模版"), default={})
-    inputs = jsonfield.JSONField(_("输入参数"), help_text=_("输入参数引用的参数变量"), default={})
+    params = jsonfield.JSONField(
+        _("配置参数"), help_text=_("当前响应事件配置的参数模版"), default={}
+    )
+    inputs = jsonfield.JSONField(
+        _("输入参数"), help_text=_("输入参数引用的参数变量"), default={}
+    )
 
     class Meta:
         verbose_name = _("响应动作参数配置表")
@@ -135,7 +139,9 @@ class Trigger(TriggerBaseModel):
 
     signal = models.CharField(_("触发事件信号"), null=False, max_length=LEN_MIDDLE)
     sender = models.CharField(
-        _("触发对象"), help_text=_("一般为触发该信号的实际对象模型id"), max_length=LEN_NORMAL
+        _("触发对象"),
+        help_text=_("一般为触发该信号的实际对象模型id"),
+        max_length=LEN_NORMAL,
     )
 
     # inputs 好像暂时没需要
@@ -157,7 +163,10 @@ class Trigger(TriggerBaseModel):
     is_draft = models.BooleanField(_("是否为草稿"), default=True)
     is_enabled = models.BooleanField(_("是否可启用"), default=False)
     icon = models.CharField(
-        _("对应的icon"), default=EMPTY_STRING, choices=TRIGGER_ICON_CHOICE, max_length=64
+        _("对应的icon"),
+        default=EMPTY_STRING,
+        choices=TRIGGER_ICON_CHOICE,
+        max_length=64,
     )
     project_key = models.CharField(
         _("项目key"), max_length=LEN_SHORT, null=False, default=0
@@ -179,17 +188,19 @@ class Trigger(TriggerBaseModel):
     def trigger_rules(self, source_type, source_id):
         return [
             {
-                "conditions": item.condition
-                if item.by_condition
-                else {
-                    "all": [
-                        {
-                            "name": "constant_bool_true",
-                            "operator": "is_true",
-                            "value": True,
-                        }
-                    ]
-                },
+                "conditions": (
+                    item.condition
+                    if item.by_condition
+                    else {
+                        "all": [
+                            {
+                                "name": "constant_bool_true",
+                                "operator": "is_true",
+                                "value": True,
+                            }
+                        ]
+                    }
+                ),
                 "actions": [
                     {
                         "name": "trigger_handle",
