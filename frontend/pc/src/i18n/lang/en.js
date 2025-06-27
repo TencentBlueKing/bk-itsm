@@ -2623,6 +2623,7 @@ export const m = {
   '节点处理人为空时，直接跳过且不视为异常': 'When the node processor is empty, it is skipped directly and not considered an exception',
   '当审批节点的审批人为申请人时，自动通过': 'When the processor of the approval node is the requester, automatically passed',
   '审批节点最终结果为拒绝时，自动终止单据': 'When the final result of the approval node is rejection, the ticket is automatically terminated',
+  '已审批过的自动同意（历史节点中审批通过时，无需手动审批，系统将自动同意）': 'Automatically approved items (when approved in historical nodes, no manual approval is needed, and the system will automatically agree)',
   字段配置: 'Field config',
   '为必选项!': 'Required!',
   必选项: 'Required',
