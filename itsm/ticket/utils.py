@@ -153,13 +153,13 @@ def get_custom_api_data(field):
                   "name": "bk_biz_name"
                 }
     """
-    from jinja2 import Template
+    from jinja2.sandbox import SandboxedEnvironment as Environment
 
     config = field.meta.get("api_config", {})
     kv_relation = field.kv_relation
     envs = field.ticket.meta.get("envs", {})
     method = config.get("method", "GET")
-    url = Template(config.get("url", "")).render(envs)
+    url =  Environment().from_string(config.get("url", "")).render(envs)
     query_params = config.get("query_params", {})
     headers = config.get("headers", {})
     body = config.get("body", {})
