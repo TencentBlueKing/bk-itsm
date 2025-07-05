@@ -128,13 +128,11 @@ class ConstantTemplate(object):
 
         for tpl in templates:
             resolved = ConstantTemplate.resolve_template(tpl, value_maps)
-            string = string.replace(tpl, resolved)
+            string = string.replace(tpl, str(resolved))
         return string
 
     @staticmethod
     def resolve_template(template, value_maps):
-        data = {}
-        data.update(value_maps)
         if not isinstance(template, str):
             raise exceptions.ConstantTypeException("constant resolve error, template[%s] is not a string" % template)
         try:
@@ -143,7 +141,7 @@ class ConstantTemplate(object):
             logger.error("pipeline resolve template[{}] error[{}]".format(template, e))
             return template
         try:
-            resolved = tm.render(**data)
+            resolved = tm.render(**value_maps)
         except (NameError, TypeError, KeyError) as e:
             logger.warning(
                 "constant content is invalid, variable referred does not exist or variable type error[%s]" % e

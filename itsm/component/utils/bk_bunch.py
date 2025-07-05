@@ -84,13 +84,3 @@ def unbunchify(x):
         return type(x)(unbunchify(v) for v in x)
     else:
         return x
-
-
-def get_data_by_key(key, data):
-    """
-    根据指定的可以获取到对应属性的值
-    """
-    data = bunchify(data)
-    get_dst_attr_bunch = 'dst_attr_bunch = data.%s' % key
-    exec(get_dst_attr_bunch)
-    return unbunchify(locals()["dst_attr_bunch"])

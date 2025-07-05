@@ -1,4 +1,8 @@
 # Changelog
+## [Version: 2.7.8] - 2025-07-06
+[Fix] Resolved execution issues with the exec command  
+[Fix] Fixed abnormal execution behavior of branch gateways when handling numeric data type  
+
 ## [Version: 2.7.7] - 2025-07-05
 【Fix】Resolved the Mako rendering issue  
 

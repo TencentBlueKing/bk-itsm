@@ -29,6 +29,8 @@ from json import JSONDecodeError
 
 import urllib
 import traceback
+
+import jmespath
 import requests
 
 from django.conf import settings
@@ -278,13 +280,8 @@ class BkComponent(object):
                 continue
 
             try:
-                handle_code = (
-                    "handle_data = unbunchify(bunchify(response).{rsp_data})".format(
-                        rsp_data=attr
-                    )
-                )
-                exec(handle_code)
-                data[attr] = locals()["handle_data"]
+                handle_code = jmespath.search(attr, response)
+                data[attr] = handle_code
             except AttributeError as e:
                 logger.warning(
                     "handle_response attribute_error[{}]: {}".format(attr, e)
