@@ -89,7 +89,7 @@
                 }"
                 @click.stop="onCollectClick(service, 'all')">
               </i>
-              <div class="name" v-html="service.highlightName"></div>
+              <div class="name" v-html="$xss(service.highlightName)"></div>
               <div class="category">{{ service.serviceTypeName }}</div>
             </li>
           </ul>

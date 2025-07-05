@@ -50,7 +50,8 @@
     "vuedraggable": "^2.21.0",
     "vuex": "^2.4.0",
     "wangeditor": "^4.7.9",
-    "xlsx": "^0.12.13"
+    "xlsx": "^0.12.13",
+    "xss": "^1.0.14"
   },
   "devDependencies": {
     "acorn": "^8.0.5",

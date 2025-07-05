@@ -74,7 +74,7 @@
                   </div>
                 </div>
                 <div v-else-if="ticketTypeList4.indexOf(ticketList[(index - 1) * 2].type) !== -1 && ticketList[(index - 1) * 2].display_value">
-                  <div class="bk-RICHTEXT" v-html="ticketList[(index - 1) * 2].display_value"></div>
+                  <div class="bk-RICHTEXT" v-html="$xss(ticketList[(index - 1) * 2].display_value)"></div>
                 </div>
                 <div v-else-if="ticketList[(index - 1) * 2].type === 'TEXT' && ticketList[(index - 1) * 2].display_value">
                   {{ ticketList[(index - 1) * 2].display_value }}
@@ -107,7 +107,7 @@
                   </div>
                 </div>
                 <div v-else-if="ticketTypeList4.indexOf(ticketList[(index - 1) * 2 + 1].type) !== -1 && ticketList[(index - 1) * 2 + 1].display_value">
-                  <div class="bk-RICHTEXT" v-html="ticketList[(index - 1) * 2 + 1].display_value"></div>
+                  <div class="bk-RICHTEXT" v-html="$xss(ticketList[(index - 1) * 2 + 1].display_value)"></div>
                 </div>
                 <div v-else-if="ticketList[(index - 1) * 2 + 1].type === 'TEXT' && ticketList[(index - 1) * 2 + 1].display_value">
                   <div>{{ ticketList[(index - 1) * 2 + 1].display_value }}</div>
@@ -216,7 +216,7 @@
                   </div>
                   <div v-else-if="ticketTypeList4.indexOf(itemFlow['fields'][(index - 1) * 2].type) !== -1 && itemFlow['fields'][(index - 1) * 2].display_value">
                     <div class="bk-RICHTEXT"
-                      v-html="itemFlow['fields'][(index - 1) * 2].display_value"></div>
+                      v-html="$xss(itemFlow['fields'][(index - 1) * 2].display_value)"></div>
                   </div>
                   <div v-else-if="itemFlow['fields'][(index - 1) * 2].type === 'TEXT' && itemFlow['fields'][(index - 1) * 2].display_value">
                     <div>{{ itemFlow['fields'][(index - 1) * 2].display_value }}</div>
@@ -247,7 +247,7 @@
                   </div>
                   <div v-else-if="ticketTypeList4.indexOf(itemFlow['fields'][(index - 1) * 2 + 1].type) !== -1 && itemFlow['fields'][(index - 1) * 2 + 1].display_value">
                     <div class="bk-RICHTEXT"
-                      v-html="itemFlow['fields'][(index - 1) * 2 + 1].display_value"></div>
+                      v-html="$xss(itemFlow['fields'][(index - 1) * 2 + 1].display_value)"></div>
                   </div>
                   <div v-else-if="itemFlow['fields'][(index - 1) * 2 + 1].type === 'TEXT' && itemFlow['fields'][(index - 1) * 2 + 1].display_value">
                     <div>{{ itemFlow['fields'][(index - 1) * 2 + 1].display_value }}</div>

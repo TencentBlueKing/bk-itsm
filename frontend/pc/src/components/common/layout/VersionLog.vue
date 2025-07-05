@@ -63,7 +63,7 @@
         <div class="bk-content-title">
           {{ $t('m.wiki["【"]')}}V{{versionInfo.version}}{{ $t('m.wiki["】版本更新明细"]')}}
         </div>
-        <div class="bk-content-markdown" v-html="markdownText"></div>
+        <div class="bk-content-markdown" v-html="$xss(markdownText)"></div>
       </div>
     </div>
   </div>

@@ -113,6 +113,23 @@ const { renderHeader } = require('./utils/util')
 Vue.prototype.$ace = ace;
 Vue.prototype.$cookie = cookie;
 Vue.prototype.$renderHeader = renderHeader;
+Vue.prototype.$xss = (html) => {
+  const attrs = ['class', 'title', 'target', 'style', 'id'];
+  return xss(html || '', {
+    onTagAttr: (tag, name, value, _isWhiteAttr) => {
+      if (attrs.includes(name)) {
+        return `${name}=${value}`;
+      }
+    },
+    onIgnoreTag: function (tag, html) {
+      if (tag === 'style') {
+        // 不对其属性列表进行过滤
+        return html;
+      }
+    }
+  });
+};
+
 require("brace/mode/javascript");
 require("brace/mode/python");
 require("brace/mode/json");

@@ -23,10 +23,10 @@
 <template>
   <footer id="page-footer-wrapper">
     <template v-if="bkSharedResUrl">
-      <p class="link-list" v-html="platformInfo.i18n.footerInfoHTML"></p>
-      <p class="copyright" v-html="platformInfo.footerCopyrightContent"></p>
+      <p class="link-list" v-html="$xss(platformInfo.i18n.footerInfoHTML)"></p>
+      <p class="copyright" v-html="$xss(platformInfo.footerCopyrightContent)"></p>
     </template>
-    <p v-else v-html="footer" class="common-footer"></p>
+    <p v-else v-html="$xss(footer" class="common-footer)"></p>
   </footer>
 </template>
 <script>
