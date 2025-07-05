@@ -28,8 +28,8 @@ import copy
 from django.db import models
 from django.utils.translation import ugettext as _
 from jsonfield import JSONField
-from mako.template import Template
 
+from common.template.template import Template
 from itsm.component.constants import (
     EMPTY_DICT,
     EMPTY_INT,
