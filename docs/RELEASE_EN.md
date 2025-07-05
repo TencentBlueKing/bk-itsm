@@ -1,4 +1,7 @@
 # Changelog
+## [Version: 2.7.7] - 2025-07-05
+【Fix】Resolved the Mako rendering issue  
+
 ## [Version: 2.7.6] - 2025-04-18
 【Feature】Use environment variables to configure whether to enable the blue shield node.  
 【Feature】Add new API endpoint `get_ticket_event_logs` for retrieving ticket event logs.  

@@ -31,9 +31,9 @@ import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext as _
-from mako.template import Template
 
 from common.log import logger
+from common.template.template import Template
 from itsm.component.constants import GENERAL_NOTICE
 from itsm.component.exceptions import GetCustomApiDataError
 from itsm.component.utils.misc import transform_single_username
