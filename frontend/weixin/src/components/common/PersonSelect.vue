@@ -25,7 +25,9 @@
     <div class="person-select">
       <header class="select-title">
         <span v-if="!showSelectedPerson">选择成员</span>
-        <span v-else>已选人员 <span class="color-blue">{{ selected.length }}</span> </span>
+        <span v-else
+          >已选人员 <span class="color-blue">{{ selected.length }}</span>
+        </span>
       </header>
       <div class="select-body">
         <template v-if="showSelectedPerson">
@@ -33,9 +35,14 @@
             <li
               v-for="(item, index) in selected"
               :key="index"
-              class="person-item">
+              class="person-item"
+            >
               <span>{{ item.username }}({{ item.display_name }})</span>
-              <van-icon class="delete-person-icon" name="cross" @click="cancelSelect(index)" />
+              <van-icon
+                class="delete-person-icon"
+                name="cross"
+                @click="cancelSelect(index)"
+              />
             </li>
           </ul>
         </template>
@@ -44,18 +51,23 @@
             v-model="searchValue"
             shape="round"
             placeholder="请输入搜索关键词"
-            @update:model-value="handelerSearchChange" />
+            @update:model-value="handelerSearchChange"
+          />
           <ul class="person-list search">
             <li
-              v-for="(item) in searchList"
+              v-for="item in searchList"
               :key="item.username"
-              class="person-item">
+              class="person-item"
+            >
               <div class="person-name">
                 <van-checkbox
-                  :model-value="selected.some(person => person.username === item.username)"
+                  :model-value="
+                    selected.some((person) => person.username === item.username)
+                  "
                   class="select-checkbox"
-                  @click="onSelectPerson(item)" />
-                <span v-if="!!searchValue" v-html="item.highlightName" />
+                  @click="onSelectPerson(item)"
+                />
+                <span v-if="!!searchValue" v-html="$xss(item.highlightName)" />
                 <span v-else>{{ item.username }}({{ item.display_name }})</span>
               </div>
             </li>
@@ -72,117 +84,128 @@
           收起
           <van-icon class="unfold-icon" name="arrow-down" />
         </span>
-        <van-button type="primary" class="confirm-button" @click="onClose">确定</van-button>
+        <van-button type="primary" class="confirm-button" @click="onClose"
+          >确定</van-button
+        >
       </footer>
     </div>
   </van-popup>
 </template>
 <script lang="ts">
-import { defineComponent, ref, toRefs, watch } from 'vue'
-import jsonp from 'jsonp'
-import { debounce } from '../../utils/tool'
+import { defineComponent, ref, toRefs, watch } from "vue";
+import jsonp from "jsonp";
+import { debounce } from "../../utils/tool";
 
 interface IUserItem {
-  id: number,
-  username: string,
+  id: number;
+  username: string;
   // eslint-disable-next-line
-  display_name: string,
+  display_name: string;
 }
 
 export default defineComponent({
-  name: 'PersonSelect',
+  name: "PersonSelect",
   props: {
     show: {
       type: Boolean,
-      default: false
+      default: false,
     },
     modelValue: {
       type: Array,
-      default: () => ([])
+      default: () => [],
     },
     inculde: {
       type: Array,
-      default: () => ([])
-    }
+      default: () => [],
+    },
   },
-  emits: ['update:modelValue', 'close'],
+  emits: ["update:modelValue", "close"],
   setup(props, { emit }) {
-    const { show, inculde } = toRefs(props)
-    const showSelectedPerson = ref(false) // 显示已选
+    const { show, inculde } = toRefs(props);
+    const showSelectedPerson = ref(false); // 显示已选
     watch(show, () => {
-      const searchStr = inculde.value.length ? inculde.value.join(',') : ''
-      getSearchList(searchStr, !!inculde.value.length)
-    })
+      const searchStr = inculde.value.length ? inculde.value.join(",") : "";
+      getSearchList(searchStr, !!inculde.value.length);
+    });
 
-    const selected = ref<IUserItem []>([])
+    const selected = ref<IUserItem[]>([]);
     const cancelSelect = (index: number) => {
-      selected.value.splice(index, 1)
-    }
+      selected.value.splice(index, 1);
+    };
     watch(selected, (value) => {
-      emit('update:modelValue', value)
-    })
+      emit("update:modelValue", value);
+    });
 
-    const searchValue = ref('')
-    const searchList = ref([])
+    const searchValue = ref("");
+    const searchList = ref([]);
     /**
      * 搜索人员
      * value 搜索值
      * exact 是否精确搜索
      */
     const loadUserInfo = (value: string, exact = false) => {
-      const host = window.BK_USER_MANAGE_WEIXIN_HOST || location.origin
-      const api = `${host}/api/c/compapi/v2/usermanage/fs_list_users/`
+      const host = window.BK_USER_MANAGE_WEIXIN_HOST || location.origin;
+      const api = `${host}/api/c/compapi/v2/usermanage/fs_list_users/`;
       return new Promise((resolve, reject) => {
-        const lookups = exact ? 'exact_lookups' : 'fuzzy_lookups'
-        const url = `${api}?app_code=bk-magicbox&${lookups}=${value}&page_size=20&page=1`
+        const lookups = exact ? "exact_lookups" : "fuzzy_lookups";
+        const url = `${api}?app_code=bk-magicbox&${lookups}=${value}&page_size=20&page=1`;
         jsonp(url, null, (err: Error, res: any) => {
           if (err) {
-            reject(err)
+            reject(err);
           } else {
-            resolve(res.data.results)
+            resolve(res.data.results);
           }
-        })
-      })
-    }
+        });
+      });
+    };
     const getSearchList = (value: string, exact = false) => {
       loadUserInfo(value, exact).then((data: any) => {
-        searchList.value = data.filter((item: IUserItem) => {
-          if (inculde.value.length && inculde.value.includes(item.username)) {
-            return true
-          }
-          // 当二级处理人为空时，返回所有结果
-          if (!inculde.value.length) {
-            return true
-          }
-          return false
-        }).map((item: IUserItem) => {
-          const reg = new RegExp(value, 'i')
-          const names = `${item.username}(${item.display_name})`
-          const highlightName = names.replace(reg, `<span style="color: #3a84ff;">${value}</span>`)
-          return {
-            ...item,
-            highlightName
-          }
-        })
-      })
-    }
-    const onSearch = debounce(getSearchList, 500)
+        searchList.value = data
+          .filter((item: IUserItem) => {
+            if (inculde.value.length && inculde.value.includes(item.username)) {
+              return true;
+            }
+            // 当二级处理人为空时，返回所有结果
+            if (!inculde.value.length) {
+              return true;
+            }
+            return false;
+          })
+          .map((item: IUserItem) => {
+            const reg = new RegExp(value, "i");
+            const names = `${item.username}(${item.display_name})`;
+            const highlightName = names.replace(
+              reg,
+              `<span style="color: #3a84ff;">${value}</span>`
+            );
+            return {
+              ...item,
+              highlightName,
+            };
+          });
+      });
+    };
+    const onSearch = debounce(getSearchList, 500);
     const handelerSearchChange = (value: string) => {
-      onSearch(value)
-    }
+      onSearch(value);
+    };
     const onSelectPerson = (person: IUserItem) => {
-      const target = selected.value.find((item: IUserItem) => item.username === person.username)
-      console.log(target, 'target')
+      const target = selected.value.find(
+        (item: IUserItem) => item.username === person.username
+      );
+      console.log(target, "target");
       if (target) {
-        selected.value = selected.value.filter((item: IUserItem) => item.username !== person.username)
+        selected.value = selected.value.filter(
+          (item: IUserItem) => item.username !== person.username
+        );
       } else {
-        selected.value.push(person)
+        selected.value.push(person);
       }
-    }
+    };
 
     const onClose = () => {
-      emit('close', selected.value)
-    }
+      emit("close", selected.value);
+    };
 
     return {
       selected,
@@ -192,10 +215,10 @@ export default defineComponent({
       showSelectedPerson,
       handelerSearchChange,
       onSelectPerson,
-      onClose
-    }
-  }
-})
+      onClose,
+    };
+  },
+});
 </script>
 <style lang="postcss">
 .color-blue {

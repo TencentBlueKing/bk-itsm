@@ -5,34 +5,46 @@
         shape="round"
         v-model="serviceSearchStr"
         placeholder="请输入服务名称"
-        @update:model-value="onchange" />
+        @update:model-value="onchange"
+      />
     </div>
     <div class="service-container">
       <van-pull-refresh
         v-model="refreshing"
         pulling-text="释放刷新列表..."
-        @refresh="onRefresh">
+        @refresh="onRefresh"
+      >
         <div v-if="!searchFocus" class="service-content">
           <div class="commonly-service">
             <h2 class="serivce-title">
               <i class="itsm-mobile-icon icon-favorite-o"></i>
-              收藏的服务</h2>
-            <van-loading
-              v-if="commonlyLoading"
-              size="24px"
-              vertical>加载中...</van-loading>
+              收藏的服务
+            </h2>
+            <van-loading v-if="commonlyLoading" size="24px" vertical
+              >加载中...</van-loading
+            >
             <div v-else class="container">
               <ul class="service-list">
-                <li v-for="serviceItem in serviceList.favoriteList" :key="serviceItem.id">
+                <li
+                  v-for="serviceItem in serviceList.favoriteList"
+                  :key="serviceItem.id"
+                >
                   <span
                     class="name"
                     :title="serviceItem.name"
-                    @click="onCreateTicket(serviceItem)">
-                    {{serviceItem.name}}
+                    @click="onCreateTicket(serviceItem)"
+                  >
+                    {{ serviceItem.name }}
                   </span>
                   <span class="favorite" @click="onChangeFavorite(serviceItem)">
                     <i
-                      :class="['itsm-mobile-icon', serviceItem.favorite ? 'icon-favorite orange': 'icon-favorite-o']">
+                      :class="[
+                        'itsm-mobile-icon',
+                        serviceItem.favorite
+                          ? 'icon-favorite orange'
+                          : 'icon-favorite-o',
+                      ]"
+                    >
                     </i>
                   </span>
                 </li>
@@ -42,23 +54,33 @@
           <div class="commonly-service">
             <h2 class="serivce-title">
               <i class="itsm-mobile-icon icon-time-circle"></i>
-              近一个月使用服务</h2>
-            <van-loading
-              v-if="commonlyLoading"
-              size="24px"
-              vertical>加载中...</van-loading>
+              近一个月使用服务
+            </h2>
+            <van-loading v-if="commonlyLoading" size="24px" vertical
+              >加载中...</van-loading
+            >
             <div v-else class="container">
               <ul class="service-list">
-                <li v-for="serviceItem in serviceList.latestList" :key="serviceItem.id">
+                <li
+                  v-for="serviceItem in serviceList.latestList"
+                  :key="serviceItem.id"
+                >
                   <span
                     class="name"
                     :title="serviceItem.name"
-                    @click="onCreateTicket(serviceItem)">
-                    {{serviceItem.name}}
+                    @click="onCreateTicket(serviceItem)"
+                  >
+                    {{ serviceItem.name }}
                   </span>
                   <span class="favorite" @click="onChangeFavorite(serviceItem)">
                     <i
-                      :class="['itsm-mobile-icon', serviceItem.favorite ? 'icon-favorite orange': 'icon-favorite-o']">
+                      :class="[
+                        'itsm-mobile-icon',
+                        serviceItem.favorite
+                          ? 'icon-favorite orange'
+                          : 'icon-favorite-o',
+                      ]"
+                    >
                     </i>
                   </span>
                 </li>
@@ -67,10 +89,9 @@
           </div>
           <div class="all-service">
             <h2 class="service-line"></h2>
-            <van-loading
-              v-if="allLoading"
-              size="24px"
-              vertical>加载中...</van-loading>
+            <van-loading v-if="allLoading" size="24px" vertical
+              >加载中...</van-loading
+            >
             <div v-else class="container">
               <van-list
                 v-model:loading="listState.loading"
@@ -78,18 +99,32 @@
                 :finished="listState.finished"
                 finished-text="没有更多了"
                 offset="0"
-                @load="onload">
+                @load="onload"
+              >
                 <ul class="service-list">
-                  <li v-for="serviceItem in serviceList.allList" :key="serviceItem.id">
+                  <li
+                    v-for="serviceItem in serviceList.allList"
+                    :key="serviceItem.id"
+                  >
                     <span
                       class="name"
                       :title="serviceItem.name"
-                      @click="onCreateTicket(serviceItem)">
-                      {{serviceItem.name}}
+                      @click="onCreateTicket(serviceItem)"
+                    >
+                      {{ serviceItem.name }}
                     </span>
-                    <span class="favorite" @click="onChangeFavorite(serviceItem)">
+                    <span
+                      class="favorite"
+                      @click="onChangeFavorite(serviceItem)"
+                    >
                       <i
-                        :class="['itsm-mobile-icon', serviceItem.favorite ? 'icon-favorite orange': 'icon-favorite-o']">
+                        :class="[
+                          'itsm-mobile-icon',
+                          serviceItem.favorite
+                            ? 'icon-favorite orange'
+                            : 'icon-favorite-o',
+                        ]"
+                      >
                       </i>
                     </span>
                   </li>
@@ -105,13 +140,21 @@
             class="result-item"
             v-for="service in serviceList.searchResultList"
             :key="service.id"
-            @click="onCreateTicket(service)">
+            @click="onCreateTicket(service)"
+          >
             <div class="favorite-icon">
               <span @click="onChangeFavorite(service)">
-                <i :class="['itsm-mobile-icon', service.favorite ? 'icon-favorite orange': 'icon-favorite-o']"></i>
+                <i
+                  :class="[
+                    'itsm-mobile-icon',
+                    service.favorite
+                      ? 'icon-favorite orange'
+                      : 'icon-favorite-o',
+                  ]"
+                ></i>
               </span>
             </div>
-            <div class="name" v-html="service.highlightName"></div>
+            <div class="name" v-html="$xss(service.highlightName)"></div>
             <div class="category">{{ service.key }}</div>
           </li>
         </ul>
@@ -125,47 +168,47 @@
 </template>
 
 <script lang="ts">
-import { ref, Ref, reactive, onMounted } from 'vue'
-import { useStore } from 'vuex'
-import { useRouter } from 'vue-router'
-import { ITicketService } from '../../typings/ticket'
+import { ref, Ref, reactive, onMounted } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+import { ITicketService } from "../../typings/ticket";
 
 interface IState {
-  searchResultList: Array<ITicketService>,
-  favoriteList: Array<ITicketService>,
-  latestList: Array<ITicketService>,
-  allList: Array<ITicketService>,
-  initList: Array<ITicketService>
+  searchResultList: Array<ITicketService>;
+  favoriteList: Array<ITicketService>;
+  latestList: Array<ITicketService>;
+  allList: Array<ITicketService>;
+  initList: Array<ITicketService>;
 }
 interface LState {
-  list: Array<any>
-  loading: boolean,
-  finished: boolean,
+  list: Array<any>;
+  loading: boolean;
+  finished: boolean;
   pagination: {
-    page: number,
-    totalPage: number,
-    count: number
-  }
+    page: number;
+    totalPage: number;
+    count: number;
+  };
 }
 export default {
-  name: 'Service',
+  name: "Service",
   props: {},
   emits: {},
   setup() {
-    const store = useStore()
-    const router = useRouter()
-    const refreshing = ref(false)
-    const searchFocus: Ref<boolean> = ref(false)
-    const commonlyLoading: Ref<boolean> = ref(true)
-    const allLoading: Ref<boolean> = ref(true)
-    const serviceSearchStr: Ref<string> = ref('')
+    const store = useStore();
+    const router = useRouter();
+    const refreshing = ref(false);
+    const searchFocus: Ref<boolean> = ref(false);
+    const commonlyLoading: Ref<boolean> = ref(true);
+    const allLoading: Ref<boolean> = ref(true);
+    const serviceSearchStr: Ref<string> = ref("");
     const serviceList = reactive<IState>({
       searchResultList: [],
       favoriteList: [],
       latestList: [], // 最近一个月使用服务
       allList: [],
-      initList: []
-    })
+      initList: [],
+    });
     const listState = reactive<LState>({
       list: [],
       loading: false,
@@ -173,93 +216,114 @@ export default {
       pagination: {
         page: 1,
         totalPage: 1,
-        count: 40
-      }
-    })
+        count: 40,
+      },
+    });
     const onload = () => {
-      listState.pagination.page += 1
-      listState.finished = listState.pagination.page === listState.pagination.totalPage
-      const begin = (listState.pagination.page - 1) * listState.pagination.count
-      const end = listState.pagination.page * listState.pagination.count
-      const list = serviceList.initList.slice(begin, end)
-      serviceList.allList = [...serviceList.allList, ...list]
-      listState.loading = false
-    }
+      listState.pagination.page += 1;
+      listState.finished =
+        listState.pagination.page === listState.pagination.totalPage;
+      const begin =
+        (listState.pagination.page - 1) * listState.pagination.count;
+      const end = listState.pagination.page * listState.pagination.count;
+      const list = serviceList.initList.slice(begin, end);
+      serviceList.allList = [...serviceList.allList, ...list];
+      listState.loading = false;
+    };
     const onchange = (str: string): void => {
       if (str) {
-        searchFocus.value = true
-        const list: Array<any> = []
-        const reg = new RegExp(str, 'i')
-        serviceList.initList.forEach(item => {
+        searchFocus.value = true;
+        const list: Array<any> = [];
+        const reg = new RegExp(str, "i");
+        serviceList.initList.forEach((item) => {
           if (reg.test(item.name) && list.length < 6) {
-            const highlightName = item.name.replace(reg, `<span style="color: #3a84ff;">${str}</span>`)
-            list.push(Object.assign({}, item, { highlightName }))
+            const highlightName = item.name.replace(
+              reg,
+              `<span style="color: #3a84ff;">${str}</span>`
+            );
+            list.push(Object.assign({}, item, { highlightName }));
           }
-        })
-        serviceList.searchResultList = list.sort((a: any, b: any) => a.name.length - b.name.length)
+        });
+        serviceList.searchResultList = list.sort(
+          (a: any, b: any) => a.name.length - b.name.length
+        );
       } else {
-        searchFocus.value = false
-        serviceList.searchResultList = []
+        searchFocus.value = false;
+        serviceList.searchResultList = [];
       }
-    }
+    };
     const onCreateTicket = (service: any): void => {
       router.push({
-        name: 'createTicket',
+        name: "createTicket",
         query: {
-          serviceId: service.id
-        }
-      })
-    }
+          serviceId: service.id,
+        },
+      });
+    };
     const onChangeFavorite = (service: any): void => {
-      store.dispatch('toggleServiceFavorite', {
-        id: service.id,
-        favorite: !service.favorite
-      }).then(res => {
-        if (res.result) {
-          // 同步所有服务favorite状态
-          service.favorite = !service.favorite
-          const serviceItem = serviceList.initList.find(item => item.id === service.id)
-          serviceItem.favorite = service.favorite
-          getService()
-        }
-      })
-    }
+      store
+        .dispatch("toggleServiceFavorite", {
+          id: service.id,
+          favorite: !service.favorite,
+        })
+        .then((res) => {
+          if (res.result) {
+            // 同步所有服务favorite状态
+            service.favorite = !service.favorite;
+            const serviceItem = serviceList.initList.find(
+              (item) => item.id === service.id
+            );
+            serviceItem.favorite = service.favorite;
+            getService();
+          }
+        });
+    };
     const getService = (): void => {
-      commonlyLoading.value = true
+      commonlyLoading.value = true;
       Promise.all([
-        store.dispatch('getServiceFavorites'),
-        store.dispatch('getRecentFavorites')
-      ]).then(res => {
-        serviceList.favoriteList = res[0]
-        serviceList.latestList = res[1]
-      }).catch(e => {
-        console.log(e)
-      }).finally(() => {
-        commonlyLoading.value = false
-      })
-    }
+        store.dispatch("getServiceFavorites"),
+        store.dispatch("getRecentFavorites"),
+      ])
+        .then((res) => {
+          serviceList.favoriteList = res[0];
+          serviceList.latestList = res[1];
+        })
+        .catch((e) => {
+          console.log(e);
+        })
+        .finally(() => {
+          commonlyLoading.value = false;
+        });
+    };
     const getAllService = async () => {
-      allLoading.value = true
-      const res = await store.dispatch('getServiceList')
-      serviceList.initList = res.sort((a: any, b: any) => b.favorite - a.favorite)
-      serviceList.allList = serviceList.initList.slice(listState.pagination.page - 1, listState.pagination.count)
-      allLoading.value = false
-      refreshing.value = false
-      listState.pagination.totalPage = Math.ceil(serviceList.initList.length / 40)
-    }
+      allLoading.value = true;
+      const res = await store.dispatch("getServiceList");
+      serviceList.initList = res.sort(
+        (a: any, b: any) => b.favorite - a.favorite
+      );
+      serviceList.allList = serviceList.initList.slice(
+        listState.pagination.page - 1,
+        listState.pagination.count
+      );
+      allLoading.value = false;
+      refreshing.value = false;
+      listState.pagination.totalPage = Math.ceil(
+        serviceList.initList.length / 40
+      );
+    };
     const onRefresh = (): void => {
       listState.pagination = {
         page: 1,
         totalPage: 1,
-        count: 40
-      }
-      getService()
-      getAllService()
-    }
+        count: 40,
+      };
+      getService();
+      getAllService();
+    };
     onMounted(() => {
-      getService()
-      getAllService()
-    })
+      getService();
+      getAllService();
+    });
     return {
       serviceSearchStr,
       serviceList,
@@ -273,10 +337,10 @@ export default {
       onload,
       getService,
       onCreateTicket,
-      onChangeFavorite
-    }
-  }
-}
+      onChangeFavorite,
+    };
+  },
+};
 </script>
 
 <style lang="postcss" scoped>
@@ -388,7 +452,7 @@ export default {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: rgba(105,157,244,0.8);
+  background: rgba(105, 157, 244, 0.8);
   i {
     color: #ffffff;
     font-size: 40px;

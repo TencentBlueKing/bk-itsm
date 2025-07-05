@@ -24,59 +24,63 @@
   <not-support v-if="!isViewMode" :item="item" />
   <p v-else class="common-view-field">
     <label class="view-label">{{ item.name }}</label>
-    <span v-if="item.value" class="view-value richtext-ui" v-html="item.value" />
+    <span
+      v-if="item.value"
+      class="view-value richtext-ui"
+      v-html="$xss(item.value)"
+    />
     <span v-else class="view-value">--</span>
   </p>
 </template>
 <script lang="ts">
-import { defineComponent, toRefs, computed } from 'vue'
-import NotSupport from '../notSupport.vue'
+import { defineComponent, toRefs, computed } from "vue";
+import NotSupport from "../notSupport.vue";
 
 export default defineComponent({
-  name: 'FieldRichtext',
+  name: "FieldRichtext",
   components: {
-    NotSupport
+    NotSupport,
   },
   props: {
     item: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     isViewMode: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   setup(props) {
-    const { item } =  toRefs(props)
+    const { item } = toRefs(props);
 
-    const isRequire = computed(() => item.value.validate_type === 'REQUIRE')
+    const isRequire = computed(() => item.value.validate_type === "REQUIRE");
     // 校验规则
     const validate = (): boolean => {
       if (isRequire.value && !item.value.value) {
-        return false
+        return false;
       }
-      return true
-    }
+      return true;
+    };
 
     return {
       // eslint-disable-next-line vue/no-dupe-keys
       item,
-      validate
-    }
-  }
-})
+      validate,
+    };
+  },
+});
 </script>
 <style lang="postcss">
-  .view-value.richtext-ui {
+.view-value.richtext-ui {
+  width: 100%;
+  overflow: auto;
+  > * {
+    width: 100%;
+    word-break: break-all;
+    img {
       width: 100%;
-      overflow: auto;
-      > * {
-          width: 100%;
-          word-break: break-all;
-          img {
-            width: 100%;
-          }
-      }
+    }
   }
+}
 </style>
