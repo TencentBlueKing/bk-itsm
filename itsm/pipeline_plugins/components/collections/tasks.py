@@ -49,7 +49,7 @@ def auto_approve(node_status_id, creator, activity_id, callback_data):
         activity_callback(activity_id, callback_data)
 
 
-@task
+@shared_task
 def auto_approve_by_approved_user(
     node_status_id, processor, activity_id, callback_data
 ):
