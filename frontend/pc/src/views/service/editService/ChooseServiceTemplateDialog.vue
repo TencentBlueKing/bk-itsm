@@ -48,7 +48,7 @@
             :key="index"
             :data-test-id="`serviceTemplateList-li-${template.id}`"
             @click="onTemplateClick(template)">
-            <p class="template-name" v-html="template.name"></p>
+            <p class="template-name" v-dompurify-html="template.name"></p>
             <p class="template-time" v-if="createWay === 'recom'">{{ template.time }}</p>
           </li>
         </ul>
