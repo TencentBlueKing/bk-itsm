@@ -636,6 +636,17 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
             workflow = self.update_workflow_configs(workflow_id, workflow_config)
             configs["workflow_id"] = workflow.create_version().id
             service.update_service_configs(configs)
+            states_info = service.workflow.states
+            error_message = []
+            for state_id, state_info in states_info.items():
+                if state_info["processors_type"] in ["CMDB", "GENERAL"]:
+                    if state_info["processors"] == "":
+                        error_message.append(
+                            f"【{state_info['name']}】节点的处理人不能为空"
+                        )
+
+            if error_message:
+                raise ParamError(_("\n".join(error_message)))
         context = self.get_serializer_context()
         return Response(self.serializer_class(instance=service, context=context).data)
 
@@ -690,6 +701,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
             )
         ServiceImportSerializer(data=data).is_valid(raise_exception=True)
         catalog_id = request.data.get("catalog_id")
+        data["is_valid"] = False
         service = Service.objects.clone(
             data, request.user.username, catalog_id=catalog_id
         )

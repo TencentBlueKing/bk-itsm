@@ -30,8 +30,8 @@ import jsonfield
 
 from django.db import models
 from django.utils.translation import gettext as _
-from mako.template import Template
 
+from common.template.template import Template
 from itsm.component.utils.client_backend_query import get_bk_users
 from itsm.component.constants import (
     SYS,

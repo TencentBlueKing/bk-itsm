@@ -26,6 +26,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import json
 import os
 
+import jmespath
 import jsonfield
 import jsonschema
 from django.conf import settings
@@ -509,17 +510,9 @@ class RemoteApiInstance(Model):
         try:
             data = []
             for item in rsp_data:
-                exec(
-                    "key = unbunchify(bunchify(item).{key})".format(
-                        key=kv_relation["key"]
-                    )
-                )
-                exec(
-                    "name = unbunchify(bunchify(item).{name})".format(
-                        name=kv_relation["name"]
-                    )
-                )
-                data.append({"key": locals()["key"], "name": locals()["name"]})
+                key = jmespath.search(kv_relation["key"], item)
+                name = jmespath.search(kv_relation["name"], item)
+                data.append({"key": key, "name": name})
             return {
                 "result": True,
                 "code": ResponseCodeStatus.OK,

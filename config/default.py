@@ -808,6 +808,9 @@ TAM_PROJECT_ID = os.environ.get("TAM_PROJECT_ID", "")
 # 是否初始化蓝盾
 INIT_DEVOPS_TEMPLATE = os.environ.get("INIT_DEVOPS_TEMPLATE", False)
 
+# 是否显示蓝盾节点
+BKAPP_CI_ENABLED = os.environ.get("BKAPP_CI_ENABLED", "") == "1"
+
 # 权限中心 SaaS host
 BK_IAM_APP_CODE = os.getenv("BK_IAM_V3_APP_CODE", "bk_iam")
 BK_IAM_SAAS_HOST = os.environ.get(
@@ -962,7 +965,6 @@ ENABLE_NOTIFY_ROUTER = os.getenv("BKAPP_ENABLE_NOTIFY_ROUTER", False)
 NOTIFY_ROUTER_NAME = os.getenv("BKAPP_NOTIFY_ROUTER_NAME", "router")
 
 IAM_SDK_CLIENT_TIMEOUT = int(os.getenv("BKAPP_IAM_SDK_CLIENT_TIMEOUT", 20))
-
 
 # 公共配置
 BK_SHARED_RES_URL = os.getenv("BKPAAS_SHARED_RES_URL") or os.getenv(

@@ -29,8 +29,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
 from rest_framework.fields import empty
 
-from mako.template import Template
-
+from common.template.template import Template
 from itsm.component.constants import (
     EMPTY_STRING,
     LEN_LONG,

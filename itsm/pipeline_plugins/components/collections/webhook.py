@@ -29,7 +29,7 @@ import logging
 import jmespath
 import requests
 from django.conf import settings
-from jinja2 import Template
+from jinja2.sandbox import SandboxedEnvironment as Environment
 from pipeline.utils.boolrule import BoolRule
 from pipeline.component_framework.component import Component
 from django.utils.translation import gettext as _
@@ -61,7 +61,7 @@ class ParamsBuilder:
         :return:
         """
         if isinstance(template_value, str):
-            return Template(template_value).render(self.variables)
+            return Environment().from_string(template_value).render(self.variables)
         if isinstance(template_value, dict):
             render_value = {}
             for key, value in template_value.items():

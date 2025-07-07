@@ -376,18 +376,18 @@ class UserRole(ObjectManagerMixin, Model):
                 role_ids = [role_id for role_id in str(users).split(",") if role_id]
                 roles = roles.filter(id__in=role_ids)
 
-            if user_type == "CMDB":
-                if bk_biz_id == DEFAULT_BK_BIZ_ID:
-                    return []
+                if user_type == "CMDB":
+                    if bk_biz_id == DEFAULT_BK_BIZ_ID:
+                        return []
 
-                cmdb_users = get_bk_business(
-                    bk_biz_id, role_type=[role.role_key for role in roles]
-                )
-                return list_by_separator(cmdb_users)
+                    cmdb_users = get_bk_business(
+                        bk_biz_id, role_type=[role.role_key for role in roles]
+                    )
+                    return list_by_separator(cmdb_users)
 
-            if user_type == "GENERAL":
-                general_users = ",".join([role.members for role in roles])
-                return list_by_separator(general_users)
+                if user_type == "GENERAL":
+                    general_users = ",".join([role.members for role in roles])
+                    return list_by_separator(general_users)
 
         if user_type in ["PERSON", "EMPTY", "VARIABLE"] and users:
             return list_by_separator(users)
@@ -405,6 +405,7 @@ class UserRole(ObjectManagerMixin, Model):
         if user_type == "ASSIGN_LEADER":
             if ticket is not None:
                 # 获取节点处理人的leader
+                # 这种情况传参过来的pros是一个state_id
                 status = ticket.node_status.get(state_id=int(users))
                 return get_user_leader(status.processed_user)
 

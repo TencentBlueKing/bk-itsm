@@ -1,6 +1,22 @@
 # Changelog
-## [Version: 2.8.1] - 2025-06-27
+## [Version: 2.8.1] - 2025-07-07
 【Feature】Upgraded version dependencies: Python 3.11 and Django 4.2 
+## [Version: 2.7.8] - 2025-07-06
+[Fix] Resolved execution issues with the exec command  
+[Fix] Fixed abnormal execution behavior of branch gateways when handling numeric data type  
+
+## [Version: 2.7.7] - 2025-07-05
+【Fix】Resolved the Mako rendering issue  
+
+## [Version: 2.7.6] - 2025-04-18
+【Feature】Use environment variables to configure whether to enable the blue shield node.  
+【Feature】Add new API endpoint `get_ticket_event_logs` for retrieving ticket event logs.  
+【Feature】Add new API endpoint `get_tickets_processors` for retrieving tickets current processors.  
+【Improved】Display complete errors.    
+【Fix】The issue of error reporting on the "Current Processors" interface of the ticket list page.  
+【Fix】Resolved error in get SOPS node logs.  
+【Fix】Resolved error when required fields with default values were not provided during ticket creation via API.  
+【Fix】Fix DevOps node configuration does not fill the form issue.
 
 ## [Version: 2.7.5] - 2025-03-04
 【Improved】Optimize the issue of OpenAPI returning an error when extra fields are passed during ticket creation.  

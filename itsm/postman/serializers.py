@@ -26,10 +26,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import json
 
 from django.utils.translation import gettext as _
-from mako.template import Template
 from rest_framework import serializers
 from rest_framework.fields import JSONField
 
+from common.template.template import Template
 from itsm.component.constants import (
     LEN_LONG,
     LEN_NORMAL,

@@ -30,9 +30,9 @@ import datetime
 import re
 from django.utils.translation import gettext as _
 from django.core.exceptions import ValidationError
-from mako.template import Template
 
 from common.log import logger
+from common.template.template import Template
 from itsm.role.models import UserRole
 from itsm.postman.models import RemoteApi
 from itsm.component.constants import (

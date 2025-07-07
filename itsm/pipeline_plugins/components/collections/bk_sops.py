@@ -248,6 +248,8 @@ class BkOpsService(ItsmBaseService):
 
     def schedule(self, data, parent_data, callback_data=None):
 
+        error_message_template = "标准运维任务【{name}】schedule 执行失败，失败信息 {detail_message}"
+
         sops_task_id = data.outputs.get("sops_task_id", None)
         logger.info(
             "[bk_sops_schedule] start query task status, task_id = {}".format(
@@ -279,7 +281,7 @@ class BkOpsService(ItsmBaseService):
                 sops_result=sops_result,
                 error=error_message,
                 processors=processors,
-                error_message_template=error_message,
+                error_message_template=error_message_template,
                 ticket=ticket,
                 state_id=state_id,
             )
@@ -300,7 +302,7 @@ class BkOpsService(ItsmBaseService):
                 sops_result=sops_result,
                 error=str(error),
                 processors=processors,
-                error_message_template=str(error),
+                error_message_template=error_message_template,
                 ticket=ticket,
                 state_id=state_id,
             )
@@ -315,7 +317,7 @@ class BkOpsService(ItsmBaseService):
                 sops_result=sops_result,
                 error=error_message,
                 processors=processors,
-                error_message_template=error_message,
+                error_message_template=error_message_template,
                 ticket=ticket,
                 state_id=state_id,
             )
@@ -350,7 +352,7 @@ class BkOpsService(ItsmBaseService):
                 sops_result=sops_result,
                 error=error_message,
                 processors=processors,
-                error_message_template=error_message,
+                error_message_template=error_message_template,
                 ticket=ticket,
                 state_id=state_id,
             )

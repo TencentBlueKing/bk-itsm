@@ -1202,9 +1202,8 @@ class Status(Model):
         processed = self.ticket.logs.filter(from_state_id=self.state_id).values_list(
             "operator", flat=True
         )
-        return ",".join(
-            set(self.processors.strip(",").split(",")) & set(list(processed))
-        )
+        processors = self.get_processors()
+        return ",".join(set(processors) & set(list(processed)))
 
     # ======================================= SLA功能接口 =====================================
 
@@ -1900,6 +1899,8 @@ class Ticket(Model, BaseTicket):
                     for department in departments
                 }
             elif processors_type in ["CMDB", "GENERAL"]:
+                # 去掉""值
+                processors = [processor for processor in processors if processor]
                 processors_info = UserRole.get_role_name(
                     processors_type, list(set(processors))
                 )
@@ -1914,6 +1915,12 @@ class Ticket(Model, BaseTicket):
             if status.action_type == SYSTEM_OPERATE:
                 continue
             for processor in status.processors.strip(",").split(","):
+                # 如果处理人为"",将处理人的名称设置为"当前节点无处理人"
+                if processor == "":
+                    current_processors.setdefault(status.ticket_id, []).append(
+                        "当前节点无处理人"
+                    )
+                    continue
                 real_processor = instantiated_processors[status.processors_type].get(
                     processor, processor
                 )
@@ -3245,6 +3252,7 @@ class Ticket(Model, BaseTicket):
                 return leaders, PERSON
 
             if pros_type == ASSIGN_LEADER:
+                # 这种情况传参过来的pros是一个state_id
                 obj = Status.objects.get(ticket_id=ticket.id, state_id=int(pros))
                 leaders = get_user_leader(obj.processed_user)
                 leaders = dotted_name(",".join(leaders)) if leaders else ""

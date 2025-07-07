@@ -32,8 +32,8 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.translation import gettext as _, get_language
 from django.views.decorators.http import require_GET
-from mako.template import Template
 
+from common.template.template import Template
 from itsm.iadmin.contants import NOTICE_CENTER_SWITCH
 from itsm.iadmin.models import SystemSettings
 from itsm.project.models import UserProjectAccessRecord
@@ -151,6 +151,7 @@ def index(request):
             "BK_PLATFORM_NAME": settings.BK_PLATFORM_NAME,
             "VERSION": version,
             "BKAPP_CSRF_COOKIE_NAME": settings.CSRF_COOKIE_NAME,
+            "BKAPP_CI_ENABLED": settings.BKAPP_CI_ENABLED,
         },
     )
 

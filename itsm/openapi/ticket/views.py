@@ -91,8 +91,9 @@ from itsm.ticket.models import (
     SignTask,
     TicketComment,
     Status,
+    TicketEventLog,
 )
-from itsm.ticket.serializers import TicketList, TicketSerializer
+from itsm.ticket.serializers import TicketList, TicketSerializer, EventSerializer
 from itsm.ticket.validators import (
     terminate_validate,
     withdraw_validate,
@@ -287,6 +288,43 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             serializer_class = TicketComplexLogsSerializer
 
         return Response(serializer_class(ticket).data)
+
+    @action(detail=False, methods=["get"])
+    @custom_apigw_required
+    def get_ticket_event_logs(self, request):
+        """
+        获取单据web日志
+        """
+
+        try:
+            ticket = self.queryset.get(id=request.query_params.get("ticket"))
+        except Ticket.DoesNotExist:
+            return Response(
+                {
+                    "result": False,
+                    "code": TicketNotFoundError.ERROR_CODE_INT,
+                    "data": None,
+                    "message": TicketNotFoundError.MESSAGE,
+                }
+            )
+        queryset = TicketEventLog.objects.filter(ticket=ticket)
+        serializer = EventSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=["get"])
+    @custom_apigw_required
+    def get_tickets_processors(self, request):
+        """
+        获取多个单据的当前处理人，和web页面的tickets_processors接口一直
+        """
+        ticket_ids = request.query_params.get("ids", "").split(",")
+        processors = Ticket.get_ticket_current_processors(ticket_ids)
+        return Response(
+            {
+                ticket_id: ",".join(processors.get(int(ticket_id), []))
+                for ticket_id in ticket_ids
+            }
+        )
 
     @action(detail=False, methods=["post"], serializer_class=TicketApproveSerializer)
     @catch_openapi_exception

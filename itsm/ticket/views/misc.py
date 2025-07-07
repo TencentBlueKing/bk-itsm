@@ -26,12 +26,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.conf import settings
 from django.utils.translation import gettext as _
-from mako.template import Template
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from common.log import logger
+from common.template.template import Template
 from itsm.component.constants import FOLLOW_OPERATE
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.exceptions import ComponentCallError

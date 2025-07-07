@@ -26,9 +26,10 @@ import copy
 import json
 import re
 
-from django.utils.translation import gettext as _
-from mako.template import Template
 
+from django.utils.translation import gettext as _
+
+from common.template.template import Template
 from itsm.component.exceptions import ParamError
 from itsm.component.utils.bk_bunch import bunchify
 from pipeline.utils.boolrule import BoolRule

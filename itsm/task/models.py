@@ -35,8 +35,9 @@ from django.db.models import Q
 from django.db import models, transaction
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
-from mako.template import Template
 from bulk_update.helper import bulk_update
+
+from common.template.template import Template
 from pipeline.engine import api as pipeline_api
 from itsm.component.esb.esbclient import client_backend, backend_client, client
 

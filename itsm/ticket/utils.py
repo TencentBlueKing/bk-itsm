@@ -31,9 +31,9 @@ import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
-from mako.template import Template
 
 from common.log import logger
+from common.template.template import Template
 from itsm.component.constants import GENERAL_NOTICE
 from itsm.component.exceptions import GetCustomApiDataError
 from itsm.component.utils.misc import transform_single_username
@@ -156,13 +156,13 @@ def get_custom_api_data(field):
                   "name": "bk_biz_name"
                 }
     """
-    from jinja2 import Template
+    from jinja2.sandbox import SandboxedEnvironment as Environment
 
     config = field.meta.get("api_config", {})
     kv_relation = field.kv_relation
     envs = field.ticket.meta.get("envs", {})
     method = config.get("method", "GET")
-    url = Template(config.get("url", "")).render(envs)
+    url = Environment().from_string(config.get("url", "")).render(envs)
     query_params = config.get("query_params", {})
     headers = config.get("headers", {})
     body = config.get("body", {})
