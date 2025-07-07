@@ -1,6 +1,6 @@
 <!--
   - Tencent is pleased to support the open source community by making BK-ITSM 蓝鲸流程服务 available.
-  - Copyright (C) 2021 THL A29 Limited, a Tencent company.  All rights reserved.
+  - Copyright (C) 2025 Tencent.  All rights reserved.
   - BK-ITSM 蓝鲸流程服务 is licensed under the MIT License.
   -
   - License for BK-ITSM 蓝鲸流程服务:
@@ -238,7 +238,7 @@
           const currContentOffsetTop = document.querySelector(`.bk-content-node.state_id_${this.nodeInfo.state_id}`).offsetTop;
           document.body.querySelector('.ticket-container-left').scrollTo({ top: currStepOffsetTop + currContentOffsetTop - 70 });
         });
-                
+
         // 进入处理界面，添加滚动监听，按钮悬浮在内容上
         // this.handleContentScroll = debounce(this.contentScroll, 30)
         // document.querySelector('.ticket-container-left').addEventListener('scroll', this.handleContentScroll, false)
