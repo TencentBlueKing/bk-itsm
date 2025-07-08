@@ -343,8 +343,9 @@ class TaskFieldViewSet(component_viewsets.ModelViewSet):
             {field["id"]: field for field in serializer.validated_data["fields"]}
         )
         ordering = "FIELD(`id`, {})".format(
-            ",".join(["'{}'".format(field_id) for field_id in fields.keys()])
+            ",".join(["'{}'".format(int(field_id)) for field_id in fields.keys()])
         )
+
         task_fields = TaskField.objects.filter(id__in=fields.keys()).extra(
             select={"custom_order": ordering}, order_by=["custom_order"]
         )

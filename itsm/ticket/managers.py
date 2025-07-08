@@ -324,11 +324,11 @@ class TicketManager(Manager):
                 ids.append(value["id"])
 
         clauses = " ".join(
-            ["WHEN id={} THEN {}".format(pk, i) for i, pk in enumerate(ids)]
+            ["WHEN id={} THEN {}".format(int(pk), int(i)) for i, pk in enumerate(ids)]
         )
         ordering = "CASE %s END" % clauses
 
-        queryset = queryset.filter(id__in=ids).extra(
+        queryset = queryset.filter(id__in=ids).extra(  # review
             select={"ordering": ordering}, order_by=("ordering",)
         )
 

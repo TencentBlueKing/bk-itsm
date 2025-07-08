@@ -153,9 +153,11 @@ class TicketStatusViewSet(ModelViewSet):
 
         # 按照自定义顺序获取工单状态
         ordering = "FIELD(`id`, {})".format(
-            ",".join(["'{}'".format(v) for v in ticket_status_ids])
+            ",".join(["'{}'".format(int(v)) for v in ticket_status_ids])
         )
-        ticket_status = TicketStatus.objects.status_of_service_type(service_type).extra(
+        ticket_status = TicketStatus.objects.status_of_service_type(
+            service_type
+        ).extra(  # review
             select={"ordering": ordering}, order_by=["ordering"]
         )
 

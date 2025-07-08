@@ -1107,7 +1107,7 @@ class Status(Model):
 
         clauses = " ".join(
             [
-                "WHEN workflow_field_id=%s THEN %s" % (pk, index)
+                "WHEN workflow_field_id=%s THEN %s" % (int(pk), int(index))
                 for index, pk in enumerate(workflow_field_order)
             ]
         )
@@ -1123,7 +1123,7 @@ class Status(Model):
         fields = (
             self.ticket.fields.filter(filter_experssion)
             .exclude(source=BASE_MODEL)
-            .extra(
+            .extra(  # review
                 select={"ordering": ordering},
                 order_by=(
                     "ordering",
@@ -4762,7 +4762,7 @@ class Ticket(Model, BaseTicket):
         info = (
             cls.objects.filter(project_query)
             .filter(**time_range)
-            .extra(select={"date_str": data_str})
+            .extra(select={"date_str": data_str})  # review
             .values("date_str")
             .annotate(count=Count("creator", distinct=True))
             .order_by("date_str")
@@ -4779,7 +4779,7 @@ class Ticket(Model, BaseTicket):
         info = (
             cls.objects.filter(project_query)
             .filter(**data)
-            .extra(select={"date_str": data_str})
+            .extra(select={"date_str": data_str})  # review
             .values("date_str")
             .annotate(count=Count("id"))
             .order_by("date_str")
@@ -4797,7 +4797,7 @@ class Ticket(Model, BaseTicket):
             cls.objects.filter(project_query)
             .filter(**data)
             .filter(bk_biz_id__gt=-1)
-            .extra(select={"date_str": data_str})
+            .extra(select={"date_str": data_str})  # review
             .values("date_str")
             .annotate(count=Count("bk_biz_id", distinct=True))
             .order_by("date_str")

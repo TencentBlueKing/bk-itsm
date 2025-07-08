@@ -31,7 +31,7 @@ from ...service.models import ServiceCategory
 
 
 class ServiceTypeResourceProvider(ItsmResourceProvider):
-    queryset = ServiceCategory.objects.filter(key__in=SERVICE_LIST).extra(
+    queryset = ServiceCategory.objects.filter(key__in=SERVICE_LIST).extra(  # reviewed
         select={'ordering': "FIELD(`key`, 'request', 'change', 'event', 'question')"},
         order_by=('ordering',)
     )

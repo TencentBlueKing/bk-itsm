@@ -145,6 +145,7 @@ if USE_IAM:
         "iam.contrib.iam_migration",
         "itsm.auth_iam",
     )
+IAM_SKIP_AUTH = False
 
 # 这里是默认的中间件，大部分情况下，不需要改动
 # 如果你已经了解每个默认 MIDDLEWARE 的作用，确实需要去掉某些 MIDDLEWARE，或者改动先后顺序，请去掉下面的注释，然后修改
@@ -343,7 +344,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_FILTER_BACKENDS": (
-        "itsm.component.drf.filters.OrderingFilter",
+        "rest_framework.filters.OrderingFilter",
         "django_filters.rest_framework.DjangoFilterBackend",
     ),
     "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",

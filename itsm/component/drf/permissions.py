@@ -39,6 +39,7 @@ from itsm.component.exceptions import ProjectNotFound
 from itsm.project.models import Project
 from itsm.role.models import UserRole
 from itsm.workflow.models import TemplateField
+from pipeline.conf import settings
 
 
 class IsAdmin(permissions.BasePermission):
@@ -133,6 +134,8 @@ class IamAuthPermit(permissions.BasePermission):
         return apply_actions
 
     def iam_auth(self, request, apply_actions, obj=None):
+        if settings.IAM_SKIP_AUTH:
+            return True
 
         resources = []
         if obj:
@@ -208,6 +211,9 @@ class IamAuthPermit(permissions.BasePermission):
         )
 
     def iam_create_auth(self, request, apply_actions):
+        if settings.IAM_SKIP_AUTH:
+            return True
+
         resources = []
         project_key = request.data["project_key"]
         project = self.get_project(project_key)

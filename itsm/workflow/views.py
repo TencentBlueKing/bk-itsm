@@ -674,7 +674,7 @@ class FieldViewSet(BaseFieldViewSet):
         if state_id:
             valid_fields = State.objects.fields_of_state(state_id)
             ordering = "FIELD(`id`, {})".format(
-                ",".join(["'{}'".format(v) for v in valid_fields])
+                ",".join(["'{}'".format(int(v)) for v in valid_fields])
             )
             queryset = queryset.filter(id__in=valid_fields).extra(
                 select={"ordering": ordering}, order_by=["ordering"]
@@ -1123,17 +1123,18 @@ class TaskSchemaViewSet(DynamicListModelMixin, component_viewsets.ModelViewSet):
                     _("任务字段排序参数不合法，请联系管理员")
                 )
 
-            ordering = "FIELD(`id`, {})".format(
-                ",".join(
-                    [
-                        "'{}'".format(task_field_id)
-                        for task_field_id in task_fields["task_field_ids"]
-                    ]
-                )
+            task_field_ids = [int(i) for i in task_fields["task_field_ids"]]
+            ordering_tpl = "FIELD(`id`, {})".format(
+                ",".join(["%s"] * len(task_field_ids))
             )
+
             task_fields_schema = TaskFieldSchema.objects.filter(
                 task_schema_id=instance.id, stage=task_fields.get("stage")
-            ).extra(select={"custom_order": ordering}, order_by=["custom_order"])
+            ).extra(
+                select={"custom_order": ordering_tpl},
+                select_params=task_field_ids,
+                order_by=["custom_order"],
+            )  # modify
 
             for index, task_field_schema in enumerate(task_fields_schema):
                 task_field_schema.sequence = index
