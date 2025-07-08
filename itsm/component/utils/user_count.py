@@ -61,7 +61,7 @@ def get_user_statistics(time_delta, data):
     data_str = TIME_DELTA[time_delta].format(field_name="date_joined")
     info = (
         User.objects.filter(date_joined__range=(data["create_at__gte"], data["create_at__lte"]))
-        .extra(select={"date_str": data_str})
+        .extra(select={"date_str": data_str})   # reviewed
         .values("date_str")
         .annotate(count=Count("id"))
         .order_by("date_str")

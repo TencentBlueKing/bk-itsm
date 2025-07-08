@@ -470,10 +470,10 @@ class TableSerializer(AuthModelSerializer):
     def to_representation(self, instance):
         data = super(TableSerializer, self).to_representation(instance)
         ordering = "FIELD(`id`, %s)" % ",".join(
-            [str(field_id) for field_id in data["fields_order"]]
+            [str(int(field_id)) for field_id in data["fields_order"]]
         )
         data["fields"] = TemplateFieldSerializer(
-            TemplateField.objects.filter(id__in=data["fields"]).extra(
+            TemplateField.objects.filter(id__in=data["fields"]).extra(  # review
                 select={"ordering": ordering}, order_by=("ordering",)
             ),
             many=True,
@@ -510,10 +510,10 @@ class TableRetrieveSerializer(AuthModelSerializer):
             query_set = query_set.exclude(key=FIELD_BIZ)
 
         ordering = "FIELD(`id`, %s)" % ",".join(
-            [str(field_id) for field_id in instance.fields_order]
+            [str(int(field_id)) for field_id in instance.fields_order]
         )
         data["fields"] = TemplateFieldSerializer(
-            query_set.extra(select={"ordering": ordering}, order_by=("ordering",)),
+            query_set.extra(select={"ordering": ordering}, order_by=("ordering",)), # review
             many=True,
         ).data
         return data

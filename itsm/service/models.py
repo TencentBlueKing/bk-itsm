@@ -411,7 +411,7 @@ class Service(ObjectManagerMixin, Model):
         info = (
             cls.objects.filter(project_query)
             .filter(**data)
-            .extra(select={"date_str": data_str})
+            .extra(select={"date_str": data_str})   # reviewed
             .values("date_str")
             .annotate(count=Count("id"))
             .order_by("date_str")
