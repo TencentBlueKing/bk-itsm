@@ -310,7 +310,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         queryset = TicketEventLog.objects.filter(ticket=ticket)
         serializer = EventSerializer(queryset, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=["get"])
     @custom_apigw_required
     def get_tickets_processors(self, request):
@@ -630,6 +630,32 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
         fields = []
         remarked = False
+        if serializer.validated_data["submit_action"] == "ignore":
+            logger.info(
+                f'{serializer.validated_data["handler"]} ignore ticket_id: {ticket_id}, state_id:{state_id}'
+            )
+            with transaction.atomic():
+                TicketEventLog.objects.create_log(
+                    ticket=ticket,
+                    state_id=state_id,
+                    log_operator=serializer.validated_data["handler"],
+                    message="{operator} {action}【{name}】(忽略)",
+                    action="已处理",
+                    from_state_name=node_status.name,
+                    source=API,
+                )
+                SignTask.objects.create(
+                    status_id=node_status.id,
+                    processor=serializer.validated_data["handler"],
+                    status="FINISHED",
+                )
+                ticket_current_processors = ticket.current_processors
+                ticket_current_processors = ticket_current_processors.replace(
+                    f',{serializer.validated_data["handler"]},', ""
+                )
+                ticket.current_processors = ticket_current_processors
+                ticket.save()
+                return Response()
         for field in node_fields:
             if field.meta.get("code") == APPROVE_RESULT:
                 fields.append(

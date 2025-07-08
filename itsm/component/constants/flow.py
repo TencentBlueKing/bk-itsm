@@ -140,6 +140,7 @@ NODE_FAILED = "NODE_FAILED"
 # 单据审批意见标识别
 TONGYI = "true"
 JUJUE = "false"
+HULUE = "ignore"
 
 API_FAILED_CHOICES = [
     (RETRY, "重试"),
@@ -190,10 +191,7 @@ ALL_ACTION_CHOICES = [
     (DELIVER_OPERATE, "转单"),
 ]
 
-APPROVAL_CHOICES = [
-    (TONGYI, "同意"),
-    (JUJUE, "拒绝"),
-]
+APPROVAL_CHOICES = [(TONGYI, "同意"), (JUJUE, "拒绝"), (HULUE, "忽略")]
 
 ACTION_DICT = dict(ALL_ACTION_CHOICES)
 
