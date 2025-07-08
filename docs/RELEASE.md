@@ -1,6 +1,11 @@
 # Changelog
+
 ## [Version: 2.8.1] - 2025-07-07
 【新增】版本依赖升级python3.11、Django4.2
+
+## [Version: 2.7.9] - 2025-07-08
+【修复】修复v-html可能导致xss问题  
+【修复】修复extra导致 sql 注入的问题  
 
 ## [Version: 2.7.8] - 2025-07-06
 【修复】修复 exec 执行问题  
