@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 IEOD_MANAGER_RESPONSE = {
-    "results": {
+    "results": [{
         "id": 1,
         "username": "admin",
         "display_name": "admin",
@@ -34,11 +34,11 @@ IEOD_MANAGER_RESPONSE = {
         "domain": "xxxx",
         "category_id": 1,
         "time_zone": "Asia/Shanghai",
-    }
+    }]
 }
 
 OPEN_MANAGER_RESPONSE = {
-    "results": {
+    "results": [{
         "id": 2,
         "username": "admin",
         "display_name": "admin",
@@ -48,5 +48,5 @@ OPEN_MANAGER_RESPONSE = {
         "domain": "xxxx",
         "category_id": 1,
         "time_zone": "Asia/Shanghai",
-    }
+    }]
 }

@@ -40,7 +40,7 @@ from .test_params import (
     create_ticket_data,
     create_sops_task_data,
 )
-from ...service.models import CatalogService
+from itsm.service.models import CatalogService
 
 
 class SopsTaskTest(TestCase):

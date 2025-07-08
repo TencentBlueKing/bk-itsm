@@ -226,6 +226,6 @@ class PipelineTest(TestCase):
         
         auto_service = AutoStateService(name="itsm")
         auto_service._runtime_attrs = {"by_flow": 1}
-        result = auto_service.get_rsp_content(ticket, 2, {}, {}, {})
+        result = auto_service.get_rsp_content(ticket, 2, {}, "{}", {})
         self.assertEqual(result[0], False)
 

@@ -108,8 +108,6 @@ def index(request):
     ):
         BK_USER_MANAGE_HOST = FRONTEND_URL
 
-    logger.info("HTTP_REFERER={}".format(request.META.get("HTTP_REFERER", "")))
-
     try:
         notice_center_switch_value = SystemSettings.objects.get(
             key=NOTICE_CENTER_SWITCH

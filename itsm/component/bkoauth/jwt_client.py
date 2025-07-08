@@ -97,7 +97,7 @@ class JWTClient(object):
         若 Header 中不存在，或者解析失败，则使用默认值
         """
         jwt_resource = self.request.META.get(self.JWT_RESOURCE, "ESB")
-        logger.info("the api resource is {}".format(jwt_resource))
+        logger.info("the api resource is %s", jwt_resource)
         if jwt_resource == "APIGW":
             return settings.APIGW_PUBLIC_KEY
         else:
