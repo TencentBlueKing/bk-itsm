@@ -48,6 +48,8 @@ from itsm.component.constants import (
     APPROVE_RESULT,
     INVISIBLE,
     PROCESS_RUNNING,
+    ResponseCodeStatus,
+    FINISHED,
 )
 from itsm.component.decorators import custom_apigw_required
 from itsm.component.drf import viewsets as component_viewsets
@@ -97,6 +99,7 @@ from itsm.ticket.serializers import TicketList, TicketSerializer, EventSerialize
 from itsm.ticket.validators import (
     terminate_validate,
     withdraw_validate,
+    ticket_status_validate,
 )
 
 
@@ -325,6 +328,41 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
                 for ticket_id in ticket_ids
             }
         )
+
+    @action(detail=False, methods=["post"])
+    @custom_apigw_required
+    def ignore_state(self, request, *args, **kwargs):
+        """
+        失败的节点可以在此进行忽略
+        """
+        try:
+            ticket_id = request.data.get("ticket_id", "")
+            ticket = Ticket.objects.get(id=ticket_id)
+            state_id = str(request.data.get("state_id", ""))
+            ticket_status_validate(ticket, state_id)
+            operator = request.data.get("operator", "")
+
+            res = ticket.skip_node(state_id, operator=operator)
+            ticket.node_status.filter(state_id=state_id).update(status=FINISHED)
+
+            return Response(
+                {
+                    "code": ResponseCodeStatus.OK
+                    if res.result
+                    else ResponseCodeStatus.FAILED,
+                    "message": res.message,
+                    "result": res.result,
+                }
+            )
+        except Ticket.DoesNotExist:
+            return Response(
+                {
+                    "result": False,
+                    "code": TicketNotFoundError.ERROR_CODE_INT,
+                    "data": None,
+                    "message": TicketNotFoundError.MESSAGE,
+                }
+            )
 
     @action(detail=False, methods=["post"], serializer_class=TicketApproveSerializer)
     @catch_openapi_exception
