@@ -211,18 +211,6 @@ class TicketOrderingFilter(object):
 
         return ordering
 
-    @staticmethod
-    def priority_order(reverse, request):
-        """优先级自定义排序"""
-        priorities = SysDict.get_data_by_key(PRIORITY)
-        if reverse:
-            priorities.reverse()
-
-        ordering = "FIELD(`priority_key`, {})".format(
-            ",".join(["'{}'".format(priority["key"]) for priority in priorities])
-        )
-        return ordering
-
 
 class TicketModelViewSet(ModelViewSet):
     """工单序列化"""
@@ -230,7 +218,6 @@ class TicketModelViewSet(ModelViewSet):
     serializer_class = TicketSerializer
     queryset = Ticket.objects.all()
     permission_classes = (TicketPermissionValidate,)
-    ordering_class = TicketOrderingFilter
     filter_fields = {
         "service_type": ["exact", "in"],
         "creator": ["exact", "in"],
@@ -358,7 +345,7 @@ class TicketModelViewSet(ModelViewSet):
                     reverse, request
                 )
                 select = {"ordering": custom_ordering}
-                queryset = queryset.extra(select=select, order_by=(order_by,))
+                queryset = queryset.extra(select=select, order_by=(order_by,)) # review
 
         return queryset
 

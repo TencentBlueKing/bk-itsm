@@ -15,7 +15,7 @@ class WorkflowInitHandler:
 
         if self.instance.table:
             ordering = "FIELD(`id`, %s)" % ",".join(
-                [str(field_id) for field_id in self.instance.table.fields_order]
+                [str(int(field_id)) for field_id in self.instance.table.fields_order]
             )
             fields = TemplateField.objects.filter(
                 id__in=self.instance.table.fields_order, is_builtin=True
@@ -24,7 +24,7 @@ class WorkflowInitHandler:
             if not self.instance.is_biz_needed:
                 fields.exclude(key=FIELD_BIZ)
 
-            fields = fields.extra(select={"ordering": ordering}, order_by=("ordering",))
+            fields = fields.extra(select={"ordering": ordering}, order_by=("ordering",))   # review 
 
             try:
                 Field.objects.create_table_fields(self.instance, fields)

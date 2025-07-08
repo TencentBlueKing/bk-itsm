@@ -123,7 +123,7 @@ class FavoriteModelViewSet(component_viewsets.ModelViewSet):
 class CategoryModelViewSet(component_viewsets.ReadOnlyModelViewSet):
     serializer_class = ServiceCategorySerializer
 
-    queryset = ServiceCategory.objects.filter(key__in=SERVICE_LIST).extra(
+    queryset = ServiceCategory.objects.filter(key__in=SERVICE_LIST).extra( # review
         select={"ordering": "FIELD(`key`, 'request', 'change', 'event', 'question')"},
         order_by=("ordering",),
     )
@@ -223,10 +223,9 @@ class ServiceCatalogViewSet(component_viewsets.ModelViewSet):
         ).difference(set(new_order)):
             raise serializers.ValidationError(_("当前排序列表参数不正确，清重试！"))
         ordering = "FIELD(`id`, {})".format(
-            ",".join(["'{}'".format(v) for v in new_order])
+            ",".join(["'{}'".format(int(v)) for v in new_order])
         )
-
-        catalogs = self.queryset.filter(parent=instance.parent).extra(
+        catalogs = self.queryset.filter(parent=instance.parent).extra(  # review 
             select={"ordering": ordering}, order_by=["ordering"]
         )
         for order, obj in enumerate(catalogs):
@@ -329,10 +328,10 @@ class CatalogServiceViewSet(component_viewsets.ModelViewSet):
         ):
             raise serializers.ValidationError(_("当前排序列表参数不正确，清重试！"))
         ordering = "FIELD(`service_id`, {})".format(
-            ",".join(["'{}'".format(v) for v in new_order])
+            ",".join(["'{}'".format(int(v)) for v in new_order])
         )
 
-        catalog_services = catalog_service.extra(
+        catalog_services = catalog_service.extra( # review
             select={"ordering": ordering}, order_by=["ordering"]
         )
         for order, obj in enumerate(catalog_services):
