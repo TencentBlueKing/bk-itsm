@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from itsm.component.constants import (
@@ -33,7 +33,8 @@ from itsm.component.constants import (
     LEN_MIDDLE,
     LEN_NORMAL,
     LEN_XX_LONG,
-    WIKI_ADMIN_SUPERUSER_KEY, LEN_SHORT,
+    WIKI_ADMIN_SUPERUSER_KEY,
+    LEN_SHORT,
 )
 from itsm.component.drf.serializers import DynamicFieldsModelSerializer
 from itsm.component.utils.basic import dotted_name, list_by_separator, normal_name
@@ -49,8 +50,11 @@ class RoleTypeSerializer(serializers.ModelSerializer):
 
     id = serializers.IntegerField(required=False)
     type = serializers.CharField(required=True, max_length=LEN_NORMAL)
-    name = serializers.CharField(required=True, max_length=LEN_NORMAL,
-                                 error_messages={"blank": _("请输入角色名！")})
+    name = serializers.CharField(
+        required=True,
+        max_length=LEN_NORMAL,
+        error_messages={"blank": _("请输入角色名！")},
+    )
     desc = serializers.CharField(required=False, max_length=LEN_MIDDLE)
 
     class Meta:
@@ -69,26 +73,48 @@ class UserRoleSerializer(DynamicFieldsModelSerializer):
 
     id = serializers.IntegerField(required=False)
     role_type = serializers.CharField(required=True, max_length=LEN_NORMAL)
-    name = serializers.CharField(required=True, max_length=LEN_NORMAL,
-                                 error_messages={"blank": _("请输入自定义角色名")})
-    members = serializers.CharField(required=True, max_length=LEN_XX_LONG,
-                                    error_messages={"blank": _("请指定角色下的人员")})
-    owners = serializers.CharField(required=False, max_length=LEN_XX_LONG, allow_blank=True)
-    access = serializers.CharField(required=False, allow_null=True, allow_blank=True,
-                                   max_length=LEN_MIDDLE)
-    creator = serializers.CharField(required=False, allow_null=True, allow_blank=True,
-                                    max_length=LEN_NORMAL)
-    role_key = serializers.CharField(required=False, allow_null=True, allow_blank=True,
-                                     max_length=LEN_MIDDLE)
-    desc = serializers.CharField(required=False, allow_null=True, allow_blank=True,
-                                 max_length=LEN_MIDDLE)
+    name = serializers.CharField(
+        required=True,
+        max_length=LEN_NORMAL,
+        error_messages={"blank": _("请输入自定义角色名")},
+    )
+    members = serializers.CharField(
+        required=True,
+        max_length=LEN_XX_LONG,
+        error_messages={"blank": _("请指定角色下的人员")},
+    )
+    owners = serializers.CharField(
+        required=False, max_length=LEN_XX_LONG, allow_blank=True
+    )
+    access = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True, max_length=LEN_MIDDLE
+    )
+    creator = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True, max_length=LEN_NORMAL
+    )
+    role_key = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True, max_length=LEN_MIDDLE
+    )
+    desc = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True, max_length=LEN_MIDDLE
+    )
     project_key = serializers.CharField(required=True, max_length=LEN_SHORT)
 
     class Meta:
         model = UserRole
         fields = (
-            "id", "role_type", "name", "members", "project_key", "owners", "access", 
-            "desc", "role_key", "creator", "is_builtin")
+            "id",
+            "role_type",
+            "name",
+            "members",
+            "project_key",
+            "owners",
+            "access",
+            "desc",
+            "role_key",
+            "creator",
+            "is_builtin",
+        )
         create_only_fields = ("project_key", "is_builtin", "creator")
 
     def __init__(self, *args, **kwargs):
@@ -121,8 +147,12 @@ class UserRoleSerializer(DynamicFieldsModelSerializer):
 
         if "access" in data:
             data["access_name"] = _(
-                ",".join([_(ACCESS_NAMES.get(key, "")) for key in
-                          list_by_separator(data.get("access"), ",")])
+                ",".join(
+                    [
+                        _(ACCESS_NAMES.get(key, ""))
+                        for key in list_by_separator(data.get("access"), ",")
+                    ]
+                )
             )
         return self.update_auth_actions(instance, data)
 
@@ -139,7 +169,9 @@ class UserRoleSerializer(DynamicFieldsModelSerializer):
 
             if cancel_wiki_admins:
                 # 去掉权限的用户
-                for not_wiki_admin_user in BKUser.objects.filter(username__in=cancel_wiki_admins):
+                for not_wiki_admin_user in BKUser.objects.filter(
+                    username__in=cancel_wiki_admins
+                ):
                     not_wiki_admin_user.set_property("is_wiki_superuser", 0)
 
             # 加权限的用户，如果用户不存在就创建一个

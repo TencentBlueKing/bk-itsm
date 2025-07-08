@@ -32,7 +32,7 @@ from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q, Count
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from mptt.models import TreeForeignKey
 from multiselectfield import MultiSelectField
 
@@ -626,7 +626,9 @@ class ServiceCatalog(BaseMpttModel):
         data = {
             "id": node.id,
             "key": node.key,
-            "name": _("{} (已删除)").format(node.name) if node.is_deleted else node.name,
+            "name": (
+                _("{} (已删除)").format(node.name) if node.is_deleted else node.name
+            ),
             "is_deleted": node.is_deleted,
             "level": node.level,
             "desc": node.desc,
@@ -1167,8 +1169,13 @@ class ServiceProperty(Model):
         related_name="properties",
         on_delete=models.CASCADE,
     )
-    key = models.CharField(_("默认为名称拼音，唯一存在，如果有一样的，则通过拼音+随机字符匹配"), max_length=LEN_SHORT)
-    pk_key = models.CharField(_("fields中的主键的key"), max_length=LEN_SHORT, default="")
+    key = models.CharField(
+        _("默认为名称拼音，唯一存在，如果有一样的，则通过拼音+随机字符匹配"),
+        max_length=LEN_SHORT,
+    )
+    pk_key = models.CharField(
+        _("fields中的主键的key"), max_length=LEN_SHORT, default=""
+    )
     cascade_key = models.CharField(
         _("fields中的级联外键的key"), max_length=LEN_SHORT, default=""
     )
@@ -1274,7 +1281,10 @@ class PropertyRecord(Model):
     )
     data = jsonfield.JSONField(_("对应属性字段的值"), null=True, blank=True)
     display_role = MultiSelectField(
-        _("可展示的用户"), default=["all"], max_length=LEN_NORMAL, choices=display_role_choice
+        _("可展示的用户"),
+        default=["all"],
+        max_length=LEN_NORMAL,
+        choices=display_role_choice,
     )
 
     # objects = managers.Manager()

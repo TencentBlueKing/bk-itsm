@@ -1,4 +1,6 @@
 # Changelog
+## [Version: 2.8.1] - 2025-07-07
+【Feature】Upgraded version dependencies: Python 3.11 and Django 4.2 
 ## [Version: 2.7.8] - 2025-07-06
 [Fix] Resolved execution issues with the exec command  
 [Fix] Fixed abnormal execution behavior of branch gateways when handling numeric data type  

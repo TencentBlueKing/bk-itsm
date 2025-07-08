@@ -14,11 +14,16 @@ specific language governing permissions and limitations under the License.
 from abc import ABCMeta, abstractmethod
 from copy import deepcopy
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from pipeline.builder import empty_data
 from pipeline.core.flow.activity.base import Activity
-from pipeline.core.flow.io import BooleanItemSchema, InputItem, IntItemSchema, OutputItem
+from pipeline.core.flow.io import (
+    BooleanItemSchema,
+    InputItem,
+    IntItemSchema,
+    OutputItem,
+)
 from pipeline.utils.utils import convert_bytes_to_str
 
 
@@ -30,8 +35,18 @@ class Service(object, metaclass=ABCMeta):
     OutputItem = OutputItem
     interval = None
     default_outputs = [
-        OutputItem(name=_("执行结果"), key="_result", type="bool", schema=BooleanItemSchema(description=_("是否执行成功"))),
-        OutputItem(name=_("循环次数"), key="_loop", type="int", schema=IntItemSchema(description=_("循环执行次数"))),
+        OutputItem(
+            name=_("执行结果"),
+            key="_result",
+            type="bool",
+            schema=BooleanItemSchema(description=_("是否执行成功")),
+        ),
+        OutputItem(
+            name=_("循环次数"),
+            key="_loop",
+            type="int",
+            schema=IntItemSchema(description=_("循环执行次数")),
+        ),
     ]
 
     def __init__(self, name=None):
@@ -234,13 +249,13 @@ class AbstractIntervalGenerator(object, metaclass=ABCMeta):
 class DefaultIntervalGenerator(AbstractIntervalGenerator):
     def next(self):
         super(DefaultIntervalGenerator, self).next()
-        return self.count ** 2
+        return self.count**2
 
 
 class SquareIntervalGenerator(AbstractIntervalGenerator):
     def next(self):
         super(SquareIntervalGenerator, self).next()
-        return self.count ** 2
+        return self.count**2
 
 
 class NullIntervalGenerator(AbstractIntervalGenerator):

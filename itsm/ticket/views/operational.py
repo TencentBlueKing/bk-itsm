@@ -28,7 +28,7 @@ from functools import reduce
 
 from django.db import connection
 from django.db.models import Count, Q, Case, When, Max
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
@@ -107,13 +107,15 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         return Response(
             {
                 "count": project_analysis.get_ticket_count(),
-                "service_count": 1
-                if service_id
-                else project_analysis.get_service_count(),
+                "service_count": (
+                    1 if service_id else project_analysis.get_service_count()
+                ),
                 "biz_count": project_analysis.get_biz_count(),
-                "user_count": project_analysis.get_ticket_user_count()
-                if service_id
-                else user_count(project_key=project_key),
+                "user_count": (
+                    project_analysis.get_ticket_user_count()
+                    if service_id
+                    else user_count(project_key=project_key)
+                ),
             }
         )
 
@@ -482,7 +484,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         filter_serializer = TicketOrganizationSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
         kwargs = self.combine_date(filter_serializer.validated_data)
-            
+
         level_dict = {
             1: ("first_level_id", "first_level_name"),
             2: ("second_level_id", "second_level_name"),
@@ -531,9 +533,9 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             return time_params
         except KeyError:
             raise ValidationError(
-                _("日期范围输入有误，请重新输入，例如：{}__gte=2019-01-01, {}__lte=2019-01-02").format(
-                    params_key, params_key
-                )
+                _(
+                    "日期范围输入有误，请重新输入，例如：{}__gte=2019-01-01, {}__lte=2019-01-02"
+                ).format(params_key, params_key)
             )
 
     @staticmethod
@@ -562,7 +564,9 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
         except ValueError:
             raise ValidationError(
-                _("日期范围输入有误，请重新输入，例如：create_at__gte=2019-01, create_at__lte=2019-02")
+                _(
+                    "日期范围输入有误，请重新输入，例如：create_at__gte=2019-01, create_at__lte=2019-02"
+                )
             )
 
         # 左开右闭
@@ -1162,9 +1166,11 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
         filter_result.sort(key=lambda x: x["day"])
         return Response(filter_result)
-    
+
     @staticmethod
     def combine_date(kwargs):
         if kwargs.get("create_at__lte"):
-            kwargs["create_at__lte"] = datetime.combine(kwargs["create_at__lte"], time(23, 59, 59))
+            kwargs["create_at__lte"] = datetime.combine(
+                kwargs["create_at__lte"], time(23, 59, 59)
+            )
         return kwargs

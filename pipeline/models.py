@@ -21,7 +21,7 @@ import ujson as json
 from django.db import models, transaction
 from django.utils import timezone
 from django.utils.module_loading import import_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from pipeline.conf import settings
 from pipeline.constants import PIPELINE_DEFAULT_PRIORITY
@@ -116,7 +116,9 @@ def get_subprocess_act_list(pipeline_data):
     @return: 子流程节点
     """
     activities = pipeline_data[PE.activities]
-    act_ids = [act_id for act_id in activities if activities[act_id][PE.type] == PE.SubProcess]
+    act_ids = [
+        act_id for act_id in activities if activities[act_id][PE.type] == PE.SubProcess
+    ]
     return [activities[act_id] for act_id in act_ids]
 
 
@@ -126,7 +128,11 @@ def _act_id_in_graph(act):
     @param act: 子流程节点
     @return: 模板 ID:版本 或 模板ID
     """
-    return "{}:{}".format(act["template_id"], act["version"]) if act.get("version") else act["template_id"]
+    return (
+        "{}:{}".format(act["template_id"], act["version"])
+        if act.get("version")
+        else act["template_id"]
+    )
 
 
 class TemplateManager(models.Manager):
@@ -139,7 +145,9 @@ class TemplateManager(models.Manager):
         @return: 引用是否合法，相关信息
         """
         try:
-            sub_refs, name_map = self.construct_subprocess_ref_graph(data, root_id=root_id, root_name=root_name)
+            sub_refs, name_map = self.construct_subprocess_ref_graph(
+                data, root_id=root_id, root_name=root_name
+            )
         except PipelineTemplate.DoesNotExist as e:
             return False, str(e)
 
@@ -193,7 +201,9 @@ class TemplateManager(models.Manager):
             template.name = uniqid()
             template.save()
 
-    def construct_subprocess_ref_graph(self, pipeline_data, root_id=None, root_name=None):
+    def construct_subprocess_ref_graph(
+        self, pipeline_data, root_id=None, root_name=None
+    ):
         """
         构造子流程引用图
         @param pipeline_data: pipeline 结构数据
@@ -219,7 +229,9 @@ class TemplateManager(models.Manager):
             tid = tid_queue.get()
             template = self.get(template_id=tid.split(":")[0])
             name_map[tid] = template.name
-            subprocess_act = get_subprocess_act_list(template.data_for_version(version[tid]))
+            subprocess_act = get_subprocess_act_list(
+                template.data_for_version(version[tid])
+            )
 
             for act in subprocess_act:
                 ref_tid = _act_id_in_graph(act)
@@ -242,7 +254,9 @@ class TemplateManager(models.Manager):
         activities = pipeline_data[PE.activities]
         for act_id, act in list(activities.items()):
             if act[PE.type] == PE.SubProcess:
-                subproc_data = self.get(template_id=act[PE.template_id]).data_for_version(act.get(PE.version))
+                subproc_data = self.get(
+                    template_id=act[PE.template_id]
+                ).data_for_version(act.get(PE.version))
 
                 sub_id_maps = self.unfold_subprocess(subproc_data)
                 # act_id is new id
@@ -278,17 +292,24 @@ class PipelineTemplate(models.Model):
     """
 
     template_id = models.CharField(_("模板ID"), max_length=32, unique=True)
-    name = models.CharField(_("模板名称"), max_length=MAX_LEN_OF_NAME, default="default_template")
+    name = models.CharField(
+        _("模板名称"), max_length=MAX_LEN_OF_NAME, default="default_template"
+    )
     create_time = models.DateTimeField(_("创建时间"), auto_now_add=True)
     creator = models.CharField(_("创建者"), max_length=32)
     description = models.TextField(_("描述"), null=True, blank=True)
     editor = models.CharField(_("修改者"), max_length=32, null=True, blank=True)
     edit_time = models.DateTimeField(_("修改时间"), auto_now=True)
     snapshot = models.ForeignKey(
-        Snapshot, verbose_name=_("模板结构数据"), related_name="snapshot_templates", on_delete=models.DO_NOTHING
+        Snapshot,
+        verbose_name=_("模板结构数据"),
+        related_name="snapshot_templates",
+        on_delete=models.DO_NOTHING,
     )
     has_subprocess = models.BooleanField(_("是否含有子流程"), default=False)
-    is_deleted = models.BooleanField(_("是否删除"), default=False, help_text=_("表示当前模板是否删除"))
+    is_deleted = models.BooleanField(
+        _("是否删除"), default=False, help_text=_("表示当前模板是否删除")
+    )
 
     objects = TemplateManager()
 
@@ -312,9 +333,9 @@ class PipelineTemplate(models.Model):
     @property
     def subprocess_version_info(self):
         # 1. get all subprocess
-        subprocess_info = TemplateRelationship.objects.get_subprocess_info(self.template_id).values(
-            "descendant_template_id", "subprocess_node_id", "version"
-        )
+        subprocess_info = TemplateRelationship.objects.get_subprocess_info(
+            self.template_id
+        ).values("descendant_template_id", "subprocess_node_id", "version")
         info = {"subproc_has_update": False, "details": []}
         if not subprocess_info:
             return info
@@ -323,7 +344,9 @@ class PipelineTemplate(models.Model):
         temp_current_versions = {
             item.template_id: item
             for item in TemplateCurrentVersion.objects.filter(
-                template_id__in=[item["descendant_template_id"] for item in subprocess_info]
+                template_id__in=[
+                    item["descendant_template_id"] for item in subprocess_info
+                ]
             )
         }
 
@@ -332,7 +355,12 @@ class PipelineTemplate(models.Model):
             item["expired"] = (
                 False
                 if item["version"] is None
-                else (item["version"] != temp_current_versions[item["descendant_template_id"]].current_version)
+                else (
+                    item["version"]
+                    != temp_current_versions[
+                        item["descendant_template_id"]
+                    ].current_version
+                )
             )
             info["details"].append(item)
             expireds.append(item["expired"])
@@ -362,9 +390,9 @@ class PipelineTemplate(models.Model):
         @return: 引用了该模板的其他模板 ID 列表
         """
         referencer = TemplateRelationship.objects.referencer(self.template_id)
-        template_id = self.__class__.objects.filter(template_id__in=referencer, is_deleted=False).values_list(
-            "template_id", flat=True
-        )
+        template_id = self.__class__.objects.filter(
+            template_id__in=referencer, is_deleted=False
+        ).values_list("template_id", flat=True)
         return list(template_id)
 
     def clone_data(self):
@@ -383,7 +411,9 @@ class PipelineTemplate(models.Model):
         @param kwargs: 其他参数
         @return:
         """
-        result, msg = PipelineTemplate.objects.subprocess_ref_validate(structure_data, self.template_id, self.name)
+        result, msg = PipelineTemplate.objects.subprocess_ref_validate(
+            structure_data, self.template_id, self.name
+        )
         if not result:
             raise SubprocessRefError(msg)
 
@@ -429,7 +459,13 @@ class TemplateRelationShipManager(models.Manager):
         @param template_id: 被引用的模板
         @return: 引用了该模板的其他模板 ID 列表
         """
-        return list(set(self.filter(descendant_template_id=template_id).values_list("ancestor_template_id", flat=True)))
+        return list(
+            set(
+                self.filter(descendant_template_id=template_id).values_list(
+                    "ancestor_template_id", flat=True
+                )
+            )
+        )
 
 
 class TemplateRelationship(models.Model):
@@ -438,7 +474,9 @@ class TemplateRelationship(models.Model):
     """
 
     ancestor_template_id = models.CharField(_("根模板ID"), max_length=32, db_index=True)
-    descendant_template_id = models.CharField(_("子流程模板ID"), max_length=32, null=False)
+    descendant_template_id = models.CharField(
+        _("子流程模板ID"), max_length=32, null=False
+    )
     subprocess_node_id = models.CharField(_("子流程节点 ID"), max_length=32, null=False)
     version = models.CharField(_("快照字符串的md5"), max_length=32, null=False)
 
@@ -453,7 +491,8 @@ class TemplateCurrentVersionManager(models.Manager):
         @return: 记录模板当前版本的对象
         """
         obj, __ = self.update_or_create(
-            template_id=template.template_id, defaults={"current_version": template.version}
+            template_id=template.template_id,
+            defaults={"current_version": template.version},
         )
         return obj
 
@@ -484,7 +523,9 @@ class TemplateVersionManager(models.Manager):
         if versions and versions[0].md5 == template.snapshot.md5sum:
             return versions[0]
 
-        return self.create(template=template, snapshot=template.snapshot, md5=template.snapshot.md5sum)
+        return self.create(
+            template=template, snapshot=template.snapshot, md5=template.snapshot.md5sum
+        )
 
 
 class TemplateVersion(models.Model):
@@ -492,8 +533,15 @@ class TemplateVersion(models.Model):
     模板版本号记录节点
     """
 
-    template = models.ForeignKey(PipelineTemplate, verbose_name=_("模板 ID"), null=False, on_delete=models.CASCADE)
-    snapshot = models.ForeignKey(Snapshot, verbose_name=_("模板数据 ID"), null=False, on_delete=models.CASCADE)
+    template = models.ForeignKey(
+        PipelineTemplate,
+        verbose_name=_("模板 ID"),
+        null=False,
+        on_delete=models.CASCADE,
+    )
+    snapshot = models.ForeignKey(
+        Snapshot, verbose_name=_("模板数据 ID"), null=False, on_delete=models.CASCADE
+    )
     md5 = models.CharField(_("快照字符串的md5"), max_length=32, db_index=True)
     date = models.DateTimeField(_("添加日期"), auto_now_add=True)
 
@@ -506,9 +554,15 @@ class TemplateScheme(models.Model):
     """
 
     template = models.ForeignKey(
-        PipelineTemplate, verbose_name=_("对应模板 ID"), null=False, blank=False, on_delete=models.CASCADE
+        PipelineTemplate,
+        verbose_name=_("对应模板 ID"),
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
     )
-    unique_id = models.CharField(_("方案唯一ID"), max_length=97, unique=True, null=False, blank=True)
+    unique_id = models.CharField(
+        _("方案唯一ID"), max_length=97, unique=True, null=False, blank=True
+    )
     name = models.CharField(_("方案名称"), max_length=64, null=False, blank=False)
     edit_time = models.DateTimeField(_("修改时间"), auto_now=True)
     data = CompressJSONField(verbose_name=_("方案数据"))
@@ -618,9 +672,15 @@ class PipelineInstance(models.Model):
 
     instance_id = models.CharField(_("实例ID"), max_length=32, unique=True)
     template = models.ForeignKey(
-        PipelineTemplate, verbose_name=_("Pipeline模板"), null=True, blank=True, on_delete=models.SET_NULL
+        PipelineTemplate,
+        verbose_name=_("Pipeline模板"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
     )
-    name = models.CharField(_("实例名称"), max_length=MAX_LEN_OF_NAME, default="default_instance")
+    name = models.CharField(
+        _("实例名称"), max_length=MAX_LEN_OF_NAME, default="default_instance"
+    )
     creator = models.CharField(_("创建者"), max_length=32, blank=True)
     create_time = models.DateTimeField(_("创建时间"), auto_now_add=True)
     executor = models.CharField(_("执行者"), max_length=32, blank=True)
@@ -630,7 +690,9 @@ class PipelineInstance(models.Model):
     is_started = models.BooleanField(_("是否已经启动"), default=False)
     is_finished = models.BooleanField(_("是否已经完成"), default=False)
     is_revoked = models.BooleanField(_("是否已经撤销"), default=False)
-    is_deleted = models.BooleanField(_("是否已经删除"), default=False, help_text=_("表示当前实例是否删除"))
+    is_deleted = models.BooleanField(
+        _("是否已经删除"), default=False, help_text=_("表示当前实例是否删除")
+    )
     snapshot = models.ForeignKey(
         Snapshot,
         blank=True,
@@ -714,7 +776,9 @@ class PipelineInstance(models.Model):
         @param kwargs: 其他参数
         @return: 当前实例对象的克隆
         """
-        name = kwargs.get("name") or timezone.localtime(timezone.now()).strftime("clone%Y%m%d%H%m%S")
+        name = kwargs.get("name") or timezone.localtime(timezone.now()).strftime(
+            "clone%Y%m%d%H%m%S"
+        )
         instance_id = node_uniqid()
 
         exec_data = self.execution_data
@@ -733,7 +797,9 @@ class PipelineInstance(models.Model):
             execution_snapshot=new_snapshot,
         )
 
-    def start(self, executor, check_workers=True, priority=PIPELINE_DEFAULT_PRIORITY, queue=""):
+    def start(
+        self, executor, check_workers=True, priority=PIPELINE_DEFAULT_PRIORITY, queue=""
+    ):
         """
         启动当前流程
         @param executor: 执行者
@@ -744,14 +810,19 @@ class PipelineInstance(models.Model):
         with transaction.atomic():
             instance = self.__class__.objects.select_for_update().get(id=self.id)
             if instance.is_started:
-                return ActionResult(result=False, message="pipeline instance already started.")
+                return ActionResult(
+                    result=False, message="pipeline instance already started."
+                )
 
             pipeline_data = instance.execution_data
 
             try:
                 parser_cls = import_string(settings.PIPELINE_PARSER_CLASS)
             except ImportError:
-                return ActionResult(result=False, message="invalid parser class: %s" % settings.PIPELINE_PARSER_CLASS)
+                return ActionResult(
+                    result=False,
+                    message="invalid parser class: %s" % settings.PIPELINE_PARSER_CLASS,
+                )
 
             instance.start_time = timezone.now()
             instance.is_started = True
@@ -763,7 +834,10 @@ class PipelineInstance(models.Model):
                     instance, obj_type="instance", data_type="data", username=executor
                 ),
                 root_pipeline_context=get_pipeline_context(
-                    instance, obj_type="instance", data_type="context", username=executor
+                    instance,
+                    obj_type="instance",
+                    data_type="context",
+                    username=executor,
                 ),
             )
 
@@ -772,7 +846,9 @@ class PipelineInstance(models.Model):
 
             instance.save()
 
-        act_result = task_service.run_pipeline(pipeline, check_workers=check_workers, priority=priority, queue=queue)
+        act_result = task_service.run_pipeline(
+            pipeline, check_workers=check_workers, priority=priority, queue=queue
+        )
 
         if not act_result.result:
             with transaction.atomic():

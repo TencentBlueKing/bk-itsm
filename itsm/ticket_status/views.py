@@ -27,7 +27,7 @@ from collections import defaultdict
 
 from django.db import transaction
 from django.db.models import Q
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django_bulk_update.helper import bulk_update
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError

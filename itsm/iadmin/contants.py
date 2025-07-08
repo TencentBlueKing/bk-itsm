@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import (
     EMAIL,
@@ -392,7 +392,9 @@ CSS_TEMPLATE = """
 </style>
 """
 
-TASK_GENERAL_CONTENT_COMMON = TASK_SMS_CONTENT_COMMON = TASK_WEIXIN_CONTENT_COMMON = """
+TASK_GENERAL_CONTENT_COMMON = TASK_SMS_CONTENT_COMMON = (
+    TASK_WEIXIN_CONTENT_COMMON
+) = """
  标题：${title}
  单号：<a href="${ticket_url}">${sn}</a>
  任务名称：${task_name}
@@ -402,18 +404,24 @@ TASK_GENERAL_CONTENT_COMMON = TASK_SMS_CONTENT_COMMON = TASK_WEIXIN_CONTENT_COMM
  任务创建时间：${task_create_at}
  ${message}"""
 
-SMS_CONTENT_COMMON = WEIXIN_CONTENT_COMMON = """
+SMS_CONTENT_COMMON = (
+    WEIXIN_CONTENT_COMMON
+) = """
  标题：${title}
   单号：<a href="${ticket_url}">${sn}</a>
  ${message}"""
 
-GENERAL_CONTENT_DONE = SMS_CONTENT_DONE = WEIXIN_CONTENT_DONE = """您的需求(${title})已经处理完成，
+GENERAL_CONTENT_DONE = SMS_CONTENT_DONE = (
+    WEIXIN_CONTENT_DONE
+) = """您的需求(${title})已经处理完成，
 现邀请您为我们的服务进行评价。
 您的反馈对我们非常重要！
 感谢回复与建议，祝您工作愉快！
 ${ticket_url}"""  # noqa
 
-GENERAL_CONTENT_FOLLOW = SMS_CONTENT_FOLLOW = WEIXIN_CONTENT_FOLLOW = """你有一条${service_type_name}工单需要关注
+GENERAL_CONTENT_FOLLOW = SMS_CONTENT_FOLLOW = (
+    WEIXIN_CONTENT_FOLLOW
+) = """你有一条${service_type_name}工单需要关注
  标题：${title}
  单号：<a href="${ticket_url}">${sn}</a>
  服务目录：${catalog_service_name}
@@ -425,21 +433,27 @@ SMS_CONTENT_OPERATE = """
  服务目录：${catalog_service_name}
  当前环节：${running_status}"""
 
-SMS_CONTENT_FAILED = WEIXIN_CONTENT_FAILED = """ 
+SMS_CONTENT_FAILED = (
+    WEIXIN_CONTENT_FAILED
+) = """ 
  节点自动执行失败
  标题：${title}
  单号：<a href="${ticket_url}">${sn}</a>
  当前环节：${running_status}
  失败信息：${message}"""
 
-GENERAL_CONTENT_OPERATE = WEIXIN_CONTENT_OPERATE = """
+GENERAL_CONTENT_OPERATE = (
+    WEIXIN_CONTENT_OPERATE
+) = """
  标题：${title}
  单号：<a href="${ticket_url}">${sn}</a>
  服务目录：${catalog_service_name}
  当前环节：${running_status}
  """
 
-GENERAL_CONTENT_COMMON = ATTENTION_SMS_CONTENT_COMMON = ATTENTION_WEIXIN_CONTENT_COMMON = """
+GENERAL_CONTENT_COMMON = ATTENTION_SMS_CONTENT_COMMON = (
+    ATTENTION_WEIXIN_CONTENT_COMMON
+) = """
  标题：${title}
  单号：${sn}
  服务：${catalog_service_name}

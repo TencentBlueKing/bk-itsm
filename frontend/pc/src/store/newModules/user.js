@@ -46,7 +46,7 @@ export default {
       });
     },
     delete({ commit, state, dispatch }, id) {
-      return ajax.delete(`role/users/${id}`).then((response) => {
+      return ajax.delete(`role/users/${id}/`).then((response) => {
         const res = response.data;
         return res;
       });

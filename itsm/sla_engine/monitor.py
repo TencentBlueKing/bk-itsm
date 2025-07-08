@@ -26,21 +26,29 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import datetime
 import json
 
+from celery import shared_task
 from celery.schedules import crontab
-from celery.task import periodic_task, task
+from blueapps.contrib.celery_tools.periodic import periodic_task
 from django.db import transaction
 
 from common.redis import Cache
 from itsm.sla.models import Action
 from itsm.sla_engine.actions import SlaTaskAction
-from itsm.sla_engine.constants import SLA_ACTION_TIME, RUNNING, REPLY_WARING, REPLY_TIMEOUT
+from itsm.sla_engine.constants import (
+    SLA_ACTION_TIME,
+    RUNNING,
+    REPLY_WARING,
+    REPLY_TIMEOUT,
+)
 from itsm.sla_engine.models import SlaTask
 from itsm.ticket.models import Ticket
 
 
-@task
+@shared_task
 def action_exclude(ac_key, ac_value, ac_time):
-    ticket_id, sla_task_id, action_policy_type = [int(item) for item in ac_key.split("-")]
+    ticket_id, sla_task_id, action_policy_type = [
+        int(item) for item in ac_key.split("-")
+    ]
     sla_task = SlaTask.objects.get(id=sla_task_id)
 
     if sla_task.task_status != RUNNING:
@@ -51,7 +59,9 @@ def action_exclude(ac_key, ac_value, ac_time):
 
     with transaction.atomic():
         for action in Action.objects.filter(id__in=action_ids):
-            sla_task_action = SlaTaskAction(action, ticket, sla_task, action_policy_type, ac_time)
+            sla_task_action = SlaTaskAction(
+                action, ticket, sla_task, action_policy_type, ac_time
+            )
             sla_task_action.alert()
 
 
@@ -78,7 +88,14 @@ def sla_task_metric():
     sla_redis_inst.srem(SLA_ACTION_TIME, ac_time)
 
 
-@periodic_task(run_every=(crontab(minute="*/10", )), ignore_result=True)
+@periodic_task(
+    run_every=(
+        crontab(
+            minute="*/10",
+        )
+    ),
+    ignore_result=True,
+)
 def compensate_task():
     """
     补偿遗漏的提醒任务
@@ -105,7 +122,14 @@ def compensate_task():
         sla_redis_inst.srem(SLA_ACTION_TIME, ac_time)
 
 
-@periodic_task(run_every=(crontab(minute="*/10", )), ignore_result=True)
+@periodic_task(
+    run_every=(
+        crontab(
+            minute="*/10",
+        )
+    ),
+    ignore_result=True,
+)
 def rebuild_sla_task():
     """
     根据SlaTask表中RUNNING的任务重建入库redis失败的任务
@@ -114,8 +138,10 @@ def rebuild_sla_task():
     for sla_task in sla_tasks:
         action_policies = sla_task.action_policies
         if sla_task.is_reply_need and not sla_task.is_replied:
-            action_policies = action_policies.exclude(type__in=[REPLY_WARING, REPLY_TIMEOUT])
-        ac_keys = sla_task.get_ac_keys(action_policies)
+            action_policies = action_policies.exclude(
+                type__in=[REPLY_WARING, REPLY_TIMEOUT]
+            )
+        _ = sla_task.get_ac_keys(action_policies)
 
 
 def update_sla_task(ac_time_dict, current_time):

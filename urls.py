@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls import include, re_path
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -33,22 +33,22 @@ from django.views import static
 # 公共URL配置
 urlpatterns = [
     # Django后台数据库管理®
-    url(r"^admin/", admin.site.urls),
-    url(r"^notice/", include("bk_notice_sdk.urls")),
+    re_path(r"^admin/", admin.site.urls),
+    re_path(r"^notice/", include("bk_notice_sdk.urls")),
     # 用户登录鉴权
-    # url(r'^account/', include('account.urls')),
-    url(r"^account/", include("blueapps.account.urls")),
+    # re_path(r'^account/', include('account.urls')),
+    re_path(r"^account/", include("blueapps.account.urls")),
     # 接口版本管理
-    url(r"^api/", include("itsm.api.v1")),
+    re_path(r"^api/", include("itsm.api.v1")),
     # 对外开放的接口
-    url(r"^openapi/", include("itsm.api.open_v1")),
-    url(r"^openapi/v2/", include("itsm.api.open_v2")),
+    re_path(r"^openapi/", include("itsm.api.open_v1")),
+    re_path(r"^openapi/v2/", include("itsm.api.open_v2")),
     # 监控，普罗米修斯相关的接口
-    url(r"^monitor/", include("itsm.monitor.urls")),
+    re_path(r"^monitor/", include("itsm.monitor.urls")),
     # 各种入口：微信/wiki/首页等
-    url(r"^", include("itsm.sites.urls")),
+    re_path(r"^", include("itsm.sites.urls")),
     # eri admin
-    url(r"^eri/admin/", include("pipeline.contrib.engine_admin.urls")),
+    re_path(r"^eri/admin/", include("pipeline.contrib.engine_admin.urls")),
 ]
 
 handler404 = "error_pages.views.error_404"
@@ -62,5 +62,7 @@ handler401 = "error_pages.views.error_401"
 # 全局生效：不推荐生产环境使用
 urlpatterns += [
     # wiki上传图片404也可以这样简单解决：路由层面不复用MEDIA_URL，后者只用来生成url，比如可以自定义prefix为SITE_URL
-    url(r"^media/(?P<path>.*)$", static.serve, {"document_root": settings.MEDIA_ROOT}),
+    re_path(
+        r"^media/(?P<path>.*)$", static.serve, {"document_root": settings.MEDIA_ROOT}
+    ),
 ]

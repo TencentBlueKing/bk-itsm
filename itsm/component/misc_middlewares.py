@@ -243,7 +243,7 @@ class WikiIamAuthMiddleware(MiddlewareMixin):
 
     def process_view(self, request, view, args, kwargs):
         """process_view."""
-        if request.user.username and "/wiki/" in request.path:
+        if request.user and request.user.username and "/wiki/" in request.path:
             apply_actions = ["knowledge_manage"]
             iam_client = IamRequest(request)
             auth_actions = iam_client.resource_multi_actions_allowed(apply_actions, [])
@@ -264,7 +264,7 @@ class HttpsMiddleware(MiddlewareMixin):
     def process_request(self, request):
         if settings.ENVIRONMENT == "dev":
             return None
-        
+
         if settings.RUN_VER == "ieod":
             # 对于openapi 跳转豁免
             if request.path.startswith(EXEMPT_HTTPS_REDIRECT):

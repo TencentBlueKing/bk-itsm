@@ -1,8 +1,8 @@
-from celery.task import task
+from celery import shared_task
 from common.log import logger
 
 
-@task
+@shared_task
 def openapi_start_ticket(ticket, fields, from_ticket_id=None):
     try:
         logger.info(

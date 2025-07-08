@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 ACTION_STATUS_CREATED = "CREATED"
 ACTION_STATUS_RUNNING = "RUNNING"
@@ -90,7 +90,7 @@ FLOW_TRIGGER_SIGNAL = {
     RECOVERY_TICKET: _("恢复单据"),
     DELETE_TICKET: _("撤销单据"),
     GLOBAL_ENTER_STATE: _("进入节点"),
-    GLOBAL_LEAVE_STATE: _("离开节点")
+    GLOBAL_LEAVE_STATE: _("离开节点"),
     # CREATE_RELATE_TICKET: _("创建关联单"),
     # CREATE_PARENTChILD_TICKET: _("创建母子单"),
     # DISSOLVE_PARENTChILD_TICKET: _("解除母子单"),

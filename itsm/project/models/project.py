@@ -40,7 +40,7 @@ from itsm.component.constants import (
 )
 from itsm.iadmin.contants import PROJECT_SETTING
 from itsm.project.models.base import Model
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.service.models import ServiceCatalog
 from itsm.sla.models import Sla, Schedule
@@ -67,7 +67,7 @@ class Project(Model):
         "catalog_create",
         "catalog_edit",
         "catalog_delete",
-        "system_settings_manage"
+        "system_settings_manage",
     ]
 
     auth_resource = {"resource_type": "project", "resource_type_name": "项目"}
@@ -180,8 +180,12 @@ class Project(Model):
 class ProjectSettings(Model):
     type = models.CharField(_("类型"), max_length=LEN_NORMAL, default="FUNCTION")
     key = models.CharField(_("关键字唯一标识"), max_length=LEN_NORMAL, unique=False)
-    value = models.TextField(_("系统设置值"), default=EMPTY_STRING, null=True, blank=True)
-    project = models.ForeignKey("Project", help_text=_("项目"), on_delete=models.CASCADE)
+    value = models.TextField(
+        _("系统设置值"), default=EMPTY_STRING, null=True, blank=True
+    )
+    project = models.ForeignKey(
+        "Project", help_text=_("项目"), on_delete=models.CASCADE
+    )
 
 
 class UserProjectAccessRecord(Model):

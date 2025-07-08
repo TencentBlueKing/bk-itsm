@@ -27,7 +27,7 @@ import json
 from collections import OrderedDict
 
 from django.db import transaction
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -66,7 +66,7 @@ from itsm.task.serializers import (
 
 
 class TaskViewSet(component_viewsets.ModelViewSet):
-    queryset = Task.objects.all().order_by('create_at')
+    queryset = Task.objects.all().order_by("create_at")
     filter_fields = {
         "ticket_id": ["exact"],
         "component_type": ["exact", "in"],
@@ -79,7 +79,7 @@ class TaskViewSet(component_viewsets.ModelViewSet):
     permission_classes = (TaskPermissionValidate,)
 
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action == "list":
             return TaskListSerializer
 
         return TaskSerializer
@@ -110,7 +110,9 @@ class TaskViewSet(component_viewsets.ModelViewSet):
             instance = serializer.save(creator=username)
             instance.create_sub_task(fields=fields, operator=username, data=data)
             instance.do_after_create(fields)
-        instance.create_task_pipeline(need_start)  # 放在事务里会在事务未提交时去获取，导致获取不到
+        instance.create_task_pipeline(
+            need_start
+        )  # 放在事务里会在事务未提交时去获取，导致获取不到
 
         return instance
 
@@ -121,14 +123,14 @@ class TaskViewSet(component_viewsets.ModelViewSet):
 
             task = self.create_task(request.data, request.user.username)
 
-            return Response({'task_id': task.id}, status=status.HTTP_201_CREATED)
+            return Response({"task_id": task.id}, status=status.HTTP_201_CREATED)
         except ComponentCallError as error:
             return Response(
                 {
-                    'result': False,
-                    'message': error.message,
-                    'data': error.ERROR_CODE,
-                    'code': ComponentCallError.ERROR_CODE_INT,
+                    "result": False,
+                    "message": error.message,
+                    "data": error.ERROR_CODE,
+                    "code": ComponentCallError.ERROR_CODE_INT,
                 }
             )
 
@@ -142,11 +144,11 @@ class TaskViewSet(component_viewsets.ModelViewSet):
         """
         data = request.data
         common_info = {
-            "ticket_id": data['ticket_id'],
+            "ticket_id": data["ticket_id"],
         }
 
         tasks = []
-        for task_data in data['tasks']:
+        for task_data in data["tasks"]:
             task_data.update(common_info)
             task = self.create_task(task_data, request.user.username)
             tasks.append(task.id)
@@ -175,20 +177,22 @@ class TaskViewSet(component_viewsets.ModelViewSet):
                 instance = serializer.save(**update_info)
                 if instance.component_type == "SOPS":
                     try:
-                        instance.update_sops_task(fields=fields["sops_templates"], operator=username)
+                        instance.update_sops_task(
+                            fields=fields["sops_templates"], operator=username
+                        )
                     except ComponentCallError as error:
                         return Response(
                             {
-                                'result': False,
-                                'message': error.message,
-                                'data': error.ERROR_CODE,
-                                'code': ComponentCallError.ERROR_CODE_INT,
+                                "result": False,
+                                "message": error.message,
+                                "data": error.ERROR_CODE,
+                                "code": ComponentCallError.ERROR_CODE_INT,
                             }
                         )
             else:
                 serializer.save(**update_info)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def fields(self, request, *args, **kwargs):
         instance = self.get_object()
         field_view = TaskFieldViewSet()
@@ -201,13 +205,17 @@ class TaskViewSet(component_viewsets.ModelViewSet):
         """设置单据任务列表在整个生命周期下的执行顺序
         生命周期: 创建任务->处理任务->总结任务
         """
-        serializer = TaskOrderSerializer(data=request.data, context=self.get_serializer_context())
+        serializer = TaskOrderSerializer(
+            data=request.data, context=self.get_serializer_context()
+        )
         serializer.is_valid(raise_exception=True)
         ticket_id = request.data["ticket_id"]
         # 示例数据: [{"task_id": 1, "order": 1}, {"task_id": 2, "order": 2}]
         task_orders = request.data["task_orders"]
         task_id_order_mapping = {i["task_id"]: i["order"] for i in task_orders}
-        tasks = Task.objects.filter(ticket_id=ticket_id, id__in=task_id_order_mapping.keys())
+        tasks = Task.objects.filter(
+            ticket_id=ticket_id, id__in=task_id_order_mapping.keys()
+        )
 
         for task in tasks:
             task.order = task_id_order_mapping.get(task.id, EMPTY_INT)
@@ -222,7 +230,7 @@ class TaskViewSet(component_viewsets.ModelViewSet):
         task = self.get_object()
 
         username = request.user.username
-        serializer = TaskProceedSerializer(data=request.data, context={'task': task})
+        serializer = TaskProceedSerializer(data=request.data, context={"task": task})
         serializer.is_valid(raise_exception=True)
 
         proceed_action = serializer.validated_data["action"]
@@ -239,7 +247,7 @@ class TaskViewSet(component_viewsets.ModelViewSet):
                 except Exception as e:
                     raise CallTaskPipelineError(_("任务节点回调异常（%s）") % e)
                 if not res.result:
-                    return Response({'result': False, 'message': res.message})
+                    return Response({"result": False, "message": res.message})
             else:
                 task.confirmer = username
                 task.save(update_fields=["confirmer"])
@@ -254,24 +262,30 @@ class TaskViewSet(component_viewsets.ModelViewSet):
         task = self.get_object()
         username = request.user.username
 
-        serializer = TaskRetrySerializer(data=request.data, context={'task': task})
+        serializer = TaskRetrySerializer(data=request.data, context={"task": task})
         serializer.is_valid(raise_exception=True)
 
         # 覆盖sops_template字段
         sops_templates = serializer.validated_data[SOPS_TEMPLATE_KEY]
-        task.create_fields.filter(key=SOPS_TEMPLATE_KEY).update(_value=json.dumps(sops_templates))
+        task.create_fields.filter(key=SOPS_TEMPLATE_KEY).update(
+            _value=json.dumps(sops_templates)
+        )
 
         fields = serializer.validated_data["fields"]
 
         try:
-            callback_result = task.activity_callback(ACTION_OPERATE, fields, username, False)
+            callback_result = task.activity_callback(
+                ACTION_OPERATE, fields, username, False
+            )
         except Exception as e:
             raise CallTaskPipelineError(_("任务节点回调异常（%s）") % e)
 
         if not callback_result.result:
             # 回调失败的时候直接抛出异常，记录回调信息
             logger.error(_("任务节点回调异常（%s）"), callback_result.message)
-            raise CallTaskPipelineError(_("任务节点回调异常（%s）") % callback_result.message)
+            raise CallTaskPipelineError(
+                _("任务节点回调异常（%s）") % callback_result.message
+            )
 
         with transaction.atomic():
             task.update_executor_status(username, RUNNING)
@@ -290,7 +304,7 @@ class TaskViewSet(component_viewsets.ModelViewSet):
             raise CallTaskPipelineError(_("任务节点回调异常（%s）") % e)
 
         if not res.result:
-            return Response({'result': False, 'message': res.message})
+            return Response({"result": False, "message": res.message})
 
         with transaction.atomic():
             task.update_executor_status(username, SKIPPED)
@@ -325,15 +339,21 @@ class TaskFieldViewSet(component_viewsets.ModelViewSet):
         serializer = TaskFieldBatchUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        fields = OrderedDict({field["id"]: field for field in serializer.validated_data["fields"]})
-        ordering = "FIELD(`id`, {})".format(",".join(["'{}'".format(field_id) for field_id in fields.keys()]))
+        fields = OrderedDict(
+            {field["id"]: field for field in serializer.validated_data["fields"]}
+        )
+        ordering = "FIELD(`id`, {})".format(
+            ",".join(["'{}'".format(field_id) for field_id in fields.keys()])
+        )
         task_fields = TaskField.objects.filter(id__in=fields.keys()).extra(
             select={"custom_order": ordering}, order_by=["custom_order"]
         )
 
         for task_field in task_fields:
             value = fields[task_field.id].get("value")
-            task_field._value = json.dumps(value) if task_field.type in JSON_HANDLE_FIELDS else value
+            task_field._value = (
+                json.dumps(value) if task_field.type in JSON_HANDLE_FIELDS else value
+            )
             task_field.choice = fields[task_field.id].get("choice", EMPTY_LIST)
 
         bulk_update(task_fields, update_fields=["_value", "choice"])
@@ -345,11 +365,11 @@ class TaskLibViewSet(component_viewsets.ModelViewSet):
     serializer_class = TaskLibSerializer
     pagination_class = None
     filter_fields = {
-        'service_id': ['exact', 'in'],
+        "service_id": ["exact", "in"],
     }
 
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action == "list":
             return TaskLibListSerializer
 
         return TaskLibSerializer
@@ -371,7 +391,7 @@ class TaskLibViewSet(component_viewsets.ModelViewSet):
 
             task_id_list = request.data.pop("tasks", [])
             instance.create_lib_tasks(task_id_list)
-        return Response({'task_lib_id': instance.id}, status=status.HTTP_201_CREATED)
+        return Response({"task_lib_id": instance.id}, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         with transaction.atomic():
@@ -382,7 +402,7 @@ class TaskLibViewSet(component_viewsets.ModelViewSet):
             instance.lib_tasks.all().delete()
             instance.create_lib_tasks(task_id_list)
 
-        return Response({'task_lib_id': instance.id}, status=status.HTTP_201_CREATED)
+        return Response({"task_lib_id": instance.id}, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["get"])
     def tasks(self, request, *args, **kwargs):

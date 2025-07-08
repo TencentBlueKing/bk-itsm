@@ -26,7 +26,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 __author__ = "蓝鲸智云"
 __copyright__ = "Copyright © 2025 Tencent BlueKing. All Rights Reserved."
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import permissions
 
 from itsm.component.drf.permissions import IamAuthPermit, IamAuthWithoutResourcePermit
@@ -50,7 +50,7 @@ class IsAdmin(permissions.BasePermission):
             return True
 
         # 提单环节拉取优先级
-        if view.action in ['priority_value']:
+        if view.action in ["priority_value"]:
             return True
 
         return False
@@ -81,10 +81,10 @@ class SlaPermit(IamAuthPermit):
             apply_actions = ["sla_agreement_edit"]
 
         return self.iam_auth(request, apply_actions, obj)
-    
-    
+
+
 class SchedulePermit(IamAuthPermit):
-    
+
     def has_object_permission(self, request, view, obj, **kwargs):
         # 关联实例的请求，需要针对对象进行鉴权
         if view.action in getattr(view, "permission_free_actions", []):
@@ -98,18 +98,13 @@ class SchedulePermit(IamAuthPermit):
             apply_actions = ["sla_calendar_edit"]
 
         return self.iam_auth(request, apply_actions, obj)
-    
-    
+
+
 class SlaMatrixPermit(IamAuthWithoutResourcePermit):
     def has_permission(self, request, view):
         if view.action == "matrix_of_service_type":
             apply_actions = ["sla_priority_view", "platform_manage_access"]
         else:
             apply_actions = ["sla_priority_manage"]
-        
+
         return self.iam_auth(request, apply_actions)
-    
-    
-    
-    
-    

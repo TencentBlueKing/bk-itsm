@@ -26,39 +26,45 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 __author__ = "蓝鲸智云"
 __copyright__ = "Copyright © 2025 Tencent BlueKing. All Rights Reserved."
 
-from django.conf.urls import url
+from django.urls import re_path
 
 from itsm.helper import views
 
 urlpatterns = [
     # 统一的升级接口
-    url(r'^db_fix_from_1_1_22_to_2_1_16/$', views.db_fix_from_1_1_22_to_2_1_16),
-    url(r'^db_fix_from_2_1_x_to_2_2_1/$', views.db_fix_from_2_1_x_to_2_2_1),
-    url(r'^db_fix_after_2_2_17/$', views.db_fix_after_2_2_17),
-    url(r'^db_fix_after_2_3_1/$', views.db_fix_after_2_3_1),
+    re_path(r"^db_fix_from_1_1_22_to_2_1_16/$", views.db_fix_from_1_1_22_to_2_1_16),
+    re_path(r"^db_fix_from_2_1_x_to_2_2_1/$", views.db_fix_from_2_1_x_to_2_2_1),
+    re_path(r"^db_fix_after_2_2_17/$", views.db_fix_after_2_2_17),
+    re_path(r"^db_fix_after_2_3_1/$", views.db_fix_after_2_3_1),
     # 杂乱的升级接口
-    url(r'^fix_ticket_title/$', views.fix_ticket_title),
-    url(r'^update_logs_type/$', views.update_logs_type),
-    url(r'^db_fix_after_2_0_3/$', views.db_fix_after_2_0_3),
-    url(r'^db_fix_ticket_end_at_after_2_0_5/$', views.db_fix_ticket_end_at_after_2_0_5),
-    url(r'^db_fix_deal_time_after_2_0_5/$', views.db_fix_deal_time_after_2_0_5),
-    url(r'^db_fix_after_2_0_7/$', views.db_fix_after_2_0_7),
-    url(r'^db_fix_after_2_0_9/$', views.db_fix_after_2_0_9),
-    url(r'^db_fix_after_2_0_14/$', views.db_fix_after_2_0_14),
-    url(r'^db_fix_after_2_1_x/$', views.db_fix_after_2_1_x),
-    url(r'^db_fix_after_2_1_1/$', views.db_fix_after_2_1_1),
-    url(r'^db_fix_sla/$', views.db_fix_sla),
-    url(r'^db_fix_after_2_1_9/$', views.db_fix_after_2_1_9),
-    url(r'^export_api_system/$', views.export_api_system),
-    url(r'^db_fix_for_attachments/$', views.db_fix_for_attachments),
-    url(r'^db_fix_for_service_catalog/$', views.db_fix_for_service_catalog),
-    url(r'^weekly_statical/$', views.weekly_statical),
-    url(r'^db_fix_for_workflow_after_2_5_9/$', views.db_fix_for_workflow_after_2_5_9),
-    url(r'^db_fix_for_blueapps_after_2_6_0/$', views.db_fix_for_blueapps_after_2_6_0),
+    re_path(r"^fix_ticket_title/$", views.fix_ticket_title),
+    re_path(r"^update_logs_type/$", views.update_logs_type),
+    re_path(r"^db_fix_after_2_0_3/$", views.db_fix_after_2_0_3),
+    re_path(
+        r"^db_fix_ticket_end_at_after_2_0_5/$", views.db_fix_ticket_end_at_after_2_0_5
+    ),
+    re_path(r"^db_fix_deal_time_after_2_0_5/$", views.db_fix_deal_time_after_2_0_5),
+    re_path(r"^db_fix_after_2_0_7/$", views.db_fix_after_2_0_7),
+    re_path(r"^db_fix_after_2_0_9/$", views.db_fix_after_2_0_9),
+    re_path(r"^db_fix_after_2_0_14/$", views.db_fix_after_2_0_14),
+    re_path(r"^db_fix_after_2_1_x/$", views.db_fix_after_2_1_x),
+    re_path(r"^db_fix_after_2_1_1/$", views.db_fix_after_2_1_1),
+    re_path(r"^db_fix_sla/$", views.db_fix_sla),
+    re_path(r"^db_fix_after_2_1_9/$", views.db_fix_after_2_1_9),
+    re_path(r"^export_api_system/$", views.export_api_system),
+    re_path(r"^db_fix_for_attachments/$", views.db_fix_for_attachments),
+    re_path(r"^db_fix_for_service_catalog/$", views.db_fix_for_service_catalog),
+    re_path(r"^weekly_statical/$", views.weekly_statical),
+    re_path(
+        r"^db_fix_for_workflow_after_2_5_9/$", views.db_fix_for_workflow_after_2_5_9
+    ),
+    re_path(
+        r"^db_fix_for_blueapps_after_2_6_0/$", views.db_fix_for_blueapps_after_2_6_0
+    ),
     # 获取settings内容
 ]
 
 # urlpatterns += [
-#     url(r'^dump_db/$', views_common.dump_db),
-#     url(r'^drop_table/$', views_common.drop_table),
+#     re_path(r'^dump_db/$', views_common.dump_db),
+#     re_path(r'^drop_table/$', views_common.drop_table),
 # ]

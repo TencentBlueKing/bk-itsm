@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
@@ -111,12 +111,18 @@ class TaskSerializer(serializers.ModelSerializer):
     """任务序列化"""
 
     name = serializers.CharField(required=False, max_length=50, allow_blank=True)
-    processors_type = serializers.CharField(required=False, allow_blank=True, max_length=LEN_LONG, default=EMPTY_STRING)
-    processors = serializers.CharField(required=False, allow_blank=True, max_length=LEN_LONG, default=EMPTY_STRING)
+    processors_type = serializers.CharField(
+        required=False, allow_blank=True, max_length=LEN_LONG, default=EMPTY_STRING
+    )
+    processors = serializers.CharField(
+        required=False, allow_blank=True, max_length=LEN_LONG, default=EMPTY_STRING
+    )
     task_schema_id = serializers.IntegerField(required=True)
     state_id = serializers.IntegerField(required=True)
     order = serializers.IntegerField(required=False, default=1)
-    component_type = serializers.CharField(required=False, max_length=LEN_LONG, default=EMPTY_STRING)
+    component_type = serializers.CharField(
+        required=False, max_length=LEN_LONG, default=EMPTY_STRING
+    )
     fields = serializers.JSONField(required=False, default={})
 
     class Meta:
@@ -153,22 +159,28 @@ class TaskSerializer(serializers.ModelSerializer):
             return validated_data
 
         try:
-            schema_instance = TaskSchema.objects.get(id=validated_data['task_schema_id'])
+            schema_instance = TaskSchema.objects.get(
+                id=validated_data["task_schema_id"]
+            )
         except TaskSchema.DoesNotExist:
             raise ValidationError(detail=_("对应的任务模板配置不存在"))
 
-        ticket = Ticket.objects.get(id=validated_data['ticket_id'])
+        ticket = Ticket.objects.get(id=validated_data["ticket_id"])
         task_config = TaskConfig.objects.filter(
-            workflow_id=ticket.flow_id, workflow_type=VERSION, create_task_state=validated_data['state_id']
+            workflow_id=ticket.flow_id,
+            workflow_type=VERSION,
+            create_task_state=validated_data["state_id"],
         ).first()
         if task_config:
-            validated_data['execute_state_id'] = task_config.execute_task_state
+            validated_data["execute_state_id"] = task_config.execute_task_state
         else:
             is_exist = TaskConfig.objects.filter(
-                workflow_id=ticket.flow_id, workflow_type=VERSION, execute_task_state=validated_data['state_id']
+                workflow_id=ticket.flow_id,
+                workflow_type=VERSION,
+                execute_task_state=validated_data["state_id"],
             ).exists()
             if is_exist:
-                validated_data['execute_state_id'] = validated_data['state_id']
+                validated_data["execute_state_id"] = validated_data["state_id"]
             else:
                 raise ValidationError(detail=_("对应的任务配置不存在"))
         # 更新component_type
@@ -182,15 +194,25 @@ class TaskSerializer(serializers.ModelSerializer):
         data = super(TaskSerializer, self).to_representation(instance)
         # 首尾去掉逗号
         data.update(processors=normal_name(data["processors"]))
-        if isinstance(self.context.get("view"), ModelViewSet) and self.context["view"].detail:
+        if (
+            isinstance(self.context.get("view"), ModelViewSet)
+            and self.context["view"].detail
+        ):
             create_fields = TaskFieldSerializer(instance.create_fields, many=True).data
-            operate_fields = TaskFieldSerializer(instance.operate_fields, many=True).data
-            confirm_fields = TaskFieldSerializer(instance.confirm_fields, many=True).data
+            operate_fields = TaskFieldSerializer(
+                instance.operate_fields, many=True
+            ).data
+            confirm_fields = TaskFieldSerializer(
+                instance.confirm_fields, many=True
+            ).data
             if instance.component_type == SOPS_TASK:
                 sops_task = SopsTask.objects.get(task_id=instance.id)
                 try:
                     detail = client_backend.sops.get_task_detail(
-                        {"bk_biz_id": sops_task.bk_biz_id, "task_id": sops_task.sops_task_id}
+                        {
+                            "bk_biz_id": sops_task.bk_biz_id,
+                            "task_id": sops_task.sops_task_id,
+                        }
                     )
                 except Exception:
                     raise ComponentCallError(_("标准运维获取任务详情失败"))
@@ -199,10 +221,14 @@ class TaskSerializer(serializers.ModelSerializer):
                     if field["key"] == SOPS_TEMPLATE_KEY:
                         sops_constants = {}
                         for sops_constant in detail["constants"].values():
-                            sops_constants[sops_constant["key"]] = sops_constant["value"]
+                            sops_constants[sops_constant["key"]] = sops_constant[
+                                "value"
+                            ]
                         for constant in field["value"]["constants"]:
                             if constant.get("is_quoted", False):
-                                current_value = Template(constant["value"]).render(**outputs)
+                                current_value = Template(constant["value"]).render(
+                                    **outputs
+                                )
                                 changed = (
                                     current_value != sops_constants[constant["key"]]
                                     if constant["key"] in sops_constants
@@ -211,17 +237,23 @@ class TaskSerializer(serializers.ModelSerializer):
                                 constant["changed"] = changed
                             else:
                                 constant["changed"] = False
-                                constant["value"] = sops_constants.get(constant["key"], constant.get("value", ""))
-                        field["display_value"]["constants"] = field["value"]["constants"]
+                                constant["value"] = sops_constants.get(
+                                    constant["key"], constant.get("value", "")
+                                )
+                        field["display_value"]["constants"] = field["value"][
+                            "constants"
+                        ]
                 data["sops_task_url"] = sops_task.sops_task_url
             data["fields"] = {
-                'create_fields': create_fields,
-                'operate_fields': operate_fields,
-                'confirm_fields': confirm_fields,
+                "create_fields": create_fields,
+                "operate_fields": operate_fields,
+                "confirm_fields": confirm_fields,
             }
 
         if isinstance(self.context.get("request"), Request):
-            data["can_process"] = instance.can_process(self.context["request"].user.username)
+            data["can_process"] = instance.can_process(
+                self.context["request"].user.username
+            )
         return data
 
 
@@ -256,7 +288,9 @@ class TaskListSerializer(serializers.ModelSerializer):
     def get_sops_tasks(self):
         tasks = [] if self.instance is None else self.instance
         task_ids = [task.id for task in tasks]
-        sops_task_ids = SopsTask.objects.filter(task_id__in=task_ids).values("task_id", "sops_task_url")
+        sops_task_ids = SopsTask.objects.filter(task_id__in=task_ids).values(
+            "task_id", "sops_task_url"
+        )
         sops_task_map = {}
         for sops_task in sops_task_ids:
             sops_task_map[sops_task["task_id"]] = sops_task["sops_task_url"]
@@ -265,7 +299,9 @@ class TaskListSerializer(serializers.ModelSerializer):
     def get_devops_tasks(self):
         tasks = [] if self.instance is None else self.instance
         task_ids = [task.id for task in tasks]
-        sub_task_ids = SubTask.objects.filter(task_id__in=task_ids).values("task_id", "sub_task_url")
+        sub_task_ids = SubTask.objects.filter(task_id__in=task_ids).values(
+            "task_id", "sub_task_url"
+        )
         sub_task_map = {}
         for sub_task in sub_task_ids:
             sub_task_map[sub_task["task_id"]] = sub_task["sub_task_url"]
@@ -276,9 +312,13 @@ class TaskListSerializer(serializers.ModelSerializer):
         # 首尾去掉逗号
         data.update(processors=normal_name(data["processors"]))
         if isinstance(self.context.get("request"), Request):
-            data["can_process"] = instance.can_process(self.context["request"].user.username)
+            data["can_process"] = instance.can_process(
+                self.context["request"].user.username
+            )
         if instance.component_type in [SOPS_TASK, DEVOPS_TASK]:
-            data["task_url"] = self.sops_tasks.get(str(data["id"]), "") or self.devops_tasks.get(str(data["id"]), "")
+            data["task_url"] = self.sops_tasks.get(
+                str(data["id"]), ""
+            ) or self.devops_tasks.get(str(data["id"]), "")
         return data
 
 
@@ -293,8 +333,12 @@ class TaskFilterSerializer(serializers.Serializer):
 
 
 class TaskOrderSerializer(serializers.Serializer):
-    task_orders = serializers.ListField(required=True, allow_empty=True, validators=[TaskOrdersValidator()])
-    ticket_id = serializers.IntegerField(required=True, validators=[TicketValidValidator()])
+    task_orders = serializers.ListField(
+        required=True, allow_empty=True, validators=[TaskOrdersValidator()]
+    )
+    ticket_id = serializers.IntegerField(
+        required=True, validators=[TicketValidValidator()]
+    )
 
     def create(self, validated_data):
         return super().create(validated_data)
@@ -304,7 +348,9 @@ class TaskOrderSerializer(serializers.Serializer):
 
 
 class TaskFieldBatchUpdateSerializer(serializers.Serializer):
-    fields = serializers.ListField(required=True, allow_empty=True, validators=[TaskFieldBatchUpdateValidator()])
+    fields = serializers.ListField(
+        required=True, allow_empty=True, validators=[TaskFieldBatchUpdateValidator()]
+    )
 
     def create(self, validated_data):
         return super().create(validated_data)
@@ -332,7 +378,10 @@ class TaskCreateSerializer(TaskSerializer):
 
 
 class TaskProceedSerializer(serializers.Serializer):
-    action = serializers.ChoiceField(choices=[(ACTION_OPERATE, _("处理")), (ACTION_CONFIRM, _("总结"))], required=True)
+    action = serializers.ChoiceField(
+        choices=[(ACTION_OPERATE, _("处理")), (ACTION_CONFIRM, _("总结"))],
+        required=True,
+    )
     fields = serializers.ListField(required=True, allow_empty=True)
 
     def validate(self, attrs):
@@ -340,11 +389,13 @@ class TaskProceedSerializer(serializers.Serializer):
 
         # 校验fields
         fields = validated_data.get("fields", {})
-        action = attrs.get('action')
-        task = self.context['task']
+        action = attrs.get("action")
+        task = self.context["task"]
 
         # 检验字段合法性：必填校验（未考虑隐藏字段）
-        task_fields = task.operate_fields if action == ACTION_OPERATE else task.confirm_fields
+        task_fields = (
+            task.operate_fields if action == ACTION_OPERATE else task.confirm_fields
+        )
         validate_task_fields(task_fields, fields)
 
         return validated_data
@@ -369,7 +420,7 @@ class TaskRetrySerializer(serializers.Serializer):
         fields = validated_data.get("fields", {})
 
         # 检验字段合法性：必填校验（未考虑隐藏字段）
-        task_fields = self.context['task'].operate_fields
+        task_fields = self.context["task"].operate_fields
         validate_task_fields(task_fields, fields)
 
         return validated_data
@@ -391,8 +442,12 @@ class TaskLibTasksSerializer(serializers.ModelSerializer):
     processors_type = serializers.CharField(required=True, max_length=LEN_NORMAL)
     processors = serializers.CharField(required=True, max_length=LEN_LONG)
     fields = serializers.JSONField(required=True)
-    sub_template_id = serializers.CharField(required=False, default="", max_length=LEN_NORMAL, allow_blank=True)
-    project_id = serializers.CharField(required=False, default="", max_length=LEN_NORMAL, allow_blank=True)
+    sub_template_id = serializers.CharField(
+        required=False, default="", max_length=LEN_NORMAL, allow_blank=True
+    )
+    project_id = serializers.CharField(
+        required=False, default="", max_length=LEN_NORMAL, allow_blank=True
+    )
     exclude_task_nodes = serializers.JSONField(required=True)
 
     class Meta:
@@ -424,10 +479,14 @@ class TaskLibSerializer(serializers.ModelSerializer):
         if (
             self.instance is None
             and TaskLib.objects.filter(
-                service_id=attrs['service_id'], name=attrs['name'], creator=attrs['creator']
+                service_id=attrs["service_id"],
+                name=attrs["name"],
+                creator=attrs["creator"],
             ).exists()
         ):
-            raise serializers.ValidationError({str(_('参数校验失败')): _('您名下已经有同名任务库，请尝试换个名称')})
+            raise serializers.ValidationError(
+                {str(_("参数校验失败")): _("您名下已经有同名任务库，请尝试换个名称")}
+            )
 
         return attrs
 

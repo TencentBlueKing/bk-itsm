@@ -12,7 +12,7 @@ specific language governing permissions and limitations under the License.
 """
 
 import abc
-from collections import Mapping
+from collections.abc import Mapping
 
 
 class DataItem(object, metaclass=abc.ABCMeta):
@@ -91,7 +91,9 @@ class BooleanItemSchema(SimpleItemSchema):
 class ArrayItemSchema(ItemSchema):
     def __init__(self, item_schema, *args, **kwargs):
         if not isinstance(item_schema, ItemSchema):
-            raise TypeError("item_schema of ArrayItemSchema must be subclass of ItemSchema")
+            raise TypeError(
+                "item_schema of ArrayItemSchema must be subclass of ItemSchema"
+            )
         self.item_schema = item_schema
         super(ArrayItemSchema, self).__init__(*args, **kwargs)
 
@@ -110,15 +112,22 @@ class ObjectItemSchema(ItemSchema):
         if not isinstance(property_schemas, Mapping):
             raise TypeError("property_schemas of ObjectItemSchema must be Mapping type")
 
-        if not all([isinstance(value, ItemSchema) for value in list(property_schemas.values())]):
-            raise TypeError("value in property_schemas of ObjectItemSchema must be subclass of ItemSchema")
+        if not all(
+            [isinstance(value, ItemSchema) for value in list(property_schemas.values())]
+        ):
+            raise TypeError(
+                "value in property_schemas of ObjectItemSchema must be subclass of ItemSchema"
+            )
 
         self.property_schemas = property_schemas
         super(ObjectItemSchema, self).__init__(*args, **kwargs)
 
     def as_dict(self):
         base = super(ObjectItemSchema, self).as_dict()
-        properties = {prop: schema.as_dict() for prop, schema in list(self.property_schemas.items())}
+        properties = {
+            prop: schema.as_dict()
+            for prop, schema in list(self.property_schemas.items())
+        }
         base["properties"] = properties
         return base
 

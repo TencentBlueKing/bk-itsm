@@ -249,7 +249,7 @@ class SignTask(Model):
         _("任务状态"), max_length=LEN_SHORT, choices=TASK_STATUS_CHOICES, default="WAIT"
     )
     processor = models.CharField(_("处理人"), max_length=LEN_LONG)
-    is_passed = models.NullBooleanField(_("是否审批通过"), null=True)
+    is_passed = models.BooleanField(_("是否审批通过"), null=True)
 
     objects = managers.SignTaskManager()
 
@@ -310,22 +310,37 @@ class Status(Model):
     )
     # 当前环节处理人
     processors_type = models.CharField(
-        _("处理人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+        _("处理人类型"),
+        max_length=LEN_SHORT,
+        choices=PROCESSOR_CHOICES,
+        default="EMPTY",
     )
     processors = models.CharField(
-        _("处理人列表"), max_length=LEN_XX_LONG, default=EMPTY_STRING, null=True, blank=True
+        _("处理人列表"),
+        max_length=LEN_XX_LONG,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
     )
     # 被转单人
     delivers_type = models.CharField(
-        _("转单人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+        _("转单人类型"),
+        max_length=LEN_SHORT,
+        choices=PROCESSOR_CHOICES,
+        default="EMPTY",
     )
-    delivers = models.TextField(_("转单人列表"), default=EMPTY_STRING, null=True, blank=True)
+    delivers = models.TextField(
+        _("转单人列表"), default=EMPTY_STRING, null=True, blank=True
+    )
     can_deliver = models.BooleanField(_("能否转单"), default=False)
 
     # 被分派人
     # TODO assignors_type/assignors是被分派人
     assignors_type = models.CharField(
-        _("派单人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+        _("派单人类型"),
+        max_length=LEN_SHORT,
+        choices=PROCESSOR_CHOICES,
+        default="EMPTY",
     )
     assignors = models.TextField(
         _("派单人列表"), default=EMPTY_STRING, null=True, blank=True
@@ -1326,7 +1341,10 @@ class Ticket(Model, BaseTicket):
 
     is_supervise_needed = models.BooleanField(_("是否需要督办"), default=False)
     supervise_type = models.CharField(
-        _("督办人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+        _("督办人类型"),
+        max_length=LEN_SHORT,
+        choices=PROCESSOR_CHOICES,
+        default="EMPTY",
     )
     supervisor = models.CharField(
         _("督办列表"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True
@@ -1341,7 +1359,9 @@ class Ticket(Model, BaseTicket):
 
     # Deprecated Fields
     # 针对节点的字段需要迁移到新的表中
-    current_state_id = models.CharField(_("当前状态ID"), null=True, max_length=LEN_NORMAL)
+    current_state_id = models.CharField(
+        _("当前状态ID"), null=True, max_length=LEN_NORMAL
+    )
     current_assignor = models.CharField(
         _("分派人列表"), max_length=LEN_LONG, default=EMPTY_STRING
     )
@@ -1349,17 +1369,31 @@ class Ticket(Model, BaseTicket):
         _("处理者列表"), max_length=LEN_LONG, default=EMPTY_STRING
     )
     current_assignor_type = models.CharField(
-        _("分派人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+        _("分派人类型"),
+        max_length=LEN_SHORT,
+        choices=PROCESSOR_CHOICES,
+        default="EMPTY",
     )
     current_processors_type = models.CharField(
-        _("处理者类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+        _("处理者类型"),
+        max_length=LEN_SHORT,
+        choices=PROCESSOR_CHOICES,
+        default="EMPTY",
     )
 
-    updated_by = models.CharField(_("修改人"), default=EMPTY_STRING, max_length=LEN_LONG)
+    updated_by = models.CharField(
+        _("修改人"), default=EMPTY_STRING, max_length=LEN_LONG
+    )
 
-    service = models.CharField(_("对应服务主键"), default="custom", max_length=LEN_NORMAL)
+    service = models.CharField(
+        _("对应服务主键"), default="custom", max_length=LEN_NORMAL
+    )
     service_property = jsonfield.JSONCharField(
-        _("业务特性json字段"), max_length=LEN_LONG, default=EMPTY_DICT, null=True, blank=True
+        _("业务特性json字段"),
+        max_length=LEN_LONG,
+        default=EMPTY_DICT,
+        null=True,
+        blank=True,
     )
     workflow_snap_id = models.IntegerField(_("对应的快照信息"), default=0)
     """
@@ -2389,7 +2423,9 @@ class Ticket(Model, BaseTicket):
                 impact = self.fields.get(key=FIELD_PY_IMPACT, source=BASE_MODEL).value
 
             except TicketField.DoesNotExist as error:
-                logger.warning("当前单据不包含影响范围的字段， error is {}".format(error))
+                logger.warning(
+                    "当前单据不包含影响范围的字段， error is {}".format(error)
+                )
                 return {}
 
         if not urgency:
@@ -2419,7 +2455,9 @@ class Ticket(Model, BaseTicket):
                     sla_instance = Sla.objects.get(id=sla_id)
                 except Sla.DoesNotExist as error:
                     logger.warning(
-                        "Failed to get sla_instance from Sla， error is {}".format(error)
+                        "Failed to get sla_instance from Sla， error is {}".format(
+                            error
+                        )
                     )
                     return {}
                 default_priority = sla_instance.get_default_policy()
@@ -4030,7 +4068,10 @@ class Ticket(Model, BaseTicket):
         reason = self.get_field_value("reason", None)
         if reason is None:
             list_view.append(
-                {"key": "提单时间", "value": self.create_at.strftime("%Y-%m-%d %H:%M:%S")}
+                {
+                    "key": "提单时间",
+                    "value": self.create_at.strftime("%Y-%m-%d %H:%M:%S"),
+                }
             )
         else:
             list_view.append({"key": "申请理由", "value": reason})
@@ -4159,14 +4200,20 @@ class Ticket(Model, BaseTicket):
                 rule_source_type=SOURCE_TICKET,
             )
             logger.info(
-                "[ticket->send_trigger_signal] 触发器发送发生成功, ticket_id={}".format(self.id)
+                "[ticket->send_trigger_signal] 触发器发送发生成功, ticket_id={}".format(
+                    self.id
+                )
             )
         except BaseException:
             logger.info(
-                "[ticket->send_trigger_signal] 触发器事件发送失败, ticket_id={}".format(self.id)
+                "[ticket->send_trigger_signal] 触发器事件发送失败, ticket_id={}".format(
+                    self.id
+                )
             )
             logger.exception(
-                _("触发器事件发送失败, ticket_sn {} signal ：{}").format(self.sn, signal)
+                _("触发器事件发送失败, ticket_sn {} signal ：{}").format(
+                    self.sn, signal
+                )
             )
 
     def create_ticket_relation(self, from_ticket_id):
@@ -4381,7 +4428,9 @@ class Ticket(Model, BaseTicket):
     def terminate(self, state_id, operator="", terminate_message="--"):
         """终止单据"""
         node_status = self.status(state_id)
-        message = _("{operator}处理节点【{name}】(流程被终止，【终止原因】:{detail_message}).")
+        message = _(
+            "{operator}处理节点【{name}】(流程被终止，【终止原因】:{detail_message})."
+        )
         # 创建流转日志
         with transaction.atomic():
             # 撤销流程
@@ -4437,7 +4486,11 @@ class Ticket(Model, BaseTicket):
         )
         self.stop_all_sla()
 
-        return {"result": True, "message": _("流程终止成功：%s") % res.message, "code": 0}
+        return {
+            "result": True,
+            "message": _("流程终止成功：%s") % res.message,
+            "code": 0,
+        }
 
     def suspend(self, suspend_message, operator="system"):
         """挂起"""

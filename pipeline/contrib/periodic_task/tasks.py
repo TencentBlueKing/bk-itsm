@@ -16,7 +16,7 @@ import logging
 import traceback
 
 import pytz
-from celery import task
+from celery import shared_task
 from django.utils import timezone
 
 from pipeline.contrib.periodic_task import signals
@@ -27,7 +27,7 @@ from pipeline.models import PipelineInstance
 logger = logging.getLogger("celery")
 
 
-@task(ignore_result=True)
+@shared_task(ignore_result=True)
 def periodic_task_start(*args, **kwargs):
     try:
         periodic_task = PeriodicTask.objects.get(id=kwargs["period_task_id"])
@@ -61,25 +61,38 @@ def periodic_task_start(*args, **kwargs):
         )
 
         result = instance.start(
-            periodic_task.creator, check_workers=False, priority=periodic_task.priority, queue=periodic_task.queue
+            periodic_task.creator,
+            check_workers=False,
+            priority=periodic_task.priority,
+            queue=periodic_task.queue,
         )
     except Exception:
         et = traceback.format_exc()
         logger.error(et)
         PeriodicTaskHistory.objects.record_schedule(
-            periodic_task=periodic_task, pipeline_instance=None, ex_data=et, start_success=False
+            periodic_task=periodic_task,
+            pipeline_instance=None,
+            ex_data=et,
+            start_success=False,
         )
         return
 
     if not result.result:
         PeriodicTaskHistory.objects.record_schedule(
-            periodic_task=periodic_task, pipeline_instance=None, ex_data=result.message, start_success=False
+            periodic_task=periodic_task,
+            pipeline_instance=None,
+            ex_data=result.message,
+            start_success=False,
         )
         return
 
     periodic_task.total_run_count += 1
     periodic_task.last_run_at = timezone.now()
     periodic_task.save()
-    signals.post_periodic_task_start.send(sender=PeriodicTask, periodic_task=periodic_task, pipeline_instance=instance)
+    signals.post_periodic_task_start.send(
+        sender=PeriodicTask, periodic_task=periodic_task, pipeline_instance=instance
+    )
 
-    PeriodicTaskHistory.objects.record_schedule(periodic_task=periodic_task, pipeline_instance=instance, ex_data="")
+    PeriodicTaskHistory.objects.record_schedule(
+        periodic_task=periodic_task, pipeline_instance=instance, ex_data=""
+    )

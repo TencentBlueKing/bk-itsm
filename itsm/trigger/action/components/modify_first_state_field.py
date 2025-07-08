@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.trigger.action.core.component import BaseComponent
 from itsm.trigger.action.core import SelectField, CascadeField, BaseForm

@@ -36,7 +36,7 @@ from six.moves import zip
 from django.db import models, connections, NotSupportedError
 from django.db.models import F, Q, QuerySet, AutoField
 from django.forms import model_to_dict
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from common.log import logger
 from itsm.component.constants import (
@@ -837,9 +837,9 @@ class TicketLogManager(LogsManager):
             from_state_id=state_id,
             type=operate_type,
             operator=log_operator,
-            message="%s..." % message[0:500]
-            if len(message) > 500
-            else message,  # 防止消息太长
+            message=(
+                "%s..." % message[0:500] if len(message) > 500 else message
+            ),  # 防止消息太长
             workflow_id=ticket.flow.id,
             processors_type=getattr(status, "processors_type", ""),
             processors=getattr(status, "processors", ""),
@@ -855,6 +855,7 @@ class TicketLogManager(LogsManager):
         )
 
         from itsm.ticket.tasks import ticket_set_history_operators
+
         ticket_set_history_operators.delay(ticket.id, log_operator)
 
         return log
@@ -1002,6 +1003,7 @@ class TicketFieldManager(models.Manager):
         max_batch_size = max(ops.bulk_batch_size(fields, objs), 1)
         batch_size = min(batch_size, max_batch_size) if batch_size else max_batch_size
         inserted_rows = []
+        on_conflict = "DO NOTHING" if ignore_conflicts else None
         bulk_return = connections[self.db].features.can_return_rows_from_bulk_insert
         for item in [objs[i : i + batch_size] for i in range(0, len(objs), batch_size)]:
             if bulk_return and not ignore_conflicts:
@@ -1011,7 +1013,7 @@ class TicketFieldManager(models.Manager):
                         fields=fields,
                         using=self.db,
                         returning_fields=self.model._meta.db_returning_fields,
-                        ignore_conflicts=ignore_conflicts,
+                        on_conflict=on_conflict,
                     )
                 )
             else:
@@ -1019,7 +1021,7 @@ class TicketFieldManager(models.Manager):
                     item,
                     fields=fields,
                     using=self.db,
-                    ignore_conflicts=ignore_conflicts,
+                    on_conflict=on_conflict,
                 )
         return inserted_rows
 

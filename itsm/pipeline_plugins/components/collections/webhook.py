@@ -32,7 +32,7 @@ from django.conf import settings
 from jinja2.sandbox import SandboxedEnvironment as Environment
 from pipeline.utils.boolrule import BoolRule
 from pipeline.component_framework.component import Component
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import (
     TRANSITION_OPERATE,
@@ -222,7 +222,9 @@ class WebHookService(ItsmBaseService):
 
         state = ticket.flow.get_state(state_id)
         variables = state["variables"].get("outputs", [])
-        error_message_template = "WebHook任务【{name}】执行失败，失败信息 {detail_message}"
+        error_message_template = (
+            "WebHook任务【{name}】执行失败，失败信息 {detail_message}"
+        )
 
         processors = ticket.current_processors[1:-1]
         current_node = ticket.node_status.get(state_id=state_id)

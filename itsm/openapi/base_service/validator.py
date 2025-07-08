@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.ticket.validators import (
     derive_validate,
@@ -41,12 +41,20 @@ class CreateTicketValidator(object):
             flow = WorkflowVersion.objects.get(id=flow_id)
         except WorkflowVersion.DoesNotExist:
             raise CreateTicketError(
-                _("单据创建失败，flow_id 对应的流程版本不存在, flow_id={}".format(flow_id))
+                _(
+                    "单据创建失败，flow_id 对应的流程版本不存在, flow_id={}".format(
+                        flow_id
+                    )
+                )
             )
 
         if flow.workflow_id != service.workflow.workflow_id:
             raise CreateTicketError(
-                _("单据创建失败，flow_id对应的流程与该服务绑定的流程不一致，flow_id:{}".format(flow_id))
+                _(
+                    "单据创建失败，flow_id对应的流程与该服务绑定的流程不一致，flow_id:{}".format(
+                        flow_id
+                    )
+                )
             )
 
         state_id = str(flow.first_state["id"])
@@ -68,7 +76,9 @@ class CreateTicketValidator(object):
 
         lost_keys = required_keys - field_keys
         if lost_keys:
-            raise CreateTicketError(_("单据创建失败，缺少参数：{}".format(list(lost_keys))))
+            raise CreateTicketError(
+                _("单据创建失败，缺少参数：{}".format(list(lost_keys)))
+            )
 
         first_state_permission(fields, state, username)
 

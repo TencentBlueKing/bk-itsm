@@ -54,7 +54,9 @@ class TestSlaProtocolsView(TestCase):
 
         rsp = self.client.post(path=url, data=data, content_type="application/json")
         self.assertEqual(rsp.data["result"], False)
-        self.assertEqual(rsp.data["message"], "参数验证失败: 服务协议名称：[7*24] 已存在")
+        self.assertEqual(
+            rsp.data["message"], "参数验证失败: 服务协议名称：[7*24] 已存在"
+        )
 
         data["name"] = "5*24"
         url = "/api/sla/protocols/"
