@@ -28,7 +28,6 @@ from functools import reduce
 
 from django.db import connection
 from django.db.models import Count, Q, Case, When, Max
-from django.db.models.functions import TruncMonth, TruncDay
 from django.utils.translation import ugettext as _
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -739,7 +738,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
         filter_result = list(
             queryset.filter(service_type=service_type)
-            .annotate(date=TruncMonth("create_at"))  # 格式化日期到年月
+            .extra(select={"date": "date_format(create_at, '%%Y-%%m')"})
             .values("date", "service_type")
             .order_by("date")
             .annotate(count=Count("id"))
@@ -827,7 +826,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
         # 每月创建的单据
         month_create_count = list(
-            queryset.annotate(date=TruncMonth("create_at"))
+            queryset.extra(select={"date": "date_format(create_at, '%%Y-%%m')"})
             .values("date", "service_type")
             .order_by("date", "service_type")
             .annotate(create_count=Count("create_at"))
@@ -860,7 +859,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
         # 整体
         whole_month_create_count = list(
-            queryset.annotate(date=TruncMonth("create_at"))
+            queryset.extra(select={"date": "date_format(create_at, '%%Y-%%m')"})
             .values("date")
             .order_by("date")
             .annotate(create_count=Count("create_at"))
@@ -1128,7 +1127,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             return Response()
 
         filter_result = list(
-            queryset.annotate(day=TruncDay("create_at"))  # 格式化日期到天
+            queryset.extra(select={"day": "date(create_at)"})
             .values("day")
             .distinct()
             .order_by("day")
