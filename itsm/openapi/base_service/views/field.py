@@ -69,9 +69,9 @@ class FieldViewSet(BaseFieldViewSet):
         if state_id:
             valid_fields = State.objects.fields_of_state(state_id)
             ordering = "FIELD(`id`, {})".format(
-                ",".join(["'{}'".format(v) for v in valid_fields])
+                ",".join(["'{}'".format(int(v)) for v in valid_fields])
             )
-            queryset = queryset.filter(id__in=valid_fields).extra(
+            queryset = queryset.filter(id__in=valid_fields).extra(  # review
                 select={"ordering": ordering}, order_by=["ordering"]
             )
 
@@ -207,10 +207,10 @@ class FieldViewSet(BaseFieldViewSet):
 
         valid_fields = state.fields
         ordering = "FIELD(`id`, {})".format(
-            ",".join(["'{}'".format(v) for v in valid_fields])
+            ",".join(["'{}'".format(int(v)) for v in valid_fields])
         )
 
-        queryset = queryset.filter(id__in=valid_fields).extra(
+        queryset = queryset.filter(id__in=valid_fields).extra( # review
             select={"ordering": ordering}, order_by=["ordering"]
         )
         serializer_data = self.get_serializer(queryset, many=True).data

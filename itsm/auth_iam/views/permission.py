@@ -63,8 +63,11 @@ class PermissionViewSet(ApiGenericMixin, ViewSet):
 
     @action(detail=False, methods=["get"])
     def platform_permission(self, request):
-        iam_client = IamRequest(request)
         verify_actions = PLATFORM_PERMISSION
+        if settings.IAM_SKIP_AUTH:
+            return Response({action_id: True for action_id in verify_actions})
+        
+        iam_client = IamRequest(request)
         auth_actions = iam_client.resource_multi_actions_allowed(verify_actions, [])
         
         return Response(auth_actions)

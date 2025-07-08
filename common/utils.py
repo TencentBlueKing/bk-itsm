@@ -70,6 +70,13 @@ def url_escape(url):
     return url
 
 
+def sql_escape(data):
+    data = url_escape(data)
+    data = data.repace("`", "")
+    data = data.repace("'", "")
+    return data
+
+
 def texteditor_escape(str_escape, unsupported_tags=None):
     """
     富文本处理
