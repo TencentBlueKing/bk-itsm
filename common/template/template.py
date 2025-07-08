@@ -85,25 +85,12 @@ class Template:
         :rtype: Any
         """
         data = self.data
+        if not isinstance(data, str):
+            raise Exception("render type error, template[%s] is not a string" % self.data)
         
         context = context or kwargs
         if isinstance(data, str):
             return self._render_string(data, context)
-        if isinstance(data, list):
-            ldata = [""] * len(data)
-            for index, item in enumerate(data):
-                ldata[index] = Template(copy.deepcopy(item)).render(context)
-            return ldata
-        if isinstance(data, tuple):
-            ldata = [""] * len(data)
-            for index, item in enumerate(data):
-                ldata[index] = Template(copy.deepcopy(item)).render(context)
-            return tuple(ldata)
-        if isinstance(data, dict):
-            for key, value in list(data.items()):
-                data[key] = Template(copy.deepcopy(value)).render(context)
-            return data
-        return data
 
     def _get_string_templates(self, string) -> List[str]:
         return list(set(TEMPLATE_PATTERN.findall(string)))
@@ -114,7 +101,7 @@ class Template:
         try:
             node = lex.parse()
         except MakoException as e:
-            logger.warning("pipeline get template[{}] reference error[{}]".format(template, e))
+            logger.warning("pipeline get template[%s] reference error[%s]", template, e)
             return []
 
         # Dummy compiler. _Identifiers class requires one
@@ -158,13 +145,13 @@ class Template:
                     mako_safety.SingleLinCodeExtractor(),
                 )
             except ForbiddenMakoTemplateException as e:
-                logger.warning("forbidden template: {}, exception: {}".format(tpl, e))
+                logger.warning("forbidden template: %s, exception: %s", tpl, e)
                 continue
             except Exception:
-                logger.exception("{} safety check error.".format(tpl))
+                logger.exception("%s safety check error.", tpl)
                 continue
             resolved = Template._render_template(tpl, context)
-            string = string.replace(tpl, resolved)
+            string = string.replace(tpl, str(resolved))
         return string
 
     @staticmethod
@@ -179,7 +166,7 @@ class Template:
             elif isinstance(cur_context, (list, tuple)):
                 cur_context = cur_context[int(key)]
             else:
-                raise ValueError("invalid context type: {}".format(type(cur_context)))
+                raise ValueError("invalid context type: %s", type(cur_context))
         return cur_context
 
     @staticmethod
@@ -200,16 +187,16 @@ class Template:
         data.update(Sandbox().get())
         
         if not isinstance(template, str):
-            raise TypeError("constant resolve error, template[%s] is not a string" % template)
+            raise TypeError("constant resolve error, template[%s] is not a string", template)
         try:
             tm = MakoTemplate(template)
         except (MakoException, SyntaxError) as e:
-            logger.error("pipeline resolve template[{}] error[{}]".format(template, e))
+            logger.error("pipeline resolve template[%s] error[%s]", template, e)
             return template
         try:
             resolved = tm.render_unicode(**data)
         except Exception as e:
-            logger.warning("constant content({}) is invalid, data({}), error: {}".format(template, data, e))
+            logger.warning("constant content(%s) is invalid, data=>%s, error=>%s", template, data, e)
             return template
         else:
             return resolved

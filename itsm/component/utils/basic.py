@@ -541,15 +541,6 @@ def ansi_escape(str):
     """终端颜色编码清理"""
     return COLOR_REMOVE.sub("", str)
 
-
-def extract_tarfile(file_name, target_dir=None):
-    """extract tgz file"""
-    tar = tarfile.open(file_name)
-    target_dir = target_dir or os.path.dirname(file_name)
-    tar.extractall(target_dir)
-    tar.close()
-
-
 def generate_random_sn(service_type):
     """单号生成器"""
     from itsm.component.data import incr_expireat, exists

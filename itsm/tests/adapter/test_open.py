@@ -35,6 +35,6 @@ class TestAdapterOpenApiInstance(TestCase):
     def test_list(self, patch_batch_users):
         patch_batch_users.usermanage.list_users.return_value = OPEN_MANAGER_RESPONSE
         users = get_batch_users(users=["admin"], properties="")
-        self.assertIsInstance(users, dict)
-        self.assertEqual(users["id"], 2)
-        self.assertEqual(users["username"], "admin")
+        self.assertIsInstance(users, list)
+        self.assertEqual(users[0]["id"], 2)
+        self.assertEqual(users[0]["username"], "admin")
