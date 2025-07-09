@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import jsonfield
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import (
     DEFAULT_FLOW_CONDITION,
@@ -42,15 +42,19 @@ from .base import Model
 class Condition(Model):
     """流转线条件配置"""
 
-    workflow = models.ForeignKey('workflow.Workflow', related_name="flows", help_text=_("关联工作流"),
-                                 on_delete=models.CASCADE)
+    workflow = models.ForeignKey(
+        "workflow.Workflow",
+        related_name="flows",
+        help_text=_("关联工作流"),
+        on_delete=models.CASCADE,
+    )
     name = models.CharField(_("流转操作"), max_length=LEN_NORMAL)
     data = jsonfield.JSONField(_("流转条件表达式"), default=DEFAULT_FLOW_CONDITION)
 
     objects = managers.ConditionManager()
 
     class Meta:
-        app_label = 'workflow'
+        app_label = "workflow"
         verbose_name = _("流转条件")
         verbose_name_plural = _("流转条件")
 
@@ -66,30 +70,51 @@ class Transition(Model):
     """状态流转"""
 
     DIRECTION_CHOICES = [
-        ("BACK", '向后'),
-        ("FORWARD", '向前'),
+        ("BACK", "向后"),
+        ("FORWARD", "向前"),
     ]
 
-    workflow = models.ForeignKey('workflow.Workflow', related_name="transitions",
-                                 help_text=_("关联流程"), on_delete=models.CASCADE)
+    workflow = models.ForeignKey(
+        "workflow.Workflow",
+        related_name="transitions",
+        help_text=_("关联流程"),
+        on_delete=models.CASCADE,
+    )
 
     name = models.CharField(_("流转操作"), max_length=LEN_NORMAL)
     condition = jsonfield.JSONField(_("流转条件表达式"), default=DEFAULT_FLOW_CONDITION)
     condition_type = models.CharField(
-        _("流转类型"), max_length=LEN_SHORT, choices=FLOW_CONDITION_TYPE_CHOICES, default="default"
+        _("流转类型"),
+        max_length=LEN_SHORT,
+        choices=FLOW_CONDITION_TYPE_CHOICES,
+        default="default",
     )
 
     # 线条的方向坐标 {"start":"left|right|top|bottom", "end": "left|right|top|bottom"}
-    axis = jsonfield.JSONCharField(_("线条的坐标位置的坐标轴"), max_length=LEN_NORMAL, default=EMPTY_DICT)
+    axis = jsonfield.JSONCharField(
+        _("线条的坐标位置的坐标轴"), max_length=LEN_NORMAL, default=EMPTY_DICT
+    )
 
-    from_state = models.ForeignKey('workflow.State', related_name="transitions_from",
-                                   help_text=_("源状态ID"), on_delete=models.CASCADE)
-    to_state = models.ForeignKey('workflow.State', related_name="transitions_to",
-                                 help_text=_("目标状态ID"), on_delete=models.CASCADE)
+    from_state = models.ForeignKey(
+        "workflow.State",
+        related_name="transitions_from",
+        help_text=_("源状态ID"),
+        on_delete=models.CASCADE,
+    )
+    to_state = models.ForeignKey(
+        "workflow.State",
+        related_name="transitions_to",
+        help_text=_("目标状态ID"),
+        on_delete=models.CASCADE,
+    )
 
     # deprecated fields: check_needed/opt_needed
-    direction = models.CharField(_("流转方向"), max_length=LEN_SHORT, choices=DIRECTION_CHOICES,
-                                 default="FORWARD")
+    direction = models.CharField(
+        _("流转方向"),
+        max_length=LEN_SHORT,
+        choices=DIRECTION_CHOICES,
+        default="FORWARD",
+    )
     check_needed = models.BooleanField(_("是否需要校验表单完整性"), default=True)
     opt_needed = models.BooleanField(_("是否需要执行操作"), default=True)
 
@@ -99,12 +124,14 @@ class Transition(Model):
     _objects = models.Manager()
 
     class Meta:
-        app_label = 'workflow'
+        app_label = "workflow"
         verbose_name = _("状态流转")
         verbose_name_plural = _("状态流转")
 
     def __unicode__(self):
-        return "{} -{} {}".format(self.from_state, '>' if self.opt_needed else '-', self.to_state)
+        return "{} -{} {}".format(
+            self.from_state, ">" if self.opt_needed else "-", self.to_state
+        )
 
     @property
     def serialized_data(self):
@@ -116,4 +143,6 @@ class Transition(Model):
         from itsm.workflow.models import State
 
         super(Transition, self).delete(using)
-        State.objects.update_state_label(self.from_state, self.to_state, operate_type='delete')
+        State.objects.update_state_label(
+            self.from_state, self.to_state, operate_type="delete"
+        )

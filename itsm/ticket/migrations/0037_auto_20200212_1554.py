@@ -34,94 +34,150 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ticket', '0036_auto_20200114_1855'),
+        ("ticket", "0036_auto_20200114_1855"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SignTask',
+            name="SignTask",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('creator', models.CharField(blank=True, max_length=64, null=True, verbose_name='创建人')),
-                ('create_at', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('update_at', models.DateTimeField(auto_now=True, verbose_name='更新时间')),
-                ('updated_by', models.CharField(blank=True, max_length=64, null=True, verbose_name='修改人')),
-                ('end_at', models.DateTimeField(blank=True, null=True, verbose_name='结束时间')),
-                ('is_deleted', models.BooleanField(db_index=True, default=False, verbose_name='是否软删除')),
-                ('status_id', models.IntegerField(verbose_name='状态ID')),
-                ('order', models.IntegerField(default=-1, verbose_name='顺序')),
                 (
-                    'status',
-                    models.CharField(
-                        choices=[('WAIT', '未激活'), ('RUNNING', '执行中'), ('FINISHED', '已完成')],
-                        default='WAIT',
-                        max_length=32,
-                        verbose_name='任务状态',
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
-                ('processor', models.CharField(max_length=255, verbose_name='处理人')),
-                ('is_active', models.BooleanField(default=False, verbose_name='是否激活')),
-                ('is_passed', models.NullBooleanField(verbose_name='是否审批通过')),
+                (
+                    "creator",
+                    models.CharField(
+                        blank=True, max_length=64, null=True, verbose_name="创建人"
+                    ),
+                ),
+                (
+                    "create_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="创建时间"),
+                ),
+                (
+                    "update_at",
+                    models.DateTimeField(auto_now=True, verbose_name="更新时间"),
+                ),
+                (
+                    "updated_by",
+                    models.CharField(
+                        blank=True, max_length=64, null=True, verbose_name="修改人"
+                    ),
+                ),
+                (
+                    "end_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="结束时间"
+                    ),
+                ),
+                (
+                    "is_deleted",
+                    models.BooleanField(
+                        db_index=True, default=False, verbose_name="是否软删除"
+                    ),
+                ),
+                ("status_id", models.IntegerField(verbose_name="状态ID")),
+                ("order", models.IntegerField(default=-1, verbose_name="顺序")),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("WAIT", "未激活"),
+                            ("RUNNING", "执行中"),
+                            ("FINISHED", "已完成"),
+                        ],
+                        default="WAIT",
+                        max_length=32,
+                        verbose_name="任务状态",
+                    ),
+                ),
+                ("processor", models.CharField(max_length=255, verbose_name="处理人")),
+                (
+                    "is_active",
+                    models.BooleanField(default=False, verbose_name="是否激活"),
+                ),
+                (
+                    "is_passed",
+                    models.BooleanField(verbose_name="是否审批通过", null=True),
+                ),
             ],
-            options={'verbose_name': '会签任务', 'verbose_name_plural': '会签任务', 'ordering': ('-id',),},
-            managers=[('_objects', django.db.models.manager.Manager()),],
+            options={
+                "verbose_name": "会签任务",
+                "verbose_name_plural": "会签任务",
+                "ordering": ("-id",),
+            },
+            managers=[
+                ("_objects", django.db.models.manager.Manager()),
+            ],
         ),
         migrations.CreateModel(
-            name='TaskField',
+            name="TaskField",
             fields=[
                 (
-                    'ticketfield_ptr',
+                    "ticketfield_ptr",
                     models.OneToOneField(
                         auto_created=True,
                         on_delete=django.db.models.deletion.CASCADE,
                         parent_link=True,
                         primary_key=True,
                         serialize=False,
-                        to='ticket.TicketField',
+                        to="ticket.TicketField",
                     ),
                 ),
             ],
-            options={'abstract': False,},
-            bases=('ticket.ticketfield',),
-            managers=[('_objects', django.db.models.manager.Manager()),],
+            options={
+                "abstract": False,
+            },
+            bases=("ticket.ticketfield",),
+            managers=[
+                ("_objects", django.db.models.manager.Manager()),
+            ],
         ),
         migrations.AddField(
-            model_name='status', name='is_sequential', field=models.BooleanField(default=False, verbose_name='是否是串行任务'),
+            model_name="status",
+            name="is_sequential",
+            field=models.BooleanField(default=False, verbose_name="是否是串行任务"),
         ),
         migrations.AddField(
-            model_name='status',
-            name='type',
+            model_name="status",
+            name="type",
             field=models.CharField(
                 choices=[
-                    ('START', '开始节点(圆形)'),
-                    ('NORMAL', '普通节点'),
-                    ('SIGN', '会签节点'),
-                    ('TASK', '自动节点'),
-                    ('TASK-SOPS', '标准运维节点'),
-                    ('ROUTER', '分支网关节点(菱形)'),
-                    ('ROUTER-P', '并行网关节点'),
-                    ('COVERAGE', '汇聚网关节点'),
-                    ('END', '结束节点(圆形)'),
+                    ("START", "开始节点(圆形)"),
+                    ("NORMAL", "普通节点"),
+                    ("SIGN", "会签节点"),
+                    ("TASK", "自动节点"),
+                    ("TASK-SOPS", "标准运维节点"),
+                    ("ROUTER", "分支网关节点(菱形)"),
+                    ("ROUTER-P", "并行网关节点"),
+                    ("COVERAGE", "汇聚网关节点"),
+                    ("END", "结束节点(圆形)"),
                 ],
-                default='NORMAL',
+                default="NORMAL",
                 max_length=32,
-                verbose_name='节点类型',
+                verbose_name="节点类型",
             ),
         ),
         migrations.AlterField(
-            model_name='status',
-            name='action_type',
+            model_name="status",
+            name="action_type",
             field=models.CharField(
                 choices=[
-                    ('TRANSITION', '提交'),
-                    ('DISTRIBUTE', '分派'),
-                    ('CLAIM', '认领'),
-                    ('SIGN', '会签'),
-                    ('AUTOMATIC', '自动执行'),
+                    ("TRANSITION", "提交"),
+                    ("DISTRIBUTE", "分派"),
+                    ("CLAIM", "认领"),
+                    ("SIGN", "会签"),
+                    ("AUTOMATIC", "自动执行"),
                 ],
-                default='TRANSITION',
+                default="TRANSITION",
                 max_length=32,
-                verbose_name='节点内部操作类型',
+                verbose_name="节点内部操作类型",
             ),
         ),
     ]

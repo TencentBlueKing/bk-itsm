@@ -27,7 +27,7 @@ import copy
 
 from django.conf import settings
 from django.db.models import Q
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -90,7 +90,7 @@ class CreateTicketValidator(object):
         field_hash = {}
 
         required_fields = filter(
-            lambda f: f["validate_type"] == "REQUIRE" and not f['default'], state_fields
+            lambda f: f["validate_type"] == "REQUIRE" and not f["default"], state_fields
         )
         required_keys = {f["key"] for f in required_fields}
 
@@ -100,7 +100,9 @@ class CreateTicketValidator(object):
 
         lost_keys = required_keys - field_keys
         if lost_keys:
-            raise CreateTicketError(_("单据创建失败，缺少参数：{}".format(list(lost_keys))))
+            raise CreateTicketError(
+                _("单据创建失败，缺少参数：{}".format(list(lost_keys)))
+            )
 
         first_state_permission(fields, state, username)
         # create_permission_validate(service, username)
@@ -173,7 +175,9 @@ class StateOperateValidator(object):
         """转单校验"""
 
         if not self.current_node.can_deliver:
-            raise ParamError(_("指定流程节点【{}】不支持转单操作.").format(self.current_node.name))
+            raise ParamError(
+                _("指定流程节点【{}】不支持转单操作.").format(self.current_node.name)
+            )
 
         if not self.current_node.status == RUNNING:
             raise ParamError(_("当前任务状态下无法转单."))
@@ -239,7 +243,9 @@ class StateOperateValidator(object):
 
             if not set(processors).issubset(set(valid_person)):
                 raise ParamError(
-                    _("当前分配的部分用户可能不符合条件，请确保用户在{}中").format(",".join(set(valid_person)))
+                    _("当前分配的部分用户可能不符合条件，请确保用户在{}中").format(
+                        ",".join(set(valid_person))
+                    )
                 )
 
 
@@ -252,7 +258,9 @@ def first_state_permission(fields, first_state, username):
         user_department_ids = get_user_department_ids(username)
         state_department_id = first_state["processors"]
         if int(state_department_id) not in user_department_ids:
-            raise CreateTicketError(_("【{}】没有任务【提单】的【提交】操作权限.").format(username))
+            raise CreateTicketError(
+                _("【{}】没有任务【提单】的【提交】操作权限.").format(username)
+            )
         else:
             return
 
@@ -266,7 +274,9 @@ def first_state_permission(fields, first_state, username):
     ):
         return
 
-    raise CreateTicketError(_("【{}】没有任务【提单】的【提交】操作权限.").format(username))
+    raise CreateTicketError(
+        _("【{}】没有任务【提单】的【提交】操作权限.").format(username)
+    )
 
 
 def create_permission_validate(service, username):
@@ -278,7 +288,9 @@ def create_permission_validate(service, username):
     ):
         return
 
-    raise CreateTicketError(_("【{}】没有任务【提单】的【提交】操作权限.").format(username))
+    raise CreateTicketError(
+        _("【{}】没有任务【提单】的【提交】操作权限.").format(username)
+    )
 
 
 def first_state_field_validate(state_fields, fields, **kwargs):
@@ -310,10 +322,14 @@ def derive_validate(username, ticket_id):
         raise serializers.ValidationError({_("单据"): _("单据不存在，请联系管理员！")})
 
     if ticket.is_over:
-        raise serializers.ValidationError({_("单据"): _("单据已结束，无法新建关联单！")})
+        raise serializers.ValidationError(
+            {_("单据"): _("单据已结束，无法新建关联单！")}
+        )
 
     if not ticket.has_perm(username):
-        raise serializers.ValidationError({_("单据"): _("抱歉，您没有单据操作权限，请联系管理员！")})
+        raise serializers.ValidationError(
+            {_("单据"): _("抱歉，您没有单据操作权限，请联系管理员！")}
+        )
 
 
 def bind_derive_tickets_validate(from_ticket_id, to_ticket_ids):
@@ -324,7 +340,7 @@ def bind_derive_tickets_validate(from_ticket_id, to_ticket_ids):
     :return:
     """
     # id有效性校验
-    if type(to_ticket_ids) != list:
+    if not isinstance(to_ticket_ids, list):
         raise serializers.ValidationError(_("参数类型错误:[to_tickets]"))
 
     if from_ticket_id in to_ticket_ids:
@@ -348,7 +364,9 @@ def bind_derive_tickets_validate(from_ticket_id, to_ticket_ids):
             )
         ).exists():
             raise serializers.ValidationError(
-                _("单据【{}】和【{}】已存在关联关系").format(from_ticket.sn, to_ticket.sn)
+                _("单据【{}】和【{}】已存在关联关系").format(
+                    from_ticket.sn, to_ticket.sn
+                )
             )
 
 
@@ -398,7 +416,9 @@ def merge_validate(from_ticket_ids, to_ticket_id, operator):
     for ticket in tickets:
 
         if ticket["flow_id"] != to_ticket["flow_id"]:
-            raise serializers.ValidationError(_("母子单必须属于同一个流程版本，无法关联"))
+            raise serializers.ValidationError(
+                _("母子单必须属于同一个流程版本，无法关联")
+            )
 
         from_ticket_ids.pop(from_ticket_ids.index(ticket["id"]))
 
@@ -413,7 +433,9 @@ def ticket_can_be_master(ticket_id):
     """
     ticket = Ticket.objects.get(id=ticket_id)
     if ticket.is_slave:
-        raise serializers.ValidationError(_("单据 [{}] 已经是子单，无法成为母单".format(ticket.sn)))
+        raise serializers.ValidationError(
+            _("单据 [{}] 已经是子单，无法成为母单".format(ticket.sn))
+        )
 
 
 def tickets_can_be_slave(ticket_ids):
@@ -446,11 +468,17 @@ def withdraw_validate(operator, ticket, ignore_user=False):
 
     if not ticket.flow.is_revocable:
         # 不可撤销或者已经结束的单，直接返回
-        raise serializers.ValidationError(_("抱歉，当前流程配置无法撤单，请联系服务负责人"))
+        raise serializers.ValidationError(
+            _("抱歉，当前流程配置无法撤单，请联系服务负责人")
+        )
 
     if operator != ticket.creator and operator != settings.SYSTEM_USE_API_ACCOUNT:
         raise serializers.ValidationError(
-            _("抱歉，你无权撤销单据，撤销单据的非当前单据的提单人, {}!={}".format(operator, ticket.creator))
+            _(
+                "抱歉，你无权撤销单据，撤销单据的非当前单据的提单人, {}!={}".format(
+                    operator, ticket.creator
+                )
+            )
         )
 
     if ticket.is_over:
@@ -475,7 +503,9 @@ def terminate_validate(username, ticket, state_id, terminate_message):
     status = ticket.status(state_id)
 
     if not status:
-        raise serializers.ValidationError(_("流程节点(%s)不存在，请联系管理员.") % state_id)
+        raise serializers.ValidationError(
+            _("流程节点(%s)不存在，请联系管理员.") % state_id
+        )
 
     if ticket.is_slave:
         raise serializers.ValidationError(_("抱歉，子单为只读状态，无法操作"))
@@ -492,7 +522,9 @@ def terminate_validate(username, ticket, state_id, terminate_message):
         )
 
     if not status.can_terminate:
-        raise serializers.ValidationError(_("指定流程节点【{}】不支持终止操作.").format(status.name))
+        raise serializers.ValidationError(
+            _("指定流程节点【{}】不支持终止操作.").format(status.name)
+        )
 
     if not status.can_operate(username):
         raise serializers.ValidationError(
@@ -578,7 +610,9 @@ def ticket_operate_validate(fields, state_id, ticket, username):
         bk_biz_id = get_bk_biz_id(fields)
         if not status.can_first_state_operate(username, bk_biz_id):
             raise serializers.ValidationError(
-                _("【{}】没有任务【{}】的【提交】操作权限.").format(username, status.name)
+                _("【{}】没有任务【{}】的【提交】操作权限.").format(
+                    username, status.name
+                )
             )
 
     elif not status.can_operate(username, TRANSITION_OPERATE):
@@ -592,7 +626,9 @@ def ticket_status_validate(ticket, state_id):
         raise serializers.ValidationError(_("抱歉，子单为只读状态，无法操作"))
 
     if not ticket.status(state_id):
-        raise serializers.ValidationError(_("流程节点(%s)不存在，请联系管理员.") % state_id)
+        raise serializers.ValidationError(
+            _("流程节点(%s)不存在，请联系管理员.") % state_id
+        )
 
     if ticket.current_status in TICKET_END_STATUS:
         raise serializers.ValidationError(_("单据状态为结束状态，无法继续转换"))

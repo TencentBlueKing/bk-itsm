@@ -23,11 +23,12 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-__author__ = u"蓝鲸智云"
+
+__author__ = "蓝鲸智云"
 __copyright__ = "Copyright © 2025 Tencent BlueKing. All Rights Reserved."
 
 from django.core.cache import cache
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from itsm.component.constants import PREFIX_KEY
 
 from .models import Service, ServiceCatalog
@@ -36,14 +37,16 @@ from .models import Service, ServiceCatalog
 def get_catalog_fullname(catalog_id):
     """
     获取服务目录全名
-    :param catalog_id: 
-    :return: 
+    :param catalog_id:
+    :return:
     """
     cache_key = "%scatalog_fullname_%s" % (PREFIX_KEY, catalog_id)
     catalog_fullname = cache.get(cache_key)
     if catalog_fullname:
         return _(catalog_fullname)
-    catalog_fullname = ServiceCatalog._objects.get(id=catalog_id).link_parent_name_ex_root
+    catalog_fullname = ServiceCatalog._objects.get(
+        id=catalog_id
+    ).link_parent_name_ex_root
     cache.set(cache_key, catalog_fullname, 30)
     return _(catalog_fullname)
 

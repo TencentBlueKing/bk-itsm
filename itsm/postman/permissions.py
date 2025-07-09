@@ -27,7 +27,7 @@ from itsm.component.constants import PUBLIC_PROJECT_PROJECT_KEY
 from itsm.component.drf import permissions as perm
 from itsm.component.exceptions import ValidateError
 from itsm.postman.models import RemoteSystem, RemoteApi
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.project.models import Project
 from itsm.workflow.permissions import WorkflowElementManagePermission
@@ -50,12 +50,12 @@ class RemoteApiPermit(WorkflowElementManagePermission):
                 # 平台公共API管理
                 if project_key == PUBLIC_PROJECT_PROJECT_KEY:
                     return self.iam_auth(request, ["public_apis_manage"])
-                
+
                 # 项目管理
                 apply_actions = ["system_settings_manage"]
                 project = Project.objects.get(pk=project_key)
                 return self.iam_auth(request, apply_actions, project)
-            
+
         if view.action == "batch_delete":
             api_ids = request.data["id"].split(",")
             api_instances = RemoteApi.objects.filter(pk__in=api_ids)
@@ -63,15 +63,15 @@ class RemoteApiPermit(WorkflowElementManagePermission):
             if len(project_keys) != 1:
                 raise ValidateError(_("API 所属项目异常"))
             project_key = project_keys.pop()
-            
+
             # 平台公共API管理
             if project_key == PUBLIC_PROJECT_PROJECT_KEY:
                 return self.iam_auth(request, ["public_apis_manage"])
-            
+
             # 项目
             project = Project.objects.get(pk=project_key)
             return self.iam_auth(request, ["system_settings_manage"], project)
-            
+
         return True
 
     def has_object_permission(self, request, view, obj, **kwargs):
@@ -84,7 +84,7 @@ class RemoteApiPermit(WorkflowElementManagePermission):
                 if view.action == "retrieve":
                     return True
                 return self.iam_auth(request, ["public_apis_manage"])
-            
+
             # 项目管理
             project_key = obj.remote_system.project_key
             project = Project.objects.get(pk=project_key)

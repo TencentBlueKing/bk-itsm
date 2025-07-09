@@ -8,7 +8,7 @@ import jmespath
 from itsm.pipeline_plugins.components.collections.webhook import ParamsBuilder
 from itsm.plugin_service.plugin_client import PluginServiceApiClient
 from pipeline.component_framework.component import Component
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import (
     TRANSITION_OPERATE,
@@ -157,7 +157,9 @@ class BkPluginService(ItsmBaseService):
 
         state = ticket.flow.get_state(state_id)
         variables = state["variables"].get("outputs", [])
-        error_message_template = "蓝鲸插件调用失败【{name}】执行失败，失败信息 {detail_message}"
+        error_message_template = (
+            "蓝鲸插件调用失败【{name}】执行失败，失败信息 {detail_message}"
+        )
 
         processors = ticket.current_processors[1:-1]
         current_node = ticket.node_status.get(state_id=state_id)
@@ -216,8 +218,10 @@ class BkPluginService(ItsmBaseService):
             return False
 
         if not result:
-            err_message = "bk_plugin_info 请求失败，返回值非 true， message = {}".format(
-                resp.get("message")
+            err_message = (
+                "bk_plugin_info 请求失败，返回值非 true， message = {}".format(
+                    resp.get("message")
+                )
             )
             self.do_exit_plugins(
                 ticket,
@@ -276,7 +280,9 @@ class BkPluginService(ItsmBaseService):
 
     def schedule(self, data, parent_data, callback_data=None):
 
-        error_message_template = "蓝鲸插件调用失败【{name}】执行失败，失败信息 {detail_message}"
+        error_message_template = (
+            "蓝鲸插件调用失败【{name}】执行失败，失败信息 {detail_message}"
+        )
 
         ticket = Ticket.objects.get(id=parent_data.inputs.ticket_id)
         state_id = data.inputs.state_id

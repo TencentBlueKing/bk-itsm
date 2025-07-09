@@ -1,7 +1,12 @@
 # Changelog
+
+## [Version: 2.8.1] - 2025-07-07
+【Feature】Upgraded version dependencies: Python 3.11 and Django 4.2 
+
 ## [Version: 2.7.9] - 2025-07-08
 【Fix】Resolved potential XSS vulnerability caused by v-html  
 【Fix】Fixed SQL injection risk due to extra parameter  
+
 
 ## [Version: 2.7.8] - 2025-07-06
 [Fix] Resolved execution issues with the exec command  

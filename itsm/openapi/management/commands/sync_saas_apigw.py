@@ -26,24 +26,6 @@ class Command(BaseCommand):
             print("[bk-itsm]current version is not open v3,skip sync_saas_apigw")
             return
 
-        print("[bk-itsm]call fetch_apigw_public_key")
-        try:
-            call_command("fetch_apigw_public_key")
-        except Exception:
-            print(
-                "[bk-itsm]this env has not bk-itsm esb api,skip fetch_apigw_public_key "
-            )
-            traceback.print_exc()
-
-        print("[bk-itsm]call fetch_esb_public_key")
-        try:
-            call_command("fetch_esb_public_key")
-        except Exception:
-            print(
-                "[bk-itsm]this env has not bk-itsm esb api,skip fetch_esb_public_key "
-            )
-            traceback.print_exc()
-
         if (
             settings.IS_OPEN_V3
             and settings.ENGINE_REGION == "default"
@@ -90,3 +72,21 @@ class Command(BaseCommand):
             )
 
             print("[bk-itsm] migrate apigw success")
+
+        print("[bk-itsm]call fetch_apigw_public_key")
+        try:
+            call_command("fetch_apigw_public_key")
+        except Exception:
+            print(
+                "[bk-itsm]this env has not bk-itsm esb api,skip fetch_apigw_public_key "
+            )
+            traceback.print_exc()
+
+        print("[bk-itsm]call fetch_esb_public_key")
+        try:
+            call_command("fetch_esb_public_key")
+        except Exception:
+            print(
+                "[bk-itsm]this env has not bk-itsm esb api,skip fetch_esb_public_key "
+            )
+            traceback.print_exc()

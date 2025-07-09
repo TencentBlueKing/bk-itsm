@@ -28,7 +28,7 @@ import json
 from math import ceil
 from django.conf import settings
 from django.core.cache import cache
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from common.log import logger
 from itsm.component.constants import CACHE_5MIN, CACHE_30MIN, PREFIX_KEY
@@ -52,7 +52,11 @@ def get_biz_choices():
 
     apps = get_all_apps()
     app_list = [
-        {"key": item["bk_biz_id"], "name": item["bk_biz_name"], "desc": _("请选择关联业务")}
+        {
+            "key": item["bk_biz_id"],
+            "name": item["bk_biz_name"],
+            "desc": _("请选择关联业务"),
+        }
         for item in apps
     ]
 
@@ -80,7 +84,11 @@ def get_group_app_list(apps, group_apps, group_other, biz_group_conf):
     if apps:
         group_other["items"].extend(
             [
-                {"key": a["bk_biz_id"], "name": a["bk_biz_name"], "desc": _("请选择关联业务")}
+                {
+                    "key": a["bk_biz_id"],
+                    "name": a["bk_biz_name"],
+                    "desc": _("请选择关联业务"),
+                }
                 for a in list(apps.values())
             ]
         )
@@ -304,7 +312,8 @@ def get_department_users(department_id, recursive=False, detail=False):
             cache.set(cache_key, users, CACHE_5MIN)
         except ComponentCallError as e:
             logger.error(
-                "获取组织架构用户失败：department_id=%s, error=%s" % (department_id, str(e))
+                "获取组织架构用户失败：department_id=%s, error=%s"
+                % (department_id, str(e))
             )
             return []
 
@@ -338,7 +347,9 @@ def get_department_info(department_id):
     try:
         res = client_backend.usermanage.retrieve_department({"id": department_id})
     except ComponentCallError as e:
-        logger.error("获取组织架构详情失败：department_id=%s, error=%s" % (department_id, str(e)))
+        logger.error(
+            "获取组织架构详情失败：department_id=%s, error=%s" % (department_id, str(e))
+        )
         return []
     return res
 
@@ -395,7 +406,9 @@ def get_components(system_names):
         )
         return res.get("data", [])
     except Exception as e:
-        logger.error("获取指定系统的组件列表: system_names=%s, error=%s" % (system_names, str(e)))
+        logger.error(
+            "获取指定系统的组件列表: system_names=%s, error=%s" % (system_names, str(e))
+        )
         return []
 
 

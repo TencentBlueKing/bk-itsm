@@ -23,12 +23,12 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.conf.urls import url
+from django.urls import re_path
 
 from itsm.misc import views
 
 urlpatterns = [
-    url(r"^upload_file/$", views.upload),
-    url(r"^download_file/$", views.download),
-    url(r"^clean_cache/$", views.clean_cache),
+    re_path(r"^upload_file/$", views.upload),
+    re_path(r"^download_file/$", views.download),
+    re_path(r"^clean_cache/$", views.clean_cache),
 ]

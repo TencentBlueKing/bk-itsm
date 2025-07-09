@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import traceback
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.forms.fields import CallableChoiceIterator
 from django.forms.forms import DeclarativeFieldsMetaclass
 
@@ -39,9 +39,9 @@ class BaseComponent(metaclass=BaseComponentMeta):  # noqa
     Base class for component
     """
 
-    name = 'UNKNOWN'  # display name
-    code = 'unknown'  # 在trigger组件里唯一
-    type = 'trigger'
+    name = "UNKNOWN"  # display name
+    code = "unknown"  # 在trigger组件里唯一
+    type = "trigger"
     Form = None
     is_async = True
     need_refresh = True
@@ -53,7 +53,11 @@ class BaseComponent(metaclass=BaseComponentMeta):  # noqa
         self.params_schema = params_schema
         self.action_id = action_id
         self.countdown = countdown
-        self.form = self.form_class(self.params_schema, self.context) if self.form_class else None
+        self.form = (
+            self.form_class(self.params_schema, self.context)
+            if self.form_class
+            else None
+        )
         self.validate_inputs()
 
     def invoke(self, inputs):
@@ -115,16 +119,18 @@ class BaseComponent(metaclass=BaseComponentMeta):  # noqa
         # Whether define form data
         if isinstance(cls.Form, DeclarativeFieldsMetaclass):
             for field_name, field in cls.Form.declared_fields.items():
-                choices = getattr(field, "choices") if hasattr(field, "choices") else None
+                choices = (
+                    getattr(field, "choices") if hasattr(field, "choices") else None
+                )
                 if isinstance(choices, CallableChoiceIterator):
                     choices = choices.choices_func()
 
                 input_data = {
-                    'name': _(field_name),
-                    'label': _(field.label),
-                    'initial': field.initial,
-                    'required': field.required,
-                    'choices': choices,
+                    "name": _(field_name),
+                    "label": _(field.label),
+                    "initial": field.initial,
+                    "required": field.required,
+                    "choices": choices,
                 }
                 inputs.append(input_data)
 

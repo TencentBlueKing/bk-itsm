@@ -34,7 +34,7 @@ import jsonfield
 from django.db.models import Q
 from django.db import models, transaction
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from bulk_update.helper import bulk_update
 
 from common.template.template import Template
@@ -139,7 +139,9 @@ class Task(Model):
 
     ticket_id = models.IntegerField(_("单据ID"), default=0)
     state_id = models.IntegerField(_("节点ID"), default=0)
-    activity_id = models.CharField(_("Pipeline节点ID"), max_length=LEN_NORMAL, blank=True)
+    activity_id = models.CharField(
+        _("Pipeline节点ID"), max_length=LEN_NORMAL, blank=True
+    )
     name = models.CharField(_("任务的名称"), max_length=LEN_LONG)
     task_schema_id = models.IntegerField(_("对应的任务模板ID"), null=False)
     component_type = models.CharField(
@@ -149,16 +151,27 @@ class Task(Model):
         null=False,
     )
     processors_type = models.CharField(
-        _("处理人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+        _("处理人类型"),
+        max_length=LEN_SHORT,
+        choices=PROCESSOR_CHOICES,
+        default="EMPTY",
     )
     processors = models.CharField(
-        _("处理人列表"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True
+        _("处理人列表"),
+        max_length=LEN_LONG,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
     )
     inputs = jsonfield.JSONField(
-        _("组件输入信息"), help_text=_("当前组件输入参数引用的参数变量"), default=EMPTY_DICT
+        _("组件输入信息"),
+        help_text=_("当前组件输入参数引用的参数变量"),
+        default=EMPTY_DICT,
     )
     outputs = jsonfield.JSONField(
-        _("组件输出信息"), help_text=_("当前组件输出信息，比如sops各阶段返回"), default=EMPTY_DICT
+        _("组件输出信息"),
+        help_text=_("当前组件输出信息，比如sops各阶段返回"),
+        default=EMPTY_DICT,
     )
 
     order = models.IntegerField(_("任务的执行顺序"), default=1)
@@ -169,8 +182,12 @@ class Task(Model):
         default="NEW",
     )
 
-    executor = models.CharField(_("处理人"), max_length=LEN_NORMAL, default=EMPTY_STRING)
-    confirmer = models.CharField(_("确认人"), max_length=LEN_NORMAL, default=EMPTY_STRING)
+    executor = models.CharField(
+        _("处理人"), max_length=LEN_NORMAL, default=EMPTY_STRING
+    )
+    confirmer = models.CharField(
+        _("确认人"), max_length=LEN_NORMAL, default=EMPTY_STRING
+    )
     start_at = models.DateTimeField(_("开始执行的时间"), null=True)
     end_at = models.DateTimeField(_("结束执行的时间"), null=True)
     pipeline_data = jsonfield.JSONField(_("Pipeline流程树元数据"), default=EMPTY_DICT)
@@ -796,7 +813,8 @@ class Task(Model):
             # 获取不到标准运维任务信息，直接设置为异常
             return {
                 "result": False,
-                "message": "重试失败，获取标准运维任务信息出错 %s" % res.get("message", ""),
+                "message": "重试失败，获取标准运维任务信息出错 %s"
+                % res.get("message", ""),
             }
 
         failed_nodes = [
@@ -806,7 +824,7 @@ class Task(Model):
         ]
         if not failed_nodes:
             # 不存在失败节点的时候，说明任务成功执行了
-            return {"result": True, "message": u"重试成功，标准运维任务已经在执行中"}
+            return {"result": True, "message": "重试成功，标准运维任务已经在执行中"}
 
         for node_id in failed_nodes:
             # 依次进行重试，除了并行节点，一般只会有一个错误的id
@@ -1002,11 +1020,16 @@ class SopsTask(Model):
     task_id = models.CharField(_("itsm任务ID"), max_length=LEN_NORMAL)
     task_name = models.CharField(_("任务的名称"), max_length=LEN_LONG)
     sops_template_id = models.IntegerField(_("sops任务模板ID"))
-    sops_task_id = models.IntegerField(_("sops任务ID，成功启动后填充"), null=True, blank=True)
+    sops_task_id = models.IntegerField(
+        _("sops任务ID，成功启动后填充"), null=True, blank=True
+    )
     # params|detail|status
     sops_task_info = jsonfield.JSONField(_("sops任务信息"), default=EMPTY_DICT)
     sops_task_url = models.CharField(
-        _("sops任务详情链接，成功启动后填充"), max_length=LEN_LONG, null=True, blank=True
+        _("sops任务详情链接，成功启动后填充"),
+        max_length=LEN_LONG,
+        null=True,
+        blank=True,
     )
 
     creator = models.CharField(_("创建者"), max_length=LEN_NORMAL, blank=True)
@@ -1057,12 +1080,14 @@ class SopsTask(Model):
             "task_name": self.task_name,
             "sops_task_url": self.sops_task_url,
             "create_time": self.create_time.strftime("%Y-%m-%d %H:%M:%S"),
-            "start_time": self.start_time.strftime("%Y-%m-%d %H:%M:%S")
-            if self.start_time
-            else "",
-            "finish_time": self.finish_time.strftime("%Y-%m-%d %H:%M:%S")
-            if self.finish_time
-            else "",
+            "start_time": (
+                self.start_time.strftime("%Y-%m-%d %H:%M:%S") if self.start_time else ""
+            ),
+            "finish_time": (
+                self.finish_time.strftime("%Y-%m-%d %H:%M:%S")
+                if self.finish_time
+                else ""
+            ),
             "elapsed_time": self.elapsed_time,
             "state": self.state,
         }
@@ -1124,12 +1149,14 @@ class SubTask(Model):
             "task_name": self.task_name,
             "sub_task_url": self.sub_task_url,
             "create_time": self.create_time.strftime("%Y-%m-%d %H:%M:%S"),
-            "start_time": self.start_time.strftime("%Y-%m-%d %H:%M:%S")
-            if self.start_time
-            else "",
-            "finish_time": self.finish_time.strftime("%Y-%m-%d %H:%M:%S")
-            if self.finish_time
-            else "",
+            "start_time": (
+                self.start_time.strftime("%Y-%m-%d %H:%M:%S") if self.start_time else ""
+            ),
+            "finish_time": (
+                self.finish_time.strftime("%Y-%m-%d %H:%M:%S")
+                if self.finish_time
+                else ""
+            ),
             "elapsed_time": self.elapsed_time,
             "state": self.state,
             "sub_pipeline_id": self.sub_pipeline_id,
@@ -1196,7 +1223,9 @@ class TaskLibTasks(Model):
     component_type = models.CharField(_("任务类型"), max_length=LEN_NORMAL)
     processors_type = models.CharField(_("处理人类型"), max_length=LEN_NORMAL)
     processors = models.CharField(_("处理人"), max_length=LEN_LONG)
-    fields = jsonfield.JSONField(_("字段列表"), max_length=LEN_XX_LONG, default=EMPTY_LIST)
+    fields = jsonfield.JSONField(
+        _("字段列表"), max_length=LEN_XX_LONG, default=EMPTY_LIST
+    )
     sub_template_id = models.CharField(_("子模版ID"), default="", max_length=LEN_NORMAL)
     project_id = models.CharField(_("项目ID/业务ID"), default="", max_length=LEN_NORMAL)
     exclude_task_nodes = jsonfield.JSONField(

@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.db import transaction
 from rest_framework import status
 from rest_framework.response import Response
@@ -239,7 +239,7 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
             if not rule.action_schemas:
                 continue
             actions_schemas.extend(rule.action_schemas)
-            
+
         schemas = []
         with transaction.atomic():
             for _data in request.data:

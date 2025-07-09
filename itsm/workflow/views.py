@@ -34,7 +34,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.http import StreamingHttpResponse, FileResponse, Http404
 from django.utils.encoding import escape_uri_path
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers, status, permissions
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -298,11 +298,11 @@ class WorkflowViewSet(
         response = FileResponse(json.dumps([data], cls=JsonEncoder, indent=2))
         response["Content-Type"] = "application/octet-stream"
         # 中文文件名乱码问题
-        response[
-            "Content-Disposition"
-        ] = "attachment; filename*=UTF-8''bk_itsm_{}_{}.json".format(
-            escape_uri_path(workflow.name),
-            create_version_number(),
+        response["Content-Disposition"] = (
+            "attachment; filename*=UTF-8''bk_itsm_{}_{}.json".format(
+                escape_uri_path(workflow.name),
+                create_version_number(),
+            )
         )
 
         return response
@@ -584,7 +584,9 @@ class BaseFieldViewSet(component_viewsets.ModelViewSet):
             field_object = self.get_object()
 
         if field_object.type != "FILE":
-            raise serializers.ValidationError(_("当前字段非附件字段，无法下载附件文件！"))
+            raise serializers.ValidationError(
+                _("当前字段非附件字段，无法下载附件文件！")
+            )
         try:
             files = (
                 field_object.choice
@@ -593,7 +595,9 @@ class BaseFieldViewSet(component_viewsets.ModelViewSet):
             )
         except Exception:
             logger.exception("json解析错误")
-            raise serializers.ValidationError(_("当前字段解析信息出错，请确认是否已进行数据升级！"))
+            raise serializers.ValidationError(
+                _("当前字段解析信息出错，请确认是否已进行数据升级！")
+            )
 
         file_info = files.get(unique_key)
         if not file_info:
@@ -604,7 +608,9 @@ class BaseFieldViewSet(component_viewsets.ModelViewSet):
 
         if not store.exists(file_path):
             raise serializers.ValidationError(
-                _("要下载的文件【{}】不存在, 可能已经被删除，请与管理员确认！").format(file_info["name"])
+                _("要下载的文件【{}】不存在, 可能已经被删除，请与管理员确认！").format(
+                    file_info["name"]
+                )
             )
 
         response = StreamingHttpResponse(FileWrapper(store.open(file_path, "rb"), 512))
@@ -1114,14 +1120,22 @@ class TaskSchemaViewSet(DynamicListModelMixin, component_viewsets.ModelViewSet):
                 isinstance(task_fields, dict)
                 and isinstance(task_fields["task_field_ids"], list)
             ):
-                raise serializers.ValidationError(_("任务字段排序参数不合法，请联系管理员"))
+                raise serializers.ValidationError(
+                    _("任务字段排序参数不合法，请联系管理员")
+                )
 
             task_field_ids = [int(i) for i in task_fields["task_field_ids"]]
-            ordering_tpl = "FIELD(`id`, {})".format(",".join(["%s"] * len(task_field_ids)))
-            
+            ordering_tpl = "FIELD(`id`, {})".format(
+                ",".join(["%s"] * len(task_field_ids))
+            )
+
             task_fields_schema = TaskFieldSchema.objects.filter(
                 task_schema_id=instance.id, stage=task_fields.get("stage")
-            ).extra(select={"custom_order": ordering_tpl}, select_params=task_field_ids, order_by=["custom_order"]) # modify
+            ).extra(
+                select={"custom_order": ordering_tpl},
+                select_params=task_field_ids,
+                order_by=["custom_order"],
+            )  # modify
 
             for index, task_field_schema in enumerate(task_fields_schema):
                 task_field_schema.sequence = index

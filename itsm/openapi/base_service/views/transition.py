@@ -2,7 +2,7 @@
 
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import START_STATE, TICKET_GLOBAL_VARIABLES
 

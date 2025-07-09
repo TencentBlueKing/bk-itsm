@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django.db import transaction
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import JSONField
@@ -184,7 +184,9 @@ class ServiceCatalogSerializer(serializers.ModelSerializer):
                 .filter(is_deleted=False, name=attrs["name"])
                 .exists()
             ):
-                raise ServiceCatalogValidateError(_("同级下目录名不能重复，请修改后提交"))
+                raise ServiceCatalogValidateError(
+                    _("同级下目录名不能重复，请修改后提交")
+                )
         if self.context["view"].action == "update":
             if (
                 parent_object
@@ -193,7 +195,9 @@ class ServiceCatalogSerializer(serializers.ModelSerializer):
                 .exclude(id=self.instance.id)
                 .exists()
             ):
-                raise ServiceCatalogValidateError(_("同级下目录名不能重复，请修改后提交"))
+                raise ServiceCatalogValidateError(
+                    _("同级下目录名不能重复，请修改后提交")
+                )
 
         attrs["parent"] = parent_object
 
@@ -253,7 +257,9 @@ class SlaSerializer(serializers.ModelSerializer):
         error_messages={"blank": _("名称为必填项")},
         max_length=8,
         validators=[
-            UniqueValidator(queryset=OldSla.objects.all(), message=_("服务级别名已存在，请重新输入")),
+            UniqueValidator(
+                queryset=OldSla.objects.all(), message=_("服务级别名已存在，请重新输入")
+            ),
             name_validator,
         ],
     )
@@ -307,7 +313,9 @@ class ServiceSlaSerializer(serializers.ModelSerializer):
     """服务与SLA关联表序列化"""
 
     name = serializers.CharField(
-        required=True, error_messages={"blank": _("协议名称不能为空")}, max_length=LEN_LONG
+        required=True,
+        error_messages={"blank": _("协议名称不能为空")},
+        max_length=LEN_LONG,
     )
     service_id = serializers.IntegerField(required=False, allow_null=True)
     lines = JSONField(required=False, initial=EMPTY_LIST)
@@ -326,7 +334,9 @@ class ServiceSerializer(AuthModelSerializer):
         error_messages={"blank": _("名称不能为空")},
         max_length=LEN_MIDDLE,
         validators=[
-            UniqueValidator(queryset=Service.objects.all(), message=_("服务名已存在，请重新输入")),
+            UniqueValidator(
+                queryset=Service.objects.all(), message=_("服务名已存在，请重新输入")
+            ),
             # name_validator
         ],
     )
@@ -386,9 +396,7 @@ class ServiceSerializer(AuthModelSerializer):
         services = (
             [self.instance]
             if isinstance(self.instance, Service)
-            else []
-            if self.instance is None
-            else self.instance
+            else [] if self.instance is None else self.instance
         )
         service_ids = [service.id for service in services]
         users = FavoriteService.objects.filter(service_id__in=service_ids).values(
@@ -476,7 +484,9 @@ class ServiceSerializer(AuthModelSerializer):
         try:
             workflow_instance = Workflow.objects.get(id=instance.workflow.workflow_id)
         except Workflow.DoesNotExist:
-            raise ServerError("当前服务绑定的流程已经被删除, service_name={}".format(instance.name))
+            raise ServerError(
+                "当前服务绑定的流程已经被删除, service_name={}".format(instance.name)
+            )
 
         username = self.context["request"].user.username
         data["creator"] = transform_single_username(data["creator"])
@@ -508,7 +518,9 @@ class ServiceListSerializer(serializers.ModelSerializer):
         error_messages={"blank": _("名称不能为空")},
         max_length=LEN_MIDDLE,
         validators=[
-            UniqueValidator(queryset=Service.objects.all(), message=_("服务名已存在，请重新输入")),
+            UniqueValidator(
+                queryset=Service.objects.all(), message=_("服务名已存在，请重新输入")
+            ),
             # name_validator
         ],
     )
@@ -533,9 +545,7 @@ class ServiceListSerializer(serializers.ModelSerializer):
         services = (
             [self.instance]
             if isinstance(self.instance, Service)
-            else []
-            if self.instance is None
-            else self.instance
+            else [] if self.instance is None else self.instance
         )
         return [service["id"] for service in services]
 
@@ -617,7 +627,9 @@ class CatalogServiceEditSerializer(serializers.Serializer):
         try:
             catalog = ServiceCatalog.objects.get(id=value)
             if catalog.level == 0:
-                raise serializers.ValidationError(_("根目录不允许添加服务，选择其他目录"))
+                raise serializers.ValidationError(
+                    _("根目录不允许添加服务，选择其他目录")
+                )
         except ServiceCatalog.DoesNotExist:
             raise serializers.ValidationError(_("指定的服务目录不存在"))
 
@@ -674,7 +686,9 @@ class SysDictSerializer(DynamicFieldsModelSerializer):
         error_messages={"blank": _("编码不能为空")},
         max_length=LEN_MIDDLE,
         validators=[
-            UniqueValidator(queryset=SysDict.objects.all(), message=_("编码已存在，请重新输入")),
+            UniqueValidator(
+                queryset=SysDict.objects.all(), message=_("编码已存在，请重新输入")
+            ),
             key_validator,
         ],
     )
@@ -768,7 +782,10 @@ class WorkflowImportSerializer(serializers.Serializer):
     name = serializers.CharField(
         required=True,
         max_length=LEN_MIDDLE,
-        error_messages={"blank": _("请输入流程名称!"), "max_length": _("流程名称长度不能大于120个字符")},
+        error_messages={
+            "blank": _("请输入流程名称!"),
+            "max_length": _("流程名称长度不能大于120个字符"),
+        },
     )
     flow_type = serializers.CharField(required=True, max_length=LEN_NORMAL)
     desc = serializers.CharField(
@@ -840,7 +857,9 @@ class ServiceImportSerializer(serializers.Serializer):
 
         project_key = attrs["project_key"]
         if not Project.objects.filter(key=project_key).exists():
-            raise serializers.ValidationError(_("导入失败，project_key 对应的项目不存在"))
+            raise serializers.ValidationError(
+                _("导入失败，project_key 对应的项目不存在")
+            )
 
         catalog_id = attrs.get("catalog_id", None)
         if catalog_id is not None:

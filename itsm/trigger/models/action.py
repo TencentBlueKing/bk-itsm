@@ -29,7 +29,7 @@ from datetime import datetime
 import jsonfield
 
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from common.template.template import Template
 from itsm.component.utils.client_backend_query import get_bk_users
@@ -110,10 +110,14 @@ class Action(TriggerBaseModel):
     end_time = models.DateTimeField(_("任务结束事件"), null=True)
     operator = models.CharField(_("执行人"), max_length=LEN_NORMAL, default=SYS)
     ex_data = jsonfield.JSONField(
-        _("执行错误信息"), help_text=_("状态为失败的时候记录的错误日志"), default=EMPTY_DICT
+        _("执行错误信息"),
+        help_text=_("状态为失败的时候记录的错误日志"),
+        default=EMPTY_DICT,
     )
 
-    params = jsonfield.JSONField(_("执行的参数"), help_text=_("手动触发器实际执行的参数信息"), default={})
+    params = jsonfield.JSONField(
+        _("执行的参数"), help_text=_("手动触发器实际执行的参数信息"), default={}
+    )
 
     objects = ActionManagers()
 

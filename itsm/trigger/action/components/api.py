@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.esb.backend_component import bk
 from itsm.postman.models import RemoteApi
@@ -42,7 +42,9 @@ class ApiForms(BaseForm):
     api_source = ApiSourceField(name=_("API接口ID"))
     req_params = ApiInfoField(name=_("API请求参数配置"))
     response = JSONField(
-        name=_("API系统返回参数"), display=False, default={"ref_type": "reference", "value": "api_response_message"}
+        name=_("API系统返回参数"),
+        display=False,
+        default={"ref_type": "reference", "value": "api_response_message"},
     )
 
 
@@ -53,10 +55,16 @@ class APIComponent(BaseComponent):
     form_class = ApiForms
 
     def get_api_source_config(self):
-        remote_api = RemoteApi._objects.get(id=self.data.get_one_of_inputs("api_source"))
-        api_config = remote_api.get_api_config(self.data.get_one_of_inputs("req_params"))
+        remote_api = RemoteApi._objects.get(
+            id=self.data.get_one_of_inputs("api_source")
+        )
+        api_config = remote_api.get_api_config(
+            self.data.get_one_of_inputs("req_params")
+        )
         # 默认API处理人的请求用户为触发事件的操作人
-        api_config['query_params']['__remote_user__'] = self.context.get("operator", 'admin')
+        api_config["query_params"]["__remote_user__"] = self.context.get(
+            "operator", "admin"
+        )
         return api_config
 
     def _execute(self):
@@ -65,9 +73,9 @@ class APIComponent(BaseComponent):
         """
         api_config = self.get_api_source_config()
         rsp = bk.http(config=api_config)
-        self.data.set_outputs("api_response_message", rsp.get('message'))
-        self.data.set_outputs("api_response", rsp.get('message'))
-        if rsp['result']:
+        self.data.set_outputs("api_response_message", rsp.get("message"))
+        self.data.set_outputs("api_response", rsp.get("message"))
+        if rsp["result"]:
             return True
-        self.data.set_outputs("message", rsp['message'])
+        self.data.set_outputs("message", rsp["message"])
         return False

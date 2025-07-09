@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.conf.urls import include, url
+from django.urls import include, re_path
 from rest_framework.routers import DefaultRouter
 
 from itsm.misc.views import download, upload
@@ -66,9 +66,9 @@ routers.register(
 routers.register(r"task/tasks", WXTaskViewSet, basename="wx_tasks")
 
 urlpatterns = routers.urls + [
-    url(r"^gateway/", include("itsm.gateway.urls")),
-    url(r"^upload_file/$", upload),
-    url(r"^download_file/$", download),
-    url(r"^postman/rpc_api/$", WXRpcApiViewSet.as_view()),
-    url(r"^c/compapi/v2/usermanage/fs_list_users/$", get_batch_users),
+    re_path(r"^gateway/", include("itsm.gateway.urls")),
+    re_path(r"^upload_file/$", upload),
+    re_path(r"^download_file/$", download),
+    re_path(r"^postman/rpc_api/$", WXRpcApiViewSet.as_view()),
+    re_path(r"^c/compapi/v2/usermanage/fs_list_users/$", get_batch_users),
 ]

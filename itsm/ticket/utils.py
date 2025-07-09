@@ -30,7 +30,7 @@ import jmespath
 import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from common.log import logger
 from common.template.template import Template
@@ -102,6 +102,9 @@ def build_message(_notify, task_id, ticket, message, action, **kwargs):
     else:
         custom_notify = get_custom_notify(ticket, action, _notify.type)
 
+    if task_id is not None:
+        kwargs["task_id"] = task_id
+
     # 获取单据上下文
     context = ticket.get_notify_context()
     context.update(
@@ -159,7 +162,7 @@ def get_custom_api_data(field):
     kv_relation = field.kv_relation
     envs = field.ticket.meta.get("envs", {})
     method = config.get("method", "GET")
-    url =  Environment().from_string(config.get("url", "")).render(envs)
+    url = Environment().from_string(config.get("url", "")).render(envs)
     query_params = config.get("query_params", {})
     headers = config.get("headers", {})
     body = config.get("body", {})
