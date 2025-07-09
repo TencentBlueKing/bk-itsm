@@ -70,7 +70,7 @@ class CompRequest(object):
         try:
             query_params = json.loads(Template(json.dumps(template)).render(**params_context))
         except Exception as e:
-            logger.warning("Template text=%s, context=%s, error=%s" % (template, params, e))
+            logger.warning("Template text=%s, context=%s, error=%s", template, params, e)
             return False, []
 
         if rpc_source == TRIGGER_SOURCE:

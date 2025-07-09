@@ -117,7 +117,7 @@ class SentinelClient(DefaultClient):
             connection_url = "redis://:%s@%s:%s/%s" % (password, host, port, db)
         else:
             connection_url = "redis://%s:%s/%s" % (host, port, db)
-        logger.debug("Connecting to: %s", connection_url)
+        logger.debug("Connecting to: %s", host)
         return self.connection_factory.connect(connection_url)
 
     def close(self, **kwargs):

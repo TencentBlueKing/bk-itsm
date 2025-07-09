@@ -35,9 +35,9 @@ class TestAdapterApiInstance(TestCase):
     def test_list(self, patch_list_users):
         patch_list_users.usermanage.list_users.return_value = IEOD_MANAGER_RESPONSE
         users = get_batch_users(users=["admin"], properties="")
-        self.assertIsInstance(users, dict)
-        self.assertEqual(users["id"], 1)
-        self.assertEqual(users["username"], "admin")
+        self.assertIsInstance(users, list)
+        self.assertEqual(users[0]["id"], 1)
+        self.assertEqual(users[0]["username"], "admin")
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.component.esb.esbclient.client_backend")

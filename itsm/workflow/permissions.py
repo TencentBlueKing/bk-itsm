@@ -89,6 +89,9 @@ class BaseWorkflowElementIamAuth(IamAuthPermit):
     """
 
     def has_permission(self, request, view):
+        if view.action in getattr(view, "permission_free_actions", []):
+            return True
+
         apply_actions = ["service_manage"]
 
         # 节点和字段的查看，首先必须有当前流程的管理权限
@@ -117,6 +120,9 @@ class BaseWorkflowElementIamAuth(IamAuthPermit):
         :param obj:
         :return:
         """
+        if view.action in getattr(view, "permission_free_actions", []):
+            return True
+
         apply_actions = ["service_manage"]
         service_obj = obj.workflow.get_iam_resource()
         return self.iam_auth(request, apply_actions, service_obj)

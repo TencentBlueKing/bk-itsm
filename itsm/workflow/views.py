@@ -374,6 +374,7 @@ class StateViewSet(BaseWorkflowElementViewSet):
         "type": ["exact", "in"],
     }
     pagination_class = None
+    permission_free_actions = ["variables"]
 
     def perform_destroy(self, instance):
         """删除State的同时需要重连主流程状态"""

@@ -37,7 +37,6 @@ from common.template.template import Template
 from itsm.iadmin.contants import NOTICE_CENTER_SWITCH
 from itsm.iadmin.models import SystemSettings
 from itsm.project.models import UserProjectAccessRecord
-from common.log import logger
 from config.default import FRONTEND_URL
 from itsm.role.models import BKUserRole, UserRole
 
@@ -107,8 +106,6 @@ def index(request):
         and settings.WEIXIN_APP_EXTERNAL_HOST.find(request.get_host()) == -1
     ):
         BK_USER_MANAGE_HOST = FRONTEND_URL
-
-    logger.info("HTTP_REFERER={}".format(request.META.get("HTTP_REFERER", "")))
 
     try:
         notice_center_switch_value = SystemSettings.objects.get(
