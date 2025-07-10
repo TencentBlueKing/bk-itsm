@@ -25,6 +25,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from typing import Pattern
 from urllib.parse import urlparse
 
+from common.log import logger
+from common.pxfilter import XssHtml
+
+
 # 开发框架公用方法
 # 1. 页面输入内容转义（防止xss攻击）
 # from common.utils import html_escape, url_escape, texteditor_escape
@@ -34,10 +38,6 @@ from urllib.parse import urlparse
 # url_content = url_escape(input_content)
 # 4. 转义富文本内容
 # texteditor_content = texteditor_escape(input_content)
-
-
-from common.log import logger
-from common.pxfilter import XssHtml
 
 
 def html_escape(html, is_json=False):
@@ -116,3 +116,11 @@ def is_safe_url(url, allow_pattern: Pattern = None):
         return True
     except Exception:
         return False
+
+
+def sanitized_user_template(template):
+    """
+    清理用户输入的内容
+    """
+    sanitized_template = template.replace("\r\n", "").replace("\n", "")
+    return sanitized_template
