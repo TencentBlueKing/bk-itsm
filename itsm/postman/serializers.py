@@ -24,12 +24,14 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import json
+import re
 
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 from rest_framework.fields import JSONField
 
 from common.template.template import Template
+from common.utils import is_safe_url
 from itsm.component.constants import (
     LEN_LONG,
     LEN_NORMAL,
@@ -39,9 +41,13 @@ from itsm.component.constants import (
     LEN_XX_LONG,
     PUBLIC_PROJECT_PROJECT_KEY,
 )
-from itsm.component.drf.serializers import DynamicFieldsModelSerializer, BaseModelSerializer
+from itsm.component.drf.serializers import (
+    DynamicFieldsModelSerializer,
+    BaseModelSerializer,
+)
 from itsm.component.exceptions import ParamError
 from itsm.component.utils.basic import normal_name, dotted_name
+from itsm.meta.services.domain_regex_pattern import domain_regex_pattern_service
 from itsm.postman.models import RemoteApi, RemoteApiInstance, RemoteSystem
 from itsm.workflow.models import Field, State
 
@@ -54,6 +60,9 @@ class RemoteSystemSerializer(BaseModelSerializer):
     )
     code = serializers.CharField(
         max_length=LEN_NORMAL, required=True, error_messages={"blank": _("编码不能为空")}
+    )
+    domain = serializers.CharField(
+        max_length=LEN_LONG, required=True, error_messages={"blank": _("系统域名不能为空")}
     )
     system_id = serializers.IntegerField(required=False)
     desc = serializers.CharField(max_length=LEN_LONG, required=False, allow_blank=True)
@@ -118,6 +127,15 @@ class RemoteSystemSerializer(BaseModelSerializer):
             if RemoteSystem.objects.filter(code=value).exists():
                 raise ParamError(_("该系统已经存在，请重新选择"))
         return value
+
+    def validate_domain(self, value):
+        pattern_str = domain_regex_pattern_service.get_domain_regex_pattern()
+        if not pattern_str:
+            return value
+        pattern = re.compile(pattern_str)
+        if pattern and is_safe_url(value, pattern):
+            return value
+        raise ParamError(_("不合法的域名"))
 
 
 class RemoteApiSerializer(DynamicFieldsModelSerializer):
@@ -212,6 +230,12 @@ class RemoteApiSerializer(DynamicFieldsModelSerializer):
         else:
             if RemoteApi.objects.filter(name=value).exists():
                 raise ParamError(_("该接口名称已存在，请重新输入"))
+        return value
+
+    def validate_path(self, value):
+        # path不能包含http和https
+        if "http://" in value or "https://" in value:
+            raise ParamError(_("接口路径不能包含http://或https://"))
         return value
 
 
