@@ -22,6 +22,8 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+from typing import Pattern
+from urllib.parse import urlparse
 
 # 开发框架公用方法
 # 1. 页面输入内容转义（防止xss攻击）
@@ -96,3 +98,21 @@ def texteditor_escape(str_escape, unsupported_tags=None):
 def cmp(a, b):
     """适配py2的cmp方法"""
     return (a > b) - (a < b)
+
+
+def is_safe_url(url, allow_pattern: Pattern = None):
+    try:
+        parsed = urlparse(url)
+
+        # 限定协议
+        if parsed.scheme not in ["http", "https"]:
+            return False
+
+        # 限定域名
+        hostname = parsed.hostname
+        if allow_pattern and not allow_pattern.findall(hostname):
+            return False
+
+        return True
+    except Exception:
+        return False
