@@ -689,7 +689,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
                 )
                 ticket_current_processors = ticket.current_processors
                 ticket_current_processors = ticket_current_processors.replace(
-                    f',{serializer.validated_data["handler"]},', ""
+                    f',{serializer.validated_data["handler"]},', ","
                 )
                 ticket.current_processors = ticket_current_processors
                 ticket.save()
