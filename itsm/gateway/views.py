@@ -31,6 +31,7 @@ from django.views.decorators.cache import cache_page
 from django.http import JsonResponse, HttpResponse
 
 from common.log import logger
+from common.utils import filter_user_sensitive_info
 from itsm.component.constants import CACHE_5MIN, PREFIX_KEY, CACHE_30MIN
 from itsm.component.decorators import fbv_exception_handler
 from itsm.component.esb.esbclient import client_backend, client
@@ -100,7 +101,7 @@ def get_batch_users(request):
         users = users.split(",")
 
     try:
-        res = adapter_api.get_batch_users(users, properties, is_exact, page_params)
+        res = filter_user_sensitive_info(adapter_api.get_batch_users(users, properties, is_exact, page_params))
         if callback_func_name:
             response = {
                 "result": True,
@@ -233,9 +234,9 @@ def get_department_users(request):
         department_id = request.GET.get("id")
         recursive = request.GET.get("recursive") == "true"
 
-        res = get_list_department_profiles(
+        res = filter_user_sensitive_info(get_list_department_profiles(
             {"id": department_id, "recursive": recursive, "detail": True}
-        )
+        ))
 
     except ComponentCallError as e:
         return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_USERS").json()
