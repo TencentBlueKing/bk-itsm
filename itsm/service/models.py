@@ -348,10 +348,12 @@ class Service(ObjectManagerMixin, Model):
         conditions = [Q(display_type__in=["OPEN", "API"])]
 
         # 组织角色
-        for organization in UserRole.get_user_roles(username)["organization"]:
-            conditions.append(
-                Q(display_type="ORGANIZATION") & Q(display_role__contains=organization)
-            )
+        user_roles = UserRole.get_user_roles(username)
+        if user_roles:
+            for organization in user_roles["organization"]:
+                conditions.append(
+                    Q(display_type="ORGANIZATION") & Q(display_role__contains=organization)
+                )
 
         # 通用角色
         for role in UserRole.get_general_role_by_user(dotted_name(username)):

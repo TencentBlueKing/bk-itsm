@@ -33,7 +33,6 @@ from itsm.gateway import views
 urlpatterns = [
     url(r"^test/token/$", views.get_token),
     url(r"^bk_login/get_batch_users/$", views.get_batch_users),
-    url(r"^bk_login/get_all_users/$", views.get_all_users),
     url(r"^cmdb/get_app_list/$", views.get_app_list),
     url(r"^usermanage/get_departments/$", views.get_departments),
     url(

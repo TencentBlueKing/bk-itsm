@@ -22,8 +22,10 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-from typing import Pattern
+from typing import Pattern, List
 from urllib.parse import urlparse
+
+from django.conf import settings
 
 from common.log import logger
 from common.pxfilter import XssHtml
@@ -124,3 +126,19 @@ def sanitized_user_template(template):
     """
     sanitized_template = template.replace("\r\n", "").replace("\n", "")
     return sanitized_template
+
+
+def filter_user_sensitive_info(users: List):
+    """
+    过滤用户敏感信息
+    """
+    fields = settings.BK_USER_WHITE_FIELDS
+    results = []
+    for user_info in users:
+        user = {}
+        for field in fields:
+            if field in user_info:
+                user[field] = user_info[field]
+        if user:
+            results.append(user)
+    return results
