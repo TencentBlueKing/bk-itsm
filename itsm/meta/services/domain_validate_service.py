@@ -22,14 +22,49 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import logging
+
 from itsm.meta.services.context import ContextService
 
+import re
+from urllib.parse import urlparse
 
-class DomainRegexPatternService:
+
+class DomainValidateService:
+    def __init__(self):
+        self.allow_patterns = self.compile_domain_patterns()
+
+    def is_safe_url(self, url):
+        try:
+            parsed = urlparse(url)
+
+            # 限定协议
+            if parsed.scheme not in ["http", "https"]:
+                return False
+
+            # 限定域名
+            hostname = parsed.hostname
+            if not hostname:
+                return False
+
+            # 如果没有配置允许的域名正则表达式列表，则默认允许
+            if not self.allow_patterns:
+                return True
+
+            # 匹配域名是否符合允许的正则表达式列表
+            for pattern in self.allow_patterns:
+                if pattern.match(hostname):
+                    return True
+
+            return False
+        except Exception as e:  # 如果可能，特定捕获异常类型，比如 ValueError
+            logging.error(f"error parsing URL: {e}")
+            return False
+
     @staticmethod
-    def get_domain_regex_pattern():
-        """获取域名正则表达式"""
-        return ContextService.get_context_value("domain_regex_pattern")
-
-
-domain_regex_pattern_service = DomainRegexPatternService()
+    def compile_domain_patterns():
+        """编译并返回域名正则表达式"""
+        patterns = ContextService.get_context_value("domain_regex_pattern")
+        if not patterns:
+            return []
+        return [re.compile(i.strip()) for i in patterns.split(";") if i.strip()]

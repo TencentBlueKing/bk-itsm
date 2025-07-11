@@ -17,7 +17,7 @@ import os
 import requests
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
-from common.utils import sanitized_user_template
+from common.utils import sanitize_user_content
 from . import env
 from .conf import PLUGIN_CLIENT_LOGGER
 from .client_decorators import (
@@ -329,7 +329,7 @@ class PluginServiceApiClient:
                     "request api error,invoke_num=>%s, method=>%s, url=>%s kwargs=>%s,error=>%s ",
                     invoke_num,
                     method,
-                    sanitized_user_template(url),
+                    sanitize_user_content(url),
                     kwargs,
                     error,
                 )

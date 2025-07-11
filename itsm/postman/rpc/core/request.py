@@ -28,7 +28,7 @@ import json
 
 from common.log import logger
 from common.template.template import Template
-from common.utils import sanitized_user_template
+from common.utils import sanitize_user_content
 from itsm.postman.constants import TICKET_CONTEXT_KEY, TRIGGER_SOURCE
 from itsm.ticket.models import Ticket, TicketGlobalVariable
 from itsm.trigger.models import Trigger
@@ -79,8 +79,8 @@ class CompRequest(object):
         except Exception as e:
             logger.warning(
                 "Template text=%s, context=%s, error=%s",
-                sanitized_user_template(template),
-                sanitized_user_template(params),
+                sanitize_user_content(template),
+                sanitize_user_content(params),
                 e,
             )
             return False, []

@@ -25,7 +25,7 @@ from common.template.mako_utils.checker import check_mako_template_safety
 from common.template.mako_utils.exceptions import ForbiddenMakoTemplateException
 from common.template.mako_utils.string import deformat_var_key
 from common.template.sandbox import Sandbox
-from common.utils import sanitized_user_template
+from common.utils import sanitize_user_content
 
 logger = logging.getLogger("root")
 # find mako template(format is ${xxx}，and ${}# not in xxx, # may raise memory error)
@@ -149,12 +149,12 @@ class Template:
             except ForbiddenMakoTemplateException as e:
                 logger.warning(
                     "forbidden template: %s, exception: %s",
-                    sanitized_user_template(tpl),
+                    sanitize_user_content(tpl),
                     e,
                 )
                 continue
             except Exception:
-                logger.exception("%s safety check error.", sanitized_user_template(tpl))
+                logger.exception("%s safety check error.", sanitize_user_content(tpl))
                 continue
             resolved = Template._render_template(tpl, context)
             string = string.replace(tpl, str(resolved))
@@ -201,7 +201,7 @@ class Template:
         except (MakoException, SyntaxError) as e:
             logger.error(
                 "pipeline resolve template[%s] error[%s]",
-                sanitized_user_template(template),
+                sanitize_user_content(template),
                 e,
             )
             return template
@@ -210,7 +210,7 @@ class Template:
         except Exception as e:
             logger.warning(
                 "constant content(%s) is invalid, data=>%s, error=>%s",
-                sanitized_user_template(template),
+                sanitize_user_content(template),
                 data,
                 e,
             )

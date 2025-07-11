@@ -24,14 +24,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import json
-import re
 
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 from rest_framework.fields import JSONField
 
 from common.template.template import Template
-from common.utils import is_safe_url
 from itsm.component.constants import (
     LEN_LONG,
     LEN_NORMAL,
@@ -47,7 +45,7 @@ from itsm.component.drf.serializers import (
 )
 from itsm.component.exceptions import ParamError
 from itsm.component.utils.basic import normal_name, dotted_name
-from itsm.meta.services.domain_regex_pattern import domain_regex_pattern_service
+from itsm.meta.services.domain_validate_service import DomainValidateService
 from itsm.postman.models import RemoteApi, RemoteApiInstance, RemoteSystem
 from itsm.workflow.models import Field, State
 
@@ -129,11 +127,7 @@ class RemoteSystemSerializer(BaseModelSerializer):
         return value
 
     def validate_domain(self, value):
-        pattern_str = domain_regex_pattern_service.get_domain_regex_pattern()
-        if not pattern_str:
-            return value
-        pattern = re.compile(pattern_str)
-        if pattern and is_safe_url(value, pattern):
+        if DomainValidateService().is_safe_url(value):
             return value
         raise ParamError(_("不合法的域名"))
 
