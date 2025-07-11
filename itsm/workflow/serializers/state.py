@@ -22,14 +22,12 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-import re
 
 from django.db import transaction
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 from rest_framework.fields import JSONField, empty
 
-from common.utils import is_safe_url
 from itsm.component.constants import (
     DISTRIBUTE_TYPE_CHOICES,
     EMPTY_STRING,
@@ -44,7 +42,7 @@ from itsm.component.constants import (
 )
 from itsm.component.exceptions import ParamError
 from itsm.component.utils.basic import dotted_name, dotted_property
-from itsm.meta.services.domain_regex_pattern import domain_regex_pattern_service
+from itsm.meta.services.domain_validate_service import DomainValidateService
 from itsm.postman.models import RemoteApi, RemoteApiInstance
 from itsm.postman.serializers import RemoteApiSerializer, ApiInstanceSerializer
 from itsm.workflow.models import GlobalVariable, State
@@ -253,21 +251,19 @@ class StateSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
-        type_value = attrs.get("type", None)
-        if self.instance:  # 如果是更新操作，优先使用 instance 的 type
-            type_value = type_value or self.instance.type
+        if not self.instance:
+            type_value = attrs.get("type", None)
+        else:
+            type_value = attrs.get("type", self.instance.type)
 
         if type_value == "WEBHOOK":
-            url = attrs.get("extras", {}).get("webhook_info", {}).get("url", "")
-            pattern_str = domain_regex_pattern_service.get_domain_regex_pattern()
-            if not pattern_str:
-                return attrs
-            pattern = re.compile(pattern_str)
-            if pattern and is_safe_url(url, pattern):
-                return attrs
-            raise ParamError(_("不合法的域名"))
+            url = attrs.get("extras", {}).get("webhook_info", {}).get("url", None)
+            if url is not None:
+                if DomainValidateService().is_safe_url(url):
+                    return attrs
+                raise ParamError(_("不合法的域名"))
 
-        return attrs  # 如果不是 WEBHOOK 类型，直接返回 attrs
+        return attrs
 
     def run_validation(self, data=empty):
 

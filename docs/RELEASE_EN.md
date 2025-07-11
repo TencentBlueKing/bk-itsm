@@ -2,6 +2,8 @@
 ## [Version: 2.7.10] - 2025-07-11
 【Fix】Resolved issues related to code scanning  
 【Fix】Removed sensitive information from user interfaces  
+【Feature】Add handle ignore approval node logic  
+【Feature】Add ignore failed node apigw endpoint  
 
 ## [Version: 2.7.9] - 2025-07-08
 【Fix】Resolved potential XSS vulnerability caused by v-html  

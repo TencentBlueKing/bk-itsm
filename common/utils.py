@@ -120,12 +120,15 @@ def is_safe_url(url, allow_pattern: Pattern = None):
         return False
 
 
-def sanitized_user_template(template):
-    """
-    清理用户输入的内容
-    """
-    sanitized_template = template.replace("\r\n", "").replace("\n", "")
-    return sanitized_template
+def sanitize_user_content(content):
+    if isinstance(content, dict):
+        return {key: sanitize_user_content(value) for key, value in content.items()}
+    elif isinstance(content, list):
+        return [sanitize_user_content(element) for element in content]
+    elif isinstance(content, str):
+        return content.replace("\r\n", "").replace("\n", "")
+    else:
+        return content
 
 
 def filter_user_sensitive_info(users: List):
