@@ -1285,6 +1285,7 @@ export const m = {
     接入接口: 'Integrate API',
     新增接口: 'Add API',
     批量移除: 'Batch Remove ',
+    '系统调用时将拼接系统域名、接口路径': 'When the system is called, the system domain name and API path will be spliced together',
     请输入关键字: 'Enter the keywords ',
     状态: 'Status ',
     接入数: 'Numbers ',

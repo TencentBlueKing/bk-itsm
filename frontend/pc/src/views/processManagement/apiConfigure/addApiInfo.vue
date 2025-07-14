@@ -87,7 +87,8 @@
         <!-- eslint-enable -->
       </bk-form-item>
       <bk-form-item
-        :label="$t(`m.systemConfig['接口路径']`)">
+        :label="$t(`m.systemConfig['接口路径']`)"
+        :desc="$t(`m.systemConfig['系统调用时将拼接系统域名、接口路径']`)">
         <bk-input v-model="directory.formInfo.road" placeholder="please input path"
           :disabled="(directory.formInfo.category === 'component' || directory.formInfo.category === 'buffet_component') && typeInfo !== 'ADD'"
           @change="$emit('change')">
