@@ -72,7 +72,7 @@
   },
   "dependencies": {
     "alloyfinger": "^0.1.16",
-    "axios": "^0.21.0",
+    "axios": "^0.28.0",
     "dayjs": "^1.10.2",
     "fastclick": "^1.0.6",
     "jsonp": "^0.2.1",
