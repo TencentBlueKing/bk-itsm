@@ -1,4 +1,8 @@
 # Changelog
+【Fix】Resolved ticket stop schedule issue caused by fast approval and auto approve  
+【Feature】New APIGW endpoint of get ticket info by ticket id
+
+
 ## [Version: 2.7.10] - 2025-07-11
 【Fix】Resolved issues related to code scanning  
 【Fix】Removed sensitive information from user interfaces  
