@@ -37,6 +37,7 @@
       <template v-if="basicInfo.hasOwnProperty('method')">
         <bk-form-item class="bk-editor-form"
           :required="true"
+          :desc="$t(`m.systemConfig['系统调用时将拼接系统域名、接口路径']`)"
           :label="$t(`m.systemConfig['接口路径：']`)">
           <bk-input v-model="basicInfo.path" placeholder="/path"
             :disabled="basicInfo.is_builtin">
