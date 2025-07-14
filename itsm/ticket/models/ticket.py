@@ -1108,7 +1108,7 @@ class Status(Model):
         fields = (
             self.ticket.fields.filter(filter_experssion)
             .exclude(source=BASE_MODEL)
-            .extra( # review
+            .extra(  # review
                 select={"ordering": ordering},
                 order_by=(
                     "ordering",
@@ -3766,9 +3766,6 @@ class Ticket(Model, BaseTicket):
 
         # Send notify
         processor = node_status.get_processor_in_sign_state()
-        # 快速审批通知
-        self.notify_fast_approval(state_id, processor)
-
         # TODO 发送通知可用触发器替代
         self.notify(
             state_id,
@@ -4709,7 +4706,7 @@ class Ticket(Model, BaseTicket):
         info = (
             cls.objects.filter(project_query)
             .filter(**time_range)
-            .extra(select={"date_str": data_str}) # review
+            .extra(select={"date_str": data_str})  # review
             .values("date_str")
             .annotate(count=Count("creator", distinct=True))
             .order_by("date_str")
@@ -4726,7 +4723,7 @@ class Ticket(Model, BaseTicket):
         info = (
             cls.objects.filter(project_query)
             .filter(**data)
-            .extra(select={"date_str": data_str}) # review
+            .extra(select={"date_str": data_str})  # review
             .values("date_str")
             .annotate(count=Count("id"))
             .order_by("date_str")
@@ -4744,7 +4741,7 @@ class Ticket(Model, BaseTicket):
             cls.objects.filter(project_query)
             .filter(**data)
             .filter(bk_biz_id__gt=-1)
-            .extra(select={"date_str": data_str}) # review
+            .extra(select={"date_str": data_str})  # review
             .values("date_str")
             .annotate(count=Count("bk_biz_id", distinct=True))
             .order_by("date_str")
