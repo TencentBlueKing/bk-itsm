@@ -390,7 +390,6 @@
       // 接入系统/修改系统
       submitDictionary() {
         this.$refs.dictDataForm.validate().then(() => {
-          debugger;
           if (this.secondClick) {
             return;
           }
