@@ -28,7 +28,7 @@ supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 
 
 [program: itsm_celery]
-command = python /opt/app/code/manage.py celery worker -Q default -n default_worker -c 4 -l INFO --maxtasksperchild=128
+command = python /opt/app/code/manage.py celery worker -Q default -n default_worker -c 4 -l INFO --max-tasks-per-child=128
 directory = /opt/app/code/
 stdout_logfile = /opt/app/logs/itsm/celery.log
 redirect_stderr = true
@@ -37,7 +37,7 @@ autorestart = true
 
 
 [program: itsm_celery_pipeline]
-command = python /opt/app/code/manage.py celery worker -Q pipeline_priority,service_schedule_priority,pipeline_additional_task_priority -n pipeline_worker-0 -l INFO -c 4 --maxtasksperchild=128
+command = python /opt/app/code/manage.py celery worker -Q pipeline_priority,service_schedule_priority,pipeline_additional_task_priority -n pipeline_worker-0 -l INFO -c 4 --max-tasks-per-child=128
 directory = /opt/app/code/
 stdout_logfile = /opt/app/logs/itsm/celery.log
 redirect_stderr = true
@@ -46,7 +46,7 @@ autorestart = true
 
 
 [program: itsm_celery_pipeline1]
-command = python /opt/app/code/manage.py celery worker -Q pipeline_priority,service_schedule_priority -n pipeline_worker-1 -l INFO -P gevent -c 32 --maxtasksperchild=128
+command = python /opt/app/code/manage.py celery worker -Q pipeline_priority,service_schedule_priority -n pipeline_worker-1 -l INFO -P gevent -c 32 --max-tasks-per-child=128
 directory = /opt/app/code/
 stdout_logfile = /opt/app/logs/itsm/celery.log
 redirect_stderr = true
@@ -55,7 +55,7 @@ autorestart = true
 
 
 [program: itsm_celery_pipeline2]
-command = python /opt/app/code/manage.py celery worker -Q pipeline_priority,service_schedule_priority -n pipeline_worker-2 -l INFO -P gevent -c 32 --maxtasksperchild=128
+command = python /opt/app/code/manage.py celery worker -Q pipeline_priority,service_schedule_priority -n pipeline_worker-2 -l INFO -P gevent -c 32 --max-tasks-per-child=128
 directory = /opt/app/code/
 stdout_logfile = /opt/app/logs/itsm/celery.log
 redirect_stderr = true
@@ -64,7 +64,7 @@ autorestart = true
 
 
 [program: itsm_celery_ticket1]
-command = python /opt/app/code/manage.py celery worker -Q itsm_publish_ticket_priority -n ticket_worker-1 -l INFO -P gevent -c 32 --maxtasksperchild=128
+command = python /opt/app/code/manage.py celery worker -Q itsm_publish_ticket_priority -n ticket_worker-1 -l INFO -P gevent -c 32 --max-tasks-per-child=128
 directory = /opt/app/code/
 stdout_logfile = /opt/app/logs/itsm/celery.log
 redirect_stderr = true
@@ -73,7 +73,7 @@ autorestart = true
 
 
 [program: itsm_celery_ticket2]
-command = python /opt/app/code/manage.py celery worker -Q itsm_publish_ticket_priority -n ticket_worker-2 -l INFO -P gevent -c 32 --maxtasksperchild=128
+command = python /opt/app/code/manage.py celery worker -Q itsm_publish_ticket_priority -n ticket_worker-2 -l INFO -P gevent -c 32 --max-tasks-per-child=128
 directory = /opt/app/code/
 stdout_logfile = /opt/app/logs/itsm/celery.log
 redirect_stderr = true
