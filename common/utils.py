@@ -22,6 +22,14 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+from typing import Pattern, List
+from urllib.parse import urlparse
+
+from django.conf import settings
+
+from common.log import logger
+from common.pxfilter import XssHtml
+
 
 # 开发框架公用方法
 # 1. 页面输入内容转义（防止xss攻击）
@@ -32,10 +40,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # url_content = url_escape(input_content)
 # 4. 转义富文本内容
 # texteditor_content = texteditor_escape(input_content)
-
-
-from common.log import logger
-from common.pxfilter import XssHtml
 
 
 def html_escape(html, is_json=False):
@@ -96,3 +100,48 @@ def texteditor_escape(str_escape, unsupported_tags=None):
 def cmp(a, b):
     """适配py2的cmp方法"""
     return (a > b) - (a < b)
+
+
+def is_safe_url(url, allow_pattern: Pattern = None):
+    try:
+        parsed = urlparse(url)
+
+        # 限定协议
+        if parsed.scheme not in ["http", "https"]:
+            return False
+
+        # 限定域名
+        hostname = parsed.hostname
+        if allow_pattern and not allow_pattern.findall(hostname):
+            return False
+
+        return True
+    except Exception:
+        return False
+
+
+def sanitize_user_content(content):
+    if isinstance(content, dict):
+        return {key: sanitize_user_content(value) for key, value in content.items()}
+    elif isinstance(content, list):
+        return [sanitize_user_content(element) for element in content]
+    elif isinstance(content, str):
+        return content.replace("\r\n", "").replace("\n", "")
+    else:
+        return content
+
+
+def filter_user_sensitive_info(users: List):
+    """
+    过滤用户敏感信息
+    """
+    fields = settings.BK_USER_WHITE_FIELDS
+    results = []
+    for user_info in users:
+        user = {}
+        for field in fields:
+            if field in user_info:
+                user[field] = user_info[field]
+        if user:
+            results.append(user)
+    return results

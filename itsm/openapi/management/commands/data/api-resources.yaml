@@ -792,7 +792,7 @@ paths:
         backend:
           name: default
           method: get
-          path: /openapi/ticket/get_ticket_event_logs/
+          path: /{env.api_sub_path}/openapi/ticket/get_ticket_event_logs/
           matchSubpath: false
           timeout: 0
         pluginConfigs: []
@@ -817,7 +817,7 @@ paths:
         backend:
           name: default
           method: get
-          path: /openapi/ticket/get_tickets_processors/
+          path: /{env.api_sub_path}/openapi/ticket/get_tickets_processors/
           matchSubpath: false
           timeout: 0
         pluginConfigs: []
@@ -826,6 +826,57 @@ paths:
           appVerifiedRequired: true
           resourcePermissionRequired: true
         descriptionEn:
+  /v2/itsm/ignore_ticket_state/:
+    post:
+      operationId: ignore_ticket_state
+      description: 忽略单据节点
+      responses:
+        default:
+            description: ''
+      tags: [ ]
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        enableWebsocket: false
+        backend:
+          name: default
+          method: post
+          path: /{env.api_sub_path}/openapi/ticket/ignore_state/
+          matchSubpath: false
+          timeout: 0
+        pluginConfigs: [ ]
+        authConfig:
+          userVerifiedRequired: false
+          appVerifiedRequired: true
+          resourcePermissionRequired: true
+        descriptionEn:
+  /v2/itsm/get_ticket_info_by_id/:
+    get:
+      operationId: get_ticket_info_by_id
+      description: 根据工单ID获取单据信息
+      responses:
+          default:
+              description: ''
+      tags: [ ]
+      x-bk-apigateway-resource:
+        isPublic: false
+        allowApplyPermission: false
+        matchSubpath: false
+        enableWebsocket: false
+        backend:
+          name: default
+          method: get
+          path: /{env.api_sub_path}/openapi/ticket/get_ticket_info_by_id/
+          matchSubpath: false
+          timeout: 0
+        pluginConfigs: [ ]
+        authConfig:
+          userVerifiedRequired: false
+          appVerifiedRequired: true
+          resourcePermissionRequired: true
+        descriptionEn:                  
+  
 schemes:
 - http
 swagger: '2.0'

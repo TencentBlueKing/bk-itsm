@@ -17,6 +17,7 @@ import os
 import requests
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
+from common.utils import sanitize_user_content
 from . import env
 from .conf import PLUGIN_CLIENT_LOGGER
 from .client_decorators import (
@@ -320,10 +321,16 @@ class PluginServiceApiClient:
                 result.raise_for_status()
                 break
             except Exception as e:
-                kwargs = ("{}".format(kwargs)).replace(env.PAASV3_APIGW_API_TOKEN, "******")
+                kwargs = ("{}".format(kwargs)).replace(
+                    env.PAASV3_APIGW_API_TOKEN, "******"
+                )
                 error = str(e).replace(env.PAASV3_APIGW_API_TOKEN, "******")
                 logger.error(
                     "request api error,invoke_num=>%s, method=>%s, url=>%s kwargs=>%s,error=>%s ",
-                    invoke_num, method, url, kwargs, error
+                    invoke_num,
+                    method,
+                    sanitize_user_content(url),
+                    kwargs,
+                    error,
                 )
         return result

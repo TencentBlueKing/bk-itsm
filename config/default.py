@@ -708,6 +708,15 @@ BK_USER_MANAGE_WEIXIN_HOST = os.environ.get("BK_USER_MANAGE_WEIXIN_HOST", BK_PAA
 
 LOGIN_URL = BK_URL + "/login/"
 
+# 用户管理字段白名单
+BK_USER_DEFAULT_FIELDS = (
+    "id,username,display_name,domain,logo,category_id,category_name"
+)
+BK_USER_WHITE_FIELDS = (
+    os.environ.get("BKAPP_BK_USER_WHITE_FIELDS") or BK_USER_DEFAULT_FIELDS
+)
+BK_USER_WHITE_FIELDS = BK_USER_WHITE_FIELDS.split(",")
+
 # 是否启用短信评价
 IS_USE_INVITE_SMS = os.environ.get("IS_USE_INVITE_SMS", None)
 

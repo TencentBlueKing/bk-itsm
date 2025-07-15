@@ -199,6 +199,7 @@
           </template>
           <bk-form-item
             :label="$t(`m.systemConfig['系统域名：']`)"
+            :required="true"
             :property="'domain'">
             <bk-input :clearable="true" v-model="dictDataTable.formInfo.domain"></bk-input>
           </bk-form-item>
@@ -335,6 +336,7 @@
       this.rules.code = this.checkCommonRules('select').select;
       this.rules.addName = this.checkCommonRules('name').name;
       this.rules.addCode = this.checkCommonRules('key').key;
+      this.rules.domain = this.checkCommonRules('required').required;
     },
     methods: {
       scrollEvent($event) {

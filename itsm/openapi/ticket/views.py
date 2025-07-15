@@ -48,6 +48,8 @@ from itsm.component.constants import (
     APPROVE_RESULT,
     INVISIBLE,
     PROCESS_RUNNING,
+    ResponseCodeStatus,
+    FINISHED,
 )
 from itsm.component.decorators import custom_apigw_required
 from itsm.component.drf import viewsets as component_viewsets
@@ -97,6 +99,7 @@ from itsm.ticket.serializers import TicketList, TicketSerializer, EventSerialize
 from itsm.ticket.validators import (
     terminate_validate,
     withdraw_validate,
+    ticket_status_validate,
 )
 
 
@@ -263,6 +266,27 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
         return Response(self.serializer_class(ticket).data)
 
+    @action(detail=False, methods=["get"], serializer_class=TicketRetrieveSerializer)
+    @custom_apigw_required
+    def get_ticket_info_by_id(self, request):
+        """
+        获取单据详情
+        """
+
+        try:
+            ticket = self.queryset.get(id=request.query_params.get("id"))
+        except Ticket.DoesNotExist:
+            return Response(
+                {
+                    "result": False,
+                    "code": TicketNotFoundError.ERROR_CODE_INT,
+                    "data": None,
+                    "message": TicketNotFoundError.MESSAGE,
+                }
+            )
+
+        return Response(self.serializer_class(ticket).data)
+
     @action(detail=False, methods=["get"])
     @custom_apigw_required
     def get_ticket_logs(self, request):
@@ -310,7 +334,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         queryset = TicketEventLog.objects.filter(ticket=ticket)
         serializer = EventSerializer(queryset, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=["get"])
     @custom_apigw_required
     def get_tickets_processors(self, request):
@@ -325,6 +349,41 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
                 for ticket_id in ticket_ids
             }
         )
+
+    @action(detail=False, methods=["post"])
+    @custom_apigw_required
+    def ignore_state(self, request, *args, **kwargs):
+        """
+        失败的节点可以在此进行忽略
+        """
+        try:
+            ticket_id = request.data.get("ticket_id", "")
+            ticket = Ticket.objects.get(id=ticket_id)
+            state_id = str(request.data.get("state_id", ""))
+            ticket_status_validate(ticket, state_id)
+            operator = request.data.get("operator", "")
+
+            res = ticket.skip_node(state_id, operator=operator)
+            ticket.node_status.filter(state_id=state_id).update(status=FINISHED)
+
+            return Response(
+                {
+                    "code": ResponseCodeStatus.OK
+                    if res.result
+                    else ResponseCodeStatus.FAILED,
+                    "message": res.message,
+                    "result": res.result,
+                }
+            )
+        except Ticket.DoesNotExist:
+            return Response(
+                {
+                    "result": False,
+                    "code": TicketNotFoundError.ERROR_CODE_INT,
+                    "data": None,
+                    "message": TicketNotFoundError.MESSAGE,
+                }
+            )
 
     @action(detail=False, methods=["post"], serializer_class=TicketApproveSerializer)
     @catch_openapi_exception
@@ -630,6 +689,32 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
         fields = []
         remarked = False
+        if serializer.validated_data["submit_action"] == "ignore":
+            logger.info(
+                f'{serializer.validated_data["handler"]} ignore ticket_id: {ticket_id}, state_id:{state_id}'
+            )
+            with transaction.atomic():
+                TicketEventLog.objects.create_log(
+                    ticket=ticket,
+                    state_id=state_id,
+                    log_operator=serializer.validated_data["handler"],
+                    message="{operator} {action}【{name}】(忽略)",
+                    action="已处理",
+                    from_state_name=node_status.name,
+                    source=API,
+                )
+                SignTask.objects.create(
+                    status_id=node_status.id,
+                    processor=serializer.validated_data["handler"],
+                    status="FINISHED",
+                )
+                ticket_current_processors = ticket.current_processors
+                ticket_current_processors = ticket_current_processors.replace(
+                    f',{serializer.validated_data["handler"]},', ","
+                )
+                ticket.current_processors = ticket_current_processors
+                ticket.save()
+                return Response()
         for field in node_fields:
             if field.meta.get("code") == APPROVE_RESULT:
                 fields.append(

@@ -7,6 +7,7 @@ from django.http import HttpResponse
 
 # 非强制安装PyJWT
 from common.log import logger
+from common.utils import sanitize_user_content
 
 try:
     from jwt import exceptions as jwt_exceptions
@@ -54,16 +55,16 @@ class JWTClient(object):
 
     def get_jwt_info(self):
         if has_jwt is False:
-            self.error_message = u"【PyJWT】SDK未安装，请在requirements.txt中添加【PyJWT】后重新提测"
+            self.error_message = "【PyJWT】SDK未安装，请在requirements.txt中添加【PyJWT】后重新提测"
             return False
         if has_crypto is False:
             self.error_message = (
-                u"【cryptography】SDK未安装，请在requirements.txt中添加【cryptography】后重新提测"
+                "【cryptography】SDK未安装，请在requirements.txt中添加【cryptography】后重新提测"
             )
             return False
 
         if not self.raw_content:
-            self.error_message = u"【X_BKAPI_JWT】不在HTTP头部或者为空，请确认请求来源是否为 API Gateway"
+            self.error_message = "【X_BKAPI_JWT】不在HTTP头部或者为空，请确认请求来源是否为 API Gateway"
             return False
         try:
             self.headers = jwt.get_unverified_header(self.raw_content)
@@ -76,17 +77,17 @@ class JWTClient(object):
             self.is_valid = True
         except jwt_exceptions.InvalidKeyError:
             self.error_message = (
-                u"公钥设置错误，请在 API Gateway 下载网关公钥，并配置到Django配置项【APIGW_PUBLIC_KEY】"
+                "公钥设置错误，请在 API Gateway 下载网关公钥，并配置到Django配置项【APIGW_PUBLIC_KEY】"
             )
         except jwt_exceptions.DecodeError:
-            self.error_message = u"【X_BKAPI_JWT】不合法，请确认格式或者使用合法私钥签名"
+            self.error_message = "【X_BKAPI_JWT】不合法，请确认格式或者使用合法私钥签名"
             import traceback
 
             traceback.print_exc()
         except jwt_exceptions.ExpiredSignatureError:
-            self.error_message = u"【X_BKAPI_JWT】不合法，已经过期"
+            self.error_message = "【X_BKAPI_JWT】不合法，已经过期"
         except jwt_exceptions.InvalidIssuerError:
-            self.error_message = u"【X_BKAPI_JWT】不合法，签发者不是APIGW"
+            self.error_message = "【X_BKAPI_JWT】不合法，签发者不是APIGW"
         except Exception as error:
             LOG.exception("decode jwt fail")
             self.error_message = error.message
@@ -97,7 +98,7 @@ class JWTClient(object):
         若 Header 中不存在，或者解析失败，则使用默认值
         """
         jwt_resource = self.request.META.get(self.JWT_RESOURCE, "ESB")
-        logger.info("the api resource is %s", jwt_resource)
+        logger.info("the api resource is %s", sanitize_user_content(jwt_resource))
         if jwt_resource == "APIGW":
             return settings.APIGW_PUBLIC_KEY
         else:

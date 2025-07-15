@@ -28,6 +28,7 @@ import json
 
 from common.log import logger
 from common.template.template import Template
+from common.utils import sanitize_user_content
 from itsm.postman.constants import TICKET_CONTEXT_KEY, TRIGGER_SOURCE
 from itsm.ticket.models import Ticket, TicketGlobalVariable
 from itsm.trigger.models import Trigger
@@ -55,22 +56,33 @@ class CompRequest(object):
 
             params_context.update(
                 {
-                    "params_%s" % field['key']: field['_value']
-                    for field in ticket.fields.filter(_value__isnull=False).exclude(_value="").values("key", "_value")
+                    "params_%s" % field["key"]: field["_value"]
+                    for field in ticket.fields.filter(_value__isnull=False)
+                    .exclude(_value="")
+                    .values("key", "_value")
                 }
             )
             params_context.update(
                 {
                     "params_%s" % item["key"]: item["value"]
-                    for item in TicketGlobalVariable.objects.filter(ticket_id=ticket_id).values("key", "value")
+                    for item in TicketGlobalVariable.objects.filter(
+                        ticket_id=ticket_id
+                    ).values("key", "value")
                 }
             )
 
         template = params.get("meta", {})
         try:
-            query_params = json.loads(Template(json.dumps(template)).render(**params_context))
+            query_params = json.loads(
+                Template(json.dumps(template)).render(**params_context)
+            )
         except Exception as e:
-            logger.warning("Template text=%s, context=%s, error=%s", template, params, e)
+            logger.warning(
+                "Template text=%s, context=%s, error=%s",
+                sanitize_user_content(template),
+                sanitize_user_content(params),
+                e,
+            )
             return False, []
 
         if rpc_source == TRIGGER_SOURCE:
@@ -79,5 +91,10 @@ class CompRequest(object):
                 trigger = Trigger.objects.get(id=params.get("rpc_source_id"))
             except Trigger.DoesNotExist:
                 return False, []
-            query_params.update({"trigger_source_id": trigger.source_id, "trigger_source_type": trigger.source_type})
+            query_params.update(
+                {
+                    "trigger_source_id": trigger.source_id,
+                    "trigger_source_type": trigger.source_type,
+                }
+            )
         return True, query_params

@@ -11,7 +11,6 @@ an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express o
 specific language governing permissions and limitations under the License.
 """
 
-import copy
 import re
 import logging
 
@@ -26,6 +25,7 @@ from common.template.mako_utils.checker import check_mako_template_safety
 from common.template.mako_utils.exceptions import ForbiddenMakoTemplateException
 from common.template.mako_utils.string import deformat_var_key
 from common.template.sandbox import Sandbox
+from common.utils import sanitize_user_content
 
 logger = logging.getLogger("root")
 # find mako template(format is ${xxx}，and ${}# not in xxx, # may raise memory error)
@@ -75,7 +75,7 @@ class Template:
                 templates += Template(value).get_templates()
         return list(set(templates))
 
-    def render(self, context: dict=None, **kwargs) -> Any:
+    def render(self, context: dict = None, **kwargs) -> Any:
         """
         渲染当前模板
 
@@ -86,8 +86,10 @@ class Template:
         """
         data = self.data
         if not isinstance(data, str):
-            raise Exception("render type error, template[%s] is not a string" % self.data)
-        
+            raise Exception(
+                "render type error, template[%s] is not a string" % self.data
+            )
+
         context = context or kwargs
         if isinstance(data, str):
             return self._render_string(data, context)
@@ -145,10 +147,14 @@ class Template:
                     mako_safety.SingleLinCodeExtractor(),
                 )
             except ForbiddenMakoTemplateException as e:
-                logger.warning("forbidden template: %s, exception: %s", tpl, e)
+                logger.warning(
+                    "forbidden template: %s, exception: %s",
+                    sanitize_user_content(tpl),
+                    e,
+                )
                 continue
             except Exception:
-                logger.exception("%s safety check error.", tpl)
+                logger.exception("%s safety check error.", sanitize_user_content(tpl))
                 continue
             resolved = Template._render_template(tpl, context)
             string = string.replace(tpl, str(resolved))
@@ -185,18 +191,29 @@ class Template:
         data = {}
         data.update(context)
         data.update(Sandbox().get())
-        
+
         if not isinstance(template, str):
-            raise TypeError("constant resolve error, template[%s] is not a string", template)
+            raise TypeError(
+                "constant resolve error, template[%s] is not a string", template
+            )
         try:
             tm = MakoTemplate(template)
         except (MakoException, SyntaxError) as e:
-            logger.error("pipeline resolve template[%s] error[%s]", template, e)
+            logger.error(
+                "pipeline resolve template[%s] error[%s]",
+                sanitize_user_content(template),
+                e,
+            )
             return template
         try:
             resolved = tm.render_unicode(**data)
         except Exception as e:
-            logger.warning("constant content(%s) is invalid, data=>%s, error=>%s", template, data, e)
+            logger.warning(
+                "constant content(%s) is invalid, data=>%s, error=>%s",
+                sanitize_user_content(template),
+                data,
+                e,
+            )
             return template
         else:
             return resolved

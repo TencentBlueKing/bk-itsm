@@ -42,6 +42,7 @@ from itsm.component.constants import (
 )
 from itsm.component.exceptions import ParamError
 from itsm.component.utils.basic import dotted_name, dotted_property
+from itsm.meta.services.domain_validate_service import DomainValidateService
 from itsm.postman.models import RemoteApi, RemoteApiInstance
 from itsm.postman.serializers import RemoteApiSerializer, ApiInstanceSerializer
 from itsm.workflow.models import GlobalVariable, State
@@ -248,6 +249,21 @@ class StateSerializer(serializers.ModelSerializer):
             if not value:
                 raise ParamError(_("节点名称不能为空"))
         return value
+
+    def validate(self, attrs):
+        if not self.instance:
+            type_value = attrs.get("type", None)
+        else:
+            type_value = attrs.get("type", self.instance.type)
+
+        if type_value == "WEBHOOK":
+            url = attrs.get("extras", {}).get("webhook_info", {}).get("url", None)
+            if url is not None:
+                if DomainValidateService().is_safe_url(url):
+                    return attrs
+                raise ParamError(_("不合法的域名"))
+
+        return attrs
 
     def run_validation(self, data=empty):
 

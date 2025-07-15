@@ -73,7 +73,7 @@ class ItsmApprovalService(ItsmSignService):
         else:
             # 否则，记录日志
             logger.info(
-                "Bypass create_moa_ticket due to service id is in service_approval_blacklist"
+                f"Bypass create_moa_ticket due to service id {ticket.service_id} is in service_approval_blacklist"
             )
 
         # 如果是普通的审批节点，则自动生成条件
@@ -110,6 +110,10 @@ class ItsmApprovalService(ItsmSignService):
             )  # AUTO_APPROVE_TIME秒之后自动回调
             return True
 
+        # 获取当前节点的可以审批的审批人
+        fast_approval_notify_receivers = node_status.get_processor_in_sign_state()
+        fast_approval_notify_receivers_list = fast_approval_notify_receivers.split(",")
+
         # 检测流程和节点级别是否开启了自动过单
         is_flow_auto_approve = self.is_auto_approve(ticket, node_status)
         is_node_auto_approve, intersecting_processors = self.is_approved_auto_approve(
@@ -138,6 +142,8 @@ class ItsmApprovalService(ItsmSignService):
                 countdown=settings.AUTO_APPROVE_TIME,
             )  # AUTO_APPROVE_TIME秒之后自动回调
 
+            fast_approval_notify_receivers_list.remove(ticket.creator)
+
         # 如果节点级别开启了自动审批通过
         if is_node_auto_approve and intersecting_processors:
             msg = "检测到当前处理人已审批同意过此单据，系统自动过单"
@@ -162,6 +168,7 @@ class ItsmApprovalService(ItsmSignService):
                     (node_status.id, processor, activity_id, callback_data),
                     countdown=settings.AUTO_APPROVE_TIME,  # AUTO_APPROVE_TIME秒之后自动回调
                 )
+                fast_approval_notify_receivers_list.remove(processor)
             # 如果是多人审批
             else:
                 logger.info(
@@ -186,7 +193,15 @@ class ItsmApprovalService(ItsmSignService):
                         (node_status.id, processor, activity_id, callback_data),
                         countdown=settings.AUTO_APPROVE_TIME,  # AUTO_APPROVE_TIME秒之后自动回调
                     )
+                    fast_approval_notify_receivers_list.remove(processor)
 
+        ticket.notify_fast_approval(
+            state_id, ",".join(fast_approval_notify_receivers_list)
+        )
+        logger.info(
+            f"notify_fast_approval: ticket_id: {ticket_id} state_id: {state_id} processors: ",
+            ".join(fast_approval_notify_receivers_list)",
+        )
         return True
 
     def is_skip_approve(self, ticket, state_id, node_status):
@@ -197,8 +212,9 @@ class ItsmApprovalService(ItsmSignService):
         return False
 
     def is_auto_approve(self, ticket, node_status):
-        processors = node_status.get_processors()
-        if ticket.flow.is_auto_approve and ticket.creator in processors:
+        sign_processors = node_status.get_processor_in_sign_state()
+        sign_processors_list = sign_processors.split(",")
+        if ticket.flow.is_auto_approve and ticket.creator in sign_processors_list:
             return True
         return False
 
@@ -208,7 +224,8 @@ class ItsmApprovalService(ItsmSignService):
             "enable_auto_approve_if_previously_approved"
         ):
             # 获取当前节点审批人
-            current_processors = node_status.get_processors()
+            sign_processors = node_status.get_processor_in_sign_state()
+            sign_processors_list = sign_processors.split(",")
 
             # 获取之前审批通过的审批人
             approval_status = Status.objects.filter(
@@ -222,7 +239,7 @@ class ItsmApprovalService(ItsmSignService):
 
             # 取出他们的交集
             intersecting_processors = list(
-                set(current_processors).intersection(set(approved_processors))
+                set(sign_processors_list).intersection(set(approved_processors))
             )
             return True, intersecting_processors
         else:
