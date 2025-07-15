@@ -142,7 +142,8 @@ class ItsmApprovalService(ItsmSignService):
                 countdown=settings.AUTO_APPROVE_TIME,
             )  # AUTO_APPROVE_TIME秒之后自动回调
 
-            fast_approval_notify_receivers_list.remove(ticket.creator)
+            if ticket.creator in fast_approval_notify_receivers_list:
+                fast_approval_notify_receivers_list.remove(ticket.creator)
 
         # 如果节点级别开启了自动审批通过
         if is_node_auto_approve and intersecting_processors:
@@ -168,7 +169,8 @@ class ItsmApprovalService(ItsmSignService):
                     (node_status.id, processor, activity_id, callback_data),
                     countdown=settings.AUTO_APPROVE_TIME,  # AUTO_APPROVE_TIME秒之后自动回调
                 )
-                fast_approval_notify_receivers_list.remove(processor)
+                if processor in fast_approval_notify_receivers_list:
+                    fast_approval_notify_receivers_list.remove(processor)
             # 如果是多人审批
             else:
                 logger.info(
@@ -193,14 +195,15 @@ class ItsmApprovalService(ItsmSignService):
                         (node_status.id, processor, activity_id, callback_data),
                         countdown=settings.AUTO_APPROVE_TIME,  # AUTO_APPROVE_TIME秒之后自动回调
                     )
-                    fast_approval_notify_receivers_list.remove(processor)
+                    if processor in fast_approval_notify_receivers_list:
+                        fast_approval_notify_receivers_list.remove(processor)
 
         ticket.notify_fast_approval(
             state_id, ",".join(fast_approval_notify_receivers_list)
         )
         logger.info(
-            f"notify_fast_approval: ticket_id: {ticket_id} state_id: {state_id} processors: ",
-            ".join(fast_approval_notify_receivers_list)",
+            f"notify_fast_approval: ticket_id: {ticket_id}, state_id: {state_id}, "
+            f"processors: {','.join(fast_approval_notify_receivers_list)}"
         )
         return True
 
