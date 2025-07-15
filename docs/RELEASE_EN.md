@@ -1,4 +1,5 @@
 # Changelog
+## [Version: 2.7.11] - 2025-07-14
 【Fix】Resolved ticket stop schedule issue caused by fast approval and auto approve  
 【Feature】New APIGW endpoint of get ticket info by ticket id
 
