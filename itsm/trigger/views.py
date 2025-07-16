@@ -91,7 +91,6 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
     }
 
     permission_classes = (WorkflowTriggerPermit,)
-    permission_free_actions = ["list"]
 
     def get_queryset(self):
 
@@ -239,7 +238,7 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
             if not rule.action_schemas:
                 continue
             actions_schemas.extend(rule.action_schemas)
-            
+
         schemas = []
         with transaction.atomic():
             for _data in request.data:

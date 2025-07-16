@@ -98,8 +98,8 @@ class RemoteSystemViewSet(ModelViewSet):
     # 项目管理
     permission_action_default = "system_settings_manage"
     permission_resource_is_project = True
-    permission_free_actions = ["list", "all", "get_systems", "get_components"]
-    
+    permission_free_actions = ["all", "get_systems", "get_components"]
+
     pagination_class = None
 
     filter_fields = {
@@ -187,7 +187,7 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
 
     serializer_class = RemoteApiSerializer
     queryset = RemoteApi.objects.all()
-    
+
     permission_classes = (RemoteApiPermit,)
     permission_resource_is_project = True
     permission_create_action = ["create", "imports"]
@@ -254,11 +254,11 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
 
         will_deleted = self.queryset.filter(id__in=id_list)
         real_deleted = list(will_deleted.values_list("id", flat=True))
-        
+
         # 判断输入的接口实例
         if will_deleted.count() != len(real_deleted):
             raise ValidationError(_("接口数量异常，请刷新后重试"))
-        
+
         # 检测实例所属项目是否一致
         project_keys = [i.remote_system.project_key for i in will_deleted]
         if len(set(project_keys)) != 1:

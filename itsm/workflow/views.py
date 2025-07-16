@@ -738,7 +738,7 @@ class TemplateFieldViewSet(component_viewsets.ModelViewSet):
     queryset = TemplateField.objects.all()
     serializer_class = TemplateFieldSerializer
     permission_classes = (WorkflowElementManagePermission,)
-    permission_free_actions = ["list", "mix_list"]
+    permission_free_actions = ["mix_list"]
     # 平台管理
     permission_action_platform = "public_fields_manage"
     # 项目管理
@@ -1117,11 +1117,17 @@ class TaskSchemaViewSet(DynamicListModelMixin, component_viewsets.ModelViewSet):
                 raise serializers.ValidationError(_("任务字段排序参数不合法，请联系管理员"))
 
             task_field_ids = [int(i) for i in task_fields["task_field_ids"]]
-            ordering_tpl = "FIELD(`id`, {})".format(",".join(["%s"] * len(task_field_ids)))
-            
+            ordering_tpl = "FIELD(`id`, {})".format(
+                ",".join(["%s"] * len(task_field_ids))
+            )
+
             task_fields_schema = TaskFieldSchema.objects.filter(
                 task_schema_id=instance.id, stage=task_fields.get("stage")
-            ).extra(select={"custom_order": ordering_tpl}, select_params=task_field_ids, order_by=["custom_order"]) # modify
+            ).extra(
+                select={"custom_order": ordering_tpl},
+                select_params=task_field_ids,
+                order_by=["custom_order"],
+            )  # modify
 
             for index, task_field_schema in enumerate(task_fields_schema):
                 task_field_schema.sequence = index
