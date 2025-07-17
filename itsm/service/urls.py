@@ -43,7 +43,7 @@ routers = DefaultRouter(trailing_slash=True)
 
 routers.register(r'catalogs', ServiceCatalogViewSet, basename="catalog")
 routers.register(r'catalog_services', CatalogServiceViewSet, basename="catalog_service")
-routers.register(r'slas', SlaViewSet, basename="sla")
+# routers.register(r'slas', SlaViewSet, basename="sla")
 routers.register(r'projects', ServiceViewSet, basename="project")
 routers.register(r'datadicts', SysDictViewSet, basename="datadict")
 routers.register(r'dictdatas', SysDictDataViewSet, basename="dictdatas")

@@ -31,6 +31,6 @@ from itsm.project.views import ProjectViewSet, CostomTabViewSet
 routers = DefaultRouter(trailing_slash=True)
 
 routers.register(r"projects", ProjectViewSet, basename="projects")
-routers.register(r"tabs", CostomTabViewSet, basename="tabs")
+# routers.register(r"tabs", CostomTabViewSet, basename="tabs")
 
 urlpatterns = routers.urls

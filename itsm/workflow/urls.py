@@ -38,7 +38,6 @@ from .views import (
     TaskSchemaViewSet,
     TaskFieldSchemaViewSet,
 )
-from .views_test import TestViewSet
 
 routers = DefaultRouter(trailing_slash=True)
 
@@ -48,10 +47,8 @@ routers.register(r'states', StateViewSet, basename="state")
 routers.register(r'transitions', TransitionViewSet, basename="transition")
 routers.register(r'fields', FieldViewSet, basename="field")
 routers.register(r'template_fields', TemplateFieldViewSet, basename="template_fields")
-routers.register(r'tests', TestViewSet, basename='test')
 routers.register(r'transition_template', TransitionTemplateViewSet, basename='transition_template')
 routers.register(r'tables', TableViewSet, basename='tables')
-routers.register(r'triggers', TriggerViewSet, basename='triggers')
 routers.register(r'task_schemas', TaskSchemaViewSet, basename='task_schemas')
 routers.register(r'task_field_schemas', TaskFieldSchemaViewSet, basename='task_field_schemas')
 

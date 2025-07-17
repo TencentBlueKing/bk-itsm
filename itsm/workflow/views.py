@@ -1042,6 +1042,7 @@ class TableViewSet(component_viewsets.ModelViewSet):
         "update_at": ["lte", "gte"],
     }
     ordering_fields = "create_at"
+    http_method_names = ["get"]
 
     def list(self, request, *args, **kwargs):
         """动态关闭分页"""

@@ -71,10 +71,16 @@ class ModelViewSet(component_viewsets.ModelViewSet):
         serializer.save(updated_by=username)
 
 
-class ApiInstanceViewsSet(ModelViewSet):
+class ApiInstanceViewsSet(component_viewsets.ReadOnlyModelViewSet):
     serializer_class = ApiInstanceSerializer
     queryset = RemoteApiInstance._objects.all()
     permission_classes = ()
+    
+    def list(self, request, *args, **kwargs):
+        raise NotAllowedError(_("不支持的请求方法"))
+    
+    def retrieve(self, request, *args, **kwargs):
+        raise NotAllowedError(_("不支持的请求方法"))
 
     @action(detail=True, methods=["post", "get"])
     def field_choices(self, request, *args, **kwargs):

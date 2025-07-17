@@ -157,7 +157,7 @@ class CommentInviteViewSet(component_viewsets.NormalModelViewSet):
         "code": ["exact"],
     }
     ordering_fields = "__all__"
-
+    
 
 class FollowersNotifyLogViewSet(component_viewsets.NormalModelViewSet):
     """单据通知视图"""

@@ -234,7 +234,7 @@ class ServiceCatalogViewSet(component_viewsets.ModelViewSet):
         return Response()
 
 
-class CatalogServiceViewSet(component_viewsets.ModelViewSet):
+class CatalogServiceViewSet(component_viewsets.ReadOnlyModelViewSet):
     """服务与目录的关联视图"""
 
     serializer_class = CatalogServiceSerializer
@@ -703,7 +703,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
         )
 
 
-class SysDictViewSet(DynamicListModelMixin, component_viewsets.ModelViewSet):
+class SysDictViewSet(DynamicListModelMixin, component_viewsets.ReadOnlyModelViewSet):
     """数据字典视图集合"""
 
     serializer_class = SysDictSerializer
@@ -749,7 +749,7 @@ class SysDictViewSet(DynamicListModelMixin, component_viewsets.ModelViewSet):
         )
 
 
-class SysDictDataViewSet(component_viewsets.ModelViewSet):
+class SysDictDataViewSet(component_viewsets.ReadOnlyModelViewSet):
     """字典数据视图集合"""
 
     serializer_class = DictDataSerializer
