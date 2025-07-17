@@ -23,11 +23,11 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
 from django.db import transaction
+from django.utils.translation import ugettext as _
 from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from itsm.component.constants import (
     TRIGGER_SIGNAL,
@@ -49,8 +49,8 @@ from itsm.trigger.serializers import (
     ActionDetailSerializer,
 )
 from .api import import_trigger
-from .validators import BulkTriggerRuleValidator
 from .permissions import WorkflowTriggerPermit
+from .validators import BulkTriggerRuleValidator
 from ..component.drf.exception import ValidationError
 
 
@@ -91,7 +91,7 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
     }
 
     permission_classes = (WorkflowTriggerPermit,)
-    permission_free_actions = ["list"]
+    permission_action_mapping = {"list": ["project_view"]}
 
     def get_queryset(self):
 
@@ -239,7 +239,7 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
             if not rule.action_schemas:
                 continue
             actions_schemas.extend(rule.action_schemas)
-            
+
         schemas = []
         with transaction.atomic():
             for _data in request.data:

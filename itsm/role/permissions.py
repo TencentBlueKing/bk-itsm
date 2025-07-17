@@ -24,8 +24,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django.utils.translation import ugettext as _
+
+from itsm.component.constants import PUBLIC_PROJECT_PROJECT_KEY
 from itsm.component.drf import permissions as perm
 from itsm.component.drf.permissions import IamAuthPermit
+from itsm.project.models import Project
 
 
 class IsUserRoleManager(perm.IsManager):
@@ -37,12 +40,23 @@ class IsUserRoleManager(perm.IsManager):
 
 
 class UserGroupPermission(IamAuthPermit):
-    
+    def has_permission(self, request, view):
+        # 项目查看的权限
+        if view.action in ["list"]:
+            project_key = request.query_params.get(
+                "project_key", PUBLIC_PROJECT_PROJECT_KEY
+            )
+            project = Project.objects.get(pk=project_key)
+            apply_actions = ["project_view"]
+            return self.iam_auth(request, apply_actions, project)
+        else:
+            return super().has_permission(request, view)
+
     def has_object_permission(self, request, view, obj, **kwargs):
         # 关联实例的请求，需要针对对象进行鉴权
         if view.action in getattr(view, "permission_free_actions", []):
             return True
-        
+
         if view.action in ["retrieve"]:
             apply_actions = ["user_group_view"]
         elif view.action in ["destroy"]:
