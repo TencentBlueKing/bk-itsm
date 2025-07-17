@@ -49,7 +49,7 @@ from itsm.trigger.serializers import (
     ActionDetailSerializer,
 )
 from .api import import_trigger
-from .permissions import WorkflowTriggerPermit
+from .permissions import WorkflowTriggerPermit, TicketTriggerPermit
 from .validators import BulkTriggerRuleValidator
 from ..component.drf.exception import ValidationError
 
@@ -336,7 +336,7 @@ class ActionSchemaViewSet(component_viewsets.AuthWithoutResourceModelViewSet):
         return Response(schemas)
 
 
-class ActionViewSet(component_viewsets.ModelViewSet):
+class ActionViewSet(component_viewsets.ReadOnlyModelViewSet):
     """
     响应事件的视图
     """
@@ -349,6 +349,10 @@ class ActionViewSet(component_viewsets.ModelViewSet):
         "source_type": ["exact"],
         "source_id": ["exact"],
     }
+    permission_classes = [TicketTriggerPermit]
+    
+    def list(self, request, *args, **kwargs):
+        raise NotImplementedError
 
     def get_queryset(self):
         if not self.request.query_params.get("page_size"):

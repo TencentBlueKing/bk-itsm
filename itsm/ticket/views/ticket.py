@@ -87,6 +87,7 @@ from itsm.component.constants.flow import EXPORT_SUPPORTED_TYPE
 from itsm.component.dlls.component import ComponentLibrary
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.drf.pagination import CustomPageNumberPagination
+from itsm.component.drf.permissions import IamAuthSystemPermit
 from itsm.component.exceptions import (
     ComponentCallError,
     ComponentInvokeError,
@@ -2007,5 +2008,6 @@ class TicketModelViewSet(ModelViewSet):
 
 
 class TicketStatusModelViewSet(component_viewsets.ReadOnlyModelViewSet):
+    permission_classes = (IamAuthSystemPermit,)
     serializer_class = SimpleStatusSerializer
     queryset = Status.objects.all()

@@ -24,11 +24,14 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django.http import Http404
+from rest_framework import permissions
 
 from itsm.component.constants import PUBLIC_PROJECT_PROJECT_KEY
 from itsm.component.constants.trigger import SOURCE_WORKFLOW, SOURCE_TASK
 from itsm.component.drf.permissions import IamAuthPermit
 from itsm.project.models import Project
+from itsm.ticket.models import Ticket
+from itsm.ticket.permissions import TicketPermissionValidate
 from itsm.workflow.models import Workflow
 
 
@@ -114,3 +117,26 @@ class WorkflowTriggerPermit(IamAuthPermit):
             apply_actions = ["triggers_manage"]
 
         return self.iam_auth(request, apply_actions, obj)
+
+
+class TicketTriggerPermit(TicketPermissionValidate):
+    def has_permission(self, request, view):
+        return True
+    
+    def has_object_permission(self, request, view, obj, **kwargs):
+        if obj.source_type != "ticket":
+            return True
+        
+        ticket = Ticket.objects.get(id=obj.source_id)
+        # 查看权限校验
+        username = request.user.username
+        if request.method in permissions.SAFE_METHODS or view.action in ["params"]:
+            if ticket.can_view(username):
+                return True
+            return self.iam_ticket_view_auth(request, ticket)
+        
+        # 操作权限
+        if ticket.can_operate(username):
+            return True
+        
+        return True

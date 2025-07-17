@@ -26,20 +26,16 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from rest_framework.routers import DefaultRouter
 
 from .views import (
-    CommentInviteViewSet,
     CommentViewSet,
     EventLogViewSet,
     FieldViewSet,
     FollowersNotifyLogViewSet,
     OperationalDataViewSet,
-    StateDraftViewSet,
     TemplateViewSet,
     TicketModelViewSet,
     TicketStatusModelViewSet,
-    TicketTestModelViewSet,
 )
 from .views.ticket_remark import TicketRemarkModelViewSet
-from .views_test import TestViewSet
 
 
 routers = DefaultRouter(trailing_slash=True)
@@ -51,13 +47,9 @@ routers.register(r"fields", FieldViewSet, basename="fields")
 routers.register(r"logs", EventLogViewSet, basename="event_logs")
 routers.register(r"templates", TemplateViewSet, basename="templates")
 routers.register(r"comments", CommentViewSet, basename="comments")
-routers.register(r"invite", CommentInviteViewSet, basename="invite")
-routers.register(r"draft", StateDraftViewSet, basename="draft")
 routers.register(
     r"followers_logs", FollowersNotifyLogViewSet, basename="followers_logs"
 )
 routers.register(r"operational", OperationalDataViewSet, basename="operational")
-routers.register(r"test", TestViewSet, basename="test")
-routers.register(r"ticket_tests", TicketTestModelViewSet, basename="ticket_test")
 
 urlpatterns = routers.urls
