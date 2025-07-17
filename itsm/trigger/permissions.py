@@ -25,8 +25,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.http import Http404
 
-from itsm.component.drf.permissions import IamAuthPermit
+from itsm.component.constants import PUBLIC_PROJECT_PROJECT_KEY
 from itsm.component.constants.trigger import SOURCE_WORKFLOW, SOURCE_TASK
+from itsm.component.drf.permissions import IamAuthPermit
+from itsm.project.models import Project
 from itsm.workflow.models import Workflow
 
 
@@ -53,9 +55,14 @@ class WorkflowTriggerPermit(IamAuthPermit):
         )
 
     def has_permission(self, request, view):
-        if self.is_safe_method(request, view) and view.detail is False:
-            # 非详情内容，可以直接通过
-            return True
+        if view.action in getattr(view, "permission_action_mapping", {}):
+            # 项目查看的权限
+            project_key = request.query_params.get(
+                "project_key", PUBLIC_PROJECT_PROJECT_KEY
+            )
+            project = Project.objects.get(pk=project_key)
+            apply_actions = self.get_view_iam_actions(view)
+            return self.iam_auth(request, apply_actions, project)
 
         if view.action in ["clone", "create"]:
             # 通过流程配置需要有对应服务的管理权限
@@ -63,13 +70,15 @@ class WorkflowTriggerPermit(IamAuthPermit):
             if source_type == SOURCE_WORKFLOW:
                 workflow = Workflow.objects.get(id=request.data.get("source_id"))
                 apply_actions = ["service_manage"]
-                return self.iam_auth(request, apply_actions, workflow.get_iam_resource())
-            
+                return self.iam_auth(
+                    request, apply_actions, workflow.get_iam_resource()
+                )
+
             # 通过任务模板创建
             if source_type == SOURCE_TASK:
                 apply_actions = ["public_task_template_manage"]
                 return self.iam_auth(request, apply_actions)
-            
+
             # 其他的引用和创建，都需要尽心给流程元素的鉴权:
             return self.iam_create_auth(request, apply_actions=["triggers_create"])
 
@@ -79,7 +88,7 @@ class WorkflowTriggerPermit(IamAuthPermit):
         # 关联实例的请求，需要针对对象进行鉴权
         if view.action in getattr(view, "permission_free_actions", []):
             return True
-        
+
         if view.action in ["retrieve"]:
             apply_actions = ["triggers_view"]
         else:
@@ -89,17 +98,19 @@ class WorkflowTriggerPermit(IamAuthPermit):
             if obj.source_type == SOURCE_WORKFLOW:
                 is_workflow = True
                 workflow_id = obj.source_id
-            
+
             if is_workflow:
                 workflow = Workflow.objects.get(id=workflow_id)
                 apply_actions = ["service_manage"]
-                return self.iam_auth(request, apply_actions, workflow.get_iam_resource())
-            
+                return self.iam_auth(
+                    request, apply_actions, workflow.get_iam_resource()
+                )
+
             # 通过任务模板创建
             if obj.source_type == SOURCE_TASK:
                 apply_actions = ["public_task_template_manage"]
                 return self.iam_auth(request, apply_actions)
-            
+
             apply_actions = ["triggers_manage"]
 
         return self.iam_auth(request, apply_actions, obj)

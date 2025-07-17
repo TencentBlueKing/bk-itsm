@@ -91,11 +91,11 @@ class BaseWorkflowElementIamAuth(IamAuthPermit):
     def has_permission(self, request, view):
         if view.action in getattr(view, "permission_free_actions", []):
             return True
-        
+
         apply_actions = ["service_manage"]
 
         # 节点和字段的查看，首先必须有当前流程的管理权限
-        if not view.action in ["list", "batch_update"]:
+        if view.action not in ["list", "batch_update"]:
             # 非列表请求，通过object鉴权
             return True
 
@@ -105,7 +105,7 @@ class BaseWorkflowElementIamAuth(IamAuthPermit):
                 workflow_id = view.get_iam_resource_id()
             if not workflow_id:
                 return False
-        
+
         try:
             flow = Workflow.objects.get(id=workflow_id)
         except Workflow.DoesNotExist:
@@ -122,7 +122,7 @@ class BaseWorkflowElementIamAuth(IamAuthPermit):
         """
         if view.action in getattr(view, "permission_free_actions", []):
             return True
-        
+
         apply_actions = ["service_manage"]
         service_obj = obj.workflow.get_iam_resource()
         return self.iam_auth(request, apply_actions, service_obj)
@@ -188,25 +188,34 @@ class WorkflowElementManagePermission(IamAuthPermit):
         # 免鉴权需要明确声明
         if view.action in getattr(view, "permission_free_actions", []):
             return True
-        
+
         if view.action in getattr(view, "permission_create_action", ["create"]):
             project_key = request.data.get("project_key", PUBLIC_PROJECT_PROJECT_KEY)
-            
+
             # 平台管理
             if project_key == PUBLIC_PROJECT_PROJECT_KEY:
                 apply_actions = [view.permission_action_platform]
                 return self.iam_auth(request, apply_actions)
-            
+
             # 项目管理
             apply_actions = self.get_view_iam_actions(view)
             return self.iam_create_auth(request, apply_actions)
+
+        if view.action in ["list"]:
+            apply_actions = self.get_view_iam_actions(view)
+            project_key = request.query_params.get(
+                "project_key", PUBLIC_PROJECT_PROJECT_KEY
+            )
+            project = Project.objects.get(pk=project_key)
+            return self.iam_auth(request, apply_actions, project)
+
         return True
 
     def has_object_permission(self, request, view, obj, **kwargs):
         # 关联实例的请求，需要针对对象进行鉴权
         if view.action in getattr(view, "permission_free_actions", []):
             return True
-        
+
         # 平台管理
         if obj.project_key == PUBLIC_PROJECT_PROJECT_KEY:
             apply_actions = [view.permission_action_platform]

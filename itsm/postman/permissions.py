@@ -43,6 +43,17 @@ class IsObjManager(perm.IsManager):
 
 class RemoteApiPermit(WorkflowElementManagePermission):
     def has_permission(self, request, view):
+        if view.action in getattr(view, "permission_action_mapping", {}):
+            # 项目查看的权限
+            project_key = request.query_params.get(
+                "project_key", PUBLIC_PROJECT_PROJECT_KEY
+            )
+            if project_key == PUBLIC_PROJECT_PROJECT_KEY:
+                return True
+            project = Project.objects.get(pk=project_key)
+            apply_actions = self.get_view_iam_actions(view)
+            return self.iam_auth(request, apply_actions, project)
+
         if view.action in getattr(view, "permission_create_action", ["create"]):
             if "remote_system" in request.data:
                 remote_system_id = request.data["remote_system"]
@@ -50,12 +61,12 @@ class RemoteApiPermit(WorkflowElementManagePermission):
                 # 平台公共API管理
                 if project_key == PUBLIC_PROJECT_PROJECT_KEY:
                     return self.iam_auth(request, ["public_apis_manage"])
-                
+
                 # 项目管理
                 apply_actions = ["system_settings_manage"]
                 project = Project.objects.get(pk=project_key)
                 return self.iam_auth(request, apply_actions, project)
-            
+
         if view.action == "batch_delete":
             api_ids = request.data["id"].split(",")
             api_instances = RemoteApi.objects.filter(pk__in=api_ids)
@@ -63,15 +74,15 @@ class RemoteApiPermit(WorkflowElementManagePermission):
             if len(project_keys) != 1:
                 raise ValidateError(_("API 所属项目异常"))
             project_key = project_keys.pop()
-            
+
             # 平台公共API管理
             if project_key == PUBLIC_PROJECT_PROJECT_KEY:
                 return self.iam_auth(request, ["public_apis_manage"])
-            
+
             # 项目
             project = Project.objects.get(pk=project_key)
             return self.iam_auth(request, ["system_settings_manage"], project)
-            
+
         return True
 
     def has_object_permission(self, request, view, obj, **kwargs):
@@ -84,7 +95,7 @@ class RemoteApiPermit(WorkflowElementManagePermission):
                 if view.action == "retrieve":
                     return True
                 return self.iam_auth(request, ["public_apis_manage"])
-            
+
             # 项目管理
             project_key = obj.remote_system.project_key
             project = Project.objects.get(pk=project_key)
