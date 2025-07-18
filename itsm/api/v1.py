@@ -46,7 +46,7 @@ urlpatterns = [
     # 服务模块
     url(r"^service/", include("itsm.service.urls")),
     # sla模块
-    # url(r"^sla/", include("itsm.sla.urls")),
+    url(r"^sla/", include("itsm.sla.urls")),
     # postman
     url(r"^postman/", include("itsm.postman.urls")),
     # 角色模块
