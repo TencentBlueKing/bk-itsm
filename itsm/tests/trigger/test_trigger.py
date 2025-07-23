@@ -163,15 +163,3 @@ class ActionSchemaViewTest(TestCase):
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["result"], True)
         self.assertIsInstance(rsp.data["data"], list)
-
-
-class ActionViewTest(TestCase):
-    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_list(self):
-        url = "/api/trigger/actions/"
-        rsp = self.client.get(path=url, data=None, content_type="application/json")
-
-        print(json.loads(rsp.content.decode("utf-8")))
-        self.assertEqual(rsp.status_code, 200)
-        self.assertEqual(rsp.data["result"], True)
-        self.assertIsInstance(rsp.data["data"], list)

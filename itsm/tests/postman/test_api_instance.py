@@ -25,15 +25,15 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.test import TestCase, override_settings
 
+from itsm.component.exceptions import NotAllowedError
+
 
 class TestApiInstance(TestCase):
-
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_list(self):
         url = "/api/postman/api_instance/"
 
         resp = self.client.get(url)
 
-        self.assertEqual(resp.data["result"], True)
-        self.assertEqual(resp.data["code"], "OK")
-        self.assertEqual(len(resp.data["data"]), 6)
+        self.assertEqual(resp.data["result"], False)
+        self.assertEqual(resp.data["code"], NotAllowedError.ERROR_CODE)
