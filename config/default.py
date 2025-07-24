@@ -322,6 +322,7 @@ def _(s):
 LANGUAGES = (
     ("en", _("English")),
     ("zh-cn", _("简体中文")),
+    ("ja", _("日本語"))
 )
 
 LANGUAGE_SESSION_KEY = "blueking_language"
