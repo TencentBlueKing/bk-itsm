@@ -14,8 +14,31 @@ module.exports = merge(webpackBase, {
     module: {
         rules: [
             {
-                test: /\.(css|scss|sass)$/,
-                use: ['style-loader', 'css-loader', 'sass-loader']
+                test: /\.(scss|sass)$/,
+                exclude: /node_modules/,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 1 // 确保 @import 的文件也会被处理
+                        }
+                    },
+                    'sass-loader'
+                ]
+            },
+            // 单独处理所有 CSS 文件（包括 node_modules）
+            {
+                test: /\.css$/,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 1 // 确保 @import 的文件也会被处理
+                        }
+                    }
+                ]
             }
         ]
     },
@@ -41,26 +64,33 @@ module.exports = merge(webpackBase, {
             '/api/*':{
                 target: ORIGIN + SET_URL,
                 changeOrigin: true,
-                secure: false
+                secure: false,
+                headers: {
+                    referer: ORIGIN,
+                }
             },
             '/init':{
                 target: ORIGIN + SET_URL,
                 changeOrigin: true,
+                Referer: ORIGIN,
                 secure: false
             },
             '/openapi/*':{
                 target: ORIGIN + SET_URL,
                 changeOrigin: true,
+                Referer: ORIGIN,
                 secure: false
             },
             '/core/': {
                 target: ORIGIN + SET_URL,
                 changeOrigin: true,
+                Referer: ORIGIN,
                 secure: false
             },
             '/o/bk_sops/*': {
                 target: ORIGIN,
                 changeOrigin: true,
+                Referer: ORIGIN,
                 secure: false,
             },
             '/sops/*':{
