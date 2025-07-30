@@ -1318,7 +1318,7 @@ class Ticket(Model, BaseTicket):
     node_status = models.ManyToManyField(Status, help_text=_("节点状态"))
 
     # 单据当前状态
-    current_status = models.CharField(_("单据状态"), max_length=LEN_SHORT)
+    current_status = models.CharField(_("单据状态"), max_length=LEN_SHORT, db_index=True)
     # 单据前一状态
     pre_status = models.CharField(
         _("单据前一状态"), max_length=LEN_SHORT, default=EMPTY_STRING
