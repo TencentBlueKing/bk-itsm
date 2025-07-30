@@ -392,7 +392,7 @@ class TicketRemark(BaseMpttModel):
         related_name="children",
     )
     ticket_id = models.IntegerField(
-        _("单据id"), max_length=LEN_SHORT, null=False, default=0
+        _("单据id"), max_length=LEN_SHORT, null=False, default=0, db_index=True
     )
     users = models.JSONField(_("用户@的用户列表"), default=[])
     update_log = models.JSONField(_("用户评论的更新记录"), default=[])
