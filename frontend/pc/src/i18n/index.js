@@ -27,7 +27,9 @@ import { lang } from 'bk-magic-vue';
 // 国际化
 const zhI18n = require('./lang/zh');
 const enI18n = require('./lang/en');
+const jaI18n = require('./lang/ja');
 const localeCookie = cookie.parse(document.cookie).blueking_language || 'zh-cn';
+console.log(cookie.parse(document.cookie));
 Vue.use(VueI18n);
 const i18n = new VueI18n({
   // 语言标识
@@ -38,6 +40,7 @@ const i18n = new VueI18n({
     'zh-cn': Object.assign(lang.zhCN, zhI18n),
     // 英文语言包
     en: Object.assign(lang.enUS, enI18n),
+    ja: Object.assign(lang.jaJP, jaI18n),
   },
 });
 

@@ -340,7 +340,7 @@
     },
     mounted() {
       this.initData();
-      this.localeCookie =            cookie.parse(document.cookie).blueking_language !== 'zh-cn';
+      this.localeCookie = cookie.parse(document.cookie).blueking_language !== 'zh-cn';
     },
     methods: {
       initData() {

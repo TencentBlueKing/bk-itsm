@@ -884,3 +884,6 @@ url("scss/icon/fonts/commonicon.eot?#iefix") format("embedded-opentype");
 .icon-tiaozhuan:before {
 	content: "\e22a";
 }
+.icon-yuyan-riwen:before {
+	content: "\e22d";
+}

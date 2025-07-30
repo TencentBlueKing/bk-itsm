@@ -948,7 +948,7 @@
     @include scroller;
     .advanced-search {
         .export {
-            width: 86px;
+            min-width: 86px;
         }
     }
     .ticket-table {

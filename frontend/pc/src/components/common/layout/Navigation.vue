@@ -70,6 +70,11 @@
                 <span>English</span>
                 <!-- <span>{{ $t(`m["英文"]`) }}</span> -->
               </li>
+              <li class="language-item" :class="{ 'active': curLanguage === 'ja' }" @click="changeLanguage('ja')">
+                <span class="bk-itsm-icon icon-yuyan-riwen"></span>
+                <span>日本語</span>
+                <!-- <span>{{ $t(`m["日本語"]`) }}</span> -->
+              </li>
             </ul>
           </template>
         </bk-popover>
@@ -169,7 +174,7 @@
             v-if="Array.isArray(router.subRouters) && router.subRouters.length > 0"
             class="nav-group-wrap"
             :key="router.id">
-            <div class="group-name">{{ !isSideOpen && $store.state.language === 'en' ? router.abbrName : router.name }}</div>
+            <div class="group-name">{{ !isSideOpen && ['en', 'ja'].includes($store.state.language) ? router.abbrName : router.name }}</div>
             <bk-navigation-menu-item
               v-for="item in router.subRouters"
               :data-test-id="`navigation-menu-${item.id}`"
@@ -330,7 +335,10 @@
       },
     },
     created() {
-      this.curLanguage = getCookie('blueking_language') === 'en' ? 'en' : 'zh';
+      const language = getCookie('blueking_language');
+      console.log(language);
+
+      this.curLanguage = ['zh', 'zh-cn'].includes(language) ? 'zh' : language;
       this.getAccessService();
       bus.$on('openCreateTicketDialog', () => {
         this.isCreateTicketDialogShow = true;
@@ -356,7 +364,7 @@
       async changeLanguage(language) {
         try {
           this.curLanguage = language;
-          const local = language === 'zh' ? 'zh-cn' : 'en';
+          const local = language === 'zh' ? 'zh-cn' : language;
           Cookies.set('blueking_language', local, {
             expires: 1,
             domain: window.location.hostname.replace(/^[^.]+(.*)$/, '$1'),
