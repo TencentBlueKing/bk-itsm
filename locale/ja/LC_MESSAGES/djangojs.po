@@ -1,0 +1,434 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-07-23 15:46+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "delete"
+msgstr "削除する"
+
+msgid "has"
+msgstr "所有する"
+
+msgid "get"
+msgstr "取得する"
+
+msgid "Wrong offset!"
+msgstr "不正なオフセットです!"
+
+msgid "Wrong length!"
+msgstr "不正な長さです!"
+
+msgid "NGMicrosyntaxKey"
+msgstr "NGマイクロシンタックスキー"
+
+msgid "NGMicrosyntax"
+msgstr "NGマイクロシンタックス"
+
+msgid "NGMicrosyntaxExpression"
+msgstr "NGマイクロシンタックス式"
+
+msgid "NGMicrosyntaxKeyedExpression"
+msgstr "NGキー付きマイクロシンタックス式"
+
+msgid "NGMicrosyntaxLet"
+msgstr "NGマイクロシンタックスLet"
+
+msgid "NGMicrosyntaxAs"
+msgstr "NGマイクロシンタックスAs"
+
+msgid "key"
+msgstr "キー"
+
+msgid "value"
+msgstr "値"
+
+msgid "id"
+msgstr "ID"
+
+msgid "typeParameters"
+msgstr "型パラメータ"
+
+msgid "body"
+msgstr "ボディ"
+
+msgid "big_int"
+msgstr "ビッグインテジャー"
+
+msgid "num"
+msgstr "数値"
+
+msgid "string"
+msgstr "文字列"
+
+msgid "template_head"
+msgstr "テンプレートヘッド"
+
+msgid "comment2"
+msgstr "コメント2"
+
+msgid "regexp"
+msgstr "正規表現"
+
+msgid "operator"
+msgstr "演算子"
+
+msgid "eof"
+msgstr "終端"
+
+msgid "expand"
+msgstr "展開"
+
+msgid "punc"
+msgstr "句読点" 
+
+msgid "arrow"
+msgstr "矢印"
+
+msgid "name"
+msgstr "名前"
+
+msgid "atom"
+msgstr "アトム"
+
+msgid "keyword"
+msgstr "キーワード"
+
+#, javascript-format
+msgid "Available %s"
+msgstr "利用可能な%s"
+
+#, javascript-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr "これは利用可能な%sのリストです。下のボックスで項目を選択し、2つのボックスの間にある「選択」矢印をクリックすることで選択できます。"
+
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "利用可能な%sのリストをフィルターするにはこのボックスに入力してください。"
+
+msgid "Filter"
+msgstr "フィルター"
+
+msgid "Choose all"
+msgstr "全て選択"
+
+#, javascript-format
+msgid "Click to choose all %s at once."
+msgstr "全ての%sを一度に選択するにはクリックしてください。"
+
+msgid "Choose"
+msgstr "選択"
+
+msgid "Remove"
+msgstr "削除"
+
+#, javascript-format
+msgid "Chosen %s"
+msgstr "選択済み %s"
+
+#, javascript-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr "これは選択済みの%sのリストです。下のボックスで項目を選択し、2つのボックスの間にある「削除」矢印をクリックすることで削除できます。"
+
+msgid "Remove all"
+msgstr "全て削除"
+
+#, javascript-format
+msgid "Click to remove all chosen %s at once."
+msgstr "選択済みの%sを一度に全て削除するにはクリックしてください。"
+
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(cnt)s個中%(sel)s個選択"
+msgstr[1] "%(cnt)s個中%(sel)s個選択"
+
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr "編集中のフィールドに未保存の変更があります。操作を実行すると、これらの変更は失われます。"
+
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr "操作を選択しましたが、個々のフィールドへの変更が保存されていません。[OK]をクリックして保存してください。操作を再度実行する必要があります。"
+
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr "操作を選択しましたが、個々のフィールドを変更していません。[保存]ボタンではなく、[実行]ボタンを探しているのではないでしょうか。"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "注: サーバー時間より%s時間進んでいます。"
+msgstr[1] "注: サーバー時間より%s時間進んでいます。"
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "注: サーバー時間より%s時間遅れています。"
+msgstr[1] "注: サーバー時間より%s時間遅れています。"
+
+msgid "Now"
+msgstr "現在"
+
+msgid "Choose a Time"
+msgstr "時間を選択"
+
+msgid "Choose a time"
+msgstr "時間を選択"
+
+msgid "Midnight"
+msgstr "深夜0時"
+
+msgid "6 a.m."
+msgstr "午前6時"
+
+msgid "Noon"
+msgstr "正午"
+
+msgid "6 p.m."
+msgstr "午後6時"
+
+msgid "Cancel"
+msgstr "キャンセル"
+
+msgid "Today"
+msgstr "今日"
+
+msgid "Choose a Date"
+msgstr "日付を選択"
+
+msgid "Yesterday"
+msgstr "昨日"
+
+msgid "Tomorrow"
+msgstr "明日"
+
+msgid "January"
+msgstr "1月"
+
+msgid "February"
+msgstr "2月"
+
+msgid "March"
+msgstr "3月"
+
+msgid "April"
+msgstr "4月"
+
+msgid "May"
+msgstr "5月"
+
+msgid "June"
+msgstr "6月"
+
+msgid "July"
+msgstr "7月"
+
+msgid "August"
+msgstr "8月"
+
+msgid "September"
+msgstr "9月"
+
+msgid "October"
+msgstr "10月"
+
+msgid "November"
+msgstr "11月"
+
+msgid "December"
+msgstr "12月"
+
+msgctxt "one letter Sunday"  
+msgid "S"  
+msgstr "日"  
+
+msgctxt "one letter Monday"  
+msgid "M"  
+msgstr "月"  
+
+msgctxt "one letter Tuesday"  
+msgid "T"  
+msgstr "火"  
+
+msgctxt "one letter Wednesday"  
+msgid "W"  
+msgstr "水"  
+
+msgctxt "one letter Thursday"  
+msgid "T"  
+msgstr "木"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "金"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "土"
+
+msgid "Show"
+msgstr "表示"
+
+msgid "Hide"
+msgstr "非表示"
+
+msgid "hidden"
+msgstr "非表示中"
+
+msgid "mint"
+msgstr "ミント"
+
+msgid "mintinline"
+msgstr "インラインミント"
+
+msgid "url"
+msgstr "URL"
+
+msgid "hyperref"
+msgstr "ハイパーリファレンス"
+
+msgid "href"
+msgstr "リンク先"
+
+msgid "edit"
+msgstr "編集"
+
+msgid "add"
+msgstr "追加"
+
+msgid "move failed"
+msgstr "移動に失敗しました"
+
+msgid "Error while loading the data from the server"
+msgstr "サーバーからのデータ読み込み中にエラーが発生しました"
+
+msgid "秒"
+msgstr "秒"
+
+msgid "分"
+msgstr "分"
+
+msgid "小时"
+msgstr "時間"
+
+msgid "天"
+msgstr "日"
+
+msgid "必填项"
+msgstr "必須項目"
+
+msgid "sorry，您没有访问权限!"
+msgstr "申し訳ありません、アクセス権限がありません!"
+
+msgid "Sorry，您的权限不足!"
+msgstr "申し訳ありません、権限が不足しています!"
+
+msgid "系统出现异常, 请记录下错误场景并与开发人员联系, 谢谢!"
+msgstr "システムエラーが発生しました。エラーの状況を記録の上、開発者までご連絡ください。"
+
+msgid "当前访问的页面不存在"
+msgstr "アクセスしたページは存在しません"
+
+msgid "无数据"
+msgstr "データなし"
+
+msgid "请选择"
+msgstr "選択してください"
+
+msgid "请输入，多个用换行分隔"
+msgstr "入力してください(複数の場合は改行で区切ります)"
+
+msgid "筛选"
+msgstr "フィルター"
+
+msgid "排除"
+msgstr "除外"
+
+msgid "（同时满足）"
+msgstr "（すべての条件を満たす）"
+
+msgid "点击增加条件"
+msgstr "条件を追加"
+
+msgid "取消勾选"
+msgstr "チェックを外す"
+
+msgid "勾选参数作为全局变量"
+msgstr "パラメータをグローバル変数としてチェック"
+
+msgid "参数值不符合正则规则："
+msgstr "パラメータ値が正規表現ルールに一致しません："
+
+msgid "资源筛选"
+msgstr "リソースフィルタ"
+
+msgid "导出"
+msgstr "エクスポート"
+
+msgid "导入"
+msgstr "インポート"
+
+msgid "編集"
+msgstr "編集する"
+
+msgid "删除"
+msgstr "削除"
+
+msgid "保存"
+msgstr "保存"
+
+msgid "取消"
+msgstr "キャンセル"
+
+msgid "格式错误！请选择xlsx,xls,xlc,xlm,xlt,xlw或csv文件"
+msgstr "フォーマットエラー！xlsx、xls、xlc、xlm、xlt、xlw、またはcsvファイルを選択してください"
+
+msgid "分隔符："
+msgstr "区切り文字："
+
+msgid "逗号"
+msgstr "コンマ"
+
+msgid "分号"
+msgstr "セミコロン"
+
+msgid "竖线"
+msgstr "縦棒"
+
+msgid "换行符"
+msgstr "改行文字"
+
+msgid "entries"
+msgstr "エントリ"
+
+msgid "values"
+msgstr "値"
+
+msgid "keys"
+msgstr "キー"
+
+msgid "Hello"
+msgstr "こんにちは"
