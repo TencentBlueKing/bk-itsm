@@ -65,9 +65,12 @@ def translate_constant_2(constant):
 
 
 def translate_constant_export_fields_dict(value):
+    translated_fields = []
     for index, item in enumerate(value):
-        value[index]["name"] = _(item["name"])
-    return value
+        new_field = item.copy()
+        new_field["name"] = _(item["name"])
+        translated_fields.append(new_field)
+    return translated_fields
 
 
 def compute_list_difference(current, new):
