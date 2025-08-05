@@ -24,7 +24,12 @@ module.exports = merge(webpackBase, {
                 test: /\.(scss|sass)$/,
                 exclude: /node_modules/,
                 use: [
-                MiniCssExtractPlugin.loader,
+                {
+                    loader: MiniCssExtractPlugin.loader,
+                    options: {
+                        publicPath: '../../'
+                    }
+                },
                 {
                     loader: 'css-loader',
                     options: {
@@ -44,7 +49,12 @@ module.exports = merge(webpackBase, {
                             publicPath: '../../'
                         }
                     },
-                    'css-loader' // 不要包含 sass-loader
+                    {
+                        loader: 'css-loader',
+                        options: {
+                        importLoaders: 1 // 允许通过 @import 引入的文件也被处理
+                        }
+                    },
                 ]
             }
         ]
