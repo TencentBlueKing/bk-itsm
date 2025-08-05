@@ -73,6 +73,7 @@ class UserRoleModelViewSet(DynamicListModelMixin, AuthModelViewSet):
     serializer_class = UserRoleSerializer
     queryset = UserRole.objects.all().order_by("-create_at")
     pagination_class = None
+    permission_free_actions = ["list"]  # 转单操作会用到list
     permission_classes = (UserGroupPermission,)
 
     filter_fields = {
