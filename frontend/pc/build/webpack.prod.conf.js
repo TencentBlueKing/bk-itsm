@@ -19,8 +19,29 @@ module.exports = merge(webpackBase, {
     },
     module: {
         rules: [
+            // 处理项目内的 Sass 文件 (排除 node_modules)
             {
-                test: /\.(css|scss|sass)$/,
+                test: /\.(scss|sass)$/,
+                exclude: /node_modules/,
+                use: [
+                {
+                    loader: MiniCssExtractPlugin.loader,
+                    options: {
+                        publicPath: '../../'
+                    }
+                },
+                {
+                    loader: 'css-loader',
+                    options: {
+                    importLoaders: 1 // 允许通过 @import 引入的文件也被处理
+                    }
+                },
+                'sass-loader'
+                ]
+            },
+            // 单独处理所有 CSS 文件 (包括 node_modules)
+            {
+                test: /\.css$/,
                 use: [
                     {
                         loader: MiniCssExtractPlugin.loader,
@@ -28,8 +49,12 @@ module.exports = merge(webpackBase, {
                             publicPath: '../../'
                         }
                     },
-                    'css-loader',
-                    'sass-loader'
+                    {
+                        loader: 'css-loader',
+                        options: {
+                        importLoaders: 1 // 允许通过 @import 引入的文件也被处理
+                        }
+                    },
                 ]
             }
         ]

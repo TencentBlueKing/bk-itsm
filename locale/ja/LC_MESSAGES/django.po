@@ -1,0 +1,6019 @@
+# Japanese translations for PROJECT.
+# Copyright (C) 2025 blueking
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-07-23 15:57+0800\n"
+"PO-Revision-Date: 2025-07-23 15:58+0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: ja <LL@li.org>\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.11.0\n"
+
+#: itsm/auth_iam/models.py:35 itsm/component/constants/ticket.py:172
+#: itsm/component/db/models.py:48 itsm/component/db/models.py:77
+#: itsm/iadmin/models.py:64 itsm/postman/models.py:69
+#: itsm/project/models/base.py:35 itsm/role/models.py:68
+#: itsm/service/models.py:77 itsm/sla/models/basic.py:44
+#: itsm/ticket/models/basic.py:37 itsm/ticket/models/misc.py:55
+#: itsm/ticket/models/misc.py:73 itsm/ticket/models/misc.py:110
+#: itsm/ticket/models/misc.py:228 itsm/ticket_status/models.py:58
+#: itsm/trigger/models/base.py:44 itsm/workflow/models/base.py:38
+msgid "创建人"
+msgstr "によって作成されました"
+
+#: itsm/auth_iam/models.py:36 itsm/component/constants/ticket.py:173
+#: itsm/component/db/models.py:49 itsm/component/db/models.py:79
+#: itsm/iadmin/models.py:65 itsm/iadmin/models.py:138
+#: itsm/postman/models.py:70 itsm/project/models/base.py:36
+#: itsm/role/models.py:69 itsm/service/models.py:78 itsm/service/models.py:116
+#: itsm/service/models.py:135 itsm/sla/models/basic.py:45
+#: itsm/task/models.py:1013 itsm/task/models.py:1094
+#: itsm/ticket/models/basic.py:38 itsm/ticket/models/misc.py:111
+#: itsm/ticket/models/misc.py:178 itsm/ticket/models/misc.py:230
+#: itsm/ticket/models/misc.py:341 itsm/ticket/models/ticket.py:4986
+#: itsm/ticket/models/ticket.py:5056 itsm/ticket/models/ticket.py:5072
+#: itsm/ticket_status/models.py:59 itsm/trigger/models/base.py:45
+#: itsm/workflow/models/base.py:39
+msgid "创建时间"
+msgstr "作成時間"
+
+#: itsm/auth_iam/models.py:37 itsm/component/db/models.py:50
+#: itsm/component/db/models.py:80 itsm/iadmin/models.py:66
+#: itsm/iadmin/models.py:139 itsm/postman/models.py:71
+#: itsm/project/models/base.py:37 itsm/role/models.py:70
+#: itsm/role/models.py:450 itsm/service/models.py:79
+#: itsm/service/models.py:117 itsm/sla/models/basic.py:46
+#: itsm/ticket/models/basic.py:39 itsm/ticket/models/misc.py:112
+#: itsm/ticket/models/misc.py:342 itsm/ticket_status/models.py:60
+#: itsm/trigger/models/base.py:46 itsm/workflow/models/base.py:40
+msgid "更新时间"
+msgstr "時間を更新します"
+
+#: itsm/auth_iam/models.py:38 itsm/component/db/models.py:51
+#: itsm/component/db/models.py:82 itsm/iadmin/models.py:67
+#: itsm/postman/models.py:72 itsm/project/models/base.py:38
+#: itsm/role/models.py:71 itsm/service/models.py:80
+#: itsm/sla/models/basic.py:47 itsm/ticket/models/basic.py:40
+#: itsm/ticket/models/ticket.py:1358 itsm/ticket_status/models.py:61
+#: itsm/trigger/models/base.py:47 itsm/workflow/models/base.py:41
+msgid "修改人"
+msgstr "修正する"
+
+#: itsm/auth_iam/models.py:39 itsm/component/constants/ticket.py:174
+#: itsm/component/db/models.py:84 itsm/role/models.py:72
+#: itsm/service/models.py:81 itsm/sla/models/schedule.py:49
+#: itsm/task/models.py:1015 itsm/task/models.py:1096
+#: itsm/ticket/models/basic.py:41 itsm/workflow/models/base.py:42
+msgid "结束时间"
+msgstr "終了時間"
+
+#: itsm/auth_iam/models.py:40 itsm/component/db/models.py:52
+#: itsm/component/db/models.py:85 itsm/iadmin/models.py:68
+#: itsm/postman/models.py:73 itsm/project/models/project.py:58
+#: itsm/project/models/project.py:215 itsm/role/models.py:73
+#: itsm/service/models.py:82 itsm/sla/models/basic.py:48
+#: itsm/ticket/models/basic.py:42 itsm/ticket/models/misc.py:113
+#: itsm/ticket/models/misc.py:233 itsm/ticket_status/models.py:62
+#: itsm/trigger/models/base.py:48 itsm/workflow/models/base.py:43
+#: itsm/workflow/models/event.py:58
+msgid "是否软删除"
+msgstr "ソフト削除されていますか？"
+
+#: itsm/component/decorators.py:122 itsm/component/decorators.py:125
+#: itsm/component/decorators.py:150 itsm/component/decorators.py:154
+msgid "文件上传失败：{}"
+msgstr "ファイルのアップロードに失敗しました：{}"
+
+#: itsm/component/decorators.py:143
+msgid "文件上传失败：列表不能为空"
+msgstr "ファイルのアップロードに失敗しました：リストを空にすることはできません"
+
+#: itsm/component/decorators.py:181
+msgid "禁止上传空文件."
+msgstr "空のファイルのアップロードは禁止されています。"
+
+#: itsm/component/decorators.py:189
+#, python-format
+msgid "上传文件大小不得超过%s."
+msgstr "アップロードされたファイルサイズは %s を超えてはなりません。"
+
+#: itsm/component/decorators.py:202 itsm/component/decorators.py:212
+#, python-format
+msgid "上传文件类型仅支持：%s"
+msgstr "ファイルタイプのアップロードサポートのみ：%s"
+
+#: itsm/component/decorators.py:235
+msgid "请检查系统配置：附件存储目录不存在"
+msgstr "システム構成を確認してください：添付ファイルストレージディレクトリは存在しません"
+
+#: itsm/component/decorators.py:237
+msgid "请检查系统配置：附件存储的目录配置无效"
+msgstr "システム構成を確認してください：添付ファイルのディレクトリ構成は無効です"
+
+#: itsm/component/decorators.py:239
+#, python-format
+msgid "附件路径生成异常：%s"
+msgstr "アタッチメントパスは例外を生成します: %s"
+
+#: itsm/component/decorators.py:267
+msgid "接口异常，缺少请求参数: {}"
+msgstr "インターフェイスの例外、欠落要求パラメーター：{}"
+
+#: itsm/component/decorators.py:277
+msgid "接口异常: {}"
+msgstr "インターフェイスの例外：{}"
+
+#: itsm/component/exceptions.py:36 itsm/component/exceptions.py:261
+msgid "系统异常"
+msgstr "システムの例外"
+
+#: itsm/component/exceptions.py:53
+msgid "升级失败"
+msgstr "アップグレードは失敗しました"
+
+#: itsm/component/exceptions.py:59
+msgid "方法不允许"
+msgstr "方法は許可されていません"
+
+#: itsm/component/exceptions.py:65
+msgid "提单失败"
+msgstr "船荷証券は失敗しました"
+
+#: itsm/component/exceptions.py:71
+msgid "单据操作失败"
+msgstr "ドキュメント操作に失敗しました"
+
+#: itsm/component/exceptions.py:77
+msgid "参数验证失败"
+msgstr "パラメーター検証に失敗しました"
+
+#: itsm/component/exceptions.py:83
+msgid "附件存储"
+msgstr "アクセサリーストレージ"
+
+#: itsm/component/exceptions.py:89
+msgid "组织架构功能开关"
+msgstr "組織構造機能スイッチ"
+
+#: itsm/component/constants/basic.py:190 itsm/component/constants/iam.py:453
+#: itsm/component/constants/ticket.py:169 itsm/component/exceptions.py:95
+#: itsm/postman/rpc/components/service_catalog.py:35
+#: itsm/service/models.py:531 itsm/service/models.py:532
+msgid "服务目录"
+msgstr "サービスディレクトリ"
+
+#: itsm/component/exceptions.py:101
+msgid "删除失败"
+msgstr "削除が失敗しました"
+
+#: itsm/component/exceptions.py:107
+msgid "创建流程失败"
+msgstr "作成プロセスは失敗しました"
+
+#: itsm/component/exceptions.py:113
+msgid "流程保存失败"
+msgstr "プロセスの保存は失敗しました"
+
+#: itsm/component/exceptions.py:123
+msgid "远程服务请求结果异常"
+msgstr "リモートサービス要求の結果は異常です"
+
+#: itsm/component/exceptions.py:129
+msgid "组件调用异常"
+msgstr "コンポーネントコール例外"
+
+#: itsm/component/exceptions.py:149
+msgid "权限不足"
+msgstr "許可が不十分です"
+
+#: itsm/component/exceptions.py:155
+msgid "当前对象不匹配查询条件"
+msgstr "現在のオブジェクトは、クエリ基準と一致しません"
+
+#: itsm/component/exceptions.py:161
+msgid "没有找到对应的节点"
+msgstr "対応するノードは見つかりませんでした"
+
+#: itsm/component/exceptions.py:167
+msgid "流程终止失败"
+msgstr "プロセス終了が失敗しました"
+
+#: itsm/component/exceptions.py:173
+msgid "流程服务调用失败"
+msgstr "プロセスサービスコールに失敗しました"
+
+#: itsm/component/exceptions.py:179
+msgid "添加连接线失败"
+msgstr "接続ラインを追加できませんでした"
+
+#: itsm/component/exceptions.py:185
+msgid "参数错误"
+msgstr "エラーパラメーター"
+
+#: itsm/component/exceptions.py:191
+msgid "没有找到对应的单据"
+msgstr "対応するドキュメントは見つかりませんでした"
+
+#: itsm/component/exceptions.py:197
+msgid "SLA任务异常"
+msgstr "SLAタスクの例外"
+
+#: itsm/component/exceptions.py:207
+msgid "RPC的API返回错误"
+msgstr "RPCのAPIはエラーを返します"
+
+#: itsm/component/exceptions.py:213
+msgid "组件未找到"
+msgstr "コンポーネントが見つかりません"
+
+#: itsm/component/exceptions.py:219
+msgid "组件参数校验错误"
+msgstr "コンポーネントパラメーター検証エラー"
+
+#: itsm/component/exceptions.py:225
+msgid "触发器参数校验错误"
+msgstr "トリガーパラメーター検証エラー"
+
+#: itsm/component/exceptions.py:231
+msgid "组件调用错误"
+msgstr "コンポーネントコールエラー"
+
+#: itsm/component/exceptions.py:237
+msgid "任务流程初始化失败"
+msgstr "タスクプロセスの初期化に失敗しました"
+
+#: itsm/component/exceptions.py:243
+msgid "任务服务调用失败"
+msgstr "タスクサービスコールに失敗しました"
+
+#: itsm/component/exceptions.py:249
+msgid "必填字段不存在"
+msgstr "必要なフィールドは存在しません"
+
+#: itsm/component/exceptions.py:255
+msgid "查找对象不存在"
+msgstr "検索オブジェクトは存在しません"
+
+#: itsm/component/exceptions.py:271
+msgid "用户没有对应模块的权限"
+msgstr "ユーザーには、対応するモジュールへの権限がありません"
+
+#: itsm/component/exceptions.py:277
+msgid "母子单功能开关"
+msgstr "母親と子供の単一関数スイッチ"
+
+#: itsm/component/exceptions.py:283
+msgid "任务功能开关"
+msgstr "タスク関数スイッチ"
+
+#: itsm/component/exceptions.py:289
+msgid "触发器功能开关"
+msgstr "トリガー関数スイッチ"
+
+#: itsm/component/exceptions.py:295
+msgid "关联创建权限失败"
+msgstr "協会の許可の作成に失敗しました"
+
+#: itsm/component/exceptions.py:301
+msgid "创建服务失败"
+msgstr "サービスの作成に失敗しました"
+
+#: itsm/component/exceptions.py:307
+msgid "创建服务部分失败"
+msgstr "サービス部品の作成に失敗しました"
+
+#: itsm/component/exceptions.py:313
+msgid "目录占用中，请先解绑当前目录及子目录下的服务"
+msgstr "ディレクトリが占有されています。現在のディレクトリとサブディレクトリの下でサービスを解除してください。"
+
+#: itsm/component/exceptions.py:319
+msgid "相关类型未找到"
+msgstr "関連タイプが見つかりません"
+
+#: itsm/component/exceptions.py:325
+msgid "项目未找到"
+msgstr "プロジェクトが見つかりません"
+
+#: itsm/component/exceptions.py:331
+msgid "当前没有权限迁移此资源"
+msgstr "現在、このリソースを移行する許可はありません"
+
+#: itsm/component/exceptions.py:337
+msgid "没有找到对应的配置"
+msgstr "対応する構成は見つかりませんでした"
+
+#: itsm/component/exceptions.py:343
+msgid "服务未找到"
+msgstr "サービスが見つかりません"
+
+#: itsm/component/exceptions.py:349
+msgid "服务模板未找到"
+msgstr "サービステンプレートが見つかりません"
+
+#: itsm/component/exceptions.py:355
+msgid "权限迁移失败"
+msgstr "許可の移行に失敗しました"
+
+#: itsm/component/exceptions.py:361
+msgid "Sla节点参数验证失败"
+msgstr "SLAノードパラメーター検証に失敗しました"
+
+#: itsm/component/exceptions.py:367
+msgid "转派单异常"
+msgstr "異常な順序転送"
+
+#: itsm/component/exceptions.py:373
+msgid "获取自定义数据异常"
+msgstr "カスタムデータの例外を取得します"
+
+#: itsm/component/generics.py:67
+msgid "用户未登录或登录态失效，请使用登录链接重新登录"
+msgstr "ユーザーがログインしていないか、ログイン状態が無効です。ログインリンクを使用して、もう一度ログインしてください。"
+
+#: itsm/component/generics.py:117
+msgid "当前操作的对象不存在"
+msgstr "現在動作しているオブジェクトは存在しません"
+
+#: itsm/component/middlewares.py:74 itsm/component/request_middlewares.py:42
+#, python-format
+msgid "%s is not allowed to connect"
+msgstr "%s は接続できません"
+
+#: itsm/component/middlewares.py:115 itsm/component/request_middlewares.py:71
+msgid "get_request can't be called in a new thread."
+msgstr "get_requestは新しいスレッドでは呼ばれません。"
+
+#: itsm/component/notify.py:150
+msgid "<a href=\"{site_url}weixin/#/detail/{ticket_id}/\">点击查看详情</a>"
+msgstr "<a href = \"{site_url} weixin/＃/detail/{ticket_id}/\">クリックして詳細を表示</a>"
+
+#: itsm/component/request_middlewares.py:79
+msgid "get_request: current thread hasn't request."
+msgstr "get_request：現在のスレッドには要求がありません。"
+
+#: itsm/component/constants/basic.py:155 itsm/component/constants/basic.py:235
+#: itsm/ticket/models/ticket.py:5070
+msgid "单号"
+msgstr "単一番号"
+
+#: itsm/component/constants/basic.py:162
+msgid "标题(单据)"
+msgstr "タイトル（ドキュメント）"
+
+#: itsm/component/constants/basic.py:169 itsm/component/constants/basic.py:243
+msgid "提单人"
+msgstr "船荷証券"
+
+#: itsm/component/constants/basic.py:176 itsm/component/constants/basic.py:246
+msgid "提单时间"
+msgstr "船荷証券"
+
+#: itsm/component/constants/basic.py:183 itsm/component/constants/basic.py:252
+msgid "服务项"
+msgstr "サービス"
+
+#: itsm/component/constants/basic.py:197
+msgid "服务（服务目录+服务项）"
+msgstr "サービス（サービスディレクトリ +サービスアイテム）"
+
+#: itsm/component/constants/basic.py:204 itsm/component/constants/basic.py:258
+#: itsm/ticket/models/ticket.py:1321
+#: itsm/trigger/action/components/update_ticket_status.py:52
+msgid "单据状态"
+msgstr "ドキュメントステータス"
+
+#: itsm/component/constants/basic.py:211
+msgid "当前步骤(单据)"
+msgstr "現在の手順（ドキュメント）"
+
+#: itsm/component/constants/basic.py:218
+msgid "单据详情链接"
+msgstr "ドキュメントの詳細リンク"
+
+#: itsm/component/constants/basic.py:226 itsm/component/constants/basic.py:276
+msgid "当前各节点处理人"
+msgstr "現在、各ノードハンドラー"
+
+#: itsm/component/constants/basic.py:236
+#: itsm/component/constants/ticket.py:166
+msgid "标题"
+msgstr "タイトル"
+
+#: itsm/component/constants/basic.py:239
+msgid "单据链接"
+msgstr "ドキュメントリンク"
+
+#: itsm/component/constants/basic.py:264
+msgid "单据状态名称"
+msgstr "ドキュメントステータス名"
+
+#: itsm/component/constants/basic.py:270
+msgid "关联业务ID"
+msgstr "関連ビジネスID"
+
+#: itsm/component/constants/basic.py:282
+msgid "SOPS总结信息"
+msgstr "SOPSサマリー情報"
+
+#: itsm/component/constants/basic.py:288
+msgid "所有任务处理人"
+msgstr "すべてのタスクハンドラー"
+
+#: itsm/component/constants/basic.py:297 itsm/sla_engine/models.py:503
+#: itsm/ticket/models/field.py:133
+msgid "任务ID"
+msgstr "タスクID"
+
+#: itsm/component/constants/basic.py:298 itsm/service/models.py:489
+#: itsm/sla_engine/models.py:65 itsm/task/models.py:1193
+msgid "任务名称"
+msgstr "タスク名"
+
+#: itsm/component/constants/basic.py:301
+msgid "任务类型名"
+msgstr "タスクタイプ名"
+
+#: itsm/component/constants/basic.py:305
+msgid "任务创建人"
+msgstr "タスククリエーター"
+
+#: itsm/component/constants/basic.py:306
+msgid "任务处理人"
+msgstr "タスクハンドラー"
+
+#: itsm/component/constants/basic.py:309
+msgid "任务创建时间"
+msgstr "タスクの作成時間"
+
+#: itsm/component/constants/basic.py:313 itsm/sla_engine/models.py:76
+#: itsm/task/models.py:1018 itsm/task/models.py:1099
+#: itsm/ticket/models/ticket.py:249
+msgid "任务状态"
+msgstr "タスクステータス"
+
+#: itsm/component/constants/basic.py:316
+msgid "任务状态名"
+msgstr "タスクステータス名"
+
+#: itsm/component/constants/basic.py:322
+msgid "SOPS步骤信息"
+msgstr "SOPSステップ情報"
+
+#: itsm/component/constants/builtin.py:36 itsm/service/models.py:195
+msgid "低"
+msgstr "低い"
+
+#: itsm/component/constants/builtin.py:37 itsm/service/models.py:196
+msgid "中"
+msgstr "真ん中"
+
+#: itsm/component/constants/builtin.py:38 itsm/service/models.py:197
+msgid "高"
+msgstr "高い"
+
+#: itsm/component/constants/builtin.py:359
+msgid "服务反馈"
+msgstr "サービスフィードバック"
+
+#: itsm/component/constants/builtin.py:360
+msgid "基础配置"
+msgstr "基本的な構成"
+
+#: itsm/component/constants/builtin.py:361
+msgid "资源服务"
+msgstr "リソースサービス"
+
+#: itsm/component/constants/builtin.py:362
+msgid "咨询建议"
+msgstr "相談の提案"
+
+#: itsm/component/constants/builtin.py:363
+msgid "问题管理"
+msgstr "問題管理"
+
+#: itsm/component/constants/builtin.py:364
+msgid "事件管理"
+msgstr "イベント管理"
+
+#: itsm/component/constants/builtin.py:365
+msgid "主机管理"
+msgstr "ホスト管理"
+
+#: itsm/component/constants/builtin.py:366
+msgid "业务管理"
+msgstr "ビジネス管理"
+
+#: itsm/component/constants/builtin.py:367
+msgid "运维资源"
+msgstr "運用およびメンテナンスリソース"
+
+#: itsm/component/constants/field.py:44
+msgid "处理人数"
+msgstr "処理する人の数"
+
+#: itsm/component/constants/field.py:45
+msgid "通过人数"
+msgstr "合格した"
+
+#: itsm/component/constants/field.py:46
+msgid "拒绝人数"
+msgstr "拒否された人の数"
+
+#: itsm/component/constants/field.py:47
+msgid "通过率"
+msgstr "合格率"
+
+#: itsm/component/constants/field.py:48
+msgid "拒绝率"
+msgstr "拒否率"
+
+#: itsm/component/constants/field.py:54
+msgid "会签意见"
+msgstr "コメントにサインアップしてください"
+
+#: itsm/component/constants/field.py:59 itsm/component/constants/field.py:81
+#: itsm/component/constants/field.py:99
+msgid "通过"
+msgstr "合格"
+
+#: itsm/component/constants/field.py:59 itsm/component/constants/field.py:80
+#: itsm/component/constants/field.py:99
+msgid "拒绝"
+msgstr "拒否する"
+
+#: itsm/component/constants/field.py:63 itsm/component/constants/field.py:104
+#: itsm/component/constants/field.py:119 itsm/iadmin/models.py:301
+msgid "备注"
+msgstr "述べる"
+
+#: itsm/component/constants/field.py:74
+msgid "审批结果"
+msgstr "承認結果"
+
+#: itsm/component/constants/field.py:86
+msgid "审批人"
+msgstr "承認者"
+
+#: itsm/component/constants/field.py:94
+msgid "审批意见"
+msgstr "承認意見"
+
+#: itsm/component/constants/iam.py:32
+msgid "创建项目"
+msgstr "プロジェクトを作成します"
+
+#: itsm/component/constants/iam.py:39
+msgid "项目查看"
+msgstr "プロジェクトビュー"
+
+#: itsm/component/constants/iam.py:46
+msgid "项目编辑"
+msgstr "プロジェクト編集"
+
+#: itsm/component/constants/iam.py:53
+msgid "流程创建"
+msgstr "プロセス作成"
+
+#: itsm/component/constants/iam.py:60
+msgid "流程管理"
+msgstr "プロセス管理"
+
+#: itsm/component/constants/iam.py:67
+msgid "流程部署"
+msgstr "プロセス展開"
+
+#: itsm/component/constants/iam.py:74
+msgid "服务创建"
+msgstr "サービス作成"
+
+#: itsm/component/constants/iam.py:81
+msgid "服务查看"
+msgstr "サービスビュー"
+
+#: itsm/component/constants/iam.py:88
+msgid "服务管理"
+msgstr "サービス管理"
+
+#: itsm/component/constants/iam.py:95
+msgid "流程版本还原"
+msgstr "プロセスバージョンの復元"
+
+#: itsm/component/constants/iam.py:102
+msgid "流程版本管理"
+msgstr "プロセスバージョン管理"
+
+#: itsm/component/constants/iam.py:109
+msgid "角色创建"
+msgstr "役割の作成"
+
+#: itsm/component/constants/iam.py:116
+msgid "角色管理"
+msgstr "ロール管理"
+
+#: itsm/component/constants/iam.py:123
+msgid "服务协议管理"
+msgstr "サービス契約管理"
+
+#: itsm/component/constants/iam.py:130
+msgid "流程元素管理"
+msgstr "プロセス要素管理"
+
+#: itsm/component/constants/iam.py:137
+msgid "项目管理"
+msgstr "プロジェクト管理"
+
+#: itsm/component/constants/iam.py:144
+msgid "工单查看"
+msgstr "ワークオーダービュー"
+
+#: itsm/component/constants/iam.py:151
+msgid "工单管理"
+msgstr "ワークオーダー管理"
+
+#: itsm/component/constants/iam.py:158
+msgid "运营数据查看"
+msgstr "運用データを表示します"
+
+#: itsm/component/constants/iam.py:165
+msgid "字段新建"
+msgstr "新しいフィールド作成"
+
+#: itsm/component/constants/iam.py:172
+msgid "字段查看"
+msgstr "フィールド表示"
+
+#: itsm/component/constants/iam.py:179
+msgid "字段编辑"
+msgstr "フィールド編集"
+
+#: itsm/component/constants/iam.py:186
+msgid "字段删除"
+msgstr "フィールド削除"
+
+#: itsm/component/constants/iam.py:193
+msgid "触发器新建"
+msgstr "新しいトリガー作成"
+
+#: itsm/component/constants/iam.py:200
+msgid "触发器查看"
+msgstr "トリガービュー"
+
+#: itsm/component/constants/iam.py:207
+msgid "触发器编辑"
+msgstr "トリガー編集"
+
+#: itsm/component/constants/iam.py:214
+msgid "触发器管理"
+msgstr "トリガー管理"
+
+#: itsm/component/constants/iam.py:221
+msgid "设置查看"
+msgstr "設定ビュー"
+
+#: itsm/component/constants/iam.py:228
+msgid "设置管理"
+msgstr "設定管理"
+
+#: itsm/component/constants/iam.py:235
+msgid "目录新建"
+msgstr "新しいディレクトリを作成します"
+
+#: itsm/component/constants/iam.py:242
+msgid "目录编辑"
+msgstr "ディレクトリ編集"
+
+#: itsm/component/constants/iam.py:249
+msgid "目录删除"
+msgstr "ディレクトリ削除"
+
+#: itsm/component/constants/iam.py:256 itsm/component/constants/iam.py:263
+msgid "用户组新建"
+msgstr "ユーザーグループの作成"
+
+#: itsm/component/constants/iam.py:270
+msgid "用户组查看"
+msgstr "ユーザーグループビュー"
+
+#: itsm/component/constants/iam.py:277
+msgid "用户组编辑"
+msgstr "ユーザーグループの編集"
+
+#: itsm/component/constants/iam.py:284
+msgid "用户组删除"
+msgstr "ユーザーグループの削除"
+
+#: itsm/component/constants/iam.py:291
+msgid "SLA 服务模式查看"
+msgstr "SLAサービスモードビュー"
+
+#: itsm/component/constants/iam.py:298
+msgid "SLA 服务模式编辑"
+msgstr "SLAサービスモードの編集"
+
+#: itsm/component/constants/iam.py:305
+msgid "SLA 服务模式删除"
+msgstr "SLAサービスモードの削除"
+
+#: itsm/component/constants/iam.py:312
+msgid "SLA 服务模式新建"
+msgstr "新しいSLAサービスモデル"
+
+#: itsm/component/constants/iam.py:319
+msgid "SLA 服务协议查看"
+msgstr "SLAサービス契約ビュー"
+
+#: itsm/component/constants/iam.py:326
+msgid "SLA 服务协议创建"
+msgstr "SLAサービス契約の作成"
+
+#: itsm/component/constants/iam.py:333
+msgid "SLA 服务协议编辑"
+msgstr "SLAサービス契約編集"
+
+#: itsm/component/constants/iam.py:340
+msgid "SLA 服务协议删除"
+msgstr "SLAサービス契約の削除"
+
+#: itsm/component/constants/iam.py:347
+msgid "SLA 优先级查看"
+msgstr "SLA優先度表示"
+
+#: itsm/component/constants/iam.py:354
+msgid "SLA 优先级管理"
+msgstr "SLA優先管理"
+
+#: itsm/component/constants/iam.py:361
+msgid "公共字段管理"
+msgstr "パブリックフィールド管理"
+
+#: itsm/component/constants/iam.py:368
+msgid "公共API管理"
+msgstr "パブリックAPI管理"
+
+#: itsm/component/constants/iam.py:375
+msgid "任务模版管理"
+msgstr "タスクテンプレート管理"
+
+#: itsm/component/constants/iam.py:382
+msgid "通知配置查看"
+msgstr "通知構成ビュー"
+
+#: itsm/component/constants/iam.py:389
+msgid "通知配置管理"
+msgstr "通知構成管理"
+
+#: itsm/component/constants/iam.py:396
+msgid "全局设置查看"
+msgstr "グローバル設定を表示します"
+
+#: itsm/component/constants/iam.py:403
+msgid "全局设置管理"
+msgstr "グローバル設定管理"
+
+#: itsm/component/constants/iam.py:410
+msgid "单据状态查看"
+msgstr "ドキュメントステータスビュー"
+
+#: itsm/component/constants/iam.py:417
+msgid "单据状态管理"
+msgstr "ドキュメントステータス管理"
+
+#: itsm/component/constants/iam.py:424
+msgid "平台管理访问"
+msgstr "プラットフォーム管理アクセス"
+
+#: itsm/component/constants/iam.py:433 itsm/iadmin/models.py:338
+#: itsm/project/models/project.py:184 itsm/service/models.py:526
+#: itsm/service/models.py:912 itsm/service/models.py:1033
+#: itsm/trigger/models/base.py:53
+msgid "项目"
+msgstr "プロジェクト"
+
+#: itsm/component/constants/iam.py:435 itsm/component/constants/ticket.py:175
+#: itsm/service/models.py:285 itsm/service/models.py:286
+#: itsm/service/validators.py:69 itsm/service/validators.py:71
+#: itsm/service/validators.py:76
+msgid "服务"
+msgstr "仕える"
+
+#: itsm/component/constants/iam.py:437 itsm/component/constants/task.py:82
+#: itsm/component/constants/trigger.py:51
+msgid "流程"
+msgstr "プロセス"
+
+#: itsm/component/constants/iam.py:439 itsm/component/constants/task.py:83
+#: itsm/component/constants/trigger.py:52
+msgid "流程版本"
+msgstr "プロセスバージョン"
+
+#: itsm/component/constants/iam.py:441
+msgid "流程元素"
+msgstr "プロセス要素"
+
+#: itsm/component/constants/iam.py:443
+msgid "通用角色"
+msgstr "一般的な役割"
+
+#: itsm/component/constants/iam.py:445 itsm/ticket/models/ticket.py:1390
+#: itsm/ticket/models/ticket.py:1391
+msgid "工单"
+msgstr "作業注文"
+
+#: itsm/component/constants/iam.py:447 itsm/sla/models/policy.py:448
+#: itsm/sla/models/policy.py:449
+msgid "服务协议"
+msgstr "サービス契約"
+
+#: itsm/component/constants/iam.py:449
+msgid "系统配置"
+msgstr "システム構成"
+
+#: itsm/component/constants/iam.py:451
+msgid "运营数据"
+msgstr "運用データ"
+
+#: itsm/component/constants/iam.py:455
+msgid "用户组"
+msgstr "ユーザーグループ"
+
+#: itsm/component/constants/iam.py:457 itsm/workflow/models/field.py:220
+msgid "字段"
+msgstr "フィールド"
+
+#: itsm/component/constants/iam.py:459 itsm/trigger/models/trigger.py:172
+#: itsm/trigger/models/trigger.py:173 itsm/workflow/models/trigger.py:53
+#: itsm/workflow/models/trigger.py:54
+msgid "触发器"
+msgstr "トリガー"
+
+#: itsm/component/constants/iam.py:461
+msgid "SLA 服务协议"
+msgstr "SLAサービス契約"
+
+#: itsm/component/constants/iam.py:463
+msgid "SLA 服务模式"
+msgstr "SLAサービスモデル"
+
+#: itsm/component/constants/iam.py:465
+msgid "公共字段"
+msgstr "パブリックフィールド"
+
+#: itsm/component/constants/iam.py:467
+msgid "公共API"
+msgstr "パブリックAPI"
+
+#: itsm/component/constants/iam.py:469 itsm/service/models.py:114
+#: itsm/service/models.py:161 itsm/service/models.py:162
+#: itsm/sla/models/policy.py:133 itsm/sla/models/policy.py:157
+#: itsm/ticket_status/models.py:106 itsm/ticket_status/models.py:157
+#: itsm/ticket_status/models.py:259
+msgid "服务类型"
+msgstr "サービスタイプ"
+
+#: itsm/component/constants/iam.py:471
+msgid "任务模版"
+msgstr "タスクテンプレート"
+
+#: itsm/component/constants/iam.py:474 itsm/sites/views.py:141
+msgid "流程服务"
+msgstr "プロセスサービス"
+
+#: itsm/component/constants/task.py:87 itsm/component/constants/task.py:432
+#: itsm/component/constants/trigger.py:34
+msgid "新建"
+msgstr "新しい"
+
+#: itsm/component/constants/task.py:88 itsm/task/serializers.py:336
+#: itsm/ticket/handlers.py:88 itsm/ticket/models/ticket.py:3494
+msgid "处理"
+msgstr "対処する"
+
+#: itsm/component/constants/task.py:89
+msgid "确认"
+msgstr "確認する"
+
+#: itsm/component/constants/task.py:97
+msgid "常规"
+msgstr "従来の"
+
+#: itsm/component/constants/task.py:97
+msgid "标准运维"
+msgstr "標準の操作とメンテナンス"
+
+#: itsm/component/constants/task.py:97
+msgid "蓝盾"
+msgstr "ブルーシールド"
+
+#: itsm/component/constants/task.py:434 itsm/component/constants/task.py:436
+#: itsm/ticket/views/misc.py:190
+msgid "待处理"
+msgstr "保留中"
+
+#: itsm/component/constants/task.py:438 itsm/component/constants/trigger.py:35
+#: itsm/ticket/serializers/ticket.py:262 itsm/ticket/serializers/ticket.py:273
+msgid "执行中"
+msgstr "実行"
+
+#: itsm/component/constants/task.py:439
+msgid "待总结"
+msgstr "要約する"
+
+#: itsm/component/constants/task.py:441
+msgid "已忽略"
+msgstr "無視した"
+
+#: itsm/component/constants/task.py:443 itsm/component/constants/trigger.py:37
+#: itsm/component/utils/basic.py:391 itsm/sla_engine/models.py:505
+msgid "失败"
+msgstr "失敗"
+
+#: itsm/component/constants/task.py:444
+msgid "完成"
+msgstr "仕上げる"
+
+#: itsm/component/constants/task.py:445
+msgid "被撤销"
+msgstr "取り消された"
+
+#: itsm/component/constants/task.py:446
+msgid "被挂起"
+msgstr "中断される"
+
+#: itsm/component/constants/task.py:447
+msgid "被删除"
+msgstr "削除されました"
+
+#: itsm/component/constants/task.py:448 itsm/component/utils/basic.py:411
+msgid "执行成功"
+msgstr "正常に実行"
+
+#: itsm/component/constants/task.py:449 itsm/component/constants/ticket.py:101
+msgid "已终止"
+msgstr "終了"
+
+#: itsm/component/constants/task.py:450
+msgid "已取消"
+msgstr "キャンセル"
+
+#: itsm/component/constants/ticket.py:35
+msgid "新"
+msgstr "新しい"
+
+#: itsm/component/constants/ticket.py:46 itsm/ticket/models/ticket.py:5002
+msgid "处理中"
+msgstr "処理"
+
+#: itsm/component/constants/ticket.py:57
+msgid "已解决"
+msgstr "解決しました"
+
+#: itsm/component/constants/ticket.py:68
+msgid "待确认"
+msgstr "確認されます"
+
+#: itsm/component/constants/ticket.py:79
+msgid "挂起"
+msgstr "電話を切る"
+
+#: itsm/component/constants/ticket.py:90 itsm/iadmin/contants.py:118
+msgid "已完成"
+msgstr "完了しました"
+
+#: itsm/component/constants/ticket.py:112
+msgid "已撤销"
+msgstr "取り消された"
+
+#: itsm/component/constants/ticket.py:139 itsm/sla/models/policy.py:136
+msgid "紧急程度"
+msgstr "緊急"
+
+#: itsm/component/constants/ticket.py:140 itsm/sla/models/policy.py:137
+msgid "影响范围"
+msgstr "衝撃の範囲"
+
+#: itsm/component/constants/ticket.py:141 itsm/sla/models/policy.py:65
+#: itsm/sla/models/policy.py:138 itsm/sla_engine/models.py:465
+msgid "优先级"
+msgstr "優先度"
+
+#: itsm/component/constants/ticket.py:165
+msgid "工单编号"
+msgstr "作業注文番号"
+
+#: itsm/component/constants/ticket.py:167
+msgid "关联业务"
+msgstr "関連ビジネス"
+
+#: itsm/component/constants/ticket.py:168
+msgid "工单类型"
+msgstr "チケットの種類"
+
+#: itsm/component/constants/ticket.py:170 itsm/workflow/models/state.py:183
+#: itsm/workflow/models/state.py:184
+msgid "状态"
+msgstr "州"
+
+#: itsm/component/constants/ticket.py:171
+msgid "当前步骤"
+msgstr "現在の手順"
+
+#: itsm/component/constants/ticket.py:176
+msgid "满意度评分"
+msgstr "満足度の評価"
+
+#: itsm/component/constants/ticket.py:177
+msgid "满意度评价"
+msgstr "満足度評価"
+
+#: itsm/component/constants/ticket.py:183 itsm/component/utils/basic.py:246
+msgid "浮点数"
+msgstr "フローティングポイント番号"
+
+#: itsm/component/constants/ticket.py:184
+msgid "非负数（0，正整数，正浮点数）"
+msgstr "非陰性数（0、正の整数、正の浮動小数点数）"
+
+#: itsm/component/constants/ticket.py:185
+msgid "非正数（0，负整数，负浮点数）"
+msgstr "非陽性数（0、負の整数、負の浮動小数点数）"
+
+#: itsm/component/constants/ticket.py:186 itsm/component/utils/basic.py:249
+msgid "大于零的数（包括正数和正浮点数）"
+msgstr "ゼロより大きい数（正と正の浮動小数点数を含む）"
+
+#: itsm/component/constants/ticket.py:187 itsm/component/utils/basic.py:250
+msgid "小于零的数（包括负数和负浮点数）"
+msgstr "ゼロ未満の数（負と負の浮動小数点数を含む）"
+
+#: itsm/component/constants/ticket.py:188
+#: itsm/component/constants/ticket.py:227
+msgid "仅小写字母"
+msgstr "小文字のみ"
+
+#: itsm/component/constants/ticket.py:189
+#: itsm/component/constants/ticket.py:228
+msgid "仅大写字母"
+msgstr "大文字のみ"
+
+#: itsm/component/constants/ticket.py:190
+#: itsm/component/constants/ticket.py:229
+msgid "仅英文字符"
+msgstr "英語のキャラクターのみ"
+
+#: itsm/component/constants/ticket.py:191
+#: itsm/component/constants/ticket.py:230 itsm/component/utils/basic.py:160
+#: itsm/component/utils/basic.py:260
+msgid "仅能包含英文字符和数字"
+msgstr "英語のキャラクターと番号のみを含めることができます"
+
+#: itsm/component/constants/ticket.py:192
+#: itsm/component/constants/ticket.py:231
+msgid "仅中文字符"
+msgstr "漢字のみ"
+
+#: itsm/component/constants/ticket.py:193
+#: itsm/component/constants/ticket.py:232 itsm/component/utils/basic.py:161
+#: itsm/component/utils/basic.py:261
+msgid "仅能包含中英文字符"
+msgstr "中国語と英語のキャラクターのみを含めることができます"
+
+#: itsm/component/constants/ticket.py:194
+#: itsm/component/constants/ticket.py:233 itsm/component/utils/basic.py:162
+#: itsm/component/utils/basic.py:262
+msgid "仅能包含中英文，数字，下划线"
+msgstr "中国語、英語、数字、およびアンダースコアのみを含めることができます"
+
+#: itsm/component/constants/ticket.py:195
+#: itsm/component/constants/ticket.py:234 itsm/component/utils/basic.py:163
+#: itsm/component/utils/basic.py:263
+msgid "包含中英文，数字，以英文字符开头"
+msgstr "英語のキャラクターから始めて、中国語と英語の番号が含まれています"
+
+#: itsm/component/constants/ticket.py:196
+#: itsm/trigger/action/components/send_message.py:84
+msgid "邮件"
+msgstr "郵便"
+
+#: itsm/component/constants/ticket.py:197 itsm/component/utils/basic.py:156
+#: itsm/component/utils/basic.py:256
+msgid "内地手机号码"
+msgstr "本土の携帯電話番号"
+
+#: itsm/component/constants/ticket.py:198 itsm/component/utils/basic.py:157
+#: itsm/component/utils/basic.py:257
+msgid "身份证"
+msgstr "IDカード"
+
+#: itsm/component/constants/ticket.py:199
+msgid "QQ号码"
+msgstr "QQ番号"
+
+#: itsm/component/constants/ticket.py:200 itsm/component/utils/basic.py:158
+#: itsm/component/utils/basic.py:258
+msgid "IP地址"
+msgstr "IPアドレス"
+
+#: itsm/component/constants/ticket.py:207
+#: itsm/component/constants/ticket.py:240 itsm/component/utils/basic.py:148
+#: itsm/component/utils/basic.py:244
+msgid "数字0-9"
+msgstr "番号0-9"
+
+#: itsm/component/constants/ticket.py:208
+#: itsm/component/constants/ticket.py:241
+msgid "非零正整数"
+msgstr "非ゼロ陽性整数"
+
+#: itsm/component/constants/ticket.py:209
+#: itsm/component/constants/ticket.py:216
+#: itsm/component/constants/ticket.py:222
+#: itsm/component/constants/ticket.py:246
+msgid "联合字段校验"
+msgstr "ジョイントフィールド検証"
+
+#: itsm/component/constants/ticket.py:214
+#: itsm/component/constants/ticket.py:242
+msgid "系统日期之后"
+msgstr "システムの日付の後"
+
+#: itsm/component/constants/ticket.py:215
+#: itsm/component/constants/ticket.py:243
+msgid "系统日期之前"
+msgstr "システムの日付の前"
+
+#: itsm/component/constants/ticket.py:220
+#: itsm/component/constants/ticket.py:244
+msgid "系统时间之后"
+msgstr "システム時間の後"
+
+#: itsm/component/constants/ticket.py:221
+#: itsm/component/constants/ticket.py:245
+msgid "系统时间之前"
+msgstr "システム時間の前"
+
+#: itsm/component/constants/trigger.py:36 itsm/sla_engine/models.py:505
+msgid "成功"
+msgstr "成功"
+
+#: itsm/component/constants/trigger.py:42
+msgid "手动执行"
+msgstr "手動実行"
+
+#: itsm/component/constants/trigger.py:42
+msgid "后台执行"
+msgstr "背景実行"
+
+#: itsm/component/constants/trigger.py:50
+msgid "公共"
+msgstr "公共"
+
+#: itsm/component/constants/trigger.py:53
+msgid "任务"
+msgstr "タスク"
+
+#: itsm/component/constants/trigger.py:57
+msgid "消息"
+msgstr "情報"
+
+#: itsm/component/constants/trigger.py:58
+msgid "修改状态"
+msgstr "ステータスを変更します"
+
+#: itsm/component/constants/trigger.py:59
+#: itsm/trigger/action/components/modify_processor.py:46
+msgid "修改处理人"
+msgstr "ハンドラーを変更します"
+
+#: itsm/component/constants/trigger.py:60
+msgid "API接口"
+msgstr "APIインターフェイス"
+
+#: itsm/component/constants/trigger.py:86
+msgid "创建单据"
+msgstr "ドキュメントを作成します"
+
+#: itsm/component/constants/trigger.py:87
+msgid "关闭单据"
+msgstr "ドキュメントを閉じます"
+
+#: itsm/component/constants/trigger.py:88
+msgid "终止单据"
+msgstr "終了ドキュメント"
+
+#: itsm/component/constants/trigger.py:89
+msgid "挂起单据"
+msgstr "保留中の文書"
+
+#: itsm/component/constants/trigger.py:90
+msgid "恢复单据"
+msgstr "ドキュメントを回復します"
+
+#: itsm/component/constants/trigger.py:91
+msgid "撤销单据"
+msgstr "ドキュメントを取り消します"
+
+#: itsm/component/constants/trigger.py:92
+#: itsm/component/constants/trigger.py:100
+msgid "进入节点"
+msgstr "ノードを入力します"
+
+#: itsm/component/constants/trigger.py:93
+#: itsm/component/constants/trigger.py:101
+msgid "离开节点"
+msgstr "ノードを離れます"
+
+#: itsm/component/constants/trigger.py:102
+msgid "分派单据"
+msgstr "配布文書"
+
+#: itsm/component/constants/trigger.py:103
+msgid "认领单据"
+msgstr "領収書を請求します"
+
+#: itsm/component/constants/trigger.py:104
+msgid "转单"
+msgstr "転送順序"
+
+#: itsm/component/constants/trigger.py:109
+msgid "进入分支"
+msgstr "ブランチを入力します"
+
+#: itsm/component/constants/trigger.py:120
+msgid "创建任务之后"
+msgstr "タスクを作成した後"
+
+#: itsm/component/constants/trigger.py:121
+msgid "删除任务"
+msgstr "タスクを削除します"
+
+#: itsm/component/constants/trigger.py:122
+msgid "执行任务之前"
+msgstr "タスクを実行する前に"
+
+#: itsm/component/constants/trigger.py:123
+msgid "执行任务之后"
+msgstr "タスクが実行された後"
+
+#: itsm/component/constants/trigger.py:124
+msgid "完成任务之后"
+msgstr "タスクを完了した後"
+
+#: itsm/component/constants/trigger.py:142
+msgid "单据信号"
+msgstr "ドキュメント信号"
+
+#: itsm/component/constants/trigger.py:143
+msgid "节点信号"
+msgstr "ノード信号"
+
+#: itsm/component/constants/trigger.py:144
+msgid "线条信号"
+msgstr "線信号"
+
+#: itsm/component/constants/trigger.py:145
+msgid "任务信号"
+msgstr "タスク信号"
+
+#: itsm/component/drf/permissions.py:49 itsm/component/drf/permissions.py:66
+#: itsm/component/drf/permissions.py:89 itsm/iadmin/permissions.py:44
+#: itsm/iadmin/permissions.py:88 itsm/sla/permissions.py:41
+#: itsm/task/permissions.py:37 itsm/ticket_status/permissions.py:38
+#: itsm/workflow/permissions.py:174
+msgid "您没有该模块的权限"
+msgstr "このモジュールの権限はありません"
+
+#: itsm/component/utils/basic.py:149
+msgid "不能为0"
+msgstr "0にすることはできません"
+
+#: itsm/component/utils/basic.py:150 itsm/component/utils/basic.py:251
+msgid "小写字母"
+msgstr "小文字"
+
+#: itsm/component/utils/basic.py:151 itsm/component/utils/basic.py:252
+msgid "大写字母"
+msgstr "大文字"
+
+#: itsm/component/utils/basic.py:152 itsm/component/utils/basic.py:253
+msgid "英文"
+msgstr "英語"
+
+#: itsm/component/utils/basic.py:153 itsm/component/utils/basic.py:254
+msgid "中文"
+msgstr "中国語"
+
+#: itsm/component/utils/basic.py:155 itsm/component/utils/basic.py:255
+msgid "邮箱"
+msgstr "郵便"
+
+#: itsm/component/utils/basic.py:159 itsm/component/utils/basic.py:259
+msgid "腾讯QQ号"
+msgstr "Tencent QQ番号"
+
+#: itsm/component/utils/basic.py:200 itsm/component/utils/basic.py:202
+msgid "包含了指定字符【{}】以外的内容"
+msgstr "指定された文字[{}]以外のコンテンツが含まれています"
+
+#: itsm/component/utils/basic.py:204
+msgid "开头格式不正确"
+msgstr "誤った開始形式"
+
+#: itsm/component/utils/basic.py:206
+msgid "结尾格式不正确"
+msgstr "誤ったエンディング形式"
+
+#: itsm/component/utils/basic.py:209 itsm/component/utils/basic.py:275
+msgid "输入格式不正确：包含了指定字符【{}】以外的内容"
+msgstr "間違った入力形式：指定された文字以外のコンテンツを含む[{}]"
+
+#: itsm/component/utils/basic.py:213
+#, python-format
+msgid "至少需要匹配%s种字符(%s)"
+msgstr "少なくとも%s文字（%s）を一致させる必要があります"
+
+#: itsm/component/utils/basic.py:245
+msgid "数字首位只能为1-9"
+msgstr "最初の数字は1〜9です"
+
+#: itsm/component/utils/basic.py:247
+msgid "非负数（0，正数，正浮点数）"
+msgstr "非陰性数（0、正の数、正の浮動小数点数）"
+
+#: itsm/component/utils/basic.py:248
+msgid "非正数（0，负数，负浮点数）"
+msgstr "非陽性数（0、負の数、負の浮動小数点数）"
+
+#: itsm/component/utils/basic.py:392
+msgid "异常"
+msgstr "異常な"
+
+#: itsm/component/utils/basic.py:393
+msgid "超时"
+msgstr "タイムアウト"
+
+#: itsm/component/utils/basic.py:394
+msgid "放弃"
+msgstr "あきらめる"
+
+#: itsm/component/utils/basic.py:395
+msgid "无法"
+msgstr "できません"
+
+#: itsm/component/utils/basic.py:396
+msgid "错误码"
+msgstr "エラーコード"
+
+#: itsm/component/utils/basic.py:397
+msgid "错误"
+msgstr "間違い"
+
+#: itsm/component/utils/basic.py:398
+msgid "批量安装作业启动失败"
+msgstr "バルクインストールジョブは開始できませんでした"
+
+#: itsm/component/utils/basic.py:399
+msgid "command not found"
+msgstr "コマンドが見つかりません"
+
+#: itsm/component/utils/basic.py:400
+msgid "error"
+msgstr "エラー"
+
+#: itsm/component/utils/basic.py:401
+msgid "exception"
+msgstr "例外"
+
+#: itsm/component/utils/basic.py:402
+msgid "timeout"
+msgstr "タイムアウト"
+
+#: itsm/component/utils/basic.py:403
+msgid "failed"
+msgstr "失敗した"
+
+#: itsm/component/utils/basic.py:404
+msgid "setup failed"
+msgstr "セットアップに失敗しました"
+
+#: itsm/component/utils/basic.py:405
+msgid "no such file or directory"
+msgstr "そのようなファイル、又はディレクトリはありません"
+
+#: itsm/component/utils/basic.py:412
+msgid "启动成功"
+msgstr "正常に開始しました"
+
+#: itsm/component/utils/basic.py:413
+msgid "发送成功"
+msgstr "正常に送信します"
+
+#: itsm/component/utils/basic.py:414
+msgid "成功录入cmdb"
+msgstr "CMDBを正常に入力しました"
+
+#: itsm/component/utils/basic.py:415
+msgid "Done"
+msgstr "終わり"
+
+#: itsm/component/utils/basic.py:416
+msgid "step done"
+msgstr "ステップが完了しました"
+
+#: itsm/component/utils/basic.py:417 itsm/sla_engine/constants.py:71
+msgid "正常"
+msgstr "普通"
+
+#: itsm/component/utils/basic.py:418
+msgid "install_success"
+msgstr "install_success"
+
+#: itsm/component/utils/basic.py:419
+msgid "success"
+msgstr "成功"
+
+#: itsm/component/utils/basic.py:420
+msgid "100%"
+msgstr "100％"
+
+#: itsm/component/utils/basic.py:426
+msgid "返回码"
+msgstr "コードを返します"
+
+#: itsm/component/utils/basic.py:426
+msgid "执行完毕"
+msgstr "実行が完了します"
+
+#: itsm/component/utils/basic.py:426
+msgid "作业参数"
+msgstr "ジョブパラメーター"
+
+#: itsm/component/utils/basic.py:426
+msgid "curl"
+msgstr "カール"
+
+#: itsm/component/utils/basic.py:426
+msgid "status"
+msgstr "状態"
+
+#: itsm/component/utils/basic.py:426
+msgid "agent状态"
+msgstr "エージェントステータス"
+
+#: itsm/component/utils/basic.py:426
+msgid "yum"
+msgstr "ヤム"
+
+#: itsm/component/utils/basic.py:426
+msgid "apt-get"
+msgstr "apt-get"
+
+#: itsm/component/utils/basic.py:431
+msgid "warning"
+msgstr "警告"
+
+#: itsm/component/utils/basic.py:432
+msgid "执行命令"
+msgstr "コマンドを実行します"
+
+#: itsm/component/utils/basic.py:433
+msgid "输出结果"
+msgstr "出力結果"
+
+#: itsm/component/utils/basic.py:434
+msgid "add crontab task failed. you can add it manually"
+msgstr "Crontabタスクを追加しました。失敗しました。手動で追加できます"
+
+#: itsm/component/utils/basic.py:435
+msgid "Failed to register host to cmdb. you can register it manually"
+msgstr "ホストをCMDBに登録できませんでした。手動で登録できます"
+
+#: itsm/component/utils/basic.py:589
+msgid "格式错误，仅支持【G/M/K】结尾的大小标记字符串."
+msgstr "故障した形式では、[g/m/k]で終わるサイズのタグ文字列のみがサポートされています。"
+
+#: itsm/component/utils/basic.py:717
+#, python-format
+msgid "请求参数校验失败: %s"
+msgstr "リクエストパラメーター検証に失敗しました：%s"
+
+#: itsm/component/utils/batch.py:92
+msgid "all success, data list in key success"
+msgstr "すべての成功、重要な成功のデータリスト"
+
+#: itsm/component/utils/batch.py:93
+msgid "part fail, please read detail info in key fail"
+msgstr "パーツが失敗します。キーフェイルの詳細情報をお読みください"
+
+#: itsm/component/utils/batch.py:94
+msgid "all fail, please read detail info in key fail"
+msgstr "すべて失敗します。キーフェイルの詳細情報をお読みください"
+
+#: itsm/component/utils/client_backend_query.py:55
+#: itsm/component/utils/client_backend_query.py:77
+#: itsm/component/utils/client_backend_query.py:83
+msgid "请选择关联业务"
+msgstr "関連するビジネスを選択してください"
+
+#: itsm/component/utils/client_backend_query.py:115
+msgid "未接管"
+msgstr "引き継がれていません"
+
+#: itsm/component/utils/client_backend_query.py:135
+#: itsm/ticket/models/ticket.py:4613 itsm/ticket/models/ticket.py:4618
+#: itsm/ticket/models/ticket.py:4650 itsm/ticket/models/ticket.py:4655
+#: itsm/ticket/models/ticket.py:4975 itsm/ticket/models/ticket.py:4979
+#: itsm/ticket/models/ticket.py:4983
+msgid "其他"
+msgstr "他の"
+
+#: itsm/component/utils/conversion.py:254
+msgid "空闲机池"
+msgstr "アイドルマシンプール"
+
+#: itsm/component/utils/conversion.py:255
+msgid "故障自愈"
+msgstr "断層の自己修復"
+
+#: itsm/component/utils/conversion.py:256
+msgid "数据服务模块"
+msgstr "データサービスモジュール"
+
+#: itsm/component/utils/conversion.py:257
+msgid "公共组件"
+msgstr "パブリックコンポーネント"
+
+#: itsm/component/utils/conversion.py:258
+msgid "集成平台"
+msgstr "統合プラットフォーム"
+
+#: itsm/component/utils/conversion.py:259
+msgid "作业平台"
+msgstr "作業プラットフォーム"
+
+#: itsm/component/utils/conversion.py:260
+msgid "配置平台"
+msgstr "プラットフォームを構成します"
+
+#: itsm/component/utils/conversion.py:261
+msgid "管控平台"
+msgstr "制御プラットフォーム"
+
+#: itsm/component/utils/conversion.py:288
+msgid "参数转换失败，请联系管理员"
+msgstr "パラメーター変換が失敗した場合、管理者に連絡してください"
+
+#: itsm/gateway/views.py:98
+msgid "用户名列表不能为空"
+msgstr "ユーザー名リストを空にすることはできません"
+
+#: itsm/gateway/views.py:118 itsm/gateway/views.py:119
+#, python-format
+msgid "批量获取用户信息出错，%s"
+msgstr "ユーザー情報のバッチ取得でエラーが発生しました、%s"
+
+#: itsm/gateway/views.py:516
+msgid "批量获取流水线出错:{}"
+msgstr "バルク取得パイプラインエラー：{}"
+
+#: itsm/gateway/views.py:666
+msgid "批量获取流水线出错:{}, kwargs:{}"
+msgstr "バルク取得パイプラインエラー：{}、kwargs：{}"
+
+#: itsm/helper/views_common.py:78
+msgid "<h3>磁盘中不存在该文件!</h3>"
+msgstr "<h3>このファイルはディスクに存在しません！</h3>"
+
+#: itsm/helper/views_common.py:80
+#, python-format
+msgid "<h3>系统异常!</h3><br><p>%s</p>"
+msgstr "<h3>システムの例外！</h3> <br> <p>%s </p>"
+
+#: itsm/helper/views_common.py:103
+msgid "命令执行成功"
+msgstr "コマンドの実行は成功しました"
+
+#: itsm/helper/views_common.py:105
+#, python-format
+msgid "命令执行异常:%s"
+msgstr "コマンド実行例外：%s"
+
+#: itsm/iadmin/contants.py:70 itsm/iadmin/contants.py:89
+msgid "单据终止通知"
+msgstr "ドキュメント終了通知"
+
+#: itsm/iadmin/contants.py:71 itsm/iadmin/contants.py:90
+msgid "邀请关注通知"
+msgstr "招待して通知に従ってください"
+
+#: itsm/iadmin/contants.py:72 itsm/iadmin/contants.py:91
+msgid "邀请评价通知"
+msgstr "招待評価通知"
+
+#: itsm/iadmin/contants.py:73 itsm/iadmin/contants.py:92
+msgid "单据督办通知"
+msgstr "文書監督通知"
+
+#: itsm/iadmin/contants.py:74 itsm/iadmin/contants.py:93
+msgid "单据挂起通知"
+msgstr "ドキュメントサスペンション通知"
+
+#: itsm/iadmin/contants.py:75 itsm/iadmin/contants.py:94
+msgid "单据恢复通知"
+msgstr "ドキュメント回復通知"
+
+#: itsm/iadmin/contants.py:76 itsm/iadmin/contants.py:95
+msgid "单据待办通知"
+msgstr "注文する文書"
+
+#: itsm/iadmin/contants.py:77 itsm/iadmin/contants.py:108
+msgid "任务待办通知"
+msgstr "タスクTO DO通知"
+
+#: itsm/iadmin/contants.py:78 itsm/iadmin/contants.py:109
+msgid "任务待总结通知"
+msgstr "要約するタスク"
+
+#: itsm/iadmin/contants.py:79
+msgid "关注人通知"
+msgstr "フォロワー通知"
+
+#: itsm/iadmin/contants.py:80 itsm/iadmin/contants.py:96
+msgid "单据结束通知"
+msgstr "ドキュメントの終了通知"
+
+#: itsm/iadmin/contants.py:81 itsm/iadmin/contants.py:101
+msgid "SLA服务处理预警提醒通知"
+msgstr "SLAサービス処理警告通知"
+
+#: itsm/iadmin/contants.py:82 itsm/iadmin/contants.py:102
+msgid "SLA服务处理超时提醒通知"
+msgstr "SLAサービス処理タイムアウトリマインダー通知"
+
+#: itsm/iadmin/contants.py:83 itsm/iadmin/contants.py:103
+msgid "SLA服务响应预警提醒通知"
+msgstr "SLAサービス応答警告通知"
+
+#: itsm/iadmin/contants.py:84 itsm/iadmin/contants.py:104
+msgid "SLA服务响应超时提醒"
+msgstr "SLAサービス応答タイムアウトリマインダー"
+
+#: itsm/iadmin/contants.py:85 itsm/iadmin/contants.py:97
+msgid "节点失败通知"
+msgstr "ノード障害通知"
+
+#: itsm/iadmin/forms.py:35 itsm/iadmin/models.py:120
+msgid "标题模板"
+msgstr "タイトルテンプレート"
+
+#: itsm/iadmin/forms.py:35 itsm/iadmin/models.py:125
+msgid "工单字段的值可以作为参数写到模板中，格式如：【ITSM】${service}管理单【${action}】提醒"
+msgstr "ワークオーダーフィールドの値は、テンプレートのパラメーターとして記述できます。形式は次のとおりです。"
+
+#: itsm/iadmin/forms.py:39 itsm/iadmin/models.py:128
+msgid "内容模板"
+msgstr "コンテンツテンプレート"
+
+#: itsm/iadmin/forms.py:40 itsm/iadmin/models.py:132
+msgid "工单字段的值可以作为参数写到模板中，格式如：单号:${sn}"
+msgstr "ワークオーダーフィールドの値は、次のような形式のテンプレートのパラメーターとして書き込むことができます。注文番号：$ {sn}"
+
+#: itsm/iadmin/models.py:88 itsm/iadmin/models.py:332
+#: itsm/project/models/project.py:181 itsm/workflow/models/trigger.py:38
+msgid "类型"
+msgstr "タイプ"
+
+#: itsm/iadmin/models.py:89 itsm/project/models/project.py:182
+msgid "关键字唯一标识"
+msgstr "キーワード一意の識別子"
+
+#: itsm/iadmin/models.py:90 itsm/project/models/project.py:183
+msgid "系统设置值"
+msgstr "システムの設定値"
+
+#: itsm/iadmin/models.py:96 itsm/iadmin/models.py:97
+msgid "系统设置"
+msgstr "システム設定"
+
+#: itsm/iadmin/models.py:135
+msgid "通知模板类型"
+msgstr "通知テンプレートタイプ"
+
+#: itsm/iadmin/models.py:137 itsm/ticket/models/misc.py:175
+#: itsm/ticket/models/misc.py:232 itsm/workflow/models/common.py:57
+#: itsm/workflow/models/common.py:58
+msgid "通知方式"
+msgstr "通知方法"
+
+#: itsm/iadmin/models.py:140
+msgid "更新人"
+msgstr "アップデーター"
+
+#: itsm/iadmin/models.py:141
+msgid "使用者"
+msgstr "ユーザー"
+
+#: itsm/iadmin/models.py:142
+msgid "版本"
+msgstr "バージョン"
+
+#: itsm/iadmin/models.py:145 itsm/postman/models.py:126
+#: itsm/project/models/project.py:190 itsm/project/models/project.py:210
+#: itsm/role/models.py:158 itsm/service/models.py:85
+#: itsm/service/models.py:521 itsm/sla/models/policy.py:434
+#: itsm/sla/models/schedule.py:90 itsm/ticket/models/ticket.py:1377
+#: itsm/trigger/models/trigger.py:163 itsm/workflow/models/field.py:215
+msgid "项目key"
+msgstr "プロジェクトキー"
+
+#: itsm/iadmin/models.py:153 itsm/iadmin/models.py:154
+msgid "通知模板"
+msgstr "通知テンプレート"
+
+#: itsm/iadmin/models.py:279 itsm/workflow/models/workflow.py:124
+msgid "版本号"
+msgstr "バージョン番号"
+
+#: itsm/iadmin/models.py:280
+msgid "日志内容"
+msgstr "ログコンテンツ"
+
+#: itsm/iadmin/models.py:281
+msgid "语言"
+msgstr "言語"
+
+#: itsm/iadmin/models.py:282
+msgid "日期"
+msgstr "日付"
+
+#: itsm/iadmin/models.py:283
+msgid "是否最新版本"
+msgstr "最新バージョンです"
+
+#: itsm/iadmin/models.py:284
+msgid "版本号大小"
+msgstr "バージョン番号サイズ"
+
+#: itsm/iadmin/models.py:290 itsm/iadmin/models.py:291
+msgid "版本日志"
+msgstr "バージョンログ"
+
+#: itsm/iadmin/models.py:297
+msgid "旧版本"
+msgstr "古いバージョン"
+
+#: itsm/iadmin/models.py:298
+msgid "新版本"
+msgstr "新しいバージョン"
+
+#: itsm/iadmin/models.py:299
+msgid "升级人"
+msgstr "人をアップグレードします"
+
+#: itsm/iadmin/models.py:300
+msgid "记录创建日期"
+msgstr "作成日を記録します"
+
+#: itsm/iadmin/models.py:302
+msgid "执行的函数"
+msgstr "実行された関数"
+
+#: itsm/iadmin/models.py:303
+msgid "是否执行结束"
+msgstr "実行が終了するかどうか"
+
+#: itsm/iadmin/models.py:304
+msgid "是否迁移成功"
+msgstr "移行が成功したかどうか"
+
+#: itsm/iadmin/models.py:308 itsm/iadmin/models.py:309
+msgid "数据迁移日志"
+msgstr "データ移行ログ"
+
+#: itsm/iadmin/models.py:323
+msgid "字符串"
+msgstr "弦"
+
+#: itsm/iadmin/models.py:324
+msgid "哈希值"
+msgstr "ハッシュ値"
+
+#: itsm/iadmin/models.py:325
+msgid "列表"
+msgstr "リスト"
+
+#: itsm/iadmin/models.py:326
+msgid "集合"
+msgstr "集める"
+
+#: itsm/iadmin/models.py:327
+msgid "有序集合"
+msgstr "注文コレクション"
+
+#: itsm/iadmin/models.py:329 itsm/service/models.py:152
+msgid "关键字"
+msgstr "キーワード"
+
+#: itsm/iadmin/models.py:330
+msgid "值"
+msgstr "価値"
+
+#: itsm/iadmin/models.py:334
+msgid "过期时间"
+msgstr "有効期限"
+
+#: itsm/iadmin/models.py:343 itsm/iadmin/models.py:344
+msgid "数据存储"
+msgstr "データストレージ"
+
+#: itsm/iadmin/permissions.py:55
+msgid "您没有该模块的操作权限"
+msgstr "モジュールを操作する許可はありません"
+
+#: itsm/iadmin/permissions.py:69
+msgid "您没有权限"
+msgstr "許可はありません"
+
+#: itsm/iadmin/serializers.py:66
+msgid "version_to must occur after version_from"
+msgstr "version_toはversion_fromの後に発生する必要があります"
+
+#: itsm/iadmin/serializers.py:93
+msgid "消息模板不能为空"
+msgstr "メッセージテンプレートを空にすることはできません"
+
+#: itsm/iadmin/serializers.py:116
+msgid "公共配置不允许新增"
+msgstr "パブリック構成を追加することは許可されていません"
+
+#: itsm/iadmin/serializers.py:137
+msgid "该项目下已存在相同的通知配置，不能重复添加"
+msgstr "このプロジェクトの下には同じ通知構成がすでに存在し、繰り返し追加することはできません"
+
+#: itsm/iadmin/validators.py:82
+msgid "路径不能为空！"
+msgstr "パスを空にすることはできません！"
+
+#: itsm/iadmin/validators.py:89
+msgid "路径不存在，请检查！"
+msgstr "パスは存在しません、チェックしてください！"
+
+#: itsm/iadmin/validators.py:114
+msgid "组织架构接口调用失败，无法启用，请联系管理员"
+msgstr "組織構造インターフェイスコールが失敗し、有効にすることができません。管理者に連絡してください。"
+
+#: itsm/iadmin/validators.py:123
+msgid "以下流程节点正在使用组织架构功能，请更改再关闭：{}"
+msgstr "次のプロセスノードは組織構造関数を使用しています。それらを変更して閉じてください。{}"
+
+#: itsm/iadmin/validators.py:132
+msgid "以下服务正在使用组织架构功能，请更改再关闭：{}"
+msgstr "次のサービスは組織構造機能を使用しています。変更して閉じてください。{}"
+
+#: itsm/iadmin/validators.py:152
+msgid "存在未完成的含有母子单的单据，请处理后再关闭"
+msgstr "母と子の注文を含む未完成の文書があります。それらを閉じる前に処理してください。"
+
+#: itsm/iadmin/validators.py:159
+msgid "存在含有未完成任务的单据，请处理后再关闭"
+msgstr "未完成のタスクを含むドキュメントがあります。閉じる前に処理してください。"
+
+#: itsm/iadmin/validators.py:169
+msgid "存在被引用的触发器，请处理后再关闭"
+msgstr "参照されるトリガーがあります。閉じる前に処理してください"
+
+#: itsm/iadmin/views.py:187
+msgid "有数据迁移任务未完成"
+msgstr "データ移行タスクは完了していません"
+
+#: itsm/iadmin/views.py:234
+msgid "已经是最新版本，无需升级。"
+msgstr "すでに最新バージョンであり、アップグレードは必要ありません。"
+
+#: itsm/misc/views.py:71
+msgid "缓存更新成功"
+msgstr "キャッシュアップデートは正常に更新されます"
+
+#: itsm/misc/views.py:73
+#, python-format
+msgid "缓存更新失败：%s"
+msgstr "キャッシュの更新に失敗しました：%s"
+
+#: itsm/misc/views.py:139
+msgid "文件【{}】不存在"
+msgstr "ファイル[{}]は存在しません"
+
+#: itsm/postman/models.py:99
+msgid "系统id"
+msgstr "システムID"
+
+#: itsm/postman/models.py:100
+msgid "系统名称"
+msgstr "システム名"
+
+#: itsm/postman/models.py:101
+msgid "系统编码"
+msgstr "システムエンコーディング"
+
+#: itsm/postman/models.py:103
+msgid "系统描述"
+msgstr "システムの説明"
+
+#: itsm/postman/models.py:106
+msgid "系统责任人"
+msgstr "システム責任者"
+
+#: itsm/postman/models.py:108
+msgid "联系方式"
+msgstr "連絡先"
+
+#: itsm/postman/models.py:109
+msgid "是否内置系统"
+msgstr "システムが組み込まれています"
+
+#: itsm/postman/models.py:113
+msgid "系统域名"
+msgstr "システムドメイン名"
+
+#: itsm/postman/models.py:115 itsm/postman/models.py:231
+#: itsm/project/models/project.py:57 itsm/service/models.py:905
+#: itsm/sla/models/policy.py:430 itsm/workflow/models/workflow.py:89
+msgid "是否启用"
+msgstr "有効にするかどうか"
+
+#: itsm/postman/models.py:117
+msgid "系统公共头部"
+msgstr "システムパブリックヘッド"
+
+#: itsm/postman/models.py:120
+msgid "系统公共cookies"
+msgstr "システムパブリッククッキー"
+
+#: itsm/postman/models.py:123
+msgid "系统变量"
+msgstr "システム変数"
+
+#: itsm/postman/models.py:131 itsm/postman/models.py:132
+msgid "第三方系统配置"
+msgstr "サードパーティのシステム構成"
+
+#: itsm/postman/models.py:149 itsm/service/models.py:1044
+msgid "请先删除【{}】下的子数据项"
+msgstr "最初に[{{}]の下のsubdataアイテムを削除してください"
+
+#: itsm/postman/models.py:151 itsm/postman/models.py:253
+msgid "内置系统不可删除"
+msgstr "内蔵システムを削除することはできません"
+
+#: itsm/postman/models.py:198
+msgid "对应的对接系统"
+msgstr "対応するドッキングシステム"
+
+#: itsm/postman/models.py:202
+msgid "API名称"
+msgstr "API名"
+
+#: itsm/postman/models.py:203
+msgid "API路径"
+msgstr "APIパス"
+
+#: itsm/postman/models.py:204
+msgid "API版本"
+msgstr "APIバージョン"
+
+#: itsm/postman/models.py:205
+msgid "API调用函数"
+msgstr "APIは関数を呼び出します"
+
+#: itsm/postman/models.py:207
+msgid "请求方法"
+msgstr "リクエスト方法"
+
+#: itsm/postman/models.py:212 itsm/project/models/project.py:209
+#: itsm/service/models.py:205 itsm/service/models.py:902
+msgid "描述"
+msgstr "説明する"
+
+#: itsm/postman/models.py:213 itsm/role/models.py:151
+#: itsm/service/models.py:904 itsm/workflow/models/task.py:69
+#: itsm/workflow/models/workflow.py:100
+msgid "负责人"
+msgstr "担当者"
+
+#: itsm/postman/models.py:217
+msgid "headers参数"
+msgstr "ヘッダーパラメーター"
+
+#: itsm/postman/models.py:220
+msgid "query参数"
+msgstr "クエリパラメーター"
+
+#: itsm/postman/models.py:223
+msgid "body参数"
+msgstr "ボディパラメーター"
+
+#: itsm/postman/models.py:227
+msgid "rsp_data"
+msgstr "RSP_DATA"
+
+#: itsm/postman/models.py:229 itsm/postman/models.py:355
+msgid "request预处理代码"
+msgstr "プリプロセシングコードをリクエストします"
+
+#: itsm/postman/models.py:230 itsm/postman/models.py:354
+msgid "response后处理代码"
+msgstr "応答後処理コード"
+
+#: itsm/postman/models.py:232
+msgid "是否内置API"
+msgstr "組み込みのAPIはありますか"
+
+#: itsm/postman/models.py:233
+msgid "只读"
+msgstr "読むだけです"
+
+#: itsm/postman/models.py:240 itsm/postman/models.py:241
+msgid "第三方API配置"
+msgstr "サードパーティAPI構成"
+
+#: itsm/postman/models.py:339
+msgid "api基础信息"
+msgstr "基本的なAPI情報"
+
+#: itsm/postman/models.py:343
+msgid "配置名称"
+msgstr "構成名"
+
+#: itsm/postman/models.py:344
+msgid "配置描述"
+msgstr "構成の説明"
+
+#: itsm/postman/models.py:346
+msgid "query实例化参数"
+msgstr "クエリインスタンス化パラメーター"
+
+#: itsm/postman/models.py:347
+msgid "body实例化参数"
+msgstr "ボディインスタンスパラメーター"
+
+#: itsm/postman/models.py:348
+msgid "返回参数"
+msgstr "パラメーターを返します"
+
+#: itsm/postman/models.py:349
+msgid "成功条件"
+msgstr "成功の条件"
+
+#: itsm/postman/models.py:351
+msgid "结束条件（api节点可用）"
+msgstr "終了条件（APIノードが利用可能）"
+
+#: itsm/postman/models.py:353
+msgid "是否轮询"
+msgstr "ラインをオンにするかどうか"
+
+#: itsm/postman/models.py:357
+msgid "remote_api_info"
+msgstr "remote_api_info"
+
+#: itsm/postman/models.py:361 itsm/postman/models.py:362
+msgid "API配置参数实例"
+msgstr "API構成パラメーターインスタンス"
+
+#: itsm/postman/models.py:365
+msgid "{}配置实例({})"
+msgstr "{}構成インスタンス（{}）"
+
+#: itsm/postman/models.py:389 itsm/ticket/views/field.py:74
+#: itsm/ticket/views/ticket.py:450
+msgid "对应的api配置不存在，请查询"
+msgstr "対応するAPI構成は存在しません。クエリしてください"
+
+#: itsm/postman/models.py:470
+msgid "接口返回协议不符合规范，请确保接口协议符合蓝鲸规范。详见: Github->API功能使用说明"
+msgstr ""
+"インターフェイスリターンプロトコルは仕様に準拠していません。インターフェイスプロトコルがブルークジラの仕様に準拠していることを確認してください。参照：github->"
+" api関数ユーザー命令"
+
+#: itsm/postman/models.py:478
+#, python-format
+msgid "用户没有对应的第三方系统接口【%s】权限"
+msgstr "ユーザーは、対応するサードパーティシステムインターフェイス[%s]アクセス許可を持っていません"
+
+#: itsm/postman/models.py:518
+msgid "所选关键字与返回结果不匹配， 请联系管理员"
+msgstr "選択したキーワードは返された結果と一致しません。管理者に連絡してください"
+
+#: itsm/postman/permissions.py:64
+msgid "API 所属项目异常"
+msgstr "APIに属するプロジェクトは例外です"
+
+#: itsm/postman/serializers.py:53 itsm/postman/serializers.py:127
+#: itsm/service/serializers.py:123 itsm/service/serializers.py:326
+#: itsm/service/serializers.py:508 itsm/service/serializers.py:638
+#: itsm/service/serializers.py:683 itsm/service/serializers.py:816
+msgid "名称不能为空"
+msgstr "名前を空にすることはできません"
+
+#: itsm/postman/serializers.py:56 itsm/service/serializers.py:335
+#: itsm/service/serializers.py:517 itsm/service/serializers.py:632
+#: itsm/service/serializers.py:674 itsm/service/serializers.py:721
+#: itsm/service/serializers.py:820
+msgid "编码不能为空"
+msgstr "エンコーディングは空にすることはできません"
+
+#: itsm/postman/serializers.py:116 itsm/postman/serializers.py:119
+msgid "该系统已经存在，请重新选择"
+msgstr "システムはすでに存在しています。もう一度選択してください"
+
+#: itsm/postman/serializers.py:130
+msgid "路径不能为空"
+msgstr "パスを空にすることはできません"
+
+#: itsm/postman/serializers.py:134
+msgid "调用函数不能为空"
+msgstr "コール機能を空にすることはできません"
+
+#: itsm/postman/serializers.py:211 itsm/postman/serializers.py:214
+msgid "该接口名称已存在，请重新输入"
+msgstr "インターフェイス名はすでに存在しています。再入力してください"
+
+#: itsm/postman/views.py:260 itsm/postman/views.py:265
+msgid "接口数量异常，请刷新后重试"
+msgstr "インターフェイスの数は異常です。更新して再試行してください"
+
+#: itsm/postman/views.py:302 itsm/workflow/views.py:324
+msgid "文件格式有误，请提供从本系统导出的json文件"
+msgstr "ファイル形式が正しくありません。このシステムからエクスポートされたJSONファイルを提供してください。"
+
+#: itsm/postman/views.py:314 itsm/workflow/views.py:318
+msgid "暂不支持当前操作"
+msgstr "現在の操作はまだサポートされていません"
+
+#: itsm/postman/views.py:341
+#, python-format
+msgid "【%s】为必需参数"
+msgstr "【%s】は必要なパラメーターです"
+
+#: itsm/postman/rpc/components/demo.py:37
+#: itsm/postman/rpc/components/demo.py:42
+msgid "样例"
+msgstr "サンプル"
+
+#: itsm/postman/rpc/components/state_fields.py:39
+msgid "流程内的节点字段"
+msgstr "プロセス内のノードフィールド"
+
+#: itsm/postman/rpc/components/state_fields.py:44
+#: itsm/postman/rpc/components/ticket_fields.py:42
+#: itsm/postman/rpc/components/ticket_states.py:42
+msgid "触发器源id"
+msgstr "ソースIDをトリガーします"
+
+#: itsm/postman/rpc/components/state_fields.py:47
+#: itsm/postman/rpc/components/ticket_fields.py:43
+#: itsm/postman/rpc/components/ticket_states.py:43
+msgid "触发器源类型"
+msgstr "ソースタイプをトリガーします"
+
+#: itsm/postman/rpc/components/ticket_fields.py:38
+msgid "工单的公共字段"
+msgstr "チケットのパブリックフィールド"
+
+#: itsm/postman/rpc/components/ticket_states.py:38
+msgid "工单的节点"
+msgstr "作業指示のノード"
+
+#: itsm/postman/rpc/components/ticket_status.py:39
+#: itsm/ticket/serializers/ticket.py:963 itsm/ticket_status/models.py:180
+#: itsm/ticket_status/models.py:181
+#: itsm/trigger/action/components/modify_ticket_status.py:49
+msgid "工单状态"
+msgstr "チケットのステータス"
+
+#: itsm/postman/rpc/components/ticket_status.py:116
+msgid "所有服务类型"
+msgstr "すべてのサービスタイプ"
+
+#: itsm/project/views.py:83
+msgid "删除失败，项目目前不允许删除！"
+msgstr "削除が失敗し、プロジェクトは現在削除されていません！"
+
+#: itsm/project/views.py:193
+msgid "project_key:该字段是必填项"
+msgstr "project_key：このフィールドが必要です"
+
+#: itsm/project/handler/migration_handler.py:120
+msgid "您当前没有权限迁移该服务，您在权限中心没有该服务的权限，service_name={}"
+msgstr "現在、サービスを移行する許可がありません。許可センター、service_name = {}のサービスに許可がありません。"
+
+#: itsm/project/models/project.py:50
+msgid "项目唯一标识"
+msgstr "ユニークなプロジェクト識別"
+
+#: itsm/project/models/project.py:51
+msgid "项目名"
+msgstr "プロジェクト名"
+
+#: itsm/project/models/project.py:53
+msgid "项目描述"
+msgstr "プロジェクトの説明"
+
+#: itsm/project/models/project.py:55
+msgid "logo base64 内容"
+msgstr "ロゴBase64コンテンツ"
+
+#: itsm/project/models/project.py:56
+msgid "项目颜色"
+msgstr "プロジェクトの色"
+
+#: itsm/project/models/project.py:84 itsm/service/managers.py:504
+#: itsm/service/managers.py:548
+msgid "根目录"
+msgstr "ルートディレクトリ"
+
+#: itsm/project/models/project.py:188 itsm/ticket/models/ticket.py:4972
+msgid "用户名"
+msgstr "ユーザー名"
+
+#: itsm/project/models/project.py:208 itsm/service/models.py:199
+#: itsm/service/models.py:900 itsm/service/models.py:1020
+#: itsm/sla/models/schedule.py:84 itsm/trigger/models/trigger.py:133
+#: itsm/workflow/models/trigger.py:36
+msgid "名称"
+msgstr "名前"
+
+#: itsm/project/models/project.py:212
+msgid "筛选条件"
+msgstr "フィルター基準"
+
+#: itsm/project/models/project.py:214
+msgid "排序"
+msgstr "選別"
+
+#: itsm/role/models.py:94
+msgid "角色名称"
+msgstr "ロール名"
+
+#: itsm/role/models.py:95
+msgid "角色类型"
+msgstr "ロールタイプ"
+
+#: itsm/role/models.py:96
+msgid "可否操作单据"
+msgstr "ドキュメントを操作できますか"
+
+#: itsm/role/models.py:97 itsm/service/models.py:908
+msgid "是否显示"
+msgstr "表示するかどうか"
+
+#: itsm/role/models.py:99
+msgid "角色描述"
+msgstr "役割の説明"
+
+#: itsm/role/models.py:109 itsm/role/models.py:110
+msgid "用户角色类型"
+msgstr "ユーザーロールタイプ"
+
+#: itsm/role/models.py:145
+msgid "对应角色类型"
+msgstr "対応するロールタイプ"
+
+#: itsm/role/models.py:147
+msgid "角色唯一标识"
+msgstr "文字ユニークな識別子"
+
+#: itsm/role/models.py:149
+msgid "角色命名"
+msgstr "キャラクターの命名"
+
+#: itsm/role/models.py:150
+msgid "角色组成人员"
+msgstr "ロール構成"
+
+#: itsm/role/models.py:152
+msgid "对应服务"
+msgstr "対応するサービス"
+
+#: itsm/role/models.py:154
+msgid "用户角色描述"
+msgstr "ユーザーロール説明"
+
+#: itsm/role/models.py:156 itsm/service/models.py:83
+#: itsm/sla/models/policy.py:431 itsm/sla/models/schedule.py:89
+#: itsm/workflow/models/task.py:63
+msgid "是否内置"
+msgstr "組み込みですか"
+
+#: itsm/role/models.py:169 itsm/role/models.py:170
+msgid "用户角色和权限表"
+msgstr "ユーザーの役割と権限テーブル"
+
+#: itsm/role/models.py:444
+msgid "蓝鲸用户username"
+msgstr "ブルークジラのユーザー名"
+
+#: itsm/role/models.py:446
+msgid "用户角色"
+msgstr "ユーザーロール"
+
+#: itsm/role/models.py:448
+msgid "用户uid"
+msgstr "ユーザーUID"
+
+#: itsm/role/models.py:454 itsm/role/models.py:455
+msgid "蓝鲸用户角色表"
+msgstr "ブルークジラのユーザーロールリスト"
+
+#: itsm/role/permissions.py:36
+msgid "您没有操作角色配置的权限"
+msgstr "役割構成を操作する許可はありません"
+
+#: itsm/role/serializers.py:53
+msgid "请输入角色名！"
+msgstr "ロール名を入力してください！"
+
+#: itsm/role/serializers.py:62 itsm/role/serializers.py:113
+#: itsm/service/serializers.py:113 itsm/service/serializers.py:302
+#: itsm/service/serializers.py:713 itsm/ticket/utils.py:69
+msgid "name"
+msgstr "名前"
+
+#: itsm/role/serializers.py:63 itsm/role/serializers.py:114
+#: itsm/service/serializers.py:112 itsm/service/serializers.py:301
+msgid "desc"
+msgstr "desc"
+
+#: itsm/role/serializers.py:73
+msgid "请输入自定义角色名"
+msgstr "カスタムロール名を入力してください"
+
+#: itsm/role/serializers.py:75
+msgid "请指定角色下的人员"
+msgstr "役割の下で人を指定してください"
+
+#: itsm/role/serializers.py:125
+msgid ","
+msgstr "、"
+
+#: itsm/role/validators.py:49
+msgid "角色 ID 异常"
+msgstr "役割ID例外"
+
+#: itsm/role/validators.py:52
+msgid "{}角色类型不存在"
+msgstr "{}ロールタイプは存在しません"
+
+#: itsm/role/validators.py:61
+msgid "该角色名称已存在"
+msgstr "ロール名はすでに存在します"
+
+#: itsm/role/validators.py:66
+msgid "该管理员权限页面不允许修改"
+msgstr "この管理者許可ページでは、変更を許可しません"
+
+#: itsm/role/validators.py:68
+msgid "该管理员角色名不允许修改"
+msgstr "この管理者の役割名は変更されていません"
+
+#: itsm/role/validators.py:73 itsm/ticket/validators/misc.py:128
+#: itsm/workflow/validators.py:95
+msgid "【{}】用户不存在"
+msgstr "【{}ユーザーは存在しません"
+
+#: itsm/role/validators.py:82
+msgid "该角色不能删除"
+msgstr "この役割を削除することはできません"
+
+#: itsm/service/models.py:94
+msgid "系统管理"
+msgstr "システム管理"
+
+#: itsm/service/models.py:111 itsm/service/models.py:133
+msgid "收藏的用户"
+msgstr "お気に入りのユーザー"
+
+#: itsm/service/models.py:113
+msgid "收藏名称"
+msgstr "コレクション名"
+
+#: itsm/service/models.py:115
+msgid "收藏数据"
+msgstr "お気に入りのデータ"
+
+#: itsm/service/models.py:121 itsm/service/models.py:122
+#: itsm/service/models.py:139 itsm/service/models.py:140
+msgid "用户收藏"
+msgstr "ユーザーのお気に入り"
+
+#: itsm/service/models.py:134
+msgid "服务标识"
+msgstr "サービスID"
+
+#: itsm/service/models.py:153 itsm/service/models.py:245
+msgid "服务名称"
+msgstr "サービス名"
+
+#: itsm/service/models.py:154 itsm/service/models.py:246
+msgid "服务描述"
+msgstr "サービスの説明"
+
+#: itsm/service/models.py:200
+msgid "级别关键字"
+msgstr "レベルキーワード"
+
+#: itsm/service/models.py:201
+msgid "级别"
+msgstr "レベル"
+
+#: itsm/service/models.py:202
+msgid "响应时间要求"
+msgstr "応答時間要件"
+
+#: itsm/service/models.py:203
+msgid "解决时间要求"
+msgstr "時間要件を解決します"
+
+#: itsm/service/models.py:212 itsm/service/models.py:213
+msgid "服务级别"
+msgstr "サービスレベル"
+
+#: itsm/service/models.py:244
+msgid "服务编号"
+msgstr "サービス番号"
+
+#: itsm/service/models.py:251
+msgid "关联流程版本"
+msgstr "関連するプロセスバージョン"
+
+#: itsm/service/models.py:255
+msgid "服务负责人"
+msgstr "担当者"
+
+#: itsm/service/models.py:257
+msgid "是否可以代提单"
+msgstr "あなたに代わって船荷証券を作ることはできますか"
+
+#: itsm/service/models.py:258 itsm/workflow/models/common.py:107
+msgid "是否有效"
+msgstr "有効かどうか"
+
+#: itsm/service/models.py:261
+msgid "可见范围类型"
+msgstr "可視範囲タイプ"
+
+#: itsm/service/models.py:264
+msgid "可见范围"
+msgstr "可視範囲"
+
+#: itsm/service/models.py:268
+msgid "来源"
+msgstr "ソース"
+
+#: itsm/service/models.py:369
+msgid "您所请求的服务不存在"
+msgstr "要求したサービスは存在しません"
+
+#: itsm/service/models.py:486 itsm/task/models.py:1147
+msgid "服务ID"
+msgstr "サービスID"
+
+#: itsm/service/models.py:487 itsm/sla_engine/models.py:67
+msgid "计时开始节点ID"
+msgstr "タイミング開始ノードID"
+
+#: itsm/service/models.py:488 itsm/sla_engine/models.py:68
+msgid "计时结束节点ID"
+msgstr "タイミング付きエンドノードID"
+
+#: itsm/service/models.py:490
+msgid "SLA协议 ID"
+msgstr "SLAプロトコルID"
+
+#: itsm/service/models.py:491
+msgid "颜色标志"
+msgstr "カラーロゴ"
+
+#: itsm/service/models.py:492
+msgid "线条列表"
+msgstr "行リスト"
+
+#: itsm/service/models.py:493
+msgid "节点列表"
+msgstr "ノードリスト"
+
+#: itsm/service/models.py:497 itsm/service/models.py:498
+msgid "服务与SLA关联表"
+msgstr "サービスおよびSLAアソシエーションテーブル"
+
+#: itsm/service/models.py:504 itsm/ticket/models/misc.py:382
+msgid "目录关键字"
+msgstr "ディレクトリキーワード"
+
+#: itsm/service/models.py:505
+msgid "目录名称"
+msgstr "ディレクトリ名"
+
+#: itsm/service/models.py:507
+msgid "目录描述"
+msgstr "目次説明"
+
+#: itsm/service/models.py:509 itsm/ticket/models/misc.py:384
+msgid "节点顺序"
+msgstr "ノード注文"
+
+#: itsm/service/models.py:510
+msgid "特殊过滤"
+msgstr "特別なフィルタリング"
+
+#: itsm/service/models.py:514 itsm/service/models.py:1027
+#: itsm/ticket/models/misc.py:389
+msgid "上级目录"
+msgstr "高度なディレクトリ"
+
+#: itsm/service/models.py:519
+msgid "前置路径集合"
+msgstr "準備パスコレクション"
+
+#: itsm/service/models.py:562
+msgid "请先删除【{}】下的子目录"
+msgstr "最初に[{{}]の下でサブディレクトリを削除してください"
+
+#: itsm/service/models.py:629
+msgid "{} (已删除)"
+msgstr "{}（削除）"
+
+#: itsm/service/models.py:840
+msgid "关联服务目录"
+msgstr "関連サービスディレクトリ"
+
+#: itsm/service/models.py:843
+msgid "关联服务条目"
+msgstr "関連サービスエントリ"
+
+#: itsm/service/models.py:853 itsm/service/models.py:854
+msgid "服务分类表"
+msgstr "サービス分類テーブル"
+
+#: itsm/service/models.py:899 itsm/service/models.py:1019
+msgid "编码"
+msgstr "コーディング"
+
+#: itsm/service/models.py:906 itsm/workflow/models/field.py:72
+msgid "是否只读"
+msgstr "読むだけです"
+
+#: itsm/service/models.py:920 itsm/service/models.py:921
+msgid "数据字典"
+msgstr "データ辞書"
+
+#: itsm/service/models.py:931
+msgid "以下流程模板中正在使用该字典，请先删除：{}"
+msgstr "この辞書は次のプロセステンプレートで使用されています。最初に削除してください。{}"
+
+#: itsm/service/models.py:1007 itsm/ticket/validators/field.py:164
+#, python-format
+msgid "数据字典不存在，请检查字典编码: %s"
+msgstr "データ辞書は存在しません。辞書エンコードを確認してください：%s"
+
+#: itsm/service/models.py:1016
+msgid "关联字典项"
+msgstr "関連する辞書項目"
+
+#: itsm/service/models.py:1021 itsm/ticket/models/ticket.py:247
+msgid "顺序"
+msgstr "注文"
+
+#: itsm/service/models.py:1022
+msgid "是否只读（不可编辑）"
+msgstr "読み取り専用かどうか（編集できない）"
+
+#: itsm/service/models.py:1023
+msgid "是否内置（不可删除）"
+msgstr "組み込みですか（削除できません）"
+
+#: itsm/service/models.py:1052 itsm/service/models.py:1053
+msgid "字典数据"
+msgstr "辞書データ"
+
+#: itsm/service/models.py:1166
+msgid "关联服务类别"
+msgstr "関連サービスカテゴリ"
+
+#: itsm/service/models.py:1170
+msgid "默认为名称拼音，唯一存在，如果有一样的，则通过拼音+随机字符匹配"
+msgstr "デフォルトはPinyinという名前で、存在します。同じものがある場合、Pinyin +ランダム文字と一致します。"
+
+#: itsm/service/models.py:1171
+msgid "fields中的主键的key"
+msgstr "フィールドの主キーのキー"
+
+#: itsm/service/models.py:1173
+msgid "fields中的级联外键的key"
+msgstr "フィールドで外国の鍵をカスケードする鍵"
+
+#: itsm/service/models.py:1175
+msgid "判断是否为级联属性"
+msgstr "カスケード属性であるかどうかを判断します"
+
+#: itsm/service/models.py:1176
+msgid "服务属性名称"
+msgstr "サービス属性名"
+
+#: itsm/service/models.py:1177
+msgid "属性描述"
+msgstr "属性の説明"
+
+#: itsm/service/models.py:1179
+msgid "属性包含的字段"
+msgstr "属性に含まれるフィールド"
+
+#: itsm/service/models.py:1184 itsm/service/models.py:1185
+msgid "服务属性"
+msgstr "サービス属性"
+
+#: itsm/service/models.py:1253
+msgid "全部"
+msgstr "全て"
+
+#: itsm/service/models.py:1253
+msgid "协同办公"
+msgstr "共同オフィス"
+
+#: itsm/service/models.py:1256
+msgid "关联服务属性"
+msgstr "関連するサービス属性"
+
+#: itsm/service/models.py:1260
+msgid "对应的唯一属性key"
+msgstr "対応する一意の属性キー"
+
+#: itsm/service/models.py:1262
+msgid "对应的主键名，为属性设置的主键信息"
+msgstr "対応するプライマリキー名、属性の主要なキー情報セット"
+
+#: itsm/service/models.py:1269
+msgid "关联了对应属性的workflow的id集合"
+msgstr "対応する属性に関連付けられたワークフローのIDコレクション"
+
+#: itsm/service/models.py:1273
+msgid "关联了对应属性的ticket的id集合"
+msgstr "対応する属性に関連付けられたチケットのIDセット"
+
+#: itsm/service/models.py:1275
+msgid "对应属性字段的值"
+msgstr "対応する属性フィールドの値"
+
+#: itsm/service/models.py:1277
+msgid "可展示的用户"
+msgstr "表示可能なユーザー"
+
+#: itsm/service/models.py:1284 itsm/service/models.py:1285
+msgid "服务属性记录"
+msgstr "サービス属性レコード"
+
+#: itsm/service/permissions.py:84
+msgid "服务占用中，请到服务目录中解绑后再删除"
+msgstr "サービスが占有されています。削除する前に、サービスディレクトリにアクセスしてバインドしてください"
+
+#: itsm/service/permissions.py:122
+msgid "服务 ID 不存在"
+msgstr "サービスIDは存在しません"
+
+#: itsm/service/permissions.py:129
+msgid "服务所属项目不一致"
+msgstr "一貫性のないサービス"
+
+#: itsm/service/serializers.py:163 itsm/service/serializers.py:170
+msgid "指定的父目录不存在"
+msgstr "指定された親ディレクトリは存在しません"
+
+#: itsm/service/serializers.py:174
+msgid "请提供合法的父级目录"
+msgstr "合法的な親ディレクトリを提供してください"
+
+#: itsm/service/serializers.py:177
+msgid "服务目录最多只支持3级"
+msgstr "サービスディレクトリは、せいぜいレベル3のみをサポートしています"
+
+#: itsm/service/serializers.py:187 itsm/service/serializers.py:196
+msgid "同级下目录名不能重复，请修改后提交"
+msgstr "同じレベルの下のディレクトリ名を繰り返すことはできません。それを変更して送信してください"
+
+#: itsm/service/serializers.py:253
+msgid "名称为必填项"
+msgstr "名前が必要です"
+
+#: itsm/service/serializers.py:256
+msgid "服务级别名已存在，请重新输入"
+msgstr "サービスレベルの名前はすでに存在しています。再入力してください"
+
+#: itsm/service/serializers.py:262
+msgid "选项不合法"
+msgstr "違法な選択肢"
+
+#: itsm/service/serializers.py:265
+msgid "响应时间为必填项"
+msgstr "応答時間が必要です"
+
+#: itsm/service/serializers.py:268
+msgid "处理时间为必填项"
+msgstr "処理時間が必要です"
+
+#: itsm/service/serializers.py:310
+msgid "协议名称不能为空"
+msgstr "プロトコル名を空にすることはできません"
+
+#: itsm/service/serializers.py:329 itsm/service/serializers.py:511
+msgid "服务名已存在，请重新输入"
+msgstr "サービス名はすでに存在しています。再入力してください"
+
+#: itsm/service/serializers.py:352 itsm/service/serializers.py:754
+#: itsm/service/serializers.py:833
+msgid "服务负责人不能为空"
+msgstr "サービスマネージャーは空にすることはできません"
+
+#: itsm/service/serializers.py:605
+msgid "请选择至少一项服务"
+msgstr "少なくとも1つのサービスを選択してください"
+
+#: itsm/service/serializers.py:608
+msgid "部分服务不存在"
+msgstr "一部のサービスは存在しません"
+
+#: itsm/service/serializers.py:620
+msgid "根目录不允许添加服务，选择其他目录"
+msgstr "ルートディレクトリはサービスの追加を許可しません、別のディレクトリを選択します"
+
+#: itsm/service/serializers.py:622
+msgid "指定的服务目录不存在"
+msgstr "指定されたサービスディレクトリは存在しません"
+
+#: itsm/service/serializers.py:677
+msgid "编码已存在，请重新输入"
+msgstr "エンコーディングはすでに存在していますが、再入力してください"
+
+#: itsm/service/serializers.py:762
+msgid "display_role 为必填项"
+msgstr "display_roleが必要です"
+
+#: itsm/service/serializers.py:771 itsm/workflow/serializers/workflow.py:56
+msgid "请输入流程名称!"
+msgstr "プロセス名を入力してください！"
+
+#: itsm/service/serializers.py:771 itsm/workflow/serializers/workflow.py:56
+msgid "流程名称长度不能大于120个字符"
+msgstr "プロセス名は120文字を超えることはできません"
+
+#: itsm/service/serializers.py:843
+msgid "导入失败，project_key 对应的项目不存在"
+msgstr "インポートが失敗し、project_keyに対応するプロジェクトは存在しません"
+
+#: itsm/service/serializers.py:848
+msgid "导入失败，对应的服务目录不存在"
+msgstr "インポートは失敗し、対応するサービスディレクトリは存在しません"
+
+#: itsm/service/serializers.py:853
+msgid "更新失败，对应的服务不存在"
+msgstr "更新に失敗しましたが、対応するサービスは存在しません"
+
+#: itsm/service/validators.py:42
+msgid "时间单位不正确"
+msgstr "間違った時間単位"
+
+#: itsm/service/validators.py:46
+msgid "时间超出了设置范围（1~65536）"
+msgstr "時間が設定範囲を超えています（1〜65536）"
+
+#: itsm/service/validators.py:48
+msgid "数据类型错误，不是合法的时间"
+msgstr "法的時間ではなく、データ型エラー"
+
+#: itsm/service/validators.py:51
+msgid "请输入合法编码：英文数字及下划线"
+msgstr "法的コードを入力してください：英語番号とアンダースコア"
+
+#: itsm/service/validators.py:55
+msgid "请输入合法名称：中英文、中英文括号、数字、空格及下划线"
+msgstr "法的名前を入力してください：中国語と英語、中国語と英語の括弧、数字、スペース、アンダースコア"
+
+#: itsm/service/validators.py:62
+msgid "服务类型不合法"
+msgstr "違法サービスタイプ"
+
+#: itsm/service/validators.py:69
+msgid "服务未启用，请联系管理员！"
+msgstr "サービスが有効になっていません。管理者に連絡してください！"
+
+#: itsm/service/validators.py:71
+msgid "服务不存在，请联系管理员！"
+msgstr "サービスは存在しません。管理者に連絡してください！"
+
+#: itsm/service/validators.py:76
+msgid "服务对应的服务目录不存在"
+msgstr "サービスに対応するサービスディレクトリは存在しません"
+
+#: itsm/service/views.py:224 itsm/service/views.py:330
+msgid "当前排序列表参数不正确，清重试！"
+msgstr "現在のソートリストパラメーターが正しくありません。もう一度やり直してください！"
+
+#: itsm/service/views.py:645
+msgid "\n"
+msgstr ""
+
+#: itsm/service/views.py:695
+msgid "2.5.9 版本之前的流程无法导入，请转换后在看，详情请看github"
+msgstr "バージョン2.5.9の前のプロセスはインポートできません。変換して読んでください。詳細については、Githubをご覧ください"
+
+#: itsm/service/views.py:796
+msgid "[{}] 已经被绑定，请先到优先级管理中解绑"
+msgstr "[{}]拘束されています。優先順位管理に進んで最初にバインドしてください"
+
+#: itsm/service/views.py:807
+msgid "[{}] 已经被勾选绑定，请先到优先级管理中解绑"
+msgstr "[{}]拘束力があることがチェックされています。最初にバインドするために優先管理に移動してください"
+
+#: itsm/sla/validators.py:58
+msgid "参数缺失，请联系管理员"
+msgstr "パラメーターがありません。管理者に連絡してください"
+
+#: itsm/sla/validators.py:66
+msgid "影响范围/紧急程度不存在"
+msgstr "衝撃/緊急性の範囲は存在しません"
+
+#: itsm/sla/validators.py:100
+#, python-format
+msgid "参数错误，%s数据缺少参数id"
+msgstr "パラメーターエラー、%sデータにはパラメーターIDがありません"
+
+#: itsm/sla/validators.py:103
+#, python-format
+msgid "参数错误，%s数据缺少参数is_enabled"
+msgstr "パラメーターエラー、%sデータはパラメーターis_enabledの欠落です"
+
+#: itsm/sla/validators.py:106
+#, python-format
+msgid "参数错误，%s数据缺少参数name"
+msgstr "パラメーターエラー、%sデータにはパラメーター名がありません"
+
+#: itsm/sla/validators.py:108
+#, python-format
+msgid "参数错误，%s数据缺少参数key"
+msgstr "パラメーターエラー、%sデータにはパラメーターキーがありません"
+
+#: itsm/sla/validators.py:115
+msgid "参数错误，优先级数据缺少参数id"
+msgstr "パラメーターエラー、優先データが欠落しているパラメーターID"
+
+#: itsm/sla/validators.py:117
+msgid "参数错误，优先级数据缺少参数priority"
+msgstr "パラメーターエラー、優先度データにはパラメーターの優先度がありません"
+
+#: itsm/sla/validators.py:119
+#, python-format
+msgid "参数错误，不存在id为[%s]的优先级对象"
+msgstr "パラメーターが間違っています、ID [%s]の優先オブジェクトはありません"
+
+#: itsm/sla/validators.py:141
+msgid "参数错误，优先级选项不能为空且必须合法"
+msgstr "誤ったパラメーター、優先オプションは空にすることはできず、合法でなければなりません"
+
+#: itsm/sla/validators.py:146
+msgid "请输入合法名称：中英文、中英文括号、数字、下划线、空格及星号"
+msgstr "中国語と英語、中国語と英語の括弧、数字、アンダースコア、スペース、アスタリスクの法的名前を入力してください"
+
+#: itsm/sla/validators.py:154
+msgid "内置的服务模式不能删除"
+msgstr "内蔵サービスモードを削除することはできません"
+
+#: itsm/sla/validators.py:157
+msgid "该服务模式已绑定服务协议，请解绑后再删除"
+msgstr "このサービスモデルは、サービス契約に縛られています。バインドしてから削除してください。"
+
+#: itsm/sla/validators.py:163
+msgid "内置的服务协议不能删除"
+msgstr "組み込みサービス契約を削除することはできません"
+
+#: itsm/sla/validators.py:166
+msgid "该服务协议已绑定服务，请解绑后再删除"
+msgstr "このサービス契約はサービスに拘束されています。バインドしてから削除してください。"
+
+#: itsm/sla/validators.py:185
+#, python-format
+msgid "内置服务模式：[%s] 的名称不能修改"
+msgstr "ビルトインサービスモード：[%s]の名前を変更できません"
+
+#: itsm/sla/validators.py:191
+#, python-format
+msgid "服务模式名称：[%s] 已存在"
+msgstr "サービスモード名：[%s]はすでに存在します"
+
+#: itsm/sla/validators.py:206
+msgid "{}时间段设置有冲突，请检查"
+msgstr "{}期間に競合があります、チェックしてください"
+
+#: itsm/sla/validators.py:227
+msgid "请勿重复定义{}的工作时间"
+msgstr "{}の労働時間を繰り返し定義しないでください"
+
+#: itsm/sla/validators.py:244
+msgid "日期类型错误：[{}]"
+msgstr "日付タイプエラー：[{}]"
+
+#: itsm/sla/validators.py:255
+msgid "请输入节假日名称"
+msgstr "ホリデー名を入力してください"
+
+#: itsm/sla/validators.py:257
+#, python-format
+msgid "节假日期：[%s]的时间范围设置错误"
+msgstr "休日の日付：[%s]時間範囲の設定エラー"
+
+#: itsm/sla/validators.py:262
+msgid "加班时间的范围设置错误，开始时间不能大于结束时间"
+msgstr "残業時間の範囲は間違って設定されています、開始時間は終了時間より大きくなりません"
+
+#: itsm/sla/validators.py:270
+msgid "请输入正确的星期数字(0-6)"
+msgstr "正しい週番号（0-6）を入力してください"
+
+#: itsm/sla/validators.py:276
+msgid "参数缺失：[duration]"
+msgstr "欠落パラメーター：[期間]"
+
+#: itsm/sla/validators.py:279
+msgid "工作时间段的命名不能重复，请检查"
+msgstr "労働時間の命名を繰り返すことはできません、チェックしてください"
+
+#: itsm/sla/validators.py:291
+msgid "工作日的工作时间段重合，请检查"
+msgstr "営業時間の労働時間が重複しています。確認してください"
+
+#: itsm/sla/validators.py:306
+msgid "时间范围错误，开始时间不能大于或等于结束时间"
+msgstr "時間範囲が間違っています、開始時間は終了時間以上にすることはできません"
+
+#: itsm/sla/validators.py:325
+#, python-format
+msgid "内置服务协议：[%s] 的名称不能修改"
+msgstr "組み込みサービス契約：[%s]の名前を変更できません"
+
+#: itsm/sla/validators.py:329
+#, python-format
+msgid "服务协议名称：[%s] 已存在"
+msgstr "サービス契約名：[%s]はすでに存在します"
+
+#: itsm/sla/validators.py:347
+msgid "参数错误，计时规则条件表达式缺少type"
+msgstr "間違ったパラメーター、タイミングのタイプのタイプの欠落ルール条件式"
+
+#: itsm/sla/validators.py:352
+msgid "参数错误，计时规则条件表达式缺少operator"
+msgstr "エラーパラメーター、オペレーターはタイミングルール条件式から欠落しています"
+
+#: itsm/sla/validators.py:354
+msgid "参数错误，计时规则条件表达式缺少name"
+msgstr "誤ったパラメーター、タイミングルールの条件式の欠落名"
+
+#: itsm/sla/validators.py:356
+msgid "参数错误，计时规则条件表达式缺少value"
+msgstr "エラーパラメーター、タイミングルール条件式の欠損値"
+
+#: itsm/sla/models/policy.py:64 itsm/sla/models/policy.py:355
+msgid "策略名称"
+msgstr "ポリシー名"
+
+#: itsm/sla/models/policy.py:67
+msgid "服务时间"
+msgstr "サービス時間"
+
+#: itsm/sla/models/policy.py:72
+msgid "处理期限"
+msgstr "処理期間"
+
+#: itsm/sla/models/policy.py:74 itsm/ticket_status/models.py:276
+msgid "时长单位"
+msgstr "期間単位"
+
+#: itsm/sla/models/policy.py:83
+msgid "应答时长"
+msgstr "応答時間"
+
+#: itsm/sla/models/policy.py:85
+msgid "应答时长单位"
+msgstr "応答時間単位"
+
+#: itsm/sla/models/policy.py:97 itsm/sla/models/policy.py:98
+msgid "服务策略"
+msgstr "サービス戦略"
+
+#: itsm/sla/models/policy.py:145 itsm/sla/models/policy.py:146
+msgid "优先级矩阵"
+msgstr "優先行列"
+
+#: itsm/sla/models/policy.py:159
+msgid "规则名称"
+msgstr "ルール名"
+
+#: itsm/sla/models/policy.py:161
+msgid "条件类型"
+msgstr "条件タイプ"
+
+#: itsm/sla/models/policy.py:163
+msgid "开始"
+msgstr "始める"
+
+#: itsm/sla/models/policy.py:163 itsm/ticket/models/ticket.py:3441
+#: itsm/ticket/models/ticket.py:3452
+msgid "结束"
+msgstr "仕上げる"
+
+#: itsm/sla/models/policy.py:163
+msgid "暂停"
+msgstr "一時停止"
+
+#: itsm/sla/models/policy.py:166
+msgid "条件"
+msgstr "状態"
+
+#: itsm/sla/models/policy.py:188 itsm/sla/models/policy.py:189
+msgid "计时规则"
+msgstr "タイミングルール"
+
+#: itsm/sla/models/policy.py:307 itsm/sla/models/policy.py:308
+msgid "升级事件配置"
+msgstr "イベント構成をアップグレードします"
+
+#: itsm/sla/models/policy.py:356
+msgid "升级事件类型"
+msgstr "イベントタイプのアップグレード"
+
+#: itsm/sla/models/policy.py:357
+msgid "策略顺序"
+msgstr "戦略のシーケンス"
+
+#: itsm/sla/models/policy.py:359
+msgid "处理事件"
+msgstr "イベントを処理します"
+
+#: itsm/sla/models/policy.py:363 itsm/sla/models/policy.py:364
+msgid "升级策略"
+msgstr "アップグレード戦略"
+
+#: itsm/sla/models/policy.py:423
+msgid "Sla名称"
+msgstr "SLA名"
+
+#: itsm/sla/models/policy.py:425
+msgid "服务优先级策略"
+msgstr "サービスの優先ポリシー"
+
+#: itsm/sla/models/policy.py:428
+msgid "服务升级事件策略"
+msgstr "サービスアップグレードイベントポリシー"
+
+#: itsm/sla/models/policy.py:432
+msgid "是否启用响应约定"
+msgstr "応答条約を有効にするかどうか"
+
+#: itsm/sla/models/policy.py:543
+msgid "预警单据背景色"
+msgstr "警告ドキュメントの背景色"
+
+#: itsm/sla/models/policy.py:544
+msgid "超时单据背景色"
+msgstr "タイムアウトドキュメントの背景色"
+
+#: itsm/sla/models/schedule.py:46
+msgid "时间段名称"
+msgstr "期間名"
+
+#: itsm/sla/models/schedule.py:48
+msgid "开始时间"
+msgstr "開始時間"
+
+#: itsm/sla/models/schedule.py:53 itsm/sla/models/schedule.py:54
+msgid "工作时间段"
+msgstr "労働時間"
+
+#: itsm/sla/models/schedule.py:63
+msgid "假期名称"
+msgstr "ホリデー名"
+
+#: itsm/sla/models/schedule.py:64
+msgid "星期几"
+msgstr "曜日は何ですか"
+
+#: itsm/sla/models/schedule.py:65
+msgid "日期类型"
+msgstr "日付タイプ"
+
+#: itsm/sla/models/schedule.py:68
+msgid "开始日期"
+msgstr "開始日"
+
+#: itsm/sla/models/schedule.py:69
+msgid "结束日期"
+msgstr "終了日"
+
+#: itsm/sla/models/schedule.py:70
+msgid "工作时间段，没有配置的情况下，默认从0:00 -23:59"
+msgstr "作業期間、構成がない場合、デフォルトは0:00 -23：59です"
+
+#: itsm/sla/models/schedule.py:74 itsm/sla/models/schedule.py:75
+msgid "工作日和节假日"
+msgstr "営業日と休日"
+
+#: itsm/sla/models/schedule.py:86
+msgid "常规日历"
+msgstr "通常のカレンダー"
+
+#: itsm/sla/models/schedule.py:87
+msgid "加班日"
+msgstr "残業日"
+
+#: itsm/sla/models/schedule.py:88
+msgid "假期"
+msgstr "休日"
+
+#: itsm/sla/models/schedule.py:99 itsm/sla/models/schedule.py:100
+msgid "服务运营时间"
+msgstr "サービス操作時間"
+
+#: itsm/sla/models/schedule.py:116
+msgid "上午"
+msgstr "朝"
+
+#: itsm/sla/models/schedule.py:117
+msgid "下午"
+msgstr "午後"
+
+#: itsm/sla/models/schedule.py:119
+msgid "全天"
+msgstr "終日"
+
+#: itsm/sla/serializers/matrix.py:91
+msgid "请指定合法的优先级选项"
+msgstr "法的優先オプションを指定してください"
+
+#: itsm/sla/serializers/policy.py:144
+msgid "SLA协议名称为必填"
+msgstr "SLAプロトコル名が必要です"
+
+#: itsm/sla/serializers/schedule.py:65
+msgid "日期类型不能为空"
+msgstr "日付タイプを空にすることはできません"
+
+#: itsm/sla/serializers/schedule.py:115
+msgid "服务模式名称不能为空"
+msgstr "サービスモード名を空にすることはできません"
+
+#: itsm/sla/serializers/schedule.py:208
+msgid "不存在的日期类型"
+msgstr "存在しない日付タイプ"
+
+#: itsm/sla/views/policy.py:198
+msgid "抱歉, 该协议下存在运行中的单据, 无法禁用!"
+msgstr "申し訳ありませんが、このプロトコルの下でドキュメントを実行しているため、無効にすることはできません！"
+
+#: itsm/sla_engine/constants.py:45
+msgid "未激活"
+msgstr "アクティブ化されていません"
+
+#: itsm/sla_engine/constants.py:46
+msgid "计时中"
+msgstr "タイマーが進行中です"
+
+#: itsm/sla_engine/constants.py:47
+msgid "暂停中"
+msgstr "一時停止"
+
+#: itsm/sla_engine/constants.py:48
+msgid "已停止"
+msgstr "停止"
+
+#: itsm/sla_engine/constants.py:58 itsm/sla_engine/constants.py:67
+msgid "响应提醒"
+msgstr "リマインダーに応答します"
+
+#: itsm/sla_engine/constants.py:59 itsm/sla_engine/constants.py:68
+msgid "响应超时"
+msgstr "応答タイムアウト"
+
+#: itsm/sla_engine/constants.py:60 itsm/sla_engine/constants.py:69
+msgid "处理提醒"
+msgstr "処理リマインダー"
+
+#: itsm/sla_engine/constants.py:61 itsm/sla_engine/constants.py:70
+msgid "处理超时"
+msgstr "タイムアウトの処理"
+
+#: itsm/sla_engine/constants.py:81
+msgid "响应"
+msgstr "応答"
+
+#: itsm/sla_engine/models.py:64
+msgid "关联的sla协议ID"
+msgstr "関連するSLAプロトコルID"
+
+#: itsm/sla_engine/models.py:66
+msgid "关联的单据ID"
+msgstr "関連するドキュメントID"
+
+#: itsm/sla_engine/models.py:69
+msgid "任务截止时间"
+msgstr "タスクの締め切り"
+
+#: itsm/sla_engine/models.py:70
+msgid "经过的时长(s)"
+msgstr "経過時間"
+
+#: itsm/sla_engine/models.py:71
+msgid "任务开始计时的时间"
+msgstr "タスクが開始される時間"
+
+#: itsm/sla_engine/models.py:72
+msgid "任务结束计时的时间"
+msgstr "タスクを終了する時間"
+
+#: itsm/sla_engine/models.py:73
+msgid "任务升级时间"
+msgstr "タスクのアップグレード時間"
+
+#: itsm/sla_engine/models.py:74
+msgid "上次结算时间"
+msgstr "最後のチェックアウト時間"
+
+#: itsm/sla_engine/models.py:75
+msgid "sla状态"
+msgstr "SLAステータス"
+
+#: itsm/sla_engine/models.py:77
+msgid "是否需要响应"
+msgstr "応答が必要です"
+
+#: itsm/sla_engine/models.py:78
+msgid "是否已响应"
+msgstr "それが応答されたかどうか"
+
+#: itsm/sla_engine/models.py:79
+msgid "响应截至时间"
+msgstr "応答期限"
+
+#: itsm/sla_engine/models.py:80
+msgid "响应耗时(s)"
+msgstr "応答時間消費"
+
+#: itsm/sla_engine/models.py:81
+msgid "响应时间"
+msgstr "応答時間"
+
+#: itsm/sla_engine/models.py:85 itsm/sla_engine/models.py:86
+msgid "sla任务"
+msgstr "SLAミッション"
+
+#: itsm/sla_engine/models.py:464
+msgid "SLA TASK ID"
+msgstr "SLAタスクID"
+
+#: itsm/sla_engine/models.py:467
+msgid "事件类型"
+msgstr "イベントタイプ"
+
+#: itsm/sla_engine/models.py:470
+msgid "是否已归档"
+msgstr "アーカイブされていますか"
+
+#: itsm/sla_engine/models.py:472
+msgid "计时标志"
+msgstr "タイミングフラグ"
+
+#: itsm/sla_engine/models.py:475
+msgid "事件发生时间"
+msgstr "イベント発生時間"
+
+#: itsm/sla_engine/models.py:481 itsm/sla_engine/models.py:482
+msgid "sla事件日志"
+msgstr "SLAイベントログ"
+
+#: itsm/sla_engine/models.py:504
+msgid "结果状态"
+msgstr "結果状態"
+
+#: itsm/sla_engine/models.py:506
+msgid "行为类型"
+msgstr "行動タイプ"
+
+#: itsm/sla_engine/models.py:507
+msgid "行为详情"
+msgstr "行動の詳細"
+
+#: itsm/sla_engine/models.py:508
+msgid "动作发生时间"
+msgstr "アクション発生時間"
+
+#: itsm/sla_engine/models.py:509
+msgid "触发的规则"
+msgstr "トリガーされたルール"
+
+#: itsm/sla_engine/models.py:516 itsm/sla_engine/models.py:517
+msgid "sla行为历史记录"
+msgstr "SLA行動履歴記録"
+
+#: itsm/task/models.py:139 itsm/task/models.py:999 itsm/task/models.py:1080
+#: itsm/ticket/models/ticket.py:278
+msgid "单据ID"
+msgstr "文書ID"
+
+#: itsm/task/models.py:140 itsm/ticket/models/ticket.py:280
+#: itsm/workflow/models/trigger.py:46
+msgid "节点ID"
+msgstr "ノードID"
+
+#: itsm/task/models.py:141
+msgid "Pipeline节点ID"
+msgstr "パイプラインノードID"
+
+#: itsm/task/models.py:142 itsm/task/models.py:1002 itsm/task/models.py:1083
+msgid "任务的名称"
+msgstr "タスクの名前"
+
+#: itsm/task/models.py:143
+msgid "对应的任务模板ID"
+msgstr "対応するタスクテンプレートID"
+
+#: itsm/task/models.py:145 itsm/workflow/models/task.py:64
+msgid "任务组件类型"
+msgstr "タスクコンポーネントタイプ"
+
+#: itsm/task/models.py:151 itsm/task/models.py:1196
+#: itsm/ticket/models/ticket.py:313 itsm/workflow/models/event.py:51
+#: itsm/workflow/models/state.py:108
+msgid "处理人类型"
+msgstr "担当者タイプ"
+
+#: itsm/task/models.py:154 itsm/ticket/models/ticket.py:316
+#: itsm/workflow/models/event.py:52 itsm/workflow/models/state.py:111
+msgid "处理人列表"
+msgstr "担当者リスト"
+
+#: itsm/task/models.py:157 itsm/workflow/models/task.py:73
+msgid "组件输入信息"
+msgstr "コンポーネント入力情報"
+
+#: itsm/task/models.py:157 itsm/workflow/models/task.py:73
+msgid "当前组件输入参数引用的参数变量"
+msgstr "現在のコンポーネント入力パラメータが参照するパラメータ変数"
+
+#: itsm/task/models.py:160
+msgid "组件输出信息"
+msgstr "コンポーネント出力情報"
+
+#: itsm/task/models.py:160
+msgid "当前组件输出信息，比如sops各阶段返回"
+msgstr "現在のコンポーネント出力情報、例えばsops各ステージの戻り値"
+
+#: itsm/task/models.py:163
+msgid "任务的执行顺序"
+msgstr "タスクの実行順序"
+
+#: itsm/task/models.py:165
+msgid "任务的状态"
+msgstr "タスクの状態"
+
+#: itsm/task/models.py:171 itsm/task/models.py:1197
+#: itsm/ticket/models/ticket.py:251
+#: itsm/trigger/action/components/modify_processor.py:42
+#: itsm/trigger/action/components/modify_specified_state_processor.py:50
+msgid "处理人"
+msgstr "担当者"
+
+#: itsm/task/models.py:172
+msgid "确认人"
+msgstr "確認者"
+
+#: itsm/task/models.py:173
+msgid "开始执行的时间"
+msgstr "実行開始時間"
+
+#: itsm/task/models.py:174
+msgid "结束执行的时间"
+msgstr "終了実行時間"
+
+#: itsm/task/models.py:175 itsm/ticket/models/ticket.py:1316
+msgid "Pipeline流程树元数据"
+msgstr "パイプラインプロセスツリーのメタデータ"
+
+#: itsm/task/models.py:176
+msgid "执行节点ID"
+msgstr "実行ノードID"
+
+#: itsm/task/models.py:181 itsm/task/models.py:182 itsm/task/models.py:1139
+#: itsm/task/models.py:1140
+msgid "子任务"
+msgstr "サブタスク"
+
+#: itsm/task/models.py:403
+msgid "您收到一个单据任务，请及时处理"
+msgstr "文書タスクを受信しました、速やかに処理してください"
+
+#: itsm/task/models.py:437
+msgid "您收到一个单据总结任务，请及时处理"
+msgstr "文書の要約タスクを受信しました、速やかに処理してください"
+
+#: itsm/task/models.py:928 itsm/workflow/models/task.py:141
+msgid "对应的任务模型"
+msgstr "対応するタスクモデル"
+
+#: itsm/task/models.py:933 itsm/workflow/models/task.py:143
+msgid "所处阶段"
+msgstr "現在のステージ"
+
+#: itsm/task/models.py:938 itsm/ticket_status/models.py:170
+#: itsm/workflow/models/task.py:145
+msgid "序号"
+msgstr "シリアル番号"
+
+#: itsm/task/models.py:939 itsm/ticket/models/field.py:44
+#: itsm/ticket/models/field.py:130
+msgid "表单值"
+msgstr "フォーム値"
+
+#: itsm/task/models.py:942 itsm/task/models.py:943
+#: itsm/workflow/models/task.py:155 itsm/workflow/models/task.py:156
+msgid "任务字段表"
+msgstr "タスクフィールドテーブル"
+
+#: itsm/task/models.py:1000 itsm/ticket/models/ticket.py:281
+msgid "业务ID"
+msgstr "ビジネスID"
+
+#: itsm/task/models.py:1001 itsm/task/models.py:1082
+msgid "itsm任务ID"
+msgstr "itsmタスクID"
+
+#: itsm/task/models.py:1003
+msgid "sops任务模板ID"
+msgstr "sopsタスクテンプレートID"
+
+#: itsm/task/models.py:1004
+msgid "sops任务ID，成功启动后填充"
+msgstr "sopsタスクID、成功した開始後に入力"
+
+#: itsm/task/models.py:1006
+msgid "sops任务信息"
+msgstr "sopsタスク情報"
+
+#: itsm/task/models.py:1008
+msgid "sops任务详情链接，成功启动后填充"
+msgstr "sopsタスク詳細リンク、成功した開始後に入力"
+
+#: itsm/task/models.py:1011 itsm/task/models.py:1092
+msgid "创建者"
+msgstr "作成者"
+
+#: itsm/task/models.py:1012 itsm/task/models.py:1093
+msgid "执行者"
+msgstr "実行者"
+
+#: itsm/task/models.py:1014 itsm/task/models.py:1095
+msgid "启动时间"
+msgstr "開始時間"
+
+#: itsm/task/models.py:1016 itsm/task/models.py:1097
+msgid "当前耗时"
+msgstr "現在の所要時間"
+
+#: itsm/task/models.py:1070 itsm/task/models.py:1071
+msgid "标准运维任务"
+msgstr "標準運用タスク"
+
+#: itsm/task/models.py:1081 itsm/task/models.py:1200
+msgid "项目ID/业务ID"
+msgstr "プロジェクトID/ビジネスID"
+
+#: itsm/task/models.py:1084
+msgid "子流水线ID"
+msgstr "サブパイプラインID"
+
+#: itsm/task/models.py:1086
+msgid "子ID，成功启动后填充"
+msgstr "サブID、成功した開始後に入力"
+
+#: itsm/task/models.py:1088
+msgid "子任务信息"
+msgstr "サブタスク情報"
+
+#: itsm/task/models.py:1090
+msgid "子任务详情链接"
+msgstr "サブタスク詳細リンク"
+
+#: itsm/task/models.py:1148
+msgid "任务库名称"
+msgstr "タスクライブラリ名"
+
+#: itsm/task/models.py:1151 itsm/task/models.py:1152
+msgid "任务库"
+msgstr "タスクライブラリ"
+
+#: itsm/task/models.py:1189
+msgid "关联的任务库"
+msgstr "関連するタスクライブラリ"
+
+#: itsm/task/models.py:1194
+msgid "任务模版ID"
+msgstr "タスクテンプレートID"
+
+#: itsm/task/models.py:1195
+msgid "任务类型"
+msgstr "タスクタイプ"
+
+#: itsm/task/models.py:1198 itsm/ticket/models/ticket.py:338
+msgid "字段列表"
+msgstr "フィールドリスト"
+
+#: itsm/task/models.py:1199
+msgid "子模版ID"
+msgstr "サブテンプレートID"
+
+#: itsm/task/models.py:1202
+msgid "排除节点ID列表"
+msgstr "除外ノードIDリスト"
+
+#: itsm/task/models.py:1206 itsm/task/models.py:1207
+msgid "任务库任务列表"
+msgstr "タスクライブラリのタスクリスト"
+
+#: itsm/task/permissions.py:67
+msgid "抱歉，您无权处理该任务"
+msgstr "申し訳ありませんが、このタスクを処理する権限がありません"
+
+#: itsm/task/serializers.py:159
+msgid "对应的任务模板配置不存在"
+msgstr "対応するタスクテンプレート設定が存在しません"
+
+#: itsm/task/serializers.py:174
+msgid "对应的任务配置不存在"
+msgstr "対応するタスク設定が存在しません"
+
+#: itsm/task/serializers.py:197
+msgid "标准运维获取任务详情失败"
+msgstr "標準運用でタスク詳細の取得に失敗しました"
+
+#: itsm/task/serializers.py:336
+msgid "总结"
+msgstr "要約"
+
+#: itsm/task/serializers.py:431 itsm/task/validators.py:81
+#: itsm/workflow/serializers/workflow.py:189
+#: itsm/workflow/serializers/workflow.py:196
+#: itsm/workflow/serializers/workflow.py:199
+#: itsm/workflow/serializers/workflow.py:204
+#: itsm/workflow/serializers/workflow.py:211
+msgid "参数校验失败"
+msgstr "パラメータ検証に失敗しました"
+
+#: itsm/task/serializers.py:431
+msgid "您名下已经有同名任务库，请尝试换个名称"
+msgstr "同名のタスクライブラリがすでに存在します。別の名前を試してください"
+
+#: itsm/task/validators.py:43
+msgid "请输入合法单据ID"
+msgstr "有効な文書IDを入力してください"
+
+#: itsm/task/validators.py:47
+msgid "非法请求"
+msgstr "不正なリクエスト"
+
+#: itsm/task/validators.py:49
+msgid "抱歉, 你没有权限操作该单据"
+msgstr "申し訳ありませんが、この文書を操作する権限がありません"
+
+#: itsm/task/validators.py:61
+#, python-format
+msgid "无效任务ID(%s)"
+msgstr "無効なタスクID(%s)"
+
+#: itsm/task/validators.py:70
+#, python-format
+msgid "无效任务字段ID(%s)"
+msgstr "無効なタスクフィールドID(%s)"
+
+#: itsm/task/validators.py:81
+msgid "任务处理失败，缺少参数：{}"
+msgstr "タスク処理に失敗しました。パラメータが不足しています：{}"
+
+#: itsm/task/views/task.py:240 itsm/task/views/task.py:269
+#: itsm/task/views/task.py:273 itsm/task/views/task.py:274
+#: itsm/task/views/task.py:290
+#, python-format
+msgid "任务节点回调异常（%s）"
+msgstr "タスクノードコールバックの異常（%s）"
+
+#: itsm/task/views/task.py:381
+msgid "任务列表为空"
+msgstr "タスクリストが空です"
+
+#: itsm/ticket/managers.py:885
+#, python-format
+msgid "{operator} {action}【{name}】(%s)"
+msgstr "{operator} {action}【{name}】(%s)"
+
+#: itsm/ticket/managers.py:891
+msgid "已处理"
+msgstr "処理済み"
+
+#: itsm/ticket/permissions.py:49
+msgid "抱歉，您无权查看和操作"
+msgstr "申し訳ありませんが、閲覧および操作する権限がありません"
+
+#: itsm/ticket/permissions.py:64
+msgid "抱歉，您无权查看该单据"
+msgstr "申し訳ありませんが、この文書を閲覧する権限がありません"
+
+#: itsm/ticket/permissions.py:103
+msgid "抱歉，当前单据无法操作"
+msgstr "申し訳ありませんが、現在の文書は操作できません"
+
+#: itsm/ticket/permissions.py:113
+msgid "抱歉，您无权执行此操作，因为您该服务没有工单管理的权限"
+msgstr "申し訳ありませんが、この操作を実行する権限がありません。サービスにチケット管理の権限がありません"
+
+#: itsm/ticket/permissions.py:144
+msgid "抱歉，您无权操作该单据"
+msgstr "申し訳ありませんが、この文書を操作する権限がありません"
+
+#: itsm/ticket/permissions.py:226
+msgid "抱歉，您无权操作当前单据任务"
+msgstr "申し訳ありませんが、現在の文書タスクを操作する権限がありません"
+
+#: itsm/ticket/permissions.py:239
+msgid "抱歉，您无权查看该单据的日志"
+msgstr "申し訳ありませんが、この文書のログを閲覧する権限がありません"
+
+#: itsm/ticket/permissions.py:253
+#, python-format
+msgid "单据不存在：%s，请检查"
+msgstr "文書が存在しません：%s、確認してください"
+
+#: itsm/ticket/permissions.py:265
+msgid "抱歉，您无权限查看此信息"
+msgstr "申し訳ありませんが、この情報を閲覧する権限がありません"
+
+#: itsm/ticket/permissions.py:284
+msgid "抱歉，您无权查看该单据的日志信息"
+msgstr "申し訳ありませんが、この文書のログ情報を閲覧する権限がありません"
+
+#: itsm/ticket/permissions.py:293
+#, python-format
+msgid "抱歉，单据不存在：%s，请检查"
+msgstr "申し訳ありませんが、文書が存在しません：%s、確認してください"
+
+#: itsm/ticket/permissions.py:301
+msgid "抱歉，您无权查看该单据的评价信息"
+msgstr "申し訳ありませんが、この文書の評価情報を閲覧する権限がありません"
+
+#: itsm/ticket/permissions.py:321
+msgid "抱歉，您不是该单据的提单人，无法评价"
+msgstr "申し訳ありませんが、この文書の提出者ではないため、評価できません"
+
+#: itsm/ticket/permissions.py:332
+msgid "抱歉，您无权处理该单据的评论信息"
+msgstr "申し訳ありませんが、この文書のコメント情報を処理する権限がありません"
+
+#: itsm/ticket/permissions.py:356
+msgid "对不起，您没有模块的权限，请联系管理员。"
+msgstr "申し訳ありませんが、このモジュールの権限がありません。管理者に連絡してください。"
+
+#: itsm/ticket/tasks.py:78
+msgid "添加默认评价"
+msgstr "デフォルト評価を追加"
+
+#: itsm/ticket/tasks.py:255
+msgid "当前单据的状态, current_status={}"
+msgstr "現在の文書の状態, current_status={}"
+
+#: itsm/ticket/tasks.py:260
+msgid "当前任务已过期, ticket_id={}, state_id={}"
+msgstr "現在のタスクは期限切れです, ticket_id={}, state_id={}"
+
+#: itsm/ticket/tasks.py:264
+msgid "开始定时发送通知, ticket_id={}, state_id={}"
+msgstr "定期通知の送信開始, ticket_id={}, state_id={}"
+
+#: itsm/ticket/utils.py:51
+msgid "action"
+msgstr "アクション"
+
+#: itsm/ticket/models/event.py:47
+msgid "页面操作"
+msgstr "ページ操作"
+
+#: itsm/ticket/models/event.py:47
+msgid "移动端操作"
+msgstr "モバイル操作"
+
+#: itsm/ticket/models/event.py:47
+msgid "系统操作"
+msgstr "システム操作"
+
+#: itsm/ticket/models/event.py:47
+msgid "自动执行"
+msgstr "自動実行"
+
+#: itsm/ticket/models/event.py:50 itsm/ticket/models/field.py:42
+#: itsm/ticket/models/misc.py:101 itsm/ticket/models/misc.py:254
+#: itsm/ticket/models/misc.py:314
+msgid "关联工单"
+msgstr "関連チケット"
+
+#: itsm/ticket/models/event.py:51
+msgid "是否有效流程节点"
+msgstr "有効なプロセスノードかどうか"
+
+#: itsm/ticket/models/event.py:52
+msgid "处理时间"
+msgstr "処理時間"
+
+#: itsm/ticket/models/event.py:54
+msgid "处理人快照"
+msgstr "処理者スナップショット"
+
+#: itsm/ticket/models/event.py:55
+msgid "日志来源"
+msgstr "ログソース"
+
+#: itsm/ticket/models/event.py:56 itsm/ticket/models/ticket.py:352
+#: itsm/ticket/models/ticket.py:353
+msgid "节点处理状态"
+msgstr "ノード処理状態"
+
+#: itsm/ticket/models/event.py:62 itsm/ticket/models/event.py:63
+msgid "单据流转日志"
+msgstr "文書流転ログ"
+
+#: itsm/ticket/models/field.py:45 itsm/ticket/models/field.py:131
+#: itsm/workflow/models/field.py:182
+msgid "添加方式"
+msgstr "追加方法"
+
+#: itsm/ticket/models/field.py:46 itsm/ticket/models/field.py:132
+msgid "流程版本字段ID"
+msgstr "プロセスバージョンフィールドID"
+
+#: itsm/ticket/models/field.py:52 itsm/ticket/models/field.py:53
+msgid "表单字段值"
+msgstr "フォームフィールド値"
+
+#: itsm/ticket/models/field.py:137 itsm/ticket/models/field.py:138
+msgid "任务字段值"
+msgstr "タスクフィールド値"
+
+#: itsm/ticket/models/misc.py:54
+msgid "模板名称"
+msgstr "テンプレート名"
+
+#: itsm/ticket/models/misc.py:56 itsm/ticket/models/ticket.py:1360
+msgid "对应服务主键"
+msgstr "対応するサービス主キー"
+
+#: itsm/ticket/models/misc.py:58
+msgid "单据模板字段"
+msgstr "文書テンプレートフィールド"
+
+#: itsm/ticket/models/misc.py:63 itsm/ticket/models/misc.py:64
+msgid "单据模板"
+msgstr "文書テンプレート"
+
+#: itsm/ticket/models/misc.py:74 itsm/ticket/models/misc.py:395
+msgid "单据id"
+msgstr "文書ID"
+
+#: itsm/ticket/models/misc.py:75
+msgid "节点id"
+msgstr "ノードID"
+
+#: itsm/ticket/models/misc.py:77
+msgid "单据节点草稿字段"
+msgstr "文書ノードのドラフトフィールド"
+
+#: itsm/ticket/models/misc.py:82
+msgid "单据节点草稿"
+msgstr "文書ノードのドラフト"
+
+#: itsm/ticket/models/misc.py:106
+msgid "评价信息"
+msgstr "評価情報"
+
+#: itsm/ticket/models/misc.py:108
+msgid "评价来源"
+msgstr "評価の出所"
+
+#: itsm/ticket/models/misc.py:117 itsm/ticket/models/misc.py:118
+msgid "工单评价"
+msgstr "チケット評価"
+
+#: itsm/ticket/models/misc.py:171
+msgid "关联评论"
+msgstr "関連コメント"
+
+#: itsm/ticket/models/misc.py:176
+msgid "联系人/联系方式"
+msgstr "連絡先/連絡方法"
+
+#: itsm/ticket/models/misc.py:177
+msgid "短码"
+msgstr "ショートコード"
+
+#: itsm/ticket/models/misc.py:182 itsm/ticket/models/misc.py:183
+msgid "邀请途径记录"
+msgstr "招待方法の記録"
+
+#: itsm/ticket/models/misc.py:223
+msgid "发送节点ID"
+msgstr "送信ノードID"
+
+#: itsm/ticket/models/misc.py:225
+msgid "节点名称"
+msgstr "ノード名"
+
+#: itsm/ticket/models/misc.py:231
+msgid "通知信息"
+msgstr "通知情報"
+
+#: itsm/ticket/models/misc.py:259 itsm/ticket/models/ticket.py:5071
+msgid "关注人"
+msgstr "フォロワー"
+
+#: itsm/ticket/models/misc.py:262
+msgid "处理者类型/角色类型"
+msgstr "処理者タイプ/役割タイプ"
+
+#: itsm/ticket/models/misc.py:268
+msgid "关注链接只读标识"
+msgstr "フォローリンクの読み取り専用識別"
+
+#: itsm/ticket/models/misc.py:275
+msgid "是否系统流程发送"
+msgstr "システムプロセスで送信されるかどうか"
+
+#: itsm/ticket/models/misc.py:281 itsm/ticket/models/misc.py:282
+msgid "关注人通知日志"
+msgstr "フォロワー通知ログ"
+
+#: itsm/ticket/models/misc.py:319
+msgid "被督办的人"
+msgstr "督促される人"
+
+#: itsm/ticket/models/misc.py:324 itsm/ticket/models/misc.py:325
+msgid "督办日志"
+msgstr "督促ログ"
+
+#: itsm/ticket/models/misc.py:334 itsm/workflow/models/common.py:98
+msgid "变量关键字"
+msgstr "変数キーワード"
+
+#: itsm/ticket/models/misc.py:335 itsm/workflow/models/common.py:99
+msgid "变量名"
+msgstr "変数名"
+
+#: itsm/ticket/models/misc.py:336
+msgid "变量值"
+msgstr "変数の値"
+
+#: itsm/ticket/models/misc.py:338 itsm/workflow/models/common.py:104
+msgid "关联节点"
+msgstr "関連ノード"
+
+#: itsm/ticket/models/misc.py:339
+msgid "关联单据"
+msgstr "関連文書"
+
+#: itsm/ticket/models/misc.py:348 itsm/ticket/models/misc.py:349
+msgid "单据全局变量"
+msgstr "文書のグローバル変数"
+
+#: itsm/ticket/models/misc.py:383
+msgid "评论内容"
+msgstr "コメント内容"
+
+#: itsm/ticket/models/misc.py:385
+msgid "评论类型"
+msgstr "コメントタイプ"
+
+#: itsm/ticket/models/misc.py:397
+msgid "用户@的用户列表"
+msgstr "ユーザー@のユーザーリスト"
+
+#: itsm/ticket/models/misc.py:398
+msgid "用户评论的更新记录"
+msgstr "ユーザーコメントの更新記録"
+
+#: itsm/ticket/models/ticket.py:246
+msgid "状态ID"
+msgstr "状態ID"
+
+#: itsm/ticket/models/ticket.py:252
+msgid "是否审批通过"
+msgstr "承認済みかどうか"
+
+#: itsm/ticket/models/ticket.py:257 itsm/ticket/models/ticket.py:258
+msgid "会签任务"
+msgstr "合議タスク"
+
+#: itsm/ticket/models/ticket.py:279
+msgid "进入节点的线条ID"
+msgstr "ノードに入る線のID"
+
+#: itsm/ticket/models/ticket.py:282
+msgid "节点名"
+msgstr "ノード名"
+
+#: itsm/ticket/models/ticket.py:284
+msgid "节点类型类型"
+msgstr "ノードタイプのタイプ"
+
+#: itsm/ticket/models/ticket.py:290 itsm/workflow/models/state.py:154
+msgid "是否是串行任务"
+msgstr "直列タスクかどうか"
+
+#: itsm/ticket/models/ticket.py:292 itsm/ticket/models/ticket.py:1318
+msgid "节点状态"
+msgstr "ノード状態"
+
+#: itsm/ticket/models/ticket.py:298 itsm/workflow/models/state.py:104
+msgid "节点标签"
+msgstr "ノードタグ"
+
+#: itsm/ticket/models/ticket.py:300
+msgid "节点内部操作类型"
+msgstr "ノード内部操作タイプ"
+
+#: itsm/ticket/models/ticket.py:306 itsm/workflow/models/state.py:126
+msgid "分配方式"
+msgstr "配分方法"
+
+#: itsm/ticket/models/ticket.py:320 itsm/workflow/models/state.py:121
+msgid "转单人类型"
+msgstr "転送者タイプ"
+
+#: itsm/ticket/models/ticket.py:322 itsm/workflow/models/state.py:123
+msgid "转单人列表"
+msgstr "転送者リスト"
+
+#: itsm/ticket/models/ticket.py:323 itsm/workflow/models/state.py:119
+msgid "能否转单"
+msgstr "転送可能かどうか"
+
+#: itsm/ticket/models/ticket.py:328 itsm/workflow/models/state.py:114
+msgid "派单人类型"
+msgstr "担当者タイプ"
+
+#: itsm/ticket/models/ticket.py:331 itsm/workflow/models/state.py:117
+msgid "派单人列表"
+msgstr "担当者リスト"
+
+#: itsm/ticket/models/ticket.py:333
+msgid "能否强制终止"
+msgstr "強制終了可能かどうか"
+
+#: itsm/ticket/models/ticket.py:335
+msgid "终止原因"
+msgstr "終了理由"
+
+#: itsm/ticket/models/ticket.py:340 itsm/workflow/models/field.py:80
+#: itsm/workflow/models/state.py:160
+msgid "api实例主键"
+msgstr "APIインスタンス主キー"
+
+#: itsm/ticket/models/ticket.py:342
+msgid "失败信息"
+msgstr "失敗情報"
+
+#: itsm/ticket/models/ticket.py:345
+msgid "状态上下文"
+msgstr "状態コンテキスト"
+
+#: itsm/ticket/models/ticket.py:346
+msgid "配置信息"
+msgstr "構成情報"
+
+#: itsm/ticket/models/ticket.py:347
+msgid "表单输入信息"
+msgstr "フォーム入力情報"
+
+#: itsm/ticket/models/ticket.py:348
+msgid "忽略结果参数"
+msgstr "結果パラメータを無視する"
+
+#: itsm/ticket/models/ticket.py:651
+msgid "组织架构"
+msgstr "組織構造"
+
+#: itsm/ticket/models/ticket.py:922
+msgid "系统自动处理"
+msgstr "システム自動処理"
+
+#: itsm/ticket/models/ticket.py:1294
+msgid "单据号"
+msgstr "文書番号"
+
+#: itsm/ticket/models/ticket.py:1295
+msgid "单据名称"
+msgstr "文書名"
+
+#: itsm/ticket/models/ticket.py:1296 itsm/trigger/models/trigger.py:157
+#: itsm/workflow/models/state.py:146 itsm/workflow/models/task.py:67
+#: itsm/workflow/models/workflow.py:97
+msgid "是否为草稿"
+msgstr "ドラフトかどうか"
+
+#: itsm/ticket/models/ticket.py:1299
+msgid "服务目录ID"
+msgstr "サービスカタログID"
+
+#: itsm/ticket/models/ticket.py:1301
+msgid "服务项ID"
+msgstr "サービス項目ID"
+
+#: itsm/ticket/models/ticket.py:1304
+msgid "服务编码"
+msgstr "サービスコード"
+
+#: itsm/ticket/models/ticket.py:1307
+msgid "流程版本ID"
+msgstr "プロセスバージョンID"
+
+#: itsm/ticket/models/ticket.py:1310
+msgid "业务id"
+msgstr "ビジネスID"
+
+#: itsm/ticket/models/ticket.py:1313
+msgid "优先级编码"
+msgstr "優先順位コード"
+
+#: itsm/ticket/models/ticket.py:1324
+msgid "单据前一状态"
+msgstr "文書の前の状態"
+
+#: itsm/ticket/models/ticket.py:1327 itsm/workflow/models/workflow.py:113
+msgid "是否需要督办"
+msgstr "督促が必要かどうか"
+
+#: itsm/ticket/models/ticket.py:1329 itsm/workflow/models/workflow.py:115
+msgid "督办人类型"
+msgstr "督促者のタイプ"
+
+#: itsm/ticket/models/ticket.py:1332 itsm/workflow/models/workflow.py:118
+msgid "督办列表"
+msgstr "督促リスト"
+
+#: itsm/ticket/models/ticket.py:1336
+msgid "任务处理者列表"
+msgstr "タスク処理者リスト"
+
+#: itsm/ticket/models/ticket.py:1339
+msgid "任务历史处理者列表"
+msgstr "タスクの過去の処理者リスト"
+
+#: itsm/ticket/models/ticket.py:1344 itsm/workflow/models/event.py:47
+msgid "当前状态ID"
+msgstr "現在の状態ID"
+
+#: itsm/ticket/models/ticket.py:1346
+msgid "分派人列表"
+msgstr "割り当て担当者リスト"
+
+#: itsm/ticket/models/ticket.py:1349
+msgid "处理者列表"
+msgstr "処理者リスト"
+
+#: itsm/ticket/models/ticket.py:1352
+msgid "分派人类型"
+msgstr "割り当て担当者のタイプ"
+
+#: itsm/ticket/models/ticket.py:1355
+msgid "处理者类型"
+msgstr "処理者タイプ"
+
+#: itsm/ticket/models/ticket.py:1362
+msgid "业务特性json字段"
+msgstr "業務特性JSONフィールド"
+
+#: itsm/ticket/models/ticket.py:1364
+msgid "对应的快照信息"
+msgstr "対応するスナップショット情報"
+
+#: itsm/ticket/models/ticket.py:1374 itsm/workflow/models/common.py:110
+msgid "扩展描述信息"
+msgstr "拡張説明情報"
+
+#: itsm/ticket/models/ticket.py:1381
+msgid "单据标签"
+msgstr "文書タグ"
+
+#: itsm/ticket/models/ticket.py:1555 itsm/ticket/models/ticket.py:3983
+msgid "没有获取到当前节点处理状态"
+msgstr "現在のノードの処理状態を取得できませんでした"
+
+#: itsm/ticket/models/ticket.py:3158
+msgid "节点设置的默认单据状态为结束状态"
+msgstr "ノードに設定されたデフォルトの文書状態は終了状態です"
+
+#: itsm/ticket/models/ticket.py:3616 itsm/ticket/models/ticket.py:3645
+#, python-format
+msgid "流程服务异常（%s）"
+msgstr "プロセスサービス異常（%s）"
+
+#: itsm/ticket/models/ticket.py:4169
+msgid "触发器事件发送失败, ticket_sn {} signal ：{}"
+msgstr "トリガーイベントの送信に失敗しました、ticket_sn {} シグナル ：{}"
+
+#: itsm/ticket/models/ticket.py:4289
+msgid "您的单据已经完成！"
+msgstr "チケットが完了しました！"
+
+#: itsm/ticket/models/ticket.py:4306
+msgid "{operator} 处理【{name}】"
+msgstr "{operator} 【{name}】に対応しました"
+
+#: itsm/ticket/models/ticket.py:4384
+msgid "{operator}处理节点【{name}】(流程被终止，【终止原因】:{detail_message})."
+msgstr "{operator}ノード【{name}】を処理(フローが終了しました，【終了理由】:{detail_message})."
+
+#: itsm/ticket/models/ticket.py:4440
+#, python-format
+msgid "流程终止成功：%s"
+msgstr "フロー終了に成功しました：%s"
+
+#: itsm/ticket/models/ticket.py:4973
+msgid "一级组织id"
+msgstr "1階層組織ID"
+
+#: itsm/ticket/models/ticket.py:4975
+msgid "一级组织名称"
+msgstr "1階層組織名"
+
+#: itsm/ticket/models/ticket.py:4977
+msgid "二级组织id"
+msgstr "2階層組織ID"
+
+#: itsm/ticket/models/ticket.py:4979
+msgid "二级组织名称"
+msgstr "2階層組織名"
+
+#: itsm/ticket/models/ticket.py:4981
+msgid "三级组织id"
+msgstr "3階層組織ID"
+
+#: itsm/ticket/models/ticket.py:4983
+msgid "三级组织名称"
+msgstr "3階層組織名"
+
+#: itsm/ticket/models/ticket.py:4985
+msgid "组织树"
+msgstr "組織ツリー"
+
+#: itsm/ticket/models/ticket.py:4990 itsm/ticket/models/ticket.py:4991
+msgid "用户组织"
+msgstr "ユーザー組織"
+
+#: itsm/ticket/models/ticket.py:5003
+msgid "绑定成功"
+msgstr "紐付け成功"
+
+#: itsm/ticket/models/ticket.py:5004
+msgid "绑定失败"
+msgstr "紐付け失敗"
+
+#: itsm/ticket/models/ticket.py:5005
+msgid "解绑成功"
+msgstr "解除成功"
+
+#: itsm/ticket/models/ticket.py:5006
+msgid "解绑失败"
+msgstr "解除失敗"
+
+#: itsm/ticket/models/ticket.py:5011
+msgid "源单据"
+msgstr "元伝票"
+
+#: itsm/ticket/models/ticket.py:5018
+msgid "目标单据"
+msgstr "ターゲット文書"
+
+#: itsm/ticket/models/ticket.py:5024
+msgid "单据关联类型"
+msgstr "文書の関連タイプ"
+
+#: itsm/ticket/models/ticket.py:5027
+msgid "关联状态"
+msgstr "関連状態"
+
+#: itsm/ticket/models/ticket.py:5038 itsm/ticket/models/ticket.py:5039
+msgid "单据间关联"
+msgstr "文書間の関連"
+
+#: itsm/ticket/models/ticket.py:5050
+msgid "关联的单据"
+msgstr "関連する文書"
+
+#: itsm/ticket/models/ticket.py:5054
+msgid "流转前的单据状态"
+msgstr "流転前の文書状態"
+
+#: itsm/ticket/models/ticket.py:5055
+msgid "流转后的单据状态"
+msgstr "流転後の文書状態"
+
+#: itsm/ticket/models/ticket.py:5060 itsm/ticket/models/ticket.py:5061
+#: itsm/ticket/models/ticket.py:5077
+msgid "单据状态流转日志"
+msgstr "文書状態流転ログ"
+
+#: itsm/ticket/models/ticket.py:5076
+msgid "单据关注人"
+msgstr "文書フォロワー"
+
+#: itsm/ticket/serializers/event.py:93
+msgid "{}(修改前)before{}(修改后)"
+msgstr "{}(修正前)before{}(修正後)"
+
+#: itsm/ticket/serializers/misc.py:62 itsm/ticket/serializers/misc.py:73
+#: itsm/ticket/serializers/misc.py:97
+msgid "该模板名字已存在"
+msgstr "このテンプレート名はすでに存在します"
+
+#: itsm/ticket/serializers/misc.py:108
+msgid "已在该单据节点创建了草稿"
+msgstr "この文書ノードですでにドラフトが作成されています"
+
+#: itsm/ticket/serializers/misc.py:137
+msgid "该单据已经被评论，请勿重复评论"
+msgstr "この文書はすでにコメントされています、重複してコメントしないでください"
+
+#: itsm/ticket/serializers/ticket.py:345
+#, python-format
+msgid "%s (共%d人, 已处理%d人)"
+msgstr "%s (全%d人, 処理済み%d人)"
+
+#: itsm/ticket/serializers/ticket.py:370
+msgid "operationsname"
+msgstr "操作名"
+
+#: itsm/ticket/serializers/ticket.py:405 itsm/workflow/models/workflow.py:180
+#: itsm/workflow/models/workflow.py:181
+msgid "流程模板"
+msgstr "プロセステンプレート"
+
+#: itsm/ticket/serializers/ticket.py:963
+msgid "工单状态不存在，请检查"
+msgstr "チケット状態が存在しません、確認してください"
+
+#: itsm/ticket/serializers/ticket.py:971
+msgid "服务:{}, 节点({})不存在"
+msgstr "サービス:{}, ノード({})が存在しません"
+
+#: itsm/ticket/serializers/ticket.py:983
+msgid "服务:{}, 节点({})对应的审批人不允许为空"
+msgstr "サービス:{}, ノード({})の承認者は空にできません"
+
+#: itsm/ticket/serializers/ticket.py:1186
+#: itsm/ticket/serializers/ticket.py:1192
+msgid "母子单"
+msgstr "親チケットと子チケット"
+
+#: itsm/ticket/serializers/ticket.py:1186
+#, python-format
+msgid "子单ID(%s)->母单ID(%s)的绑定关系不存在"
+msgstr "子チケットID(%s)と親チケットID(%s)のバインディング関係が存在しません"
+
+#: itsm/ticket/serializers/ticket.py:1192
+msgid "正在解绑中... 请勿重复执行"
+msgstr "解除中です... 繰り返し実行しないでください"
+
+#: itsm/ticket/serializers/ticket.py:1225
+msgid "该节点不存在"
+msgstr "このノードは存在しません"
+
+#: itsm/ticket/serializers/ticket.py:1228
+msgid "抱歉, 你不具有操作当前节点的权限"
+msgstr "申し訳ありませんが、現在のノードを操作する権限がありません"
+
+#: itsm/ticket/serializers/ticket.py:1364
+#: itsm/ticket/serializers/ticket.py:1420
+msgid "操作的任务不存在，请确认后再提交"
+msgstr "操作するタスクが存在しません、確認後に再提出してください"
+
+#: itsm/ticket/serializers/ticket.py:1461
+msgid "[步骤：{}，处理人：{}]"
+msgstr "[ステップ：{}、担当者：{}]"
+
+#: itsm/ticket/validators/field.py:75 itsm/ticket/validators/field.py:468
+msgid "标题不能超过120个字符"
+msgstr "タイトルは120文字を超えてはいけません"
+
+#: itsm/ticket/validators/field.py:92
+msgid "【{}】只读字段不允许修改"
+msgstr "【{}】読み取り専用フィールドは変更できません"
+
+#: itsm/ticket/validators/field.py:103 itsm/ticket/validators/field.py:107
+#: itsm/ticket/validators/field.py:135
+msgid "【{}】为必填项"
+msgstr "【{}】は必須項目です"
+
+#: itsm/ticket/validators/field.py:127
+msgid "表格字段【{field_name}】的第【{index}】行【{column_name}】为必填项"
+msgstr "テーブルフィールド【{field_name}】の第【{index}】行の【{column_name}】は必須項目です"
+
+#: itsm/ticket/validators/field.py:157
+#, python-format
+msgid "【%s】选项不存在，请联系管理员"
+msgstr "【%s】オプションが存在しません、管理者に連絡してください"
+
+#: itsm/ticket/validators/field.py:172 itsm/ticket/validators/field.py:178
+#: itsm/ticket/validators/field.py:184
+msgid "【{}】选项不匹配，请重新选择"
+msgstr "【{}】オプションが一致しません、再選択してください"
+
+#: itsm/ticket/validators/field.py:230
+msgid "用户输入的值不符合自定义正则规则"
+msgstr "ユーザーが入力した値はカスタム正規表現ルールに適合していません"
+
+#: itsm/ticket/validators/field.py:232
+msgid "自定义正则出现异常， error = {}"
+msgstr "カスタム正規表現に例外が発生しました、エラー = {}"
+
+#: itsm/ticket/validators/field.py:319
+msgid "该正则规则不在可选范围内"
+msgstr "この正規表現ルールは選択可能範囲にありません"
+
+#: itsm/ticket/validators/field.py:337
+msgid "字段[{}]关联规则不满足条件，请检查"
+msgstr "フィールド[{}]の関連ルールが条件を満たしていません、確認してください"
+
+#: itsm/ticket/validators/field.py:395
+msgid "【{}】{} 不匹配日期格式{}"
+msgstr "【{}】{} が日付フォーマット{}と一致しません"
+
+#: itsm/ticket/validators/field.py:400
+msgid "【{}】{} 不在当前日期之后"
+msgstr "【{}】{} が現在の日付の後ではありません"
+
+#: itsm/ticket/validators/field.py:405
+msgid "【{}】{} 不在当前日期之前"
+msgstr "【{}】{} が現在の日付の前ではありません"
+
+#: itsm/ticket/validators/field.py:419
+msgid "【{}】{} 不匹配时间格式{}"
+msgstr "【{}】{} が時間フォーマット{}と一致しません"
+
+#: itsm/ticket/validators/field.py:426
+msgid "【{}】{} 不在当前时间之后"
+msgstr "【{}】{} が現在の時間の後ではありません"
+
+#: itsm/ticket/validators/field.py:431
+msgid "【{}】{} 不在当前时间之前"
+msgstr "【{}】{} が現在の時間の前ではありません"
+
+#: itsm/ticket/validators/field.py:441
+msgid "【{}】字段不存在，请联系管理员"
+msgstr "【{}】フィールドが存在しません、管理者に連絡してください"
+
+#: itsm/ticket/validators/field.py:444
+msgid "非公共字段不允许修改"
+msgstr "非公開フィールドの変更は許可されていません"
+
+#: itsm/ticket/validators/misc.py:41
+msgid "天数参数类型错误！"
+msgstr "日数パラメータのタイプエラー！"
+
+#: itsm/ticket/validators/misc.py:53
+msgid "请填写关注信息！"
+msgstr "フォロー情報を記入してください！"
+
+#: itsm/ticket/validators/misc.py:55
+msgid "关注信息不能超过200个字符！"
+msgstr "フォロー情報は200文字を超えてはいけません！"
+
+#: itsm/ticket/validators/misc.py:61
+msgid "发送关注通知校验失败：单据不存在，请联系管理员"
+msgstr "フォローノーティスの検証に失敗しました：文書が存在しません、管理者に連絡してください"
+
+#: itsm/ticket/validators/misc.py:65
+msgid "发送关注通知校验失败：单据已结束或权限不足"
+msgstr "フォローノーティスの検証に失敗しました：文書は終了したか権限が不足しています"
+
+#: itsm/ticket/validators/misc.py:76
+msgid "发送关注通知校验失败：通知人不存在或通知角色没有人员，请联系管理员"
+msgstr "フォローノーティスの検証に失敗しました：通知する人が存在しないか、通知役割に人員がいません、管理者に連絡してください"
+
+#: itsm/ticket/validators/misc.py:86
+msgid "单据评论信息不存在，请联系管理员！"
+msgstr "文書のコメント情報が存在しません、管理者に連絡してください！"
+
+#: itsm/ticket/validators/misc.py:90
+msgid "评价信息不正确，请联系管理员！"
+msgstr "評価情報が不正です、管理者に連絡してください！"
+
+#: itsm/ticket/validators/misc.py:92
+msgid "单据评论信息不匹配"
+msgstr "文書のコメント情報が一致しません"
+
+#: itsm/ticket/validators/misc.py:94
+msgid "该单据已经被评论，请勿重复评论！"
+msgstr "この文書はすでにコメントされています、重複コメントしないでください！"
+
+#: itsm/ticket/validators/misc.py:96
+msgid "请从（1~5星）选择评价星级！"
+msgstr "（1~5星）から評価星を選択してください！"
+
+#: itsm/ticket/validators/misc.py:104 itsm/ticket/validators/misc.py:125
+msgid "抱歉，您无权发送评价邀请"
+msgstr "申し訳ありませんが、評価招待を送る権限がありません"
+
+#: itsm/ticket/validators/misc.py:108 itsm/ticket/validators/misc.py:112
+msgid "SMS 发送评价邀请超过限额"
+msgstr "SMSによる評価招待の送信が上限を超えました"
+
+#: itsm/ticket/validators/ticket.py:72
+msgid "fields字段未填"
+msgstr "fieldsフィールドが記入されていません"
+
+#: itsm/ticket/validators/ticket.py:103
+msgid "单据创建失败，缺少参数：{}"
+msgstr "文書の作成に失敗しました、パラメータが不足しています: {}"
+
+#: itsm/ticket/validators/ticket.py:134
+msgid "节点暂不支持操作：{}"
+msgstr "ノードは現在操作をサポートしていません: {}"
+
+#: itsm/ticket/validators/ticket.py:149 itsm/ticket/validators/ticket.py:162
+#, python-format
+msgid "当前节点无法进行【%s】操作"
+msgstr "現在のノードでは【%s】の操作ができません"
+
+#: itsm/ticket/validators/ticket.py:150 itsm/ticket/validators/ticket.py:163
+msgid "不存在操作类型的"
+msgstr "存在しない操作タイプの"
+
+#: itsm/ticket/validators/ticket.py:170
+msgid "您无法认领该单据"
+msgstr "この文書を引き受けることはできません"
+
+#: itsm/ticket/validators/ticket.py:176
+msgid "指定流程节点【{}】不支持转单操作."
+msgstr "指定されたプロセスノード【{}】は転送操作をサポートしていません."
+
+#: itsm/ticket/validators/ticket.py:179
+msgid "当前任务状态下无法转单."
+msgstr "現在のタスク状態では転送できません."
+
+#: itsm/ticket/validators/ticket.py:182
+msgid "转单描述信息不能为空，请重新确认."
+msgstr "転送の説明情報を空にできません、再確認してください."
+
+#: itsm/ticket/validators/ticket.py:205
+msgid "当前分配的用户组类型不正确"
+msgstr "現在割り当てられているユーザーグループのタイプが正しくありません"
+
+#: itsm/ticket/validators/ticket.py:219
+msgid "当前分配的用户组可能不存在"
+msgstr "現在割り当てられているユーザーグループが存在しない可能性があります"
+
+#: itsm/ticket/validators/ticket.py:228
+msgid "当前分配的部分用户组可能不存在"
+msgstr "現在割り当てられている一部のユーザーグループが存在しない可能性があります"
+
+#: itsm/ticket/validators/ticket.py:242
+msgid "当前分配的部分用户可能不符合条件，请确保用户在{}中"
+msgstr "現在割り当てられている一部のユーザーは条件を満たしていない可能性があります、ユーザーが{}内にいることを確認してください"
+
+#: itsm/ticket/validators/ticket.py:255 itsm/ticket/validators/ticket.py:269
+#: itsm/ticket/validators/ticket.py:281
+msgid "【{}】没有任务【提单】的【提交】操作权限."
+msgstr "【{}】はタスク【提案】の【提出】操作権限がありません."
+
+#: itsm/ticket/validators/ticket.py:310 itsm/ticket/validators/ticket.py:313
+#: itsm/ticket/validators/ticket.py:316
+msgid "单据"
+msgstr "文書"
+
+#: itsm/ticket/validators/ticket.py:310
+msgid "单据不存在，请联系管理员！"
+msgstr "文書が存在しません、管理者に連絡してください！"
+
+#: itsm/ticket/validators/ticket.py:313
+msgid "单据已结束，无法新建关联单！"
+msgstr "文書は終了しており、新たに関連チケットを作成できません！"
+
+#: itsm/ticket/validators/ticket.py:316
+msgid "抱歉，您没有单据操作权限，请联系管理员！"
+msgstr "申し訳ありませんが、文書を操作する権限がありません、管理者に連絡してください！"
+
+#: itsm/ticket/validators/ticket.py:328
+msgid "参数类型错误:[to_tickets]"
+msgstr "パラメータタイプエラー: [to_tickets]"
+
+#: itsm/ticket/validators/ticket.py:331
+msgid "关联失败，单据不能关联自身"
+msgstr "関連付けに失敗しました、文書は自身と関連付けできません"
+
+#: itsm/ticket/validators/ticket.py:351
+msgid "单据【{}】和【{}】已存在关联关系"
+msgstr "文書【{}】と【{}】はすでに関連関係が存在します"
+
+#: itsm/ticket/validators/ticket.py:365
+msgid "母单为必填项"
+msgstr "親チケットは必須項目です"
+
+#: itsm/ticket/validators/ticket.py:389
+msgid "母单不存在，请联系管理员"
+msgstr "親チケットが存在しません、管理者に連絡してください"
+
+#: itsm/ticket/validators/ticket.py:396
+msgid "抱歉，您没有关联母子单的权限"
+msgstr "申し訳ありませんが、親チケットと子チケットを関連付ける権限がありません"
+
+#: itsm/ticket/validators/ticket.py:401
+msgid "母子单必须属于同一个流程版本，无法关联"
+msgstr "親チケットと子チケットは同じプロセスバージョンである必要があり、関連付けできません"
+
+#: itsm/ticket/validators/ticket.py:407
+msgid "子单不存在，请联系管理员"
+msgstr "子チケットが存在しません、管理者に連絡してください"
+
+#: itsm/ticket/validators/ticket.py:416
+msgid "单据 [{}] 已经是子单，无法成为母单"
+msgstr "文書 [{}] はすでに子チケットです、親チケットになることはできません"
+
+#: itsm/ticket/validators/ticket.py:436
+msgid "单据 [{}] 已经是母单，无法成为子单"
+msgstr "文書 [{}] はすでに親チケットです、子チケットになることはできません"
+
+#: itsm/ticket/validators/ticket.py:449
+msgid "抱歉，当前流程配置无法撤单，请联系服务负责人"
+msgstr "申し訳ありません、現在のプロセス設定ではチケットを取り消せません、サービス担当者に連絡してください"
+
+#: itsm/ticket/validators/ticket.py:453
+msgid "抱歉，你无权撤销单据，撤销单据的非当前单据的提单人, {}!={}"
+msgstr "申し訳ありませんが、文書を取消す権限がありません。取消する文書の担当者は現在の文書の申請者ではありません, {}!={}"
+
+#: itsm/ticket/validators/ticket.py:457
+msgid "抱歉，单据已经结束，无法撤销"
+msgstr "申し訳ありませんが、文書はすでに終了しています、取消できません"
+
+#: itsm/ticket/validators/ticket.py:462
+msgid "抱歉，单据执行中，无法撤销"
+msgstr "申し訳ありませんが、文書は実行中です、取消できません"
+
+#: itsm/ticket/validators/ticket.py:469
+msgid "抱歉，您无权督办"
+msgstr "申し訳ありませんが、督促する権限がありません"
+
+#: itsm/ticket/validators/ticket.py:478 itsm/ticket/validators/ticket.py:595
+#, python-format
+msgid "流程节点(%s)不存在，请联系管理员."
+msgstr "プロセスノード(%s)が存在しません、管理者に連絡してください."
+
+#: itsm/ticket/validators/ticket.py:481 itsm/ticket/validators/ticket.py:592
+msgid "抱歉，子单为只读状态，无法操作"
+msgstr "申し訳ありませんが、子チケットは読み取り専用です、操作できません"
+
+#: itsm/ticket/validators/ticket.py:485 itsm/ticket/validators/ticket.py:567
+msgid "任务处于【{}】状态，无法操作."
+msgstr "タスクは【{}】状態で、操作できません."
+
+#: itsm/ticket/validators/ticket.py:495
+msgid "指定流程节点【{}】不支持终止操作."
+msgstr "指定されたプロセスノード【{}】は終了操作をサポートしていません."
+
+#: itsm/ticket/validators/ticket.py:499
+msgid "【{}】没有任务【{}】的操作权限."
+msgstr "【{}】はタスク【{}】の操作権限がありません."
+
+#: itsm/ticket/validators/ticket.py:503
+msgid "请输入终止原因！"
+msgstr "終了理由を入力してください！"
+
+#: itsm/ticket/validators/ticket.py:581 itsm/ticket/validators/ticket.py:586
+msgid "【{}】没有任务【{}】的【提交】操作权限."
+msgstr "【{}】はタスク【{}】の【提出】操作権限がありません."
+
+#: itsm/ticket/validators/ticket.py:598 itsm/ticket_status/validators.py:74
+msgid "单据状态为结束状态，无法继续转换"
+msgstr "文書状態は終了状態です、続行して変換できません"
+
+#: itsm/ticket/views/misc.py:122
+msgid "单据评论信息不存在"
+msgstr "文書のコメント情報が存在しません"
+
+#: itsm/ticket/views/misc.py:223
+msgid "组件调用异常：发送失败，请联系管理员"
+msgstr "コンポーネント呼び出し例外：送信に失敗しました、管理者に連絡してください"
+
+#: itsm/ticket/views/operational.py:534
+msgid "日期范围输入有误，请重新输入，例如：{}__gte=2019-01-01, {}__lte=2019-01-02"
+msgstr "日付範囲の入力が間違っています、再入力してください、例：{}__gte=2019-01-01, {}__lte=2019-01-02"
+
+#: itsm/ticket/views/operational.py:565
+msgid "日期范围输入有误，请重新输入，例如：create_at__gte=2019-01, create_at__lte=2019-02"
+msgstr ""
+"日付範囲の入力が間違っています、再入力してください、例：create_at__gte=2019-01, create_at__lte=2019-02"
+
+#: itsm/ticket/views/operational.py:758 itsm/ticket/views/ticket.py:469
+msgid "服务类型参数必填"
+msgstr "サービスタイプのパラメータは必須です"
+
+#: itsm/ticket/views/operational.py:1014 itsm/ticket/views/operational.py:1056
+msgid "服务类型参数有误，请重新输入"
+msgstr "サービスタイプのパラメータが間違っています、再入力してください"
+
+#: itsm/ticket/views/ticket.py:379
+msgid "用户登录态异常"
+msgstr "ユーザーログイン状態異常"
+
+#: itsm/ticket/views/ticket.py:410
+msgid "请输入service_id"
+msgstr "service_idを入力してください"
+
+#: itsm/ticket/views/ticket.py:576
+msgid "【{}】发送短信失败，请检查电话号码是否正确或联系管理员！"
+msgstr "【{}】SMS送信失敗、電話番号が正しいか確認するか、管理者に連絡してください！"
+
+#: itsm/ticket/views/ticket.py:642
+msgid "【{}】发送邮件失败，请检查用户邮件配置是否正确或联系管理员！"
+msgstr "【{}】メール送信失敗、ユーザーメールの設定が正しいか確認するか、管理者に連絡してください！"
+
+#: itsm/ticket/views/ticket.py:654 itsm/ticket/views/ticket.py:705
+msgid "请选择需要导出的字段"
+msgstr "エクスポートする必要があるフィールドを選択してください"
+
+#: itsm/ticket/views/ticket.py:722
+msgid "解析导出的提单字段异常：请检查请求参数内容，提单字段需要通过base64编码。"
+msgstr "エクスポートされた申請フィールドの解析異常：リクエストパラメータ内容を確認してください。申請フィールドはbase64エンコードが必要です。"
+
+#: itsm/ticket/views/ticket.py:891
+msgid "处理失败，单据处于挂起状态中，请先恢复"
+msgstr "処理失敗、文書は保留状態中です、先に復帰してください"
+
+#: itsm/ticket/views/ticket.py:1148
+msgid "催办失败，该单据处于挂起状态"
+msgstr "督促失敗、この文書は保留状態です"
+
+#: itsm/ticket/views/ticket.py:1207
+msgid "异常分派失败，该单据处于挂起状态"
+msgstr "異常割り当てに失敗しました、この文書は保留状態です"
+
+#: itsm/ticket/views/ticket.py:1227
+msgid "该单据已经是挂起状态, 请勿重复操作"
+msgstr "この文書はすでに保留状態です、重複操作しないでください"
+
+#: itsm/ticket/views/ticket.py:1229
+msgid "无"
+msgstr "なし"
+
+#: itsm/ticket/views/ticket.py:1238
+msgid "该单据不是挂起状态, 请勿重复操作"
+msgstr "この文書は保留状態ではありません、重複操作しないでください"
+
+#: itsm/ticket/views/ticket.py:1249
+msgid "设置的关闭状态不在正确状态范围之内"
+msgstr "設定された終了状態は正しい状態範囲内にありません"
+
+#: itsm/ticket/views/ticket.py:1253
+msgid "关单失败，原因描述超过 {len}  字符"
+msgstr "チケットを閉じることに失敗しました、理由の説明が {len} 文字を超えました"
+
+#: itsm/ticket/views/ticket.py:1386 itsm/ticket/views/ticket.py:1411
+msgid "无操作权限"
+msgstr "操作権限がありません"
+
+#: itsm/ticket/views/ticket.py:1426
+msgid "无效的关联关系"
+msgstr "無効な関連関係"
+
+#: itsm/ticket/views/ticket.py:1816
+msgid "存在挂起的单据, 请检查"
+msgstr "保留中の文書が存在します、確認してください"
+
+#: itsm/ticket/views/ticket_remark.py:25
+msgid "ticket_id 不能为空"
+msgstr "ticket_id は空にできません"
+
+#: itsm/ticket_status/models.py:107
+msgid "已配置"
+msgstr "構成済み"
+
+#: itsm/ticket_status/models.py:113 itsm/ticket_status/models.py:114
+msgid "工单状态配置"
+msgstr "チケット状態構成"
+
+#: itsm/ticket_status/models.py:158
+msgid "状态关键字"
+msgstr "状態キーワード"
+
+#: itsm/ticket_status/models.py:159
+msgid "状态名称"
+msgstr "状態名"
+
+#: itsm/ticket_status/models.py:160
+msgid "二进制颜色"
+msgstr "バイナリ色"
+
+#: itsm/ticket_status/models.py:162
+msgid "状态说明"
+msgstr "状態説明"
+
+#: itsm/ticket_status/models.py:165
+msgid "流程状态"
+msgstr "プロセス状態"
+
+#: itsm/ticket_status/models.py:171
+msgid "是否内置状态"
+msgstr "ビルトイン状態かどうか"
+
+#: itsm/ticket_status/models.py:172
+msgid "是否为开始状态"
+msgstr "開始状態かどうか"
+
+#: itsm/ticket_status/models.py:173
+msgid "是否为结束状态"
+msgstr "終了状態かどうか"
+
+#: itsm/ticket_status/models.py:174
+msgid "是否为挂起状态"
+msgstr "保留状態かどうか"
+
+#: itsm/ticket_status/models.py:262
+msgid "源状态"
+msgstr "元の状態"
+
+#: itsm/ticket_status/models.py:268
+msgid "目标状态"
+msgstr "目標状態"
+
+#: itsm/ticket_status/models.py:273
+msgid "是否自动转换"
+msgstr "自動変換するかどうか"
+
+#: itsm/ticket_status/models.py:274
+msgid "阈值"
+msgstr "しきい値"
+
+#: itsm/ticket_status/models.py:290 itsm/ticket_status/models.py:291
+msgid "状态转换规则"
+msgstr "状態変換ルール"
+
+#: itsm/ticket_status/serializers.py:52
+msgid "请输入状态名称"
+msgstr "状態名を入力してください"
+
+#: itsm/ticket_status/serializers.py:52
+msgid "状态名称长度不能大于255个字符"
+msgstr "状態名の長さは255文字を超えてはなりません"
+
+#: itsm/ticket_status/serializers.py:54
+msgid "二进制颜色不能为空"
+msgstr "バイナリ色は空にできません"
+
+#: itsm/ticket_status/serializers.py:58
+msgid "服务类型不能为空"
+msgstr "サービスタイプは必須です"
+
+#: itsm/ticket_status/serializers.py:108
+msgid "抱歉，内置单据状态无法被编辑"
+msgstr "申し訳ありませんが、システム標準のチケット状態は編集できません"
+
+#: itsm/ticket_status/validators.py:42
+msgid "用于排序的工单状态参数不合法，请联系管理员"
+msgstr "チケット状態の並び順パラメータが不正です。管理者に連絡してください"
+
+#: itsm/ticket_status/validators.py:45
+msgid "设置为起始状态的工单状态不存在，请联系管理员"
+msgstr "開始状態として設定されたチケット状態が存在しません。管理者に連絡してください"
+
+#: itsm/ticket_status/validators.py:49
+msgid "设置为结束状态的工作状态不存在，请联系管理员"
+msgstr "終了状態として設定されたチケット状態が存在しません。管理者に連絡してください"
+
+#: itsm/ticket_status/validators.py:70
+msgid "单据状态不存在，请联系管理员"
+msgstr "チケット状態が存在しません。管理者に連絡してください"
+
+#: itsm/ticket_status/validators.py:81
+msgid "阈值单位错误，请重新输入"
+msgstr "閾値の単位が誤っています。再入力してください"
+
+#: itsm/ticket_status/validators.py:84
+msgid "阈值必须为正整数，请重新输入"
+msgstr "閾値は正の整数で入力してください"
+
+#: itsm/ticket_status/validators.py:89
+msgid "流转目标的单据状态不存在，请联系管理员"
+msgstr "遷移先のチケット状態が存在しません。管理者に連絡してください"
+
+#: itsm/ticket_status/validators.py:95
+msgid "from_status_id不能为空"
+msgstr "from_status_idは必須項目です"
+
+#: itsm/ticket_status/validators.py:97
+msgid "id为【{}】的工单状态不存在，请联系管理员"
+msgstr "ID【{}】のチケット状態は存在しません。管理者に連絡してください"
+
+#: itsm/ticket_status/validators.py:117
+msgid "状态名称已存在，请重新输入"
+msgstr "状態名が既に存在します。再入力してください"
+
+#: itsm/ticket_status/views.py:94
+msgid "抱歉，内置工单状态无法被删除"
+msgstr "申し訳ありませんが、組み込みのチケット状態は削除できません"
+
+#: itsm/trigger/validators.py:56 itsm/trigger/validators.py:59
+msgid "存在其他相同名称的触发器，请修改后再提交"
+msgstr "同じ名前のトリガーが既に存在します。修正してから再送信してください"
+
+#: itsm/trigger/validators.py:75
+msgid "同一个触发器下的规则名称不能重复"
+msgstr "同一トリガー内のルール名は重複できません"
+
+#: itsm/trigger/validators.py:82
+msgid "第{}个规则下的响应事件部分不存在"
+msgstr "{}番目のルールの応答イベントセクションが存在しません"
+
+#: itsm/trigger/views.py:196
+msgid "触发器规则 ID 匹配异常"
+msgstr "トリガールールIDのマッチング異常"
+
+#: itsm/trigger/views.py:249
+msgid "Schema ID 异常"
+msgstr "スキーマID異常"
+
+#: itsm/trigger/action/components/api.py:42
+msgid "API接口ID"
+msgstr "APIインターフェースID"
+
+#: itsm/trigger/action/components/api.py:43
+msgid "API请求参数配置"
+msgstr "APIリクエストパラメータ設定"
+
+#: itsm/trigger/action/components/api.py:45
+msgid "API系统返回参数"
+msgstr "APIシステム応答パラメータ"
+
+#: itsm/trigger/action/components/api.py:50
+msgid "API执行"
+msgstr "API実行"
+
+#: itsm/trigger/action/components/automatic_announcement.py:43
+msgid "文本内容"
+msgstr "テキスト内容"
+
+#: itsm/trigger/action/components/automatic_announcement.py:50
+msgid "企业微信机器人通知"
+msgstr "企業WeChatボット通知"
+
+#: itsm/trigger/action/components/modify_field.py:41
+msgid "修改的字段"
+msgstr "変更フィールド"
+
+#: itsm/trigger/action/components/modify_field.py:42
+#: itsm/trigger/action/components/modify_first_state_field.py:48
+msgid "设置的字段值"
+msgstr "設定フィールド値"
+
+#: itsm/trigger/action/components/modify_field.py:46
+msgid "修改字段值"
+msgstr "フィールド値変更"
+
+#: itsm/trigger/action/components/modify_field.py:56
+#: itsm/trigger/action/components/modify_first_state_field.py:64
+#: itsm/trigger/action/components/unbind_parent_child_tickets.py:62
+#, python-format
+msgid "对应的单据【%s】不存在"
+msgstr "対応のチケット【%s】は存在しません"
+
+#: itsm/trigger/action/components/modify_first_state_field.py:42
+msgid "节点字段值"
+msgstr "ノードフィールド値"
+
+#: itsm/trigger/action/components/modify_first_state_field.py:53
+msgid "修改提单节点字段值"
+msgstr "チケット作成ノードのフィールド値変更"
+
+#: itsm/trigger/action/components/modify_specified_state_processor.py:43
+msgid "指定节点"
+msgstr "指定ノード"
+
+#: itsm/trigger/action/components/modify_specified_state_processor.py:54
+msgid "修改指定节点处理人"
+msgstr "指定ノードの担当者変更"
+
+#: itsm/trigger/action/components/modify_ticket_status.py:53
+msgid "修改工单状态"
+msgstr "チケット状態の変更"
+
+#: itsm/trigger/action/components/modify_ticket_status.py:86
+#: itsm/trigger/action/components/update_ticket_status.py:79
+#, python-format
+msgid "工单状态无法更新为%s, 不满足状态流转规则, 请联系管理员! "
+msgstr "チケット状態を%sに更新できません。状態遷移ルールに準拠していません。管理者に連絡してください！"
+
+#: itsm/trigger/action/components/send_message.py:105
+msgid "短信"
+msgstr "SMS"
+
+#: itsm/trigger/action/components/send_message.py:127
+msgid "微信"
+msgstr "WeChat"
+
+#: itsm/trigger/action/components/send_message.py:193
+msgid "发送通知给用户"
+msgstr "ユーザーへの通知送信"
+
+#: itsm/trigger/action/components/unbind_parent_child_tickets.py:38
+msgid "解绑说明"
+msgstr "バインド解除説明"
+
+#: itsm/trigger/action/components/unbind_parent_child_tickets.py:41
+msgid "解绑的子单"
+msgstr "バインド解除子チケット"
+
+#: itsm/trigger/action/components/unbind_parent_child_tickets.py:50
+msgid "解绑母子单"
+msgstr "親子チケットバインド解除"
+
+#: itsm/trigger/action/components/unbind_parent_child_tickets.py:69
+#, python-format
+msgid "当前的单据【%s】不存在母子关联单"
+msgstr "現在のチケット【%s】に親子関連チケットは存在しません"
+
+#: itsm/trigger/action/components/update_ticket_status.py:46
+msgid "更新单据状态"
+msgstr "チケット状態更新"
+
+#: itsm/trigger/action/core/field.py:145
+msgid "所选择的API配置对象不存在"
+msgstr "選択したAPI設定オブジェクトは存在しません"
+
+#: itsm/trigger/models/action.py:77 itsm/trigger/models/trigger.py:136
+msgid "触发事件信号"
+msgstr "イベントトリガー信号"
+
+#: itsm/trigger/models/action.py:80 itsm/trigger/models/trigger.py:138
+msgid "触发对象"
+msgstr "トリガーオブジェクト"
+
+#: itsm/trigger/models/action.py:80
+msgid "一般为触发该信号的元素id"
+msgstr "通常はこの信号をトリガーする要素のid"
+
+#: itsm/trigger/models/action.py:82
+msgid "事件关联的触发器规则信息"
+msgstr "イベント関連トリガールール情報"
+
+#: itsm/trigger/models/action.py:83
+msgid "事件关联的触发器信息"
+msgstr "イベント関連トリガー情報"
+
+#: itsm/trigger/models/action.py:84
+msgid "事件关联的配置信息"
+msgstr "イベント関連設定情報"
+
+#: itsm/trigger/models/action.py:88
+msgid "响应事件来源类型"
+msgstr "応答イベントソースタイプ"
+
+#: itsm/trigger/models/action.py:89
+msgid "记录响应事件的来源类型, 由用户自定义，方便使用方后期管理"
+msgstr "応答イベントのソースタイプを記録(ユーザー定義可能、後続管理用)"
+
+#: itsm/trigger/models/action.py:93 itsm/trigger/models/trigger.py:153
+msgid "对应的来源PK值"
+msgstr "対応ソースPK値"
+
+#: itsm/trigger/models/action.py:95
+msgid "触发事件的上下文参数"
+msgstr "イベントトリガーコンテキストパラメータ"
+
+#: itsm/trigger/models/action.py:97
+msgid "用户的输入参数"
+msgstr "ユーザー入力パラメータ"
+
+#: itsm/trigger/models/action.py:97 itsm/trigger/models/trigger.py:81
+#: itsm/trigger/models/trigger.py:143
+msgid "输入参数引用的参数变量"
+msgstr "入力パラメータ参照用変数"
+
+#: itsm/trigger/models/action.py:100
+msgid "动作的输出参数"
+msgstr "アクション出力パラメータ"
+
+#: itsm/trigger/models/action.py:100
+msgid "动作的输出参数字典"
+msgstr "アクション出力パラメータ辞書"
+
+#: itsm/trigger/models/action.py:105
+msgid "响应事件状态"
+msgstr "イベント応答ステータス"
+
+#: itsm/trigger/models/action.py:110
+msgid "任务结束事件"
+msgstr "タスク終了イベント"
+
+#: itsm/trigger/models/action.py:111
+msgid "执行人"
+msgstr "実行者"
+
+#: itsm/trigger/models/action.py:113
+msgid "执行错误信息"
+msgstr "実行エラー情報"
+
+#: itsm/trigger/models/action.py:113
+msgid "状态为失败的时候记录的错误日志"
+msgstr "ステータスが失敗時のエラーログ"
+
+#: itsm/trigger/models/action.py:116
+msgid "执行的参数"
+msgstr "実行パラメータ"
+
+#: itsm/trigger/models/action.py:116
+msgid "手动触发器实际执行的参数信息"
+msgstr "手動トリガー実際の実行パラメータ情報"
+
+#: itsm/trigger/models/action.py:123 itsm/trigger/models/action.py:124
+msgid "响应动作表"
+msgstr "応答アクションテーブル"
+
+#: itsm/trigger/models/action.py:277
+msgid "系统"
+msgstr "システム"
+
+#: itsm/trigger/models/trigger.py:68
+msgid "动作模版的名称"
+msgstr "アクションテンプレート名"
+
+#: itsm/trigger/models/trigger.py:69
+msgid "动作显示名称"
+msgstr "アクション表示名"
+
+#: itsm/trigger/models/trigger.py:70
+msgid "组件类型"
+msgstr "コンポーネントタイプ"
+
+#: itsm/trigger/models/trigger.py:73
+msgid "操作方式"
+msgstr "操作方法"
+
+#: itsm/trigger/models/trigger.py:76
+msgid "延迟参数"
+msgstr "遅延パラメータ"
+
+#: itsm/trigger/models/trigger.py:78
+msgid "是否可以重复执行"
+msgstr "繰り返し実行可能か"
+
+#: itsm/trigger/models/trigger.py:80
+msgid "配置参数"
+msgstr "設定パラメータ"
+
+#: itsm/trigger/models/trigger.py:80
+msgid "当前响应事件配置的参数模版"
+msgstr "現在の応答イベント設定のパラメータテンプレート"
+
+#: itsm/trigger/models/trigger.py:81 itsm/trigger/models/trigger.py:143
+msgid "输入参数"
+msgstr "入力パラメータ"
+
+#: itsm/trigger/models/trigger.py:84 itsm/trigger/models/trigger.py:85
+msgid "响应动作参数配置表"
+msgstr "レスポンスアクションパラメータ設定テーブル"
+
+#: itsm/trigger/models/trigger.py:134
+msgid "描述信息"
+msgstr "説明情報"
+
+#: itsm/trigger/models/trigger.py:138
+msgid "一般为触发该信号的实际对象模型id"
+msgstr "通常はこの信号をトリガーする実際のオブジェクトモデルID"
+
+#: itsm/trigger/models/trigger.py:148
+msgid "来源类型"
+msgstr "ソースタイプ"
+
+#: itsm/trigger/models/trigger.py:149
+msgid "触发规则的配置来源"
+msgstr "トリガールールの設定ソース"
+
+#: itsm/trigger/models/trigger.py:155
+msgid "对应的变量来源表ID"
+msgstr "対応する変数ソーステーブルID"
+
+#: itsm/trigger/models/trigger.py:158
+msgid "是否可启用"
+msgstr "有効化可能か"
+
+#: itsm/trigger/models/trigger.py:160
+msgid "对应的icon"
+msgstr "対応するアイコン"
+
+#: itsm/trigger/models/trigger.py:264
+msgid "规则标题"
+msgstr "ルールタイトル"
+
+#: itsm/trigger/models/trigger.py:266 itsm/workflow/models/trigger.py:39
+msgid "触发条件"
+msgstr "トリガー条件"
+
+#: itsm/trigger/models/trigger.py:267
+msgid "触发方式"
+msgstr "トリガー方式"
+
+#: itsm/trigger/models/trigger.py:269
+msgid "响应事件列表"
+msgstr "応答イベントリスト"
+
+#: itsm/trigger/models/trigger.py:270
+msgid "关联事件的配置ID列表,关联actionSchema"
+msgstr "関連イベントの設定IDリスト（actionSchema関連）"
+
+#: itsm/trigger/models/trigger.py:274
+msgid "对应的触发器id"
+msgstr "対応するトリガーID"
+
+#: itsm/trigger/models/trigger.py:277 itsm/trigger/models/trigger.py:278
+msgid "触发器条件与动作配置"
+msgstr "トリガー条件とアクション設定"
+
+#: itsm/workflow/backend.py:105
+msgid "当前节点画布连线不合理, 请重新确认"
+msgstr "現在のノードキャンバス接続が不適切です。再確認してください"
+
+#: itsm/workflow/backend.py:390
+#, python-format
+msgid "不支持的数据类型 %s"
+msgstr "サポートされていないデータ型 %s"
+
+#: itsm/workflow/permissions.py:42
+msgid "抱歉，您没有基础模型编辑的权限，请联系管理员添加"
+msgstr "申し訳ありませんが、基本モデル編集権限がありません。管理者に連絡して追加してください"
+
+#: itsm/workflow/permissions.py:54
+msgid "抱歉，您没有流程编辑的权限，请联系管理员添加"
+msgstr "申し訳ありませんが、プロセス編集権限がありません。管理者に連絡して追加してください"
+
+#: itsm/workflow/permissions.py:71
+msgid "对不起，您未拥有相应权限，请联系管理员添加"
+msgstr "申し訳ございませんが、必要な権限がありません。管理者に連絡して追加してください"
+
+#: itsm/workflow/permissions.py:136
+msgid "流程版本占用中，请到服务中解绑后再删除"
+msgstr "プロセスバージョンが使用中です。サービスから紐付けを解除してから削除してください"
+
+#: itsm/workflow/validators.py:106
+msgid "不关联业务的流程不能选择CMDB操作角色"
+msgstr "業務と関連付けられていないプロセスではCMDB操作ロールを選択できません"
+
+#: itsm/workflow/validators.py:118
+msgid "流程不存在"
+msgstr "プロセスが存在しません"
+
+#: itsm/workflow/validators.py:122
+msgid "存在线条不属于该流程，请检查"
+msgstr "このプロセスに属していない接続線があります。確認してください"
+
+#: itsm/workflow/validators.py:158 itsm/workflow/validators.py:175
+msgid "该字段正在被【{}】节点引用，请先取消引用"
+msgstr "このフィールドは【{}】ノードで参照されています。参照を解除してください"
+
+#: itsm/workflow/validators.py:198
+msgid "该字段正作为【{}】线条的判断条件，请先取消引用"
+msgstr "このフィールドは【{}】接続線の判断条件として使用されています。参照を解除してください"
+
+#: itsm/workflow/validators.py:214
+msgid "该字段正作为【{}】字段的显示条件，请先取消引用"
+msgstr "このフィールドは【{}】フィールドの表示条件として使用されています。参照を解除してください"
+
+#: itsm/workflow/validators.py:226
+msgid "该字段正在被【{}】字段引用，请先取消引用"
+msgstr "このフィールドは【{}】フィールドで参照されています。参照を解除してください"
+
+#: itsm/workflow/validators.py:233
+msgid "请选择字段"
+msgstr "フィールドを選択してください"
+
+#: itsm/workflow/validators.py:239 itsm/workflow/validators.py:251
+msgid "{}公共字段不存在，请联系管理员"
+msgstr "{}共通フィールドが存在しません。管理者に連絡してください"
+
+#: itsm/workflow/validators.py:267 itsm/workflow/validators.py:568
+msgid "当前流程已存在唯一标识【{}】，请重新输入"
+msgstr "現在のプロセスには既にユニーク識別子【{}】が存在します。再入力してください"
+
+#: itsm/workflow/validators.py:281
+msgid "当前SLA任务缺少开始节点或者结束节点，请重新选择"
+msgstr "現在のSLAタスクには開始ノードまたは終了ノードが不足しています。再選択してください"
+
+#: itsm/workflow/validators.py:316
+msgid "{source_type}【{source_name}】内的触发器【{trigger_name}】为草稿状态，无法部署"
+msgstr ""
+"{source_type}【{source_name}】内のトリガー【{trigger_name}】はドラフト状態のため、デプロイできません"
+
+#: itsm/workflow/validators.py:339
+#, python-format
+msgid "流程内引用的任务模版【%s】为草稿状态，无法部署"
+msgstr "プロセス内で参照されているタスクテンプレート【%s】はドラフト状態のため、デプロイできません"
+
+#: itsm/workflow/validators.py:353
+msgid "流程内任务信息没有配置"
+msgstr "プロセス内のタスク情報が設定されていません"
+
+#: itsm/workflow/validators.py:375
+msgid "{obj_type}【{name}】使用了未定义的字段【{diff}】"
+msgstr "{obj_type}【{name}】で未定義のフィールド【{diff}】が使用されています"
+
+#: itsm/workflow/validators.py:444
+msgid "当前流程画布连线不合理，请重新确认. "
+msgstr "現在のプロセスキャンバスの接続が適切ではありません。再確認してください。"
+
+#: itsm/workflow/validators.py:450
+msgid "当前节点画布连线不合理，请重新确认. "
+msgstr "現在のノードキャンバスの接続が適切ではありません。再確認してください。"
+
+#: itsm/workflow/validators.py:462
+msgid "请选择标准运维流程模板"
+msgstr "標準オペレーションプロセステンプレートを選択してください"
+
+#: itsm/workflow/validators.py:471
+msgid "请选择蓝盾项目"
+msgstr "BlueOceanプロジェクトを選択してください"
+
+#: itsm/workflow/validators.py:473
+msgid "请选择蓝盾流水线"
+msgstr "BlueOceanパイプラインを選択してください"
+
+#: itsm/workflow/validators.py:476
+msgid "【{}】参数不能为空"
+msgstr "【{}】パラメーターは必須です"
+
+#: itsm/workflow/validators.py:497
+msgid "操作角色不存在"
+msgstr "操作ロールが存在しません"
+
+#: itsm/workflow/validators.py:505
+msgid "操作角色不能为空"
+msgstr "操作ロールは必須です"
+
+#: itsm/workflow/validators.py:513
+msgid "该节点操作角色不能选择不限"
+msgstr "このノードの操作ロールでは「無制限」を選択できません"
+
+#: itsm/workflow/validators.py:543
+msgid "参数格式错误，请联系管理员"
+msgstr "パラメーター形式が不正です。管理者に連絡してください"
+
+#: itsm/workflow/validators.py:545
+msgid "所选API接口不存在，请重新选择"
+msgstr "選択したAPIインターフェースが存在しません。再選択してください"
+
+#: itsm/workflow/validators.py:554
+msgid "字段唯一标识不能修改"
+msgstr "フィールドのユニーク識別子は変更できません"
+
+#: itsm/workflow/validators.py:558
+msgid "title 为内置唯一标识，请重新输入"
+msgstr "titleはシステム組み込みのユニーク識別子です。再入力してください"
+
+#: itsm/workflow/validators.py:581
+msgid "存在空行数据，请补全或删除"
+msgstr "空行データがあります。補完または削除してください"
+
+#: itsm/workflow/validators.py:589
+msgid "表现形式不支持，请重新选择！"
+msgstr "表示形式がサポートされていません。再選択してください！"
+
+#: itsm/workflow/validators.py:593
+msgid "选择框数据存在空行，请检查"
+msgstr "選択ボックスデータに空行があります。確認してください"
+
+#: itsm/workflow/validators.py:597
+msgid "自定义表格表头不能为空，请联系管理员！"
+msgstr "カスタムテーブルのヘッダーは空にできません。管理者に連絡してください！"
+
+#: itsm/workflow/validators.py:611
+msgid "【{0}】请输入自定义数据，换行分隔。"
+msgstr "【{0}】カスタムデータを入力してください（改行区切り）"
+
+#: itsm/workflow/validators.py:625
+msgid "自定义数据【{}】不唯一，请重新输入"
+msgstr "カスタムデータ【{}】が一意ではありません。再入力してください"
+
+#: itsm/workflow/validators.py:630
+msgid "请输入选项值"
+msgstr "オプション値を入力してください"
+
+#: itsm/workflow/validators.py:632
+msgid "自定义数据【{}】长度不能大于{}个字符"
+msgstr "カスタムデータ【{}】の長さは{}文字以内にしてください"
+
+#: itsm/workflow/validators.py:641
+msgid "自定义数据key值【{}】仅支持【英文、数字和下划线】，长度小于128字符，请重新输入"
+msgstr "カスタムデータのキー値【{}】は【英数字とアンダースコア】のみ対応し、128文字以内で入力してください"
+
+#: itsm/workflow/validators.py:689
+msgid "title, bk_biz_id 为内置唯一标识，请重新输入"
+msgstr "titleとbk_biz_idはシステム組み込みのユニーク識別子です。再入力してください"
+
+#: itsm/workflow/validators.py:690
+msgid "当前项目字段库已存在唯一标识【{}】，请重新输入"
+msgstr "現在のプロジェクトフィールドライブラリには既にユニーク識別子【{}】が存在します。再入力してください"
+
+#: itsm/workflow/validators.py:701
+msgid "字段库已存在名称【{}】，请重新输入"
+msgstr "フィールドライブラリには既に名称【{}】が存在します。再入力してください"
+
+#: itsm/workflow/validators.py:710
+msgid "字段已被基础模型[{}]引用，无法删除"
+msgstr "フィールドは基本モデル[{}]で参照されているため削除できません"
+
+#: itsm/workflow/validators.py:721
+msgid "请选择API接口"
+msgstr "APIインターフェースを選択してください"
+
+#: itsm/workflow/validators.py:724
+msgid "API接口不存在"
+msgstr "APIインターフェースが存在しません"
+
+#: itsm/workflow/validators.py:732
+msgid "请添加完整成功条件"
+msgstr "完全な成功条件を追加してください"
+
+#: itsm/workflow/validators.py:734
+msgid "轮询间隔必须为大于0的整数"
+msgstr "ポーリング間隔は0より大きい整数でなければなりません"
+
+#: itsm/workflow/validators.py:736
+msgid "轮询次数必须为大于0的整数"
+msgstr "ポーリング回数は0より大きい整数でなければなりません"
+
+#: itsm/workflow/validators.py:741
+msgid "请添加完整结束条件"
+msgstr "完全な終了条件を追加してください"
+
+#: itsm/workflow/validators.py:756
+msgid "全局变量名重复或存在空值，请重新输入"
+msgstr "グローバル変数名が重複しているか空値があります。再入力してください"
+
+#: itsm/workflow/validators.py:794
+msgid "起始节点已经存在连接线."
+msgstr "開始ノードには既に接続線が存在します"
+
+#: itsm/workflow/validators.py:828
+msgid "并行网关连线不规范"
+msgstr "並列ゲートウェイの接続が不適切です"
+
+#: itsm/workflow/validators.py:838 itsm/workflow/validators.py:844
+msgid "待连接的聚合网关与当前节点不在同一个工作区域内"
+msgstr "接続待ちの集約ゲートウェイは現在のノードと同じワークエリア内にありません"
+
+#: itsm/workflow/validators.py:851 itsm/workflow/validators.py:865
+#: itsm/workflow/validators.py:890
+msgid "源任务和目标任务不在同一个工作区域内"
+msgstr "ソースタスクとターゲットタスクは同じワークエリア内にありません"
+
+#: itsm/workflow/validators.py:901
+msgid "当前任务模板已经被流程引用，无法删除！"
+msgstr "現在のタスクテンプレートはプロセスで使用されているため削除できません！"
+
+#: itsm/workflow/views.py:500
+msgid "参数格式不合法"
+msgstr "パラメータ形式が不正です"
+
+#: itsm/workflow/views.py:544
+msgid "内置连线不能被删除"
+msgstr "組み込み接続は削除できません"
+
+#: itsm/workflow/views.py:581
+msgid "提供的流程版本信息错误！"
+msgstr "提供されたプロセスのバージョン情報が誤っています！"
+
+#: itsm/workflow/views.py:586
+msgid "当前字段非附件字段，无法下载附件文件！"
+msgstr "現在のフィールドは添付ファイルフィールドではないため、ファイルをダウンロードできません！"
+
+#: itsm/workflow/views.py:595
+msgid "当前字段解析信息出错，请确认是否已进行数据升级！"
+msgstr "現在のフィールド解析情報にエラーがあります。データ更新を確認してください！"
+
+#: itsm/workflow/views.py:599
+msgid "当前字段不存在您需要下载的附件！"
+msgstr "現在のフィールドにはダウンロードする添付ファイルが存在しません！"
+
+#: itsm/workflow/views.py:606
+msgid "要下载的文件【{}】不存在, 可能已经被删除，请与管理员确认！"
+msgstr "ダウンロードするファイル【{}】は存在しません。削除された可能性がありますので管理者に確認してください！"
+
+#: itsm/workflow/views.py:838
+msgid "内置字段不能删除"
+msgstr "組み込みフィールドは削除できません"
+
+#: itsm/workflow/views.py:1116
+msgid "任务字段排序参数不合法，请联系管理员"
+msgstr "タスクフィールドの並び順パラメータが不正です。管理者に連絡してください"
+
+#: itsm/workflow/models/common.py:48
+msgid "通知方式名称"
+msgstr "通知方法名"
+
+#: itsm/workflow/models/common.py:49 itsm/workflow/models/state.py:148
+#: itsm/workflow/models/transition.py:96 itsm/workflow/models/workflow.py:98
+msgid "是否为系统内置"
+msgstr "システム組み込みか"
+
+#: itsm/workflow/models/common.py:50
+msgid "通知渠道"
+msgstr "通知チャネル"
+
+#: itsm/workflow/models/common.py:52
+msgid "通知模板：可使用变量如下：xxx（TODO）"
+msgstr "通知テンプレート：以下の変数が使用可能：xxx（TODO）"
+
+#: itsm/workflow/models/common.py:101
+msgid "变量类型"
+msgstr "変数タイプ"
+
+#: itsm/workflow/models/common.py:105 itsm/workflow/models/field.py:178
+#: itsm/workflow/models/field.py:180 itsm/workflow/models/state.py:90
+#: itsm/workflow/models/transition.py:74
+msgid "关联流程"
+msgstr "関連プロセス"
+
+#: itsm/workflow/models/common.py:108
+msgid "是否已删除"
+msgstr "削除済みか"
+
+#: itsm/workflow/models/common.py:116 itsm/workflow/models/common.py:117
+msgid "全局变量"
+msgstr "グローバル変数"
+
+#: itsm/workflow/models/deprecated.py:49
+msgid "快照创建时间"
+msgstr "スナップショット作成時間"
+
+#: itsm/workflow/models/deprecated.py:51 itsm/workflow/models/event.py:46
+msgid "工作流ID"
+msgstr "ワークフローID"
+
+#: itsm/workflow/models/deprecated.py:53 itsm/workflow/models/workflow.py:549
+msgid "字段快照字典"
+msgstr "フィールドスナップショット辞書"
+
+#: itsm/workflow/models/deprecated.py:54 itsm/workflow/models/workflow.py:550
+msgid "状态快照字典"
+msgstr "ステータススナップショット辞書"
+
+#: itsm/workflow/models/deprecated.py:55 itsm/workflow/models/workflow.py:552
+msgid "流转快照字典"
+msgstr "転送スナップショット辞書"
+
+#: itsm/workflow/models/deprecated.py:58 itsm/workflow/models/workflow.py:128
+msgid "主分支列表"
+msgstr "メインブランチリスト"
+
+#: itsm/workflow/models/deprecated.py:60 itsm/workflow/models/state.py:132
+#: itsm/workflow/models/workflow.py:102
+msgid "可关联多种通知方式"
+msgstr "複数の通知方法を関連付け可能"
+
+#: itsm/workflow/models/deprecated.py:61 itsm/workflow/models/state.py:134
+#: itsm/workflow/models/workflow.py:104
+msgid "通知规则"
+msgstr "通知ルール"
+
+#: itsm/workflow/models/deprecated.py:62 itsm/workflow/models/state.py:136
+#: itsm/workflow/models/workflow.py:106
+msgid "重试间隔(s)"
+msgstr "再試行間隔(秒)"
+
+#: itsm/workflow/models/deprecated.py:68 itsm/workflow/models/deprecated.py:69
+msgid "工作流快照"
+msgstr "ワークフロースナップショット"
+
+#: itsm/workflow/models/deprecated.py:78 itsm/workflow/models/field.py:214
+#: itsm/workflow/models/workflow.py:87
+msgid "流程分类"
+msgstr "プロセス分類"
+
+#: itsm/workflow/models/deprecated.py:79
+msgid "字段归类，面向业务逻辑，比如服务类型（change|event）"
+msgstr "フィールド分類（ビジネスロジック向け）例: サービスタイプ（change|event）"
+
+#: itsm/workflow/models/deprecated.py:85 itsm/workflow/models/deprecated.py:86
+msgid "内置字段表"
+msgstr "ビルトインフィールドテーブル"
+
+#: itsm/workflow/models/event.py:48
+msgid "流转ID"
+msgstr "転送ID"
+
+#: itsm/workflow/models/event.py:49
+msgid "下一个状态ID"
+msgstr "次ステータスID"
+
+#: itsm/workflow/models/event.py:50
+msgid "流转事件类型"
+msgstr "転送イベントタイプ"
+
+#: itsm/workflow/models/event.py:53
+msgid "表单快照字典"
+msgstr "フォームスナップショット辞書"
+
+#: itsm/workflow/models/event.py:55
+msgid "操作时间"
+msgstr "操作時間"
+
+#: itsm/workflow/models/event.py:56
+msgid "操作人"
+msgstr "操作者"
+
+#: itsm/workflow/models/event.py:57
+msgid "日志概述"
+msgstr "ログ概要"
+
+#: itsm/workflow/models/event.py:61
+msgid "动作"
+msgstr "アクション"
+
+#: itsm/workflow/models/event.py:62
+msgid "详细信息"
+msgstr "詳細情報"
+
+#: itsm/workflow/models/event.py:63
+msgid "任务name"
+msgstr "タスク名"
+
+#: itsm/workflow/models/field.py:71
+msgid "是否是内置字段"
+msgstr "ビルトインフィールドかどうか"
+
+#: itsm/workflow/models/field.py:73
+msgid "是否生效"
+msgstr "有効/無効"
+
+#: itsm/workflow/models/field.py:74
+msgid "是否显示在单据列表中"
+msgstr "書類リストに表示するか"
+
+#: itsm/workflow/models/field.py:76
+msgid "数据来源类型"
+msgstr "データソースタイプ"
+
+#: itsm/workflow/models/field.py:78
+msgid "接口uri"
+msgstr "APIエンドポイント"
+
+#: itsm/workflow/models/field.py:81
+msgid "源数据的kv关系配置"
+msgstr "ソースデータのキー/バリュー設定"
+
+#: itsm/workflow/models/field.py:83
+msgid "字段类型"
+msgstr "フィールドタイプ"
+
+#: itsm/workflow/models/field.py:85
+msgid "字段标识"
+msgstr "フィールド識別子"
+
+#: itsm/workflow/models/field.py:86
+msgid "字段名"
+msgstr "フィールド名"
+
+#: itsm/workflow/models/field.py:88
+msgid "布局"
+msgstr "レイアウト"
+
+#: itsm/workflow/models/field.py:91
+msgid "校验规则"
+msgstr "検証ルール"
+
+#: itsm/workflow/models/field.py:95
+msgid "显示条件类型"
+msgstr "表示条件タイプ"
+
+#: itsm/workflow/models/field.py:98
+msgid "字段的显示条件"
+msgstr "フィールド表示条件"
+
+#: itsm/workflow/models/field.py:100
+msgid "正则校验规则关键字"
+msgstr "正規表現検証ルールキーワード"
+
+#: itsm/workflow/models/field.py:113
+msgid "正则校验规则配置"
+msgstr "正規表現検証ルール設定"
+
+#: itsm/workflow/models/field.py:114
+msgid "自定义正则规则"
+msgstr "カスタム正規表現ルール"
+
+#: itsm/workflow/models/field.py:116
+msgid "字段填写说明"
+msgstr "フィールド入力説明"
+
+#: itsm/workflow/models/field.py:118
+msgid "字段展示说明"
+msgstr "フィールド表示説明"
+
+#: itsm/workflow/models/field.py:120
+msgid "额外提示"
+msgstr "追加ヒント"
+
+#: itsm/workflow/models/field.py:121
+msgid "默认值"
+msgstr "デフォルト値"
+
+#: itsm/workflow/models/field.py:123
+msgid "选项"
+msgstr "オプション"
+
+#: itsm/workflow/models/field.py:124
+msgid "级联字段"
+msgstr "カスケードフィールド"
+
+#: itsm/workflow/models/field.py:125
+msgid "复杂描述信息"
+msgstr "複雑な説明情報"
+
+#: itsm/workflow/models/field.py:189 itsm/workflow/models/field.py:190
+msgid "字段表"
+msgstr "フィールドテーブル"
+
+#: itsm/workflow/models/field.py:229 itsm/workflow/models/field.py:230
+msgid "字段库"
+msgstr "フィールドライブラリ"
+
+#: itsm/workflow/models/field.py:251
+msgid "关联的公共字段"
+msgstr "関連する共通フィールド"
+
+#: itsm/workflow/models/field.py:252
+msgid "模型名称"
+msgstr "モデル名"
+
+#: itsm/workflow/models/field.py:253
+msgid "基础模型描述"
+msgstr "ベースモデル説明"
+
+#: itsm/workflow/models/field.py:254
+msgid "字段排序"
+msgstr "フィールド順序"
+
+#: itsm/workflow/models/field.py:256
+msgid "是否内置字段"
+msgstr "組み込みフィールドか"
+
+#: itsm/workflow/models/field.py:258
+msgid "Table版本：空"
+msgstr "テーブルバージョン：空"
+
+#: itsm/workflow/models/field.py:265 itsm/workflow/models/field.py:266
+#: itsm/workflow/models/workflow.py:423 itsm/workflow/serializers/field.py:85
+#: itsm/workflow/serializers/field.py:99
+msgid "基础模型"
+msgstr "ベースモデル"
+
+#: itsm/workflow/models/state.py:94
+msgid "状态名"
+msgstr "ステータス名"
+
+#: itsm/workflow/models/state.py:96
+msgid "状态描述"
+msgstr "ステータス説明"
+
+#: itsm/workflow/models/state.py:99
+msgid "状态类型"
+msgstr "ステータスタイプ"
+
+#: itsm/workflow/models/state.py:140
+msgid "表单字段(ID列表，按顺序排列)"
+msgstr "フォームフィールド(IDリスト、順序付き)"
+
+#: itsm/workflow/models/state.py:143
+msgid "只读表单字段(ID列表，按顺序排列)"
+msgstr "読み取り専用フォームフィールド(IDリスト、順序付き)"
+
+#: itsm/workflow/models/state.py:147
+msgid "是否可以终止"
+msgstr "終了可能か"
+
+#: itsm/workflow/models/state.py:151
+msgid "是否允许在单据处理人为空时跳过"
+msgstr "処理担当者が空欄の場合にスキップを許可するか"
+
+#: itsm/workflow/models/state.py:155
+msgid "可向下调度的条件"
+msgstr "下位スケジューリング条件"
+
+#: itsm/workflow/models/state.py:157
+msgid "变量"
+msgstr "変数"
+
+#: itsm/workflow/models/state.py:158
+msgid "节点的坐标轴"
+msgstr "ノード座標軸"
+
+#: itsm/workflow/models/state.py:163
+msgid "额外信息"
+msgstr "追加情報"
+
+#: itsm/workflow/models/state.py:168
+msgid "关注人类型"
+msgstr "ウォッチャータイプ"
+
+#: itsm/workflow/models/state.py:171
+msgid "关注人列表"
+msgstr "ウォッチャーリスト"
+
+#: itsm/workflow/models/state.py:174
+msgid "标签记录"
+msgstr "タグ記録"
+
+#: itsm/workflow/models/state.py:177
+msgid "是否多签"
+msgstr "マルチサイン要否"
+
+#: itsm/workflow/models/task.py:62 itsm/workflow/models/task.py:66
+msgid "任务模版的名称"
+msgstr "タスクテンプレート名"
+
+#: itsm/workflow/models/task.py:68
+msgid "是否为开启状态"
+msgstr "有効状態か"
+
+#: itsm/workflow/models/task.py:71
+msgid "是否可编辑状态"
+msgstr "編集可能状態か"
+
+#: itsm/workflow/models/task.py:71
+msgid "当为流程version引用的时候，不可编辑和查看"
+msgstr "フローバージョン参照時は編集・閲覧不可"
+
+#: itsm/workflow/models/task.py:84 itsm/workflow/models/task.py:85
+msgid "任务模型"
+msgstr "タスクモデル"
+
+#: itsm/workflow/models/task.py:168
+msgid "流程id"
+msgstr "フローID"
+
+#: itsm/workflow/models/task.py:169
+msgid "流程类型"
+msgstr "プロセスタイプ"
+
+#: itsm/workflow/models/task.py:170
+msgid "任务模版id"
+msgstr "タスクテンプレートID"
+
+#: itsm/workflow/models/task.py:171
+msgid "任务创建节点"
+msgstr "タスク作成ノード"
+
+#: itsm/workflow/models/task.py:172
+msgid "任务执行节点"
+msgstr "タスク実行ノード"
+
+#: itsm/workflow/models/task.py:173
+msgid "执行节点是否可创建"
+msgstr "実行ノード作成可否"
+
+#: itsm/workflow/models/task.py:174
+msgid "流转是否需要任务全部完成"
+msgstr "遷移に全タスク完了が必要か"
+
+#: itsm/workflow/models/task.py:178 itsm/workflow/models/task.py:179
+msgid "任务配置"
+msgstr "タスク設定"
+
+#: itsm/workflow/models/transition.py:45
+msgid "关联工作流"
+msgstr "関連ワークフロー"
+
+#: itsm/workflow/models/transition.py:47 itsm/workflow/models/transition.py:76
+msgid "流转操作"
+msgstr "遷移操作"
+
+#: itsm/workflow/models/transition.py:48 itsm/workflow/models/transition.py:77
+msgid "流转条件表达式"
+msgstr "遷移条件式"
+
+#: itsm/workflow/models/transition.py:54 itsm/workflow/models/transition.py:55
+msgid "流转条件"
+msgstr "遷移条件"
+
+#: itsm/workflow/models/transition.py:79
+msgid "流转类型"
+msgstr "遷移タイプ"
+
+#: itsm/workflow/models/transition.py:83
+msgid "线条的坐标位置的坐标轴"
+msgstr "ライン座標軸"
+
+#: itsm/workflow/models/transition.py:86
+msgid "源状态ID"
+msgstr "元状態ID"
+
+#: itsm/workflow/models/transition.py:88
+msgid "目标状态ID"
+msgstr "先状態ID"
+
+#: itsm/workflow/models/transition.py:91
+msgid "流转方向"
+msgstr "遷移方向"
+
+#: itsm/workflow/models/transition.py:93
+msgid "是否需要校验表单完整性"
+msgstr "フォーム完全性検証の有無"
+
+#: itsm/workflow/models/transition.py:94
+msgid "是否需要执行操作"
+msgstr "操作実行の有無"
+
+#: itsm/workflow/models/transition.py:103
+#: itsm/workflow/models/transition.py:104
+msgid "状态流转"
+msgstr "ステータス遷移"
+
+#: itsm/workflow/models/trigger.py:37
+msgid "原子key"
+msgstr "アトミックキー"
+
+#: itsm/workflow/models/trigger.py:40
+msgid "传入参数"
+msgstr "入力パラメータ"
+
+#: itsm/workflow/models/trigger.py:47
+msgid "流程ID"
+msgstr "フローID"
+
+#: itsm/workflow/models/workflow.py:82
+msgid "流程名"
+msgstr "フロー名"
+
+#: itsm/workflow/models/workflow.py:84
+msgid "流程描述"
+msgstr "フロー説明"
+
+#: itsm/workflow/models/workflow.py:90
+msgid "是否可撤销"
+msgstr "取り消し可能か"
+
+#: itsm/workflow/models/workflow.py:92
+msgid "撤销配置"
+msgstr "取消設定"
+
+#: itsm/workflow/models/workflow.py:99
+msgid "是否需要关联子任务"
+msgstr "サブタスクの関連付けが必要か"
+
+#: itsm/workflow/models/workflow.py:109
+msgid "是否绑定业务"
+msgstr "業務にバインドするか"
+
+#: itsm/workflow/models/workflow.py:111
+msgid "是否自动过单"
+msgstr "自動承認するか"
+
+#: itsm/workflow/models/workflow.py:112
+msgid "是否使用IAM角色"
+msgstr "IAMロールを使用するか"
+
+#: itsm/workflow/models/workflow.py:121
+msgid "引擎版本：空/PIPELINE_VX"
+msgstr "エンジンバージョン：空/PIPELINE_VX"
+
+#: itsm/workflow/models/workflow.py:130
+msgid "其他配置信息"
+msgstr "その他設定情報"
+
+#: itsm/workflow/models/workflow.py:153
+msgid "关联的基础模型"
+msgstr "関連する基本モデル"
+
+#: itsm/workflow/models/workflow.py:162
+msgid "对应的服务类型，为服务的主键"
+msgstr "対応するサービスタイプ（サービスの主キー）"
+
+#: itsm/workflow/models/workflow.py:170
+msgid "对应服务的属性，为json字段"
+msgstr "対応サービスの属性（JSONフィールド）"
+
+#: itsm/workflow/models/workflow.py:191
+msgid "服务初始化流程版本异常"
+msgstr "サービス初期化フローバージョンエラー"
+
+#: itsm/workflow/models/workflow.py:195
+msgid "服务初始化异常"
+msgstr "サービス初期化エラー"
+
+#: itsm/workflow/models/workflow.py:509
+msgid "检测到您的流程已经发生改变，现流程版本中缺少【{}】信息，请补充完整后重新配置sla"
+msgstr "フローに変更が検出されました。現在のバージョンには【{}】情報が不足しています。情報を補完後、SLAを再設定してください"
+
+#: itsm/workflow/models/workflow.py:547
+msgid "流程模板ID"
+msgstr "フローテンプレートID"
+
+#: itsm/workflow/models/workflow.py:555
+msgid "触发器快照字典"
+msgstr "トリガースナップショット辞書"
+
+#: itsm/workflow/models/workflow.py:558
+msgid "基础模型快照字典"
+msgstr "ベースモデルスナップショット辞書"
+
+#: itsm/workflow/models/workflow.py:561
+msgid "版本信息"
+msgstr "バージョン情報"
+
+#: itsm/workflow/models/workflow.py:565
+msgid "pipeline描述数据"
+msgstr "パイプラインデータ記述"
+
+#: itsm/workflow/models/workflow.py:575 itsm/workflow/models/workflow.py:576
+msgid "流程快照"
+msgstr "フロースナップショット"
+
+#: itsm/workflow/models/workflow.py:890
+msgid "流程版本中缺少【{}】信息，请补充完整后再进行服务协议的关联"
+msgstr "フローバージョンに【{}】情報が不足しています。情報を補完後、サービス契約を関連付けてください"
+
+#: itsm/workflow/serializers/field.py:87
+#: itsm/workflow/serializers/field.py:102
+#: itsm/workflow/serializers/global_variable.py:47
+#: itsm/workflow/serializers/global_variable.py:50
+#: itsm/workflow/serializers/global_variable.py:70
+#: itsm/workflow/serializers/global_variable.py:73
+msgid "当前节点"
+msgstr "現在のノード"
+
+#: itsm/workflow/serializers/field.py:121
+msgid "字段显示名称不能超过64个字符"
+msgstr "フィールド表示名は64文字以内で入力してください"
+
+#: itsm/workflow/serializers/field.py:441
+msgid "基础模型名称已经存在，请重新输入"
+msgstr "基本モデル名は既に存在します。再度入力してください"
+
+#: itsm/workflow/serializers/field.py:450
+msgid "该字段模板不存在，请检查"
+msgstr "このフィールドテンプレートは存在しません。確認してください"
+
+#: itsm/workflow/serializers/state.py:249
+msgid "节点名称不能为空"
+msgstr "ノード名は必須です"
+
+#: itsm/workflow/serializers/transition.py:42
+msgid "请输入模板名称!"
+msgstr "テンプレート名を入力してください！"
+
+#: itsm/workflow/serializers/transition.py:42
+msgid "模板名称长度不能大于64个字符"
+msgstr "テンプレート名は64文字以内で入力してください"
+
+#: itsm/workflow/serializers/transition.py:56
+#: itsm/workflow/serializers/transition.py:59
+msgid "同流程下线条模板名称已存在"
+msgstr "同一フロー内に同名の接続テンプレートが既に存在します"
+
+#: itsm/workflow/serializers/transition.py:117
+msgid "条件配置错误"
+msgstr "条件設定エラー"
+
+#: itsm/workflow/serializers/transition.py:119
+msgid "布尔类型的取值范围不正确"
+msgstr "ブール型の値範囲が不正です"
+
+#: itsm/workflow/serializers/workflow.py:189
+msgid "通知频率参数不正确"
+msgstr "通知頻度パラメータが不正です"
+
+#: itsm/workflow/serializers/workflow.py:196
+#: itsm/workflow/serializers/workflow.py:199
+msgid "系统中已存在同名流程，请尝试换个流程名称"
+msgstr "システムに同名フローが既に存在します。別のフロー名をお試しください"
+
+#: itsm/workflow/serializers/workflow.py:204
+msgid "至少选择一种通知类型"
+msgstr "最低1つの通知タイプを選択してください"
+
+#: itsm/workflow/serializers/workflow.py:211
+msgid "请指定部署流程名"
+msgstr "デプロイ用フロー名を指定してください"
