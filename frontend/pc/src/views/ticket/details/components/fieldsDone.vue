@@ -90,13 +90,13 @@
     <div v-else-if="item.type === 'RICHTEXT'" class="bk-fields-done-item">
       <span v-if="isShowName" class="bk-li-left" style="float: initial;" :title="item.name">{{item.name}}：</span>
       <div class="bk-li-right bk-fields-richtext tui-editor-contents"
-        v-html="item.value">
+        v-dompurify-html="item.value">
       </div>
       <bk-popover theme="light">
         <div class="bk-itsm-icon icon-icon-info bk-text-primary f12 rich-show"></div>
         <div slot="content" style="white-space: normal; cursor: pointer;">
           <div v-bk-copy="item.value.replace(/<[^>]+>/g, '')" class="bk-li-right bk-fields-richtext tui-editor-contents"
-            v-html="item.value" :title="'点击复制'">
+            v-dompurify-html="item.value" :title="'点击复制'">
           </div>
         </div>
       </bk-popover>
