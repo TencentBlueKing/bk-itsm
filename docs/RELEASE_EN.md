@@ -1,3 +1,9 @@
+# Changelog
+## [Version: 2.7.12] - 2025-08-05
+【Feature】Japanese language support  
+【Fix】XSS security vulnerability  
+【Fix】Resolved request user api permission issue in ticket transfer
+
 ## [Version: 2.7.11] - 2025-07-14
 【Fix】Resolved ticket stop schedule issue caused by fast approval and auto approve  
 【Feature】New APIGW endpoint of get ticket info by ticket id
