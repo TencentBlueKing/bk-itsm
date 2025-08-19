@@ -301,6 +301,24 @@
             errorHandler(res, this);
           });
       },
+      getServiceData(val) {
+        const params = {
+          catalog_id: val,
+          is_valid: 1,
+        };
+        this.$store.dispatch('catalogService/getServices', params).then((res) => {
+          const formItem = this.searchForms.find(item => item.key === 'service_id__in');
+          formItem.list = [];
+          res.data.forEach((item) => {
+            formItem.list.push({
+              key: item.id,
+              name: item.name,
+            });
+          });
+        }).catch((res) => {
+          errorHandler(res, this);
+        });
+      },
       // 导出弹框
       openExportList() {
         this.isExportDialogShow = true;
@@ -324,8 +342,10 @@
           const formItem = this.searchForms.find((item) => item.key === 'service_id__in');
           formItem.display = val.length;
           if (val.length) {
+            const serviceCatalogId = val[val.length - 1];
             // 当服务目录的数据发生变化时，清空服务数据
             formItem.value = [];
+            this.getServiceData(serviceCatalogId);
           }
         }
       },
