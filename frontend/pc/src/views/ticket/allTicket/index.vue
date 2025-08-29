@@ -315,9 +315,10 @@
               name: item.name,
             });
           });
-        }).catch((res) => {
-          errorHandler(res, this);
-        });
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
       },
       // 导出弹框
       openExportList() {

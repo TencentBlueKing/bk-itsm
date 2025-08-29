@@ -51,7 +51,7 @@
                 </log-tab>
             </bk-tab-panel> -->
       <template v-if="hasNodeOptAuth">
-        <bk-tab-panel
+        <!-- <bk-tab-panel
           name="all-task"
           :label="$t(`m.newCommon['所有任务']`)"
         >
@@ -60,7 +60,7 @@
             :ticket-info="ticketInfo"
           >
           </all-task-tab>
-        </bk-tab-panel>
+        </bk-tab-panel> -->
         <bk-tab-panel
           name="triggerLog"
           :label="$t(`m.task['触发器记录']`)"
@@ -83,7 +83,7 @@
           >
           </email-notice-tab>
         </bk-tab-panel>
-        <bk-tab-panel
+        <!-- <bk-tab-panel
           v-if="Number(ticketInfo.comment_id) !== -1"
           name="comment"
           :label="$t(`m.newCommon['评价']`)"
@@ -93,7 +93,7 @@
             :ticket-info="ticketInfo"
           >
           </comment-tab>
-        </bk-tab-panel>
+        </bk-tab-panel> -->
         <bk-tab-panel
           v-if="openFunction.CHILD_TICKET_SWITCH"
           name="mother-child"
@@ -129,8 +129,8 @@
   import AssociatedTab from './AssociatedTab/AssociatedTab.vue';
   import InheritTicket from './InheritTicketTab.vue';
   import EmailNoticeTab from './EmailNoticeTab.vue';
-  import CommentTab from './CommentTab.vue';
-  import AllTaskTab from './AllTaskTab.vue';
+  // import CommentTab from './CommentTab.vue';
+  // import AllTaskTab from './AllTaskTab.vue';
   import taskHistory from '../taskInfo/taskHistory.vue';
 
   export default {
@@ -140,8 +140,8 @@
       AssociatedTab,
       InheritTicket,
       EmailNoticeTab,
-      CommentTab,
-      AllTaskTab,
+      // CommentTab,
+      // AllTaskTab,
       taskHistory,
     },
     props: {
