@@ -7,7 +7,7 @@
 由于 `bk_bs_topo` 为一个动态数组，无法配置，因此在传入的时候可以使用 `json.dumps` 转为文本传入，在请求之前，需要对该参数做json解析。示例如下：
 
 ```python
-query_params["data"].update({"bk_bs_topo": json.loads(query_params["data"]["bk_bs_topo"])})
+query_params["data"].update({"bk_bs_topo": json_loads(query_params["data"]["bk_bs_topo"])})
 ```
 其中 `query_params` 为GET请求参数中的 `query`， POST请求参数中的 `body`，是沙箱的输入函数，沙箱的返回也是 `query_params`
 
