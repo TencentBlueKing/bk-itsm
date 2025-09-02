@@ -22,6 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import json
 
 from RestrictedPython import compile_restricted, safe_globals, safe_builtins, utility_builtins  # noqa
 from RestrictedPython.Guards import guarded_iter_unpack_sequence  # noqa
@@ -52,9 +53,15 @@ def map_data(source_code, data, key='response'):
         '_getiter_': default_guarded_getiter,
         '_iter_unpack_sequence_': guarded_iter_unpack_sequence,
         'enumerate': enumerate,
+        # 最小暴露 JSON
+        'json_loads': json_loads,
     }
 
-    limited_globals = {'__builtins__': {**safe_builtins, **utility_builtins}, **available_attrs}
+    # 安全：删除 utility_builtins 中的 'string'
+    utility = dict(utility_builtins)
+    utility.pop('string', None)
+
+    limited_globals = {'__builtins__': {**safe_builtins, **utility}, **available_attrs}
 
     try:
         byte_code = compile_restricted(
@@ -68,3 +75,11 @@ def map_data(source_code, data, key='response'):
         return limited_locals.get(key, data)
     except SyntaxError:
         return data
+
+
+def json_loads(s):
+    try:
+        return json.loads(s)
+    except json.JSONDecodeError:
+        # 如果无法解析，直接返回原值
+        return s
