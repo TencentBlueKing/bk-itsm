@@ -88,5 +88,14 @@ class Command(BaseCommand):
                 file=definition_file_path,
                 stage=settings.BKAPP_APIGW_SYNC_STAGE,
             )
+            
+            print(
+                "[bk-itsm]call grant_apigw_permissions with definition: %s" % definition_file_path)
+            try:
+                call_command("grant_apigw_permissions", file=definition_file_path)
+                print("[bk-itsm]grant_apigw_permissions success")
+            except Exception as e:
+                print("[bk-itsm]grant_apigw_permissions failed: %s" % str(e))
+                traceback.print_exc()
 
             print("[bk-itsm] migrate apigw success")

@@ -30,3 +30,10 @@ release:
 
 grant_permissions:
   - bk_app_code: bk-audit
+    
+  - bk_app_code: bk_sops
+    grant_dimension: api
+    resource_names:
+      - create_ticket
+      - get_ticket_info
+      - operate_node
