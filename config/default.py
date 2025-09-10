@@ -121,7 +121,7 @@ AUTHENTICATION_BACKENDS += ("itsm.openapi.authentication.backend.CustomUserBacke
 IS_PAAS_V3 = int(os.getenv("BKPAAS_MAJOR_VERSION", False)) == 3
 IS_OPEN_V3 = IS_PAAS_V3 and RUN_VER == "open"
 
-ENABLE_SYNC_API_GATEWAY = bool(os.getenv("ENABLE_SYNC_API_GATEWAY", False))
+ENABLE_SYNC_API_GATEWAY = bool(os.getenv("ENABLE_SYNC_API_GATEWAY", True))
 # 如果是对外版PAASV3 并且 是容器化版本 并且开启了网关同步 才会执行网关的migrate操作
 if IS_OPEN_V3 and ENGINE_REGION == "default" and ENABLE_SYNC_API_GATEWAY:
     # 网关管理员
