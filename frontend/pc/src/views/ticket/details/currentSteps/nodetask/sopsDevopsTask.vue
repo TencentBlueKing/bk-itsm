@@ -233,6 +233,7 @@
               bodyValue,
               bodyRadio,
               rawType,
+              headers,
             } = this.$refs.webhook.$refs.requestConfig.config;
             const query_params = queryParams.filter((item) => item.select);
             const auth_params = {
@@ -263,13 +264,14 @@
             const settings_parmas = {
               timeout: Number(settings.timeout),
             };
+            const headers_params = headers ? headers.filter((item) => item.select) : [];
             params.inputs = {
               method,
               url,
               success_exp,
               query_params,
               auth: auth_params,
-              headers: [],
+              headers: headers_params,
               body: body_params,
               settings: settings_parmas,
             };
@@ -277,6 +279,13 @@
               this.errorTip = !query_params.every((item) => item.key !== '' && item.value !== '');
             } else if (typeof body_params.content !== 'string') {
               this.errorTip = ![body_params.content, query_params].every((item) => item.every((ite) => ite.key !== '' && ite.value !== ''));
+            }
+
+            if (headers_params.length > 0) {
+              const headersValid = headers_params.every((item) => item.key !== '' && item.value !== '');
+              if (!headersValid) {
+                this.errorTip = true;
+              }
             }
             if (this.errorTip) return;
             this.retry(params);
