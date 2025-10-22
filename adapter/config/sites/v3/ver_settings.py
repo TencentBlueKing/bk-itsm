@@ -14,7 +14,7 @@ specific language governing permissions and limitations under the License.
 import os
 
 from adapter.config.sites.v3.utils import get_bk_itsm_host
-from adapter.utils.storage import RepoStorage
+from adapter.utils.storage import HybridStorage
 
 DATABASES = {
     "default": {
@@ -33,7 +33,7 @@ BKREPO_PASSWORD = os.environ.get("BKREPO_PASSWORD")
 BKREPO_PROJECT = os.environ.get("BKREPO_PROJECT")
 BKREPO_BUCKET = os.environ.get("BKREPO_BUCKET")
 
-STORE = RepoStorage()
+STORE = HybridStorage()
 
 # 企业微信发送，默认weixin，可配置为企业微信rtx
 QY_WEIXIN = os.environ.get("BKAPP_WEIXIN_TYPE", "weixin")
