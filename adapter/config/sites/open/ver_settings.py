@@ -29,6 +29,7 @@ import os
 
 from django.core.files.storage import FileSystemStorage
 
+from adapter.utils.storage import HybridStorage
 from . import api as ADAPTER_API  # noqa
 
 ESB_SDK_NAME = "blueking.component.open"
