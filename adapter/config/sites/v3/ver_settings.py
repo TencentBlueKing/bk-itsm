@@ -33,7 +33,7 @@ BKREPO_PASSWORD = os.environ.get("BKREPO_PASSWORD")
 BKREPO_PROJECT = os.environ.get("BKREPO_PROJECT")
 BKREPO_BUCKET = os.environ.get("BKREPO_BUCKET")
 
-STORE = HybridStorage()
+STORE = HybridStorage(write_target="repo", read_priority=["repo", "fs"], fs_location="/")
 
 # 企业微信发送，默认weixin，可配置为企业微信rtx
 QY_WEIXIN = os.environ.get("BKAPP_WEIXIN_TYPE", "weixin")
