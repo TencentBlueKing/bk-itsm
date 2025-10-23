@@ -125,7 +125,7 @@ class HybridStorage(Storage):
     混合存储类
     """
 
-    def __init__(self, read_priority=None, write_target='fs', fs_location=None):
+    def __init__(self, read_priority=None, write_target='repo', fs_location=None):
         """
          初始化混合存储
 
