@@ -138,7 +138,7 @@ def download(request):
     if not store.exists(download_file_path):
         return Fail(_("文件【{}】不存在").format(file_name), "NO_SUCH_FILE").json()
 
-    response = StreamingHttpResponse(FileWrapper(store.open(file_path, "rb"), 512))
+    response = StreamingHttpResponse(FileWrapper(store.open(download_file_path, "rb"), 512))
     response["Content-Type"] = "application/octet-stream"
     response["Content-Disposition"] = "attachment; filename* = UTF-8''%s" % format(escape_uri_path(file_name))
 

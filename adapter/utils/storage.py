@@ -179,9 +179,6 @@ class HybridStorage(Storage):
             if self.repo_storage is not None:
                 logger.debug(f"保存文件到 制品库: {name}")
                 self.repo_storage.save(name, content, max_length)
-            else:
-                logger.warning(f"RepoStorage not available, fallback to FileSystemStorage: {name}")
-                self.fs_storage.save(name, content, max_length)
         else:
             # 仅写入文件系统
             logger.debug(f"保存文件到 文件系统: {name}")
