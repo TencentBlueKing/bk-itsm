@@ -30,14 +30,13 @@ from blueapps.account.decorators import login_exempt
 from django.conf import settings
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.utils.translation import ugettext as _, get_language
+from django.utils.translation import gettext as _, get_language
 from django.views.decorators.http import require_GET
 
 from common.template.template import Template
 from itsm.iadmin.contants import NOTICE_CENTER_SWITCH
 from itsm.iadmin.models import SystemSettings
 from itsm.project.models import UserProjectAccessRecord
-from common.log import logger
 from config.default import FRONTEND_URL
 from itsm.role.models import BKUserRole, UserRole
 
@@ -71,9 +70,9 @@ def init(request):
                 "chname": request.user.get_property("chname"),
                 "username": request.user.username,
                 "all_access": UserRole.get_access_by_user(request.user.username),
-                "IS_ITSM_ADMIN": 1
-                if UserRole.is_itsm_superuser(request.user.username)
-                else 0,
+                "IS_ITSM_ADMIN": (
+                    1 if UserRole.is_itsm_superuser(request.user.username) else 0
+                ),
                 "need_target": False,  # 不需要强制跳转无权限页
                 "location": "",
             },

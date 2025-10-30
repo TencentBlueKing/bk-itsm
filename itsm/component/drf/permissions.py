@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import copy
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import permissions
 
 from iam import Subject, Action, Resource
@@ -95,7 +95,7 @@ class IamAuthPermit(permissions.BasePermission):
             return True
 
         apply_actions = self.get_view_iam_actions(view)
-        
+
         # 项目下创建资源
         if view.action in ["create", "imports"]:
             if not apply_actions:
@@ -111,11 +111,11 @@ class IamAuthPermit(permissions.BasePermission):
         # 关联实例的请求，需要针对对象进行鉴权
         if view.action in getattr(view, "permission_free_actions", []):
             return True
-        
+
         # 获取视图权限action
         apply_actions = self.get_view_iam_actions(view)
         return self.iam_auth(request, apply_actions, obj)
-    
+
     @staticmethod
     def get_view_iam_actions(view):
         # 获取视图权限action
@@ -132,7 +132,7 @@ class IamAuthPermit(permissions.BasePermission):
         else:
             apply_actions = copy.deepcopy(apply_actions)
         return apply_actions
-        
+
     def iam_auth(self, request, apply_actions, obj=None):
         if settings.IAM_SKIP_AUTH:
             return True
@@ -188,9 +188,11 @@ class IamAuthPermit(permissions.BasePermission):
                 str(resource["resource_id"]),
                 {
                     "iam_resource_owner": resource.get("creator", ""),
-                    "_bk_iam_path_": "/project,{}/".format(project_key)
-                    if resource["resource_type"] != "project"
-                    else "",
+                    "_bk_iam_path_": (
+                        "/project,{}/".format(project_key)
+                        if resource["resource_type"] != "project"
+                        else ""
+                    ),
                     "name": resource.get("resource_name", ""),
                 },
             )
@@ -211,7 +213,7 @@ class IamAuthPermit(permissions.BasePermission):
     def iam_create_auth(self, request, apply_actions):
         if settings.IAM_SKIP_AUTH:
             return True
-        
+
         resources = []
         project_key = request.data["project_key"]
         project = self.get_project(project_key)
@@ -241,9 +243,9 @@ class IamAuthPermit(permissions.BasePermission):
                 str(resource["resource_id"]),
                 {
                     "iam_resource_owner": resource.get("creator", ""),
-                    "_bk_iam_path_": bk_iam_path
-                    if resource["resource_type"] != "project"
-                    else "",
+                    "_bk_iam_path_": (
+                        bk_iam_path if resource["resource_type"] != "project" else ""
+                    ),
                     "name": resource.get("resource_name", ""),
                 },
             )
@@ -307,12 +309,12 @@ class IamAuthWithoutResourcePermit(IamAuthPermit):
 class IamAuthProjectViewPermit(IamAuthPermit):
     def has_object_permission(self, request, view, obj):
         apply_actions = self.get_view_iam_actions(view)
-        
+
         if hasattr(obj, "project_key"):
             project_key = obj.project_key
             if not apply_actions and view.action in ["create", "update", "destroy"]:
                 apply_actions = ["system_settings_manage"]
-                
+
             # 项目管理必须有查看权限
             apply_actions.append("project_view")
             return self.has_project_view_permission(request, project_key, apply_actions)
@@ -348,9 +350,9 @@ class IamAuthProjectViewPermit(IamAuthPermit):
                 str(resource["resource_id"]),
                 {
                     "iam_resource_owner": resource.get("creator", ""),
-                    "_bk_iam_path_": bk_iam_path
-                    if resource["resource_type"] != "project"
-                    else "",
+                    "_bk_iam_path_": (
+                        bk_iam_path if resource["resource_type"] != "project" else ""
+                    ),
                     "name": resource.get("resource_name", ""),
                 },
             )

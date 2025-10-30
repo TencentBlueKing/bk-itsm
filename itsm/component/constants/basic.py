@@ -27,7 +27,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from calendar import FRIDAY, MONDAY, SATURDAY, SUNDAY, THURSDAY, TUESDAY, WEDNESDAY
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.utils.basic import choices_to_namedtuple, tuple_choices
 
@@ -240,7 +240,12 @@ TICKET_GLOBAL_VARIABLES = [
         "source": "ticket",
         "type": "STRING",
     },
-    {"key": "ticket_creator", "name": _("提单人"), "source": "ticket", "type": "MEMBER"},
+    {
+        "key": "ticket_creator",
+        "name": _("提单人"),
+        "source": "ticket",
+        "type": "MEMBER",
+    },
     {
         "key": "ticket_create_at",
         "name": _("提单时间"),
@@ -302,8 +307,18 @@ TASK_GLOBAL_VARIABLES = [
         "source": "task",
         "type": "STRING",
     },
-    {"key": "task_creator", "name": _("任务创建人"), "source": "task", "type": "MEMBER"},
-    {"key": "task_operator", "name": _("任务处理人"), "source": "task", "type": "MEMBER"},
+    {
+        "key": "task_creator",
+        "name": _("任务创建人"),
+        "source": "task",
+        "type": "MEMBER",
+    },
+    {
+        "key": "task_operator",
+        "name": _("任务处理人"),
+        "source": "task",
+        "type": "MEMBER",
+    },
     {
         "key": "task_create_at",
         "name": _("任务创建时间"),

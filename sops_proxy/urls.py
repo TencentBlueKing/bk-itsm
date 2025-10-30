@@ -23,14 +23,14 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.conf.urls import url
+from django.urls import re_path
 
 from sops_proxy.views import SopsProxy
 
 urlpatterns = [
     # 插件静态资源（jsonp）转发
-    # url(r"^static/(?P<path>.*)$", dispatch_static),
+    # re_path(r"^static/(?P<path>.*)$", dispatch_static),
     # 插件请求（ajax）转发
-    # url(r"^(?P<path>.*)$", dispatch_query),
-    url(r"^(?P<path>.*)$", SopsProxy.as_view()),
+    # re_path(r"^(?P<path>.*)$", dispatch_query),
+    re_path(r"^(?P<path>.*)$", SopsProxy.as_view()),
 ]

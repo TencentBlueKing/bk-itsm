@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import json
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.fields import JSONField
 
@@ -54,10 +54,14 @@ class RemoteSystemSerializer(BaseModelSerializer):
     """API系统序列化"""
 
     name = serializers.CharField(
-        max_length=LEN_NORMAL, required=True, error_messages={"blank": _("名称不能为空")}
+        max_length=LEN_NORMAL,
+        required=True,
+        error_messages={"blank": _("名称不能为空")},
     )
     code = serializers.CharField(
-        max_length=LEN_NORMAL, required=True, error_messages={"blank": _("编码不能为空")}
+        max_length=LEN_NORMAL,
+        required=True,
+        error_messages={"blank": _("编码不能为空")},
     )
     domain = serializers.CharField(
         max_length=LEN_LONG, required=True, error_messages={"blank": _("系统域名不能为空")}
@@ -136,14 +140,20 @@ class RemoteApiSerializer(DynamicFieldsModelSerializer):
     """API序列化"""
 
     name = serializers.CharField(
-        required=True, error_messages={"blank": _("名称不能为空")}, max_length=LEN_NORMAL
+        required=True,
+        error_messages={"blank": _("名称不能为空")},
+        max_length=LEN_NORMAL,
     )
     path = serializers.CharField(
-        required=True, error_messages={"blank": _("路径不能为空")}, max_length=LEN_X_LONG
+        required=True,
+        error_messages={"blank": _("路径不能为空")},
+        max_length=LEN_X_LONG,
     )
     version = serializers.CharField(required=False, max_length=LEN_SHORT)
     func_name = serializers.CharField(
-        required=True, error_messages={"blank": _("调用函数不能为空")}, max_length=LEN_NORMAL
+        required=True,
+        error_messages={"blank": _("调用函数不能为空")},
+        max_length=LEN_NORMAL,
     )
     method = serializers.ChoiceField(
         choices=[("GET", "GET"), ("POST", "POST")], default="GET"

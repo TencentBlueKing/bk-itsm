@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import time
 
-from celery.task import periodic_task
+from blueapps.contrib.celery_tools.periodic import periodic_task
 from celery.schedules import crontab
 from common.redis import Cache
 

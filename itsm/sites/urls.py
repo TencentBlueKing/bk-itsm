@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.conf.urls import include, url
+from django.urls import include, re_path
 from django_nyt.urls import get_pattern as get_nyt_pattern
 
 from itsm.sites.views import index, get_footer, init
@@ -31,17 +31,17 @@ from weixin import views as weixin_views
 
 urlpatterns = [
     # main
-    url(r"^$", index),
-    url(r"^init/$", init),
+    re_path(r"^$", index),
+    re_path(r"^init/$", init),
     # flower, celery monitor
-    url(r"^o/bk_sops/", include("sops_proxy.urls")),
+    re_path(r"^o/bk_sops/", include("sops_proxy.urls")),
     # helper, fix database
-    url(r"^helper/", include("itsm.helper.urls")),
+    re_path(r"^helper/", include("itsm.helper.urls")),
     # weixin
-    url(r"^weixin/$", weixin_views.index),
-    url(r"^weixin/login/", include("weixin.core.urls")),
-    url(r"^weixin/api/", include("weixin.urls")),
+    re_path(r"^weixin/$", weixin_views.index),
+    re_path(r"^weixin/login/", include("weixin.core.urls")),
+    re_path(r"^weixin/api/", include("weixin.urls")),
     # wiki
-    url(r"^notifications/", get_nyt_pattern()),
-    url(r"^core/footer/$", get_footer),
+    re_path(r"^notifications/", get_nyt_pattern()),
+    re_path(r"^core/footer/$", get_footer),
 ]

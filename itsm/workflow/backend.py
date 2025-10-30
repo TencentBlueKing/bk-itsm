@@ -34,7 +34,7 @@ import os
 import time
 
 import six
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import (
     COVERAGE_STATE,
@@ -102,7 +102,9 @@ class PipelineWrapper(object):
         except Exception as error:
             # 记录代码底层报错
             logger.exception(error)
-            raise WorkFlowInvalidError([state["id"]], _("当前节点画布连线不合理, 请重新确认"))
+            raise WorkFlowInvalidError(
+                [state["id"]], _("当前节点画布连线不合理, 请重新确认")
+            )
 
     def _unpack_state(self, states, state_id):
         """状态提取"""
@@ -387,7 +389,9 @@ class PipelineWrapper(object):
                         evaluation = "1==1"
                     else:
                         if exp.type not in SUPPORTED_TYPE:
-                            raise NotImplementedError(_("不支持的数据类型 %s") % exp.type)
+                            raise NotImplementedError(
+                                _("不支持的数据类型 %s") % exp.type
+                            )
                         template = get_exp_template(exp.type)
                         value = format_exp_value(exp.type, exp.value)
                         evaluation = template.format(

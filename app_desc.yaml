@@ -1,5 +1,5 @@
 spec_version: 2
-app_version: "2.7.13"
+app_version: "2.8.0"
 app:
     region: default
     bk_app_code: bk_itsm
@@ -47,11 +47,11 @@ modules:
                 plan: 2C4G1R
                 replicas: 1
             pworker:
-                command: python manage.py celery worker -n prefork@%h -P threads -c 10 -l info --maxtasksperchild=100
+                command: python manage.py celery worker -n prefork@%h -P threads -c 10 -l info --max-tasks-per-child=100
                 plan: 2C4G1R
                 replicas: 1
             gworker:
-                command: python manage.py celery worker -P gevent -n gevent@%h -c 4 -l info --maxtasksperchild=100
+                command: python manage.py celery worker -P gevent -n gevent@%h -c 4 -l info --max-tasks-per-child=100
                 plan: 2C4G1R
                 replicas: 1
         svc_discovery:

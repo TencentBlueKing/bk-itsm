@@ -29,7 +29,7 @@ import json
 from django.db.models import Q
 from django.forms.forms import DeclarativeFieldsMetaclass
 from django.http import HttpResponse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -71,7 +71,7 @@ class ModelViewSet(component_viewsets.ModelViewSet):
         serializer.save(updated_by=username)
 
 
-class ApiInstanceViewsSet(component_viewsets.ReadOnlyModelViewSet):
+class ApiInstanceViewsSet(ModelViewSet):
     serializer_class = ApiInstanceSerializer
     queryset = RemoteApiInstance._objects.all()
     permission_classes = ()
@@ -104,8 +104,7 @@ class RemoteSystemViewSet(ModelViewSet):
     # 项目管理
     permission_action_default = "system_settings_manage"
     permission_resource_is_project = True
-    permission_free_actions = ["all", "get_systems", "get_components"]
-    permission_action_mapping = {"list": ["project_view"]}
+    permission_free_actions = ["list", "all", "get_systems", "get_components"]
 
     pagination_class = None
 
@@ -287,10 +286,10 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
         data = api.tag_data()
 
         response = HttpResponse(content_type="application/octet-stream; charset=utf-8")
-        response[
-            "Content-Disposition"
-        ] = "attachment; filename=bk_itsm_api_{}_{}.json".format(
-            api.func_name, datetime.datetime.now().strftime("%Y%m%d%H%M")
+        response["Content-Disposition"] = (
+            "attachment; filename=bk_itsm_api_{}_{}.json".format(
+                api.func_name, datetime.datetime.now().strftime("%Y%m%d%H%M")
+            )
         )
 
         # 统一导入导出格式为列表数据

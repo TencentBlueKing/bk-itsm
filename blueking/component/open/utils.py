@@ -30,22 +30,18 @@ import json
 
 
 def get_signature(method, path, app_secret, params=None, data=None):
-    """generate signature
-    """
+    """generate signature"""
     kwargs = {}
     if params:
         kwargs.update(params)
     if data:
         data = json.dumps(data) if isinstance(data, dict) else data
-        kwargs['data'] = data
-    kwargs = '&'.join([
-        '%s=%s' % (k, v)
-        for k, v in sorted(iter(kwargs.items()), key=lambda x: x[0])
-    ])
-    orignal = '%s%s?%s' % (method, path, kwargs)
+        kwargs["data"] = data
+    kwargs = "&".join(
+        ["%s=%s" % (k, v) for k, v in sorted(iter(kwargs.items()), key=lambda x: x[0])]
+    )
+    orignal = "%s%s?%s" % (method, path, kwargs)
     signature = base64.b64encode(
-        hmac.new(
-            str(app_secret),
-            orignal,
-            hashlib.sha1).digest())
+        hmac.new(str(app_secret), orignal, hashlib.sha256).digest()
+    )
     return signature

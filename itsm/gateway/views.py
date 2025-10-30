@@ -26,7 +26,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import json
 
 from django.core.cache import cache
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_page
 from django.http import JsonResponse, HttpResponse
 
@@ -117,7 +117,9 @@ def get_batch_users(request):
         return Success(res).json()
     except Exception as error:
         logger.warning(_("批量获取用户信息出错，%s"), str(error))
-        return Fail(_("批量获取用户信息出错，%s") % str(error), "BK_LOGIN.GET_BATCH_USERS").json()
+        return Fail(
+            _("批量获取用户信息出错，%s") % str(error), "BK_LOGIN.GET_BATCH_USERS"
+        ).json()
 
 
 @fbv_exception_handler
@@ -514,7 +516,9 @@ def get_user_pipeline_list(request):
         pipeline_list.extend(batch_process(get_user_pipeline_singel_page, kwarg_list))
         return Success(pipeline_list).json()
     except Exception as e:
-        return Fail(_("批量获取流水线出错:{}".format(str(e))), "BK_LOGIN.GET_BATCH_USERS").json()
+        return Fail(
+            _("批量获取流水线出错:{}".format(str(e))), "BK_LOGIN.GET_BATCH_USERS"
+        ).json()
 
 
 @fbv_exception_handler

@@ -31,7 +31,6 @@ import os
 import posixpath
 import re
 import stat
-import tarfile
 from collections import Counter, namedtuple
 from functools import reduce
 from itertools import combinations
@@ -41,7 +40,7 @@ from celery.result import AsyncResult
 from django.db.models.fields.reverse_related import ManyToManyRel
 from django.utils import timezone
 from django.utils.crypto import get_random_string
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from jsonschema import validate
 from pypinyin import lazy_pinyin
 from rest_framework.exceptions import ValidationError
@@ -53,7 +52,9 @@ from itsm.component.exceptions import ParamError
 
 # 清理终端颜色
 COLOR_REMOVE = re.compile(r"\x1b[^m]*m")
-CLEAR_COLOR_RE = re.compile(r"\\u001b\[\D{1}|\[\d{1,2}\D?|\\u001b\[\d{1,2}\D?~?", re.I | re.U)
+CLEAR_COLOR_RE = re.compile(
+    r"\\u001b\[\D{1}|\[\d{1,2}\D?|\\u001b\[\d{1,2}\D?~?", re.I | re.U
+)
 # 换行转换
 LINE_BREAK_RE = re.compile(r"\r\n|\r|\n", re.I | re.U)
 # ip地址v4版本
@@ -61,8 +62,7 @@ IPV4_RE = re.compile(r"(?:[0-9]{1,3}\.){3}[0-9]{1,3}")
 
 
 def merge_dict_list(dict_list):
-    """合并字典列表为单个字典，后面的覆盖前面的
-    """
+    """合并字典列表为单个字典，后面的覆盖前面的"""
 
     merged_dict = {}
     for dict_item in dict_list:
@@ -113,17 +113,26 @@ class ComplexRegexField(object):
     end_with：以什么类型的字符结束 type:list
     """
 
-    def __init__(self, validate_type=None, min_match_count=1, start_with=None, end_with=None, special_char=""):
-        
+    def __init__(
+        self,
+        validate_type=None,
+        min_match_count=1,
+        start_with=None,
+        end_with=None,
+        special_char="",
+    ):
+
         if end_with is None:
             end_with = []
         if start_with is None:
             start_with = []
         if validate_type is None:
             validate_type = []
-        
+
         self.validate_type = validate_type
-        self.min_match_count = min_match_count if min_match_count else len(validate_type)
+        self.min_match_count = (
+            min_match_count if min_match_count else len(validate_type)
+        )
         self.start_with = start_with
         self.end_with = end_with
         self.regex_dict = {
@@ -163,7 +172,9 @@ class ComplexRegexField(object):
             "start_en": _("包含中英文，数字，以英文字符开头"),
         }
         self.regex_error_display = [
-            str(value) for key, value in list(self.regex_display_dict.items()) if key in self.validate_type
+            str(value)
+            for key, value in list(self.regex_display_dict.items())
+            if key in self.validate_type
         ]
         if special_char:
             self.regex_dict["special"] = special_char
@@ -173,20 +184,33 @@ class ComplexRegexField(object):
     def get_regex(self):
         regex_list = list(
             combinations(
-                ["(?=.*[%s])" % self.regex_dict.get(type_key, "") for type_key in self.validate_type],
+                [
+                    "(?=.*[%s])" % self.regex_dict.get(type_key, "")
+                    for type_key in self.validate_type
+                ],
                 self.min_match_count,
             )
         )
         start_pattern = (
-            "[%s]" % "".join([self.regex_dict.get(type_key, "") for type_key in self.start_with])
+            "[%s]"
+            % "".join(
+                [self.regex_dict.get(type_key, "") for type_key in self.start_with]
+            )
             if self.start_with
             else ""
         )
         end_pattern = (
-            "[%s]" % "".join([self.regex_dict.get(type_key, "") for type_key in self.end_with]) if self.end_with else ""
+            "[%s]"
+            % "".join([self.regex_dict.get(type_key, "") for type_key in self.end_with])
+            if self.end_with
+            else ""
         )
-        include_rules = "".join([self.regex_dict.get(type_key, "") for type_key in self.validate_type])
-        include_pattern = "^{}[{}]*{}$".format(start_pattern, include_rules, end_pattern)
+        include_rules = "".join(
+            [self.regex_dict.get(type_key, "") for type_key in self.validate_type]
+        )
+        include_pattern = "^{}[{}]*{}$".format(
+            start_pattern, include_rules, end_pattern
+        )
         end_pattern = "^.*%s$" % end_pattern
         start_pattern = "^%s.*$" % start_pattern
         least_pattern = "^%s.*$" % "|".join(["".join(item) for item in regex_list])
@@ -197,20 +221,35 @@ class ComplexRegexField(object):
             return
         include_pattern, least_pattern, start_pattern, end_pattern = self.get_regex()
         if list(set(self.start_with).difference(self.validate_type)):
-            raise ValidationError(_("包含了指定字符【{}】以外的内容").format(",".join(self.regex_error_display)), code="not-matched")
+            raise ValidationError(
+                _("包含了指定字符【{}】以外的内容").format(
+                    ",".join(self.regex_error_display)
+                ),
+                code="not-matched",
+            )
         if list(set(self.end_with).difference(self.validate_type)):
-            raise ValidationError(_("包含了指定字符【{}】以外的内容").format(",".join(self.regex_error_display)), code="not-matched")
+            raise ValidationError(
+                _("包含了指定字符【{}】以外的内容").format(
+                    ",".join(self.regex_error_display)
+                ),
+                code="not-matched",
+            )
         if not re.match(start_pattern, value):
             raise ValidationError(_("开头格式不正确"), code="not-matched")
         if not re.match(end_pattern, value):
             raise ValidationError(_("结尾格式不正确"), code="not-matched")
         if not re.match(include_pattern, value):
             raise ValidationError(
-                _("输入格式不正确：包含了指定字符【{}】以外的内容").format(",".join(self.regex_error_display)), code="not-matched"
+                _("输入格式不正确：包含了指定字符【{}】以外的内容").format(
+                    ",".join(self.regex_error_display)
+                ),
+                code="not-matched",
             )
         if not re.match(least_pattern, value):
             raise ValidationError(
-                _("至少需要匹配%s种字符(%s)") % (self.min_match_count, ",".join(self.regex_error_display)), code="not-matched"
+                _("至少需要匹配%s种字符(%s)")
+                % (self.min_match_count, ",".join(self.regex_error_display)),
+                code="not-matched",
             )
 
 
@@ -263,7 +302,9 @@ class Regex(object):
             "start_en": _("包含中英文，数字，以英文字符开头"),
         }
         self.regex_error_display = [
-            value for key, value in list(self.regex_display_dict.items()) if key == self.validate_type
+            value
+            for key, value in list(self.regex_display_dict.items())
+            if key == self.validate_type
         ]
 
     def validate(self, value):
@@ -272,7 +313,10 @@ class Regex(object):
         pattern = self.regex_dict.get(self.validate_type, "")
         if not re.match(pattern, value):
             raise ValidationError(
-                _("输入格式不正确：包含了指定字符【{}】以外的内容").format(",".join(self.regex_error_display)), code="not-matched"
+                _("输入格式不正确：包含了指定字符【{}】以外的内容").format(
+                    ",".join(self.regex_error_display)
+                ),
+                code="not-matched",
             )
 
 
@@ -340,7 +384,9 @@ def deep_getattr(obj, attr):
     return reduce(getattr, attr.split("."), obj)
 
 
-def group_by(item_list, key_or_index_tuple, dict_result=False, aggregate=None, as_key=None):
+def group_by(
+    item_list, key_or_index_tuple, dict_result=False, aggregate=None, as_key=None
+):
     """
     对列表中的字典元素进行groupby操作，依据为可排序的某个key
     :param item_list: 待分组字典列表或元组列表
@@ -423,7 +469,16 @@ def parse_color(content):
         },
         {"pattern": [], "class": "agent-color-gray"},
         {
-            "pattern": [_("返回码"), _("执行完毕"), _("作业参数"), _("curl"), _("status"), _("agent状态"), _("yum"), _("apt-get")],
+            "pattern": [
+                _("返回码"),
+                _("执行完毕"),
+                _("作业参数"),
+                _("curl"),
+                _("status"),
+                _("agent状态"),
+                _("yum"),
+                _("apt-get"),
+            ],
             "class": "agent-color-black",
         },
         {
@@ -541,22 +596,32 @@ def ansi_escape(str):
     """终端颜色编码清理"""
     return COLOR_REMOVE.sub("", str)
 
+
 def generate_random_sn(service_type):
     """单号生成器"""
     from itsm.component.data import incr_expireat, exists
     from itsm.component.constants import PREFIX_KEY
 
-    prefix_mapping = {"event": "INC", "request": "REQ", "change": "CRQ", "question": "PBI"}
+    prefix_mapping = {
+        "event": "INC",
+        "request": "REQ",
+        "change": "CRQ",
+        "question": "PBI",
+    }
     key = PREFIX_KEY + service_type
     when = None
     now_time = now()
     if not exists(key):
         # 设置第二天的0:00:00过期
-        when = datetime.datetime(year=now_time.year, month=now_time.month, day=now_time.day) + datetime.timedelta(
-            days=1
-        )
+        when = datetime.datetime(
+            year=now_time.year, month=now_time.month, day=now_time.day
+        ) + datetime.timedelta(days=1)
     num = incr_expireat(key, when=when)
-    sn = prefix_mapping[service_type] + now_time.strftime("%Y%m%d") + "{:0>6}".format(num)
+    sn = (
+        prefix_mapping[service_type]
+        + now_time.strftime("%Y%m%d")
+        + "{:0>6}".format(num)
+    )
     return sn
 
 
@@ -628,7 +693,11 @@ def dotted_property(instance, name):
     '' -> ''
     ',aaa,bbb,ccc', -> 'aaa,bbb,ccc'
     """
-    property = instance.get(name, "") if isinstance(instance, dict) else getattr(instance, name, "")
+    property = (
+        instance.get(name, "")
+        if isinstance(instance, dict)
+        else getattr(instance, name, "")
+    )
 
     return ",".join(list_by_separator(property))
 
@@ -652,10 +721,17 @@ class TempDisableSignal(object):
         self.dispatch_uid = dispatch_uid
 
     def __enter__(self):
-        self.signal.disconnect(receiver=self.receiver, sender=self.sender, dispatch_uid=self.dispatch_uid)
+        self.signal.disconnect(
+            receiver=self.receiver, sender=self.sender, dispatch_uid=self.dispatch_uid
+        )
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.signal.connect(receiver=self.receiver, sender=self.sender, weak=False, dispatch_uid=self.dispatch_uid)
+        self.signal.connect(
+            receiver=self.receiver,
+            sender=self.sender,
+            weak=False,
+            dispatch_uid=self.dispatch_uid,
+        )
 
 
 def fill_tree_route(pure_tree, pre_routes=None):
@@ -667,7 +743,9 @@ def fill_tree_route(pure_tree, pre_routes=None):
     pure_tree["route"] = pre_routes
 
     for child in pure_tree.get("children", []):
-        fill_tree_route(child, pre_routes + [{"id": pure_tree["id"], "name": pure_tree["name"]}])
+        fill_tree_route(
+            child, pre_routes + [{"id": pure_tree["id"], "name": pure_tree["name"]}]
+        )
 
 
 def build_tree(raw_nodes, parent_name, empty_parent=None, need_route=False):
@@ -709,7 +787,7 @@ def jsonschema_validate(schema, instance):
 
 
 def walk(node):
-    """ iterate tree in pre-order depth-first search order """
+    """iterate tree in pre-order depth-first search order"""
     yield node
     for child in node.get("children", []):
         for item in walk(child):
@@ -806,7 +884,7 @@ def convert_bytes_to_str(obj):
 def namedtuplefetchall(cursor):
     "Return all rows from a cursor as a namedtuple"
     desc = cursor.description
-    nt_result = namedtuple('Result', [col[0] for col in desc])
+    nt_result = namedtuple("Result", [col[0] for col in desc])
     return [nt_result(*row) for row in cursor.fetchall()]
 
 
