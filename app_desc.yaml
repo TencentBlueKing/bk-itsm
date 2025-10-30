@@ -35,9 +35,6 @@ modules:
             - key: GUNICORN_THREAD_NUM
               value: 10
               description: GunicornThread数量
-            - key: C_FORCE_ROOT
-              value: 1
-              description: celery5 fit
         scripts:
             pre_release_hook: "bash ./bin/pre-release"
         processes:
