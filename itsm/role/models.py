@@ -29,7 +29,7 @@ import jsonfield
 from django.conf import settings
 from django.core.cache import cache
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from common.log import logger
 from itsm.component.constants import (
@@ -96,12 +96,19 @@ class RoleType(Model):
     is_processor = models.BooleanField(_("可否操作单据"), default=True)
     is_display = models.BooleanField(_("是否显示"), default=True)
     desc = models.CharField(
-        _("角色描述"), max_length=LEN_MIDDLE, default=EMPTY_STRING, null=True, blank=True
+        _("角色描述"),
+        max_length=LEN_MIDDLE,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
     )
 
     objects = managers.Manager()
 
-    auth_resource = {"resource_type": "system_settings", "resource_type_name": "系统配置"}
+    auth_resource = {
+        "resource_type": "system_settings",
+        "resource_type_name": "系统配置",
+    }
     resource_operations = ["system_settings_manage"]
 
     class Meta:
@@ -151,7 +158,11 @@ class UserRole(ObjectManagerMixin, Model):
     owners = models.CharField(_("负责人"), max_length=LEN_XX_LONG, default=EMPTY_STRING)
     access = models.CharField(_("对应服务"), max_length=LEN_MIDDLE)
     desc = models.CharField(
-        _("用户角色描述"), max_length=LEN_MIDDLE, default=EMPTY_STRING, null=True, blank=True
+        _("用户角色描述"),
+        max_length=LEN_MIDDLE,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
     )
     is_builtin = models.BooleanField(_("是否内置"), default=False)
     project_key = models.CharField(
@@ -443,7 +454,9 @@ class BKUserRole(models.Model):
     username = models.CharField(
         _("蓝鲸用户username"), max_length=LEN_NORMAL, default=EMPTY_STRING
     )
-    roles = jsonfield.JSONField(_("用户角色"), default=roles_dict, null=True, blank=True)
+    roles = jsonfield.JSONField(
+        _("用户角色"), default=roles_dict, null=True, blank=True
+    )
     uid = models.CharField(
         _("用户uid"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True, blank=True
     )

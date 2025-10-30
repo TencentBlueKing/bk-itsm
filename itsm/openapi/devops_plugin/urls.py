@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import url
+from django.urls import re_path
 
 from itsm.openapi.devops_plugin import views
 
 urlpatterns = [
     # main
-    url(r"^devops_plugin/services/$", views.services),
-    url(r"^devops_plugin/fields/$", views.service_fields),
+    re_path(r"^devops_plugin/services/$", views.services),
+    re_path(r"^devops_plugin/fields/$", views.service_fields),
 ]

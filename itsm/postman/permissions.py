@@ -27,7 +27,7 @@ from itsm.component.constants import PUBLIC_PROJECT_PROJECT_KEY
 from itsm.component.drf import permissions as perm
 from itsm.component.exceptions import ValidateError
 from itsm.postman.models import RemoteSystem, RemoteApi
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.project.models import Project
 from itsm.workflow.permissions import WorkflowElementManagePermission

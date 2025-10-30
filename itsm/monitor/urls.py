@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import url
+from django.urls import re_path
 
 from itsm.monitor.views import healthz, ping
 
 urlpatterns = [
     # main
-    url(r"^healthz/$", healthz),
-    url(r"ping/$", ping),
+    re_path(r"^healthz/$", healthz),
+    re_path(r"ping/$", ping),
 ]

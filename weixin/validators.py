@@ -26,7 +26,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from functools import wraps
 
 from django.contrib.auth.models import AnonymousUser
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 import settings
 from weixin.utils import FailResponse
@@ -39,13 +39,18 @@ def validate_weixin(view_func):
         # 必须在微信中打开
 
         if isinstance(request.weixin_user, AnonymousUser):
-            return FailResponse(message=_('请在企业微信中打开链接'), code='1002').json()
+            return FailResponse(message=_("请在企业微信中打开链接"), code="1002").json()
 
         # 必须绑定微信到蓝鲸
         if isinstance(request.user, AnonymousUser):
             return FailResponse(
-                message=_('请先登录蓝鲸平台的个人中心({}/console/user_center/)绑定你的微信({})，并访问一次ITSM.').format(
-                    settings.BK_PAAS_HOST, getattr(request.weixin_user, 'nickname', '')), code='1003').json()
+                message=_(
+                    "请先登录蓝鲸平台的个人中心({}/console/user_center/)绑定你的微信({})，并访问一次ITSM."
+                ).format(
+                    settings.BK_PAAS_HOST, getattr(request.weixin_user, "nickname", "")
+                ),
+                code="1003",
+            ).json()
 
         return view_func(request, *args, **kwargs)
 

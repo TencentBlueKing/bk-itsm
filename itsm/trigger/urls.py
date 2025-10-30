@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.conf.urls import url
+from django.urls import re_path
 from rest_framework.routers import DefaultRouter
 
 from itsm.trigger.views import (
@@ -41,4 +41,4 @@ routers.register(r"action_schemas", ActionSchemaViewSet, basename="action_schema
 routers.register(r"actions", ActionViewSet, basename="actions")
 
 
-urlpatterns = routers.urls + [url(r'^components/$', ComponentApiViewSet.as_view())]
+urlpatterns = routers.urls + [re_path(r"^components/$", ComponentApiViewSet.as_view())]

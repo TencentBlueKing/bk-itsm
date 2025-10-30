@@ -35,8 +35,8 @@
 * 修改urls.py文件
 ```python
 # urlpatterns 添加
-    url(r'^weixin/login/', include('weixin.core.urls')),
-    url(r'^weixin/', include('weixin.urls')),
+    re_path(r'^weixin/login/', include('weixin.core.urls')),
+    re_path(r'^weixin/', include('weixin.urls')),
 ```
 ## 蓝鲸应用
 * 部署蓝鲸应用

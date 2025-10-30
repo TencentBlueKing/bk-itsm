@@ -24,20 +24,26 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django.db.models import Q
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from itsm.component.drf.exception import ValidationError
 from itsm.component.drf.viewsets import NormalModelViewSet, AuthModelViewSet
-from itsm.sla.models import ActionPolicy, PriorityPolicy, Sla, SlaTimerRule, SlaTicketHighlight
+from itsm.sla.models import (
+    ActionPolicy,
+    PriorityPolicy,
+    Sla,
+    SlaTimerRule,
+    SlaTicketHighlight,
+)
 from itsm.sla.serializers import (
     ActionPolicySerializer,
     PriorityPolicySerializer,
     SlaSerializer,
     SlaTimerRuleSerializer,
-    TicketHighlightSerializer
+    TicketHighlightSerializer,
 )
 from itsm.sla.validators import sla_can_destroy
 from itsm.ticket_status.models import TicketStatus, TicketStatusConfig
@@ -69,9 +75,9 @@ class SlaTimerRuleViewSet(ModelViewSet):
         批量创建
         """
         data = request.data
-        basic_info = {"name": data['name'], "service_type": data['service_type']}
+        basic_info = {"name": data["name"], "service_type": data["service_type"]}
         rules = []
-        for rule in data['rules']:
+        for rule in data["rules"]:
             rule.update(basic_info)
             serializer = self.get_serializer(data=rule)
             serializer.is_valid(raise_exception=True)
@@ -80,20 +86,20 @@ class SlaTimerRuleViewSet(ModelViewSet):
             rules.append(serializer.data)
 
         # 创建完后，修改工单状态配置为已配置状态
-        TicketStatusConfig.update_config(data['service_type'], request.user, True)
+        TicketStatusConfig.update_config(data["service_type"], request.user, True)
 
         return Response(rules, status=status.HTTP_201_CREATED, headers=headers)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def batch_update(self, request, *args, **kwargs):
         """
         批量修改
         """
 
         data = request.data
-        basic_info = {"name": data['name'], "service_type": data['service_type']}
+        basic_info = {"name": data["name"], "service_type": data["service_type"]}
         rules = []
-        for rule in data['rules']:
+        for rule in data["rules"]:
             rule.update(basic_info)
             try:
                 instance = self.queryset.get(id=rule.pop("id", 0))
@@ -108,7 +114,7 @@ class SlaTimerRuleViewSet(ModelViewSet):
                 self.perform_update(serializer)
             rules.append(serializer.data)
         # 修改完后，修改工单状态配置为已配置状态
-        TicketStatusConfig.update_config(data['service_type'], request.user, True)
+        TicketStatusConfig.update_config(data["service_type"], request.user, True)
         return Response(rules)
 
 
@@ -145,7 +151,7 @@ class SlaViewSet(AuthModelViewSet):
 
     serializer_class = SlaSerializer
     queryset = Sla.objects.all()
-    permission_classes = (SlaPermit, )
+    permission_classes = (SlaPermit,)
     permission_free_actions = ["list"]
     filter_fields = {
         "name": ["exact", "contains", "icontains"],
@@ -157,10 +163,14 @@ class SlaViewSet(AuthModelViewSet):
         if not self.request.query_params.get("page_size"):
             self.pagination_class = None
         return super(SlaViewSet, self).get_queryset().filter()
-    
+
     def list(self, request, *args, **kwargs):
-        project_key = self.request.query_params.get("project_key", DEFAULT_PROJECT_PROJECT_KEY)
-        queryset = self.filter_queryset(self.get_queryset().filter(project_key=project_key))
+        project_key = self.request.query_params.get(
+            "project_key", DEFAULT_PROJECT_PROJECT_KEY
+        )
+        queryset = self.filter_queryset(
+            self.get_queryset().filter(project_key=project_key)
+        )
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -191,7 +201,9 @@ class SlaViewSet(AuthModelViewSet):
             for service_type, statuses in is_over_statuses.items():
                 sub_q = Q()
                 sub_q.connector = "AND"
-                sub_q.children.extend([("service_type", service_type), ("current_status__in", statuses)])
+                sub_q.children.extend(
+                    [("service_type", service_type), ("current_status__in", statuses)]
+                )
                 is_over_q.add(sub_q, "OR")
 
             if serializer.instance.get_tickets().exclude(is_over_q).exists():

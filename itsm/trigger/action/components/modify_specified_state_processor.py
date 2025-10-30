@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import FLOW_STATES, TASK_SIGNAL
 from itsm.trigger.action.core.component import BaseComponent
@@ -69,15 +69,21 @@ class ModifySpecifiedStateProcessorComponent(BaseComponent):
 
         states = self.data.get_one_of_inputs("states", [])
 
-        all_status = Status.objects.filter(ticket=ticket, status__in=Status.CAN_OPERATE_STATUS, state_id__in=states)
+        all_status = Status.objects.filter(
+            ticket=ticket, status__in=Status.CAN_OPERATE_STATUS, state_id__in=states
+        )
 
         processors = self.data.get_one_of_inputs("processors")
         if not processors:
             self.data.set_outputs("message", "设置处理人为空")
             return False
 
-        all_status.update(processors_type=processors['member_type'], processors=processors["members"])
-        self.data.set_outputs("states__display", ",".join(set(all_status.values_list("name", flat=True))))
+        all_status.update(
+            processors_type=processors["member_type"], processors=processors["members"]
+        )
+        self.data.set_outputs(
+            "states__display", ",".join(set(all_status.values_list("name", flat=True)))
+        )
         ticket.set_current_processors()
 
         return True
@@ -90,6 +96,6 @@ class ModifySpecifiedStateProcessorComponent(BaseComponent):
             dst_state = Status.objects.get(id=self.context.get("dst_state"))
         except Status.DoesNotExist:
             return self.context
-        self.context.update(dst_state.ticket.get_output_fields(return_format='dict'))
+        self.context.update(dst_state.ticket.get_output_fields(return_format="dict"))
         self.validate_inputs()
         return self.context

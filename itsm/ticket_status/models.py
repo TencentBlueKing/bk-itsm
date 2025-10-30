@@ -27,7 +27,7 @@ import itertools
 from datetime import datetime
 
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import (
     BUILTIN_TICKET_STATUS,

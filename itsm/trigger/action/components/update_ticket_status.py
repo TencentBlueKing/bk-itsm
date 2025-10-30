@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django import forms
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import FIELD_STATUS
 from itsm.component.dlls.component import BaseComponentForm
@@ -38,7 +38,9 @@ __register_ignore__ = False
 
 def get_ticket_status_names():
     """Get all ticket status display name"""
-    status_names = TicketStatus.objects.get_overall_status_names(exclude_keys=["SUSPENDED"])
+    status_names = TicketStatus.objects.get_overall_status_names(
+        exclude_keys=["SUSPENDED"]
+    )
     return [(key, name) for key, name in status_names.items()]
 
 
@@ -49,7 +51,9 @@ class UpdateTicketStatus(BaseComponent):
     is_sub_class = True
 
     class Form(BaseComponentForm):
-        ticket_status_name = forms.ChoiceField(label=_("单据状态"), required=True, choices=get_ticket_status_names)
+        ticket_status_name = forms.ChoiceField(
+            label=_("单据状态"), required=True, choices=get_ticket_status_names
+        )
 
         def clean(self):
             """Form data clean"""
@@ -62,19 +66,29 @@ class UpdateTicketStatus(BaseComponent):
         ticket = Ticket.objects.get(id=ticket_id)
 
         # Whether follow status transit rule
-        from_status = TicketStatus.objects.get(service_type=ticket.service_type, key=ticket.current_status)
-        to_status_infos = from_status.from_transits.values("to_status__key", "to_status__name")
+        from_status = TicketStatus.objects.get(
+            service_type=ticket.service_type, key=ticket.current_status
+        )
+        to_status_infos = from_status.from_transits.values(
+            "to_status__key", "to_status__name"
+        )
 
         for to_status_info in to_status_infos:
-            if to_status_info['to_status__key'] == ticket_status_key:
+            if to_status_info["to_status__key"] == ticket_status_key:
 
                 # Update status from ticket
                 ticket.current_status = ticket_status_key
-                ticket.save(update_fields=['current_status'])
+                ticket.save(update_fields=["current_status"])
 
                 # Update status from field
                 ticket.fields.filter(key=FIELD_STATUS).update(_value=ticket_status_key)
                 return True
 
-        self.data.set_outputs('message', _('工单状态无法更新为%s, 不满足状态流转规则, 请联系管理员! ' % ticket_status_key))
+        self.data.set_outputs(
+            "message",
+            _(
+                "工单状态无法更新为%s, 不满足状态流转规则, 请联系管理员! "
+                % ticket_status_key
+            ),
+        )
         return False

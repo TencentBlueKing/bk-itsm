@@ -31,7 +31,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from rest_framework.exceptions import ValidationError as RrfValidationError
 from django.http import JsonResponse, HttpResponse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.bkoauth.jwt_client import JWTClient, jwt_invalid_view
 from itsm.component.exceptions import ServerError, ParamError
@@ -119,7 +119,9 @@ def validate_file_name(view_func):
         try:
             is_file_name_valid(file_name)
         except ValidationError as error:
-            return Fail(_("文件上传失败：{}").format(str(error)), "FILE_NAME_INVALID").json()
+            return Fail(
+                _("文件上传失败：{}").format(str(error)), "FILE_NAME_INVALID"
+            ).json()
         except RrfValidationError as error:
             return Fail(
                 _("文件上传失败：{}").format(error.detail[0]), "FILE_NAME_INVALID"
@@ -199,7 +201,8 @@ def validate_file_upload(max_size, content_types=None, file_exts=None):
                     {
                         "code": "FILE_NOT_ALLOWED",
                         "result": False,
-                        "message": _("上传文件类型仅支持：%s") % ", ".join(content_types),
+                        "message": _("上传文件类型仅支持：%s")
+                        % ", ".join(content_types),
                     }
                 )
 
@@ -232,9 +235,13 @@ def validate_filepath_settings(view_func):
         try:
             system_file_path = SystemSettings.objects.get(key="SYS_FILE_PATH").value
             if not os.path.exists(system_file_path):
-                return Fail(_("请检查系统配置：附件存储目录不存在"), "SYS_FILE_PATH_INVALID").json()
+                return Fail(
+                    _("请检查系统配置：附件存储目录不存在"), "SYS_FILE_PATH_INVALID"
+                ).json()
         except SystemSettings.DoesNotExist:
-            return Fail(_("请检查系统配置：附件存储的目录配置无效"), "SYS_FILE_PATH_EMPTY").json()
+            return Fail(
+                _("请检查系统配置：附件存储的目录配置无效"), "SYS_FILE_PATH_EMPTY"
+            ).json()
         except Exception as e:
             return Fail(_("附件路径生成异常：%s") % e, "FILE_PATH_EXCEPTION").json()
 

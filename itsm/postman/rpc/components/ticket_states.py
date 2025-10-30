@@ -23,11 +23,17 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from django import forms
 
-from itsm.component.constants import FLOW_STATES, NORMAL_STATE, TASK_STATE, TASK_SOPS_STATE, SIGN_STATE
+from itsm.component.constants import (
+    FLOW_STATES,
+    NORMAL_STATE,
+    TASK_STATE,
+    TASK_SOPS_STATE,
+    SIGN_STATE,
+)
 from itsm.component.dlls.component import BaseComponentForm
 from itsm.postman.rpc.core.component import BaseComponent
 from itsm.workflow.models import Workflow
@@ -39,8 +45,12 @@ class GetTicketFields(BaseComponent):
     code = FLOW_STATES
 
     class Form(BaseComponentForm):
-        trigger_source_id = forms.IntegerField(label=_("触发器源id"), required=True, initial="trigger source id")
-        trigger_source_type = forms.CharField(label=_("触发器源类型"), required=True, initial="trigger source type")
+        trigger_source_id = forms.IntegerField(
+            label=_("触发器源id"), required=True, initial="trigger source id"
+        )
+        trigger_source_type = forms.CharField(
+            label=_("触发器源类型"), required=True, initial="trigger source type"
+        )
 
         def clean(self):
             """数据清理"""
@@ -49,17 +59,20 @@ class GetTicketFields(BaseComponent):
 
     def handle(self):
         payload = []
-        if self.form_data.get("trigger_source_type") != 'workflow':
+        if self.form_data.get("trigger_source_type") != "workflow":
             self.response.payload = payload
             return
 
         try:
-            current_workflow = Workflow.objects.get(id=self.form_data.get("trigger_source_id"))
+            current_workflow = Workflow.objects.get(
+                id=self.form_data.get("trigger_source_id")
+            )
         except Workflow.DoesNotExist:
             raise
         payload = StateSerializer(
             current_workflow.states.filter(
-                type__in=[NORMAL_STATE, TASK_STATE, TASK_SOPS_STATE, SIGN_STATE], is_builtin=False
+                type__in=[NORMAL_STATE, TASK_STATE, TASK_SOPS_STATE, SIGN_STATE],
+                is_builtin=False,
             ),
             many=True,
         ).data

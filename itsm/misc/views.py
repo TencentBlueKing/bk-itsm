@@ -36,7 +36,7 @@ from django.conf import settings
 from django.db import connection
 from django.http import StreamingHttpResponse
 from django.utils.encoding import escape_uri_path
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
@@ -66,7 +66,9 @@ def clean_cache(request):
         # 更新用户角色表的更新时间，达到清理缓存目的
         from itsm.role.models import BKUserRole
 
-        BKUserRole.objects.update(update_at=datetime.datetime.now() - datetime.timedelta(minutes=30))
+        BKUserRole.objects.update(
+            update_at=datetime.datetime.now() - datetime.timedelta(minutes=30)
+        )
 
         return Success(message=_("缓存更新成功")).json()
     except Exception as e:
@@ -82,9 +84,15 @@ def compile_file_path(request):
     tmp_key = request.GET.get("key") or ("tmp_%s" % int(time.time()))
     system_file_path = SystemSettings.objects.get(key="SYS_FILE_PATH").value
 
-    file_prefix = request.GET.get("ticket_id") or "workflow_%s" % request.GET.get("workflow_id")
+    file_prefix = request.GET.get("ticket_id") or "workflow_%s" % request.GET.get(
+        "workflow_id"
+    )
 
-    file_path = os.path.join(system_file_path, "%s_%s" % (file_prefix, request.GET.get("state_id", "")), tmp_key)
+    file_path = os.path.join(
+        system_file_path,
+        "%s_%s" % (file_prefix, request.GET.get("state_id", "")),
+        tmp_key,
+    )
 
     return file_path, tmp_key
 
@@ -140,6 +148,8 @@ def download(request):
 
     response = StreamingHttpResponse(FileWrapper(store.open(file_path, "rb"), 512))
     response["Content-Type"] = "application/octet-stream"
-    response["Content-Disposition"] = "attachment; filename* = UTF-8''%s" % format(escape_uri_path(file_name))
+    response["Content-Disposition"] = "attachment; filename* = UTF-8''%s" % format(
+        escape_uri_path(file_name)
+    )
 
     return response
