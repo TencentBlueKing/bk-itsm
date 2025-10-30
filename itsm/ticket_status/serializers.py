@@ -23,11 +23,17 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.fields import empty
 
-from itsm.component.constants import FIRST_ORDER, LEN_LONG, LEN_NORMAL, LEN_SHORT, PROCESS_RUNNING
+from itsm.component.constants import (
+    FIRST_ORDER,
+    LEN_LONG,
+    LEN_NORMAL,
+    LEN_SHORT,
+    PROCESS_RUNNING,
+)
 from itsm.service.validators import service_type_validator
 from itsm.ticket_status.models import StatusTransit, TicketStatus, TicketStatusConfig
 from itsm.ticket_status.validators import TicketStatusValidator
@@ -36,7 +42,15 @@ from itsm.ticket_status.validators import TicketStatusValidator
 class TicketStatusConfigSerializer(serializers.ModelSerializer):
     class Meta:
         model = TicketStatusConfig
-        fields = ("id", "service_type", "service_type_name", "ticket_status", "updated_by", "update_at", "configured")
+        fields = (
+            "id",
+            "service_type",
+            "service_type_name",
+            "ticket_status",
+            "updated_by",
+            "update_at",
+            "configured",
+        )
 
 
 class TicketStatusOptionSerializer(serializers.Serializer):
@@ -49,9 +63,18 @@ class TicketStatusSerializer(serializers.ModelSerializer):
     """单据状态序列化"""
 
     name = serializers.CharField(
-        required=True, max_length=LEN_LONG, error_messages={"blank": _("请输入状态名称"), "max_length": _("状态名称长度不能大于255个字符")}
+        required=True,
+        max_length=LEN_LONG,
+        error_messages={
+            "blank": _("请输入状态名称"),
+            "max_length": _("状态名称长度不能大于255个字符"),
+        },
     )
-    color_hex = serializers.CharField(required=True, max_length=LEN_SHORT, error_messages={"blank": _("二进制颜色不能为空")})
+    color_hex = serializers.CharField(
+        required=True,
+        max_length=LEN_SHORT,
+        error_messages={"blank": _("二进制颜色不能为空")},
+    )
     service_type = serializers.CharField(
         required=True,
         max_length=LEN_NORMAL,
@@ -85,9 +108,13 @@ class TicketStatusSerializer(serializers.ModelSerializer):
 
         # 获取同一服务类型下的最大order数值
         ticket_status = (
-            TicketStatus.objects.filter(service_type=validated_data["service_type"]).order_by("order").last()
+            TicketStatus.objects.filter(service_type=validated_data["service_type"])
+            .order_by("order")
+            .last()
         )
-        created_order = ticket_status.order + FIRST_ORDER if ticket_status else FIRST_ORDER
+        created_order = (
+            ticket_status.order + FIRST_ORDER if ticket_status else FIRST_ORDER
+        )
         validated_data.update(
             order=created_order,
             key=TicketStatus.get_unique_key(validated_data["name"]),
@@ -103,7 +130,13 @@ class TicketStatusSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """更新单据状态"""
         # 内置的单据状态 只有以下属性可以被编辑
-        can_edited = ("is_start", "is_over", "name", "desc", "color_hex") + TicketStatus.DISPLAY_FIELDS
+        can_edited = (
+            "is_start",
+            "is_over",
+            "name",
+            "desc",
+            "color_hex",
+        ) + TicketStatus.DISPLAY_FIELDS
         if instance.is_builtin and set(validated_data.keys()).difference(can_edited):
             raise serializers.ValidationError(_("抱歉，内置单据状态无法被编辑"))
 

@@ -25,5 +25,5 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.dispatch import Signal
 
-state_created = Signal(providing_args=["flow_id", "state_id", "state_type"])
-state_deleted = Signal(providing_args=["flow_id", "state_id"])
+state_created = Signal()  # providing_args=["flow_id", "state_id", "state_type"]
+state_deleted = Signal()  # providing_args=["flow_id", "state_id"]

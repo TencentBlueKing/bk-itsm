@@ -19,7 +19,7 @@ from celery import schedules
 from django.core.exceptions import MultipleObjectsReturned, ValidationError
 from django.db import models
 from django.db.models import signals
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from pipeline.constants import PIPELINE_DEFAULT_PRIORITY
 from pipeline.contrib.periodic_task.djcelery import managers
@@ -28,7 +28,12 @@ from pipeline.contrib.periodic_task.djcelery.tzcrontab import TzAwareCrontab
 from pipeline.contrib.periodic_task.djcelery.utils import now
 from pipeline.contrib.periodic_task.signals import periodic_task_start_failed
 from pipeline.exceptions import InvalidOperationException
-from pipeline.models import CompressJSONField, PipelineInstance, PipelineTemplate, Snapshot
+from pipeline.models import (
+    CompressJSONField,
+    PipelineInstance,
+    PipelineTemplate,
+    Snapshot,
+)
 from pipeline.utils.uniqid import uniqid
 
 PERIOD_CHOICES = (
@@ -43,7 +48,11 @@ PERIOD_CHOICES = (
 @python_2_unicode_compatible
 class IntervalSchedule(models.Model):
     every = models.IntegerField(_("every"), null=False)
-    period = models.CharField(_("period"), max_length=24, choices=PERIOD_CHOICES,)
+    period = models.CharField(
+        _("period"),
+        max_length=24,
+        choices=PERIOD_CHOICES,
+    )
 
     class Meta:
         verbose_name = _("interval")
@@ -83,9 +92,21 @@ def cronexp(field):
 class CrontabSchedule(models.Model):
     minute = models.CharField(_("minute"), max_length=64, default="*")
     hour = models.CharField(_("hour"), max_length=64, default="*")
-    day_of_week = models.CharField(_("day of week"), max_length=64, default="*",)
-    day_of_month = models.CharField(_("day of month"), max_length=64, default="*",)
-    month_of_year = models.CharField(_("month of year"), max_length=64, default="*",)
+    day_of_week = models.CharField(
+        _("day of week"),
+        max_length=64,
+        default="*",
+    )
+    day_of_month = models.CharField(
+        _("day of month"),
+        max_length=64,
+        default="*",
+    )
+    month_of_year = models.CharField(
+        _("month of year"),
+        max_length=64,
+        default="*",
+    )
     timezone = timezone_field.TimeZoneField(default="UTC")
 
     class Meta:
@@ -153,10 +174,19 @@ class DjCeleryPeriodicTasks(models.Model):
 
 @python_2_unicode_compatible
 class DjCeleryPeriodicTask(models.Model):
-    name = models.CharField(_("name"), max_length=200, unique=True, help_text=_("Useful description"),)
+    name = models.CharField(
+        _("name"),
+        max_length=200,
+        unique=True,
+        help_text=_("Useful description"),
+    )
     task = models.CharField(_("task name"), max_length=200)
     interval = models.ForeignKey(
-        IntervalSchedule, null=True, blank=True, verbose_name=_("interval"), on_delete=models.CASCADE,
+        IntervalSchedule,
+        null=True,
+        blank=True,
+        verbose_name=_("interval"),
+        on_delete=models.CASCADE,
     )
     crontab = models.ForeignKey(
         CrontabSchedule,
@@ -166,19 +196,60 @@ class DjCeleryPeriodicTask(models.Model):
         on_delete=models.CASCADE,
         help_text=_("Use one of interval/crontab"),
     )
-    args = models.TextField(_("Arguments"), blank=True, default="[]", help_text=_("JSON encoded positional arguments"),)
+    args = models.TextField(
+        _("Arguments"),
+        blank=True,
+        default="[]",
+        help_text=_("JSON encoded positional arguments"),
+    )
     kwargs = models.TextField(
-        _("Keyword arguments"), blank=True, default="{}", help_text=_("JSON encoded keyword arguments"),
+        _("Keyword arguments"),
+        blank=True,
+        default="{}",
+        help_text=_("JSON encoded keyword arguments"),
     )
     queue = models.CharField(
-        _("queue"), max_length=200, blank=True, null=True, default=None, help_text=_("Queue defined in CELERY_QUEUES"),
+        _("queue"),
+        max_length=200,
+        blank=True,
+        null=True,
+        default=None,
+        help_text=_("Queue defined in CELERY_QUEUES"),
     )
-    exchange = models.CharField(_("exchange"), max_length=200, blank=True, null=True, default=None,)
-    routing_key = models.CharField(_("routing key"), max_length=200, blank=True, null=True, default=None,)
-    expires = models.DateTimeField(_("expires"), blank=True, null=True,)
-    enabled = models.BooleanField(_("enabled"), default=True,)
-    last_run_at = models.DateTimeField(auto_now=False, auto_now_add=False, editable=False, blank=True, null=True,)
-    total_run_count = models.PositiveIntegerField(default=0, editable=False,)
+    exchange = models.CharField(
+        _("exchange"),
+        max_length=200,
+        blank=True,
+        null=True,
+        default=None,
+    )
+    routing_key = models.CharField(
+        _("routing key"),
+        max_length=200,
+        blank=True,
+        null=True,
+        default=None,
+    )
+    expires = models.DateTimeField(
+        _("expires"),
+        blank=True,
+        null=True,
+    )
+    enabled = models.BooleanField(
+        _("enabled"),
+        default=True,
+    )
+    last_run_at = models.DateTimeField(
+        auto_now=False,
+        auto_now_add=False,
+        editable=False,
+        blank=True,
+        null=True,
+    )
+    total_run_count = models.PositiveIntegerField(
+        default=0,
+        editable=False,
+    )
     date_changed = models.DateTimeField(auto_now=True)
     description = models.TextField(_("description"), blank=True)
 
@@ -192,9 +263,13 @@ class DjCeleryPeriodicTask(models.Model):
     def validate_unique(self, *args, **kwargs):
         super(DjCeleryPeriodicTask, self).validate_unique(*args, **kwargs)
         if not self.interval and not self.crontab:
-            raise ValidationError({"interval": ["One of interval or crontab must be set."]})
+            raise ValidationError(
+                {"interval": ["One of interval or crontab must be set."]}
+            )
         if self.interval and self.crontab:
-            raise ValidationError({"crontab": ["Only one of interval or crontab must be set"]})
+            raise ValidationError(
+                {"crontab": ["Only one of interval or crontab must be set"]}
+            )
 
     def save(self, *args, **kwargs):
         self.exchange = self.exchange or None
@@ -286,10 +361,16 @@ class PeriodicTask(models.Model):
     )
     cron = models.CharField(_("调度策略"), max_length=128)
     celery_task = models.ForeignKey(
-        DjCeleryPeriodicTask, verbose_name=_("celery 周期任务实例"), null=True, on_delete=models.SET_NULL
+        DjCeleryPeriodicTask,
+        verbose_name=_("celery 周期任务实例"),
+        null=True,
+        on_delete=models.SET_NULL,
     )
     snapshot = models.ForeignKey(
-        Snapshot, related_name="periodic_tasks", verbose_name=_("用于创建流程实例的结构数据"), on_delete=models.DO_NOTHING
+        Snapshot,
+        related_name="periodic_tasks",
+        verbose_name=_("用于创建流程实例的结构数据"),
+        on_delete=models.DO_NOTHING,
     )
     total_run_count = models.PositiveIntegerField(_("执行次数"), default=0)
     last_run_at = models.DateTimeField(_("上次运行时间"), null=True)
@@ -350,7 +431,9 @@ class PeriodicTask(models.Model):
 
     def modify_constants(self, constants):
         if self.enabled:
-            raise InvalidOperationException("can not modify constants when task is enabled")
+            raise InvalidOperationException(
+                "can not modify constants when task is enabled"
+            )
         exec_data = self.execution_data
         for key, value in list(constants.items()):
             if key in exec_data["constants"]:
@@ -361,7 +444,9 @@ class PeriodicTask(models.Model):
 
 
 class PeriodicTaskHistoryManager(models.Manager):
-    def record_schedule(self, periodic_task, pipeline_instance, ex_data, start_success=True):
+    def record_schedule(
+        self, periodic_task, pipeline_instance, ex_data, start_success=True
+    ):
         history = self.create(
             periodic_task=periodic_task,
             pipeline_instance=pipeline_instance,
@@ -372,14 +457,20 @@ class PeriodicTaskHistoryManager(models.Manager):
         )
 
         if not start_success:
-            periodic_task_start_failed.send(sender=PeriodicTask, periodic_task=periodic_task, history=history)
+            periodic_task_start_failed.send(
+                sender=PeriodicTask, periodic_task=periodic_task, history=history
+            )
 
         return history
 
 
 class PeriodicTaskHistory(models.Model):
     periodic_task = models.ForeignKey(
-        PeriodicTask, related_name="instance_rel", verbose_name=_("周期任务"), null=True, on_delete=models.DO_NOTHING
+        PeriodicTask,
+        related_name="instance_rel",
+        verbose_name=_("周期任务"),
+        null=True,
+        on_delete=models.DO_NOTHING,
     )
     pipeline_instance = models.ForeignKey(
         PipelineInstance,

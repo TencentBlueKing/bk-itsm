@@ -26,7 +26,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import copy
 
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from jsonfield import JSONField
 
 from common.template.template import Template
@@ -353,7 +353,9 @@ class ActionPolicy(Model):
     """
 
     name = models.CharField(_("策略名称"), max_length=LEN_LONG)
-    type = models.IntegerField(_("升级事件类型"), choices=ACTION_POLICY_TYPES, default=1)
+    type = models.IntegerField(
+        _("升级事件类型"), choices=ACTION_POLICY_TYPES, default=1
+    )
     order = models.IntegerField(_("策略顺序"), default=-1)
     condition = JSONField("升级条件", help_text="当达到条件的时候，可以触发不同的动作")
     actions = models.ManyToManyField(Action, help_text=_("处理事件"))

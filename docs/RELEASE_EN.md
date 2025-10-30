@@ -1,4 +1,8 @@
 # Changelog
+
+## [Version: 2.8.0] - 2025-10-30
+【Feature】Upgraded version dependencies: Python 3.11 and Django 4.2 
+
 ## [Version: 2.7.13] - 2025-09-10
 【Improved】Remove “All Tasks” and “Comments” from the work order processing page         
 【Fix】Resolve the issue with API configuration where “Request Data Processing” cannot use JSON   

@@ -28,7 +28,7 @@ import datetime
 from collections import defaultdict
 from operator import itemgetter
 from celery.schedules import crontab
-from celery.task import periodic_task
+from blueapps.contrib.celery_tools.periodic import periodic_task
 
 from itsm.component.constants.task import (
     NEED_UPDATE_TASK_STATUS,
@@ -48,7 +48,7 @@ from itsm.component.utils.lock import share_lock
 from itsm.task.models import SopsTask, Task, SubTask
 from itsm.ticket.models import TicketGlobalVariable
 
-logger = logging.getLogger('celery')
+logger = logging.getLogger("celery")
 
 
 def get_tasks_status(bk_biz_id, sops_task_ids):
@@ -58,42 +58,63 @@ def get_tasks_status(bk_biz_id, sops_task_ids):
         {"__raw": True, "task_id_list": list(sops_task_ids), "bk_biz_id": bk_biz_id}
     )
 
-    if not res.get('result', False):
-        logger.error('sops_task_poller failed: {}'.format(res.get('message')))
+    if not res.get("result", False):
+        logger.error("sops_task_poller failed: {}".format(res.get("message")))
         return None
 
-    return res.get('data')
+    return res.get("data")
 
 
 def get_task_detail(bk_biz_id, sops_task_id):
     """查询任务详情"""
 
     res = client_backend.sops.get_task_detail(
-        {"__raw": True, "task_id": sops_task_id, "bk_biz_id": bk_biz_id, })
-    if not res.get('result', False):
-        logger.warning('sops_task_poller->get_task_detail({}) failed: {}'.format(sops_task_id,
-                                                                                 res.get(
-                                                                                     'message')))
+        {
+            "__raw": True,
+            "task_id": sops_task_id,
+            "bk_biz_id": bk_biz_id,
+        }
+    )
+    if not res.get("result", False):
+        logger.warning(
+            "sops_task_poller->get_task_detail({}) failed: {}".format(
+                sops_task_id, res.get("message")
+            )
+        )
         return None
 
-    return res.get('data')
+    return res.get("data")
 
 
 def get_task_status(bk_biz_id, sops_task_id):
     """查询各节点状态"""
 
     res = client_backend.sops.get_task_status(
-        {"__raw": True, "task_id": sops_task_id, "bk_biz_id": bk_biz_id, })
-    if not res.get('result', False):
-        logger.warning('sops_task_poller->get_task_status({}) failed: {}'.format(sops_task_id,
-                                                                                 res.get(
-                                                                                     'message')))
+        {
+            "__raw": True,
+            "task_id": sops_task_id,
+            "bk_biz_id": bk_biz_id,
+        }
+    )
+    if not res.get("result", False):
+        logger.warning(
+            "sops_task_poller->get_task_status({}) failed: {}".format(
+                sops_task_id, res.get("message")
+            )
+        )
         return None
 
-    return res.get('data')
+    return res.get("data")
 
 
-@periodic_task(run_every=(crontab(minute="*/2", )), ignore_result=True)
+@periodic_task(
+    run_every=(
+        crontab(
+            minute="*/2",
+        )
+    ),
+    ignore_result=True,
+)
 @share_lock()
 def sops_task_poller(task_ids=None):
     """sops任务轮询
@@ -101,8 +122,9 @@ def sops_task_poller(task_ids=None):
     """
     # 支持查询指定task的状态
     if task_ids:
-        sync_ids = Task.objects.filter(id__in=task_ids, status__in=NEED_SYNC_STATUS).values_list(
-            'id', flat=True)
+        sync_ids = Task.objects.filter(
+            id__in=task_ids, status__in=NEED_SYNC_STATUS
+        ).values_list("id", flat=True)
         running_sops_tasks = SopsTask.objects.filter(task_id__in=sync_ids)
     else:
         running_sops_tasks = SopsTask.objects.filter(state__in=[RUNNING, SUSPENDED])
@@ -118,10 +140,12 @@ def sops_task_poller(task_ids=None):
             continue
 
         for status in tasks_status:
-            sops_task = running_sops_tasks.get(sops_task_id=status['id'])
-            sops_task_state = DELETED if status["is_deleted"] else status['status']['state']
+            sops_task = running_sops_tasks.get(sops_task_id=status["id"])
+            sops_task_state = (
+                DELETED if status["is_deleted"] else status["status"]["state"]
+            )
             sops_task.state = sops_task_state
-            sops_task.elapsed_time = status['status']['elapsed_time']
+            sops_task.elapsed_time = status["status"]["elapsed_time"]
             if sops_task_state in SOPS_TASK_STARTED_STATUS and not sops_task.executor:
                 detail = get_task_detail(bk_biz_id, sops_task.sops_task_id)
                 sops_task.executor = detail["executor"]
@@ -133,23 +157,23 @@ def sops_task_poller(task_ids=None):
                 Task.objects.filter(id=sops_task.task_id).update(status=sops_task_state)
                 continue
 
-            if sops_task_state != 'FINISHED':
+            if sops_task_state != "FINISHED":
                 continue
 
             # 执行结束
-            sops_task.finish_time = status['finish_time'].rstrip("+0800").strip()
+            sops_task.finish_time = status["finish_time"].rstrip("+0800").strip()
 
             # 查询流程详情并补充detail信息到status中
             detail = get_task_detail(bk_biz_id, sops_task.sops_task_id)
             if not detail:
                 continue
 
-            pipeline_tree = detail['pipeline_tree']
-            activities = pipeline_tree['activities']
+            pipeline_tree = detail["pipeline_tree"]
+            activities = pipeline_tree["activities"]
             activities.update(
                 {
-                    pipeline_tree['start_event']['id']: pipeline_tree['start_event'],
-                    pipeline_tree['end_event']['id']: pipeline_tree['end_event'],
+                    pipeline_tree["start_event"]["id"]: pipeline_tree["start_event"],
+                    pipeline_tree["end_event"]["id"]: pipeline_tree["end_event"],
                 }
             )
             sops_task.executor = detail["executor"]
@@ -163,22 +187,23 @@ def sops_task_poller(task_ids=None):
 
             cleaned_status = {}
 
-            for node_id, node_info in status['children'].items():
+            for node_id, node_info in status["children"].items():
                 if node_id not in activities:
                     continue
                 node_info.update(
                     {
-                        'incoming': activities[node_id]['incoming'],
-                        'outgoing': activities[node_id]['outgoing'],
-                        'labels': activities[node_id]['labels'],
-                        'type': activities[node_id]['type'],
-                        'stage_name': activities[node_id].get('stage_name', ''),
-                        'component_code': activities[node_id].get('component', {}).get('code',
-                                                                                       'unknown'),
+                        "incoming": activities[node_id]["incoming"],
+                        "outgoing": activities[node_id]["outgoing"],
+                        "labels": activities[node_id]["labels"],
+                        "type": activities[node_id]["type"],
+                        "stage_name": activities[node_id].get("stage_name", ""),
+                        "component_code": activities[node_id]
+                        .get("component", {})
+                        .get("code", "unknown"),
                     }
                 )
                 cleaned_status[node_id] = node_info
-            status['children'] = cleaned_status
+            status["children"] = cleaned_status
             sops_task.sops_task_info.update(status=status)
             sops_task.save()
 
@@ -186,23 +211,23 @@ def sops_task_poller(task_ids=None):
             do_after_sops_task_finished(sops_task.id)
 
             # 结束处理后的统一通知和触发器
-            sops_task.task.do_after_finish_operate(operator='system')
+            sops_task.task.do_after_finish_operate(operator="system")
 
 
 def get_step_label_type(labels, default_label=2):
     """1：发布准备, 2：操作执行, 3：DB变更, 4：DB备份, 5：现网测试"""
 
     ops_types = {
-        'ExecuteTask': 2,
-        'PrepareTask': 1,
-        'DbChange': 3,
-        'DbBackup': 4,
-        'TestOnline': 5,
+        "ExecuteTask": 2,
+        "PrepareTask": 1,
+        "DbChange": 3,
+        "DbBackup": 4,
+        "TestOnline": 5,
     }
 
     for label in labels:
-        if label['group'] == 'TimerGroup':
-            return ops_types.get(label['label'], default_label)
+        if label["group"] == "TimerGroup":
+            return ops_types.get(label["label"], default_label)
 
     return default_label
 
@@ -213,25 +238,25 @@ def get_step_list_data(status, executor):
     steps = [
         {
             # 节点开始执行时间
-            "start_time": step['start_time'][:-6],
+            "start_time": step["start_time"][:-6],
             # 插件code
-            "tag_code": step['component_code'],
+            "tag_code": step["component_code"],
             # 插件name
-            "tag_name": step['name'],
+            "tag_name": step["name"],
             # 执行结果：success/fail
             "result": "success",
             # 执行人
             "operator": executor,
             # 1：发布准备, 2：操作执行, 3：DB变更, 4：DB备份, 5：现网测试
-            "type": get_step_label_type(step['labels']),
+            "type": get_step_label_type(step["labels"]),
             # 节点结束执行时间
-            "end_time": step['finish_time'][:-6],
+            "end_time": step["finish_time"][:-6],
         }
-        for step_id, step in status['children'].items()
-        if step['component_code'] != 'unknown'
+        for step_id, step in status["children"].items()
+        if step["component_code"] != "unknown"
     ]
 
-    return sorted(steps, key=itemgetter('start_time'))
+    return sorted(steps, key=itemgetter("start_time"))
 
 
 def get_tag_data(status):
@@ -239,15 +264,15 @@ def get_tag_data(status):
 
     tag_data = {
         # 完全成功-1|成功但有问题-2|发布失败-1m
-        "isSuccess": 1 if status['state'] == 'FINISHED' else 2,
+        "isSuccess": 1 if status["state"] == "FINISHED" else 2,
         # 实际开始时间m
-        "actualBeginTime": status['start_time'][:-6],
+        "actualBeginTime": status["start_time"][:-6],
         # 实际结束时间m
-        "actualEndTime": status['finish_time'][:-6],
+        "actualEndTime": status["finish_time"][:-6],
         # 任务准备时长m
         "prepareTime": 0,
         # 运维执行时长m
-        "executeTime": status['elapsed_time'],
+        "executeTime": status["elapsed_time"],
         # 现网测试时长m
         "testTime": 0,
         # 停机比例：0-100
@@ -267,34 +292,36 @@ def get_tag_data(status):
 
     is_shutdown, total_time = 0, 0
     stop_time, start_time = None, None
-    for node_id, node_info in status['children'].items():
-        labels = node_info['labels']
+    for node_id, node_info in status["children"].items():
+        labels = node_info["labels"]
         for label in labels:
-            if label['group'] == 'TimerGroup':
-                elapsed_time = node_info['elapsed_time']
-                if label['label'] == 'ExecuteTask':
-                    tag_data['executeTime'] += elapsed_time
-                elif label['label'] == 'PrepareTask':
-                    tag_data['prepareTime'] += elapsed_time
-                elif label['label'] == 'TestOnline':
-                    tag_data['testTime'] += elapsed_time
-                elif label['label'] == 'DbChange':
-                    tag_data['reviewDbChangeTime'] += elapsed_time
-                    tag_data['reviewIsDbChange'] = 1
-                elif label['label'] == 'DbBackup':
-                    tag_data['dbBackupTime'] += elapsed_time
+            if label["group"] == "TimerGroup":
+                elapsed_time = node_info["elapsed_time"]
+                if label["label"] == "ExecuteTask":
+                    tag_data["executeTime"] += elapsed_time
+                elif label["label"] == "PrepareTask":
+                    tag_data["prepareTime"] += elapsed_time
+                elif label["label"] == "TestOnline":
+                    tag_data["testTime"] += elapsed_time
+                elif label["label"] == "DbChange":
+                    tag_data["reviewDbChangeTime"] += elapsed_time
+                    tag_data["reviewIsDbChange"] = 1
+                elif label["label"] == "DbBackup":
+                    tag_data["dbBackupTime"] += elapsed_time
 
                 total_time += elapsed_time
-            elif label['group'] == 'AreaOpsGroup':
-                elapsed_time = node_info['elapsed_time']
-                if label['label'] == 'StopService':
+            elif label["group"] == "AreaOpsGroup":
+                elapsed_time = node_info["elapsed_time"]
+                if label["label"] == "StopService":
                     stop_time = datetime.datetime.strptime(
-                        node_info['start_time'].rstrip("+0800").strip(), '%Y-%m-%d %H:%M:%S'
+                        node_info["start_time"].rstrip("+0800").strip(),
+                        "%Y-%m-%d %H:%M:%S",
                     )
                     is_shutdown = 1
-                elif label['label'] == 'StartService':
+                elif label["label"] == "StartService":
                     start_time = datetime.datetime.strptime(
-                        node_info['start_time'].rstrip("+0800").strip(), '%Y-%m-%d %H:%M:%S'
+                        node_info["start_time"].rstrip("+0800").strip(),
+                        "%Y-%m-%d %H:%M:%S",
                     )
                 total_time += elapsed_time
 
@@ -303,9 +330,9 @@ def get_tag_data(status):
         shutdown_percent = shutdown_time / total_time * 100
         tag_data.update(
             {
-                'reviewIsShutdown': is_shutdown,
-                'reviewShutdownTime': shutdown_time,
-                'reviewNumerator': int(shutdown_percent),
+                "reviewIsShutdown": is_shutdown,
+                "reviewShutdownTime": shutdown_time,
+                "reviewNumerator": int(shutdown_percent),
             }
         )
 
@@ -318,7 +345,7 @@ def do_after_sops_task_finished(sops_task_id):
     sops_task = SopsTask.objects.get(pk=sops_task_id)
     task = sops_task.task
 
-    status = sops_task.sops_task_info.get('status')
+    status = sops_task.sops_task_info.get("status")
     tag_data = get_tag_data(status)
     logger.info("sops_task get_tag_data is {}".format(tag_data))
 
@@ -328,20 +355,28 @@ def do_after_sops_task_finished(sops_task_id):
 
     # 更新sops任务信息到task.outputs
     task.outputs = {
-        'tag_data': tag_data,
-        'sops_step_list': get_step_list_data(status, sops_task.executor),
+        "tag_data": tag_data,
+        "sops_step_list": get_step_list_data(status, sops_task.executor),
     }
 
     task.save()
 
 
-@periodic_task(run_every=(crontab(minute="*/5", )), ignore_result=True)
+@periodic_task(
+    run_every=(
+        crontab(
+            minute="*/5",
+        )
+    ),
+    ignore_result=True,
+)
 @share_lock()
 def devops_task_poller(task_ids=None):
     """蓝盾任务轮询"""
     if task_ids:
-        sync_ids = Task.objects.filter(id__in=task_ids, status__in=NEED_SYNC_STATUS).values_list(
-            'id', flat=True)
+        sync_ids = Task.objects.filter(
+            id__in=task_ids, status__in=NEED_SYNC_STATUS
+        ).values_list("id", flat=True)
         devops_tasks = SubTask.objects.filter(task_id__in=sync_ids)
     else:
         devops_tasks = SubTask.objects.filter(state=RUNNING)

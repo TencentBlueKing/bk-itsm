@@ -33,6 +33,9 @@ from blueapps.conf.log import get_logging_config_dict
 from blueapps.opentelemetry.utils import inject_logging_trace_info
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.db.backends.mysql.features import DatabaseFeatures
+from django.utils.functional import cached_property
+
 
 from config import (
     APP_CODE,
@@ -378,7 +381,9 @@ IS_USE_REDIS = REDIS_HOST is not None
 if IS_USE_REDIS:
     CACHE_BACKEND_TYPE = os.environ.get("CACHE_BACKEND_TYPE", "RedisCache")
     REDIS_PORT = os.environ.get("BKAPP_REDIS_PORT", 6379)
-    REDIS_PASSWORD = os.environ.get("BKAPP_REDIS_PASSWORD", "")  # 密码中不能包括敏感字符,例如":"
+    REDIS_PASSWORD = os.environ.get(
+        "BKAPP_REDIS_PASSWORD", ""
+    )  # 密码中不能包括敏感字符,例如":"
     REDIS_SERVICE_NAME = os.environ.get("BKAPP_REDIS_SERVICE_NAME", "mymaster")
     REDIS_MODE = os.environ.get("BKAPP_REDIS_MODE", "single")
     REDIS_DB = os.environ.get("BKAPP_REDIS_DB", 0)
@@ -992,3 +997,24 @@ else:
         "BKAPP_QW_WEB_HOOK_URL",
         "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key={}",
     )
+
+
+class PatchFeatures:
+    @cached_property
+    def minimum_database_version(self):
+        if self.connection.mysql_is_mariadb:
+            return (10, 4)
+        else:
+            return (5, 7)
+
+
+# 将补丁应用到 DatabaseFeatures 中
+DatabaseFeatures.minimum_database_version = PatchFeatures.minimum_database_version
+
+SCHEME_HTTPS = "https"
+SCHEME_HTTP = "http"
+BKPAAS_BK_DOMAIN = os.getenv("BKPAAS_BK_DOMAIN", "")
+CSRF_TRUSTED_ORIGINS = [
+    f"{SCHEME_HTTPS}://*.{BKPAAS_BK_DOMAIN}",
+    f"{SCHEME_HTTP}://*.{BKPAAS_BK_DOMAIN}",
+]

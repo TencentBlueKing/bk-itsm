@@ -11,7 +11,7 @@ if [ "$CREATE_PYTHON_VENV" ]; then
   pip install virtualenv
   VENV_DIR="${APP_CODE}_venv"
   virtualenv "$VENV_DIR"
-  virtualenv -p /usr/local/bin/python3.6 "$VENV_DIR"
+  virtualenv -p /usr/local/bin/python3.11 "$VENV_DIR"
   # 激活Python虚拟环境
   source "${VENV_DIR}/bin/activate"
 fi

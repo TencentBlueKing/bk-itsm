@@ -30,7 +30,7 @@ import jsonfield
 from django.conf import settings
 from django.db import models, transaction
 from django.utils.crypto import get_random_string
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from mptt.fields import TreeForeignKey
 
 from itsm.component.constants import (
@@ -53,7 +53,9 @@ class TicketTemplate(models.Model):
 
     name = models.CharField(_("模板名称"), max_length=LEN_NORMAL)
     creator = models.CharField(_("创建人"), max_length=LEN_NORMAL)
-    service = models.CharField(_("对应服务主键"), default=EMPTY_STRING, max_length=LEN_NORMAL)
+    service = models.CharField(
+        _("对应服务主键"), default=EMPTY_STRING, max_length=LEN_NORMAL
+    )
     template = jsonfield.JSONField(
         _("单据模板字段"), default=EMPTY_LIST, null=True, blank=True
     )
@@ -103,11 +105,15 @@ class TicketComment(models.Model):
         on_delete=models.CASCADE,
     )
     stars = models.IntegerField("评价等级1~5，5星为最好", default=0)
-    comments = models.CharField(_("评价信息"), max_length=LEN_LONG, null=True, blank=True)
+    comments = models.CharField(
+        _("评价信息"), max_length=LEN_LONG, null=True, blank=True
+    )
     source = models.CharField(
         _("评价来源"), choices=SOURCE_CHOICE, default="SYS", max_length=LEN_NORMAL
     )
-    creator = models.CharField(_("创建人"), max_length=LEN_NORMAL, null=True, blank=True)
+    creator = models.CharField(
+        _("创建人"), max_length=LEN_NORMAL, null=True, blank=True
+    )
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
     update_at = models.DateTimeField(_("更新时间"), auto_now=True)
     is_deleted = models.BooleanField(_("是否软删除"), default=False)
@@ -222,13 +228,19 @@ class NotifyLogModel(models.Model):
 
     state_id = models.IntegerField(_("发送节点ID"), default=EMPTY_INT)
     state_name = models.CharField(
-        _("节点名称"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True, blank=True
+        _("节点名称"),
+        max_length=LEN_NORMAL,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
     )
     creator = models.CharField(
         _("创建人"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True, blank=True
     )
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
-    message = models.TextField(_("通知信息"), default=EMPTY_STRING, null=True, blank=True)
+    message = models.TextField(
+        _("通知信息"), default=EMPTY_STRING, null=True, blank=True
+    )
     notify_type = models.CharField(_("通知方式"), max_length=LEN_SHORT, default="EMAIL")
     is_deleted = models.BooleanField(_("是否软删除"), default=False, db_index=True)
 
@@ -316,7 +328,11 @@ class TicketSuperviseNotifyLog(NotifyLogModel):
         on_delete=models.CASCADE,
     )
     supervised = models.CharField(
-        _("被督办的人"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True
+        _("被督办的人"),
+        max_length=LEN_LONG,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
     )
 
     class Meta:
@@ -380,9 +396,13 @@ class TicketRemark(BaseMpttModel):
     ]
 
     key = models.CharField(_("目录关键字"), max_length=LEN_LONG, unique=True)
-    content = models.TextField(_("评论内容"), max_length=LEN_LONG, null=True, blank=True)
+    content = models.TextField(
+        _("评论内容"), max_length=LEN_LONG, null=True, blank=True
+    )
     order = models.IntegerField(_("节点顺序"), default=FIRST_ORDER)
-    remark_type = models.CharField(_("评论类型"), max_length=LEN_SHORT, choices=REMARK_TYPE)
+    remark_type = models.CharField(
+        _("评论类型"), max_length=LEN_SHORT, choices=REMARK_TYPE
+    )
     parent = TreeForeignKey(
         "self",
         on_delete=models.CASCADE,
@@ -391,11 +411,9 @@ class TicketRemark(BaseMpttModel):
         blank=True,
         related_name="children",
     )
-    ticket_id = models.IntegerField(
-        _("单据id"), max_length=LEN_SHORT, null=False, default=0, db_index=True
-    )
-    users = models.JSONField(_("用户@的用户列表"), default=[])
-    update_log = models.JSONField(_("用户评论的更新记录"), default=[])
+    ticket_id = models.IntegerField(_("单据id"), null=False, default=0)
+    users = models.JSONField(_("用户@的用户列表"), default=list)
+    update_log = models.JSONField(_("用户评论的更新记录"), default=list)
 
     class Meta:
         app_label = "ticket"

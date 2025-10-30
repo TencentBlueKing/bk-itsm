@@ -23,11 +23,11 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+from django.utils.translation import gettext as _
 from django.db import transaction
-from django.utils.translation import ugettext as _
 from rest_framework import status
-from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from itsm.component.constants import (
     TRIGGER_SIGNAL,
@@ -49,8 +49,8 @@ from itsm.trigger.serializers import (
     ActionDetailSerializer,
 )
 from .api import import_trigger
-from .permissions import WorkflowTriggerPermit, TicketTriggerPermit
 from .validators import BulkTriggerRuleValidator
+from .permissions import WorkflowTriggerPermit
 from ..component.drf.exception import ValidationError
 
 
@@ -336,7 +336,7 @@ class ActionSchemaViewSet(component_viewsets.AuthWithoutResourceModelViewSet):
         return Response(schemas)
 
 
-class ActionViewSet(component_viewsets.ReadOnlyModelViewSet):
+class ActionViewSet(component_viewsets.ModelViewSet):
     """
     响应事件的视图
     """
@@ -349,10 +349,6 @@ class ActionViewSet(component_viewsets.ReadOnlyModelViewSet):
         "source_type": ["exact"],
         "source_id": ["exact"],
     }
-    permission_classes = [TicketTriggerPermit]
-    
-    def list(self, request, *args, **kwargs):
-        raise NotImplementedError
 
     def get_queryset(self):
         if not self.request.query_params.get("page_size"):

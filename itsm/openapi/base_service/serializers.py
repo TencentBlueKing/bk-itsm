@@ -3,7 +3,7 @@ from django.conf import settings
 from django.db import transaction
 from django.db.models.signals import post_save
 from rest_framework import serializers
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import DEFAULT_BK_BIZ_ID
 from itsm.component.exceptions import ParamError
@@ -52,7 +52,11 @@ class OpenApiServiceSerializer(ServiceSerializer):
             workflow_meta = validated_data.pop("workflow_meta")
             if Workflow.objects.filter(name=workflow_meta["name"]).exists():
                 raise serializers.ValidationError(
-                    {str(_("参数校验失败")): _("系统中已存在同名流程，请尝试换个流程名称")}
+                    {
+                        str(_("参数校验失败")): _(
+                            "系统中已存在同名流程，请尝试换个流程名称"
+                        )
+                    }
                 )
             with TempDisableSignal(post_save, init_after_workflow_created, Workflow):
                 work_flow_instance = Workflow.objects.create(
@@ -163,7 +167,11 @@ class CustomFieldValidator(FieldValidator):
                     flow_id=value.get("workflow").id, key=value.get("key")
                 ).exists()
             ):
-                raise ParamError(_("当前流程已存在唯一标识【{}】，请重新输入").format(value.get("key")))
+                raise ParamError(
+                    _("当前流程已存在唯一标识【{}】，请重新输入").format(
+                        value.get("key")
+                    )
+                )
 
 
 class BatchSaveFieldSerializer(FieldSerializer):
@@ -267,7 +275,9 @@ class TicketCreateSerializer(TicketSerializer):
                     service_type=service.key, is_start=True
                 ).key
             except TicketStatus.DoesNotExist:
-                raise serializers.ValidationError({_("工单状态"): _("工单状态不存在，请检查")})
+                raise serializers.ValidationError(
+                    {_("工单状态"): _("工单状态不存在，请检查")}
+                )
 
             # 创建单据时，若没有传入creator参数，则采用request的当前用户
             creator = data.get("creator", self.context["request"].user.username)

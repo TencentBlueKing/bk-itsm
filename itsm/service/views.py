@@ -28,7 +28,7 @@ from functools import reduce
 
 from django.http import FileResponse
 from django.utils.encoding import escape_uri_path
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django_bulk_update.helper import bulk_update
 from rest_framework import serializers
 from rest_framework.decorators import action
@@ -123,7 +123,7 @@ class FavoriteModelViewSet(component_viewsets.ModelViewSet):
 class CategoryModelViewSet(component_viewsets.ReadOnlyModelViewSet):
     serializer_class = ServiceCategorySerializer
 
-    queryset = ServiceCategory.objects.filter(key__in=SERVICE_LIST).extra( # review
+    queryset = ServiceCategory.objects.filter(key__in=SERVICE_LIST).extra(  # review
         select={"ordering": "FIELD(`key`, 'request', 'change', 'event', 'question')"},
         order_by=("ordering",),
     )
@@ -225,7 +225,7 @@ class ServiceCatalogViewSet(component_viewsets.ModelViewSet):
         ordering = "FIELD(`id`, {})".format(
             ",".join(["'{}'".format(int(v)) for v in new_order])
         )
-        catalogs = self.queryset.filter(parent=instance.parent).extra(  # review 
+        catalogs = self.queryset.filter(parent=instance.parent).extra(  # review
             select={"ordering": ordering}, order_by=["ordering"]
         )
         for order, obj in enumerate(catalogs):
@@ -331,7 +331,7 @@ class CatalogServiceViewSet(component_viewsets.ReadOnlyModelViewSet):
             ",".join(["'{}'".format(int(v)) for v in new_order])
         )
 
-        catalog_services = catalog_service.extra( # review
+        catalog_services = catalog_service.extra(  # review
             select={"ordering": ordering}, order_by=["ordering"]
         )
         for order, obj in enumerate(catalog_services):
@@ -514,7 +514,9 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
             raise ParamError("service_id 不能为空")
         from_service = Service.objects.get(id=service_id)
         if from_service is None:
-            raise ServiceNotExist("未找到相对应的服务, service_id={}".format(service_id))
+            raise ServiceNotExist(
+                "未找到相对应的服务, service_id={}".format(service_id)
+            )
         with transaction.atomic():
             self.copy_fields_from_service(from_service, service)
 
@@ -638,7 +640,9 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
             for state_id, state_info in states_info.items():
                 if state_info["processors_type"] in ["CMDB", "GENERAL"]:
                     if state_info["processors"] == "":
-                        error_message.append(f"【{state_info['name']}】节点的处理人不能为空")
+                        error_message.append(
+                            f"【{state_info['name']}】节点的处理人不能为空"
+                        )
 
             if error_message:
                 raise ParamError(_("\n".join(error_message)))
@@ -666,11 +670,11 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
         response = FileResponse(json.dumps(data, cls=JsonEncoder, indent=2))
         response["Content-Type"] = "application/octet-stream"
         # 中文文件名乱码问题
-        response[
-            "Content-Disposition"
-        ] = "attachment; filename*=UTF-8''bk_itsm_{}_{}.json".format(
-            escape_uri_path(instance.name),
-            create_version_number(),
+        response["Content-Disposition"] = (
+            "attachment; filename*=UTF-8''bk_itsm_{}_{}.json".format(
+                escape_uri_path(instance.name),
+                create_version_number(),
+            )
         )
 
         return response
@@ -691,7 +695,9 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
         project_key = request.data.get("project_key", data.get("project_key"))
         data["project_key"] = project_key
         if isinstance(data, list):
-            raise ParamError(_("2.5.9 版本之前的流程无法导入，请转换后在看，详情请看github"))
+            raise ParamError(
+                _("2.5.9 版本之前的流程无法导入，请转换后在看，详情请看github")
+            )
         ServiceImportSerializer(data=data).is_valid(raise_exception=True)
         catalog_id = request.data.get("catalog_id")
         data["is_valid"] = False
@@ -803,7 +809,11 @@ class SysDictDataViewSet(component_viewsets.ReadOnlyModelViewSet):
                 dict_table__key__in=tables, key=instance.key
             ).exists():
                 raise serializers.ValidationError(
-                    _("[{}] 已经被勾选绑定，请先到优先级管理中解绑".format(instance.name))
+                    _(
+                        "[{}] 已经被勾选绑定，请先到优先级管理中解绑".format(
+                            instance.name
+                        )
+                    )
                 )
 
         instance.delete()

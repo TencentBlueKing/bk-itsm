@@ -33,7 +33,7 @@ import hashlib
 import json
 import os
 
-from celery import task
+from celery import shared_task
 from django.conf import settings
 from django.db import connection
 from django.db.models import F
@@ -71,7 +71,7 @@ from itsm.ticket.models import Ticket, TicketEventLog, TicketField
 from itsm.workflow.models import DefaultField, Field, State, Workflow, WorkflowVersion
 
 
-@task
+@shared_task
 def _db_fix_for_blueapps_after_2_6_0():
     """
     blueapps的数据升级
@@ -79,7 +79,9 @@ def _db_fix_for_blueapps_after_2_6_0():
     migrations = (("account", "0002_init_superuser"), ("account", "0003_verifyinfo"))
     if settings.RUN_VER != "open":
         logger.Exception(
-            "当前运行环境为:{}，不支持db_fix_for_blueapps_after_2_6_0方法".format(settings.RUN_VER)
+            "当前运行环境为:{}，不支持db_fix_for_blueapps_after_2_6_0方法".format(
+                settings.RUN_VER
+            )
         )
         return
     try:
@@ -98,7 +100,7 @@ def _db_fix_for_blueapps_after_2_6_0():
         logger.Exception(str(err))
 
 
-@task
+@shared_task
 def _db_fix_for_workflow_to_2_5_9():
     """
     流程任务的数据升级
@@ -135,7 +137,7 @@ def _db_fix_for_workflow_to_2_5_9():
     create_task(WorkflowVersion.objects.all())
 
 
-@task
+@shared_task
 def _db_fix_for_service_catalog():
     """服务目录添加前置路径"""
     print("start execute _db_fix_for_service_catalog")
@@ -146,17 +148,17 @@ def _db_fix_for_service_catalog():
     print("finish execute _db_fix_for_service_catalog")
 
 
-@task
+@shared_task
 def _db_fix_default_value_for_field():
     fix_default_value_for_field()
 
 
-@task
+@shared_task
 def _db_fix_for_ticket_processors():
     migrate_processors_for_ticket()
 
 
-@task
+@shared_task
 def _db_fix_for_attachments():
     """附件升级方案"""
 
@@ -248,7 +250,7 @@ def _db_fix_for_attachments():
     update_ticket_fields()
 
 
-@task
+@shared_task
 def _db_fix_from_2_1_x_to_2_2_1():
     """
     流程引擎版本升级迁移：
@@ -298,7 +300,9 @@ def _db_fix_from_2_1_x_to_2_2_1():
         source_type="CUSTOM"
     )
 
-    TicketEventLog.objects.filter(message__in=["流程开始", "单据流程结束"]).update(source="SYS")
+    TicketEventLog.objects.filter(message__in=["流程开始", "单据流程结束"]).update(
+        source="SYS"
+    )
 
     task_end = datetime.datetime.now()
     SystemSettings.objects.filter(key="_db_fix_from_2_1_x_to_2_2_1").update(
@@ -310,7 +314,7 @@ def _db_fix_from_2_1_x_to_2_2_1():
     )
 
 
-@task
+@shared_task
 def _db_fix_from_1_1_22_to_2_1_x():
     """V1.1.x到V2.1.x的数据升级接口（建议提前做好数据备份）"""
 
@@ -343,7 +347,7 @@ def _db_fix_from_1_1_22_to_2_1_x():
         logger.info("_db_fix_from_1_1_22_to_2_1_x fail: %s" % str(e))
 
 
-@task
+@shared_task
 def _db_fix_after_2_0_3():
     """
     修复数据库数据：
@@ -377,7 +381,7 @@ def _db_fix_after_2_0_3():
         logger.error("db_fix_after_2_0_3 fail! error: %s" % str(e))
 
 
-@task
+@shared_task
 def _db_fix_after_2_0_7():
     """
     日志新增处理人员快照
@@ -405,7 +409,7 @@ def _db_fix_after_2_0_7():
         )
 
 
-@task
+@shared_task
 def _db_fix_after_2_0_9():
     try:
         cnt = 0
@@ -442,7 +446,7 @@ def _db_fix_after_2_0_9():
         logger.error("db_fix_after_2_0_9 fail! error: %s" % str(e))
 
 
-@task
+@shared_task
 def _db_fix_after_2_1_x():
     """
     第二次数据迁移：
@@ -473,7 +477,7 @@ def _db_fix_after_2_1_x():
     ).delete()
 
 
-@task
+@shared_task
 def _db_fix_after_2_0_14():
     try:
         Ticket.objects.filter(
@@ -484,7 +488,7 @@ def _db_fix_after_2_0_14():
         logger.error("db_fix_after_2_0_14 fail! error: %s" % str(e))
 
 
-@task
+@shared_task
 def _db_fix_after_2_1_1():
     try:
         TicketEventLog.objects.filter(message__contains="驳回").update(
@@ -495,7 +499,7 @@ def _db_fix_after_2_1_1():
         logger.error("db_fix_after_2_1_1 fail! error: %s" % str(e))
 
 
-@task
+@shared_task
 def _fix_ticket_title():
     tickets = Ticket.objects.filter(is_deleted=False, is_draft=False)
     try:
@@ -509,7 +513,7 @@ def _fix_ticket_title():
         logger.error("fix_ticket_title fail! error: %s" % str(e))
 
 
-@task
+@shared_task
 def _update_logs_type():
     try:
         TicketEventLog.objects.filter(message__contains="】终止，原因:【").update(
@@ -520,7 +524,7 @@ def _update_logs_type():
         logger.error("update_logs_type fail! error: %s" % str(e))
 
 
-@task
+@shared_task
 def _db_fix_sla():
     try:
         choices = OldSla.objects.values(
@@ -539,7 +543,7 @@ def _db_fix_sla():
         logger.error("_db_fix_sla fail! error: %s" % str(e))
 
 
-@task
+@shared_task
 def _db_fix_after_2_1_9():
     try:
         TicketField.objects.update(related_fields={})
@@ -551,7 +555,7 @@ def _db_fix_after_2_1_9():
         logger.error("_db_fix_after_2_1_9 fail!, error: %s" % str(e))
 
 
-@task
+@shared_task
 def _db_fix_ticket_end_at_after_2_0_5():
     try:
         Ticket.objects.filter(
@@ -562,7 +566,7 @@ def _db_fix_ticket_end_at_after_2_0_5():
         logger.error("_db_fix_ticket_end_at_after_2_0_5 fail!, error: %s" % str(e))
 
 
-@task
+@shared_task
 def _db_fix_deal_time_after_2_0_5():
     try:
         for log in TicketEventLog.objects.filter(type="CLAIM", deal_time=0):

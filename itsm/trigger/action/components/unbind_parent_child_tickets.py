@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itsm.component.constants import MASTER_SLAVE
 from itsm.trigger.action.core.component import BaseComponent
@@ -59,18 +59,25 @@ class UnbindTicketsComponent(BaseComponent):
         try:
             master_ticket = Ticket.objects.get(sn=self.context.get("ticket_sn"))
         except Ticket.DoesNotExist:
-            self.data.set_outputs("message", _("对应的单据【%s】不存在") % self.context.get("ticket_sn"))
+            self.data.set_outputs(
+                "message", _("对应的单据【%s】不存在") % self.context.get("ticket_sn")
+            )
             return False
         slave_tickets = [
             item.from_ticket
-            for item in TicketToTicket.objects.filter(related_type=MASTER_SLAVE, to_ticket=master_ticket)
+            for item in TicketToTicket.objects.filter(
+                related_type=MASTER_SLAVE, to_ticket=master_ticket
+            )
         ]
         if not slave_tickets:
-            self.data.set_outputs("message", _("当前的单据【%s】不存在母子关联单") % self.context.get("ticket_sn"))
+            self.data.set_outputs(
+                "message",
+                _("当前的单据【%s】不存在母子关联单") % self.context.get("ticket_sn"),
+            )
             return False
-        TicketToTicket.objects.filter(related_type=MASTER_SLAVE, to_ticket=master_ticket).update(
-            related_status="RUNNING"
-        )
+        TicketToTicket.objects.filter(
+            related_type=MASTER_SLAVE, to_ticket=master_ticket
+        ).update(related_status="RUNNING")
         slave_tickets_sn = []
         for slave_ticket in slave_tickets:
             clone_pipeline.apply_async(args=(slave_ticket, master_ticket))

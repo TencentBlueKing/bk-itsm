@@ -27,7 +27,7 @@ from collections import defaultdict
 
 from django.db import transaction
 from django.db.models import Q
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django_bulk_update.helper import bulk_update
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -155,7 +155,9 @@ class TicketStatusViewSet(ModelViewSet):
         ordering = "FIELD(`id`, {})".format(
             ",".join(["'{}'".format(int(v)) for v in ticket_status_ids])
         )
-        ticket_status = TicketStatus.objects.status_of_service_type(service_type).extra( # review
+        ticket_status = TicketStatus.objects.status_of_service_type(
+            service_type
+        ).extra(  # review
             select={"ordering": ordering}, order_by=["ordering"]
         )
 

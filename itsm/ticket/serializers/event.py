@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from rest_framework.fields import empty
@@ -43,21 +43,21 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = TicketEventLog
         fields = (
-            'id',
-            'ticket',
-            'type',
-            'operator',
-            'operate_at',
-            'deal_time',
-            'processors_type',
-            'processors',
-            'message',
-            'detail_message',
-            'action',
-            'from_state_name',
-            'ticket_id',
-            'form_data',
-            'from_state_id',
+            "id",
+            "ticket",
+            "type",
+            "operator",
+            "operate_at",
+            "deal_time",
+            "processors_type",
+            "processors",
+            "message",
+            "detail_message",
+            "action",
+            "from_state_name",
+            "ticket_id",
+            "form_data",
+            "from_state_id",
         )
 
     def __init__(self, instance=None, data=empty, **kwargs):
@@ -72,27 +72,42 @@ class EventSerializer(serializers.ModelSerializer):
         """
 
         logs = (
-            [self.instance] if isinstance(self.instance,
-                                          TicketEventLog) else [] if self.instance is None else self.instance
+            [self.instance]
+            if isinstance(self.instance, TicketEventLog)
+            else [] if self.instance is None else self.instance
         )
 
         all_related_users = [inst.operator for inst in logs if inst.operator]
-        return get_bk_users(format='dict', users=list(set(all_related_users)))
+        return get_bk_users(format="dict", users=list(set(all_related_users)))
 
     def to_representation(self, instance):
         data = super(EventSerializer, self).to_representation(instance)
-        data['message'] = translate(instance.message, data, related_operators=self.related_users)
-        data['operator'] = self.related_users.get(instance.operator)
+        data["message"] = translate(
+            instance.message, data, related_operators=self.related_users
+        )
+        data["operator"] = self.related_users.get(instance.operator)
         form_data = []
-        origin_form_data = data['form_data'].values() if isinstance(data['form_data'], dict) else data['form_data']
+        origin_form_data = (
+            data["form_data"].values()
+            if isinstance(data["form_data"], dict)
+            else data["form_data"]
+        )
         for item in origin_form_data:
-            if not item.get('show_result'):
+            if not item.get("show_result"):
                 continue
             value_status = item.get("value_status")
             if value_status:
-                item.update({"name": _("{}(修改前)" if value_status == 'before' else "{}(修改后)").format(item['name'])})
+                item.update(
+                    {
+                        "name": _(
+                            "{}(修改前)" if value_status == "before" else "{}(修改后)"
+                        ).format(item["name"])
+                    }
+                )
             form_data.append(item)
-        data['form_data'] = form_data
-        node_status = Status.objects.filter(ticket_id=instance.ticket_id, state_id=instance.from_state_id).first()
-        data['from_state_type'] = getattr(node_status, "type", "")
+        data["form_data"] = form_data
+        node_status = Status.objects.filter(
+            ticket_id=instance.ticket_id, state_id=instance.from_state_id
+        ).first()
+        data["from_state_type"] = getattr(node_status, "type", "")
         return data

@@ -13,7 +13,7 @@ specific language governing permissions and limitations under the License.
 
 import logging
 
-from celery.decorators import periodic_task
+from blueapps.contrib.celery_tools.periodic import periodic_task
 from celery.schedules import crontab
 from django.conf import settings
 
@@ -28,7 +28,9 @@ def clean_expired_log():
 
     if expired_interval is None:
         expired_interval = 30
-        logger.warning("LOG_PERSISTENT_DAYS are not found in settings, use default value: 30")
+        logger.warning(
+            "LOG_PERSISTENT_DAYS are not found in settings, use default value: 30"
+        )
 
     del_num = LogEntry.objects.delete_expired_log(expired_interval)
     logger.info("%s log entry are deleted" % del_num)

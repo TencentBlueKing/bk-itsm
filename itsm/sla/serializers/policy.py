@@ -23,13 +23,20 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.fields import empty
 
 from itsm.component.constants import LEN_MIDDLE, LEN_SHORT
 from itsm.component.drf.serializers import AuthModelSerializer
-from itsm.sla.models import Action, ActionPolicy, PriorityPolicy, Sla, SlaTimerRule, SlaTicketHighlight
+from itsm.sla.models import (
+    Action,
+    ActionPolicy,
+    PriorityPolicy,
+    Sla,
+    SlaTimerRule,
+    SlaTicketHighlight,
+)
 from itsm.sla.serializers import ModelSerializer
 from itsm.sla.validators import SlaTimerRuleValidator, SlaValidator
 
@@ -59,11 +66,11 @@ class PriorityPolicySerializer(serializers.ModelSerializer):
         ) + model.DISPLAY_FIELDS
 
         read_only_fields = model.DISPLAY_FIELDS
-        
+
     def to_internal_value(self, data):
         if not data["reply_time"]:
             data["reply_time"] = None
-            
+
         return super(PriorityPolicySerializer, self).to_internal_value(data)
 
 
@@ -76,7 +83,13 @@ class SlaTimerRuleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SlaTimerRule
-        fields = ('id', 'name', 'service_type', 'condition_type', 'condition') + model.DISPLAY_FIELDS
+        fields = (
+            "id",
+            "name",
+            "service_type",
+            "condition_type",
+            "condition",
+        ) + model.DISPLAY_FIELDS
 
         read_only_fields = model.DISPLAY_FIELDS
 
@@ -95,7 +108,11 @@ class ActionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Action
-        fields = ('id', 'action_type', 'config',) + model.DISPLAY_FIELDS
+        fields = (
+            "id",
+            "action_type",
+            "config",
+        ) + model.DISPLAY_FIELDS
 
         read_only_fields = model.DISPLAY_FIELDS
 
@@ -112,7 +129,7 @@ class ActionPolicySerializer(ModelSerializer):
 
     class Meta:
         model = ActionPolicy
-        fields = ('id', 'name', 'condition', 'actions', 'type') + model.DISPLAY_FIELDS
+        fields = ("id", "name", "condition", "actions", "type") + model.DISPLAY_FIELDS
 
         read_only_fields = model.DISPLAY_FIELDS
 
@@ -122,7 +139,9 @@ class ActionPolicySerializer(ModelSerializer):
         if not actions:
             return instance
 
-        actions = [self.fields.fields['actions'].child.create(action) for action in actions]
+        actions = [
+            self.fields.fields["actions"].child.create(action) for action in actions
+        ]
         instance.actions.set(actions)
         instance.save()
         return instance
@@ -154,19 +173,19 @@ class SlaSerializer(AuthModelSerializer, ModelSerializer):
     class Meta:
         model = Sla
         fields = (
-            'id',
-            'name',
-            'is_enabled',
-            'is_builtin',
-            'policies',
-            'action_policies',
-            'service_count',
-            'service_names',
-            'is_reply_need',
-            'project_key'
+            "id",
+            "name",
+            "is_enabled",
+            "is_builtin",
+            "policies",
+            "action_policies",
+            "service_count",
+            "service_names",
+            "is_reply_need",
+            "project_key",
         ) + model.DISPLAY_FIELDS
 
-        related_fields = ('policies', 'action_policies')
+        related_fields = ("policies", "action_policies")
 
         read_only_fields = model.DISPLAY_FIELDS
 
@@ -175,15 +194,22 @@ class SlaSerializer(AuthModelSerializer, ModelSerializer):
         action_policies = validated_data.pop("action_policies", [])
         policies = validated_data.pop("policies", [])
         instance = super(SlaSerializer, self).create(validated_data)
-        instance.action_policies.set([
-            self.fields.fields['action_policies'].child.create(a_data) for a_data in action_policies
-        ])
-        instance.policies.set([self.fields.fields['policies'].child.create(p_data) for p_data in policies])
+        instance.action_policies.set(
+            [
+                self.fields.fields["action_policies"].child.create(a_data)
+                for a_data in action_policies
+            ]
+        )
+        instance.policies.set(
+            [self.fields.fields["policies"].child.create(p_data) for p_data in policies]
+        )
         instance.save()
         return instance
 
     def update(self, instance, validated_data):
-        rel_fields = {key: validated_data.pop(key, []) for key in self.Meta.related_fields}
+        rel_fields = {
+            key: validated_data.pop(key, []) for key in self.Meta.related_fields
+        }
 
         instance = super(SlaSerializer, self).update(instance, validated_data)
         instance = self.update_many_to_many_relation(instance, rel_fields)
@@ -192,7 +218,7 @@ class SlaSerializer(AuthModelSerializer, ModelSerializer):
 
     def run_validation(self, data=empty):
         return super(SlaSerializer, self).run_validation(data)
-    
+
     def to_representation(self, instance):
         data = super(SlaSerializer, self).to_representation(instance)
         return self.update_auth_actions(instance, data)
@@ -203,8 +229,4 @@ class TicketHighlightSerializer(ModelSerializer):
 
     class Meta:
         model = SlaTicketHighlight
-        fields = (
-            'id',
-            'reply_timeout_color',
-            'handle_timeout_color'
-        )
+        fields = ("id", "reply_timeout_color", "handle_timeout_color")
