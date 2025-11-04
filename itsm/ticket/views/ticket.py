@@ -585,10 +585,9 @@ class TicketModelViewSet(ModelViewSet):
         ticket = self.get_object()
         invitor = request.user.username
         receiver = request.data.get("receiver", "")
+        receivers = [r.strip() for r in receiver.split(",") if r.strip()]
 
-        email_invite_validate(ticket, invitor, receiver)
-
-        code = TicketCommentInvite.get_unique_code()
+        email_invite_validate(ticket, invitor, receivers)
 
         # 构建信息
         context = ticket.get_notify_context()
@@ -607,40 +606,59 @@ class TicketModelViewSet(ModelViewSet):
                 action=INVITE_OPERATE, notify_type=EMAIL, project_key="public"
             )
 
-        ticket_url = ticket.ticket_url + "&token={token}&invite=email".format(
-            token=code
-        )
-        context.update(ticket_url=ticket_url)
-        notifier = EmailNotifier(
-            title=Template(custom_notify.title_template).render(**context),
-            receivers=receiver,
-            message=Template(custom_notify.content_template).render(**context),
-        )
-        try:
-            notifier.send()
-            TicketCommentInvite.objects.create(
-                receiver=receiver, comment_id=ticket.comment_id, code=code
+        # 为每个接收者生成独立的邀请码并发送邮件
+        fail_receivers = []
+        success_urls = []
+        
+        for receiver_user in receivers:
+            code = TicketCommentInvite.get_unique_code()
+            ticket_url = ticket.ticket_url + "&token={token}&invite=email".format(
+                token=code
             )
+            context.update(ticket_url=ticket_url)
+            
+            notifier = EmailNotifier(
+                title=Template(custom_notify.title_template).render(**context),
+                receivers=[receiver_user],
+                message=Template(custom_notify.content_template).render(**context),
+            )
+            
+            try:
+                notifier.send()
+                TicketCommentInvite.objects.create(
+                    receiver=receiver_user, 
+                    comment_id=ticket.comment_id, 
+                    code=code
+                )
+                success_urls.append(ticket_url)
+            except ComponentCallError as error:
+                fail_receivers.append(receiver_user)
+                logger.warning(
+                    f"[send email] receiver=>{receiver_user}, ticket_url=>{ticket_url}, "
+                    f"exception=>{error}"
+                )
+        
+        # 返回结果
+        if fail_receivers:
             return Response(
                 {
-                    "result": True,
-                    "message": "success",
-                    "data": ticket_url,
-                    "code": ResponseCodeStatus.OK,
-                }
-            )
-        except ComponentCallError as error:
-            logger.warning(f"[send email] ticket_url=>{ticket_url}, execption=>{error}")
-            return Response(
-                {
-                    "result": False,
+                    "result": len(fail_receivers) < len(receivers),
                     "message": _(
                         "【{}】发送邮件失败，请检查用户邮件配置是否正确或联系管理员！"
-                    ).format(receiver),
-                    "data": ticket_url,
-                    "code": "SEND_EMAIL_FAILED",
+                    ).format(",".join(fail_receivers)),
+                    "data": success_urls,
+                    "code": "SEND_EMAIL_FAILED" if len(fail_receivers) == len(receivers) else "PARTIAL_SUCCESS",
                 }
             )
+        
+        return Response(
+            {
+                "result": True,
+                "message": "success",
+                "data": success_urls,
+                "code": ResponseCodeStatus.OK,
+            }
+        )
 
     @action(detail=False, methods=["get"])
     def export_excel(self, request, *args, **kwargs):
