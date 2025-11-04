@@ -128,11 +128,14 @@ def sms_invite_validate(ticket, numbers, invitor):
             raise serializers.ValidationError("【{}】{}".format(number, str(error)))
 
 
-def email_invite_validate(ticket, invitor, receiver):
+def email_invite_validate(ticket, invitor, receivers):
     """邮件邀请评价校验"""
 
     if not ticket.can_comment(invitor):
         raise serializers.ValidationError(_("抱歉，您无权发送评价邀请"))
 
-    if receiver not in get_bk_users(users=[receiver]):
-        raise serializers.ValidationError(_("【{}】用户不存在").format(receiver))
+    # 验证每个接收者是否存在
+    all_users = get_bk_users(users=receivers)
+    for receiver in receivers:
+        if receiver not in all_users:
+            raise serializers.ValidationError(_("【{}】用户不存在").format(receiver))
