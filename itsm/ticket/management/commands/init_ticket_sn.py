@@ -43,6 +43,11 @@ class Command(BaseCommand):
             action='store_true',
             help='强制删除现有的 Redis key 并重新初始化（用于测试）',
         )
+        parser.add_argument(
+            '--dry-run',
+            action='store_true',
+            help='仅检查 Redis key 是否存在，不进行初始化（用于测试）',
+        )
 
     def handle(self, *args, **kwargs):
         """
@@ -52,8 +57,9 @@ class Command(BaseCommand):
         from itsm.ticket.models import Ticket
         from itsm.component.data import exists
         
-        # 获取 --force 参数
+        # 获取参数
         force_delete = kwargs.get('force', False)
+        dry_run = kwargs.get('dry_run', False)
 
         service_types = ["event", "request", "change", "question"]
         prefix_mapping = {
@@ -67,11 +73,12 @@ class Command(BaseCommand):
         today_start = datetime.datetime(
             year=now_time.year, month=now_time.month, day=now_time.day
         )
-        today_end = today_start + datetime.timedelta(days=1)
+        tomorrow = today_start + datetime.timedelta(days=1)
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"[init_ticket_sn] 开始检查工单序号 Redis Key (当前时间: {now_time.strftime('%Y-%m-%d %H:%M:%S')})"
+                f"[init_ticket_sn] 开始检查工单序号 Redis Key (当前时间: "
+                f"{now_time.strftime('%Y-%m-%d %H:%M:%S')}, 时区: {now_time.tzinfo})"
             )
         )
 
@@ -86,6 +93,38 @@ class Command(BaseCommand):
                         f"[init_ticket_sn] 强制模式已启用，将删除现有的 Redis key '{key}'"
                     )
                 )
+            
+            if dry_run:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"[init_ticket_sn] 干跑模式已启用，将检查 Redis key '{key}' 是否存在，不进行初始化"
+                    )
+                )
+                if exists(key):
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"[init_ticket_sn] {service_type}: Redis key '{key}' 已存在"
+                        )
+                    )
+                today_sn_prefix = prefix + now_time.strftime("%Y%m%d")
+                today_ticket_count = Ticket.objects.filter(
+                    service_type=service_type,
+                    sn__startswith=today_sn_prefix,
+                    create_at__gte=today_start,
+                    create_at__lt=tomorrow,
+                ).count()
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"[init_ticket_sn] {service_type}: 初始化成功\n"
+                        f"工单前缀: {prefix}\n"
+                        f"今日已有工单数: {today_ticket_count}\n"
+                        f"Redis Key: '{key}'\n"
+                        f"初始值: {today_ticket_count}\n"
+                        f"过期时间: {tomorrow.strftime('%Y-%m-%d %H:%M:%S')}\n"
+                        f"-----------------------------------------------------\n"
+                    )
+                )
+                continue
 
             # 检查 Redis key 是否存在
             if exists(key):
@@ -102,14 +141,14 @@ class Command(BaseCommand):
                 service_type=service_type,
                 sn__startswith=today_sn_prefix,
                 create_at__gte=today_start,
-                create_at__lt=today_end,
+                create_at__lt=tomorrow,
             ).count()
 
             # 设置 Redis key 的初始值和过期时间
-            when = today_end  # 第二天 0:00:00
+            when = tomorrow  # 第二天 0:00:00
             
             try:
-                # 直接设置 Redis key 的值和过期时间
+                # 直接设置 Redis key 的值和过期时间            
                 settings.REDIS_INST.set(key, today_ticket_count)
                 settings.REDIS_INST.expireat(key, when)
                 
