@@ -44,7 +44,7 @@ django-mptt-admin==2.7.0
 django-nyt==1.4.1
 django-sekizai==4.1.0
 Markdown==3.5.2
-Pillow==10.2.0
+pillow>=10.3.0,<10.4
 sorl-thumbnail==12.11.0
 django-simplemde==0.1.4
 martor==1.6.45
