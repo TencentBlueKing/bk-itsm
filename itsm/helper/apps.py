@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import datetime
-
+try:
+    import bkoauth
+except ImportError:
+    bkoauth = None
 from django.apps import AppConfig
 from django.conf import settings
 from django.db import connection
@@ -31,6 +34,8 @@ class HelperConfig(AppConfig):
         """
         blueapps的数据升级
         """
+        if bkoauth:
+            bkoauth._init_function()
         if not self.is_before_2_6_0():
             print("发现非2.6.0 之前的升级版本，已跳过修复")
             return
