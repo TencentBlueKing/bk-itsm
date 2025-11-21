@@ -8,7 +8,7 @@ Django>=4.2.26,<4.3
 PyMySQL==1.1.1
 MarkupSafe==2.1.5
 Mako==1.3.2
-requests==2.31.0
+requests==2.32.4
 celery==5.3.0
 django-celery-beat==2.7.0
 django-celery-results==2.5.1
@@ -17,7 +17,7 @@ python-json-logger==2.0.7
 whitenoise==6.8.2
 six==1.16.0
 httplib2==0.22.0
-djangorestframework==3.15.1
+djangorestframework==3.15.2
 drf-extensions==0.7.1
 django-cors-headers==4.2.0
 jsonfield==3.1.0
@@ -61,16 +61,16 @@ redis==5.0.3
 django-timezone-field==5.1
 factory_boy==3.3.1
 mistune==3.0.2
-eventlet==0.35.2
+eventlet==0.40.3
 gevent==24.2.1
 
 # iam
 cachetools==5.5.0
-certifi==2024.2.2
+certifi==2024.7.4
 chardet==5.2.0
 curlify==2.2.1
 idna==3.10
-urllib3==2.2.1
+urllib3==2.5.0
 # pycrypto==2.6.1
 
 #others
@@ -88,7 +88,7 @@ typing-extensions==4.12.2
 
 #bkouth
 PyJWT==2.8.0
-cryptography==42.0.5
+cryptography==44.0.1
 
 # prometheus
 django-prometheus==2.3.1
@@ -115,7 +115,7 @@ opentelemetry-instrumentation-requests==0.50b0
 
 pyCryptodome==3.20.0
 
-Jinja2==3.1.3
+Jinja2==3.1.6
 jmespath==1.0.1
 requests_toolbelt==1.0.0
 
