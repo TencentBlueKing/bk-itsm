@@ -426,7 +426,7 @@ class DynamicFieldSerializer(serializers.Serializer):
     type = serializers.ChoiceField(
         choices=[("STRING", "字符串"), ("INT", "数字"), ("LINK", "链接")], required=True
     )
-    value = serializers.CharField(required=True, max_length=1024)
+    value = serializers.CharField(required=True, max_length=4096)
     key = serializers.CharField(required=False, read_only=True)
     meta = serializers.DictField(required=False)
 
