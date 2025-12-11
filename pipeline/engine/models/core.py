@@ -1193,6 +1193,7 @@ class ScheduleService(models.Model):
     is_scheduling = models.BooleanField(
         _("是否正在被调度"), default=False, db_index=True
     )
+    last_schedule_time = models.DateTimeField(_("最后调度时间"), null=True, blank=True)
 
     objects = ScheduleServiceManager()
 

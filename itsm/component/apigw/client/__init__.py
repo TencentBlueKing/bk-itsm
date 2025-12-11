@@ -24,3 +24,4 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from . import devops  # noqa
+from . import monitor  # noqa

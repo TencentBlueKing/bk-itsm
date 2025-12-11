@@ -55,6 +55,7 @@ from itsm.component.utils.basic import now, namedtuplefetchall, dotted_name
 from itsm.component.utils.lock import share_lock
 from itsm.component.notify import EmailNotifier
 from itsm.component.utils.client_backend_query import get_biz_choices
+from itsm.helper.utils import AutoSchedules
 from itsm.iadmin.models import SystemSettings
 from itsm.sla_engine.constants import TO_SECOND
 from itsm.role.models import UserRole
@@ -408,7 +409,7 @@ def build_auto_transit_rules(ticket, auto_transits):
                         "name": "status_keep_time",
                         "operator": "greater_than_or_equal_to",
                         "value": auto_transit.threshold
-                        * TO_SECOND[auto_transit.threshold_unit],
+                                 * TO_SECOND[auto_transit.threshold_unit],
                     },
                 ]
             },
@@ -537,3 +538,43 @@ def ticket_set_history_operators(ticket_id, current_operator):
             history_operators.append(current_operator)
         ticket.updated_by = dotted_name(",".join(set(history_operators)))
         ticket.save(update_fields=("updated_by",))
+
+
+@periodic_task(run_every=crontab(hour="4", minute="0", day_of_week="*"), ignore_result=True)
+def check_auto_stuck_schedules():
+    try:
+        from itsm.component.apigw.client.monitor import PushData
+        auto_schedules = AutoSchedules()
+        stuck_schedules = auto_schedules.find_stuck_schedules()
+        if stuck_schedules:
+            fixed_count, failed_count = auto_schedules.fix_stuck_schedules(stuck_schedules)
+            logger.info(
+                f"[check_auto_stuck_schedules] Fixed {fixed_count} stuck schedules, "
+                f"failed to fix {failed_count}")
+            log_data = f"stuck schedules fixed: {fixed_count} fixed, {failed_count} failed"
+        else:
+            log_data = "no stuck schedules found"
+
+        if settings.IS_MONITOR_EVENT:
+            # 开启监控事件日志上报
+            data = [{
+                "event_name": f"itsm 2.x 工单卡顿--{settings.RUN_MODE}",
+                "event": {
+                    "content": log_data
+                },
+                "target": "check_auto_stuck_schedules",
+                "dimension": {
+                    "module": "celery scheduled task",
+                    "location": "itsm 2.X"
+                },
+                "timestamp": int(time.time() * 1000)
+            }]
+            res = PushData()(data)
+            if res.get("code") == "200":
+                logger.info(f"[check_auto_stuck_schedules] Monitor data pushed: {res}")
+            else:
+                logger.error(f"[check_auto_stuck_schedules] Error pushing monitor data: {res}")
+
+        logger.info("[check_auto_stuck_schedules] No stuck schedules found")
+    except Exception as e:
+        logger.error(f"[check_auto_stuck_schedules] Error checking stuck schedules: {e}")
