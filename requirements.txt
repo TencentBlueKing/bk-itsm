@@ -80,6 +80,7 @@ gunicorn==23.0.0
 bkstorages==2.0.0
 pytz==2024.2
 mock==5.1.0
+pydantic==2.10.6
 
 # excel
 xlrd==2.0.1

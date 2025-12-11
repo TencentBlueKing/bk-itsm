@@ -27,10 +27,12 @@ import datetime
 import json
 import re
 import time
+import six
 from functools import wraps
 
-import six
+from django.conf import settings
 from django.db import connection
+from dataclasses import dataclass
 from django.db.models import F
 
 from bulk_update.helper import bulk_update
@@ -49,6 +51,9 @@ from itsm.ticket.models import (
     TicketFollowerNotifyLog,
 )
 from itsm.workflow.models import Field, State, WorkflowSnap, WorkflowVersion
+
+from datetime import datetime, timedelta
+from pipeline.engine.models import Data, ScheduleService, Status, PipelineProcess
 
 
 def fix_default_value_for_field():
@@ -686,3 +691,279 @@ def build_field_kwargs():
     )
     DictData.create_builtin_dicts_data(obj, fault_level_init)
     return kwargs
+
+
+@dataclass
+class AutoSchedules:
+    """API 节点卡顿任务"""
+    
+    timeout_minutes: int = settings.AUTO_TIMEOUT_MINUTES
+    
+    def __post_init__(self):
+        """dataclass 初始化后的处理"""
+        if not isinstance(self.timeout_minutes, int) or self.timeout_minutes <= 0:
+            self.timeout_minutes = 30
+
+    def find_stuck_schedules(self) -> list:
+        """
+        查找可能卡住的调度任务
+
+        判断逻辑:
+        1. is_finished = False (未完成)
+        2. wait_callback = False (轮询型，非回调型)
+        3. poll_time > 0 (还有剩余轮询次数)
+        4. latest_poll_time + poll_interval << 当前时间 (理论下次轮询时间远小于当前时间)
+
+        returns:
+            list: 卡住的调度任务列表
+        """
+        stuck_schedules = []
+        now = datetime.now()
+        timeout_threshold = now - timedelta(minutes=self.timeout_minutes)
+
+        # 查询未完成的轮询型调度
+        schedules = ScheduleService.objects.filter(
+            is_finished=False,
+            wait_callback=False,
+        ).select_related()
+
+        logger.info(f"共有 {schedules.count()} 个未完成的轮询型调度任务")
+        
+        # 预先批量获取所有 process_id 对应的 ticket 信息
+        process_ids = list(schedules.values_list("process_id", flat=True))
+        ticket_info_map = self._batch_get_ticket_info(process_ids)
+
+        for ss in schedules:
+            try:
+                # 获取节点状态
+                status = Status.objects.filter(id=ss.activity_id).first()
+                if not status:
+                    continue
+
+                # 只检查 RUNNING 状态的节点
+                if status.state != "RUNNING":
+                    continue
+
+                # 获取 outputs 数据
+                data = Data.objects.filter(id=ss.activity_id).first()
+                if not data:
+                    continue
+
+                outputs = data.outputs or {}
+                if isinstance(outputs, str):
+                    try:
+                        outputs = json.loads(outputs)
+                    except json.JSONDecodeError:
+                        continue
+
+                # 已经正常退出的跳过 (service_status 存在说明调用过 do_exit_plugins)
+                if outputs.get("service_status"):
+                    continue
+
+                poll_time = outputs.get("poll_time", 0)
+                poll_interval = outputs.get("poll_interval", 0)
+                latest_poll_time_str = outputs.get("latest_poll_time")
+
+                # 没有剩余轮询次数的跳过
+                if not poll_time or poll_time <= 0:
+                    continue
+                if not poll_interval or poll_interval <= 0:
+                    continue
+
+                # 解析 latest_poll_time
+                latest_poll_time = self._parse_datetime(latest_poll_time_str)
+
+                if latest_poll_time:
+                    is_stuck, minutes_overdue, next_poll_time, reason = self._check_stuck_condition(
+                        latest_poll_time, poll_interval, status.started_time, now, timeout_threshold
+                    )
+
+                    if is_stuck:
+                        ticket_id, service_id = ticket_info_map.get(ss.process_id, (None, None))
+                        stuck_schedules.append(
+                            self._build_stuck_schedule_info(ss, status, ticket_id, service_id, 
+                                                            poll_time, poll_interval, 
+                                                            latest_poll_time, next_poll_time, 
+                                                            minutes_overdue, reason)
+                        )
+
+            except Exception as e:
+                logger.error(f"处理 schedule {ss.id} 时出错: {e}")
+                continue
+        # 按超时时间降序排序
+        stuck_schedules.sort(key=lambda x: x["minutes_overdue"], reverse=True)
+        return stuck_schedules
+
+    def fix_stuck_schedules(self, stuck_schedules: list) -> tuple[int, int]:
+        """修复卡住的调度任务"""
+        logger.info("\n开始修复卡住的调度任务...")
+
+        fixed_count = 0
+        failed_count = 0
+
+        for item in stuck_schedules:
+            schedule_id = item["schedule_id"]
+            process_id = item["process_id"]
+
+            try:
+                res = self._fix_core_schedules(schedule_id, process_id)
+
+                if res:
+                    fixed_count += 1
+
+            except Exception as e:
+                logger.error(f"  修复 schedule {schedule_id} 失败: {e}")
+                failed_count += 1
+
+        logger.info(f"\n修复完成: 成功 {fixed_count} 个, 失败 {failed_count} 个")
+        return fixed_count, failed_count
+        
+    def fix_one_schedule(self, schedule_id, process_id) -> bool:
+        """修复单个卡住的调度任务"""
+        try:
+            return self._fix_core_schedules(schedule_id, process_id)
+        except Exception as e:
+            return False
+    
+    @staticmethod
+    def _fix_core_schedules(schedule_id: str, process_id: str) -> bool:
+        from pipeline.engine import signals
+        from pipeline.django_signal_valve import valve
+        
+        # 重置 is_scheduling 锁
+        updated = ScheduleService.objects.filter(
+            id=schedule_id, is_scheduling=True
+        ).update(is_scheduling=False)
+
+        if updated:
+            logger.info(f"已重置 schedule {schedule_id} 的 is_scheduling 锁")
+
+        sched_service = ScheduleService.objects.get(process_id=process_id)
+
+        # 重新发送调度信号
+        valve.send(
+            signals,
+            "schedule_ready",
+            sender=ScheduleService,
+            process_id=sched_service.process_id,
+            schedule_id=sched_service.id,
+            countdown=0,
+        )
+
+        logger.info(f"  已重新触发 schedule {schedule_id} 的调度")
+        
+        return True
+    
+    @staticmethod
+    def _batch_get_ticket_info(process_ids: list) -> dict:
+        """
+        批量根据 process_id 列表获取关联的 ticket_id 和 service_id
+
+        Args:
+            process_ids: PipelineProcess 的 ID 列表
+
+        Returns:
+            dict: {process_id: (ticket_id, service_id)} 映射字典
+        """
+        result = {}
+        if not process_ids:
+            return result
+
+        try:
+            # 批量查询 PipelineProcess，获取 process_id -> root_pipeline_id 映射
+            processes = PipelineProcess.objects.filter(
+                id__in=process_ids
+            ).values("id", "root_pipeline_id")
+
+            process_to_ticket = {p["id"]: p["root_pipeline_id"] for p in processes}
+            ticket_ids = list(set(process_to_ticket.values()))
+
+            # 批量查询 Ticket，获取 ticket_id -> service_id 映射
+            tickets = Ticket._objects.filter(
+                id__in=ticket_ids
+            ).values("id", "service_id")
+
+            ticket_info = {str(t["id"]): t.get("service_id") for t in tickets}
+
+            # 构建最终结果：process_id -> (ticket_id, service_id)
+            for process_id, ticket_id in process_to_ticket.items():
+                service_id = ticket_info.get(str(ticket_id))
+                result[process_id] = (ticket_id, service_id)
+
+        except Exception as e:
+            logger.error(f"批量获取 ticket 信息失败: {e}")
+
+        return result
+
+    @staticmethod
+    def _check_stuck_condition(
+        latest_poll_time: datetime | None,
+        poll_interval: int,
+        started_time: datetime | None,
+        now: datetime,
+        timeout_threshold: datetime
+    ) -> tuple[bool, float, datetime | None, str]:
+        """
+        检查调度是否卡住
+        """
+        if latest_poll_time:
+            next_poll_time = latest_poll_time + timedelta(seconds=poll_interval)
+            if next_poll_time < timeout_threshold:
+                minutes_overdue = (now - next_poll_time).total_seconds() / 60
+                return True, minutes_overdue, next_poll_time, "latest_poll_time + poll_interval 超时"
+        elif started_time and started_time < timeout_threshold:
+            minutes_running = (now - started_time.replace(tzinfo=None)).total_seconds() / 60
+            return True, minutes_running, None, "无 latest_poll_time 且运行时间超时"
+        
+        return False, 0, None, ""
+
+    @staticmethod
+    def _parse_datetime(value) -> datetime | None:
+        """
+        解析日期时间，支持多种格式
+
+        Args:
+            value: datetime对象或日期字符串
+
+        Returns:
+            datetime对象，解析失败返回None
+        """
+        if not value:
+            return None
+        if isinstance(value, datetime):
+            return value
+        if isinstance(value, str):
+            for fmt in [
+                "%Y-%m-%d %H:%M:%S.%f",
+                "%Y-%m-%d %H:%M:%S",
+                "%Y-%m-%dT%H:%M:%S.%f",
+                "%Y-%m-%dT%H:%M:%S",
+            ]:
+                try:
+                    return datetime.strptime(value, fmt)
+                except ValueError:
+                    continue
+        return None
+
+    @staticmethod
+    def _build_stuck_schedule_info(
+        ss, status, ticket_id, service_id, poll_time, poll_interval,
+        latest_poll_time, next_poll_time, minutes_overdue, reason
+    ) -> dict:
+        """构建卡住调度的信息字典"""
+        return {
+            "schedule_id": ss.id,
+            "activity_id": ss.activity_id,
+            "process_id": ss.process_id,
+            "ticket_id": ticket_id,
+            "service_id": service_id,
+            "schedule_times": ss.schedule_times,
+            "is_scheduling": ss.is_scheduling,
+            "poll_time": poll_time,
+            "poll_interval": poll_interval,
+            "latest_poll_time": latest_poll_time,
+            "next_poll_time": next_poll_time,
+            "started_time": status.started_time,
+            "minutes_overdue": minutes_overdue,
+            "reason": reason,
+        }

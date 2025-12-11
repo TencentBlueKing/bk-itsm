@@ -31,6 +31,7 @@ from datetime import datetime, timedelta
 import jmespath
 import jsonschema
 from blueapps.utils.logger import logger_celery as logger
+from django.conf import settings
 from django.core.cache import cache
 from django.db import transaction
 from django.utils.translation import gettext as _
@@ -72,7 +73,7 @@ class AutoStateService(ItsmBaseService):
     """
 
     __need_schedule__ = True
-    interval = StaticIntervalGenerator(3)
+    interval = StaticIntervalGenerator(settings.AUTOSTATE_SCHEDULE_INTERVAL)
 
     @staticmethod
     def poll_proceed(api_config, success_conditions):

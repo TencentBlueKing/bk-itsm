@@ -25,7 +25,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import base64
 import datetime
 import importlib
-import os
 from urllib.parse import urljoin, urlparse
 
 from blueapps.conf.default_settings import *  # noqa
@@ -1018,3 +1017,14 @@ CSRF_TRUSTED_ORIGINS = [
     f"{SCHEME_HTTPS}://*.{BKPAAS_BK_DOMAIN}",
     f"{SCHEME_HTTP}://*.{BKPAAS_BK_DOMAIN}",
 ]
+
+# 调度器配置
+AUTOSTATE_SCHEDULE_INTERVAL = os.getenv("AUTOSTATE_SCHEDULE_INTERVAL", 30)
+
+# 监控配置
+MONITOR_PROXY_IP = os.getenv("MONITOR_PROXY_IP", "")
+MONITOR_PROXY_PORT = os.getenv("MONITOR_PROXY_PORT", "10205")
+MONITOR_EVENT_DATA_ID = os.getenv("MONITOR_EVENT_DATA_ID", "")
+MONITOR_EVENT_TOKEN = os.getenv("MONITOR_EVENT_TOKEN", "")
+IS_MONITOR_EVENT = os.getenv("IS_MONITOR_EVENT", False)
+AUTO_TIMEOUT_MINUTES = os.getenv("AUTO_TIMEOUT_MINUTES", 30)
