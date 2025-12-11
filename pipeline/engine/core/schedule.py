@@ -16,6 +16,7 @@ import logging
 import traceback
 
 from django.db import transaction
+from django.utils import timezone
 
 from pipeline.django_signal_valve import valve
 from pipeline.engine import exceptions, signals, states
@@ -138,6 +139,7 @@ def schedule(process_id, schedule_id, data_id=None):
                 logging.error(ex_data)
 
             sched_service.schedule_times += 1
+            sched_service.last_schedule_time = timezone.now()
             set_schedule_data(sched_service.id, parent_data)
 
             # schedule failed
