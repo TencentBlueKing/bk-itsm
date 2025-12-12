@@ -80,7 +80,7 @@
     "mitt": "^2.1.0",
     "vant": "3.4.9",
     "vue": "^3.2.26",
-    "vue-router": "^4.0.0-rc.6",
+    "vue-router": "4.1.6",
     "vuex": "^4.0.0-rc.2"
   },
   "browserslist": [
