@@ -2,9 +2,9 @@ name: CodeCov
 on: [push, pull_request]
 jobs:
   run:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
-      OS: ubuntu-20.04
+      OS: ubuntu-22.04
       PYTHON: "3.11.10"
       RUN_ENV: "open"
       APP_CODE: "bk_itsm"
