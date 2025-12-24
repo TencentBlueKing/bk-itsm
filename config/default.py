@@ -773,6 +773,11 @@ PREFIX_SOPS = ""
 SOPS_PROXY_URL = os.environ.get(
     "BKAPP_SOPS_PROXY_URL", "{}{}".format(BK_PAAS_INNER_HOST, SITE_URL_SOPS)
 )
+# 反向代理配置
+REVPROXY = {
+    "QUOTE_SPACES_AS_PLUS": False,
+}
+
 
 # 设置被代理的标准运维插件静态资源地址，比如标准运维的site_url或API网关接口
 # 'https://paasee-dev.XX.com/t/bk_sops'
