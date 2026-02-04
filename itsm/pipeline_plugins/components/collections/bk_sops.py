@@ -25,11 +25,13 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
 from itsm.component.constants import SYSTEM_OPERATE, TRANSITION_OPERATE, NODE_FAILED
-from itsm.component.esb.esbclient import client_backend
 from itsm.ticket.serializers import StatusSerializer
 from itsm.ticket.models import Ticket, TicketGlobalVariable
 from pipeline.component_framework.component import Component
 from pipeline.core.flow.activity import StaticIntervalGenerator
+
+from blueking.apigw.bkapis.bk_sops import BkSopsApi
+from bkapi_client_core.exceptions import APIGatewayResponseError
 
 from .itsm_base_service import ItsmBaseService
 
@@ -64,8 +66,6 @@ class BkOpsService(ItsmBaseService):
             "name": "ITSM-" + state["name"],
             "constants": constants,
             "exclude_task_nodes_id": exclude_task_nodes_id,
-            # return raw response data
-            "__raw": True,
         }
 
         return params
@@ -157,8 +157,21 @@ class BkOpsService(ItsmBaseService):
         self.update_info(current_node, sops_result, task_params=task_params)
 
         try:
-            create_result = client_backend.sops.create_task(task_params)
-        except Exception as error:
+            _client = BkSopsApi.get_client()
+            create_result = _client.create_task(
+                path_params={
+                    "template_id": task_params["template_id"],
+                    "bk_biz_id": str(task_params["bk_biz_id"]),
+                },
+                data={
+                    "flow_type": task_params["flow_type"],
+                    "template_source": task_params["template_source"],
+                    "name": task_params["name"],
+                    "constants": task_params["constants"],
+                    "exclude_task_nodes_id": task_params["exclude_task_nodes_id"],
+                }
+            )
+        except APIGatewayResponseError as error:
             logger.info(
                 "create task error，error  info %s , task params %s",
                 str(error),
@@ -176,7 +189,10 @@ class BkOpsService(ItsmBaseService):
             )
             return False
 
-        if not create_result.get("result", False):
+        sops_task_id = create_result.get("task_id")
+        task_url = create_result.get("task_url")
+
+        if not sops_task_id:
             detail_message = create_result.get("message") or "unknown"
             self.do_exit_plugins(
                 result=False,
@@ -190,20 +206,17 @@ class BkOpsService(ItsmBaseService):
             )
             return False
 
-        sops_task_id = create_result.get("data", {}).get("task_id")
-        task_url = create_result.get("data", {}).get("task_url")
-
         # second_step execute
         try:
-            start_result = client_backend.sops.start_task(
-                {
-                    "__raw": True,
+            _client = BkSopsApi.get_client()
+            _client.start_task(
+                path_params={
                     "task_id": sops_task_id,
-                    "bk_biz_id": task_params["bk_biz_id"],
+                    "bk_biz_id": str(task_params["bk_biz_id"]),
                 }
             )
             self.update_info(current_node, sops_result, task_url=task_url)
-        except Exception as error:
+        except APIGatewayResponseError as error:
             error_message = (
                 "start task error，error  info %s , task id %s",
                 str(error),
@@ -214,20 +227,6 @@ class BkOpsService(ItsmBaseService):
                 current_node=current_node,
                 sops_result=sops_result,
                 error=error_message,
-                processors=processors,
-                error_message_template=error_message_template,
-                ticket=ticket,
-                state_id=state_id,
-            )
-            return False
-
-        if not start_result.get("result", False):
-            message = start_result.get("message", "未知错误")
-            self.do_exit_plugins(
-                result=False,
-                current_node=current_node,
-                sops_result=sops_result,
-                error=message,
                 processors=processors,
                 error_message_template=error_message_template,
                 ticket=ticket,
@@ -289,13 +288,14 @@ class BkOpsService(ItsmBaseService):
             return False
 
         try:
-            task_status_params = {
-                "__raw": True,
-                "task_id": sops_task_id,
-                "bk_biz_id": bk_biz_id,
-            }
-            task_result = client_backend.sops.get_task_status(task_status_params)
-        except Exception as error:
+            _client = BkSopsApi.get_client()
+            task_result = _client.get_task_status(
+                path_params={
+                    "task_id": sops_task_id,
+                    "bk_biz_id": str(bk_biz_id),
+                }
+            )
+        except APIGatewayResponseError as error:
             self.do_exit_plugins(
                 result=False,
                 current_node=current_node,
@@ -309,24 +309,7 @@ class BkOpsService(ItsmBaseService):
             self.finish_schedule()
             return False
 
-        if not task_result.get("result", False):
-            error_message = task_result.get("message", "")
-            self.do_exit_plugins(
-                result=False,
-                current_node=current_node,
-                sops_result=sops_result,
-                error=error_message,
-                processors=processors,
-                error_message_template=error_message_template,
-                ticket=ticket,
-                state_id=state_id,
-            )
-            self.finish_schedule()
-            return False
-
-        task_info = task_result.get("data", {})
-
-        current_status = task_info.get("state")
+        current_status = task_result.get("state")
         logger.info(
             "[bk_sops_schedule] get task state success, state = {}".format(
                 current_status
@@ -344,7 +327,7 @@ class BkOpsService(ItsmBaseService):
         if current_status in ["FAILED", "REVOKED"]:
             data.set_outputs("params_sops_result_%s" % state_id, False)
             error_message = self.get_detail_message(
-                task_status_params, task_info, current_node
+                sops_task_id, bk_biz_id, task_result, current_node
             )
             self.do_exit_plugins(
                 result=False,
@@ -385,7 +368,7 @@ class BkOpsService(ItsmBaseService):
             return True
 
     @staticmethod
-    def get_detail_message(task_params, task_info, task_node):
+    def get_detail_message(sops_task_id, bk_biz_id, task_info, task_node):
         failed_children = [
             child
             for child in task_info.get("children", {}).values()
@@ -393,13 +376,24 @@ class BkOpsService(ItsmBaseService):
         ]
         error_messages = []
         for child in failed_children:
-            task_params.update({"__raw": True, "node_id": child["id"]})
-            result = client_backend.sops.get_task_node_detail(task_params)
-            error_messages.append(
-                "{}:{}".format(
-                    child["name"], result.get("data", {}).get("ex_data") or "未知错误"
+            try:
+                _client = BkSopsApi.get_client()
+                result = _client.get_task_node_detail(
+                    path_params={
+                        "task_id": sops_task_id,
+                        "bk_biz_id": str(bk_biz_id),
+                    },
+                    params={"node_id": child["id"]}
                 )
-            )
+                error_messages.append(
+                    "{}:{}".format(
+                        child["name"], result.get("ex_data") or "未知错误"
+                    )
+                )
+            except APIGatewayResponseError as error:
+                error_messages.append(
+                    "{}:{}".format(child["name"], str(error))
+                )
         return "\n".join(error_messages)
 
     def outputs_format(self):

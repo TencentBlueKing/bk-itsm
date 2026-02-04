@@ -25,16 +25,19 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import json
 
+from bkapi_client_core.exceptions import APIGatewayResponseError
 from django.core.cache import cache
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_page
 from django.http import JsonResponse, HttpResponse
 
+from blueking.apigw.bkapis.bk_sops import BkSopsApi
+from blueking.apigw.bkapis.bk_user import BkUserApi
 from common.log import logger
 from common.utils import filter_user_sensitive_info
 from itsm.component.constants import CACHE_5MIN, PREFIX_KEY, CACHE_30MIN
 from itsm.component.decorators import fbv_exception_handler
-from itsm.component.esb.esbclient import client_backend, client
+from itsm.component.esb.esbclient import client_backend
 from itsm.component.exceptions import (
     ComponentCallError,
     IamPermissionDenied,
@@ -252,16 +255,14 @@ def get_department_users_count(request):
     try:
         department_id = request.GET.get("id")
         # 只拉取第一页的数据，拿到用户数
-        params = {
-            "id": department_id,
-            "recursive": "true",
-            "detail": True,
-            "page_size": 1,
-        }
-        res = client_backend.usermanage.list_department_profiles(params)
-    except ComponentCallError as e:
+        _client = BkUserApi.get_client()
+        res = _client.list_department_user(
+            path_params={"department_id": department_id},
+            params={"recursive": True, "page": 1, "page_size": 1}
+        )
+    except APIGatewayResponseError as e:
         return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_USERS").json()
-    return Success({"count": res["count"]}).json()
+    return Success({"count": res.get("count", 0)}).json()
 
 
 @cache_page(CACHE_5MIN, cache="default")
@@ -269,12 +270,11 @@ def get_department_info(request):
     """获取部门详情"""
     try:
         department_id = request.GET.get("id")
-        res = client_backend.usermanage.retrieve_department(
-            {
-                "id": department_id,
-            }
+        _client = BkUserApi.get_client()
+        res = _client.retrieve_department(
+            path_params={"department_id": department_id}
         )
-    except ComponentCallError as e:
+    except APIGatewayResponseError as e:
         return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_INFO").json()
 
     return Success(res).json()
@@ -285,12 +285,11 @@ def get_user_info(request):
     """获取人员所属部门"""
     try:
         username = request.GET.get("username", request.user.username)
-        res = client_backend.usermanage.list_profile_departments(
-            {
-                "id": username,
-            }
+        _client = BkUserApi.get_client()
+        res = _client.list_user_department(
+            path_params={"bk_username": username}
         )
-    except ComponentCallError as e:
+    except APIGatewayResponseError as e:
         return Fail(str(e), "BK_USER_MANAGE.GET_USER_INFO").json()
 
     return Success(res).json()
@@ -302,9 +301,14 @@ def get_user_project_list(request):
     获取标准运维用户有权限的项目
     """
     try:
-        res = client.sops.get_user_project_list({})
+        sops_client = BkSopsApi.get_client_by_request(request)
+        response = sops_client.get_user_project_list()
+        
+        # 获取返回数据
+        res = response.get("data", [])
+        
         return Success(res).json()
-    except ComponentCallError as e:
+    except (ComponentCallError, APIGatewayResponseError) as e:
         return Fail(str(e), "SOPS.GET_USER_PROJECT_LIST").json()
 
 
@@ -318,20 +322,29 @@ def get_template_list(request):
 
     bk_biz_id = request.GET.get("bk_biz_id", None)
     with_common = request.GET.get("with_common", None) == "true"
-    params = {"operator": request.user.username}
 
     try:
+        sops_client = BkSopsApi.get_client_by_request(request)
+        
         if bk_biz_id:
-            res = client.sops.get_template_list(
-                {"bk_biz_id": bk_biz_id, "operator": request.user.username}
+            # 获取业务模板列表
+            response = sops_client.get_template_list(
+                path_params={"bk_biz_id": bk_biz_id}
             )
+            res = response.get("data", [])
+            
             if with_common:
-                res_com = client_backend.sops.get_common_template_list(**params)
+                # 获取公共模板列表
+                response_com = sops_client.get_common_template_list()
+                res_com = response_com.get("data", [])
                 res.extend(res_com)
         else:
-            res = client.sops.get_common_template_list(**params)
+            # 只获取公共模板列表
+            response = sops_client.get_common_template_list()
+            res = response.get("data", [])
+            
         return Success(res).json()
-    except ComponentCallError as e:
+    except APIGatewayResponseError as e:
         return Fail(str(e), "SOPS.GET_COMMON_TEMPLATE_LIST").json()
 
 
@@ -366,13 +379,21 @@ def get_template_detail(request):
     if not template_id:
         return Fail("invalid template_id", "SOPS.GET_TEMPLATE_DETAIL").json()
 
-    params = {"template_id": template_id, "operator": request.user.username}
     try:
+        sops_client = BkSopsApi.get_client_by_request(request)
+        
         if bk_biz_id:
-            params.update(bk_biz_id=bk_biz_id)
-            res = client_backend.sops.get_template_info(params)
+            # 获取业务模板详情
+            response = sops_client.get_template_info(
+                path_params={"template_id": template_id, "bk_biz_id": bk_biz_id}
+            )
         else:
-            res = client_backend.sops.get_common_template_info(params)
+            # 获取公共模板详情
+            response = sops_client.get_common_template_info(
+                path_params={"template_id": template_id}
+            )
+        
+        res = response.get("data", {})
         result = {
             "constants": get_constants(res),
             "optional_ids": get_option_ids(res),
@@ -392,7 +413,7 @@ def get_template_detail(request):
         }
         return JsonResponse(data, status=HTTP_499_IAM_FORBIDDEN)
 
-    except ComponentCallError as e:
+    except (ComponentCallError, APIGatewayResponseError) as e:
         return Fail(str(e), "SOPS.GET_TEMPLATE_DETAIL").json()
 
 
@@ -400,11 +421,16 @@ def get_template_detail(request):
 def get_unfinished_sops_tasks(request):
     try:
         bk_biz_id = request.GET.get("bk_biz_id")
-        res = client_backend.sops.get_task_list(
-            {"bk_biz_id": bk_biz_id, "is_started": False}
+        sops_client = BkSopsApi.get_client_by_request(request)
+        
+        response = sops_client.get_task_list(
+            path_params={"bk_biz_id": bk_biz_id},
+            params={"is_started": False}
         )
+        res = response.get("data", [])
+        
         return Success(res).json()
-    except ComponentCallError as e:
+    except (ComponentCallError, APIGatewayResponseError) as e:
         return Fail(str(e), "SOPS.GET_UNFINISHED_SOPS_TASKS").json()
 
 
@@ -413,7 +439,9 @@ def get_sops_tasks(request):
     try:
         support_params = ["is_started", "keyword", "is_finished", "limit", "offset"]
         bool_params = ["is_started", "is_finished"]
-        query_params = {"bk_biz_id": request.GET.get("bk_biz_id")}
+        bk_biz_id = request.GET.get("bk_biz_id")
+        query_params = {}
+        
         for param in support_params:
             param_value = request.GET.get(param)
             if param_value is not None:
@@ -421,9 +449,16 @@ def get_sops_tasks(request):
                     query_params[param] = param_value == "true"
                 else:
                     query_params[param] = param_value
-        res = client_backend.sops.get_task_list(query_params)
+        
+        sops_client = BkSopsApi.get_client_by_request(request)
+        response = sops_client.get_task_list(
+            path_params={"bk_biz_id": bk_biz_id},
+            params=query_params
+        )
+        res = response.get("data", [])
+        
         return Success(res).json()
-    except ComponentCallError as e:
+    except (ComponentCallError, APIGatewayResponseError) as e:
         return Fail(str(e), "SOPS.GET_SOPS_TASKS").json()
 
 
@@ -432,11 +467,15 @@ def get_sops_tasks_detail(request):
     try:
         bk_biz_id = request.GET.get("bk_biz_id")
         task_id = request.GET.get("task_id")
-        res = client_backend.sops.get_task_detail(
-            {"bk_biz_id": bk_biz_id, "task_id": task_id}
+        
+        sops_client = BkSopsApi.get_client_by_request(request)
+        response = sops_client.get_task_detail(
+            path_params={"bk_biz_id": bk_biz_id, "task_id": task_id}
         )
+        res = response.get("data", {})
+        
         return Success(res).json()
-    except ComponentCallError as e:
+    except (ComponentCallError, APIGatewayResponseError) as e:
         return Fail(str(e), "SOPS.GET_SOPS_TASKS_DETAIL").json()
 
 
@@ -445,13 +484,17 @@ def get_sops_template_schemes(request):
     try:
         bk_biz_id = request.GET.get("bk_biz_id")
         res = []
+        
         if bk_biz_id:
             template_id = request.GET.get("template_id")
-            res = client_backend.sops.get_template_schemes(
-                {"bk_biz_id": bk_biz_id, "template_id": template_id}
+            sops_client = BkSopsApi.get_client_by_request(request)
+            response = sops_client.get_template_schemes(
+                path_params={"bk_biz_id": bk_biz_id, "template_id": template_id}
             )
+            res = response.get("data", [])
+            
         return Success(res).json()
-    except ComponentCallError as e:
+    except (ComponentCallError, APIGatewayResponseError) as e:
         return Fail(str(e), "SOPS.GET_SOPS_TEMPLATE_SCHEMES").json()
 
 
@@ -460,15 +503,18 @@ def get_sops_preview_task_tree(request):
     try:
         data = json.loads(request.body)
         bk_biz_id = data.get("bk_biz_id")
-        data = {
-            "template_id": data.get("template_id"),
-            "exclude_task_nodes_id": data.get("exclude_task_nodes_id", []),
-        }
-        if bk_biz_id:
-            data["bk_biz_id"] = bk_biz_id
-        res = client_backend.sops.preview_task_tree(data)
+        template_id = data.get("template_id")
+        exclude_task_nodes_id = data.get("exclude_task_nodes_id", [])
+        
+        sops_client = BkSopsApi.get_client_by_request(request)
+        response = sops_client.preview_task_tree(
+            path_params={"template_id": template_id, "bk_biz_id": bk_biz_id},
+            data={"exclude_task_nodes_id": exclude_task_nodes_id}
+        )
+        res = response.get("data", {})
+        
         return Success(res).json()
-    except ComponentCallError as e:
+    except (ComponentCallError, APIGatewayResponseError) as e:
         return Fail(str(e), "SOPS.GET_SOPS_PREVIEW_TASK_TREE").json()
 
 
@@ -476,16 +522,18 @@ def get_sops_preview_task_tree(request):
 def get_sops_preview_common_task_tree(request):
     try:
         data = json.loads(request.body)
-        bk_biz_id = data.get("bk_biz_id")
-        data = {
-            "template_id": data.get("template_id"),
-            "exclude_task_nodes_id": data.get("exclude_task_nodes_id", []),
-        }
-        if bk_biz_id:
-            data["bk_biz_id"] = bk_biz_id
-        res = client_backend.sops.preview_common_task_tree(data)
+        template_id = data.get("template_id")
+        exclude_task_nodes_id = data.get("exclude_task_nodes_id", [])
+        
+        sops_client = BkSopsApi.get_client_by_request(request)
+        response = sops_client.preview_common_task_tree(
+            path_params={"template_id": template_id},
+            data={"exclude_task_nodes_id": exclude_task_nodes_id}
+        )
+        res = response.get("data", {})
+        
         return Success(res).json()
-    except ComponentCallError as e:
+    except (ComponentCallError, APIGatewayResponseError) as e:
         return Fail(str(e), "SOPS.GET_COMMON_SOPS_PREVIEW_TASK_TREE").json()
 
 

@@ -42,11 +42,13 @@ from itsm.component.constants.task import (
     DEVOPS_RUNNING_STATUS,
     DEVOPS_FAILED_STATUS,
 )
-from itsm.component.esb.esbclient import client_backend
 from itsm.component.apigw import client as apigw_client
 from itsm.component.utils.lock import share_lock
 from itsm.task.models import SopsTask, Task, SubTask
 from itsm.ticket.models import TicketGlobalVariable
+
+from blueking.apigw.bkapis.bk_sops import BkSopsApi
+from bkapi_client_core.exceptions import APIGatewayResponseError
 
 logger = logging.getLogger("celery")
 
@@ -54,57 +56,52 @@ logger = logging.getLogger("celery")
 def get_tasks_status(bk_biz_id, sops_task_ids):
     """批量查询任务状态"""
 
-    res = client_backend.sops.get_tasks_status(
-        {"__raw": True, "task_id_list": list(sops_task_ids), "bk_biz_id": bk_biz_id}
-    )
-
-    if not res.get("result", False):
-        logger.error("sops_task_poller failed: {}".format(res.get("message")))
+    try:
+        _client = BkSopsApi.get_client()
+        res = _client.get_tasks_status(
+            path_params={"bk_biz_id": str(bk_biz_id)},
+            data={"task_id_list": list(sops_task_ids)}
+        )
+        return res
+    except APIGatewayResponseError as e:
+        logger.error("sops_task_poller failed: {}".format(str(e)))
         return None
-
-    return res.get("data")
 
 
 def get_task_detail(bk_biz_id, sops_task_id):
     """查询任务详情"""
 
-    res = client_backend.sops.get_task_detail(
-        {
-            "__raw": True,
-            "task_id": sops_task_id,
-            "bk_biz_id": bk_biz_id,
-        }
-    )
-    if not res.get("result", False):
+    try:
+        _client = BkSopsApi.get_client()
+        res = _client.get_task_detail(
+            path_params={"task_id": sops_task_id, "bk_biz_id": str(bk_biz_id)}
+        )
+        return res
+    except APIGatewayResponseError as e:
         logger.warning(
             "sops_task_poller->get_task_detail({}) failed: {}".format(
-                sops_task_id, res.get("message")
+                sops_task_id, str(e)
             )
         )
         return None
-
-    return res.get("data")
 
 
 def get_task_status(bk_biz_id, sops_task_id):
     """查询各节点状态"""
 
-    res = client_backend.sops.get_task_status(
-        {
-            "__raw": True,
-            "task_id": sops_task_id,
-            "bk_biz_id": bk_biz_id,
-        }
-    )
-    if not res.get("result", False):
+    try:
+        _client = BkSopsApi.get_client()
+        res = _client.get_task_status(
+            path_params={"task_id": sops_task_id, "bk_biz_id": str(bk_biz_id)}
+        )
+        return res
+    except APIGatewayResponseError as e:
         logger.warning(
             "sops_task_poller->get_task_status({}) failed: {}".format(
-                sops_task_id, res.get("message")
+                sops_task_id, str(e)
             )
         )
         return None
-
-    return res.get("data")
 
 
 @periodic_task(

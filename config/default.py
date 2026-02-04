@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import base64
 import datetime
 import importlib
+import os
 from urllib.parse import urljoin, urlparse
 
 from blueapps.conf.default_settings import *  # noqa
@@ -1033,3 +1034,7 @@ MONITOR_EVENT_DATA_ID = os.getenv("MONITOR_EVENT_DATA_ID", "")
 MONITOR_EVENT_TOKEN = os.getenv("MONITOR_EVENT_TOKEN", "")
 IS_MONITOR_EVENT = os.getenv("IS_MONITOR_EVENT", False)
 AUTO_TIMEOUT_MINUTES = os.getenv("AUTO_TIMEOUT_MINUTES", 30)
+
+# 多租户
+BKPAAS_APP_TENANT_ID = os.getenv("BKPAAS_APP_TENANT_ID", "")
+

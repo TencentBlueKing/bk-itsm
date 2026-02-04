@@ -32,7 +32,9 @@ from itsm.component.constants import (
     NOTIFY_TYPE_CHOICES,
     BUILTIN_NOTIFY_TYPE,
 )
-from itsm.component.esb.esbclient import client_backend
+from itsm.component.exceptions import ComponentCallError
+from blueking.apigw.bkapis.bk_cmsi import BkCmsiApi
+from bkapi_client_core.exceptions import APIGatewayResponseError
 
 
 def translate_constant_2(constant):
@@ -47,14 +49,25 @@ def translate_constant_2(constant):
 def init_notify_type_choice():
     """获取ESB接入通知类型"""
     try:
-        result = client_backend.cmsi.get_msg_type()
-        notify_type_choice = [
-            (NOTIFY_TYPE_MAPPING.get(ins["type"], ins["type"].upper()), ins["label"])
-            for ins in result
-            if ins["is_active"]
-        ]
+        cmsi_client = BkCmsiApi.get_client()
+        response = cmsi_client.v1_channels_list()
+        if isinstance(response, list):
+            result = response
+        else:
+            result = response.get("data", []) if response else []
+        
+        notify_type_choice = []
+        for ins in result:
+            is_enabled = ins.get("enable", ins.get("is_active", True))
+            if is_enabled:
+                notify_type = ins.get("type", "")
+                notify_label = ins.get("name", ins.get("label", ""))
+                if notify_type:
+                    notify_type_choice.append(
+                        (NOTIFY_TYPE_MAPPING.get(notify_type, notify_type.upper()), notify_label)
+                    )
         return notify_type_choice
-    except Exception as e:
+    except APIGatewayResponseError as e:
         logger.error("查询消息通知类型失败，error:{}".format(e))
 
     return NOTIFY_TYPE_CHOICES

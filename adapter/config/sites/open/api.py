@@ -24,6 +24,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import os
+from django.conf import settings
+from blueapps.utils import get_client_by_user
 
 
 def get_batch_users(users, properties='all', is_exact=True, page_params=None):

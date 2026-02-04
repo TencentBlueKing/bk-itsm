@@ -30,6 +30,7 @@ from functools import reduce
 from django.conf import settings
 from django.utils.translation import gettext as _
 
+from blueking.apigw.bkapis.bk_user import BkUserApi
 from common.log import logger
 from itsm.component.esb.esbclient import client_backend
 from itsm.component.exceptions import (
@@ -106,9 +107,8 @@ class PathTypeValidators(object):
     def validate_is_organization(value):
         if value.get("value") == SWITCH_ON:
             try:
-                client_backend.usermanage.list_departments(
-                    {"fields": "id", "__raw": True}
-                )
+                client = BkUserApi.get_client()
+                client.list_departments()
             except ComponentCallError:
                 raise OrganizationStructureFunctionSwitchValidateError(
                     _("组织架构接口调用失败，无法启用，请联系管理员")
