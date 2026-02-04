@@ -22,13 +22,14 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+from bkapi_client_core.exceptions import APIGatewayResponseError
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
 from rest_framework.fields import empty
 
+from blueking.apigw.bkapis.bk_sops import BkSopsApi
 from common.template.template import Template
 from itsm.component.constants import (
     EMPTY_STRING,
@@ -43,8 +44,6 @@ from itsm.component.constants import (
     DEVOPS_TASK,
 )
 from itsm.component.drf.viewsets import ModelViewSet
-from itsm.component.esb.esbclient import client_backend
-from itsm.component.exceptions import ComponentCallError
 from itsm.component.utils.basic import dotted_name, normal_name
 from itsm.task.models import Task, TaskField, TaskLib, SopsTask, TaskLibTasks, SubTask
 from itsm.ticket.validators import regex_validate
@@ -208,14 +207,15 @@ class TaskSerializer(serializers.ModelSerializer):
             if instance.component_type == SOPS_TASK:
                 sops_task = SopsTask.objects.get(task_id=instance.id)
                 try:
-                    detail = client_backend.sops.get_task_detail(
+                    client = BkSopsApi.get_client()
+                    detail = client.get_task_detail(
                         {
                             "bk_biz_id": sops_task.bk_biz_id,
                             "task_id": sops_task.sops_task_id,
                         }
                     )
                 except Exception:
-                    raise ComponentCallError(_("标准运维获取任务详情失败"))
+                    raise APIGatewayResponseError(_("标准运维获取任务详情失败"))
                 outputs = instance.ticket.get_ticket_global_output()
                 for field in create_fields:
                     if field["key"] == SOPS_TEMPLATE_KEY:

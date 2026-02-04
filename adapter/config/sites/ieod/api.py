@@ -22,6 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+from blueking.apigw.bkapis.bk_user import BkUserApi
 from common.log import logger
 
 
@@ -55,7 +56,9 @@ def get_batch_users(users, properties, is_exact=True, page_params=None, name_typ
         else:
             kwargs.update(fields=properties)
 
-    all_users = client_backend.usermanage.list_users(kwargs)["results"]
+    client = BkUserApi.get_client()
+    all_users = client.list_user(params=kwargs)["data"]["results"]
+    
     if name_type:
         all_users = [
             {
@@ -109,13 +112,6 @@ def get_all_users(users=None):
 
 def query_user_info(normal_users, cross_dir_users):
     from itsm.component.esb.esbclient import client_backend
-
-    # if not cross_dir_users and not normal_users:
-    #     all_users = client_backend.usermanage.list_users(
-    #         {'fields': 'username,display_name', 'fuzzy_lookups': "", 'no_page': True}
-    #     )
-    #     return all_users
-
     all_users = []
     if cross_dir_users:
         for single_user in cross_dir_users:

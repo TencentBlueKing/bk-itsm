@@ -22,12 +22,14 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+from bkapi_client_core.exceptions import APIGatewayResponseError
 from celery import shared_task
 from celery.schedules import crontab
 from blueapps.contrib.celery_tools.periodic import periodic_task
 from django.core.cache import cache
 from django.conf import settings
+from blueking.apigw.bkapis.bk_cmdb import CMDBApi
+from blueking.apigw.bkapis.bk_user import BkUserApi
 from itsm.component.constants import CACHE_10MIN, CACHE_5MIN
 from itsm.component.esb.esbclient import client_backend
 from itsm.component.utils.lock import share_lock
@@ -40,10 +42,47 @@ adapter_api = settings.ADAPTER_API
 def update_user_cache(cache_key, ret_type="list", name_type="bk_username", users=None):
     """更新用户缓存"""
     bk_users = None
-    try:
-        res = adapter_api.get_all_users(users)
-    except ComponentCallError:
+    res = []
+    
+    # 如果没有指定用户列表，返回空
+    if not users:
         res = []
+    else:
+        try:
+            client = BkUserApi.get_client()
+            
+            if isinstance(users, str):
+                users = [users]
+            
+            for username in users:
+                try:
+                    response = client.retrieve_user(
+                        path_params={"bk_username": username}
+                    )
+                    user_data = response.get("data", {})
+                    if user_data:
+                        res.append({
+                            "id": user_data.get("username"),
+                            "name": "{}({})".format(
+                                user_data.get("username", ""),
+                                user_data.get("display_name", "")
+                            ),
+                            "bk_username": user_data.get("username"),
+                            "chname": user_data.get("display_name", ""),
+                        })
+                except (APIGatewayResponseError, Exception) as e:
+                    # 单个用户查询失败，记录日志但继续查询其他用户
+                    print(f"查询用户 {username} 失败: {str(e)}")
+                    # 添加一个默认的用户信息
+                    res.append({
+                        "id": username,
+                        "name": "{}()".format(username),
+                        "bk_username": username,
+                        "chname": "",
+                    })
+        except (ComponentCallError, APIGatewayResponseError) as e:
+            print(f"查询用户信息失败: {str(e)}")
+            res = []
 
     if ret_type == "dict" and name_type == "bk_username":
         bk_users = {user["bk_username"]: user["name"] for user in res}
@@ -63,13 +102,15 @@ def update_bk_business(cache_key, bk_biz_id, role_type):
     @share_lock(identify=cache_key)
     def update():
         try:
-            search_business_list = client_backend.cc.search_business(
-                {
+            client = CMDBApi.get_client()
+            search_business_list = client.search_business(
+                data={
                     "bk_supplier_id": 0,
                     "fields": role_type,
                     "condition": {"bk_biz_id": int(bk_biz_id)},
                     "page": {"start": 0, "limit": 200, "sort": ""},
-                }
+                },
+                path_params={"bk_supplier_account": "0"}
             ).get("info")
             cache.set(cache_key, search_business_list, CACHE_5MIN)
             return search_business_list
@@ -88,10 +129,13 @@ def update_user_departments(cache_key, username, id_only):
     @share_lock(identify=cache_key)
     def update():
         try:
-            res = client_backend.usermanage.list_profile_departments(
-                {"id": username, "with_family": True}
+            client = BkUserApi.get_client()
+            res = client.list_user_department(
+                path_params={"bk_username": username},
+                params={"with_ancestors": True}
             )
-        except ComponentCallError as e:
+            res = res.get("data", [])
+        except APIGatewayResponseError as e:
             print("获取组织架构失败：username=%s，error=%s" % (username, str(e)))
             return []
 
@@ -101,8 +145,9 @@ def update_user_departments(cache_key, username, id_only):
 
         departments = []
         for sub_dept in res:
+            # 新版 API 使用 ancestors 字段替代 family 字段
             departments.extend(
-                [str(dept.get("id")) for dept in sub_dept.get("family", [])]
+                [str(dept.get("id")) for dept in sub_dept.get("ancestors", [])]
             )
             departments.append(sub_dept.get("id"))
         cache.set(cache_key, departments, CACHE_10MIN)

@@ -30,11 +30,12 @@ from django.utils.translation import gettext as _
 
 from common.log import logger
 from itsm.component.constants import GENERAL_NOTICE
-from itsm.component.esb.esbclient import client_backend
 from itsm.component.exceptions import ComponentCallError
 from itsm.component.utils.basic import merge_dict_list
 from itsm.meta.services.notice_filter import notice_filter_service
 from weixin.core.settings import WEIXIN_APP_EXTERNAL_HOST
+from blueking.apigw.bkapis.bk_cmsi import BkCmsiApi
+from bkapi_client_core.exceptions import APIGatewayResponseError
 
 
 class BaseNotifier(object):
@@ -74,9 +75,11 @@ class BaseNotifier(object):
         """
         # 1.获取消息通知类型
         try:
-            result = client_backend.cmsi.get_msg_type()
+            cmsi_client = BkCmsiApi.get_client()
+            response = cmsi_client.v1_channels_list()
+            result = response.get("data", [])
             notify_type_list = [ins["type"] for ins in result if ins["is_active"]]
-        except ComponentCallError as e:
+        except (ComponentCallError, APIGatewayResponseError) as e:
             logger.error("查询消息通知类型失败，error:{}".format(e))
             raise e
         # 2.判断当前通知类型是否可用""
@@ -90,9 +93,22 @@ class BaseNotifier(object):
         )
         # 4.通用消息发送
         try:
-            return client_backend.cmsi.send_msg(params)
-        except ComponentCallError as e:
-            if e.esb_message.startswith("Some users failed"):
+            # 根据消息类型选择对应的发送接口
+            if self.notify_type.lower() == "mail":
+                response = cmsi_client.v1_send_mail(data=params)
+            elif self.notify_type.lower() == "sms":
+                response = cmsi_client.v1_send_sms(data=params)
+            elif self.notify_type.lower() == "weixin":
+                response = cmsi_client.v1_send_weixin(data=params)
+            elif self.notify_type.lower() == "voice":
+                response = cmsi_client.v1_send_voice(data=params)
+            else:
+                # 其他类型暂不支持，记录日志
+                logger.warning("不支持的消息类型: {}".format(self.notify_type))
+                return
+            return response.get("data")
+        except (ComponentCallError, APIGatewayResponseError) as e:
+            if hasattr(e, 'esb_message') and e.esb_message.startswith("Some users failed"):
                 return
             logger.error("通知发送失败，error:{}，params:{}".format(e, params))
             raise e
@@ -134,9 +150,11 @@ class WeixinNotifier(BaseNotifier):
             [self.params, kwargs, {"msg_type": settings.QY_WEIXIN}]
         )
         try:
-            client_backend.cmsi.send_msg(params)
-        except ComponentCallError as e:
-            if e.esb_message.startswith("Some users failed"):
+            cmsi_client = BkCmsiApi.get_client()
+            response = cmsi_client.v1_send_weixin(data=params)
+            return response.get("data")
+        except (ComponentCallError, APIGatewayResponseError) as e:
+            if hasattr(e, 'esb_message') and e.esb_message.startswith("Some users failed"):
                 return
             raise e
 
@@ -164,9 +182,11 @@ class EmailNotifier(BaseNotifier):
         """
         params = merge_dict_list([self.params, kwargs, {"msg_type": "mail"}])
         try:
-            return client_backend.cmsi.send_msg(params)
-        except ComponentCallError as e:
-            if e.esb_message.startswith("Some users failed"):
+            cmsi_client = BkCmsiApi.get_client()
+            response = cmsi_client.v1_send_mail(data=params)
+            return response.get("data")
+        except (ComponentCallError, APIGatewayResponseError) as e:
+            if hasattr(e, 'esb_message') and e.esb_message.startswith("Some users failed"):
                 return
             raise e
 
@@ -182,9 +202,11 @@ class SmsNotifier(BaseNotifier):
     def send(self, **kwargs):
         try:
             params = merge_dict_list([self.params, kwargs, kwargs, {"msg_type": "sms"}])
-            return client_backend.cmsi.send_sms(params)
-        except ComponentCallError as e:
-            if e.esb_message.startswith("Some users failed"):
+            cmsi_client = BkCmsiApi.get_client()
+            response = cmsi_client.v1_send_sms(data=params)
+            return response.get("data")
+        except (ComponentCallError, APIGatewayResponseError) as e:
+            if hasattr(e, 'esb_message') and e.esb_message.startswith("Some users failed"):
                 return
             raise e
 

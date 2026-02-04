@@ -31,6 +31,7 @@ from django.core.cache import cache
 from django.db import models
 from django.utils.translation import gettext as _
 
+from blueking.apigw.bkapis.bk_cmdb import CMDBApi
 from common.log import logger
 from itsm.component.constants import (
     ADMIN_STATICS_MANAGER_KEY,
@@ -294,13 +295,15 @@ class UserRole(ObjectManagerMixin, Model):
         def _get_app_list_by_role(params=None):
             if params is None:
                 params = {}
-            apps = client_backend.cc.search_business(
-                {
+            client = CMDBApi.get_client()
+            apps = client.search_business(
+                data={
                     "bk_supplier_id": 0,
                     "fields": params["search_fields"],
                     "condition": {params["role"]: params["username"]},
                     "page": {"start": 0, "limit": 1000, "sort": ""},
-                }
+                },
+                path_params={"bk_supplier_account": "0"}
             ).get("info")
 
             return apps
@@ -340,8 +343,10 @@ class UserRole(ObjectManagerMixin, Model):
 
         try:
             # 查询通用角色列表
-            res = client_backend.cc.search_object_attribute(
-                {"bk_obj_id": "biz", "bk_supplier_account": "0"}
+            client = CMDBApi.get_client()
+            res = client.search_object_attribute(
+                data={"bk_obj_id": "biz", "bk_supplier_account": "0"},
+                path_params={"bk_supplier_account": "0"}
             )
             roles = {
                 item["bk_property_id"]: item["bk_property_name"]
