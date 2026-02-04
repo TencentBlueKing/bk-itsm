@@ -30,6 +30,8 @@ import datetime
 import logging
 import json
 import jsonfield
+from blueking.apigw.bkapis.bk_sops import BkSopsApi
+from bkapi_client_core.exceptions import APIGatewayResponseError
 
 from django.db.models import Q
 from django.db import models, transaction
@@ -39,7 +41,7 @@ from bulk_update.helper import bulk_update
 
 from common.template.template import Template
 from pipeline.engine import api as pipeline_api
-from itsm.component.esb.esbclient import client_backend, backend_client, client
+from itsm.component.esb.esbclient import  backend_client, client
 
 from itsm.component.apigw import client as apigw_client
 from itsm.component.utils.client_backend_query import get_biz_names
@@ -69,7 +71,6 @@ from itsm.component.constants.trigger import (
     AFTER_FINISH_TASK,
     AFTER_CONFIRM_TASK,
 )
-from itsm.component.exceptions import ComponentCallError
 from itsm.component.utils.basic import now, dotted_name, list_by_separator
 from itsm.component.utils.misc import (
     get_field_display_value,
@@ -528,23 +529,18 @@ class Task(Model):
 
         self.claim_sops_task(sops_task.sops_task_id, sops_task.bk_biz_id, operator)
 
-        start_task_params = {
-            "__raw": True,
-            "task_id": sops_task.sops_task_id,
-            "bk_biz_id": sops_task.bk_biz_id,
-            "operator": operator,
-            "username": operator,
-        }
-
         # 创建任务 或者重试任务
-        res = client_backend.sops.start_task(start_task_params)
-
-        if not res.get("result", False):
+        try:
+            _client = BkSopsApi.get_client_by_username(operator)
+            res = _client.start_task(
+                path_params={"task_id": sops_task.sops_task_id, "bk_biz_id": sops_task.bk_biz_id}
+            )
+        except APIGatewayResponseError as e:
             if sops_task:
                 sops_task.state = TASK_CONSTANTS.START_FAILED
                 sops_task.save()
             self.set_status(
-                TASK_CONSTANTS.FAILED, operator, error_message=res.get("message", "--")
+                TASK_CONSTANTS.FAILED, operator, error_message=str(e)
             )
             return
 
@@ -632,13 +628,18 @@ class Task(Model):
                 "operate_sops_task->create_task failed: %s"
                 % res.get("message", "unknown")
             )
-            raise ComponentCallError(res)
+            raise APIGatewayResponseError(res)
         return res, task_params
 
     def claim_sops_task(self, task_id, bk_biz_id, operator):
-        res = client_backend.sops.get_tasks_status(
-            {"task_id_list": [task_id], "bk_biz_id": str(bk_biz_id)}
-        )
+        try:
+            _client = BkSopsApi.get_client()
+            res = _client.get_tasks_status(
+                path_params={"bk_biz_id": str(bk_biz_id)},
+                data={"task_id_list": [task_id]}
+            )
+        except APIGatewayResponseError:
+            return
         if not res or res[0].get("current_flow") != "func_claim":
             return
         data = {
@@ -654,7 +655,7 @@ class Task(Model):
             logger.error(
                 "create_task->claim_task failed: %s" % res.get("message", "unknown")
             )
-            raise ComponentCallError(res)
+            raise APIGatewayResponseError(res)
 
     def call_sops_update_task(self, fields, operator, task_id):
         task_params = {
@@ -675,7 +676,7 @@ class Task(Model):
                 "operate_sops_task->modify_constants_for_task failed: %s"
                 % res.get("message", "unknown")
             )
-            raise ComponentCallError(res)
+            raise APIGatewayResponseError(res)
         return res, task_params
 
     def create_sops_task(self, **kwargs):
@@ -714,8 +715,9 @@ class Task(Model):
             sops_task_id = fields["task_id"]
 
         # 创建完成之后查询详情
-        res = client_backend.sops.get_task_detail(
-            {"__raw": True, "task_id": sops_task_id, "bk_biz_id": fields["bk_biz_id"]}
+        _client = BkSopsApi.get_client()
+        res = _client.get_task_detail(
+            path_params={"task_id": sops_task_id, "bk_biz_id": fields["bk_biz_id"]}
         )
         sops_task = SopsTask.objects.create(
             ticket_id=self.ticket_id,
@@ -725,9 +727,9 @@ class Task(Model):
             creator=self.creator,
             sops_template_id=fields["id"],
             sops_task_id=sops_task_id,
-            sops_task_url=res["data"]["task_url"],
+            sops_task_url=res.get("task_url", ""),
             state=TASK_CONSTANTS.CREATED,
-            sops_task_info={"params": task_params, "detail": res["data"]},
+            sops_task_info={"params": task_params, "detail": res},
         )
 
         return sops_task
@@ -778,15 +780,14 @@ class Task(Model):
 
         detail = sop_task.sops_task_info.get("detail", "")
         # 修改完成之后查询详情
-        res = client_backend.sops.get_task_detail(
-            {
-                "__raw": True,
-                "task_id": sop_task.sops_task_id,
-                "bk_biz_id": fields["bk_biz_id"],
-            }
-        )
-        if res.get("result", False):
-            detail = res.get("data")
+        try:
+            _client = BkSopsApi.get_client()
+            res = _client.get_task_detail(
+                path_params={"task_id": sop_task.sops_task_id, "bk_biz_id": fields["bk_biz_id"]}
+            )
+            detail = res
+        except APIGatewayResponseError:
+            pass
 
         sop_task.task_name = self.name
         sop_task.sops_task_info = {"params": task_params, "detail": detail}
@@ -802,24 +803,21 @@ class Task(Model):
         :return:
         """
 
-        res = client_backend.sops.get_task_status(
-            {
-                "__raw": True,
-                "task_id": sops_task.sops_task_id,
-                "bk_biz_id": sops_task.bk_biz_id,
-            }
-        )
-        if res.get("result", False) is False:
+        try:
+            _client = BkSopsApi.get_client()
+            res = _client.get_task_status(
+                path_params={"task_id": sops_task.sops_task_id, "bk_biz_id": sops_task.bk_biz_id}
+            )
+        except APIGatewayResponseError as e:
             # 获取不到标准运维任务信息，直接设置为异常
             return {
                 "result": False,
-                "message": "重试失败，获取标准运维任务信息出错 %s"
-                % res.get("message", ""),
+                "message": "重试失败，获取标准运维任务信息出错 %s" % str(e),
             }
 
         failed_nodes = [
             node_id
-            for node_id, node_info in res["data"]["children"].items()
+            for node_id, node_info in res.get("children", {}).items()
             if node_info["state"] == TASK_CONSTANTS.FAILED
         ]
         if not failed_nodes:

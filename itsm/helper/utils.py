@@ -40,6 +40,7 @@ from common.log import logger
 from config.default import BIZ_GROUP_CONF, IS_BIZ_GROUP
 from itsm.component.constants import DEFAULT_BK_BIZ_ID
 from itsm.component.esb.esbclient import client_backend
+from blueking.apigw.bkapis.bk_cmdb import CMDBApi
 from itsm.component.utils.basic import dotted_name
 from itsm.postman.models import RemoteApi, RemoteApiInstance
 from itsm.role.models import UserRole
@@ -527,13 +528,15 @@ def fix_cmdb_snap():
     print("connection close")
 
     def get_users(cmdb_role_key, bk_biz_id):
-        info = client_backend.cc.search_business(
-            {
+        client = CMDBApi.get_client()
+        info = client.search_business(
+            data={
                 "bk_supplier_id": 0,
                 "fields": [cmdb_role_key],
                 "condition": {"bk_biz_id": bk_biz_id},
                 "page": {"start": 0, "limit": 1000, "sort": ""},
-            }
+            },
+            path_params={"bk_supplier_account": "0"}
         ).get("info")
         if info:
             return info[0][cmdb_role_key]

@@ -1,5 +1,8 @@
 # Changelog
 
+## [Version: 2.9.0] - 2026-02-04
+【Feature】Supports multi-tenant
+
 ## [Version: 2.8.0] - 2025-10-30
 【Feature】Upgraded version dependencies: Python 3.11 and Django 4.2 
 【Feature】Added Ticket SN Number Update Tool

@@ -26,14 +26,18 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import hashlib
 import json
 from math import ceil
+
+from bkapi_client_core.exceptions import APIGatewayResponseError
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import gettext as _
 
+from blueking.apigw.bkapis.bk_cmdb import CMDBApi
+from blueking.apigw.bkapis.bk_sops import BkSopsApi
+from blueking.apigw.bkapis.bk_user import BkUserApi
 from common.log import logger
 from itsm.component.constants import CACHE_5MIN, CACHE_30MIN, PREFIX_KEY
 from itsm.component.esb.esbclient import client_backend
-from itsm.component.exceptions import ComponentCallError
 from itsm.component.esb.backend_component import bk
 from itsm.component.tasks import (
     update_user_cache,
@@ -108,8 +112,12 @@ def get_group(biz_group_conf, group_enum):
     # 再获取分组的模块信息
     params = {"bk_supplier_account": 0, "bk_obj_id": biz_group_conf["biz_obj_id"]}
     try:
-        search_group_list = client_backend.cc.search_inst(params).get("info")
-    except ComponentCallError as error:
+        client = CMDBApi.get_client()
+        search_group_list = client.search_inst(
+            data=params,
+            path_params={"bk_obj_id": params["bk_obj_id"]}
+        ).get("info")
+    except APIGatewayResponseError as error:
         logger.warning("获取分组信息失败：%s" % str(error))
         search_group_list = []
 
@@ -155,9 +163,11 @@ def get_attr_enum(bk_obj_id, enum_bk_property_id):
     :param enum_bk_property_id: 枚举属性的bk_property_id
     """
     enum = {}
-    attrs = client_backend.cc.search_object_attribute(
-        {"bk_obj_id": bk_obj_id, "bk_supplier_account": "0"}
-    )
+    client = CMDBApi.get_client()
+    attrs = client.search_object_attribute(
+        data={"bk_obj_id": bk_obj_id},
+        path_params={"bk_supplier_account": "0"}
+    ).get("info", [])
     for attr in attrs:
         if attr["bk_property_id"] == enum_bk_property_id:
             enum = {value["id"]: value["name"] for value in attr["option"]}
@@ -188,8 +198,12 @@ def get_all_apps():
     params = {"bk_supplier_id": 0, "fields": [], "condition": {}}
 
     try:
-        all_apps = client_backend.cc.search_business(params).get("info")
-    except ComponentCallError as error:
+        client = CMDBApi.get_client()
+        all_apps = client.search_business(
+            data=params,
+            path_params={"bk_supplier_account": "0"}
+        ).get("info")
+    except APIGatewayResponseError as error:
         logger.warning("获取业务列表失败：%s" % str(error))
         all_apps = []
     return all_apps
@@ -249,8 +263,13 @@ def get_list_department_profiles(params, page_size=500):
     """
 
     params["page_size"] = page_size
-    res = client_backend.usermanage.list_department_profiles(params)
-    count = res.get("count")
+    department_id = params.pop("id")
+    client = BkUserApi.get_client()
+    res = client.list_department_user(
+        path_params={"department_id": department_id},
+        params=params
+    )
+    count = res.get("count", 0)
 
     # 获取第一页的结果
     result = res.get("results", [])
@@ -260,7 +279,10 @@ def get_list_department_profiles(params, page_size=500):
     # 从第二页开始拉取
     for page in range(2, page_number + 1):
         params["page"] = page
-        res = client_backend.usermanage.list_department_profiles(params)
+        res = client.list_department_user(
+            path_params={"department_id": department_id},
+            params=params
+        )
         result.extend(res.get("results", []))
 
     return result
@@ -276,8 +298,9 @@ def get_list_departments(params, page_size=500):
     """
 
     params["page_size"] = page_size
-    res = client_backend.usermanage.list_departments(params)
-    count = res.get("count")
+    client = BkUserApi.get_client()
+    res = client.list_departments(params=params)
+    count = res.get("count", 0)
 
     # 获取第一页的结果
     result = res.get("results", [])
@@ -287,7 +310,7 @@ def get_list_departments(params, page_size=500):
     # 从第二页开始拉取
     for page in range(2, page_number + 1):
         params["page"] = page
-        res = client_backend.usermanage.list_departments(params)
+        res = client.list_departments(params=params)
         result.extend(res.get("results", []))
 
     return result
@@ -310,7 +333,7 @@ def get_department_users(department_id, recursive=False, detail=False):
             )
             users = [item["username"] for item in res]
             cache.set(cache_key, users, CACHE_5MIN)
-        except ComponentCallError as e:
+        except APIGatewayResponseError as e:
             logger.error(
                 "获取组织架构用户失败：department_id=%s, error=%s"
                 % (department_id, str(e))
@@ -325,8 +348,10 @@ def get_user_department_ids(username):
     获取用户的组织架构ID，用于提升用户的组织架构提单速度
     """
     try:
-        res = client_backend.usermanage.list_profile_departments(
-            {"id": username, "with_family": True}
+        client = BkUserApi.get_client()
+        res = client.list_user_department(
+            path_params={"bk_username": username},
+            params={"with_ancestors": True}
         )
         # 用户当前的组织架构id
         current_department_ids = [int(item["id"]) for item in res]
@@ -337,7 +362,7 @@ def get_user_department_ids(username):
 
         department_ids.extend(current_department_ids)
 
-    except ComponentCallError as e:
+    except APIGatewayResponseError as e:
         logger.error("获取用户部门ids失败：username=%s, error=%s" % (username, str(e)))
         return []
     return set(department_ids)
@@ -345,8 +370,11 @@ def get_user_department_ids(username):
 
 def get_department_info(department_id):
     try:
-        res = client_backend.usermanage.retrieve_department({"id": department_id})
-    except ComponentCallError as e:
+        client = BkUserApi.get_client()
+        res = client.retrieve_department(
+            path_params={"department_id": department_id}
+        )
+    except APIGatewayResponseError as e:
         logger.error(
             "获取组织架构详情失败：department_id=%s, error=%s" % (department_id, str(e))
         )
@@ -357,7 +385,7 @@ def get_department_info(department_id):
 def list_departments_info():
     try:
         res = get_list_departments({"fields": "name,id"})
-    except ComponentCallError as e:
+    except APIGatewayResponseError as e:
         logger.error("获取组织架构失败：error={}".format(str(e)))
         return []
     return res
@@ -379,7 +407,6 @@ def get_user_departments(username, id_only):
 def get_systems():
     """获取ESB中的组件系统列表"""
     try:
-        # res = client_backend.api_gateway.get_systems()
         res = bk.http(
             {
                 "path": "/api/c/compapi/v2/esb/get_systems/",
@@ -396,7 +423,6 @@ def get_systems():
 def get_components(system_names):
     """获取指定系统的组件列表"""
     try:
-        # res = client_backend.api_gateway.get_components({"system_names": system_names})
         res = bk.http(
             {
                 "path": "/api/c/compapi/v2/esb/get_components/",
@@ -419,20 +445,32 @@ def get_group_next_data(bk_obj_id, bk_inst_id):
         "bk_inst_id": bk_inst_id,
     }
     try:
-        rsp = client_backend.cc.search_inst_association_topo(params)
+        client = CMDBApi.get_client()
+        rsp = client.search_inst_association_topo(
+            data=params,
+            path_params={"bk_obj_id": bk_obj_id, "bk_inst_id": bk_inst_id}
+        )
         next_topo = rsp[0]["children"]
-    except (ComponentCallError, KeyError, IndexError, TypeError) as error:
+    except (APIGatewayResponseError, KeyError, IndexError, TypeError) as error:
         logger.warning("获取业务列表失败：%s" % str(error))
         next_topo = []
     return next_topo
 
 
-def get_template_list(bk_biz_id=2):
-    params = {"bk_biz_id": bk_biz_id, "template_source": "business"}
+def get_template_list(bk_biz_id=2, username=None):
+    """获取标准运维流程模板列表"""
     try:
-        response = client_backend.sops.get_template_list(**params)
+        if username:
+            _client = BkSopsApi.get_client_by_username(username)
+        else:
+            # 如果没有传入用户名，使用 admin 作为默认用户
+            _client = BkSopsApi.get_client_by_username("admin")
+        response = _client.get_template_list(
+            path_params={"bk_biz_id": bk_biz_id},
+            params={"template_source": "business"}
+        )
         return response
-    except Exception as error:
+    except APIGatewayResponseError as error:
         message = "获取标准运维流程列表出错，%s" % str(error)
         logger.warning(message)
         return []

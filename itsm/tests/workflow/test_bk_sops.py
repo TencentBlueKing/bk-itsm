@@ -32,6 +32,7 @@ from itsm.pipeline_plugins.components.collections.bk_sops import BkOpsService
 from itsm.service.models import CatalogService
 from itsm.ticket.models import Ticket
 from pipeline.core.data.base import DataObject
+from bkapi_client_core.exceptions import APIGatewayResponseError
 
 
 class PipelineTest(TestCase):
@@ -128,22 +129,19 @@ class PipelineTest(TestCase):
         self.assertEqual(result, False)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    @mock.patch("itsm.pipeline_plugins.components.collections.bk_sops.client_backend")
-    def test_schedule_without_taskid(self, client_backend):
-        client_backend.sops.get_task_status.return_value = {
-            "result": True,
-            "data": {
-                "retry": 0,
-                "name": "&lt;class 'pipeline.core.pipeline.Pipeline'&gt;",
-                "finish_time": "",
-                "skip": False,
-                "start_time": "2018-04-26 16:08:34 +0800",
-                "children": {},
-                "state": "FAILED",
-                "version": "",
-                "id": "5a1622f9f43e3429acb604e18dbd100a",
-                "loop": 1,
-            },
+    @mock.patch("itsm.pipeline_plugins.components.collections.bk_sops.BkSopsApi")
+    def test_schedule_without_taskid(self, mock_bk_sops_api):
+        mock_bk_sops_api.get_client.return_value.get_task_status.return_value = {
+            "retry": 0,
+            "name": "&lt;class 'pipeline.core.pipeline.Pipeline'&gt;",
+            "finish_time": "",
+            "skip": False,
+            "start_time": "2018-04-26 16:08:34 +0800",
+            "children": {},
+            "state": "FAILED",
+            "version": "",
+            "id": "5a1622f9f43e3429acb604e18dbd100a",
+            "loop": 1,
         }
         sops_service = BkOpsService(name="bk_sops")
         sops_service._runtime_attrs = {"by_flow": 1}
@@ -163,13 +161,12 @@ class PipelineTest(TestCase):
         self.assertEqual(result, False)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    @mock.patch("itsm.pipeline_plugins.components.collections.bk_sops.client_backend")
-    def test_schedule_false(self, client_backend):
-        client_backend.sops.get_task_status.return_value = {
-            "result": False,
-            "data": {},
-            "message": "error",
-        }
+    @mock.patch("itsm.pipeline_plugins.components.collections.bk_sops.BkSopsApi")
+    def test_schedule_false(self, mock_bk_sops_api):
+        # 模拟 API 调用抛出异常
+        mock_bk_sops_api.get_client.return_value.get_task_status.side_effect = APIGatewayResponseError(
+            "error"
+        )
         sops_service = BkOpsService(name="bk_sops")
         sops_service._runtime_attrs = {"by_flow": 1}
         schedule_data = DataObject(
@@ -188,23 +185,19 @@ class PipelineTest(TestCase):
         self.assertEqual(result, False)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    @mock.patch("itsm.pipeline_plugins.components.collections.bk_sops.client_backend")
-    def test_schedule_succeed(self, client_backend):
-        client_backend.sops.get_task_status.return_value = {
-            "result": True,
-            "data": {
-                "retry": 0,
-                "name": "&lt;class 'pipeline.core.pipeline.Pipeline'&gt;",
-                "finish_time": "",
-                "skip": False,
-                "start_time": "2018-04-26 16:08:34 +0800",
-                "children": {},
-                "state": "CREATED",
-                "version": "",
-                "id": "5a1622f9f43e3429acb604e18dbd100a",
-                "loop": 1,
-            },
-            "message": "error",
+    @mock.patch("itsm.pipeline_plugins.components.collections.bk_sops.BkSopsApi")
+    def test_schedule_succeed(self, mock_bk_sops_api):
+        mock_bk_sops_api.get_client.return_value.get_task_status.return_value = {
+            "retry": 0,
+            "name": "&lt;class 'pipeline.core.pipeline.Pipeline'&gt;",
+            "finish_time": "",
+            "skip": False,
+            "start_time": "2018-04-26 16:08:34 +0800",
+            "children": {},
+            "state": "CREATED",
+            "version": "",
+            "id": "5a1622f9f43e3429acb604e18dbd100a",
+            "loop": 1,
         }
         sops_service = BkOpsService(name="bk_sops")
         sops_service._runtime_attrs = {"by_flow": 1}
@@ -224,23 +217,19 @@ class PipelineTest(TestCase):
         self.assertEqual(result, True)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    @mock.patch("itsm.pipeline_plugins.components.collections.bk_sops.client_backend")
-    def test_schedule_failed(self, client_backend):
-        client_backend.sops.get_task_status.return_value = {
-            "result": True,
-            "data": {
-                "retry": 0,
-                "name": "&lt;class 'pipeline.core.pipeline.Pipeline'&gt;",
-                "finish_time": "",
-                "skip": False,
-                "start_time": "2018-04-26 16:08:34 +0800",
-                "children": {},
-                "state": "FAILED",
-                "version": "",
-                "id": "5a1622f9f43e3429acb604e18dbd100a",
-                "loop": 1,
-            },
-            "message": "error",
+    @mock.patch("itsm.pipeline_plugins.components.collections.bk_sops.BkSopsApi")
+    def test_schedule_failed(self, mock_bk_sops_api):
+        mock_bk_sops_api.get_client.return_value.get_task_status.return_value = {
+            "retry": 0,
+            "name": "&lt;class 'pipeline.core.pipeline.Pipeline'&gt;",
+            "finish_time": "",
+            "skip": False,
+            "start_time": "2018-04-26 16:08:34 +0800",
+            "children": {},
+            "state": "FAILED",
+            "version": "",
+            "id": "5a1622f9f43e3429acb604e18dbd100a",
+            "loop": 1,
         }
         sops_service = BkOpsService(name="bk_sops")
         sops_service._runtime_attrs = {"by_flow": 1}
@@ -260,23 +249,19 @@ class PipelineTest(TestCase):
         self.assertEqual(result, False)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    @mock.patch("itsm.pipeline_plugins.components.collections.bk_sops.client_backend")
-    def test_schedule_finished(self, client_backend):
-        client_backend.sops.get_task_status.return_value = {
-            "result": True,
-            "data": {
-                "retry": 0,
-                "name": "&lt;class 'pipeline.core.pipeline.Pipeline'&gt;",
-                "finish_time": "",
-                "skip": False,
-                "start_time": "2018-04-26 16:08:34 +0800",
-                "children": {},
-                "state": "FINISHED",
-                "version": "",
-                "id": "5a1622f9f43e3429acb604e18dbd100a",
-                "loop": 1,
-            },
-            "message": "error",
+    @mock.patch("itsm.pipeline_plugins.components.collections.bk_sops.BkSopsApi")
+    def test_schedule_finished(self, mock_bk_sops_api):
+        mock_bk_sops_api.get_client.return_value.get_task_status.return_value = {
+            "retry": 0,
+            "name": "&lt;class 'pipeline.core.pipeline.Pipeline'&gt;",
+            "finish_time": "",
+            "skip": False,
+            "start_time": "2018-04-26 16:08:34 +0800",
+            "children": {},
+            "state": "FINISHED",
+            "version": "",
+            "id": "5a1622f9f43e3429acb604e18dbd100a",
+            "loop": 1,
         }
         sops_service = BkOpsService(name="bk_sops")
         sops_service._runtime_attrs = {"by_flow": 1}
