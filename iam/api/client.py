@@ -20,6 +20,7 @@ from cachetools import cached, TTLCache
 from requests.models import PreparedRequest
 from django.conf import settings
 
+from blueking.apigw.utils import get_endpoint
 from .http import http_get, http_post, http_put, http_delete
 
 logger = logging.getLogger("iam")
@@ -29,14 +30,21 @@ BK_IAM_VERSION = "1"
 
 class Client(object):
     """
-    input: json
+    IAM客户端
+    - bk_iam_host: IAM直连地址，用于系统注册、资源管理等
+    - bk_paas_host: 已废弃，保留参数用于兼容，实际使用get_endpoint获取API网关地址
     """
 
-    def __init__(self, app_code, app_secret, bk_iam_host, bk_paas_host):
+    def __init__(self, app_code, app_secret, bk_iam_host, bk_paas_host=None):
         self._app_code = app_code
         self._app_secret = app_secret
         self._host = bk_iam_host
-        self._bk_paas_host = bk_paas_host
+        
+        # 直接使用API网关，通过get_endpoint自动获取完整URL
+        stage = "prod" if settings.RUN_MODE == "PRODUCT" else "stag"
+        self._bk_paas_host = get_endpoint("bk-iam", stage)
+        
+        logger.info(f"IAM Client initialized: iam_host={bk_iam_host}, apigw_host={self._bk_paas_host}")
 
     def _call_api(self, http_func, host, path, data, headers, timeout=None):
         url = "{host}{path}".format(host=host, path=path)
@@ -180,7 +188,7 @@ class Client(object):
 
     # return resource instance creator to iam, esb needed.
     def grant_resource_creator_actions(self, bk_token, bk_username, data):
-        path = "/api/c/compapi/v2/iam/authorization/resource_creator_action/"
+        path = "/api/v1/open/authorization/resource_creator_action/"
 
         ok, message, _data = self._call_esb_api(
             http_post,
@@ -297,7 +305,8 @@ class Client(object):
 
     # apply
     def get_apply_url(self, bk_token, bk_username, data):
-        path = "/api/c/compapi/v2/iam/application/"
+        """接入系统权限申请"""
+        path = "/api/v1/open/application/"
 
         ok, message, _data = self._call_esb_api(
             http_post,
@@ -313,7 +322,7 @@ class Client(object):
         return True, "success", _data.get("url", "")
 
     def instance_authorization(self, bk_token, bk_username, data):
-        path = "/api/c/compapi/v2/iam/authorization/instance/"
+        path = "/api/v1/open/authorization/instance/"
         ok, message, _data = self._call_esb_api(
             http_post,
             path,
@@ -327,7 +336,7 @@ class Client(object):
         return True, "success", _data.get("token", "")
 
     def path_authorization(self, bk_token, bk_username, data):
-        path = "/api/c/compapi/v2/iam/authorization/path/"
+        path = "/api/v1/open/authorization/path/"
         ok, message, _data = self._call_esb_api(
             http_post,
             path,

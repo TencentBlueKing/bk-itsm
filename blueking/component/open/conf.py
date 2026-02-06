@@ -40,7 +40,16 @@ try:
     #     'BK_PAAS_INNER_HOST',
     #     settings.BK_PAAS_HOST)
     HOST = getattr(settings, "BK_PAAS_INNER_HOST", settings.BK_PAAS_HOST)
-    COMPONENT_SYSTEM_HOST = os.environ.get("BK_COMPONENT_API_URL", HOST)
+    
+    # 优先使用网关接口
+    # 从 BK_API_URL_TMPL 中提取基础域名
+    BK_API_URL_TMPL = os.environ.get("BK_API_URL_TMPL", "")
+    if BK_API_URL_TMPL and "{api_name}" in BK_API_URL_TMPL:
+        # 移除 /api/{api_name} 部分，保留基础域名
+        COMPONENT_SYSTEM_HOST = BK_API_URL_TMPL.split("/api/")[0]
+    else:
+        COMPONENT_SYSTEM_HOST = os.environ.get("BK_COMPONENT_API_URL", HOST)
+    
     DEFAULT_BK_API_VER = getattr(settings, "DEFAULT_BK_API_VER", "v2")
 except BaseException:
     APP_CODE = ""

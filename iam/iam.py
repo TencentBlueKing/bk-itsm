@@ -30,10 +30,12 @@ logger = logging.getLogger("iam")
 
 class IAM(object):
     """
-    input: object
+    IAM SDK主类
+    - bk_iam_host: IAM直连地址，用于系统注册、资源管理等
+    - bk_paas_host: 已废弃，保留参数用于兼容，实际使用get_endpoint获取API网关地址
     """
 
-    def __init__(self, app_code, app_secret, bk_iam_host, bk_paas_host):
+    def __init__(self, app_code, app_secret, bk_iam_host, bk_paas_host=None):
         self._client = Client(app_code, app_secret, bk_iam_host, bk_paas_host)
 
     def _do_policy_query(self, request, with_resources=True):
