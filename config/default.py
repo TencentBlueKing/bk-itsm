@@ -840,6 +840,10 @@ BK_API_USE_TEST_ENV = True if os.environ.get("BK_API_USE_TEST_ENV") == "True" el
 IAM_ESB_PAAS_HOST = os.environ.get("BK_COMPONENT_API_URL", BK_PAAS_INNER_HOST)
 BK_IAM_ESB_PAAS_HOST = os.environ.get("BK_IAM_ESB_PAAS_HOST", IAM_ESB_PAAS_HOST)
 
+# iam网关适配容器化
+IAM_APIGW_PAAS_HOST = os.environ.get("BK_API_URL_TMPL", BK_PAAS_INNER_HOST)
+BK_IAM_APIGW_PAAS_HOST = os.environ.get("BK_IAM_APIGW_PAAS_HOST", IAM_APIGW_PAAS_HOST)
+
 IAM_INITIAL_FILE = os.environ.get("BKAPP_IAM_INITIAL_FILE", "")
 
 CALLBACK_AES_KEY = "APPROVAL_RESULT"
@@ -1038,3 +1042,18 @@ AUTO_TIMEOUT_MINUTES = os.getenv("AUTO_TIMEOUT_MINUTES", 30)
 # 多租户
 BKPAAS_APP_TENANT_ID = os.getenv("BKPAAS_APP_TENANT_ID", "")
 
+
+# OAuth 认证配置
+BKAUTH_BACKEND_TYPE = "bk_ticket" if RUN_VER == "ieod" else "bk_token"
+
+# 仅社区版需要配置，其它版本已由开发框架处理
+if BKAUTH_BACKEND_TYPE == 'bk_token':
+    OAUTH_COOKIES_PARAMS = {"bk_token": "bk_token", "bk_uid": "bk_uid"}
+
+    os.environ['OAUTH_API_URL'] = (
+        os.getenv('BKAPP_OAUTH_API_URL') or
+        os.getenv('BKPAAS_SSM_API_URL')
+    )
+
+    # OAuth 临近过期时间：生效期在 1 小时内则自动刷新 token
+    EXPIRES_SECONDS = 60 * 60
