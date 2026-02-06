@@ -48,11 +48,12 @@ from itsm.workflow.models import TemplateField
 
 class IamRequest(object):
     def __init__(self, request=None, username=None):
+        # 直接使用API网关，Client内部会通过get_endpoint自动获取完整URL
         self._iam = IAM(
             settings.APP_CODE,
             settings.SECRET_KEY,
             settings.BK_IAM_INNER_HOST,
-            settings.BK_IAM_ESB_PAAS_HOST,
+            None,  # bk_paas_host参数已废弃，保留用于兼容
         )
         self.request = request
         self.username = username
@@ -249,11 +250,12 @@ def grant_resource_creator_related_actions(
     if creator == "admin":
         return
 
+    # 直接使用API网关，Client内部会通过get_endpoint自动获取完整URL
     iam_client = Client(
         settings.APP_CODE,
         settings.SECRET_KEY,
         settings.BK_IAM_INNER_HOST,
-        settings.BK_IAM_ESB_PAAS_HOST,
+        None,  # bk_paas_host参数已废弃，保留用于兼容
     )
     if not bk_token:
         try:
