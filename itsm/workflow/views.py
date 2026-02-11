@@ -262,13 +262,16 @@ class WorkflowViewSet(
             # 流程是否有效的校验
             WorkflowPipelineValidator(instance)()
         except WorkFlowInvalidError as error:
-            logger.exception(error)
+            logger.exception(
+                "[WorkflowViewSet.create_accept_transitions] Workflow validation failed, "
+                f"workflow_id={instance.id}"
+            )
             return Response(
                 {
                     "result": False,
                     "code": error.code,
                     "data": {"invalid_state_ids": error.invalid_state_ids},
-                    "message": str(error),
+                    "message": _("流程验证失败，请检查流程配置"),
                 }
             )
         return Response()

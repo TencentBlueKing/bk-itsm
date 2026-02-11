@@ -266,22 +266,23 @@ def fbv_exception_handler(view_func):
                 }
             )
         except KeyError as e:
+            logger.error("接口异常，缺少请求参数: {}".format(e))
             return JsonResponse(
                 {
                     "result": False,
                     "code": ParamError.ERROR_CODE_INT,
                     "data": None,
-                    "message": _("接口异常，缺少请求参数: {}").format(e),
+                    "message": _("接口异常，缺少请求参数"),
                 }
             )
         except Exception as e:
-            logger.error(traceback.format_exc())
+            logger.error("接口异常，{}，{}".format(e, traceback.format_exc()))
             return JsonResponse(
                 {
                     "result": False,
                     "code": ServerError.ERROR_CODE_INT,
                     "data": None,
-                    "message": _("接口异常: {}").format(e),
+                    "message": _("接口异常"),
                 }
             )
         return response

@@ -27,6 +27,7 @@ __author__ = "蓝鲸智云"
 __copyright__ = "Copyright © 2025 Tencent BlueKing. All Rights Reserved."
 
 import datetime
+import logging
 import subprocess
 
 from django.conf import settings
@@ -34,6 +35,9 @@ from django.contrib.auth.decorators import permission_required
 from django.db import connection
 from django.http import HttpResponse
 from django.utils.translation import gettext as _
+
+
+logger = logging.getLogger(__name__)
 
 
 @permission_required("is_superuser")
@@ -77,9 +81,17 @@ def dump_db(request):
                 datetime.datetime.now(),
             )
     except IOError:
+        logger.exception(
+            "[dump_db] Database dump file not found, dbfile=%s", dbfile
+        )
         return HttpResponse(_("<h3>磁盘中不存在该文件!</h3>"))
     except Exception as e:
-        return HttpResponse(_("<h3>系统异常!</h3><br><p>%s</p>") % e)
+        logger.exception("[dump_db] System exception occurred")
+        return HttpResponse(
+            _(
+                "<h3>系统异常!</h3><br><p>数据库导出失败，请检查服务器日志或联系管理员</p>"
+            )
+        )
     return response
 
 

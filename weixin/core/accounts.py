@@ -33,6 +33,7 @@ import urllib.parse
 import urllib.request
 
 from django.http import HttpResponse, HttpResponseRedirect
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from common.log import logger
 from . import settings as weixin_settings
@@ -204,6 +205,9 @@ class WeixinAccount(WeixinAccountSingleton):
         获取实际访问的URL
         """
         callback_url = request.GET.get('c_url') or weixin_settings.WEIXIN_SITE_URL
+        allowed_hosts = {request.get_host(), weixin_settings.WEIXIN_APP_EXTERNAL_HOST}
+        if not url_has_allowed_host_and_scheme(callback_url, allowed_hosts=allowed_hosts):
+            callback_url = weixin_settings.WEIXIN_SITE_URL
         return callback_url
 
     def login(self, request):

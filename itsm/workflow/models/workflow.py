@@ -24,9 +24,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 from collections import OrderedDict
 
+import jsonfield
+import logging
 import six
 
-import jsonfield
 from django.db import models, transaction
 from django.db.models import Q
 from django.forms import model_to_dict
@@ -74,6 +75,9 @@ from .base import Model
 from .field import Field, Table
 from .task import TaskSchema, TaskConfig
 from .common import GlobalVariable, Notify
+
+
+logger = logging.getLogger(__name__)
 
 
 class WorkflowBase(ObjectManagerMixin, Model):
@@ -223,9 +227,13 @@ class Workflow(WorkflowBase):
             try:
                 field_info = field.tag_data()
             except Exception as err:
+                logger.exception(
+                    "[Workflow.tag_data] Field validation failed, "
+                    f"workflow_id={self.id}, state_name={field.state.name}, field_name={field.name}"
+                )
                 raise ValidationError(
-                    "节点{}字段{}存在异常,请检查字段配置,详情:{}".format(
-                        field.state.name, field.name, err
+                    _("节点{}字段{}存在异常,请检查字段配置").format(
+                        field.state.name, field.name
                     )
                 )
             fields[str(field.id)] = field_info

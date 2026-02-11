@@ -226,9 +226,13 @@ def get_plugin_api_data(request: Request, plugin_code: str, data_api_path: str):
     try:
         client = PluginServiceApiClient(plugin_code)
     except PluginServiceException as e:
-        message = f"[get_plugin_api_data] error: {e}"
-        logger.error(message)
-        return JsonResponse({"message": message, "result": False, "data": None})
+        logger.exception(f"[get_plugin_api_data] PluginServiceException: plugin_code={plugin_code},"
+                         f" error={e}")
+        return JsonResponse({
+            "message": "插件服务初始化失败，请检查插件配置或联系管理员",
+            "result": False,
+            "data": None
+        })
     # 注入插件特定前缀HEADER
     http_headers = dict(
         [

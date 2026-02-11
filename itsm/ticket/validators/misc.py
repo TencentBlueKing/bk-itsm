@@ -125,7 +125,8 @@ def sms_invite_validate(ticket, numbers, invitor):
         try:
             Regex(validate_type="phone_num").validate(number)
         except Exception as error:
-            raise serializers.ValidationError("【{}】{}".format(number, str(error)))
+            logger.exception(f"[sms_invite_validate] Invalid phone number: {number}")
+            raise serializers.ValidationError(_("【{}】手机号格式不正确").format(number))
 
 
 def email_invite_validate(ticket, invitor, receivers):

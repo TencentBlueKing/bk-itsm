@@ -32,8 +32,12 @@ def inject_plugin_client(func):
         try:
             plugin_client = PluginServiceApiClient(plugin_code)
         except PluginServiceException as e:
-            logger.error(f"[inject_plugin_client] error: {e}")
-            return JsonResponse({"message": e, "result": False, "data": None})
+            logger.exception(f"[inject_plugin_client] PluginServiceException: plugin_code={plugin_code}, error={e}")
+            return JsonResponse({
+                "message": "插件服务初始化失败，请检查插件配置或联系管理员",
+                "result": False,
+                "data": None
+            })
         setattr(request, "plugin_client", plugin_client)
         return func(request)
 

@@ -24,10 +24,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import json
+import logging
 import requests
 from django.conf import settings
 
 from django.http import HttpResponse, JsonResponse
+from rest_framework import status
 from django.shortcuts import redirect
 from revproxy.views import ProxyView
 
@@ -39,6 +41,8 @@ from sops_proxy.settings import (
     BK_ESB_PAAS_HOST,
 )
 from sops_proxy.utils import normalize_request_headers, get_django_response
+
+logger = logging.getLogger(__name__)
 
 
 def dispatch_static(request, path):
@@ -57,7 +61,12 @@ def dispatch_static(request, path):
             content_type=res.headers._store["content-type"][1],
         )
     except Exception as e:
-        return HttpResponse("dispatch_static exception: {}".format(e))
+        logger.exception(
+            "[dispatch_static] Failed to get static resource, "
+            f"sops_url={sops_url}, path={path}, exception={e}"
+        )
+        return HttpResponse("获取静态资源失败，请稍后重试或联系管理员", 
+                            status=status.HTTP_502_BAD_GATEWAY)
 
 
 def dispatch_query(request, path):
@@ -101,20 +110,26 @@ def dispatch_query(request, path):
             return JsonResponse(proxy_response.json())
 
         except Exception as e:
+            logger.exception(
+                "[dispatch_query] Failed to proxy request to SOPS, "
+                f"sops_path={sops_path}, path={path}"
+            )
             return JsonResponse(
                 {
                     "result": False,
-                    "message": "[{}]: dispatch_query post exception: {}".format(
-                        path, e
-                    ),
+                    "message": "代理SOPS请求失败，请稍后重试或联系管理员",
                 }
             )
 
     except Exception as e:
+        logger.exception(
+            "[dispatch_query] Failed to process request, "
+            f"full_path={full_path}, path={path}"
+        )
         return JsonResponse(
             {
                 "result": False,
-                "message": "[{}]: dispatch_query self exception: {}".format(path, e),
+                "message": "处理请求时发生异常，请稍后重试或联系管理员",
             }
         )
 

@@ -223,6 +223,6 @@ class FollowersNotifyLogViewSet(component_viewsets.NormalModelViewSet):
             error_message = _("组件调用异常：发送失败，请联系管理员")
 
         if error_message:
-            raise serializers.ValidationError(error_message)
+            raise serializers.ValidationError("邮件发送失败，请稍后重试或联系管理员")
 
         return Response()

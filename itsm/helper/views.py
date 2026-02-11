@@ -30,8 +30,11 @@ __copyright__ = "Copyright © 2025 Tencent BlueKing. All Rights Reserved."
 
 import datetime
 import json
+import logging
 
 from django.contrib.auth.decorators import permission_required
+
+logger = logging.getLogger(__name__)
 from django.db.models import F
 from django.http import HttpResponse
 
@@ -67,7 +70,8 @@ def db_fix_for_blueapps_after_2_6_0(request):
         _db_fix_for_blueapps_after_2_6_0.delay()
         return HttpResponse("_db_fix_for_blueapps_after_2_6_0: 任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse('任务下发异常:%s' % e)
+        logger.exception("[db_fix_for_blueapps_after_2_6_0] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 @permission_required('is_superuser')
@@ -77,7 +81,8 @@ def db_fix_for_workflow_after_2_5_9(request):
         _db_fix_for_workflow_to_2_5_9.delay()
         return HttpResponse("_db_fix_for_workflow_to_2_5_9: 任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse('任务下发异常:%s' % e)
+        logger.exception("[db_fix_for_workflow_after_2_5_9] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 @permission_required('is_superuser')
@@ -87,7 +92,8 @@ def db_fix_for_service_catalog(request):
         _db_fix_for_service_catalog.delay()
         return HttpResponse("db_fix_for_service_catalog: 任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse('任务下发异常:%s' % e)
+        logger.exception("[db_fix_for_service_catalog] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 @permission_required('is_superuser')
@@ -97,7 +103,8 @@ def db_fix_after_2_3_1(request):
         _db_fix_default_value_for_field.delay()
         return HttpResponse("db_fix_after_2_3_1: 任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse('任务下发异常:%s' % e)
+        logger.exception("[db_fix_after_2_3_1] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 @permission_required('is_superuser')
@@ -107,7 +114,8 @@ def db_fix_after_2_2_17(request):
         _db_fix_for_ticket_processors.delay()
         return HttpResponse("db_fix_after_2_2_17: 任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse('任务下发异常:%s' % e)
+        logger.exception("[db_fix_after_2_2_17] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 @permission_required('is_superuser')
@@ -116,7 +124,8 @@ def db_fix_for_attachments(request):
         _db_fix_for_attachments.delay()
         return HttpResponse("_db_fix_for_attachments: 任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse('任务下发异常:%s' % e)
+        logger.exception("[db_fix_for_attachments] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 @permission_required('is_superuser')
@@ -138,7 +147,8 @@ def update_logs_type(request):
         _update_logs_type.apply_async()
         return HttpResponse("_update_logs_type: 任务下发到后台，请耐心等待，具体结果，请查看celery日志.")
     except Exception as e:
-        return HttpResponse('任务下发异常:%s' % e)
+        logger.exception("[update_logs_type] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 @permission_required("is_superuser")
@@ -148,7 +158,8 @@ def fix_ticket_title(request):
         _fix_ticket_title.apply_async()
         return HttpResponse("_fix_ticket_title: 任务下发到后台，请耐心等待，具体结果，请查看celery日志.")
     except Exception as e:
-        return HttpResponse('任务下发异常:%s' % e)
+        logger.exception("[fix_ticket_title] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 @permission_required("is_superuser")
@@ -157,7 +168,8 @@ def db_fix_after_2_0_3(request):
         _db_fix_after_2_0_3.apply_async()
         return HttpResponse("_db_fix_after_2_0_3: 任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse('任务下发异常:%s' % e)
+        logger.exception("[db_fix_after_2_0_3] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 @permission_required("is_superuser")
@@ -167,7 +179,8 @@ def db_fix_after_2_1_x(request):
         _db_fix_after_2_1_x.delay()
         return HttpResponse("_db_fix_after_2_1_x: 任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse('任务下发异常:%s' % e)
+        logger.exception("[db_fix_after_2_1_x] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 @permission_required("is_superuser")
@@ -179,7 +192,8 @@ def db_fix_ticket_end_at_after_2_0_5(request):
 
         return HttpResponse("命令执行成功")
     except Exception as e:
-        return HttpResponse("任务执行失败：%s" % e)
+        logger.exception("[db_fix_ticket_end_at_after_2_0_5] 任务执行异常")
+        return HttpResponse("任务执行失败，请检查服务器日志或联系管理员")
 
 
 @permission_required("is_superuser")
@@ -189,7 +203,8 @@ def db_fix_deal_time_after_2_0_5(request):
             log.update_deal_time()
         return HttpResponse("命令执行成功")
     except Exception as e:
-        return HttpResponse("任务执行失败：%s" % e)
+        logger.exception("[db_fix_deal_time_after_2_0_5] 任务执行异常")
+        return HttpResponse("任务执行失败，请检查服务器日志或联系管理员")
 
 
 @permission_required("is_superuser")
@@ -198,7 +213,8 @@ def db_fix_after_2_0_7(request):
         _db_fix_after_2_0_7.apply_async()
         return HttpResponse("任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse("任务下发异常：%s" % e)
+        logger.exception("[db_fix_after_2_0_7] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 @permission_required("is_superuser")
@@ -207,7 +223,8 @@ def db_fix_after_2_0_9(request):
         _db_fix_after_2_0_9.apply_async()
         return HttpResponse("任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse("任务下发异常：%s" % e)
+        logger.exception("[db_fix_after_2_0_9] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 @permission_required("is_superuser")
@@ -219,7 +236,8 @@ def db_fix_after_2_0_14(request):
         _db_fix_after_2_0_14.apply_async()
         return HttpResponse("任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse("任务下发异常：%s" % e)
+        logger.exception("[db_fix_after_2_0_14] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 @permission_required("is_superuser")
@@ -233,7 +251,8 @@ def db_fix_after_2_1_1(request):
         _db_fix_after_2_1_1.apply_async()
         return HttpResponse("任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse("任务下发异常：%s" % e)
+        logger.exception("[db_fix_after_2_1_1] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 def db_fix_sla(request):
@@ -241,7 +260,8 @@ def db_fix_sla(request):
         _db_fix_sla.apply_async()
         return HttpResponse("任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse("任务下发异常：%s" % e)
+        logger.exception("[db_fix_sla] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 def db_fix_after_2_1_9(request):
@@ -249,7 +269,8 @@ def db_fix_after_2_1_9(request):
         _db_fix_after_2_1_9.apply_async()
         return HttpResponse("任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse("任务下发异常：%s" % e)
+        logger.exception("[db_fix_after_2_1_9] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 @permission_required('is_superuser')
@@ -258,7 +279,8 @@ def db_fix_from_1_1_22_to_2_1_16(request):
         _db_fix_from_1_1_22_to_2_1_x.apply_async()
         return HttpResponse("任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse("任务下发异常：%s" % e)
+        logger.exception("[db_fix_from_1_1_22_to_2_1_16] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 def db_fix_from_2_1_x_to_2_2_1(request):
@@ -266,7 +288,8 @@ def db_fix_from_2_1_x_to_2_2_1(request):
         _db_fix_from_2_1_x_to_2_2_1.apply_async()
         return HttpResponse("任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
     except Exception as e:
-        return HttpResponse("任务下发异常：%s" % e)
+        logger.exception("[db_fix_from_2_1_x_to_2_2_1] 任务下发异常")
+        return HttpResponse('任务下发异常，请检查服务器日志或联系管理员')
 
 
 @permission_required('is_superuser')
@@ -276,5 +299,6 @@ def weekly_statical(request):
     try:
         weekly_statical_task()
     except BaseException as error:
-        return HttpResponse("发送邮件任务失败： %s" % str(error))
+        logger.exception("[weekly_statical] 任务执行异常")
+        return HttpResponse("发送邮件任务失败，请检查服务器日志或联系管理员")
     return HttpResponse("发送邮件任务已完成")

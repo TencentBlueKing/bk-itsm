@@ -148,12 +148,12 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
         try:
             return processor(request, data, request_id)
         except InvalidPageException as e:
-            return fail_response(422, str(e), request_id)
+            return fail_response(422, "Invalid page parameters", request_id)
         except Exception as e:
             logger.exception(
                 "resource request({}) failed with exception: {}".format(request_id, e)
             )
-            return fail_response(500, str(e), request_id)
+            return fail_response(500, "Internal server error", request_id)
 
     def _get_options(self, request):
         return {"language": request.META.get("HTTP_BLUEKING_LANGUAGE", "zh-cn")}

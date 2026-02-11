@@ -23,6 +23,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+import logging
+
 from collections import OrderedDict
 
 import six
@@ -30,6 +32,8 @@ from django.core.paginator import InvalidPage
 from rest_framework.exceptions import NotFound
 from rest_framework.pagination import PageNumberPagination, _positive_int
 from rest_framework.response import Response
+
+logger = logging.getLogger(__name__)
 
 
 class CustomPageNumberPagination(PageNumberPagination):
@@ -112,10 +116,13 @@ class OpenApiPageNumberPagination(CustomPageNumberPagination):
         try:
             self.page = paginator.page(page_number)
         except InvalidPage as exc:
-            msg = self.invalid_page_message.format(
-                page_number=page_number, message=six.text_type(exc)
+            # 记录详细的异常信息到日志，包含请求参数
+            logger.exception(
+                "[OpenApiPageNumberPagination.paginate_queryset] Invalid page error, "
+                f"page_number={page_number}, page_size={page_size}"
             )
-            raise NotFound(msg)
+            # 返回模糊的错误提示，不泄露内部异常详情
+            raise NotFound("无效的页码，请检查分页参数")
 
         if paginator.num_pages > 1 and self.template is not None:
             # The browsable API should display pagination controls.

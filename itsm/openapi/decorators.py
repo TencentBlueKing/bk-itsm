@@ -65,13 +65,14 @@ def catch_openapi_exception(view_func):
                 }
             )
         except Exception as e:
-            logger.error(traceback.format_exc())
+            logger.exception("[catch_openapi_exception] "
+                             "{}".format(_("接口异常，请检查请求参数: {}").format(e)))
             return Response(
                 {
                     "result": False,
                     "code": OperateTicketError.ERROR_CODE_INT,
                     "data": None,
-                    "message": _("接口异常，请检查请求参数: {}").format(e),
+                    "message": _("接口异常，请检查请求参数"),
                 }
             )
 
