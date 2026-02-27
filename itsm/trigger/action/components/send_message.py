@@ -205,7 +205,7 @@ class SendMessage(BaseComponent):
         :param params_schema:
         :param action_id:
         """
-        super(SendMessage, self).__init__(context, params_schema, action_id, countdown)
+        BaseComponent.__init__(self, context, params_schema, action_id, countdown)
 
         # 初始化子组件
         self.sub_actions = []
