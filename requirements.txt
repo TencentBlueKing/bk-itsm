@@ -41,7 +41,7 @@ bleach==6.1.0
 django-classy-tags==4.1.0
 django-mptt==0.16.0
 django-mptt-admin==2.7.0
-django-nyt==1.4.1
+django-nyt==1.5.0
 django-sekizai==4.1.0
 Markdown==3.5.2
 pillow>=10.3.0,<10.4
