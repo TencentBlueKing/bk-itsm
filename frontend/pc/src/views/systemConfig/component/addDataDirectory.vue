@@ -178,6 +178,7 @@
   import memberSelect from '../../commonComponent/memberSelect';
   import SelectTree from '../../../components/form/selectTree/index.vue';
   import { errorHandler } from '../../../utils/errorHandler';
+  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'addData',
@@ -389,6 +390,7 @@
       },
       // 删除
       openDelete(item) {
+        if (guardWriteAction(this, '删除字典数据')) return;
         this.$bkInfo({
           type: 'warning',
           title: this.$t('m.systemConfig["确认删除该条数据？"]'),
@@ -419,6 +421,7 @@
         });
       },
       submitDictionary() {
+        if (guardWriteAction(this, '保存数据字典')) return;
         this.$refs.dialogForm.validate().then(() => {
           // create or update
           if (!this.dictDataTable.formInfo.id) {

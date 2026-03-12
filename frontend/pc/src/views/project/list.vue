@@ -25,11 +25,13 @@
     <i class="bk-icon icon-close-line-2 back-icon" @click="handleGoBack"></i>
     <div class="action-wrap">
       <bk-button
+        v-bk-tooltips="{ content: '当前为只读模式', disabled: !isReadOnly }"
         v-cursor="{ active: !hasPermission(['project_create']) }"
         :class="[{
           'btn-permission-disable': !hasPermission(['project_create'])
         }]"
         theme="primary"
+        :disabled="isReadOnly"
         @click="onCreateProject">
         {{ $t('m["新建"]') }}
       </bk-button>
@@ -137,6 +139,7 @@
   import i18n from '@/i18n/index.js';
   import { errorHandler } from '@/utils/errorHandler.js';
   import permission from '@/mixins/permission.js';
+  import { guardWriteAction } from '@/utils/readOnly';
   import EditProjectDialog from './editProjectDialog.vue';
   import Empty from '../../components/common/Empty.vue';
 
@@ -302,6 +305,7 @@
         this.isDeleteDialogShow = true;
       },
       async onDeleteProjectConfirm() {
+        if (guardWriteAction(this, '删除项目')) return;
         this.deleteProjectPending = true;
         try {
           await this.$store.dispatch('project/deleteProject', this.editingProject.key);

@@ -170,6 +170,7 @@
 
 <script>
   import { errorHandler } from '../../utils/errorHandler';
+  import { guardWriteAction } from '@/utils/readOnly';
   import addDataDirectory from './component/addDataDirectory.vue';
   import useModalCloseConfirmation from '@/utils/use-modal-close-confirmation';
   import Empty from '../../components/common/Empty.vue';
@@ -274,6 +275,7 @@
       },
       // 删除数据
       deleteData(item) {
+        if (guardWriteAction(this, '删除数据字典')) return;
         this.$bkInfo({
           type: 'warning',
           title: this.$t('m.systemConfig["确认删除此数据字典？"]'),
@@ -304,6 +306,7 @@
         });
       },
       deleteAll() {
+        if (guardWriteAction(this, '删除数据字典')) return;
         this.$bkInfo({
           type: 'warning',
           title: this.$t('m.systemConfig["确认删除此数据字典？"]'),

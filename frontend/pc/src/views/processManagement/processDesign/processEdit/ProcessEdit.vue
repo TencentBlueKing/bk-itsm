@@ -140,6 +140,7 @@
   import signNode from '../nodeConfigue/signNode.vue';
   import ApprovalNode from '../nodeConfigue/ApprovalNode.vue';
   import { errorHandler } from '../../../../utils/errorHandler';
+  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'ProcessEdit',
@@ -331,6 +332,7 @@
        * @param { Boolean } new 是否新建
        */
       saveFlowInfo(params, isNew) {
+        if (guardWriteAction(this, '流程信息保存')) return;
         const api = isNew ? 'cdeploy/createFlow' : 'cdeploy/changeDesign';
         this.isSaveing = true;
         const id = this.processId;

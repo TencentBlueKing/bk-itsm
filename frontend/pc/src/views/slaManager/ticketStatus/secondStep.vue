@@ -162,6 +162,7 @@
 
 <script>
   import { errorHandler } from '../../../utils/errorHandler.js';
+  import { guardWriteAction } from '@/utils/readOnly';
   import commonMix from '../../commonMix/common.js';
   import cookie from 'cookie';
   export default {
@@ -231,6 +232,7 @@
         this.$parent.backTab();
       },
       async ajaxSubmit() {
+        if (guardWriteAction(this, '工单状态操作')) return;
         await this.saveTypeFlow();
         const params = {
           name: '启动',
@@ -354,6 +356,7 @@
       },
       // 保存指定服务类型下的工单自动流转状态
       async saveTypeFlow() {
+        if (guardWriteAction(this, '工单状态操作')) return;
         const transits = [];
         const type = this.statusType;
         this.dataList.forEach(item => {
@@ -387,6 +390,7 @@
             title: this.$t('m.slaContent["确认取消？"]'),
             subTitle: this.$t('m.slaContent["确认后，将取消自动流转！"]'),
             confirmFn: () => {
+              if (guardWriteAction(this, '工单状态操作')) return;
               const id = itemRow.id;
               if (this.secondClick) {
                 return;
@@ -456,6 +460,7 @@
         });
       },
       ajaxConfirmFn() {
+        if (guardWriteAction(this, '工单状态操作')) return;
         const params = {
           to_status: this.isAutoTemp.info.id,
           threshold: this.isAutoTemp.info.threshold,

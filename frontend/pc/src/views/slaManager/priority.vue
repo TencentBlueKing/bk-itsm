@@ -105,6 +105,7 @@
 
 <script>
   import { errorHandler } from '../../utils/errorHandler';
+  import { guardWriteAction } from '@/utils/readOnly';
   import priorityTable from './priorityTable/priorityTable.vue';
   import permission from '@/mixins/permission.js';
 
@@ -212,6 +213,7 @@
       },
       // 保存
       submitEditor() {
+        if (guardWriteAction(this, '保存优先级')) return;
         // 校验
         if (this.$refs.priorityTable) {
           this.$refs.priorityTable.isSub = true;

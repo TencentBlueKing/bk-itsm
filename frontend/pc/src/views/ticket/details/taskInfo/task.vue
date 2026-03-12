@@ -415,6 +415,7 @@
   import taskLibrary from './taskLibrary.vue';
   import taskHandleTrigger from './taskHandleTrigger';
   import { errorHandler } from '@/utils/errorHandler';
+  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'task',
@@ -643,6 +644,7 @@
       },
       // 删除列表数据
       deleteTask(item) {
+        if (guardWriteAction(this, '删除任务')) return;
         this.$bkInfo({
           type: 'warning',
           title: this.$t('m.task[\'确认删除任务？\']'),
@@ -703,6 +705,7 @@
         this.minWidth = 180;
       },
       submitOrder(value) {
+        if (guardWriteAction(this, '提交任务')) return;
         const { id } = value;
         const params = {
           order: Number(value.orderInfo),
