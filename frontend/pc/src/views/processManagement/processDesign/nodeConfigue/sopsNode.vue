@@ -166,6 +166,7 @@
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import { errorHandler } from '../../../../utils/errorHandler';
   import { deepClone } from '@/utils/util.js';
+  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'sopsDevopsTask',
@@ -563,6 +564,7 @@
         this.$parent.closeConfigur();
       },
       submit() {
+        if (guardWriteAction(this, '节点配置保存')) return;
         // 处理人为空校验
         if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
           this.checkStatus.processors = true;

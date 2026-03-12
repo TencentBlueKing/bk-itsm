@@ -201,6 +201,7 @@
   import addField from '../addField';
   import inheritState from './inheritState';
   import { errorHandler } from '../../../../../utils/errorHandler';
+  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'fieldInfo',
@@ -513,6 +514,7 @@
       },
       // 删除字段
       deleteTable(item) {
+        if (guardWriteAction(this, '删除字段')) return;
         this.$bkInfo({
           type: 'warning',
           title: this.$t('m.treeinfo["确认删除此字段？"]'),
@@ -554,6 +556,7 @@
         this.moduleInfo.isShow = true;
       },
       submitModule() {
+        if (guardWriteAction(this, '添加模型字段')) return;
         const checkList = this.$refs.inheritState.checkList.filter(item => !item.is_disabled);
         if (checkList.length) {
           const params = {

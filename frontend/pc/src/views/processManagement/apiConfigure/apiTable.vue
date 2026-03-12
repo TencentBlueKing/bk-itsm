@@ -212,6 +212,7 @@
 </template>
 
 <script>
+  import { guardWriteAction } from '@/utils/readOnly';
   import { errorHandler } from '../../../utils/errorHandler';
   import addApiInfo from './addApiInfo.vue';
   import permission from '@/mixins/permission.js';
@@ -424,6 +425,7 @@
       },
       // 二次弹窗确认
       openDelete(item) {
+        if (guardWriteAction(this, '删除API')) return;
         if (!this.hasPermission(this.targetPerms, this.curPerms)) {
           this.applyPerm();
           return;
@@ -455,6 +457,7 @@
         });
       },
       deleteCheck() {
+        if (guardWriteAction(this, '删除API')) return;
         if (!this.hasPermission(this.targetPerms, this.curPerms)) {
           this.applyPerm();
           return;

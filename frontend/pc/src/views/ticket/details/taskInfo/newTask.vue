@@ -133,6 +133,7 @@
   import commonMix from '@/views/commonMix/common.js';
   import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
   import { errorHandler } from '@/utils/errorHandler';
+  import { guardWriteAction } from '@/utils/readOnly';
   import { deepClone } from '@/utils/util';
 
   export default {
@@ -287,6 +288,7 @@
         this.$emit('closeSlider');
       },
       submitTask() {
+        if (guardWriteAction(this, '创建任务')) return;
         const params = {
           processors: '',
           processors_type: '',
