@@ -190,6 +190,7 @@
 
 <script>
 import { errorHandler } from "../../../utils/errorHandler.js";
+import { guardWriteAction } from "@/utils/readOnly";
 import commonMix from "../../commonMix/common.js";
 import cookie from "cookie";
 import Empty from "../../../components/common/Empty.vue";
@@ -405,6 +406,7 @@ export default {
       this.addStatusDialog.isShow = false;
     },
     confirmFn() {
+      if (guardWriteAction(this, '工单状态操作')) return;
       this.$refs.addStatus.validate().then(
         (validator) => {
           this.secondClick = true;
@@ -475,6 +477,7 @@ export default {
         type: "warning",
         title: this.$t(`m.slaContent["确认删除？"]`),
         confirmFn: () => {
+          if (guardWriteAction(this, '工单状态操作')) return;
           const id = item.id;
           if (this.secondClick) {
             return;
@@ -504,6 +507,7 @@ export default {
     },
     // 下一步
     async stepNext() {
+      if (guardWriteAction(this, '工单状态操作')) return;
       if (this.secondClick) {
         return;
       }

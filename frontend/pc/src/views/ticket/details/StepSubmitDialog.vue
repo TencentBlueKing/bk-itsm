@@ -106,6 +106,7 @@
 <script>
   import commonMix from '@/views/commonMix/common.js';
   import { errorHandler } from '@/utils/errorHandler.js';
+  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'StepSubmitDialog',
@@ -212,6 +213,7 @@
         this.formInfo.close_message = '';
       },
       submitValidate() {
+        if (guardWriteAction(this, '工单操作')) return;
         this.$refs.ticketForm.validate().then(
           () => {
             this.submitForm();

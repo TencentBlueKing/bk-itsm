@@ -406,6 +406,7 @@
   import { CUSTOM_FORM_DEFAULT_VALUE } from '../../../../../constants/field';
   import { errorHandler } from '../../../../../utils/errorHandler.js';
   import { deepClone } from '../../../../../utils/util';
+  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'addField',
@@ -997,6 +998,7 @@
       },
       // 保存，取消
       async addField() {
+        if (guardWriteAction(this, '字段编辑')) return;
         const params = await this.getDataContent();
         if (!params) {
           return;

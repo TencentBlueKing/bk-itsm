@@ -252,6 +252,7 @@
   import { errorHandler } from '../../utils/errorHandler';
   import versionLog from '../systemConfig/component/versionLog.vue';
   import permission from '@/mixins/permission.js';
+  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'attachmentStorage',
@@ -405,6 +406,7 @@
         this.moduleInfo.systemPath.nowValue = this.moduleInfo.systemPath.formerValue;
       },
       async allSwitchChange(openStatus, type) {
+        if (guardWriteAction(this, '修改全局设置')) return;
         if (!this.hasPermission(['global_settings_manage'])) {
           this.applyForPermission(['global_settings_manage'], [], {});
           return;
@@ -442,6 +444,7 @@
       },
       // 一键清除 缓存
       handleClear() {
+        if (guardWriteAction(this, '清除缓存')) return;
         if (!this.hasPermission(['global_settings_manage'])) {
           this.applyForPermission(['global_settings_manage'], [], {});
           return;
@@ -490,6 +493,7 @@
           });
       },
       async onKeyUpdate() {
+        if (guardWriteAction(this, '一键迁移')) return;
         const params = {
           version_from: this.formerVersion.substr(1, this.formerVersion.length - 1),
           version_to: this.updatedVersion,
