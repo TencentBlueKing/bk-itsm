@@ -239,6 +239,7 @@
 <script>
   import draggable from 'vuedraggable';
   import { errorHandler } from '../../../utils/errorHandler';
+  import { guardWriteAction } from '@/utils/readOnly';
   export default {
     components: {
       draggable,
@@ -384,6 +385,7 @@
       },
       // 删除
       deleteOne(item) {
+        if (guardWriteAction(this, '移除服务')) return;
         const params = {
           catalog_id: this.treeInfo.node.id,
           services: [item.id],
@@ -391,6 +393,7 @@
         this.deleteSubmit(params);
       },
       deleteCheck() {
+        if (guardWriteAction(this, '批量移除服务')) return;
         const idList = this.checkList.map(item => item.id);
         const params = {
           catalog_id: this.treeInfo.node.id,
@@ -434,6 +437,7 @@
         this.entryInfo.allCheck = false;
       },
       submitEntry() {
+        if (guardWriteAction(this, '添加服务到目录')) return;
         // 添加服务
         const params = {
           catalog_id: this.treeInfo.node.id,

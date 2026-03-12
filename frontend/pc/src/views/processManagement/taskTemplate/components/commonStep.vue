@@ -150,6 +150,7 @@
 </template>
 
 <script>
+  import { guardWriteAction } from '@/utils/readOnly';
   import fieldConfig from '../../processDesign/nodeConfigue/components/fieldConfig';
   import commonTriggerList from './commonTriggerList';
   import memberSelect from '../../../commonComponent/memberSelect';
@@ -224,6 +225,7 @@
       },
       // 下一步操作
       async stepChange(type = 'next', isDraft = false, isTemplate = '') {
+        if (guardWriteAction(this, '保存任务模板')) return;
         if (isTemplate === 'changeName') {
           let valid = false;
           await this.$refs.taskInfoForm.validate().then(() => {

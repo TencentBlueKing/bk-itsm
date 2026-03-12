@@ -230,6 +230,7 @@
 
 <script>
   import collapseTransition from '@/utils/collapse-transition.js';
+  import { guardWriteAction } from '@/utils/readOnly';
   import memberSelect from '../../commonComponent/memberSelect';
   import commonMix from '../../commonMix/common.js';
   import { errorHandler } from '../../../utils/errorHandler.js';
@@ -389,6 +390,7 @@
       },
       // 接入系统/修改系统
       submitDictionary() {
+        if (guardWriteAction(this, '保存API分类')) return;
         this.$refs.dictDataForm.validate().then(() => {
           if (this.secondClick) {
             return;
@@ -485,6 +487,7 @@
       },
       // 二次弹窗确认
       openDelete(item) {
+        if (guardWriteAction(this, '删除API分类')) return;
         if (!this.hasPermission(this.targetPerms, this.curPerms)) {
           this.applyPerm();
           return;

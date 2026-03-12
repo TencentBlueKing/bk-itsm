@@ -26,7 +26,12 @@
       <div style="overflow: hidden">
         <div class="bk-tree-addService">
           <span>{{ $t(`m['服务目录']`) }}</span>
-          <i class="bk-itsm-icon icon-jia-2" @click="openAdd('root')"></i>
+          <i
+            class="bk-itsm-icon icon-jia-2"
+            v-bk-tooltips="{ content: '当前为只读模式', disabled: !isReadOnly }"
+            :class="{ 'bk-readonly-disabled': isReadOnly }"
+            @click="isReadOnly || openAdd('root')">
+          </i>
         </div>
         <div class="bk-tree-search">
           <bk-input
@@ -60,13 +65,15 @@
           <ul>
             <li
               data-test-id="directoty-li-addCatalogue"
+              v-bk-tooltips="{ content: '当前为只读模式', disabled: !isReadOnly }"
               v-cursor="{ active: !hasPermission(['catalog_create'], $store.state.project.projectAuthActions), zIndex: 3001 }"
               :title="$t(`m.serviceConfig['新增']`)"
               :class="{
                 'bk-disabled-add': String(treeInfo.node.level) === '3',
-                'text-permission-disable': !hasPermission(['catalog_create'], $store.state.project.projectAuthActions)
+                'text-permission-disable': !hasPermission(['catalog_create'], $store.state.project.projectAuthActions),
+                'bk-readonly-disabled': isReadOnly
               }"
-              @click="openAdd">
+              @click="isReadOnly || openAdd">
               <span>{{ $t('m.serviceConfig["新增"]') }}</span>
             </li>
             <li
@@ -146,6 +153,7 @@
   import commonMix from '../../commonMix/common.js';
   import { errorHandler } from '../../../utils/errorHandler';
   import permission from '@/mixins/permission.js';
+  import { guardWriteAction } from '@/utils/readOnly';
   import Empty from '../../../components/common/Empty.vue';
 
   export default {
@@ -394,6 +402,7 @@
         this.$refs.dynamicForm.clearError();
       },
       submitAdd() {
+        if (guardWriteAction(this, '目录操作')) return;
         this.$refs.dynamicForm.validate().then(() => {
           const params = this.addDirectory.formInfo;
           params.project_key = this.$store.state.project.id;
@@ -478,6 +487,7 @@
       },
       // 删除
       openDelete() {
+        if (guardWriteAction(this, '删除目录')) return;
         if (!this.hasPermission(['catalog_delete'], this.$store.state.project.projectAuthActions)) {
           const projectInfo = this.$store.state.project.projectInfo;
           const resourceData = {
@@ -640,6 +650,11 @@
                 border-color: #e6e6e6 !important;
                 color: #cccccc !important;
                 cursor: not-allowed !important;
+            }
+            .bk-readonly-disabled {
+                color: #cccccc !important;
+                cursor: not-allowed !important;
+                pointer-events: none;
             }
         }
     }

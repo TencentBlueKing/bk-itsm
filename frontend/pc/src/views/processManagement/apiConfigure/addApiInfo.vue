@@ -157,6 +157,7 @@
 </template>
 
 <script>
+  import { guardWriteAction } from '@/utils/readOnly';
   import commonMix from '../../commonMix/common.js';
   import memberSelect from '../../commonComponent/memberSelect';
   import { errorHandler } from '../../../utils/errorHandler.js';
@@ -262,6 +263,7 @@
       },
       // 新增api
       addHandel() {
+        if (guardWriteAction(this, '新增API')) return;
         if (this.secondClick) {
           return;
         }

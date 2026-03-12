@@ -211,6 +211,7 @@
   import preview from '../../commonComponent/preview';
   import permission from '@/mixins/permission.js';
   import { errorHandler } from '../../../utils/errorHandler';
+  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'FlowVersion',
@@ -444,6 +445,7 @@
       },
       // 批量删除
       batchDeleteSubmit() {
+        if (guardWriteAction(this, '版本操作')) return;
         if (this.secondClick) {
           return;
         }
@@ -467,6 +469,7 @@
       },
       // 删除
       deleteSubmit() {
+        if (guardWriteAction(this, '版本操作')) return;
         if (this.secondClick) {
           return;
         }
@@ -487,6 +490,7 @@
       },
       // 还原
       restoreSubmit() {
+        if (guardWriteAction(this, '版本操作')) return;
         if (this.secondClick) {
           return;
         }

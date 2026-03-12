@@ -57,6 +57,7 @@
 <script>
   import dayjs from 'dayjs';
   import relativeTime from 'dayjs/plugin/relativeTime';
+  import { guardWriteAction } from '@/utils/readOnly';
   export default {
     name: 'commentItem',
     props: {
@@ -122,6 +123,7 @@
         return str.substr(0, 1).toLocaleUpperCase();
       },
       deleteComment(id) {
+        if (guardWriteAction(this, '删除评论')) return;
         this.$store.dispatch('ticket/deleteTicketComment', id).then(() => {
           this.$emit('refreshComment');
           this.deleteCommentDialog = false;
@@ -132,6 +134,7 @@
         console.log('agree', '暂不支持');
       },
       handleDeleteDialogShow(val) {
+        if (val && guardWriteAction(this, '删除评论')) return;
         this.deleteCommentDialog = val;
       },
       jumpTargetComment(curComment) {

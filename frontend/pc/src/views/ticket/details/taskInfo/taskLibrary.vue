@@ -181,6 +181,7 @@
   import commonMix from '../../commonMix/common.js';
   import apiFieldsWatch from '../../commonMix/api_fields_watch.js';
   import { errorHandler } from '@/utils/errorHandler';
+  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'taskLibrary',
@@ -256,6 +257,7 @@
       },
       // 删除某个任务库
       handleDeleteOption(option) {
+        if (guardWriteAction(this, '删除任务')) return;
         const { id } = option;
         this.$store.dispatch('taskFlow/deleteLibrary', id).then(() => {
           this.libraryList = this.libraryList.filter(item => item.id !== option.id);
@@ -297,6 +299,7 @@
         this.minWidth = 160;
       },
       submitOrder(value) {
+        if (guardWriteAction(this, '提交任务')) return;
         value.order = Number(value.orderInfo);
         value.orderStatus = true;
         this.minWidth = 60;
@@ -309,6 +312,7 @@
       },
       // 删除数据
       deleteLibrary(item) {
+        if (guardWriteAction(this, '删除任务')) return;
         this.$bkInfo({
           type: 'warning',
           title: this.$t('m.task[\'确认删除数据？\']'),
@@ -383,6 +387,7 @@
       },
       // 创建任务库
       submitLibrary() {
+        if (guardWriteAction(this, '任务库操作')) return;
         const params = {
           batch_create: 1,
           ticket_id: this.ticketId,
