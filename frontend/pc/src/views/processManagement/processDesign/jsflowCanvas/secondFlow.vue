@@ -81,6 +81,7 @@
   import Palette from './Palette.vue';
   import lineConfigue from '../lineConfigue';
   import { errorHandler } from '../../../../utils/errorHandler';
+  import { guardWriteAction } from '@/utils/readOnly';
 
   const endpointOptions = {
     endpoint: 'Dot',
@@ -357,6 +358,7 @@
         this.customLine.isShow = false;
       },
       deleteLine() {
+        if (guardWriteAction(this, '节点/线条操作')) return;
         const { id } = this.customLine.lineValue;
         if (this.clickSecond) {
           return;
@@ -397,6 +399,7 @@
       },
       // 连线拖动到节点
       onConnectionDragStop(source, targetId, event) {
+        if (guardWriteAction(this, '节点/线条操作')) return;
         const params = {
           sourceId: source.id,
           targetId,
@@ -449,6 +452,7 @@
       },
       // 连线放下之前的回调函数
       onBeforeDrop(params) {
+        if (guardWriteAction(this, '节点/线条操作')) return false;
         return this.checkLineInfo(params);
       },
       checkLineInfo(params) {
@@ -501,6 +505,7 @@
         return statusValue.status;
       },
       async drawLine(params) {
+        if (guardWriteAction(this, '节点/线条操作')) return;
         let targetId = '';
         let sourceId = '';
         const errorId = {
@@ -689,6 +694,7 @@
       },
       // 新增节点前的回调
       async onCreateNodeBefore(node) {
+        if (guardWriteAction(this, '节点/线条操作')) return;
         if (this.nodeStatus) {
           return;
         }
@@ -723,6 +729,7 @@
         this.deleteNode();
       },
       deleteNode() {
+        if (guardWriteAction(this, '节点/线条操作')) return;
         const { id } = this.deleteInfo.info.nodeInfo;
         if (this.clickSecond) {
           return;
@@ -1034,6 +1041,7 @@
       },
       // 移动节点接口保存
       moveNode(node) {
+        if (guardWriteAction(this, '节点/线条操作')) return;
         const params = {
           axis: {
             x: node.x,

@@ -156,6 +156,7 @@
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import dealPerson from './components/dealPerson.vue';
   import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
+  import { guardWriteAction } from '@/utils/readOnly';
   export default {
     name: 'webHookNode',
     components: {
@@ -384,6 +385,7 @@
         }
       },
       submit() {
+        if (guardWriteAction(this, '节点配置保存')) return;
         Promise.all([this.$refs.processors.verifyValue(), this.$refs.webForm.validate()]).then(() => {
           const { value: processors, type: processors_type } = this.$refs.processors.getValue();
           const { queryParams, bodyFormData, bodyWwwForm, authRadio, auth_config, settings, bodyValue, bodyRadio, rawType, headers } = this.$refs.requestConfig.config;

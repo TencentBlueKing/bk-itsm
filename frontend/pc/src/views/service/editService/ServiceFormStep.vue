@@ -216,6 +216,7 @@
 <script>
   import { mapState } from 'vuex';
   import { errorHandler } from '../../../utils/errorHandler.js';
+  import { guardWriteAction } from '@/utils/readOnly';
   import commonMix from '../../commonMix/common.js';
   import { deepClone } from '../../../utils/util.js';
   import SelectTree from '../../../components/form/selectTree/index.vue';
@@ -504,6 +505,7 @@
           });
       },
       async onBasicFormSubmit() {
+        if (guardWriteAction(this, '保存服务')) return;
         try {
           if (this.isSubmitting) {
             return;
@@ -686,6 +688,7 @@
         this.crtForm = 'add';
       },
       fieldDelete(form) {
+        if (guardWriteAction(this, '删除字段')) return;
         if (this.crtForm) {
           this.$bkMessage({
             message: this.$t('m["请先将当前字段属性关闭再进行操作"]'),

@@ -36,11 +36,13 @@
         :links="emptyTip.links">
         <template slot="btns">
           <bk-button theme="primary"
+            v-bk-tooltips="{ content: '当前为只读模式', disabled: !isReadOnly }"
             data-test-id="userGroup_button_create_permission"
             v-cursor="{ active: !hasPermission(['user_group_create'], $store.state.project.projectAuthActions) }"
             :class="{
               'btn-permission-disable': !hasPermission(['user_group_create'], $store.state.project.projectAuthActions)
             }"
+            :disabled="isReadOnly"
             @click="showEditor({
               name: '',
               staffInputValue: [],
@@ -53,6 +55,7 @@
       <template v-else>
         <div class="bk-only-btn">
           <bk-button theme="primary"
+            v-bk-tooltips="{ content: '当前为只读模式', disabled: !isReadOnly }"
             data-test-id="userGroup_button_create"
             v-cursor="{ active: !hasPermission(['user_group_create'], $store.state.project.projectAuthActions) }"
             icon="plus"
@@ -60,6 +63,7 @@
             :class="['mr10', 'plus-cus', {
               'btn-permission-disable': !hasPermission(['user_group_create'], $store.state.project.projectAuthActions)
             }]"
+            :disabled="isReadOnly"
             @click="showEditor({
               name: '',
               staffInputValue: [],
@@ -191,6 +195,7 @@
 <script>
   import memberSelect from '../commonComponent/memberSelect';
   import permission from '@/mixins/permission.js';
+  import { guardWriteAction } from '@/utils/readOnly';
   import { errorHandler } from '../../utils/errorHandler';
   import EmptyTip from '../project/components/emptyTip.vue';
   import Empty from '../../components/common/Empty.vue';
@@ -300,6 +305,7 @@
       },
       // 保存修改，新增
       submitUser() {
+        if (guardWriteAction(this, '用户组操作')) return;
         this.$refs.dynamicForm.validate().then(() => {
           if (this.formData.staffInputValue.length === 0) {
             this.$bkMessage({
@@ -409,6 +415,7 @@
       },
       // 删除
       deleteUser(item) {
+        if (guardWriteAction(this, '删除用户组')) return;
         // 删除权限校验
         if (!this.hasPermission(['user_group_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
           const { projectInfo } = this.$store.state.project;

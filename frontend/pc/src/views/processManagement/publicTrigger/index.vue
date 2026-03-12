@@ -63,8 +63,10 @@
           <bk-button :theme="'primary'"
             data-test-id="triggers_button_create"
             v-cursor="{ active: !hasPermission(['triggers_create'], $store.state.project.projectAuthActions) }"
+            v-bk-tooltips="{ content: '当前为只读模式', disabled: !isReadOnly }"
             :title="$t(`m.managePage['新增']`)"
             icon="plus"
+            :disabled="isReadOnly"
             :class="['mr10', 'plus-cus', {
               'btn-permission-disable': !hasPermission(['triggers_create'], $store.state.project.projectAuthActions)
             }]"
@@ -131,6 +133,7 @@
   </div>
 </template>
 <script>
+  import { guardWriteAction } from '@/utils/readOnly';
   import { errorHandler } from '../../../utils/errorHandler';
   import permission from '@/mixins/permission.js';
   import addTrigger from './addTrigger.vue';
@@ -286,6 +289,7 @@
       },
       // 删除触发器
       deleteTrigger(item) {
+        if (guardWriteAction(this, '删除触发器')) return;
         if (!this.hasPermission(['triggers_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
           const { projectInfo } = this.$store.state.project;
           const resourceData = {

@@ -74,6 +74,7 @@
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import { deepClone } from '@/utils/util.js';
   import { errorHandler } from '../../../../utils/errorHandler';
+  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'basicNode',
@@ -139,6 +140,7 @@
       },
       // 确认
       async submitNode() {
+        if (guardWriteAction(this, '节点配置保存')) return;
         // 校验阻止
         const basicInfo = this.$refs.basic.backBasicInfo();
         const checkBasic = this.$refs.basic.checkStatus;

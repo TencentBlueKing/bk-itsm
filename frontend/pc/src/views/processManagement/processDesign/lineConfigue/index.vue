@@ -285,6 +285,7 @@
   import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
   import { errorHandler } from '../../../../utils/errorHandler';
   import { isEmpty } from '@/utils/util';
+  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     components: {
@@ -579,6 +580,7 @@
       },
       // 数据校验
       submitLine() {
+        if (guardWriteAction(this, '节点/线条操作')) return;
         if (this.lineInfo.condition_type === 'by_field') {
           this.lineInfo.expressions.forEach((item) => {
             item.checkInfo = item.expressions.some(node => (isEmpty(node.condition) || isEmpty(node.key) || isEmpty(node.value)));
@@ -597,6 +599,7 @@
       },
       // 按钮事件
       submitFn() {
+        if (guardWriteAction(this, '节点/线条操作')) return;
         if (this.secondClick) {
           return;
         }
@@ -652,10 +655,12 @@
         this.$emit('closeLine');
       },
       deleteLine() {
+        if (guardWriteAction(this, '节点/线条操作')) return;
         this.$emit('deleteLine');
       },
       // 存为模板
       submitTemplate() {
+        if (guardWriteAction(this, '节点/线条操作')) return;
         this.lineInfo.expressions.forEach((item) => {
           item.expressions.forEach((node) => {
             node.value = this.formattingData(node);
