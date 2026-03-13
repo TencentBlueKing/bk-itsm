@@ -168,7 +168,6 @@
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import NoData from '@/components/common/NoData.vue';
   import i18n from '@/i18n/index.js';
-  import { guardWriteAction } from '@/utils/readOnly';
   function newRequiredRule() {
     return {
       required: true,
@@ -465,7 +464,6 @@
         this.$parent.closeConfigur();
       },
       submit() {
-        if (guardWriteAction(this, '节点配置保存')) return;
         this.$refs.basicInfo.validate().then(() => {
           this.errorList = [];
           const isRequired = this.schema.required || [];

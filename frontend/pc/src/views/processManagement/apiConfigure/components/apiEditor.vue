@@ -112,7 +112,6 @@
 
 <script>
   import ace from '../../../commonComponent/aceEditor/index.js';
-  import { guardWriteAction } from '@/utils/readOnly';
   import mixins from '../../../commonMix/mixins_api.js';
   import apiEditorBasic from './apiEditorBasic.vue';
   import apiEditorRequest from './apiEditorRequest.vue';
@@ -203,7 +202,6 @@
         this.$parent.$parent.getRemoteApiDetail(id);
       },
       async updateApi() {
-        if (guardWriteAction(this, '编辑API')) return;
         if (this.secondClick || !this.DetailInfo.treeDataList || !this.DetailInfo.responseTreeDataList) {
           return;
         }

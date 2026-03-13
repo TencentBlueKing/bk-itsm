@@ -88,7 +88,6 @@
 <script>
   import editor from './editor.vue';
   import commentItem from './commentItem.vue';
-  import { guardWriteAction } from '@/utils/readOnly';
   export default {
     name: 'ticketComment',
     components: {
@@ -195,7 +194,6 @@
         this.isEditEditor = val;
       },
       submitEdit() {
-        if (guardWriteAction(this, '提交评论')) return;
         const _this = this.$refs.editorEdit.editor;
         const text = _this.txt.html();
         this.editorEditData = '';
@@ -262,7 +260,6 @@
         }
       },
       submit() {
-        if (guardWriteAction(this, '提交评论')) return;
         // 评论内容
         if (!this.isEditEditor) {
           this.repealReply();

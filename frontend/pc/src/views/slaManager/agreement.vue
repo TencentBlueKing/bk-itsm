@@ -60,11 +60,9 @@
               <bk-button
                 data-test-id="sla_button_createAgreement"
                 v-cursor="{ active: !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions) }"
-                v-bk-tooltips="{ content: '当前为只读模式', disabled: !isReadOnly }"
                 :theme="'primary'"
                 :title="$t(`m.managePage['新增']`)"
                 icon="plus"
-                :disabled="isReadOnly"
                 :class="['mr10', 'plus-cus', {
                   'btn-permission-disable': !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions)
                 }]"
@@ -218,7 +216,6 @@
 
 <script>
   import { errorHandler } from '../../utils/errorHandler';
-  import { guardWriteAction } from '@/utils/readOnly';
   import searchInfo from '../commonComponent/searchInfo/searchInfo.vue';
   import addAgreement from './newAddAgreement';
   import EmptyTip from '../project/components/emptyTip.vue';
@@ -511,7 +508,6 @@
             type: 'warning',
             title: this.$t('m.slaContent["确定删除该服务协议？"]'),
             confirmFn: () => {
-              if (guardWriteAction(this, '删除协议')) return;
               const id = item.id;
               if (this.secondClick) {
                 return;

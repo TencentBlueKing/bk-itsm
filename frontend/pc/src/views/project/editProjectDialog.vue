@@ -71,7 +71,6 @@
 <script>
   import { deepClone } from '@/utils/util';
   import i18n from '@/i18n/index.js';
-  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'EditProjectDialog',
@@ -164,7 +163,6 @@
         return !projectList.map(item => item.key).includes(val);
       },
       onEditProjectConfirm() {
-        if (guardWriteAction(this, '项目编辑')) return;
         this.$refs.projectForm.validate().then(async (result) => {
           if (result) {
             this.editProjectPending = true;

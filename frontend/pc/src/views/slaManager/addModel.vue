@@ -382,7 +382,6 @@
 
 <script>
   import { errorHandler } from '../../utils/errorHandler.js';
-  import { guardWriteAction } from '@/utils/readOnly';
   import commonMix from '../commonMix/common.js';
   export default {
     name: 'addModel',
@@ -587,7 +586,6 @@
         });
       },
       ajaxSubmit() {
-        if (guardWriteAction(this, '保存服务模式')) return;
         const copyFormInfo = JSON.parse(JSON.stringify(this.formInfo));
         const params = {
           name: copyFormInfo.name,

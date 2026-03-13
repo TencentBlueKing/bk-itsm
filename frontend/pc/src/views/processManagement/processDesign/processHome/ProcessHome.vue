@@ -168,11 +168,10 @@
               </bk-button>
               <bk-button
                 v-cursor="{ active: !hasPermission(['workflow_deploy'], props.row.auth_actions) }"
-                v-bk-tooltips="{ content: '当前为只读模式', disabled: !isReadOnly }"
                 text
                 theme="primary"
-                :disabled="(hasPermission(['workflow_deploy'], props.row.auth_actions)
-                  && (props.row.is_draft || !props.row.is_enabled)) || isReadOnly"
+                :disabled="hasPermission(['workflow_deploy'], props.row.auth_actions)
+                  && (props.row.is_draft || !props.row.is_enabled)"
                 :class="[{
                   'btn-permission-disable':
                     !hasPermission(['workflow_deploy'], props.row.auth_actions)
@@ -282,7 +281,6 @@
   import preview from '../../../commonComponent/preview';
   import permission from '@/mixins/permission.js';
   import { errorHandler } from '../../../../utils/errorHandler.js';
-  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'ProcessHome',
@@ -535,7 +533,6 @@
         this.deployInfo.formInfo.id = item.id;
       },
       submitForm() {
-        if (guardWriteAction(this, '流程部署')) return;
         this.$refs.deployForm.validate().then(() => {
           if (this.secondClick) {
             return;
@@ -604,7 +601,6 @@
       },
       // 删除确认
       deleteConfirm(item) {
-        if (guardWriteAction(this, '流程删除')) return;
         // 流程管理权限校验
         if (!this.CheckFowPermisson(item)) {
           return;

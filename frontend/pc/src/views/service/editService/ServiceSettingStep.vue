@@ -170,7 +170,6 @@
   import TaskConfigPanel from './TaskConfigPanel.vue';
   import { errorHandler } from '../../../utils/errorHandler';
   import { mapState } from 'vuex';
-  import { guardWriteAction } from '@/utils/readOnly';
   const frequencyList = [
     { id: 0, name: '00:00' },
     { id: 1, name: '01:00' },
@@ -353,7 +352,6 @@
         });
       },
       async validate() {
-        if (guardWriteAction(this, '保存服务配置')) return false;
         const {
           supervisor,
           can_ticket_agency: canTicketAgency,

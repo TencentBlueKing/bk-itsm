@@ -21,7 +21,6 @@
  */
 
 import "./public-path";
-window.ITSM_READ_ONLY_MODE = true;
 import Vue from "vue";
 // import Vuex from 'vuex'
 import cookie from "cookie";
@@ -70,9 +69,6 @@ import ArrowsLeftIcon from "./components/common/layout/ArrowsLeftIcon";
 import "./utils/login.js";
 import i18n from "./i18n/index.js";
 import store from "./store";
-// 只读模式全局 mixin
-import readOnlyMixin from './mixins/readOnly';
-Vue.mixin(readOnlyMixin);
 // 自定义指令
 import directives from "./directives";
 Vue.use(directives);

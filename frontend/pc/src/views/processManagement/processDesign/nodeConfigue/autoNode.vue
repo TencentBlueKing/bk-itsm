@@ -184,7 +184,6 @@
   import dealPerson from './components/dealPerson.vue';
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import { errorHandler } from '../../../../utils/errorHandler';
-  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'autoNode',
@@ -395,7 +394,6 @@
       },
       // 确认
       async submitNode() {
-        if (guardWriteAction(this, '节点配置保存')) return;
         // api参数校验
         const isre = await this.apiFz();
         if (!isre) {

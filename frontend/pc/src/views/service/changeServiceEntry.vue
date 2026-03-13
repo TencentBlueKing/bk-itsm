@@ -145,7 +145,6 @@
   import DealPerson from '../processManagement/processDesign/nodeConfigue/components/dealPerson';
   import { errorHandler } from '../../utils/errorHandler.js';
   import { isEmpty } from '../../utils/util.js';
-  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'changeServiceEntry',
@@ -339,7 +338,6 @@
       },
       // 添加服务
       addNewEntry() {
-        if (guardWriteAction(this, '新增服务')) return;
         // 关联服务
         const formInfo = JSON.parse(JSON.stringify(this.directory.formInfo));
         delete formInfo.admin;
@@ -364,7 +362,6 @@
       },
       // 修改服务
       changeEntry() {
-        if (guardWriteAction(this, '编辑服务')) return;
         this.directory.formInfo.id = this.addDirectory.id;
         if (this.clickSecond) {
           return;

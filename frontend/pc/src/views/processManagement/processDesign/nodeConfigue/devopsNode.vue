@@ -179,7 +179,6 @@
   import NoData from '@/components/common/NoData.vue';
   import { errorHandler } from '../../../../utils/errorHandler';
   import i18n from '@/i18n/index.js';
-  import { guardWriteAction } from '@/utils/readOnly';
   function newRequiredRule() {
     return {
       required: true,
@@ -461,7 +460,6 @@
         return this.pipelineData[item];
       },
       submit() {
-        if (guardWriteAction(this, '节点配置保存')) return;
         if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
           this.checkStatus.processors = true;
           return;

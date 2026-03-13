@@ -178,7 +178,6 @@
   import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import { errorHandler } from '../../../../utils/errorHandler';
-  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'signNode',
@@ -423,7 +422,6 @@
       },
       // 确认
       async submitNode() {
-        if (guardWriteAction(this, '节点配置保存')) return;
         let validates = [this.$refs.nodeInfoForm.validate()];
         if (this.$refs.finishConditionForms && this.$refs.finishConditionForms.length) {
           validates = validates.concat(this.$refs.finishConditionForms.map(form => form.validate()));

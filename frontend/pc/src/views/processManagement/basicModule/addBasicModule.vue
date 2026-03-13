@@ -127,7 +127,6 @@
   import draggable from 'vuedraggable';
   import { errorHandler } from '../../../utils/errorHandler.js';
   import commonMix from '../../commonMix/common.js';
-  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'addBasicModule',
@@ -206,7 +205,6 @@
       },
       // 创建/更新数据字典
       save() {
-        if (guardWriteAction(this, '保存基础模型')) return;
         this.$refs.addForm.validate().then(() => {
           const params = {
             desc: this.addTableInfo.formInfo.desc,
