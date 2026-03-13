@@ -162,7 +162,6 @@
   </div>
 </template>
 <script>
-  import { guardWriteAction } from '@/utils/readOnly';
   import addTrigger from '../../publicTrigger/addTrigger.vue';
   import collapseTransition from '@/utils/collapse-transition.js';
   import useModalCloseConfirmation from '@/utils/use-modal-close-confirmation';
@@ -418,7 +417,6 @@
       },
       // 删除触发器
       delTrigger(trigger) {
-        if (guardWriteAction(this, '删除触发器')) return;
         this.$bkInfo({
           type: 'warning',
           title: this.$t('m.taskTemplate[\'确认删除触发器？\']'),

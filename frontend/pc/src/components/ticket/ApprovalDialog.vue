@@ -53,7 +53,6 @@
 
 <script>
   import { errorHandler } from '../../utils/errorHandler';
-  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'ApprovalDialog',
@@ -89,7 +88,6 @@
     },
     methods: {
       onApprovalConfirm() {
-        if (guardWriteAction(this, '审批操作')) return;
         this.approvalConfirmBtnLoading = true;
         this.$refs.approvalForm.validate().then(async (val) => {
           if (val) {

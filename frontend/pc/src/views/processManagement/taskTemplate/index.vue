@@ -48,11 +48,9 @@
             <bk-button
               data-test-id="taskTemplate-button-create"
               v-cursor="{ active: !hasPermission(['public_task_template_manage'], curPerms) }"
-              v-bk-tooltips="{ content: '当前为只读模式', disabled: !isReadOnly }"
               :theme="'primary'"
               :title="$t(`m.systemConfig['新增']`)"
               icon="plus"
-              :disabled="isReadOnly"
               :class="['mr10', 'plus-cus', {
                 'btn-permission-disable': !hasPermission(['public_task_template_manage'], curPerms)
               }]"
@@ -183,7 +181,6 @@
   </div>
 </template>
 <script>
-  import { guardWriteAction } from '@/utils/readOnly';
   import commonStep from './components/commonStep';
   import memberSelect from '../../commonComponent/memberSelect';
   import permission from '@/mixins/permission.js';
@@ -302,7 +299,6 @@
           });
       },
       cloneTemplate(item) {
-        if (guardWriteAction(this, '克隆任务模板')) return;
         if (!this.hasPermission(['public_task_template_manage'], this.curPerms)) {
           this.applyForPermission(['public_task_template_manage'], this.curPerms, {});
           return;
@@ -329,7 +325,6 @@
         });
       },
       deleteTemplate(item) {
-        if (guardWriteAction(this, '删除任务模板')) return;
         if (!this.hasPermission(['public_task_template_manage'], this.curPerms)) {
           this.applyForPermission(['public_task_template_manage'], this.curPerms, {});
           return;
@@ -420,7 +415,6 @@
         this.getTemplateList();
       },
       async saveTemplate() {
-        if (guardWriteAction(this, '保存任务模板')) return;
         let valid = false;
         await this.$refs.taskInfoForm.validate().then(() => {
           valid = true;

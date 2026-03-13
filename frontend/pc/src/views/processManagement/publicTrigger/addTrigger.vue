@@ -205,7 +205,6 @@
   </div>
 </template>
 <script>
-  import { guardWriteAction } from '@/utils/readOnly';
   import commonMix from '../../commonMix/common.js';
   import triggerCondition from './components/triggerCondition.vue';
   import responseCondition from './components/responseCondition.vue';
@@ -625,7 +624,6 @@
       },
       // 保存、取消、草稿
       submitTrigger(type) {
-        if (guardWriteAction(this, '保存触发器')) return;
         this.$refs.triggerBasic.validate().then(() => {
           this.$refs.triggerMade.validate().then(() => {
             if (this.checkInfo()) {

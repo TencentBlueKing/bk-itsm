@@ -126,7 +126,6 @@
   import addBasicModule from './addBasicModule.vue';
   import searchInfo from '../../commonComponent/searchInfo/searchInfo.vue';
   import { errorHandler } from '../../../utils/errorHandler.js';
-  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'basicModule',
@@ -253,7 +252,6 @@
       },
       // 删除字段
       deleteTable(item) {
-        if (guardWriteAction(this, '删除基础模型')) return;
         this.$bkInfo({
           type: 'warning',
           title: this.$t('m.basicModule["确认删除此模型？"]'),

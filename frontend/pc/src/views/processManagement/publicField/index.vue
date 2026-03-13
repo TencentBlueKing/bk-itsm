@@ -52,10 +52,8 @@
             <bk-button :theme="'primary'"
               data-test-id="field_button_addField"
               v-cursor="{ active: !hasPermission(createFieldPerm, curPermission) }"
-              v-bk-tooltips="{ content: '当前为只读模式', disabled: !isReadOnly }"
               :title="$t(`m.deployPage['新增']`)"
               icon="plus"
-              :disabled="isReadOnly"
               :class="['mr10', 'plus-cus', {
                 'btn-permission-disable': !hasPermission(createFieldPerm, curPermission)
               }]"
@@ -243,7 +241,6 @@
   import searchInfo from '../../commonComponent/searchInfo/searchInfo.vue';
   import addField from '../processDesign/nodeConfigue/addField';
   import EmptyTip from '../../project/components/emptyTip.vue';
-  import { guardWriteAction } from '@/utils/readOnly';
   import { errorHandler } from '../../../utils/errorHandler.js';
   // import { deepClone } from '../../../utils/util';
   import Empty from '../../../components/common/Empty.vue';
@@ -497,7 +494,6 @@
       },
       // 删除字段
       deleteField(item) {
-        if (guardWriteAction(this, '删除字段')) return;
         const isAuth = this.hasPermission(
           this.deleteFieldPerm,
           [

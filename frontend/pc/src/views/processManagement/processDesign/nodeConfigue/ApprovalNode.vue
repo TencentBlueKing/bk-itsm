@@ -299,7 +299,6 @@
   import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import { errorHandler } from '../../../../utils/errorHandler';
-  import { guardWriteAction } from '@/utils/readOnly';
   export default {
     name: 'ApprovalNode',
     components: {
@@ -621,7 +620,6 @@
       },
       // 确认
       async submitNode() {
-        if (guardWriteAction(this, '节点配置保存')) return;
         const validates = [this.$refs.nodeInfoForm.validate()];
         await Promise.all(validates).then(() => {
           const params = {

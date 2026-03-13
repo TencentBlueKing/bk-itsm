@@ -52,7 +52,6 @@
   import axios from 'axios';
   import secondFlow from '../jsflowCanvas/secondFlow.vue';
   import { errorHandler } from '../../../../utils/errorHandler';
-  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'ConfigProcess',
@@ -140,7 +139,6 @@
       },
       // 下一步操作or保存流程
       submitChart() {
-        if (guardWriteAction(this, '流程保存')) return;
         this.submitFlow();
         if (this.secondClick) {
           return;
@@ -177,7 +175,6 @@
       },
       // 保存节点位置
       submitFlow() {
-        if (guardWriteAction(this, '流程保存')) return;
         const lineInfoList = this.$refs.flowInfo.canvasData;
         const params = {
           workflow_id: this.processId,

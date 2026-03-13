@@ -61,11 +61,9 @@
             <bk-button
               data-test-id="slaPattern_button_create"
               v-cursor="{ active: !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions) }"
-              v-bk-tooltips="{ content: '当前为只读模式', disabled: !isReadOnly }"
               theme="primary"
               :title="$t(`m.eventdeploy['新增']`)"
               icon="plus"
-              :disabled="isReadOnly"
               :class="['mr10', 'plus-cus', {
                 'btn-permission-disable': !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions)
               }]"
@@ -117,7 +115,6 @@
 
 <script>
   import { errorHandler } from '../../utils/errorHandler';
-  import { guardWriteAction } from '@/utils/readOnly';
   import permission from '@/mixins/permission.js';
   import addModel from './addModel.vue';
   import EmptyTip from '../project/components/emptyTip.vue';
@@ -262,7 +259,6 @@
           type: 'warning',
           title: this.$t('m.slaContent["确定删除该服务模式？"]'),
           confirmFn: () => {
-            if (guardWriteAction(this, '删除服务模式')) return;
             const { id } = item;
             if (this.secondClick) {
               return;

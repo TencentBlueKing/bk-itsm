@@ -322,7 +322,6 @@
   import { errorHandler } from '../../../utils/errorHandler.js';
   import permission from '@/mixins/permission.js';
   import { deepClone } from '../../../utils/util';
-  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'editorNotice',
@@ -395,7 +394,6 @@
       },
       // 保存
       submitNotice() {
-        if (guardWriteAction(this, '保存通知模板')) return;
         if (!this.hasPermission(['ticket_state_manage'])) {
           this.applyForPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions, {});
           return;

@@ -219,7 +219,6 @@
   import commonMix from '../../commonMix/common.js';
   import { ProcessTools } from '@/utils/process.js';
   import { errorHandler } from '../../../utils/errorHandler';
-  import { guardWriteAction } from '@/utils/readOnly';
 
   export default {
     name: 'ProjectServiceSla',
@@ -487,7 +486,6 @@
             },
             // 提交 取消
             submitFn() {
-                if (guardWriteAction(this, '保存SLA配置')) return;
                 const {
                     can_ticket_agency, catalog_id, desc, display_type, id, is_valid, key,
                     name, owners, sla, workflow,

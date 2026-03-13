@@ -36,7 +36,6 @@
           <div class="bk-more-search">
             <bk-button
               data-test-id="service_button_createService"
-              v-bk-tooltips="{ content: '当前为只读模式', disabled: !isReadOnly }"
               v-cursor="{ active: !hasPermission(['service_create'], $store.state.project.projectAuthActions) }"
               :theme="'primary'"
               icon="plus"
@@ -44,25 +43,21 @@
                 'btn-permission-disable': !hasPermission(['service_create'], $store.state.project.projectAuthActions)
               }]"
               :title="$t(`m.serviceConfig['新增']`)"
-              :disabled="isReadOnly"
               @click="onServiceCreatePermissonCheck">
               {{$t(`m.serviceConfig['新增']`)}}
             </bk-button>
             <bk-button
-              v-bk-tooltips="{ content: '当前为只读模式', disabled: !isReadOnly }"
               v-cursor="{ active: !hasPermission(['service_create'], $store.state.project.projectAuthActions) }"
               :class="['mr10', { 'btn-permission-disable': !hasPermission(['service_create'], $store.state.project.projectAuthActions) }]"
               data-test-id="service_button_batchImportService"
               :title="$t(`m['导入']`)"
-              :disabled="isReadOnly"
               @click="importService">
               {{$t(`m['导入']`)}}
             </bk-button>
             <bk-button
               data-test-id="service_button_batchDeleteService"
-              v-bk-tooltips="{ content: '当前为只读模式', disabled: !isReadOnly }"
               :title="$t(`m.serviceConfig['批量删除']`)"
-              :disabled="!checkList.length || isReadOnly"
+              :disabled="!checkList.length"
               @click="deleteCheck">
               {{$t(`m.serviceConfig['批量删除']`)}}
             </bk-button>
@@ -424,7 +419,6 @@
 <script>
   import axios from 'axios';
   import { mapState } from 'vuex';
-  import { guardWriteAction } from '@/utils/readOnly';
   import NavTitle from '@/components/common/layout/NavTitle';
   import searchInfo from '../commonComponent/searchInfo/searchInfo.vue';
   import permission from '@/mixins/permission.js';
@@ -705,7 +699,6 @@
         this.isImportServiceShow = false;
       },
       importConfirm() {
-        if (guardWriteAction(this, '导入服务')) return;
         const formdata = new FormData();
         formdata.append('file', this.$refs.importInput.files[0]);
         formdata.append('catalog_id', this.importCatalogId.slice(-1));
@@ -789,7 +782,6 @@
         this.changeFrom.bounded_catalogs = '';
       },
       submitEditService(type, row) {
-        if (guardWriteAction(this, '编辑服务')) return;
         const curRow = row;
         curRow[type] = this.editValue;
         const params = {
@@ -951,7 +943,6 @@
       },
       // 编辑
       async changeEntry(item, type) {
-        if (type === 'clone' && guardWriteAction(this, '克隆服务')) return;
         let serviceId = item.id;
         if (type === 'clone') {
           // 获取克隆id
@@ -1013,7 +1004,6 @@
         this.applyForPermission(required, [...this.$store.state.project.projectAuthActions, ...row.auth_actions], resourceData);
       },
       deleteCheck() {
-        if (guardWriteAction(this, '批量删除服务')) return;
         this.$bkInfo({
           type: 'warning',
           title: this.$t('m.serviceConfig["确认删除服务？"]'),
@@ -1044,7 +1034,6 @@
       },
       // 删除
       deleteOne(item) {
-        if (guardWriteAction(this, '删除服务')) return;
         this.$bkInfo({
           type: 'warning',
           title: this.$t('m.serviceConfig["确认删除服务？"]'),

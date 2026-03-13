@@ -131,7 +131,6 @@
 <script>
   import editorNotice from '../processManagement/notice/editorNotice.vue';
   import permission from '@/mixins/permission.js';
-  import { guardWriteAction } from '@/utils/readOnly';
   import { mapState } from 'vuex';
   import Empty from '../../components/common/Empty.vue';
   export default {
@@ -276,7 +275,6 @@
           });
       },
       submitNotice() {
-        if (guardWriteAction(this, '保存通知')) return;
         Promise.all([this.$refs.editorNotice.$refs.wechatForm.validate(), this.$refs.basicFrom.validate()]).then(() => {
           const { title, message } = this.$refs.editorNotice.formInfo;
           const params = {
@@ -355,7 +353,6 @@
           title: this.$t('m["确认要删除？"]'),
           confirmLoading: true,
           confirmFn: () => {
-            if (guardWriteAction(this, '删除通知')) return;
             this.$store.dispatch('project/deleteProjectNotice', row.id).then(() => {
               this.$bkMessage({
                 message: this.$t('m["删除成功"]'),
