@@ -578,3 +578,38 @@ def check_auto_stuck_schedules():
         logger.info("[check_auto_stuck_schedules] No stuck schedules found")
     except Exception as e:
         logger.error(f"[check_auto_stuck_schedules] Error checking stuck schedules: {e}")
+
+
+@periodic_task(run_every=crontab(minute=0, hour="*/1"), ignore_result=True)
+def periodic_migrate_ticket_from_old_db():
+    """
+    每小时执行一次旧库 → 新库的 Ticket 增量同步（适合迁移DB数据增量同步使用）。
+    """
+    src_host = os.environ.get("SRC_MYSQL_HOST", "")
+    if not src_host:
+        logger.info("[periodic_migrate_ticket_from_old_db] SRC_MYSQL_HOST 未配置，跳过同步")
+        return
+
+    src_port     = int(os.environ.get("SRC_MYSQL_PORT", 3306))
+    src_user     = os.environ.get("SRC_MYSQL_USER", "")
+    src_password = os.environ.get("SRC_MYSQL_PASSWORD", "")
+    src_db       = os.environ.get("SRC_MYSQL_NAME", "")
+
+    if not all([src_user, src_password, src_db]):
+        logger.error("[periodic_migrate_ticket_from_old_db] 旧库连接参数不完整，跳过同步")
+        return
+
+    try:
+        from django.core.management import call_command
+        logger.info("[periodic_migrate_ticket_from_old_db] 开始增量同步旧库 Ticket 数据")
+        call_command(
+            "migrate_ticket_from_old_db",
+            src_host=src_host,
+            src_port=src_port,
+            src_user=src_user,
+            src_password=src_password,
+            src_db=src_db,
+        )
+        logger.info("[periodic_migrate_ticket_from_old_db] 增量同步完成")
+    except Exception as e:
+        logger.error(f"[periodic_migrate_ticket_from_old_db] 同步异常: {e}")
