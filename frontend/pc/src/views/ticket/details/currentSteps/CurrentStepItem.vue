@@ -288,8 +288,6 @@
   import { errorHandler } from '@/utils/errorHandler.js';
   import { convertTimeArrToMS, convertTimeArrToString, convertMStoString } from '@/utils/util.js';
   import i18n from '@/i18n/index.js';
-  import { guardWriteAction } from '@/utils/readOnly';
-
   export default {
     name: 'CurrentStepItem',
     components: {
@@ -581,7 +579,6 @@
         }
       },
       submitFormAjax(submitFormData) {
-        if (guardWriteAction(this, '工单操作')) return;
         const id = this.nodeInfo.ticket_id;
         // 终止
         if (this.openFormInfo.btnInfo.key === 'TERMINATE') {
