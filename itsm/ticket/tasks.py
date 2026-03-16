@@ -585,15 +585,20 @@ def periodic_migrate_ticket_from_old_db():
     """
     每小时执行一次旧库 → 新库的 Ticket 增量同步（适合迁移DB数据增量同步使用）。
     """
-    src_host = os.environ.get("SRC_MYSQL_HOST", "")
+    # 判断是否开启增量同步
+    if not settings.ENABLE_MIGRATE_TICKET_FROM_OLD_DB:
+        logger.info("[periodic_migrate_ticket_from_old_db] 增量同步未开启，跳过同步")
+        return
+    
+    src_host = settings.SRC_MYSQL_HOST
     if not src_host:
         logger.info("[periodic_migrate_ticket_from_old_db] SRC_MYSQL_HOST 未配置，跳过同步")
         return
 
-    src_port     = int(os.environ.get("SRC_MYSQL_PORT", 3306))
-    src_user     = os.environ.get("SRC_MYSQL_USER", "")
-    src_password = os.environ.get("SRC_MYSQL_PASSWORD", "")
-    src_db       = os.environ.get("SRC_MYSQL_NAME", "")
+    src_port     = int(settings.SRC_MYSQL_PORT)
+    src_user     = settings.SRC_MYSQL_USER
+    src_password = settings.SRC_MYSQL_PASSWORD
+    src_db       = settings.SRC_MYSQL_NAME
 
     if not all([src_user, src_password, src_db]):
         logger.error("[periodic_migrate_ticket_from_old_db] 旧库连接参数不完整，跳过同步")

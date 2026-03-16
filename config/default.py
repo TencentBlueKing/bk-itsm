@@ -1057,3 +1057,12 @@ if BKAUTH_BACKEND_TYPE == 'bk_token':
 
     # OAuth 临近过期时间：生效期在 1 小时内则自动刷新 token
     EXPIRES_SECONDS = 60 * 60
+
+# DB 迁移配置
+# 判断是否开启增量同步
+ENABLE_MIGRATE_TICKET_FROM_OLD_DB = os.getenv("ENABLE_MIGRATE_TICKET_FROM_OLD_DB", False)
+SRC_MYSQL_HOST = os.getenv("SRC_MYSQL_HOST", "")
+SRC_MYSQL_PORT = os.getenv("SRC_MYSQL_PORT", "")
+SRC_MYSQL_USER = os.getenv("SRC_MYSQL_USER", "")
+SRC_MYSQL_PASSWORD = os.getenv("SRC_MYSQL_PASSWORD", "")
+SRC_MYSQL_NAME = os.getenv("SRC_MYSQL_NAME", "")
