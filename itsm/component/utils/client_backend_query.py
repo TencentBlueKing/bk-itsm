@@ -425,9 +425,9 @@ def get_components(system_names):
     try:
         res = bk.http(
             {
-                "path": "/api/c/compapi/v2/esb/get_components/",
+                "path": "/api/bk-apigateway/prod/api/v1/apis/",
                 "method": "get",
-                "query_params": {"system_names": system_names},
+                "query_params": {},
             }
         )
         return res.get("data", [])
