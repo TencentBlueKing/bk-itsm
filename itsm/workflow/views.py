@@ -608,8 +608,8 @@ class BaseFieldViewSet(component_viewsets.ModelViewSet):
 
         if not store.exists(file_path):
             raise serializers.ValidationError(
-                _("要下载的文件【{}】不存在, 可能已经被删除，请与管理员确认！").format(
-                    file_info["name"]
+                _("要下载的文件【{}】不存在, 可能已经被删除，请与管理员确认！文件路径: {}").format(
+                    file_info["name"], file_path
                 )
             )
 
