@@ -62,13 +62,10 @@ def update_user_cache(cache_key, ret_type="list", name_type="bk_username", users
                     user_data = response.get("data", {})
                     if user_data:
                         res.append({
-                            "id": user_data.get("username"),
-                            "name": "{}({})".format(
-                                user_data.get("username", ""),
-                                user_data.get("display_name", "")
-                            ),
-                            "bk_username": user_data.get("username"),
-                            "chname": user_data.get("display_name", ""),
+                            "id": user_data.get("bk_username"),
+                            "name": user_data.get("display_name", user_data.get("bk_username", "")),
+                            "bk_username": user_data.get("bk_username"),
+                            "chname": user_data.get("full_name", ""),
                         })
                 except (APIGatewayResponseError, Exception) as e:
                     # 单个用户查询失败，记录日志但继续查询其他用户
@@ -76,7 +73,7 @@ def update_user_cache(cache_key, ret_type="list", name_type="bk_username", users
                     # 添加一个默认的用户信息
                     res.append({
                         "id": username,
-                        "name": "{}()".format(username),
+                        "name": username,
                         "bk_username": username,
                         "chname": "",
                     })
