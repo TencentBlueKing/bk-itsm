@@ -224,6 +224,13 @@ class BkComponent(object):
         before_req = config.get("before_req")
         rsp_data = config.get("rsp_data")
         kwargs = {}
+        
+        # 路径参数替换（在 before_req 之前处理）
+        if query_params and path:
+            for key in list(query_params.keys()):
+                placeholder = "{%s}" % key
+                if placeholder in path:
+                    path = path.replace(placeholder, str(query_params.pop(key)))
 
         # 请求参数预处理
         if before_req:

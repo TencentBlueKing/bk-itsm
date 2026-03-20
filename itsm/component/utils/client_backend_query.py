@@ -37,8 +37,8 @@ from blueking.apigw.bkapis.bk_sops import BkSopsApi
 from blueking.apigw.bkapis.bk_user import BkUserApi
 from common.log import logger
 from itsm.component.constants import CACHE_5MIN, CACHE_30MIN, PREFIX_KEY
-from itsm.component.esb.esbclient import client_backend
 from itsm.component.esb.backend_component import bk
+from itsm.component.apigw.client.backend_apigateway import get_apis
 from itsm.component.tasks import (
     update_user_cache,
     update_bk_business,
@@ -423,14 +423,7 @@ def get_systems():
 def get_components(system_names):
     """获取指定系统的组件列表"""
     try:
-        res = bk.http(
-            {
-                "path": "/api/bk-apigateway/prod/api/v1/apis/",
-                "method": "get",
-                "query_params": {},
-            }
-        )
-        return res.get("data", [])
+        return get_apis({})
     except Exception as e:
         logger.error(
             "获取指定系统的组件列表: system_names=%s, error=%s" % (system_names, str(e))
