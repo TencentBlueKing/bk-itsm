@@ -154,11 +154,11 @@ class SopsProxy(ProxyView):
 
         self.log.debug("RESPONSE RETURNED: %s", response)
 
-        if settings.RUN_VER == "ieod":
-            if path.startswith("api/v3/component/"):
-                response = self.process(response)
-            elif path.startswith("api/v3/variable/"):
-                response = self.process(response)
+        # ieod 或多租户模式下，sops 的接口需要替换 form 的域名
+        need_process = settings.RUN_VER == "ieod" or settings.BKPAAS_MULTI_TENANT_MODE == "true"
+        if need_process and path.startswith(("api/v3/component/", "api/v3/variable/")):
+            response = self.process(response)
+    
         return response
 
 
