@@ -149,9 +149,7 @@ def index(request):
             "VERSION": version,
             "BKAPP_CSRF_COOKIE_NAME": settings.CSRF_COOKIE_NAME,
             "BKAPP_CI_ENABLED": settings.BKAPP_CI_ENABLED,
-            "BK_USER_WEB": settings.BK_USER_WEB,
-            "RUN_MODE":"prod" if settings.RUN_MODE == "PRODUCT" else "stag",
-            "BK_API_URL_TMPL": settings.BK_API_URL_TMPL or "",
+            "BK_MULTI_TENANT_USER_MANAGE_HOST": (settings.BK_API_URL_TMPL or "").format(api_name=settings.BK_USER_WEB) + ("/prod" if settings.RUN_MODE == "PRODUCT" else "/stag"),
         },
     )
 
