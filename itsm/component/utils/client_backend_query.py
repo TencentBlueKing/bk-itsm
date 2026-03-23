@@ -37,8 +37,7 @@ from blueking.apigw.bkapis.bk_sops import BkSopsApi
 from blueking.apigw.bkapis.bk_user import BkUserApi
 from common.log import logger
 from itsm.component.constants import CACHE_5MIN, CACHE_30MIN, PREFIX_KEY
-from itsm.component.esb.backend_component import bk
-from itsm.component.apigw.client.backend_apigateway import get_apis
+from itsm.component.apigw.client.backend_apigateway import get_apis, get_released_resources
 from itsm.component.tasks import (
     update_user_cache,
     update_bk_business,
@@ -407,14 +406,7 @@ def get_user_departments(username, id_only):
 def get_systems():
     """获取ESB中的组件系统列表"""
     try:
-        res = bk.http(
-            {
-                "path": "/api/c/compapi/v2/esb/get_systems/",
-                "method": "get",
-                "query_params": {},
-            }
-        )
-        return res.get("data", [])
+        return get_apis({})
     except Exception as e:
         logger.error("获取ESB中的组件系统列表：error=%s" % str(e))
         return []
@@ -423,7 +415,7 @@ def get_systems():
 def get_components(system_names):
     """获取指定系统的组件列表"""
     try:
-        return get_apis({})
+        return get_released_resources({"api_name": system_names})
     except Exception as e:
         logger.error(
             "获取指定系统的组件列表: system_names=%s, error=%s" % (system_names, str(e))

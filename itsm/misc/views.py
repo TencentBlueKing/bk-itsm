@@ -28,6 +28,7 @@ __copyright__ = "Copyright © 2025 Tencent BlueKing. All Rights Reserved."
 
 import datetime
 import hashlib
+import logging
 import os
 import time
 from wsgiref.util import FileWrapper
@@ -49,6 +50,8 @@ from itsm.component.drf.permissions import IamAuthPermit
 from itsm.component.utils.response import Fail, Success
 from itsm.iadmin.models import SystemSettings
 from weixin.core.decorators import weixin_login_exempt
+
+logger = logging.getLogger("root")
 
 # 文件存储对象
 store = settings.STORE
@@ -107,25 +110,54 @@ def upload(request):
     加入了default的原因支持预览测试
     暂无权限控制
     """
+    logger.info(
+        "[upload] 收到上传请求 | user=%s | path=%s | FILES=%s | GET=%s",
+        getattr(request.user, "username", "anonymous"),
+        request.path,
+        list(request.FILES.keys()),
+        dict(request.GET),
+    )
 
-    root = SystemSettings.objects.get(key="SYS_FILE_PATH").value
+    try:
+        root = SystemSettings.objects.get(key="SYS_FILE_PATH").value
+        logger.info("[upload] SYS_FILE_PATH=%s", root)
+    except Exception as e:
+        logger.error("[upload] 获取 SYS_FILE_PATH 失败: %s", e)
+        return Fail(message=_("文件上传失败：系统配置异常")).json()
 
     fields_root = os.path.join(root, "fields")
+    logger.info("[upload] fields_root=%s", fields_root)
 
     succeed_files = {}
     file_list = request.FILES.getlist("field_file")
+    logger.info("[upload] 待上传文件数量: %d", len(file_list))
+
     for upload_file in file_list:
         origin_name = upload_file.name
+        file_size = upload_file.size
+        content_type = upload_file.content_type
+        logger.info(
+            "[upload] 处理文件: name=%s | size=%d | content_type=%s",
+            origin_name, file_size, content_type,
+        )
+
         file_name = f"{datetime.datetime.now()}{origin_name}"  # noqa
         file_name = hashlib.md5(file_name.encode()).hexdigest()
-
         file_path = os.path.join(fields_root, file_name)
-        store.save(file_path, upload_file)
+        logger.info("[upload] 目标存储路径: %s", file_path)
+
+        try:
+            result = store.save(file_path, upload_file)
+            logger.info("[upload] 文件存储成功: origin=%s | stored_path=%s", origin_name, result)
+        except Exception as e:
+            logger.exception("[upload] 文件存储失败: origin=%s | path=%s | error=%s", origin_name, file_path, e)
+            return Fail(message=_("文件上传失败：%s") % e).json()
 
         succeed_files[file_name] = {"name": origin_name, "path": file_path}
 
     # 前端控件要求: PC端code必须为0，WEIXIN端code必须为OK
     code = "OK" if "weixin" in request.path else 0
+    logger.info("[upload] 上传完成 | succeed_files=%s", list(succeed_files.keys()))
 
     return Success({"succeed_files": succeed_files}, code=code).json()
 
@@ -146,7 +178,7 @@ def download(request):
     if not store.exists(download_file_path):
         return Fail(_("文件【{}】不存在").format(file_name), "NO_SUCH_FILE").json()
 
-    response = StreamingHttpResponse(FileWrapper(store.open(file_path, "rb"), 512))
+    response = StreamingHttpResponse(FileWrapper(store.open(download_file_path, "rb"), 512))
     response["Content-Type"] = "application/octet-stream"
     response["Content-Disposition"] = "attachment; filename* = UTF-8''%s" % format(
         escape_uri_path(file_name)

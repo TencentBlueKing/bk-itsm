@@ -136,14 +136,34 @@ class GetApis(BkApigw):
             logger.error("获取网关 API 列表失败: %s" % str(e))
             return []
 
-    def is_result_success(self, response_data):
-        # 该接口直接返回列表，无 code 字段
-        return isinstance(response_data, (list, dict))
 
-    def handle_response(self, response_data):
-        if isinstance(response_data, list):
-            return response_data
-        return response_data.get("results", response_data.get("data", []))
+class GetReleasedResources(BkApigw):
+    """
+    获取网关已发布环境的资源列表
+    GET /{stage_name}/api/v1/apis/{api_name}/released/stages/{stage_name}/resources/
+    """
+
+    method = "GET"
+
+    @property
+    def action(self):
+        from django.conf import settings
+        stage_name = "prod" if getattr(settings, "RUN_MODE", "") == "PRODUCT" else "stag"
+        return "/%s/api/v1/apis/{api_name}/released/stages/%s/resources/" % (stage_name, stage_name)
+
+    def get_request_url(self, request_data):
+        api_name = request_data.pop("api_name", "")
+        url = self.base_url + self.action.format(api_name=api_name)
+        return url
+
+    def __call__(self, request_data):
+        from common.log import logger
+        try:
+            return self.perform_request(request_data)
+        except Exception as e:
+            logger.error("获取网关已发布环境资源列表失败: %s" % str(e))
+            return []
 
 
 get_apis = GetApis()
+get_released_resources = GetReleasedResources()

@@ -184,7 +184,7 @@ class RemoteSystemViewSet(ModelViewSet):
     @action(detail=False, methods=["get"])
     def get_components(self, request):
         system_code = request.GET.get("system_code")
-        components = get_components([system_code])
+        components = get_components(system_code)
         return Response(components)
 
 
