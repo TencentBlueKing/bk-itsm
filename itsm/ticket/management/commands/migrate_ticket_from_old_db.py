@@ -274,8 +274,8 @@ def sync_base_tables(src_cursor, dst_cursor, dst_conn, ticket_ids, dry_run, src_
     flow_ids    = list({r["flow_id"]    for r in rows_meta if r["flow_id"]})
     service_ids = list({r["service_id"] for r in rows_meta if r["service_id"]})
 
-    # workflow_workflowversion 必须用 UPSERT，因为新库可能存在 transitions/states 字段残缺的旧数据
-    UPSERT_TABLES = {"workflow_workflowversion", "service_service"}
+    # workflow_* 必须用 UPSERT，因为新库可能存在字段残缺的旧数据
+    UPSERT_TABLES = {"workflow_workflow", "workflow_state", "workflow_workflowversion", "service_service"}
 
     def _sync_by_ids(table_name, id_field, id_list):
         """按 id_list 精确同步指定表，INSERT IGNORE（UPSERT_TABLES 中的表用 ON DUPLICATE KEY UPDATE）"""
@@ -348,7 +348,30 @@ def sync_base_tables(src_cursor, dst_cursor, dst_conn, ticket_ids, dry_run, src_
             dst_conn.commit()
         print_fn(f"    [OK]    {table_name}  同步完成 {len(all_rows)} 行")
 
-    # ---- 2. 同步 workflow_workflowversion（ticket.flow_id 指向这里）----
+    # ---- 2. 同步 workflow_workflow（workflowversion.workflow_id 依赖此表）----
+    # 通过 flow_ids 反查关联的 workflow_id
+    wf_ids = []
+    if flow_ids:
+        ph_wv = ", ".join(["%s"] * len(flow_ids))
+        src_cursor.execute(
+            f"SELECT DISTINCT `workflow_id` FROM `workflow_workflowversion` WHERE `id` IN ({ph_wv})",
+            flow_ids
+        )
+        wf_ids = [row["workflow_id"] for row in src_cursor.fetchall() if row["workflow_id"]]
+    _sync_by_ids("workflow_workflow", "id", wf_ids)
+
+    # ---- 2.5. 同步 workflow_state（workflow_id 依赖 workflow_workflow）----
+    ws_ids = []
+    if wf_ids:
+        ph_wf = ", ".join(["%s"] * len(wf_ids))
+        src_cursor.execute(
+            f"SELECT `id` FROM `workflow_state` WHERE `workflow_id` IN ({ph_wf})",
+            wf_ids
+        )
+        ws_ids = [row["id"] for row in src_cursor.fetchall()]
+    _sync_by_ids("workflow_state", "id", ws_ids)
+
+    # ---- 3. 同步 workflow_workflowversion（ticket.flow_id 指向这里）----
     _sync_by_ids("workflow_workflowversion", "id", flow_ids)
 
     # ---- 3. 同步 service_service（ticket.service_id 指向这里）----
