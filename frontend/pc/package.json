@@ -11,7 +11,7 @@
     "build:production:sourcemap": "cross-env SOURCE_MAP=true webpack --progress --config ./build/webpack.prod.conf.js"
   },
   "dependencies": {
-    "@blueking/bk-user-selector": "^0.1.4",
+    "@blueking/bk-user-selector": "0.1.4",
     "@blueking/bkcharts": "^2.0.6",
     "@blueking/bkui-form": "0.0.31",
     "@blueking/bkui-library": "^0.0.0-beta.6",
