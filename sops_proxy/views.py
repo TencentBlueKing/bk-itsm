@@ -126,18 +126,25 @@ class SopsProxy(ProxyView):
     def build_form(self, form):
         parsed = urlparse(form)
         path = parsed.path
-        sops_prefix = "/bk--sops"
-        if path.startswith(sops_prefix):
-            path = path[len(sops_prefix):]
+        # 去掉 sops 自身的路径前缀（如 /bk--sops），保留后面的相对路径
+        sops_path = urlparse(SOPS_SITE_URL).path.rstrip("/")
+        if sops_path and path.startswith(sops_path):
+            path = path[len(sops_path):]
         query = "?{}".format(parsed.query) if parsed.query else ""
+        # 多租户模式下，返回经过 ITSM 代理的地址，避免 render-form 替换 host 后 404
+        if settings.BKPAAS_MULTI_TENANT_MODE == "true":
+            frontend_url = settings.FRONTEND_URL.rstrip("/") + "/"
+            return "{}bk--sops{}{}".format(frontend_url, path, query)
         return "{}{}{}".format(SOPS_SITE_URL, path, query)
 
     def process(self, response):
         try:
             content = json.loads(response.content)
-            if "form" not in content:
+            data = content.get("data", {})
+            if not isinstance(data, dict) or "form" not in data:
                 return response
-            content["form"] = self.build_form(content["form"])
+            data["form"] = self.build_form(data["form"])
+            content["data"] = data
             return JsonResponse(content)
         except Exception:
             return response

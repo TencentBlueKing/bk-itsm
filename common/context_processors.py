@@ -36,11 +36,18 @@ def mysetting(request):
     proxy_path = '/{}'.format(proxy_path) if proxy_path and not proxy_path.startswith('/') else ''
     show_wiki = 'false' if proxy_path else 'true'
 
+    # 多租户模式下，SITE_URL_SOPS 需要加上 ITSM 自身的路径前缀
+    site_url_sops = settings.SITE_URL_SOPS
+    if getattr(settings, 'BKPAAS_MULTI_TENANT_MODE', '') == 'true':
+        site_url = getattr(settings, 'SITE_URL', '/')
+        # 拼成 /bk--itsm/bk--sops/ 形式，去掉重复的斜杠
+        site_url_sops = site_url.rstrip('/') + '/' + settings.SITE_URL_SOPS.lstrip('/')
+
     return {
         # 静态资源（代理地址）
         'SHOW_WIKI': show_wiki,
         # 标准运维插件服务地址
-        'SITE_URL_SOPS': settings.SITE_URL_SOPS,
+        'SITE_URL_SOPS': site_url_sops,
         'PREFIX_SOPS': settings.PREFIX_SOPS,
         "BK_IAM_APP_CODE": settings.BK_IAM_APP_CODE,
     }
