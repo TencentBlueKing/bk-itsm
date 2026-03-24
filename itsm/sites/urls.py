@@ -35,6 +35,8 @@ urlpatterns = [
     re_path(r"^init/$", init),
     # flower, celery monitor
     re_path(r"^o/bk_sops/", include("sops_proxy.urls")),
+    # 容器化环境下 SITE_URL_SOPS = '/bk--sops/'
+    re_path(r"^bk--sops/", include("sops_proxy.urls")),
     # helper, fix database
     re_path(r"^helper/", include("itsm.helper.urls")),
     # weixin

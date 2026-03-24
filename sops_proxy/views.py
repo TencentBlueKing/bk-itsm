@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import json
 import requests
+from urllib.parse import urlparse
 from django.conf import settings
 
 from django.http import HttpResponse, JsonResponse
@@ -123,8 +124,14 @@ class SopsProxy(ProxyView):
     upstream = SOPS_SITE_URL
 
     def build_form(self, form):
-        # 如果是域名, 则替换
-        return "{}o/bk_sops{}".format(settings.FRONTEND_URL, form.split(".com")[1])
+        # 提取 form URL 中的路径部分，去掉 SOPS 自身的 /bk--sops 前缀，拼接到 ITSM 代理路径
+        parsed = urlparse(form)
+        path = parsed.path
+        sops_prefix = "/bk--sops"
+        if path.startswith(sops_prefix):
+            path = path[len(sops_prefix):]
+        query = "?{}".format(parsed.query) if parsed.query else ""
+        return "{}bk--sops{}{}".format(settings.FRONTEND_URL, path, query)
 
     def process(self, response):
         try:

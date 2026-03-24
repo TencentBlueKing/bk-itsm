@@ -151,6 +151,7 @@ def index(request):
             "BKAPP_CI_ENABLED": settings.BKAPP_CI_ENABLED,
             "BK_MULTI_TENANT_USER_MANAGE_HOST": (settings.BK_API_URL_TMPL or "").format(api_name=settings.BK_USER_WEB) + ("/prod" if settings.RUN_MODE == "PRODUCT" else "/stag"),
             "BKPAAS_MULTI_TENANT_MODE": settings.BKPAAS_MULTI_TENANT_MODE,
+            "BKPAAS_APP_TENANT_ID": settings.BKPAAS_APP_TENANT_ID,
         },
     )
 

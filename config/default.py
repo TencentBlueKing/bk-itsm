@@ -1043,6 +1043,7 @@ AUTO_TIMEOUT_MINUTES = os.getenv("AUTO_TIMEOUT_MINUTES", 30)
 BKPAAS_APP_TENANT_ID = os.getenv("BKPAAS_APP_TENANT_ID", "")
 BK_USER_WEB = "bk-user-web"
 BKPAAS_MULTI_TENANT_MODE = os.getenv("BKPAAS_MULTI_TENANT_MODE", "false")
+BKPAAS_APP_TENANT_ID = os.getenv("BKPAAS_APP_TENANT_ID", "")
 
 # OAuth 认证配置
 BKAUTH_BACKEND_TYPE = "bk_ticket" if RUN_VER == "ieod" else "bk_token"
