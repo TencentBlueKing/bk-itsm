@@ -28,7 +28,8 @@ module.exports = {
             'vue': 'vue/dist/vue.esm.js',
             '@': path.resolve(__dirname, '../src/'),
             'jquery': 'jquery/dist/jquery.min.js',
-            '$': 'jquery/dist/jquery.min.js'
+            '$': 'jquery/dist/jquery.min.js',
+            '@blueking/bk-user-selector/vue2$': path.resolve(__dirname, '../node_modules/@blueking/bk-user-selector/vue2/index.umd.min.js')
         }
     },
     cache: true,

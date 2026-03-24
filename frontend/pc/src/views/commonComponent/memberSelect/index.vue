@@ -22,7 +22,19 @@
 
 <template>
   <div :class="[extCls]" test-posi-id="bk-member-selector">
+    <BKMultiTenantUserSelector
+      v-if="isMultiTenantMode"
+      exact-search-key="bk_username"
+      :value="value"
+      :api-base-url="apiBaseUrl"
+      :tenant-id="tenantId"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :multiple="multiple"
+      @change="onChange">
+    </BKMultiTenantUserSelector>
     <bk-user-selector
+      v-else
       :value="value"
       class="ui-user-selector"
       :fixed-height="true"
@@ -39,6 +51,8 @@
 
 <script>
   import BkUserSelector from '@blueking/user-selector';
+  import BKMultiTenantUserSelector from '@blueking/bk-user-selector/vue2';
+  import '@blueking/bk-user-selector/vue2/vue2.css';
   import jsonp from 'jsonp';
   import i18n from '@/i18n/index.js';
 
@@ -46,6 +60,7 @@
     name: 'MemberSelector',
     components: {
       BkUserSelector,
+      BKMultiTenantUserSelector,
     },
     model: {
       prop: 'value',
@@ -91,6 +106,9 @@
       return {
         customUserList: [],
         users: [],
+        isMultiTenantMode: window.BKPAAS_MULTI_TENANT_MODE === 'true',
+        tenantId: window.BKPAAS_APP_TENANT_ID,
+        apiBaseUrl: window.BK_MULTI_TENANT_USER_MANAGE_HOST,
       };
     },
     computed: {
