@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.utils.translation import gettext as _
 
-from itsm.component.esb.backend_component import bk
+from itsm.component.apigw.client.backend_apigateway import bk_apigw
 from itsm.postman.models import RemoteApi
 from itsm.trigger.action.core.component import BaseComponent
 from itsm.trigger.action.core import ApiSourceField, ApiInfoField, BaseForm, JSONField
@@ -72,7 +72,7 @@ class APIComponent(BaseComponent):
         API执行的业务逻辑，参考API节点
         """
         api_config = self.get_api_source_config()
-        rsp = bk.http(config=api_config)
+        rsp = bk_apigw.http(config=api_config)
         self.data.set_outputs("api_response_message", rsp.get("message"))
         self.data.set_outputs("api_response", rsp.get("message"))
         if rsp["result"]:

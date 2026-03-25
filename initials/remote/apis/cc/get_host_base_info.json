@@ -3,18 +3,18 @@
         "read_only": true,
         "req_params": [
             {
+                "is_necessary": 0,
+                "sample": "",
+                "name": "bk_supplier_account",
+                "value": "",
+                "desc": "开发商账号"
+            },
+            {
                 "is_necessary": 1,
                 "sample": "",
                 "name": "bk_host_id",
                 "value": "",
-                "desc": "\u4e3b\u673aID"
-            },
-            {
-                "is_necessary": 0,
-                "sample": "0",
-                "name": "bk_supplier_account",
-                "value": "",
-                "desc": "\u5f00\u53d1\u5546\u8d26\u53f7"
+                "desc": "主机身份ID，即bk_host_id字段值"
             }
         ],
         "is_deleted": false,
@@ -118,7 +118,7 @@
         "is_activated": true,
         "version": "v2",
         "req_headers": [],
-        "path": "/api/c/compapi/v2/cc/get_host_base_info/",
+        "path": "/api/bk-cmdb/prod/api/v3/open/hosts/{bk_supplier_account}/{bk_host_id}",
         "is_builtin": false,
         "desc": "\u83b7\u53d6\u4e3b\u673a\u8be6\u60c5",
         "updated_by": "system"

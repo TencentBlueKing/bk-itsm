@@ -47,7 +47,7 @@ from itsm.component.constants import (
     SHOW_DIRECTLY,
     SOURCE_CHOICES,
     TYPE_CHOICES,
-    VALIDATE_CHOICES,
+    VALIDATE_CHOICES, LEN_X_LONG,
 )
 from itsm.component.utils.basic import create_version_number
 from itsm.postman.models import RemoteApi, RemoteApiInstance
@@ -129,7 +129,7 @@ class BaseField(Model):
     }
     """
     regex_config = jsonfield.JSONCharField(
-        _("正则校验规则配置"), max_length=LEN_LONG, default=EMPTY_DICT
+        _("正则校验规则配置"), max_length=LEN_X_LONG, default=EMPTY_DICT
     )
     custom_regex = models.CharField(
         _("自定义正则规则"),

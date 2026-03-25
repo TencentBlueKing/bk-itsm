@@ -51,6 +51,7 @@ from itsm.component.constants import (
 from itsm.component.db import managers
 from itsm.component.drf.mixins import ObjectManagerMixin
 from itsm.component.esb.backend_component import bk
+from itsm.component.apigw.client.backend_apigateway import bk_apigw
 from itsm.component.exceptions import DeleteError, ParamError, IamPermissionDenied
 from itsm.component.utils.conversion import (
     build_params_by_mako_template,
@@ -320,11 +321,12 @@ class RemoteApi(ObjectManagerMixin, Model):
         common = {"creator": operator, "updated_by": operator, "is_builtin": is_builtin}
 
         try:
-            remote_system = RemoteSystem.objects.get(code=system_info["code"])
+            remote_system = RemoteSystem.objects.get(code=system_info["code"].upper())
         except RemoteSystem.DoesNotExist:
 
             system_info.update(common)
             system_info.pop("admin", None)
+            system_info["code"] = system_info["code"].upper()
             system_info["project_key"] = PUBLIC_PROJECT_PROJECT_KEY
             remote_system = RemoteSystem.objects.create(**system_info)
 
@@ -470,7 +472,7 @@ class RemoteApiInstance(Model):
                 }
 
         api_config["query_params"] = query_params
-        rsp = bk.http(config=api_config)
+        rsp = bk_apigw.http(config=api_config)
 
         api_protocol_keys = {"code", "data", "message", "result"}
 
@@ -495,7 +497,12 @@ class RemoteApiInstance(Model):
                 )
             return rsp
 
-        rsp_data = rsp["data"].get(api_config["rsp_data"]) or []
+        rsp_data_path = api_config["rsp_data"]
+        if not rsp_data_path or rsp_data_path == "data":
+            rsp_data = rsp["data"]
+        else:
+            rsp_data = jmespath.search(rsp_data_path, rsp["data"]) or []
+        
         if not kv_relation:
             return {
                 "result": True,

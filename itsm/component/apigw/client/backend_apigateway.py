@@ -24,14 +24,17 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import os
-
+import traceback
 from django.conf import settings
 
+from config import APP_ID, APP_TOKEN, RUN_VER
+from requests.exceptions import ReadTimeout
+from common.log import logger
+from itsm.component.constants import ResponseCodeStatus
+from itsm.component.utils.sandbox import map_data
 from itsm.component.apigw.base import APIResource
 
-# 从 BK_API_URL_TMPL 中提取 base_url
-# BK_API_URL_TMPL 格式：https://bkapi.sg.bk2game.com/api/{api_name}
-# bk-apigateway 对应的 base_url：https://bkapi.sg.bk2game.com/api/bk-apigateway
+
 _BK_API_URL_TMPL = getattr(settings, "BK_API_URL_TMPL", os.environ.get("BK_API_URL_TMPL", ""))
 _BK_APIGATEWAY_BASE_URL = _BK_API_URL_TMPL.replace("{api_name}", "bk-apigateway") if _BK_API_URL_TMPL else ""
 
@@ -167,3 +170,176 @@ class GetReleasedResources(BkApigw):
 
 get_apis = GetApis()
 get_released_resources = GetReleasedResources()
+
+
+class BkApigwComponent(object):
+    TIMEOUT = 60
+
+    def __init__(self):
+        import requests as _requests
+        self.session = _requests.session()
+
+    def _build_url(self, api_name, path):
+        # 若未指定 api_name，尝试从 path 中解析，格式：/api/{api_name}/实际路径
+        if not api_name and path:
+            parts = path.strip("/").split("/")
+            # 格式：api / {api_name} / ...
+            if len(parts) >= 2 and parts[0] == "api":
+                api_name = parts[1]
+                path = "/" + "/".join(parts[2:])
+        base = _BK_API_URL_TMPL.replace("{api_name}", api_name) if _BK_API_URL_TMPL else ""
+        return base.rstrip("/") + "/" + path.lstrip("/")
+
+    def http(self, config):
+        """
+        发起 API 网关请求
+        """
+        path = config.get("path", "")
+        method = (config.get("method") or "POST").upper()
+        api_name = config.get("api_name", "")
+        query_params = dict(config.get("query_params") or {})
+        map_code = config.get("map_code")
+        before_req = config.get("before_req")
+
+        # 获取用户身份和 token：优先从 query_params 中取，其次从请求上下文中取
+        remote_user = query_params.pop("__remote_user__", None)
+        bk_token = None
+        try:
+            from blueapps.utils import get_request
+            request_object = get_request()
+            if not remote_user:
+                remote_user = getattr(request_object.user, "username", None)
+            # open 环境从 Cookie 中取 bk_token
+            bk_token = request_object.COOKIES.get("bk_token", "")
+        except Exception:
+            pass
+
+        if query_params and path:
+            for key in list(query_params.keys()):
+                placeholder = "{%s}" % key
+                if placeholder in path:
+                    path = path.replace(placeholder, str(query_params.pop(key)))
+
+        if before_req:
+            try:
+                query_params = map_data(before_req, query_params, "query_params")
+            except Exception:
+                return {
+                    "result": False,
+                    "code": ResponseCodeStatus.FAILED,
+                    "message": traceback.format_exc().split("\n")[-2],
+                    "data": {},
+                }
+
+        request_url = self._build_url(api_name, path)
+        # 根据环境构造认证信息：open 环境用 bk_token，ieod 环境用 bk_username
+        auth_info = {"bk_app_code": APP_ID, "bk_app_secret": APP_TOKEN}
+        if RUN_VER == "ieod":
+            if remote_user:
+                auth_info["bk_username"] = remote_user
+        else:
+            # open 环境：优先用 bk_token，没有则降级用 bk_username
+            if bk_token:
+                auth_info["bk_token"] = bk_token
+            elif remote_user:
+                auth_info["bk_username"] = remote_user
+        import json
+        headers = {
+            "X-Bkapi-Authorization": json.dumps(auth_info),
+            "Content-Type": "application/json",
+        }
+
+        try:
+            if method == "GET":
+                result = self.session.get(
+                    url=request_url,
+                    params=query_params,
+                    headers=headers,
+                    verify=False,
+                    timeout=self.TIMEOUT,
+                )
+            else:
+                result = self.session.post(
+                    url=request_url,
+                    json=query_params,
+                    headers=headers,
+                    verify=False,
+                    timeout=self.TIMEOUT,
+                )
+        except ReadTimeout:
+            return {
+                "result": False,
+                "code": ResponseCodeStatus.FAILED,
+                "message": "{}接口返回结果超时".format(request_url),
+                "data": {},
+            }
+        except Exception as e:
+            logger.error("[{}] response.Exception: {}".format(request_url, e))
+            return {
+                "result": False,
+                "code": ResponseCodeStatus.FAILED,
+                "message": str(e),
+                "data": {},
+            }
+
+        try:
+            result.raise_for_status()
+        except Exception as e:
+            logger.exception("【BkApigwComponent】请求错误：%s，请求url: %s" % (e, request_url))
+            return {
+                "result": False,
+                "code": ResponseCodeStatus.FAILED,
+                "message": "{} 调用失败: {}".format(request_url, str(e)),
+                "data": {},
+            }
+
+        try:
+            response = result.json()
+        except Exception:
+            return {
+                "result": False,
+                "code": ResponseCodeStatus.FAILED,
+                "message": "not support invalid json response: {}".format(request_url),
+                "data": {},
+            }
+
+        # 响应后处理
+        if map_code:
+            try:
+                response = map_data(map_code, response, "response")
+            except Exception:
+                return {
+                    "result": False,
+                    "code": ResponseCodeStatus.FAILED,
+                    "message": traceback.format_exc().split("\n")[-2],
+                    "data": {},
+                }
+
+        # if response.get("result", False) and rsp_data:
+        #     return {
+        #         "result": True,
+        #         "message": "success",
+        #         "code": ResponseCodeStatus.OK,
+        #         "data": self._handle_response(response, rsp_data),
+        #     }
+
+        return response
+
+    def _handle_response(self, response, rsp_data):
+        """提取 response 中的字段值，例如 rsp_data='data.info'"""
+        import jmespath
+        from common.log import logger
+
+        data = {}
+        for attr in rsp_data.split(","):
+            if not attr:
+                continue
+            try:
+                data[attr] = jmespath.search(attr, response)
+            except AttributeError as e:
+                logger.warning("handle_response attribute_error[{}]: {}".format(attr, e))
+                data[attr] = ""
+        return data
+
+
+bk_apigw = BkApigwComponent()
