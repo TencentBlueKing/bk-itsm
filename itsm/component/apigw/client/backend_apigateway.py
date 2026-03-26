@@ -36,7 +36,7 @@ from itsm.component.apigw.base import APIResource
 
 
 _BK_API_URL_TMPL = getattr(settings, "BK_API_URL_TMPL", os.environ.get("BK_API_URL_TMPL", ""))
-_BK_APIGATEWAY_BASE_URL = _BK_API_URL_TMPL.replace("{api_name}", "bk-apigateway") if _BK_API_URL_TMPL else ""
+_BK_APIGATEWAY_BASE_URL = _BK_API_URL_TMPL.replace("{api_name}", "") if _BK_API_URL_TMPL else ""
 
 
 class BkApigw(APIResource):
@@ -180,13 +180,12 @@ class BkApigwComponent(object):
         self.session = _requests.session()
 
     def _build_url(self, api_name, path):
-        # 若未指定 api_name，尝试从 path 中解析，格式：/api/{api_name}/实际路径
         if not api_name and path:
+            trailing_slash = "/" if path.endswith("/") else ""
             parts = path.strip("/").split("/")
-            # 格式：api / {api_name} / ...
             if len(parts) >= 2 and parts[0] == "api":
                 api_name = parts[1]
-                path = "/" + "/".join(parts[2:])
+                path = "/" + "/".join(parts[2:]) + trailing_slash
         base = _BK_API_URL_TMPL.replace("{api_name}", api_name) if _BK_API_URL_TMPL else ""
         return base.rstrip("/") + "/" + path.lstrip("/")
 
@@ -198,6 +197,7 @@ class BkApigwComponent(object):
         method = (config.get("method") or "POST").upper()
         api_name = config.get("api_name", "")
         query_params = dict(config.get("query_params") or {})
+        path_params = dict(config.get("path_params") or {})
         map_code = config.get("map_code")
         before_req = config.get("before_req")
 
@@ -213,6 +213,13 @@ class BkApigwComponent(object):
             bk_token = request_object.COOKIES.get("bk_token", "")
         except Exception:
             pass
+        
+        # 优先用专门的 path_params 替换路径占位符
+        if path_params and path:
+            for key, value in path_params.items():
+                placeholder = "{%s}" % key
+                if placeholder in path:
+                    path = path.replace(placeholder, str(value))
 
         if query_params and path:
             for key in list(query_params.keys()):

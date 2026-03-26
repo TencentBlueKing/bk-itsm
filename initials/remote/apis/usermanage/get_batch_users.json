@@ -1,0 +1,78 @@
+[
+    {
+        "req_params": [
+            {
+                "name": "bk_usernames",
+                "in": "query",
+                "required": true,
+                "default": "",
+                "type": "string",
+                "description": "蓝鲸用户唯一标识，多个以逗号分隔，限制数量为 100"
+            }
+        ],
+        "is_deleted": false,
+        "name": "\u6279\u91cf\u83b7\u53d6\u7528\u6237\u4fe1\u606f",
+        "creator": "system",
+        "req_body": {},
+        "func_name": "get_batch_users",
+        "rsp_data": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "required": [
+                "data"
+            ],
+            "type": "object",
+            "description": "\u521d\u59cb\u5316\u6570\u636e",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "description": "\u8fd4\u56de\u6570\u636e",
+                    "items": {
+                        "required": [
+                            "bk_username",
+                            "display_name"
+                        ],
+                        "type": "object",
+                        "description": "\u7528\u6237\u4fe1\u606f",
+                        "properties": {
+                            "bk_username": {
+                                "default": "",
+                                "type": "string",
+                                "description": "\u84dd\u9cb8\u7528\u6237\u552f\u4e00\u6807\u8bc6"
+                            },
+                            "display_name": {
+                                "default": "",
+                                "type": "string",
+                                "description": "\u7528\u6237\u5c55\u793a\u540d"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "remote_system": 13,
+        "system_info": {
+            "cookies": [],
+            "code": "bk_login",
+            "is_deleted": false,
+            "name": "\u84dd\u9cb8\u7edf\u4e00\u767b\u5f55",
+            "creator": "",
+            "admin": "admin",
+            "variables": [],
+            "contact_information": "",
+            "is_activated": true,
+            "system_id": 1,
+            "headers": [],
+            "is_builtin": true,
+            "desc": "\u84dd\u9cb8\u7edf\u4e00\u767b\u5f55\uff0c\u7ba1\u7406\u7528\u6237\u767b\u5f55\u9a8c\u8bc1\uff0c\u53ca\u7528\u6237\u4fe1\u606f",
+            "updated_by": ""
+        },
+        "method": "GET",
+        "is_activated": true,
+        "version": "v2",
+        "req_headers": [],
+        "path": "/api/bk-user/prod/api/v3/open/tenant/users/-/display_info/",
+        "is_builtin": false,
+        "desc": "\u6279\u91cf\u67e5\u8be2\u7528\u6237\u5c55\u793a\u4fe1\u606f",
+        "updated_by": "system"
+    }
+]

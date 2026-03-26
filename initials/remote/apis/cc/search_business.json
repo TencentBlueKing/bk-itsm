@@ -142,9 +142,17 @@
         }
       }
     }, 
-    "path": "/api/c/compapi/v2/cc/search_business/",
+    "path": "/api/bk-cmdb/prod/api/v3/open/biz/search/{bk_supplier_account}", 
       "is_builtin": false, 
-    "req_params": [], 
+    "req_params": [
+      {
+        "name": "bk_supplier_account",
+        "in": "path",
+        "type": "string",
+        "desc": "开发商账户，参数在当前版本已废弃，可传任意值",
+        "default": "0"
+      }
+    ], 
     "desc": "\u67e5\u8be2\u4e1a\u52a1", 
     "read_only": true, 
     "is_deleted": false, 

@@ -416,6 +416,25 @@ class RemoteApiInstance(Model):
 
     def get_config(self):
         remote_api = self.remote_api
+        # 提取 path 参数的默认值，用于替换路径中的占位符
+        path_params = {
+            p["name"]: p.get("default", "")
+            for p in (remote_api.req_params or [])
+            if p.get("in") == "path"
+        }
+        
+        if remote_api.method == "POST":
+            query_params = self.req_body
+        else:
+            # GET 方法：以 req_params 定义的默认值为基础，再用实例的 req_params 覆盖
+            default_params = {
+                p["name"]: p.get("default", "")
+                for p in (remote_api.req_params or [])
+                if p.get("in") == "query"
+            }
+            default_params.update(self.req_params or {})
+            query_params = default_params
+
         return {
             "system_code": remote_api.remote_system.code,
             "system_domain": remote_api.remote_system.domain,
@@ -426,9 +445,8 @@ class RemoteApiInstance(Model):
             "rsp_data": self.rsp_data,
             "map_code": self.map_code,
             "before_req": self.before_req,
-            "query_params": (
-                self.req_body if remote_api.method == "POST" else self.req_params
-            ),
+            "path_params": path_params,
+            "query_params": query_params,
         }
 
     def get_api_choice(self, kv_relation, params):
@@ -474,9 +492,9 @@ class RemoteApiInstance(Model):
         api_config["query_params"] = query_params
         rsp = bk_apigw.http(config=api_config)
 
-        api_protocol_keys = {"code", "data", "message", "result"}
+        api_protocol_keys = {"code", "data", "message", "result", "permission"}
 
-        if not api_protocol_keys.issubset(set(rsp.keys())):
+        if not set(rsp.keys()).issubset(api_protocol_keys):
             return {
                 "result": False,
                 "code": ResponseCodeStatus.OK,
@@ -501,6 +519,8 @@ class RemoteApiInstance(Model):
         if not rsp_data_path or rsp_data_path == "data":
             rsp_data = rsp["data"]
         else:
+            if rsp_data_path.startswith("data."):
+                rsp_data_path = rsp_data_path[len("data."):]
             rsp_data = jmespath.search(rsp_data_path, rsp["data"]) or []
         
         if not kv_relation:

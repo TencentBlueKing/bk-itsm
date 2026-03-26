@@ -9,8 +9,7 @@
         "message", 
         "code", 
         "data", 
-        "result", 
-        "request_id"
+        "result"
       ], 
       "type": "object", 
       "description": "\u521d\u59cb\u5316\u6570\u636e", 
@@ -57,6 +56,16 @@
                     "default": 4, 
                     "type": "number", 
                     "description": "\u6a21\u5757ID"
+                  },
+                  "default": {
+                    "default": 1, 
+                    "type": "number", 
+                    "description": "\u9ed8\u8ba4\u6a21\u5757\u7c7b\u578b"
+                  }, 
+                  "host_apply_enabled": {
+                    "default": false, 
+                    "type": "boolean", 
+                    "description": "\u662f\u5426\u5f00\u542f\u4e3b\u673a\u5c5e\u6027\u81ea\u52a8\u5e94\u7528"
                   }
                 }
               }, 
@@ -75,17 +84,18 @@
           "type": "boolean", 
           "description": "\u8fd4\u56de\u7ed3\u679c"
         }, 
-        "request_id": {
-          "default": "89ea432a8a084c1095b090859cd20119", 
-          "type": "string", 
-          "description": "\u8bf7\u6c42ID"
+        "permission": {
+          "default": "", 
+          "type": "string",
+          "description": "\u6743\u9650\u4fe1\u606f"
         }
       }
     }, 
-    "path": "/api/c/compapi/v2/cc/get_biz_internal_module/", 
+    "path": "/api/bk-cmdb/prod/api/v3/open/topo/internal/{bk_supplier_account}/{bk_biz_id}", 
     "is_builtin": false,
     "req_params": [
       {
+
         "is_necessary": 1, 
         "sample": "", 
         "name": "bk_biz_id", 
@@ -93,9 +103,11 @@
         "desc": "\u4e1a\u52a1ID"
       }, 
       {
+        "in": "path",
         "is_necessary": 1, 
         "sample": "", 
         "name": "bk_supplier_account", 
+        "default": "0",
         "value": "", 
         "desc": "\u5f00\u53d1\u5546\u8d26\u53f7"
       }

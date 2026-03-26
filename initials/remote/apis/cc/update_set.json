@@ -4,39 +4,30 @@
     "creator": "system", 
     "func_name": "update_set", 
     "rsp_data": {
-      "$schema": "http://json-schema.org/draft-04/schema#", 
-      "required": [
-        "message", 
-        "code", 
-        "data", 
-        "result"
-      ], 
-      "type": "object", 
-      "description": "\u521d\u59cb\u5316\u6570\u636e", 
-      "properties": {
-        "message": {
-          "default": "", 
-          "type": "string", 
-          "description": "\u8fd4\u56de\u4fe1\u606f"
-        }, 
-        "code": {
-          "default": 0, 
-          "type": "number", 
-          "description": "\u9519\u8bef\u7801"
-        }, 
-        "data": {
-          "type": "object", 
-          "description": "\u8fd4\u56de\u6570\u636e", 
-          "properties": {}
-        }, 
-        "result": {
-          "default": true, 
-          "type": "boolean", 
-          "description": "\u8fd4\u56de\u7ed3\u679c"
+        "type": "object",
+        "description": "初始化数据",
+        "required": [
+            "result",
+            "code",
+            "message"
+        ],
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "properties": {
+            "result": {
+                "type": "boolean",
+                "default": true
+            },
+            "code": {
+                "type": "number",
+                "default": 0
+            },
+            "message": {
+                "type": "string",
+                "default": "success"
+            }
         }
-      }
     }, 
-    "path": "/api/c/compapi/v2/cc/update_set/",
+    "path": "/api/bk-cmdb/prod/api/v3/open/set/{bk_biz_id}/{bk_set_id}",
       "is_builtin": false, 
     "req_params": [], 
     "desc": "\u66f4\u65b0\u96c6\u7fa4", 
@@ -65,62 +56,54 @@
     "req_headers": [], 
     "method": "POST", 
     "req_body": {
-      "$schema": "http://json-schema.org/draft-04/schema#", 
-      "required": [
-        "bk_biz_id", 
-        "bk_set_id", 
-        "data"
-      ], 
-      "type": "object", 
-      "description": "\u521d\u59cb\u5316\u6570\u636e", 
-      "properties": {
-        "bk_biz_id": {
-          "default": "", 
-          "type": "number", 
-          "description": "\u4e1a\u52a1ID"
-        }, 
-        "bk_set_id": {
-          "default": "", 
-          "type": "number", 
-          "description": "\u96c6\u7fa4ID"
-        }, 
-        "data": {
-          "type": "object", 
-          "description": "", 
-          "properties": {
+        "type": "object",
+        "description": "初始化数据",
+        "required": [
+            "bk_biz_id",
+            "bk_set_id",
+            "bk_set_name",
+            "default",
+            "set_template_id",
+            "bk_capacity",
+            "bk_set_desc",
+            "description",
+            "bk_set_env",
+            "bk_service_status"
+        ],
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "properties": {
+            "bk_biz_id": {
+                "type": "number"
+            },
+            "bk_set_id": {
+                "type": "number"
+            },
             "bk_set_name": {
-              "default": "", 
-              "type": "string", 
-              "description": "\u96c6\u7fa4\u540d\u79f0"
-            }, 
-            "bk_service_status": {
-              "default": "", 
-              "type": "string", 
-              "description": "\u670d\u52a1\u72b6\u6001\uff1a1-\u5f00\u653e;2-\u5173\u95ed"
-            }, 
-            "description": {
-              "default": "", 
-              "type": "string", 
-              "description": "\u5907\u6ce8"
-            }, 
-            "bk_set_env": {
-              "default": "", 
-              "type": "string", 
-              "description": "\u73af\u5883\u7c7b\u578b\uff1a1-\u6d4b\u8bd5;2-\u4f53\u9a8c;3-\u6b63\u5f0f"
-            }, 
+                "type": "string"
+            },
+            "default": {
+                "type": "number"
+            },
+            "set_template_id": {
+                "type": "number"
+            },
+            "bk_capacity": {
+                "type": "number"
+            },
             "bk_set_desc": {
-              "default": "", 
-              "type": "string", 
-              "description": "\u96c6\u7fa4\u63cf\u8ff0"
+                "type": "string"
+            },
+            "description": {
+                "type": "string"
+            },
+            "bk_set_env": {
+                "type": "string"
+            },
+            "bk_service_status": {
+                "type": "string"
             }
-          }
-        }, 
-        "bk_supplier_account": {
-          "default": "0", 
-          "type": "string", 
-          "description": "\u5f00\u53d1\u5546\u8d26\u53f7"
         }
-      }
     }
+        
   }
 ]
