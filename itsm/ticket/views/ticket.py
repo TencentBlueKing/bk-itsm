@@ -234,6 +234,10 @@ class TicketModelViewSet(ModelViewSet):
 
     def get_object(self):
         ticket = super(TicketModelViewSet, self).get_object()
+        
+        if self._is_operate_ticket(ticket):
+            raise ValidationError("该工单为旧数据，无法操作")
+        
         master_ticket = ticket.get_master_ticket()
         if master_ticket:
             # 母单代理单据
@@ -241,6 +245,24 @@ class TicketModelViewSet(ModelViewSet):
             return master_ticket
 
         return ticket
+    
+    @staticmethod
+    def _is_operate_ticket(ticket: Ticket) -> bool:
+        """是否限制工单操作"""
+        
+        # 多租户才开启限制
+        multi_tenant = getattr(settings, "BKPAAS_MULTI_TENANT_MODE", "false")
+        if str(multi_tenant).lower() != "true":
+            return False
+        
+        # 判断开关是否开启
+        switch = getattr(settings, "MIGRATE_TICKET_READONLY_SWITCH", "false")
+        if str(switch).lower() != "true":
+            return False
+        
+        # 获取限制的工单ID
+        threshold = getattr(settings, "READONLY_TICKET_ID_THRESHOLD", 10000000)
+        return ticket.id < int(threshold)
 
     @action(detail=False, methods=["GET"])
     def total_count(self, request, *args, **kwargs):
