@@ -147,6 +147,8 @@ if USE_IAM:
     )
 IAM_SKIP_AUTH = False
 
+INSTALLED_APPS  += ("bkoauth",)
+
 # 这里是默认的中间件，大部分情况下，不需要改动
 # 如果你已经了解每个默认 MIDDLEWARE 的作用，确实需要去掉某些 MIDDLEWARE，或者改动先后顺序，请去掉下面的注释，然后修改
 MIDDLEWARE = (
@@ -1052,7 +1054,7 @@ BKAUTH_BACKEND_TYPE = "bk_ticket" if RUN_VER == "ieod" else "bk_token"
 
 # 仅社区版需要配置，其它版本已由开发框架处理
 if BKAUTH_BACKEND_TYPE == 'bk_token':
-    OAUTH_COOKIES_PARAMS = {"bk_token": "bk_token", "bk_uid": "bk_uid"}
+    OAUTH_COOKIES_PARAMS = {"bk_token": "bk_token"}
 
     os.environ['OAUTH_API_URL'] = (
         os.getenv('BKAPP_OAUTH_API_URL') or
