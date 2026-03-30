@@ -23,9 +23,13 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+import logging
+
 from bkapi_client_core.base import Operation
 
 from bkapi_client_core.django_helper import _get_client_by_settings
+
+logger = logging.getLogger(__name__)
 from bkapi_client_core.django_helper import get_client_by_request as _get_client_by_request
 from bkapi_client_core.django_helper import get_client_by_username as _get_client_by_username
 from bkapi_client_core.property import bind_property
@@ -284,3 +288,27 @@ class BkSopsApi(ApiProtocol):
         """通过用户名获取客户端（有用户上下文，推荐在后台任务中使用）"""
         return (_partial(Client, _get_client_by_username)
                 (username, endpoint=get_endpoint(cls._api_name, "prod")))
+
+    @classmethod
+    def get_client_by_username_with_db_token(cls, username) -> Client:
+        """
+        通过用户名获取客户端，access_token 直接从数据库查询（适用于后台 Celery 任务）。
+        多租户环境下 bkoauth 网络请求可能失败，此方法绕过网络请求直接读库。
+        """
+        access_token = None
+        try:
+            from bkoauth.models import AccessToken
+            token_obj = AccessToken.objects.filter(user_id=username).order_by("-expires").first()
+            if token_obj:
+                access_token = token_obj.access_token
+                logger.info("[BkSopsApi] 从数据库获取 access_token 成功, username=%s", username)
+            else:
+                logger.warning("[BkSopsApi] 数据库中未找到 access_token, username=%s", username)
+        except Exception as e:
+            logger.warning("[BkSopsApi] 从数据库获取 access_token 失败, username=%s, error=%s", username, e)
+
+        client = _get_client_by_settings(Client, endpoint=get_endpoint(cls._api_name, "prod"))
+        if access_token:
+            client.update_bkapi_authorization(access_token=access_token)
+            logger.info("[BkSopsApi] get_client_by_username_with_db_token 完成（携带 access_token）, username=%s", username)
+        return client
