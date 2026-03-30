@@ -156,8 +156,14 @@ class BkOpsService(ItsmBaseService):
         )
         self.update_info(current_node, sops_result, task_params=task_params)
 
+        raw_operator = state.get("processors", "")
+        operator = next(
+            (u.strip() for u in raw_operator.split(",") if u.strip() and u.strip() != "system"),
+            "admin"
+        )
+        logger.info("[bk_sops] operator resolved: %s (raw: %s)", operator, raw_operator)
         try:
-            _client = BkSopsApi.get_client()
+            _client = BkSopsApi.get_client_by_username(operator)
             create_result = _client.create_task(
                 path_params={
                     "template_id": task_params["template_id"],
@@ -208,7 +214,7 @@ class BkOpsService(ItsmBaseService):
 
         # second_step execute
         try:
-            _client = BkSopsApi.get_client()
+            _client = BkSopsApi.get_client_by_username(operator)
             _client.start_task(
                 path_params={
                     "task_id": sops_task_id,
