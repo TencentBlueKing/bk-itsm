@@ -714,7 +714,7 @@ paths:
       x-bk-apigateway-resource:
         allowApplyPermission: true
         authConfig:
-          userVerifiedRequired: true
+          userVerifiedRequired: false
         backend:
           matchSubpath: false
           method: post

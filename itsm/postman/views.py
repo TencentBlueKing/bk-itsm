@@ -40,6 +40,7 @@ from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.drf.exception import ValidationError
 from itsm.component.drf.mixins import DynamicListModelMixin
 from itsm.component.esb.backend_component import bk
+from itsm.component.apigw.client.backend_apigateway import bk_apigw
 from itsm.component.exceptions import NotAllowedError, ParamError, RpcAPIError
 from itsm.component.utils.client_backend_query import get_components, get_systems
 from itsm.component.utils.misc import JsonEncoder
@@ -241,7 +242,7 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
         before_req = request.data.get("before_req", "")
         api_config.update(map_code=map_code, before_req=before_req)
 
-        rsp = bk.http(config=api_config)
+        rsp = bk_apigw.http(config=api_config)
 
         # 多加一层是因为前端对返回的message有一个统一添加msg的逻辑（为了屏蔽返回差异），所以此处加一层包裹，前端取data里面的值
         return Response(

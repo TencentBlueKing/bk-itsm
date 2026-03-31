@@ -290,11 +290,7 @@ class BkSopsApi(ApiProtocol):
                 (username, endpoint=get_endpoint(cls._api_name, "prod")))
 
     @classmethod
-    def get_client_by_username_with_db_token(cls, username) -> Client:
-        """
-        通过用户名获取客户端，access_token 直接从数据库查询（适用于后台 Celery 任务）。
-        多租户环境下 bkoauth 网络请求可能失败，此方法绕过网络请求直接读库。
-        """
+    def get_client_with_token(cls, username) -> Client:
         access_token = None
         try:
             from bkoauth.models import AccessToken
@@ -310,5 +306,5 @@ class BkSopsApi(ApiProtocol):
         client = _get_client_by_settings(Client, endpoint=get_endpoint(cls._api_name, "prod"))
         if access_token:
             client.update_bkapi_authorization(access_token=access_token)
-            logger.info("[BkSopsApi] get_client_by_username_with_db_token 完成（携带 access_token）, username=%s", username)
+            logger.info("[BkSopsApi] get_client_with_token 完成（携带 access_token）, username=%s", username)
         return client

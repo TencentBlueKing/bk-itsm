@@ -161,12 +161,11 @@ class BkOpsService(ItsmBaseService):
             ticket.creator,
         )
         logger.info("[bk_sops] operator resolved: %s (current_processors: %s)", operator, processors)
-        # 提前写入 operator，防止 execute 失败时 schedule 拿不到而回退到默认值 "admin"
         data.set_outputs("operator", operator)
         try:
             logger.info("[bk_sops][execute] 开始 create_task, operator=%s, template_id=%s, bk_biz_id=%s",
                         operator, task_params["template_id"], task_params["bk_biz_id"])
-            _client = BkSopsApi.get_client_by_username_with_db_token(operator)
+            _client = BkSopsApi.get_client_with_token(operator)
             create_result = _client.create_task(
                 path_params={
                     "template_id": task_params["template_id"],
@@ -219,7 +218,7 @@ class BkOpsService(ItsmBaseService):
         try:
             logger.info("[bk_sops][execute] 开始 start_task, operator=%s, sops_task_id=%s, bk_biz_id=%s",
                         operator, sops_task_id, task_params["bk_biz_id"])
-            _client = BkSopsApi.get_client_by_username_with_db_token(operator)
+            _client = BkSopsApi.get_client_with_token(operator)
             _client.start_task(
                 path_params={
                     "task_id": sops_task_id,
@@ -312,7 +311,7 @@ class BkOpsService(ItsmBaseService):
         try:
             logger.info("[bk_sops][schedule] 开始 get_task_status, operator=%s, sops_task_id=%s, bk_biz_id=%s",
                         operator, sops_task_id, bk_biz_id)
-            _client = BkSopsApi.get_client_by_username_with_db_token(operator)
+            _client = BkSopsApi.get_client_with_token(operator)
             task_result = _client.get_task_status(
                 path_params={
                     "task_id": sops_task_id,
@@ -403,7 +402,7 @@ class BkOpsService(ItsmBaseService):
         error_messages = []
         for child in failed_children:
             try:
-                _client = BkSopsApi.get_client_by_username_with_db_token(operator)
+                _client = BkSopsApi.get_client_with_token(operator)
                 result = _client.get_task_node_detail(
                     path_params={
                         "task_id": sops_task_id,
