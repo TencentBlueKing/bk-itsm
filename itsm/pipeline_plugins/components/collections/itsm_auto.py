@@ -36,6 +36,7 @@ from django.core.cache import cache
 from django.db import transaction
 from django.utils.translation import gettext as _
 
+from itsm.component.apigw.client.backend_apigateway import bk_apigw
 from itsm.component.constants import (
     ACTION_DICT,
     FAILED,
@@ -77,7 +78,7 @@ class AutoStateService(ItsmBaseService):
 
     @staticmethod
     def poll_proceed(api_config, success_conditions):
-        rsp = bk.http(config=api_config)
+        rsp = bk_apigw.http(config=api_config)
         if success_conditions is None:
             return rsp.get("result", False), rsp
         # 构造带${params_}的条件

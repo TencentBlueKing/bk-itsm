@@ -202,8 +202,14 @@ class BkApigwComponent(object):
         before_req = config.get("before_req")
 
         # 获取用户身份和 token：优先从 query_params 中取，其次从请求上下文中取
-        remote_user = query_params.pop("__remote_user__", None)
+        remote_user = (
+            config.get("__remote_user__")
+            or query_params.pop("__remote_user__", None)
+            or settings.SYSTEM_CALL_USER
+        )
+        
         bk_token = None
+        access_token = None
         try:
             from blueapps.utils import get_request
             request_object = get_request()
@@ -213,6 +219,14 @@ class BkApigwComponent(object):
             bk_token = request_object.COOKIES.get("bk_token", "")
         except Exception:
             pass
+        
+        if remote_user:
+            try:
+                import bkoauth
+                access_token_obj = bkoauth.get_access_token_by_user(remote_user)
+                access_token = access_token_obj.get("access_token", "")
+            except Exception:
+                logger.warning("[BkApigwComponent] 获取 access_token 失败，user={}，降级使用 bk_token/bk_username".format(remote_user))
         
         # 优先用专门的 path_params 替换路径占位符
         if path_params and path:
@@ -242,14 +256,16 @@ class BkApigwComponent(object):
         # 根据环境构造认证信息：open 环境用 bk_token，ieod 环境用 bk_username
         auth_info = {"bk_app_code": APP_ID, "bk_app_secret": APP_TOKEN}
         if RUN_VER == "ieod":
-            if remote_user:
+            if access_token:
+                auth_info["access_token"] = access_token
+            elif remote_user:
                 auth_info["bk_username"] = remote_user
         else:
             # open 环境：优先用 bk_token，没有则降级用 bk_username
-            if bk_token:
+            if access_token:
+                auth_info["access_token"] = access_token
+            elif bk_token:
                 auth_info["bk_token"] = bk_token
-            elif remote_user:
-                auth_info["bk_username"] = remote_user
         import json
         headers = {
             "X-Bkapi-Authorization": json.dumps(auth_info),
