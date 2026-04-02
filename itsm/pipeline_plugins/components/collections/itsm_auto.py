@@ -80,7 +80,7 @@ class AutoStateService(ItsmBaseService):
     def poll_proceed(api_config, success_conditions):
         rsp = bk_apigw.http(config=api_config)
         if success_conditions is None:
-            return rsp.get("result", False), rsp
+            return rsp.get("result", True), rsp
         # 构造带${params_}的条件
         conditions = conditions_conversion(success_conditions)
         rsp_copy = copy.deepcopy(rsp)
@@ -380,7 +380,8 @@ class AutoStateService(ItsmBaseService):
             return True
 
         api_config["id"] = api_instance.id
-        # 设置接口执行用户为提单人
+        first_processor = (node_status.processors or "").strip(",").split(",")[0].strip()
+        api_config["__remote_user__"] = first_processor
         api_config["query_params"] = query_params
         data.set_outputs("api_config", api_config)
         data.set_outputs("need_poll", api_instance.need_poll)

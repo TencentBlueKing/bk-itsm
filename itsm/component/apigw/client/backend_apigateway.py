@@ -205,7 +205,6 @@ class BkApigwComponent(object):
         remote_user = (
             config.get("__remote_user__")
             or query_params.pop("__remote_user__", None)
-            or settings.SYSTEM_CALL_USER
         )
         
         bk_token = None
@@ -224,7 +223,7 @@ class BkApigwComponent(object):
             try:
                 import bkoauth
                 access_token_obj = bkoauth.get_access_token_by_user(remote_user)
-                access_token = access_token_obj.get("access_token", "")
+                access_token = access_token_obj.access_token
             except Exception:
                 logger.warning("[BkApigwComponent] 获取 access_token 失败，user={}，降级使用 bk_token/bk_username".format(remote_user))
         
