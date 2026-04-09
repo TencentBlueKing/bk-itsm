@@ -1053,16 +1053,16 @@ READONLY_TICKET_ID_THRESHOLD = int(os.getenv("READONLY_TICKET_ID_THRESHOLD", 100
 BKAUTH_BACKEND_TYPE = "bk_ticket" if RUN_VER == "ieod" else "bk_token"
 
 # 仅社区版需要配置，其它版本已由开发框架处理
-if BKAUTH_BACKEND_TYPE == 'bk_token':
-    OAUTH_COOKIES_PARAMS = {"bk_token": "bk_token"}
-
-    os.environ['OAUTH_API_URL'] = (
-        os.getenv('BKAPP_OAUTH_API_URL') or
-        os.getenv('BKPAAS_SSM_API_URL')
-    )
-
-    # OAuth 临近过期时间：生效期在 1 小时内则自动刷新 token
-    EXPIRES_SECONDS = 60 * 60
+# if BKAUTH_BACKEND_TYPE == 'bk_token':
+#     OAUTH_COOKIES_PARAMS = {"bk_token": "bk_token"}
+# 
+#     os.environ['OAUTH_API_URL'] = (
+#         os.getenv('BKAPP_OAUTH_API_URL') or
+#         os.getenv('BKPAAS_SSM_API_URL')
+#     )
+# 
+#     # OAuth 临近过期时间：生效期在 1 小时内则自动刷新 token
+#     EXPIRES_SECONDS = 60 * 60
 
 # DB 迁移配置
 # 判断是否开启增量同步
