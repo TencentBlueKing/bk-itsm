@@ -166,7 +166,7 @@ class BkOpsService(ItsmBaseService):
             logger.info("[bk_sops][execute] 开始 create_task, operator=%s, template_id=%s, bk_biz_id=%s",
                         operator, task_params["template_id"], task_params["bk_biz_id"])
             _client = BkSopsApi.get_client_with_token(operator)
-            create_result = _client.create_task(
+            create_result = _client.system_create_task(
                 path_params={
                     "template_id": task_params["template_id"],
                     "bk_biz_id": str(task_params["bk_biz_id"]),
@@ -219,7 +219,7 @@ class BkOpsService(ItsmBaseService):
             logger.info("[bk_sops][execute] 开始 start_task, operator=%s, sops_task_id=%s, bk_biz_id=%s",
                         operator, sops_task_id, task_params["bk_biz_id"])
             _client = BkSopsApi.get_client_with_token(operator)
-            _client.start_task(
+            _client.system_start_task(
                 path_params={
                     "task_id": sops_task_id,
                     "bk_biz_id": str(task_params["bk_biz_id"]),
@@ -312,7 +312,7 @@ class BkOpsService(ItsmBaseService):
             logger.info("[bk_sops][schedule] 开始 get_task_status, operator=%s, sops_task_id=%s, bk_biz_id=%s",
                         operator, sops_task_id, bk_biz_id)
             _client = BkSopsApi.get_client_with_token(operator)
-            task_result = _client.get_task_status(
+            task_result = _client.system_get_task_status(
                 path_params={
                     "task_id": sops_task_id,
                     "bk_biz_id": str(bk_biz_id),
@@ -403,7 +403,7 @@ class BkOpsService(ItsmBaseService):
         for child in failed_children:
             try:
                 _client = BkSopsApi.get_client_with_token(operator)
-                result = _client.get_task_node_detail(
+                result = _client.system_get_task_node_detail(
                     path_params={
                         "task_id": sops_task_id,
                         "bk_biz_id": str(bk_biz_id),

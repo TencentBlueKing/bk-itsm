@@ -57,6 +57,13 @@ class Client(TenantBaseClient):
         method="POST",
         path="/create_task/{template_id}/{bk_biz_id}/",
     )
+    
+    system_create_task = bind_property(
+        Operation,
+        name="system_create_task",
+        method="POST",
+        path="/system/create_task/{template_id}/{bk_biz_id}/",
+    )
 
     # 查询单个公共流程模板详情
     get_common_template_info = bind_property(
@@ -105,6 +112,13 @@ class Client(TenantBaseClient):
         method="GET",
         path="/get_task_node_detail/{task_id}/{bk_biz_id}/",
     )
+    
+    system_get_task_node_detail = bind_property(
+        Operation,
+        name="system_get_task_node_detail",
+        method="GET",
+        path="/system/get_task_node_detail/{task_id}/{bk_biz_id}/",
+    )
 
     # 查询任务或任务节点执行状态
     get_task_status = bind_property(
@@ -112,6 +126,13 @@ class Client(TenantBaseClient):
         name="get_task_status",
         method="GET",
         path="/get_task_status/{task_id}/{bk_biz_id}/",
+    )
+    
+    system_get_task_status = bind_property(
+        Operation,
+        name="system_get_task_status",
+        method="GET",
+        path="/system/get_task_status/{task_id}/{bk_biz_id}/",
     )
 
     # 批量查询任务执行状态
@@ -200,6 +221,13 @@ class Client(TenantBaseClient):
         name="start_task",
         method="POST",
         path="/start_task/{task_id}/{bk_biz_id}/",
+    )
+    
+    system_start_task = bind_property(
+        Operation,
+        name="start_task",
+        method="POST",
+        path="/system/start_task/{task_id}/{bk_biz_id}/",
     )
 
     # 操作任务节点
