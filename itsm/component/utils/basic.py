@@ -619,6 +619,7 @@ def generate_random_sn(service_type):
     num = incr_expireat(key, when=when)
     sn = (
         prefix_mapping[service_type]
+        + "NEW"
         + now_time.strftime("%Y%m%d")
         + "{:0>6}".format(num)
     )
