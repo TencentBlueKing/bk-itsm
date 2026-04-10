@@ -121,7 +121,7 @@ jmespath==1.0.1
 requests_toolbelt==1.0.0
 
 apigw-manager[cryptography]==4.0.0
-blueapps[opentelemetry,bkcrypto]==4.17.1
+blueapps[opentelemetry,bkcrypto]==4.15.8
 
 drf-yasg==1.21.8
 
