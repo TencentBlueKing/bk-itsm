@@ -57,6 +57,13 @@ class Client(TenantBaseClient):
         method="POST",
         path="/create_task/{template_id}/{bk_biz_id}/",
     )
+    
+    system_create_task = bind_property(
+        Operation,
+        name="system_create_task",
+        method="POST",
+        path="/system/create_task/{template_id}/{bk_biz_id}/",
+    )
 
     # 查询单个公共流程模板详情
     get_common_template_info = bind_property(
@@ -105,6 +112,13 @@ class Client(TenantBaseClient):
         method="GET",
         path="/get_task_node_detail/{task_id}/{bk_biz_id}/",
     )
+    
+    system_get_task_node_detail = bind_property(
+        Operation,
+        name="system_get_task_node_detail",
+        method="GET",
+        path="/system/get_task_node_detail/{task_id}/{bk_biz_id}/",
+    )
 
     # 查询任务或任务节点执行状态
     get_task_status = bind_property(
@@ -112,6 +126,13 @@ class Client(TenantBaseClient):
         name="get_task_status",
         method="GET",
         path="/get_task_status/{task_id}/{bk_biz_id}/",
+    )
+    
+    system_get_task_status = bind_property(
+        Operation,
+        name="system_get_task_status",
+        method="GET",
+        path="/system/get_task_status/{task_id}/{bk_biz_id}/",
     )
 
     # 批量查询任务执行状态
@@ -200,6 +221,13 @@ class Client(TenantBaseClient):
         name="start_task",
         method="POST",
         path="/start_task/{task_id}/{bk_biz_id}/",
+    )
+    
+    system_start_task = bind_property(
+        Operation,
+        name="start_task",
+        method="POST",
+        path="/system/start_task/{task_id}/{bk_biz_id}/",
     )
 
     # 操作任务节点
@@ -294,12 +322,29 @@ class BkSopsApi(ApiProtocol):
         access_token = None
         try:
             from bkoauth.models import AccessToken
-            token_obj = AccessToken.objects.filter(user_id=username).order_by("-expires").first()
-            if token_obj:
+            from bkoauth.django_conf import ENV_NAME, OAUTH_API_URL, BKAUTH_TOKEN_APP_CODE, BKAUTH_TOKEN_SECRET_KEY
+
+            token_obj = AccessToken.objects.filter(env_name=ENV_NAME, user_id=username).first()
+            if not token_obj:
+                logger.warning("[BkSopsApi] 数据库中未找到 access_token, username=%s", username)
+            else:
+                # 检查 token 是否即将过期，如果是则自动刷新
+                if token_obj.expires_soon:
+                    if token_obj.refresh_token:
+                        try:
+                            from bkoauth.client import oauth_client
+                            token_obj = oauth_client.refresh_token(token_obj)
+                            logger.info("[BkSopsApi] access_token 已自动刷新, username=%s", username)
+                        except Exception as refresh_err:
+                            logger.warning(
+                                "[BkSopsApi] 刷新 access_token 失败, username=%s, error=%s",
+                                username, refresh_err
+                            )
+                    else:
+                        logger.warning("[BkSopsApi] access_token 即将过期但无 refresh_token, username=%s", username)
+
                 access_token = token_obj.access_token
                 logger.info("[BkSopsApi] 从数据库获取 access_token 成功, username=%s", username)
-            else:
-                logger.warning("[BkSopsApi] 数据库中未找到 access_token, username=%s", username)
         except Exception as e:
             logger.warning("[BkSopsApi] 从数据库获取 access_token 失败, username=%s, error=%s", username, e)
 
