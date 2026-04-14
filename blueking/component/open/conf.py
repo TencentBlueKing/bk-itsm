@@ -52,9 +52,16 @@ try:
     
     DEFAULT_BK_API_VER = getattr(settings, "DEFAULT_BK_API_VER", "v2")
 except BaseException:
-    APP_CODE = ""
-    SECRET_KEY = ""
-    COMPONENT_SYSTEM_HOST = ""
+    APP_CODE = os.environ.get("BKPAAS_APP_ID", os.environ.get("APP_ID", ""))
+    SECRET_KEY = os.environ.get("BKPAAS_APP_SECRET", os.environ.get("APP_TOKEN", ""))
+    _BK_API_URL_TMPL = os.environ.get("BK_API_URL_TMPL", "")
+    if _BK_API_URL_TMPL and "{api_name}" in _BK_API_URL_TMPL:
+        COMPONENT_SYSTEM_HOST = _BK_API_URL_TMPL.split("/api/")[0]
+    else:
+        COMPONENT_SYSTEM_HOST = os.environ.get(
+            "BK_COMPONENT_API_URL",
+            os.environ.get("BK_PAAS_INNER_HOST", os.environ.get("BK_PAAS_HOST", ""))
+        )
     DEFAULT_BK_API_VER = "v2"
 
 CLIENT_ENABLE_SIGNATURE = False
