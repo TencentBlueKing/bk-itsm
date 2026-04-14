@@ -82,13 +82,29 @@ class PathTypeValidators(object):
         if not path:
             raise AnnexStoreValidateError(_("路径不能为空！"))
 
+        # 防御空字节注入
+        if "\x00" in path:
+            raise AnnexStoreValidateError(_("路径包含非法字符！"))
+
+        # 路径穿越检测
+        path_parts = os.path.normpath(path).split(os.sep)
+        if ".." in path_parts:
+            raise AnnexStoreValidateError(_("路径包含非法字符！"))
+
+        real_path = os.path.realpath(path)
+
+        if os.path.normpath(path) != real_path:
+            logger.warning(
+                "路径安全校验：规范化路径不一致，原始=%s，realpath=%s", path, real_path
+            )
+        
         # 如果是容器化环境, 由于使用的是制品库，跳过路径校验
         if settings.ENGINE_REGION == "default":
             return
-
-        if not os.path.exists(path):
+        
+        if not os.path.exists(real_path):
             raise AnnexStoreValidateError(_("路径不存在，请检查！"))
-        file_path = os.path.join(path, "%s/" % int(time.time()))
+        file_path = os.path.join(real_path, "%s/" % int(time.time()))
 
         try:
             os.makedirs(file_path)
