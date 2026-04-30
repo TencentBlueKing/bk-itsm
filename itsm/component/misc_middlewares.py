@@ -170,15 +170,7 @@ class InstrumentProfilerMiddleware(ProfilerMiddleware):
 
 class ApiIgnoreCheck(MiddlewareMixin):
     def process_request(self, request):
-        if (
-            request.path.find("/api/ticket/comments/get_comment") >= 0
-            or request.path.find("/api/ticket/comments/post_comment") >= 0
-            or request.path.find("/api/ticket/operational/get_tickets") >= 0
-            or request.path.find("/api/ticket/operational/comments") >= 0
-            or request.path.find("/api/ticket/operational/workflows") >= 0
-            or request.path.find("/api/ticket/receipts/get_ticket_log") >= 0
-            or request.path.find("/openapi/") >= 0
-        ):
+        if request.path.find("/openapi/") >= 0:
             setattr(request, "_dont_enforce_csrf_checks", True)
             setattr(request, "_login_exempt", True)
 
