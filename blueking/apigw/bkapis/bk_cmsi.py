@@ -77,6 +77,14 @@ class Client(TenantBaseClient):
         method="POST",
         path="/v1/send_weixin/",
     )
+    
+    # 发送企业微信
+    v1_send_rtx = bind_property(
+        Operation,
+        name="v1_send_rtx",
+        method="POST",
+        path="/v1/send_rtx/",
+    )
 
 
 class BkCmsiApi(ApiProtocol):

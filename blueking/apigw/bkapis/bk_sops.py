@@ -351,5 +351,8 @@ class BkSopsApi(ApiProtocol):
         client = _get_client_by_settings(Client, endpoint=get_endpoint(cls._api_name, "prod"))
         if access_token:
             client.update_bkapi_authorization(access_token=access_token)
-            logger.info("[BkSopsApi] get_client_with_token 完成（携带 access_token）, username=%s", username)
+            logger.info("[BkSopsApi] get_client_with_token 完成（携带 access_token 和 bk_username）, username=%s", username)
+        else:
+            client.update_bkapi_authorization(bk_username=username)
+            logger.info("[BkSopsApi] get_client_with_token 完成（仅携带 bk_username）, username=%s", username)
         return client

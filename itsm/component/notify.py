@@ -56,6 +56,13 @@ class BaseNotifier(object):
                 ticket_id=kwargs.get("ticket_id"),
             )
 
+        if notify_type == "rtx":
+            return RtxNotifier(
+                self.title,
+                self.receivers,
+                self.message,
+            )
+
         if notify_type == "email":
             return EmailNotifier(self.title, self.receivers, self.message)
 
@@ -100,6 +107,15 @@ class BaseNotifier(object):
                 response = cmsi_client.v1_send_sms(data=params)
             elif self.notify_type.lower() == "weixin":
                 response = cmsi_client.v1_send_weixin(data=params)
+            elif self.notify_type.lower() == "rtx":
+                # 企业微信走 send_rtx 接口，参数格式需要适配
+                rtx_params = {
+                    "receiver": self._get_receiver_list(),
+                    "title": self.title,
+                    "content": self.message,
+                }
+                rtx_params.update(kwargs)
+                response = cmsi_client.v1_send_rtx(data=rtx_params)
             elif self.notify_type.lower() == "voice":
                 response = cmsi_client.v1_send_voice(data=params)
             else:
@@ -119,10 +135,16 @@ class BaseNotifier(object):
         获取参数
         """
         return {
-            "receiver__username": self.receivers,
+            "receiver": self._get_receiver_list(),  # 改为 receiver 并使用列表
             "title": self.title,
             "content": self.message,
         }
+
+    def _get_receiver_list(self):
+        """将逗号分隔的接收者字符串转为列表"""
+        if isinstance(self.receivers, str):
+            return [r.strip() for r in self.receivers.split(",") if r.strip()]
+        return list(self.receivers)
 
 
 class WeixinNotifier(BaseNotifier):
@@ -161,7 +183,7 @@ class WeixinNotifier(BaseNotifier):
     @property
     def params(self):
         return {
-            "receiver__username": self.receivers,
+            "receiver__username": self._get_receiver_list(), 
             "title": self.title,
             "content": self.message,
             "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -170,6 +192,32 @@ class WeixinNotifier(BaseNotifier):
             ).format(site_url=WEIXIN_APP_EXTERNAL_HOST, ticket_id=self.ticket_id),
             "wx_qy_agentid": self.wx_qy_agentid,
             "wx_qy_corpsecret": self.wx_qy_corpsecret,
+        }
+
+
+class RtxNotifier(BaseNotifier):
+    """发送企业微信（通过 send_rtx 接口）"""
+
+    def __init__(self, title, receivers, message):
+        super(RtxNotifier, self).__init__(title, receivers, message)
+
+    def send(self, **kwargs):
+        params = merge_dict_list([self.params, kwargs])
+        try:
+            cmsi_client = BkCmsiApi.get_client()
+            response = cmsi_client.v1_send_rtx(data=params)
+            return response.get("data")
+        except (ComponentCallError, APIGatewayResponseError) as e:
+            if hasattr(e, 'esb_message') and e.esb_message.startswith("Some users failed"):
+                return
+            raise e
+
+    @property
+    def params(self):
+        return {
+            "receiver": self._get_receiver_list(),
+            "title": self.title,
+            "content": self.message,
         }
 
 
@@ -209,10 +257,11 @@ class SmsNotifier(BaseNotifier):
             if hasattr(e, 'esb_message') and e.esb_message.startswith("Some users failed"):
                 return
             raise e
+    
 
     @property
     def params(self):
         self.message = self.title + self.message
         if self.receiver_nums:
             return {"receiver": self.receiver_nums, "content": self.message}
-        return {"receiver__username": self.receivers, "content": self.message}
+        return {"receiver__username": self._get_receiver_list(), "content": self.message}
