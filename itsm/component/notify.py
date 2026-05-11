@@ -110,7 +110,7 @@ class BaseNotifier(object):
             elif self.notify_type.lower() == "rtx":
                 # 企业微信走 send_rtx 接口，参数格式需要适配
                 rtx_params = {
-                    "receiver": self._get_receiver_list(),
+                    "receiver__username": self._get_receiver_list(),
                     "title": self.title,
                     "content": self.message,
                 }
@@ -215,7 +215,7 @@ class RtxNotifier(BaseNotifier):
     @property
     def params(self):
         return {
-            "receiver": self._get_receiver_list(),
+            "receiver__username": self._get_receiver_list(),
             "title": self.title,
             "content": self.message,
         }
@@ -224,11 +224,20 @@ class RtxNotifier(BaseNotifier):
 class EmailNotifier(BaseNotifier):
     """发送邮件"""
 
+    @property
+    def params(self):
+        return {
+            "receiver__username": self._get_receiver_list(),
+            "title": self.title,
+            "content": self.message,
+            "body_format": "Html",
+        }
+
     def send(self, **kwargs):
         """
         发送通知
         """
-        params = merge_dict_list([self.params, kwargs, {"msg_type": "mail"}])
+        params = merge_dict_list([self.params, kwargs])
         try:
             cmsi_client = BkCmsiApi.get_client()
             response = cmsi_client.v1_send_mail(data=params)
@@ -239,8 +248,11 @@ class EmailNotifier(BaseNotifier):
             raise e
 
 
+
+
 class SmsNotifier(BaseNotifier):
     """发送短信"""
+
 
     def __init__(self, title, receivers, message, receiver_nums=""):
         """receiver_nums: 逗号隔开的多个手机号"""

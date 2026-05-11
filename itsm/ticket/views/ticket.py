@@ -43,9 +43,11 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework_extensions.cache.decorators import cache_response
+from bkapi_client_core.exceptions import APIGatewayResponseError
 
 from common.log import logger
 from common.redis import Cache
+
 from common.template.template import Template
 from config.default import OUT_LINK
 from itsm.component.cache_keys import ticket_cache_key
@@ -653,12 +655,13 @@ class TicketModelViewSet(ModelViewSet):
                     code=code
                 )
                 success_urls.append(ticket_url)
-            except ComponentCallError as error:
+            except (ComponentCallError, APIGatewayResponseError) as error:
                 fail_receivers.append(receiver_user)
                 logger.warning(
                     f"[send email] receiver=>{receiver_user}, ticket_url=>{ticket_url}, "
                     f"exception=>{error}"
                 )
+
         
         # 返回结果
         if fail_receivers:
