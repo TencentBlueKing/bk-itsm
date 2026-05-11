@@ -205,16 +205,29 @@ class WeixinAccount(WeixinAccountSingleton):
         获取安全的回跳URL，防止开放重定向
         """
         fallback_url = weixin_settings.WEIXIN_SITE_URL
+        logger.info(
+            "开始校验微信登录回跳地址: callback_url=%s, request_path=%s, host=%s",
+            callback_url,
+            request.path,
+            request.get_host(),
+        )
         if not callback_url:
             return fallback_url
 
         parsed = urllib.parse.urlparse(callback_url)
+        logger.info(
+            "微信登录回跳地址解析结果: scheme=%s, netloc=%s, path=%s, hostname=%s",
+            parsed.scheme,
+            parsed.netloc,
+            parsed.path,
+            parsed.hostname,
+        )
 
         # 仅允许站内相对路径，显式拦截以 // 开头的协议相对URL
         if not parsed.scheme and not parsed.netloc:
             if callback_url.startswith('/') and not callback_url.startswith('//'):
                 return callback_url
-            logger.warning("拦截不安全的微信登录回跳地址: %s", callback_url)
+            logger.warning("拦截不安全的微信登录回调地址: %s", callback_url)
             return fallback_url
 
         allowed_hosts = {
@@ -222,10 +235,12 @@ class WeixinAccount(WeixinAccountSingleton):
             for host in [request.get_host(), weixin_settings.WEIXIN_APP_EXTERNAL_HOST]
             if host
         }
+        logger.info("微信登录允许的回调域名: %s", sorted(allowed_hosts))
         if parsed.scheme in ('http', 'https') and parsed.hostname in allowed_hosts:
             return callback_url
 
-        logger.warning("拦截不安全的微信登录回跳地址: %s", callback_url)
+        logger.warning("拦截不安全的微信登录回调地址: %s", callback_url)
+        logger.info("微信登录回跳地址校验未通过，使用默认地址: %s", fallback_url)
         return fallback_url
 
     def get_callback_url(self, request):
