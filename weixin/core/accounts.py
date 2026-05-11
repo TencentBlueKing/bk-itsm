@@ -199,12 +199,41 @@ class WeixinAccount(WeixinAccountSingleton):
             # 'email': data.get('email', ''),
         }
 
+    @staticmethod
+    def get_safe_callback_url(request, callback_url):
+        """
+        获取安全的回跳URL，防止开放重定向
+        """
+        fallback_url = weixin_settings.WEIXIN_SITE_URL
+        if not callback_url:
+            return fallback_url
+
+        parsed = urllib.parse.urlparse(callback_url)
+
+        # 仅允许站内相对路径，显式拦截以 // 开头的协议相对URL
+        if not parsed.scheme and not parsed.netloc:
+            if callback_url.startswith('/') and not callback_url.startswith('//'):
+                return callback_url
+            logger.warning("拦截不安全的微信登录回跳地址: %s", callback_url)
+            return fallback_url
+
+        allowed_hosts = {
+            host.split(':', 1)[0]
+            for host in [request.get_host(), weixin_settings.WEIXIN_APP_EXTERNAL_HOST]
+            if host
+        }
+        if parsed.scheme in ('http', 'https') and parsed.hostname in allowed_hosts:
+            return callback_url
+
+        logger.warning("拦截不安全的微信登录回跳地址: %s", callback_url)
+        return fallback_url
+
     def get_callback_url(self, request):
         """
         获取实际访问的URL
         """
         callback_url = request.GET.get('c_url') or weixin_settings.WEIXIN_SITE_URL
-        return callback_url
+        return self.get_safe_callback_url(request, callback_url)
 
     def login(self, request):
         """
