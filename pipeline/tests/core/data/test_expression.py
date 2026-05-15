@@ -13,6 +13,10 @@ specific language governing permissions and limitations under the License.
 
 from django.test import TestCase
 
+from common.template.mako_utils import mako_safety
+from common.template.mako_utils.checker import check_mako_template_safety
+from common.template.mako_utils.exceptions import ForbiddenMakoTemplateException
+from common.template.template import Template as CommonTemplate
 from pipeline.core.data import expression
 from pipeline.core.data.expression import format_constant_key, deformat_constant_key
 
@@ -118,3 +122,37 @@ class TestConstantTemplate(TestCase):
     def test_built_in_functions__cover(self):
         int_template = expression.ConstantTemplate("${int}")
         self.assertEqual(int_template.resolve_data({"int": "cover"}), "cover")
+
+
+class TestMakoTemplateSafety(TestCase):
+    def _assert_forbidden_template(self, payload):
+        with self.assertRaises(ForbiddenMakoTemplateException):
+            check_mako_template_safety(
+                payload,
+                mako_safety.SingleLineNodeVisitor(),
+                mako_safety.SingleLinCodeExtractor(),
+            )
+
+    def test_reject_nested_dunder_payload(self):
+        payload = (
+            '${().__class__.__bases__[0].__subclasses__()[0].__init__.__globals__'
+            '["__builtins__"]["__import__"]("os").popen("id").read()}'
+        )
+
+        self._assert_forbidden_template(payload)
+        self.assertEqual(CommonTemplate(payload).render({}), payload)
+
+    def test_reject_dunder_subscript_payload(self):
+        payload = '${data["__globals__"]}'
+
+        self._assert_forbidden_template(payload)
+
+    def test_reject_format_payload(self):
+        payload = '${"{0.__class__}".format(1)}'
+
+        self._assert_forbidden_template(payload)
+
+    def test_reject_format_map_payload(self):
+        payload = '${"{target.__class__}".format_map({"target": 1})}'
+
+        self._assert_forbidden_template(payload)
