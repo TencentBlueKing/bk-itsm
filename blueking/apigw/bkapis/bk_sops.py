@@ -28,6 +28,8 @@ import logging
 from bkapi_client_core.base import Operation
 
 from bkapi_client_core.django_helper import _get_client_by_settings
+from django.conf import settings
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 from bkapi_client_core.django_helper import get_client_by_request as _get_client_by_request
@@ -300,6 +302,69 @@ class BkSopsApi(ApiProtocol):
 
     _api_name = "bk-sops"
 
+    @staticmethod
+    def _is_token_expired(token_obj) -> bool:
+        """判断 token 是否已过期。"""
+        expires = getattr(token_obj, "expires", None)
+        if not expires:
+            logger.warning("[BkSopsApi] access_token 缺少 expires 字段，无法判断是否过期")
+            return False
+
+        now = timezone.now()
+        try:
+            return now >= expires
+        except TypeError:
+            if timezone.is_naive(expires):
+                expires = timezone.make_aware(expires, timezone.get_current_timezone())
+            else:
+                expires = timezone.localtime(expires, timezone.get_current_timezone())
+            return now >= expires
+
+    @classmethod
+    def _refresh_token_if_needed(cls, token_obj, username):
+        """token 已过期或即将过期时尝试刷新，失败则返回 None。"""
+        token_expired = cls._is_token_expired(token_obj)
+        token_expires_soon = getattr(token_obj, "expires_soon", False)
+
+        if not (token_expired or token_expires_soon):
+            return token_obj
+
+        refresh_token = getattr(token_obj, "refresh_token", "")
+        if not refresh_token:
+            logger.warning(
+                "[BkSopsApi] access_token 已过期或即将过期但无 refresh_token, username=%s, expired=%s, expires_soon=%s",
+                username,
+                token_expired,
+                token_expires_soon,
+            )
+            return None
+
+        try:
+            from bkoauth.client import oauth_client
+
+            refreshed_token_obj = oauth_client.refresh_token(token_obj)
+            logger.info(
+                "[BkSopsApi] access_token 刷新成功, username=%s, expired=%s, expires_soon=%s",
+                username,
+                token_expired,
+                token_expires_soon,
+            )
+        except Exception as refresh_err:
+            logger.warning(
+                "[BkSopsApi] 刷新 access_token 失败, username=%s, expired=%s, expires_soon=%s, error=%s",
+                username,
+                token_expired,
+                token_expires_soon,
+                refresh_err,
+            )
+            return None
+
+        if cls._is_token_expired(refreshed_token_obj):
+            logger.warning("[BkSopsApi] 刷新后 access_token 仍已过期, username=%s", username)
+            return None
+
+        return refreshed_token_obj
+
     @classmethod
     def get_client(cls) -> Client:
         """通过 settings 配置获取客户端（无用户上下文）"""
@@ -318,41 +383,63 @@ class BkSopsApi(ApiProtocol):
                 (username, endpoint=get_endpoint(cls._api_name, "prod")))
 
     @classmethod
+    def call_api_with_auth(
+        cls,
+        api_name,
+        bk_username,
+        path_params=None,
+        params=None,
+        data=None,
+        app_code=None,
+        app_secret=None,
+    ):
+        """使用 app_code、app_secret、bk_username 鉴权并调用 API。"""
+        client = cls.get_client()
+        client.update_bkapi_authorization(
+            bk_app_code=app_code or settings.BK_APP_CODE,
+            bk_app_secret=app_secret or settings.BK_APP_SECRET,
+            bk_username=bk_username,
+        )
+
+        call_kwargs = {}
+        if path_params is not None:
+            call_kwargs["path_params"] = path_params
+        if params is not None:
+            call_kwargs["params"] = params
+        if data is not None:
+            call_kwargs["data"] = data
+
+        return getattr(client, api_name)(**call_kwargs)
+
+    @classmethod
     def get_client_with_token(cls, username) -> Client:
+        client = _get_client_by_settings(Client, endpoint=get_endpoint(cls._api_name, "prod"))
         access_token = None
+
         try:
             from bkoauth.models import AccessToken
-            from bkoauth.django_conf import ENV_NAME, OAUTH_API_URL, BKAUTH_TOKEN_APP_CODE, BKAUTH_TOKEN_SECRET_KEY
+            from bkoauth.django_conf import ENV_NAME
 
             token_obj = AccessToken.objects.filter(env_name=ENV_NAME, user_id=username).first()
             if not token_obj:
                 logger.warning("[BkSopsApi] 数据库中未找到 access_token, username=%s", username)
             else:
-                # 检查 token 是否即将过期，如果是则自动刷新
-                if token_obj.expires_soon:
-                    if token_obj.refresh_token:
-                        try:
-                            from bkoauth.client import oauth_client
-                            token_obj = oauth_client.refresh_token(token_obj)
-                            logger.info("[BkSopsApi] access_token 已自动刷新, username=%s", username)
-                        except Exception as refresh_err:
-                            logger.warning(
-                                "[BkSopsApi] 刷新 access_token 失败, username=%s, error=%s",
-                                username, refresh_err
-                            )
-                    else:
-                        logger.warning("[BkSopsApi] access_token 即将过期但无 refresh_token, username=%s", username)
-
-                access_token = token_obj.access_token
-                logger.info("[BkSopsApi] 从数据库获取 access_token 成功, username=%s", username)
+                token_obj = cls._refresh_token_if_needed(token_obj, username)
+                if token_obj is not None and not cls._is_token_expired(token_obj):
+                    access_token = token_obj.access_token
+                    logger.info("[BkSopsApi] 从数据库获取有效 access_token 成功, username=%s", username)
+                else:
+                    logger.warning(
+                        "[BkSopsApi] access_token 已过期或刷新失败，回退到 bk_username, username=%s",
+                        username,
+                    )
         except Exception as e:
             logger.warning("[BkSopsApi] 从数据库获取 access_token 失败, username=%s, error=%s", username, e)
 
-        client = _get_client_by_settings(Client, endpoint=get_endpoint(cls._api_name, "prod"))
         if access_token:
             client.update_bkapi_authorization(access_token=access_token)
-            logger.info("[BkSopsApi] get_client_with_token 完成（携带 access_token 和 bk_username）, username=%s", username)
+            logger.info("[BkSopsApi] get_client_with_token 完成（携带 access_token）, username=%s", username)
         else:
             client.update_bkapi_authorization(bk_username=username)
-            logger.info("[BkSopsApi] get_client_with_token 完成（仅携带 bk_username）, username=%s", username)
+            logger.info("[BkSopsApi] get_client_with_token 完成（回退为 bk_username）, username=%s", username)
         return client
