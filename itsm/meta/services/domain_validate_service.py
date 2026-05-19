@@ -23,16 +23,15 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import logging
-
-from itsm.meta.services.context import ContextService
-
 import re
 from urllib.parse import urlparse
 
+from itsm.meta.services.context import ContextService
+
 
 class DomainValidateService:
-    def __init__(self):
-        self.allow_patterns = self.compile_domain_patterns()
+    def __init__(self, key: str = "domain_regex_pattern"):
+        self.allow_patterns = self.compile_domain_patterns(key)
 
     def is_safe_url(self, url):
         try:
@@ -62,9 +61,9 @@ class DomainValidateService:
             return False
 
     @staticmethod
-    def compile_domain_patterns():
+    def compile_domain_patterns(key):
         """编译并返回域名正则表达式"""
-        patterns = ContextService.get_context_value("domain_regex_pattern")
+        patterns = ContextService.get_context_value(key)
         if not patterns:
             return []
         return [re.compile(i.strip()) for i in patterns.split(";") if i.strip()]

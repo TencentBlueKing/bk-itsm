@@ -37,7 +37,7 @@ class TicketViewTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def setUp(self):
         Ticket.objects.all().delete()
-        # CatalogService.objects.all().delete()
+        CatalogService.objects.all().delete()
         self.patcher_has_permission = mock.patch(
             "itsm.ticket.permissions.TicketPermissionValidate.has_permission",
             return_value=True,
@@ -132,6 +132,56 @@ class TicketViewTest(TestCase):
         self.patcher_get_user_departments.stop()
         CatalogService.objects.all().delete()
         Ticket.objects.all().delete()
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch(
+        "itsm.meta.services.domain_validate_service.ContextService.get_context_value"
+    )
+    def test_create_ticket_should_reject_disallowed_callback_url(
+        self, get_context_value
+    ):
+        get_context_value.return_value = r"^api\.example\.com$"
+        data = {
+            "catalog_id": 3,
+            "service_id": 1,
+            "service_type": "request",
+            "fields": [
+                {
+                    "type": "STRING",
+                    "id": 1,
+                    "key": "title",
+                    "value": "test_ticket_callback_url",
+                    "choice": [],
+                },
+                {
+                    "type": "STRING",
+                    "id": 5,
+                    "key": "apply_content",
+                    "value": "测试内容",
+                },
+                {
+                    "type": "STRING",
+                    "key": "ZHIDINGSHENPIREN",
+                    "value": "test",
+                },
+                {
+                    "type": "STRING",
+                    "key": "apply_reason",
+                    "value": "test",
+                },
+            ],
+            "creator": "admin",
+            "attention": True,
+            "meta": {
+                "callback_url": "https://evil.com/callback",
+            },
+        }
+        url = "/api/ticket/receipts/"
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
+        self.assertNotEqual(rsp.data["code"], "OK")
+        self.assertIn("callback_url", str(rsp.data["message"]))
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.role.models.get_user_departments")
