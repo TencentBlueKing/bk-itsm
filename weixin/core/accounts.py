@@ -29,7 +29,6 @@ import random
 import time
 import urllib.error
 import urllib.parse
-import urllib.parse
 import urllib.request
 
 from django.http import HttpResponse, HttpResponseRedirect

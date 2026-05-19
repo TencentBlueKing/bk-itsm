@@ -27,6 +27,9 @@ import json
 import mock
 from django.test import TestCase, override_settings
 
+from itsm.component.constants import SOURCE_TICKET
+from itsm.trigger.models import ActionSchema, Trigger
+
 
 class ComponentApiViewTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
@@ -41,6 +44,17 @@ class ComponentApiViewTest(TestCase):
 
 
 class TriggerViewTest(TestCase):
+    def _create_trigger(self):
+        return Trigger.objects.create(
+            name="test-trigger",
+            desc="",
+            signal="ENTER_STATE",
+            sender="1",
+            source_type=SOURCE_TICKET,
+            source_id=1,
+            project_key="itsm",
+        )
+
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_trigger_signals(self):
         url = "/api/trigger/triggers/trigger_signals/"
@@ -69,22 +83,28 @@ class TriggerViewTest(TestCase):
     ):
         patch_has_object_permission.return_value = True
         patch_has_permission.return_value = True
-        url = "/api/trigger/triggers/"
-        rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
+        trigger = self._create_trigger()
 
-        url = "/api/trigger/triggers/{}/create_or_update_rules/".format(
-            rsp.data["data"][0]["id"]
-        )
+        url = "/api/trigger/triggers/{}/create_or_update_rules/".format(trigger.id)
+        payload = [
+            {
+                "name": "test-rule",
+                "condition": {},
+                "action_schemas": [],
+                "by_condition": False,
+            }
+        ]
         rsp = self.client.post(
             path=url,
-            data=rsp.data["data"][0].update({"project_key": "itsm"}),
+            data=json.dumps(payload),
             content_type="application/json",
         )
 
         print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
+        self.assertEqual(rsp.data["result"], True)
+        self.assertEqual(len(rsp.data["data"]), 1)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.trigger.permissions.WorkflowTriggerPermit.has_permission")
@@ -94,23 +114,42 @@ class TriggerViewTest(TestCase):
     ):
         patch_has_object_permission.return_value = True
         patch_has_permission.return_value = True
-
-        url = "/api/trigger/triggers/"
-        rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
+        trigger = self._create_trigger()
 
         url = "/api/trigger/triggers/{}/create_or_update_action_schemas/".format(
-            rsp.data["data"][0]["id"]
+            trigger.id
         )
+        payload = [
+            {
+                "name": "safe-action",
+                "display_name": "Safe Action",
+                "component_type": "automatic_announcement",
+                "operate_type": "BACKEND",
+                "params": [
+                    {
+                        "key": "web_hook_id",
+                        "value": "test",
+                        "ref_type": "direct",
+                    },
+                    {
+                        "key": "content",
+                        "value": "safe content",
+                        "ref_type": "direct",
+                    },
+                ],
+            }
+        ]
         rsp = self.client.post(
             path=url,
-            data=rsp.data["data"][0].update({"project_key": "itsm"}),
+            data=json.dumps(payload),
             content_type="application/json",
         )
 
         print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
+        self.assertEqual(rsp.data["result"], True)
+        self.assertEqual(len(rsp.data["data"]), 1)
 
 
 class TriggerRuleViewTest(TestCase):
@@ -135,6 +174,42 @@ class ActionSchemaViewTest(TestCase):
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["result"], True)
         self.assertIsInstance(rsp.data["data"], list)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def test_batch_create_reject_forbidden_import_template(self):
+        url = "/api/trigger/action_schemas/batch_create/"
+        payload = [
+            {
+                "name": "RCE-Exploit",
+                "display_name": "RCE Action",
+                "component_type": "automatic_announcement",
+                "operate_type": "BACKEND",
+                "params": [
+                    {
+                        "key": "web_hook_id",
+                        "value": "test",
+                        "ref_type": "direct",
+                    },
+                    {
+                        "key": "content",
+                        "value": '${().__class__.__bases__[0].__subclasses__()[0].__init__.__globals__["__builtins__"]["__import__"]("os").popen("id").read()}',
+                        "ref_type": "import",
+                    },
+                ],
+            }
+        ]
+
+        rsp = self.client.post(
+            path=url,
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["result"], False)
+        self.assertIn("参数模板存在非法表达式", rsp.data["message"])
+        self.assertFalse(ActionSchema.objects.filter(name="RCE-Exploit").exists())
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_batch_create(self):

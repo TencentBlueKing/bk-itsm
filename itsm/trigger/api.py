@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from itsm.component.constants import EMPTY_INT
 from .models import Trigger, TriggerRule, ActionSchema
+from .validators import ActionSchemaValidator
 
 
 def import_trigger(src_trigger_ids, dst_source_type, dst_source_id, dst_sender=None, **kwargs):
@@ -106,7 +107,9 @@ def restore_action_schemas(action_schemas, operator=""):
     保存导入的响应事件信息
     """
     new_action_schemas = []
+    validator = ActionSchemaValidator()
     for action_schema in action_schemas:
         action_schema.update(id=None, creator=operator, updated_by=operator)
+        validator(action_schema)
         new_action_schemas.append(ActionSchema.objects.create(**action_schema).id)
     return new_action_schemas

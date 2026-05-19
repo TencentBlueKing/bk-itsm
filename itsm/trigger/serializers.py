@@ -36,7 +36,7 @@ from itsm.component.constants import (
 )
 from itsm.component.drf.serializers import AuthModelSerializer
 from itsm.trigger.models import Trigger, TriggerRule, ActionSchema, Action
-from .validators import TriggerValidator
+from .validators import TriggerValidator, ActionSchemaValidator
 
 
 class TriggerSerializer(AuthModelSerializer):
@@ -145,6 +145,10 @@ class ActionSchemaSerializer(AuthModelSerializer):
     # 参数
     params = serializers.JSONField(default=EMPTY_DICT)
     inputs = serializers.JSONField(default=EMPTY_DICT)
+
+    def run_validators(self, value):
+        self.validators.extend([ActionSchemaValidator(self.instance)])
+        return super(ActionSchemaSerializer, self).run_validators(value)
 
     class Meta:
         model = ActionSchema
