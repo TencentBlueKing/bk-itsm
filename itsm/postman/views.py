@@ -349,7 +349,7 @@ class RpcApiViewSet(component_viewsets.APIView):
         if RPC_CODE not in request.data:
             raise RpcAPIError(_("【%s】为必需参数" % RPC_CODE))
 
-        result, request_params = CompRequest.parse_params(request.data)
+        result, request_params = CompRequest.parse_params(request.data, safe_mode=True)
         # 构造参数不成功
         if not result:
             return Response(
