@@ -141,7 +141,10 @@ def send_fast_approval_message(title, content, receivers, ticket, state_id):
         "clickurl": ticket.ticket_url,
         "callback": settings.BKCHAT_CALLBACK_URL,
         "summaryback": settings.ITSM_SUMMARY_URL,
-        "action": [{"name": "同意", "value": "true"}, {"name": "拒绝", "value": "false"}],
+        "action": [
+            {"name": "同意", "value": "true"},
+            {"name": "拒绝", "value": "false"},
+        ],
         "context": {
             "ticket_id": ticket_id,
             "state_id": state_id,
@@ -235,15 +238,21 @@ def proceed_fast_approval(request):
                     "approver": ticket.get_approver(state_id),
                 },
                 "code": -1,
-                "message": "单据审批失败，{}不是当前节点的审批人，无法审批".format(receiver),
+                "message": "单据审批失败，{}不是当前节点的审批人，无法审批".format(
+                    receiver
+                ),
             }
         )
 
     # 3.判断当前节点是否是RUNNING状态，否则通知
     current_status = Status.objects.get(state_id=state_id, ticket_id=ticket_id)
     if current_status.status != "RUNNING":
-        title = "『ITSM{}』【审批失败通知】\n".format(RUNNING_ENV.get(settings.RUN_MODE, ""))
-        content = "单号：{} ({})\n当前单据审批操作已被处理".format(ticket.sn, ticket.ticket_url)
+        title = "『ITSM{}』【审批失败通知】\n".format(
+            RUNNING_ENV.get(settings.RUN_MODE, "")
+        )
+        content = "单号：{} ({})\n当前单据审批操作已被处理".format(
+            ticket.sn, ticket.ticket_url
+        )
         return JsonResponse(
             {
                 "result": False,
@@ -271,7 +280,20 @@ def proceed_fast_approval(request):
                 }
             )
         else:
-            if not remarked:
+            if remarked:
+                break
+            if approve_action == "true" and field.validate_type == "OPTION":
+                fields.append(
+                    {
+                        "id": field.id,
+                        "key": field.key,
+                        "type": field.type,
+                        "choice": field.choice,
+                        "value": "快速审批，审批人：{}".format(receiver),
+                    }
+                )
+                remarked = True
+            if approve_action == "false" and field.validate_type == "REQUIRE":
                 fields.append(
                     {
                         "id": field.id,
@@ -309,7 +331,9 @@ def proceed_fast_approval(request):
         )
 
     title = "『ITSM{}』【审批成功通知】".format(RUNNING_ENV.get(settings.RUN_MODE, ""))
-    approve_message = "您的审批动作为：{}".format(APPROVE_MESSAGE.get(approve_action, ""))
+    approve_message = "您的审批动作为：{}".format(
+        APPROVE_MESSAGE.get(approve_action, "")
+    )
     callback_message = "{}\n\n单号：{} ({})\n{}".format(
         title, ticket.sn, ticket.ticket_url, approve_message
     )
