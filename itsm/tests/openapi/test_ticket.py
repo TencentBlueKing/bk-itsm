@@ -33,6 +33,7 @@ from collections import OrderedDict
 import mock
 from blueapps.core.celery.celery import app
 from django.conf import settings
+from django.core.cache import cache
 from django.test import TestCase, override_settings
 from common.cipher import AESVerification
 from common.redis import Cache
@@ -49,6 +50,7 @@ from pipeline.engine.models import FunctionSwitch
 class TicketOpenTest(TestCase):
     def setUp(self):
         app.conf.update(CELERY_ALWAYS_EAGER=True)
+        self._clear_apigw_whitelist_cache()
         Ticket.objects.all().delete()
         AttentionUsers.objects.all().delete()
 
@@ -63,6 +65,11 @@ class TicketOpenTest(TestCase):
         WorkflowVersion.objects.all().delete()
         UserRole.objects.filter(role_type="IAM").delete()
         Context.objects.filter(key="OPENAPI_APIGW_WHITELIST").delete()
+        self._clear_apigw_whitelist_cache()
+
+    @staticmethod
+    def _clear_apigw_whitelist_cache():
+        cache.delete("meta_context_OPENAPI_APIGW_WHITELIST")
 
     @staticmethod
     def _build_request(path):
@@ -426,15 +433,14 @@ class TicketOpenTest(TestCase):
             resp.data["message"], "参数验证失败: 该单据已经被评论，请勿重复评论"
         )
     
-    @override_settings(BK_APIGW_REQUIRE_EXEMPT=False)
+    @override_settings(BK_APIGW_REQUIRE_EXEMPT=False, MIDDLEWARE=())
     def test_proceed_approval_without_jwt_should_return_403(self):
-        """无 JWT 认证请求 proceed_approval 应返回 403，防止未鉴权伪造审批"""
+        """请求上没有 jwt 属性时，proceed_approval 应返回 403"""
         url = "/openapi/ticket/proceed_approval/"
         data = self._proceed_approval_payload()
         resp = self.client.post(
             url, json.dumps(data), content_type="application/json"
         )
-        # custom_apigw_required 在 request 无 jwt 属性时返回 403
         self.assertEqual(resp.status_code, 403)
     
     
@@ -452,9 +458,7 @@ class TicketOpenTest(TestCase):
         self.assertNotEqual(resp.status_code, 403)
         
     
-    @override_settings(
-        BK_APIGW_REQUIRE_EXEMPT=True,
-    )
+    @override_settings(BK_APIGW_REQUIRE_EXEMPT=True, MIDDLEWARE=())
     def test_proceed_approval_exempt_mode_should_pass(self):
         """BK_APIGW_REQUIRE_EXEMPT=True 时（开发模式）应跳过鉴权直接进入业务逻辑"""
         url = "/openapi/ticket/proceed_approval/"
@@ -462,10 +466,10 @@ class TicketOpenTest(TestCase):
         resp = self.client.post(
             url, json.dumps(data), content_type="application/json"
         )
-        # 开发模式下豁免鉴权，不应返回 403
         self.assertNotEqual(resp.status_code, 403)
 
     def test_request_in_apigw_whitelist_should_support_exact_and_wildcard_paths(self):
+        self._clear_apigw_whitelist_cache()
         Context.objects.update_or_create(
             key="OPENAPI_APIGW_WHITELIST",
             defaults={
@@ -490,6 +494,7 @@ class TicketOpenTest(TestCase):
         )
 
     def test_request_in_apigw_whitelist_should_not_overmatch_sibling_path(self):
+        self._clear_apigw_whitelist_cache()
         Context.objects.update_or_create(
             key="OPENAPI_APIGW_WHITELIST",
             defaults={"value": "http://api.example.com/MyOACallBack_8/*"},
@@ -506,8 +511,9 @@ class TicketOpenTest(TestCase):
             )
         )
 
-    @override_settings(BK_APIGW_REQUIRE_EXEMPT=False)
+    @override_settings(BK_APIGW_REQUIRE_EXEMPT=False, MIDDLEWARE=())
     def test_proceed_approval_context_whitelist_exact_path_should_pass_without_jwt(self):
+        self._clear_apigw_whitelist_cache()
         Context.objects.update_or_create(
             key="OPENAPI_APIGW_WHITELIST",
             defaults={"value": "/openapi/ticket/proceed_approval/"},
@@ -521,8 +527,9 @@ class TicketOpenTest(TestCase):
 
         self.assertNotEqual(resp.status_code, 403)
 
-    @override_settings(BK_APIGW_REQUIRE_EXEMPT=False)
+    @override_settings(BK_APIGW_REQUIRE_EXEMPT=False, MIDDLEWARE=())
     def test_proceed_approval_context_whitelist_wildcard_should_pass_without_jwt(self):
+        self._clear_apigw_whitelist_cache()
         Context.objects.update_or_create(
             key="OPENAPI_APIGW_WHITELIST",
             defaults={"value": "http://api.example.com/openapi/ticket/*"},
