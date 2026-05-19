@@ -42,7 +42,7 @@ from itsm.component.constants import (
 )
 from itsm.component.exceptions import ParamError
 from itsm.component.utils.basic import dotted_name, dotted_property
-from itsm.meta.services.domain_validate_service import DomainValidateService
+from itsm.meta.services.webhook_url_validate_service import WebhookURLValidateService
 from itsm.postman.models import RemoteApi, RemoteApiInstance
 from itsm.postman.serializers import RemoteApiSerializer, ApiInstanceSerializer
 from itsm.workflow.models import GlobalVariable, State
@@ -257,11 +257,16 @@ class StateSerializer(serializers.ModelSerializer):
             type_value = attrs.get("type", self.instance.type)
 
         if type_value == "WEBHOOK":
-            url = attrs.get("extras", {}).get("webhook_info", {}).get("url", None)
-            if url is not None:
-                if DomainValidateService().is_safe_url(url):
-                    return attrs
-                raise ParamError(_("不合法的域名"))
+            webhook_info = attrs.get("extras", {}).get("webhook_info", {})
+            url = webhook_info.get("url", None)
+            success_exp = webhook_info.get("success_exp", "")
+
+            try:
+                if url is not None:
+                    WebhookURLValidateService.validate_for_config(url)
+                WebhookURLValidateService.validate_success_exp(success_exp)
+            except ValueError as error:
+                raise ParamError(str(error))
 
         return attrs
 

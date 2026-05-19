@@ -29,22 +29,23 @@ import logging
 import jmespath
 import requests
 from django.conf import settings
-from jinja2.sandbox import SandboxedEnvironment as Environment
-from pipeline.utils.boolrule import BoolRule
-from pipeline.component_framework.component import Component
 from django.utils.translation import gettext as _
+from jinja2.sandbox import SandboxedEnvironment as Environment
+from pipeline.component_framework.component import Component
+from pipeline.utils.boolrule import BoolRule
 
 from itsm.component.constants import (
-    TRANSITION_OPERATE,
-    NODE_FAILED,
     FINISHED,
     LESSCODE_PROJECT_KEY,
+    NODE_FAILED,
+    TRANSITION_OPERATE,
 )
 from itsm.component.utils.encode import EncodeWebhook
+from itsm.meta.services.webhook_url_validate_service import WebhookURLValidateService
 from itsm.pipeline_plugins.components.collections.itsm_base_service import (
     ItsmBaseService,
 )
-from itsm.ticket.models import Ticket, TicketGlobalVariable, SYSTEM_OPERATE
+from itsm.ticket.models import SYSTEM_OPERATE, Ticket, TicketGlobalVariable
 
 logger = logging.getLogger("celery")
 
@@ -127,6 +128,12 @@ class WebHookService(ItsmBaseService):
     """
 
     __need_schedule__ = False
+
+    def validate_webhook_url(self, url):
+        WebhookURLValidateService.validate_for_execute(url)
+
+    def validate_success_exp(self, success_exp):
+        WebhookURLValidateService.validate_success_exp(success_exp)
 
     def update_info(self, current_node, **kwargs):
         """
@@ -266,7 +273,7 @@ class WebHookService(ItsmBaseService):
         method = extras.get("method", "GET")
         url = extras.get("url")
         query_params = extras.get("query_params")
-        headers = extras.get("headers")
+        headers = extras.get("headers") or {}
         body = extras.get("body", {})["content"]
         timeout = extras.get("settings", {}).get("timeout", 10)
         success_exp = extras.get("success_exp")
@@ -291,6 +298,34 @@ class WebHookService(ItsmBaseService):
             return False
 
         try:
+            self.validate_webhook_url(url)
+        except Exception as e:
+            err_message = "Webhook请求地址校验失败, error={}".format(e)
+            self.do_exit_plugins(
+                ticket,
+                state_id,
+                current_node,
+                err_message,
+                error_message_template,
+                processors,
+            )
+            return False
+
+        try:
+            self.validate_success_exp(success_exp)
+        except Exception as e:
+            err_message = "Webhook成功判定表达式校验失败, error={}".format(e)
+            self.do_exit_plugins(
+                ticket,
+                state_id,
+                current_node,
+                err_message,
+                error_message_template,
+                processors,
+            )
+            return False
+
+        try:
             response = requests.request(
                 method,
                 url,
@@ -299,7 +334,7 @@ class WebHookService(ItsmBaseService):
                 headers=headers,
                 timeout=int(timeout),
                 auth=auth,
-                verify=False,
+                allow_redirects=False,
             )
         except Exception as e:
             self.do_exit_plugins(
@@ -315,7 +350,7 @@ class WebHookService(ItsmBaseService):
         try:
             # 返回code 非 200
             if response.status_code not in [200, 201]:
-                err_message = "返回状态码非200, response={}".format(response.text)
+                err_message = "返回状态码非200, status_code={}".format(response.status_code)
                 self.do_exit_plugins(
                     ticket,
                     state_id,
@@ -340,7 +375,7 @@ class WebHookService(ItsmBaseService):
         try:
             resp = response.json()
         except Exception:
-            err_message = "返回值非Json, response={}".format(response.text)
+            err_message = "返回值非Json, status_code={}".format(response.status_code)
             self.do_exit_plugins(
                 ticket,
                 state_id,
@@ -350,9 +385,6 @@ class WebHookService(ItsmBaseService):
                 processors,
             )
             return False
-
-        # 更新全局变量
-        variable_output = self.update_variables(resp, ticket_id, state_id, variables)
 
         if success_exp:
             try:
@@ -379,6 +411,9 @@ class WebHookService(ItsmBaseService):
                     processors,
                 )
                 return False
+
+        # 更新全局变量
+        variable_output = self.update_variables(resp, ticket_id, state_id, variables)
 
         # 设置状态
         self.update_info(current_node, variables=variable_output)
