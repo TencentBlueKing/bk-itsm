@@ -26,6 +26,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import os
 import traceback
 from functools import wraps
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -40,6 +41,7 @@ from itsm.component.utils.response import Fail
 from itsm.component.utils.basic import ComplexRegexField, size_mapper
 
 from common.log import logger
+from itsm.meta.services.context import ContextService
 
 
 def no_args_template(view_func):
@@ -302,6 +304,55 @@ def fbv_exception_handler(view_func):
 #     return _wrapped_view
 
 
+def _get_apigw_whitelist_paths():
+    setting = ContextService.get_context_value("OPENAPI_APIGW_WHITELIST")
+    if not setting:
+        return set(), set()
+
+    exact_paths = set()
+    prefix_paths = set()
+
+    for raw_item in setting.replace("\n", ",").split(","):
+        item = raw_item.strip()
+        if not item:
+            continue
+
+        is_prefix = item.endswith("/*")
+        if is_prefix:
+            item = item[:-2]
+
+        if "://" in item:
+            parsed = urlparse(item)
+            item = parsed.path or "/"
+
+        if not item.startswith("/"):
+            item = "/{}".format(item)
+
+        normalized_path = item.rstrip("/") or "/"
+        if is_prefix:
+            prefix_paths.add(normalized_path)
+        else:
+            exact_paths.add(normalized_path)
+
+    return exact_paths, prefix_paths
+
+
+def _request_in_apigw_whitelist(request):
+    request_path = (request.path or "/").rstrip("/") or "/"
+    exact_paths, prefix_paths = _get_apigw_whitelist_paths()
+
+    if request_path in exact_paths:
+        return True
+
+    for prefix_path in prefix_paths:
+        if prefix_path == "/":
+            return True
+        if request_path == prefix_path or request_path.startswith(prefix_path + "/"):
+            return True
+
+    return False
+
+
 def custom_apigw_required(view_func):
     """apigw装饰器"""
 
@@ -310,6 +361,9 @@ def custom_apigw_required(view_func):
 
         exempt = getattr(settings, "BK_APIGW_REQUIRE_EXEMPT", False)
         if exempt:
+            return view_func(self, request, *args, **kwargs)
+
+        if _request_in_apigw_whitelist(request):
             return view_func(self, request, *args, **kwargs)
 
         if not hasattr(request, "jwt"):
