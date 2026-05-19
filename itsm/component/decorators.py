@@ -305,7 +305,7 @@ def fbv_exception_handler(view_func):
 
 
 def _get_apigw_whitelist_paths():
-    setting = ContextService.get_context_value("OPENAPI_APIGW_WHITELIST")
+    setting = ContextService.get_context_value("openapi_apigw_whitelist")
     if not setting:
         return set(), set()
 

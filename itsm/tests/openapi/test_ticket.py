@@ -64,12 +64,12 @@ class TicketOpenTest(TestCase):
         AttentionUsers.objects.all().delete()
         WorkflowVersion.objects.all().delete()
         UserRole.objects.filter(role_type="IAM").delete()
-        Context.objects.filter(key="OPENAPI_APIGW_WHITELIST").delete()
+        Context.objects.filter(key="openapi_apigw_whitelist").delete()
         self._clear_apigw_whitelist_cache()
 
     @staticmethod
     def _clear_apigw_whitelist_cache():
-        cache.delete("meta_context_OPENAPI_APIGW_WHITELIST")
+        cache.delete("meta_context_openapi_apigw_whitelist")
 
     @staticmethod
     def _build_request(path):
@@ -471,7 +471,7 @@ class TicketOpenTest(TestCase):
     def test_request_in_apigw_whitelist_should_support_exact_and_wildcard_paths(self):
         self._clear_apigw_whitelist_cache()
         Context.objects.update_or_create(
-            key="OPENAPI_APIGW_WHITELIST",
+            key="openapi_apigw_whitelist",
             defaults={
                 "value": "http://api.example.com/MyOACallBack_8/*,/openapi/ticket/proceed_approval/"
             },
@@ -496,7 +496,7 @@ class TicketOpenTest(TestCase):
     def test_request_in_apigw_whitelist_should_not_overmatch_sibling_path(self):
         self._clear_apigw_whitelist_cache()
         Context.objects.update_or_create(
-            key="OPENAPI_APIGW_WHITELIST",
+            key="openapi_apigw_whitelist",
             defaults={"value": "http://api.example.com/MyOACallBack_8/*"},
         )
 
@@ -515,7 +515,7 @@ class TicketOpenTest(TestCase):
     def test_proceed_approval_context_whitelist_exact_path_should_pass_without_jwt(self):
         self._clear_apigw_whitelist_cache()
         Context.objects.update_or_create(
-            key="OPENAPI_APIGW_WHITELIST",
+            key="openapi_apigw_whitelist",
             defaults={"value": "/openapi/ticket/proceed_approval/"},
         )
 
@@ -531,7 +531,7 @@ class TicketOpenTest(TestCase):
     def test_proceed_approval_context_whitelist_wildcard_should_pass_without_jwt(self):
         self._clear_apigw_whitelist_cache()
         Context.objects.update_or_create(
-            key="OPENAPI_APIGW_WHITELIST",
+            key="openapi_apigw_whitelist",
             defaults={"value": "http://api.example.com/openapi/ticket/*"},
         )
 
