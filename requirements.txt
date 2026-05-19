@@ -41,10 +41,10 @@ bleach==6.1.0
 django-classy-tags==4.1.0
 django-mptt==0.16.0
 django-mptt-admin==2.7.0
-django-nyt==1.4.1
+django-nyt==1.5.0
 django-sekizai==4.1.0
 Markdown==3.5.2
-pillow>=10.3.0,<10.4
+pillow>=12.2.0
 sorl-thumbnail==12.11.0
 django-simplemde==0.1.4
 martor==1.6.45
@@ -55,7 +55,7 @@ django-multiselectfield==0.1.13
 statsd==3.3.0
 
 # pipeline
-ujson==5.9.0
+ujson==5.12.1
 pyparsing==3.2.0
 redis==5.0.3
 django-timezone-field==5.1
@@ -70,7 +70,7 @@ certifi==2024.7.4
 chardet==5.2.0
 curlify==2.2.1
 idna==3.10
-urllib3==2.5.0
+urllib3==2.7.0
 # pycrypto==2.6.1
 
 #others
@@ -89,15 +89,15 @@ typing-extensions==4.12.2
 
 #bkouth
 PyJWT==2.8.0
-cryptography==44.0.1
+cryptography==46.0.7
 
 # prometheus
 django-prometheus==2.3.1
 
 # grpcio
-grpcio==1.63.2
+grpcio==1.80.0
 
-protobuf==5.29.5
+protobuf==5.29.6
 
 # opentelemetry
 opentelemetry-api==1.29.0
