@@ -23,7 +23,11 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+from unittest import mock
+
 from django.test import TestCase, override_settings
+
+from itsm.postman.models import RemoteApi, RemoteSystem
 
 
 class TestRemoteApi(TestCase):
@@ -37,3 +41,53 @@ class TestRemoteApi(TestCase):
         self.assertEqual(resp.data["result"], True)
         self.assertEqual(resp.data["code"], "OK")
         self.assertIsInstance(resp.data["data"], list)
+
+    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
+    @mock.patch("itsm.postman.views.bk.http")
+    def test_run_api_should_ignore_request_code_override(self, mock_http):
+        remote_system = RemoteSystem.objects.create(
+            creator="admin",
+            updated_by="admin",
+            name="test-system",
+            code="TEST_SYSTEM",
+            domain="https://example.com",
+            desc="",
+            owners="admin",
+            project_key="public",
+        )
+        remote_api = RemoteApi.objects.create(
+            creator="admin",
+            updated_by="admin",
+            remote_system=remote_system,
+            name="test-api",
+            path="/test/api/",
+            version="v1",
+            func_name="test_api",
+            method="GET",
+            desc="",
+            owners="admin",
+            req_headers=[],
+            req_params=[],
+            req_body={},
+            rsp_data={},
+            before_req="stored_before_req",
+            map_code="stored_map_code",
+            is_activated=True,
+        )
+        mock_http.return_value = {"result": True, "message": "success", "data": {}}
+
+        url = "/api/postman/remote_api/{}/run_api/".format(remote_api.id)
+        payload = {
+            "req_params": {"foo": "bar"},
+            "before_req": "query_params['__local_poc_marker__'] = 'executed'",
+            "map_code": "response['data'] = {'__local_poc_marker__': 'executed'}",
+        }
+
+        resp = self.client.post(url, data=payload, content_type="application/json")
+
+        self.assertEqual(resp.data["result"], True)
+        mock_http.assert_called_once()
+        config = mock_http.call_args.kwargs["config"]
+        self.assertEqual(config["query_params"], {"foo": "bar"})
+        self.assertEqual(config["before_req"], "stored_before_req")
+        self.assertEqual(config["map_code"], "stored_map_code")

@@ -236,11 +236,6 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
 
         api_config = api.get_api_config(query_params)
 
-        # overwrite map_code
-        map_code = request.data.get("map_code", "")
-        before_req = request.data.get("before_req", "")
-        api_config.update(map_code=map_code, before_req=before_req)
-
         rsp = bk.http(config=api_config)
 
         # 多加一层是因为前端对返回的message有一个统一添加msg的逻辑（为了屏蔽返回差异），所以此处加一层包裹，前端取data里面的值
