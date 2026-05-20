@@ -11,36 +11,95 @@ an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express o
 specific language governing permissions and limitations under the License.
 """
 
+import io
+import json
+import logging
 import pickle
 
 from pipeline.conf import settings
+from pipeline.engine.contants import PICKLE_SAFE_ALLOWLIST
 from pipeline.engine.core.data.base_backend import BaseDataBackend
+from pipeline.utils.utils import convert_bytes_to_str
+
+logger = logging.getLogger(__name__)
+
+JSON_MAGIC = b"__JSON__"
+PICKLE_MAGIC = b"__PICKLE__"
+
+
+class RestrictedUnpickler(pickle.Unpickler):
+    def find_class(self, module, name):
+        allowed_names = PICKLE_SAFE_ALLOWLIST.get(module)
+        if allowed_names is not None and name in allowed_names:
+            return super().find_class(module, name)
+        raise pickle.UnpicklingError(
+            "RedisDataBackend 安全限制：不允许反序列化类型 {}.{}".format(
+                module, name
+            )
+        )
+
+
+def _restricted_pickle_loads(data, encoding="ASCII", errors="strict"):
+    return RestrictedUnpickler(io.BytesIO(data), encoding=encoding, errors=errors).load()
+
+
+def _safe_pickle_loads(data, key):
+    try:
+        return _restricted_pickle_loads(data)
+    except UnicodeDecodeError:
+        logger.warning("RedisDataBackend 检测到历史 py2 pickle 数据，key=%s", key)
+        return convert_bytes_to_str(
+            _restricted_pickle_loads(data, encoding="bytes")
+        )
+
+
+def _safe_loads(data, key):
+    if not data:
+        return None
+
+    try:
+        if data.startswith(JSON_MAGIC):
+            return json.loads(data[len(JSON_MAGIC) :].decode("utf-8"))
+
+        if data.startswith(PICKLE_MAGIC):
+            return _safe_pickle_loads(data[len(PICKLE_MAGIC) :], key)
+
+        logger.warning("RedisDataBackend 检测到历史原生 pickle 缓存，key=%s", key)
+        return _safe_pickle_loads(data, key)
+    except pickle.UnpicklingError as error:
+        logger.error(
+            "RedisDataBackend 安全拦截：拒绝反序列化不安全的 pickle 数据，key=%s error=%s",
+            key,
+            error,
+        )
+        return None
+    except Exception:
+        logger.exception("RedisDataBackend 反序列化异常，key=%s", key)
+        return None
+
+
+def _safe_dumps(data):
+    return PICKLE_MAGIC + pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 class RedisDataBackend(BaseDataBackend):
     def set_object(self, key, obj):
-        # return settings.redis_inst.set(key, pickle.dumps(obj))
-        return settings.REDIS_INST.set(key, pickle.dumps(obj))
+        return settings.REDIS_INST.set(key, _safe_dumps(obj))
 
     def get_object(self, key):
-        # pickle_str = settings.redis_inst.get(key)
         pickle_str = settings.REDIS_INST.get(key)
         if not pickle_str:
             return None
-        return pickle.loads(pickle_str)
+        return _safe_loads(pickle_str, key)
 
     def del_object(self, key):
-        # return settings.redis_inst.delete(key)
         return settings.REDIS_INST.delete(key)
 
     def expire_cache(self, key, value, expires):
-        settings.REDIS_INST.set(key, pickle.dumps(value))
-        # settings.redis_inst.set(key, pickle.dumps(value))
-        # settings.redis_inst.expire(key, expires)
+        settings.REDIS_INST.set(key, _safe_dumps(value))
         settings.REDIS_INST.expire(key, expires)
         return True
 
     def cache_for(self, key):
-        # cache = settings.redis_inst.get(key)
         cache = settings.REDIS_INST.get(key)
-        return pickle.loads(cache) if cache else cache
+        return _safe_loads(cache, key) if cache else cache
