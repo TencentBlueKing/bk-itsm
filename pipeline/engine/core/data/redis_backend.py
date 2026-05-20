@@ -11,46 +11,29 @@ an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express o
 specific language governing permissions and limitations under the License.
 """
 
-import io
-import json
 import logging
 import pickle
 
 from pipeline.conf import settings
-from pipeline.engine.contants import PICKLE_SAFE_ALLOWLIST
 from pipeline.engine.core.data.base_backend import BaseDataBackend
+from pipeline.engine.models.fields import (
+    JSON_MAGIC,
+    PICKLE_MAGIC,
+    dumps_json_payload,
+    loads_json_payload,
+    restricted_pickle_loads,
+)
 from pipeline.utils.utils import convert_bytes_to_str
 
 logger = logging.getLogger(__name__)
 
-JSON_MAGIC = b"__JSON__"
-PICKLE_MAGIC = b"__PICKLE__"
-
-
-class RestrictedUnpickler(pickle.Unpickler):
-    def find_class(self, module, name):
-        allowed_names = PICKLE_SAFE_ALLOWLIST.get(module)
-        if allowed_names is not None and name in allowed_names:
-            return super().find_class(module, name)
-        raise pickle.UnpicklingError(
-            "RedisDataBackend 安全限制：不允许反序列化类型 {}.{}".format(
-                module, name
-            )
-        )
-
-
-def _restricted_pickle_loads(data, encoding="ASCII", errors="strict"):
-    return RestrictedUnpickler(io.BytesIO(data), encoding=encoding, errors=errors).load()
-
 
 def _safe_pickle_loads(data, key):
     try:
-        return _restricted_pickle_loads(data)
+        return restricted_pickle_loads(data)
     except UnicodeDecodeError:
         logger.warning("RedisDataBackend 检测到历史 py2 pickle 数据，key=%s", key)
-        return convert_bytes_to_str(
-            _restricted_pickle_loads(data, encoding="bytes")
-        )
+        return convert_bytes_to_str(restricted_pickle_loads(data, encoding="bytes"))
 
 
 def _safe_loads(data, key):
@@ -59,7 +42,7 @@ def _safe_loads(data, key):
 
     try:
         if data.startswith(JSON_MAGIC):
-            return json.loads(data[len(JSON_MAGIC) :].decode("utf-8"))
+            return loads_json_payload(data[len(JSON_MAGIC) :])
 
         if data.startswith(PICKLE_MAGIC):
             return _safe_pickle_loads(data[len(PICKLE_MAGIC) :], key)
@@ -79,7 +62,7 @@ def _safe_loads(data, key):
 
 
 def _safe_dumps(data):
-    return PICKLE_MAGIC + pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL)
+    return dumps_json_payload(data)
 
 
 class RedisDataBackend(BaseDataBackend):

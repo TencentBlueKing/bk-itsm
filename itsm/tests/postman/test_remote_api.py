@@ -27,7 +27,8 @@ from unittest import mock
 
 from django.test import TestCase, override_settings
 
-from itsm.postman.models import RemoteApi, RemoteSystem
+from itsm.postman.models import RemoteApi, RemoteSystem, RemoteApiInstance
+from itsm.postman.serializers import RemoteApiSerializer, ApiInstanceSerializer
 
 
 class TestRemoteApi(TestCase):
@@ -91,3 +92,82 @@ class TestRemoteApi(TestCase):
         self.assertEqual(config["query_params"], {"foo": "bar"})
         self.assertEqual(config["before_req"], "stored_before_req")
         self.assertEqual(config["map_code"], "stored_map_code")
+
+    def test_remote_api_serializer_should_reject_custom_script_fields(self):
+        remote_system = RemoteSystem.objects.create(
+            creator="admin",
+            updated_by="admin",
+            name="test-system",
+            code="TEST_SYSTEM",
+            domain="https://example.com",
+            desc="",
+            owners="admin",
+            project_key="public",
+        )
+        serializer = RemoteApiSerializer(
+            data={
+                "remote_system": remote_system.id,
+                "name": "test-api",
+                "owners": "admin",
+                "path": "/test/api/",
+                "version": "v1",
+                "method": "GET",
+                "func_name": "test_api",
+                "desc": "",
+                "is_activated": True,
+                "req_headers": [],
+                "req_params": [],
+                "req_body": {},
+                "rsp_data": {},
+                "before_req": "query_params['x'] = 1",
+                "map_code": "response['data'] = {}",
+            }
+        )
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("before_req", serializer.errors)
+        self.assertIn("map_code", serializer.errors)
+
+    def test_api_instance_serializer_should_reject_custom_script_fields(self):
+        remote_system = RemoteSystem.objects.create(
+            creator="admin",
+            updated_by="admin",
+            name="test-system-2",
+            code="TEST_SYSTEM_2",
+            domain="https://example.com",
+            desc="",
+            owners="admin",
+            project_key="public",
+        )
+        remote_api = RemoteApi.objects.create(
+            creator="admin",
+            updated_by="admin",
+            remote_system=remote_system,
+            name="test-api-2",
+            path="/test/api/2/",
+            version="v1",
+            func_name="test_api_2",
+            method="GET",
+            desc="",
+            owners="admin",
+            req_headers=[],
+            req_params=[],
+            req_body={},
+            rsp_data={},
+            is_activated=True,
+        )
+        serializer = ApiInstanceSerializer(
+            data={
+                "remote_api": remote_api.id,
+                "remote_api_id": remote_api.id,
+                "req_params": {},
+                "req_body": {},
+                "rsp_data": "",
+                "before_req": "query_params['x'] = 1",
+                "map_code": "response['data'] = {}",
+            }
+        )
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("before_req", serializer.errors)
+        self.assertIn("map_code", serializer.errors)

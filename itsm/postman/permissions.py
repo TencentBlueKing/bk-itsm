@@ -26,7 +26,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from itsm.component.constants import PUBLIC_PROJECT_PROJECT_KEY
 from itsm.component.drf import permissions as perm
 from itsm.component.exceptions import ValidateError
-from itsm.postman.models import RemoteSystem, RemoteApi
+from itsm.postman.models import RemoteSystem, RemoteApi, RemoteApiInstance
 from django.utils.translation import gettext as _
 
 from itsm.project.models import Project
@@ -104,3 +104,29 @@ class RemoteApiPermit(WorkflowElementManagePermission):
                 apply_actions = ["project_view"]
                 return self.iam_auth(request, apply_actions, project)
         return True
+
+
+class RemoteApiInstancePermit(RemoteApiPermit):
+    def has_permission(self, request, view):
+        if view.action in getattr(view, "permission_create_action", ["create"]):
+            remote_api_id = request.data.get("remote_api") or request.data.get(
+                "remote_api_id"
+            )
+            if remote_api_id:
+                remote_api = RemoteApi.objects.get(id=remote_api_id)
+                obj = RemoteApiInstance(remote_api=remote_api)
+                return self.has_object_permission(request, view, obj)
+
+        return super(RemoteApiInstancePermit, self).has_permission(request, view)
+
+    def has_object_permission(self, request, view, obj, **kwargs):
+        remote_api = None
+        if obj:
+            remote_api = getattr(obj, "remote_api", None) or obj
+
+        if remote_api is None:
+            return True
+
+        return super(RemoteApiInstancePermit, self).has_object_permission(
+            request, view, remote_api, **kwargs
+        )

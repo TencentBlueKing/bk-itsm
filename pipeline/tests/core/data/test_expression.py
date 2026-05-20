@@ -233,6 +233,24 @@ class TestMakoTemplateSafety(TestCase):
             '${obj.__init__.__globals__["__builtins__"]["__import__"]("os").popen("id").read()}'
         )
 
+    def test_reject_dynamic_dunder_subscript_concat(self):
+        """拦截通过字符串拼接生成的 dunder key"""
+        payload = '${data["__" + "globals__"]}'
+        self._assert_forbidden_template(payload)
+        self.assertEqual(CommonTemplate(payload).render({"data": {}}), payload)
+
+    def test_reject_dynamic_dunder_subscript_percent_format(self):
+        """拦截通过 % 格式化生成的 dunder key"""
+        payload = '${data["%s%s" % ("__", "globals__")]}'
+        self._assert_forbidden_template(payload)
+        self.assertEqual(CommonTemplate(payload).render({"data": {}}), payload)
+
+    def test_reject_dynamic_dunder_builtins_key_concat(self):
+        """拦截通过字符串拼接生成的 __builtins__ key"""
+        payload = '${data["__built" + "ins__"]}'
+        self._assert_forbidden_template(payload)
+        self.assertEqual(CommonTemplate(payload).render({"data": {}}), payload)
+
     # ========== visit_Call format/format_map 拦截测试 ==========
 
     def test_reject_format_payload(self):

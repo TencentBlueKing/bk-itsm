@@ -21,6 +21,12 @@ from pipeline.engine.models.fields import IOField, JSON_MAGIC, PICKLE_MAGIC
 from pipeline.utils.collections import FancyDict
 
 
+class RuntimeObject(object):
+    def __init__(self, object_id, data=None):
+        self.id = object_id
+        self.data = data or {}
+
+
 class EvilPickle(object):
     def __reduce__(self):
         return (eval, ("1 + 1",))
@@ -34,6 +40,7 @@ class IOFieldTestCase(SimpleTestCase):
             "items": [1, 2, 3],
             "nested": {"enabled": True},
         }
+        self.runtime_field = IOField(restricted_loads=False)
 
     def test_get_prep_value_and_to_python_with_new_pickle_magic(self):
         prepared = self.field.get_prep_value(self.sample)
@@ -82,3 +89,13 @@ class IOFieldTestCase(SimpleTestCase):
         self.assertTrue(zlib.decompress(prepared).startswith(PICKLE_MAGIC))
         self.assertIsNone(self.field.to_python(prepared))
         self.assertIsNone(self.field.to_python(None))
+
+    def test_runtime_field_should_keep_pickle_object_roundtrip(self):
+        runtime_object = RuntimeObject("pipeline-1", {"foo": "bar"})
+
+        prepared = self.runtime_field.get_prep_value(runtime_object)
+        restored = self.runtime_field.to_python(prepared)
+
+        self.assertTrue(zlib.decompress(prepared).startswith(PICKLE_MAGIC))
+        self.assertEqual(restored.id, "pipeline-1")
+        self.assertEqual(restored.data, {"foo": "bar"})

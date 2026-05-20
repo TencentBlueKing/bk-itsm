@@ -45,7 +45,7 @@ from itsm.component.utils.client_backend_query import get_components, get_system
 from itsm.component.utils.misc import JsonEncoder
 from itsm.postman.constants import RPC_CODE
 from itsm.postman.models import RemoteApi, RemoteApiInstance, RemoteSystem
-from itsm.postman.permissions import RemoteApiPermit
+from itsm.postman.permissions import RemoteApiPermit, RemoteApiInstancePermit
 from itsm.postman.rpc.core.request import CompRequest
 from itsm.postman.serializers import (
     ApiInstanceSerializer,
@@ -74,7 +74,9 @@ class ModelViewSet(component_viewsets.ModelViewSet):
 class ApiInstanceViewsSet(ModelViewSet):
     serializer_class = ApiInstanceSerializer
     queryset = RemoteApiInstance._objects.all()
-    permission_classes = ()
+    permission_classes = (RemoteApiInstancePermit,)
+    permission_resource_is_project = True
+    permission_create_action = ["create"]
     
     def list(self, request, *args, **kwargs):
         raise NotAllowedError(_("不支持的请求方法"))
@@ -235,6 +237,8 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
             query_params = request.data.get("req_params", {})
 
         api_config = api.get_api_config(query_params)
+        api_config["before_req"] = ""
+        api_config["map_code"] = ""
 
         rsp = bk.http(config=api_config)
 
