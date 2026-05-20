@@ -237,8 +237,6 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
             query_params = request.data.get("req_params", {})
 
         api_config = api.get_api_config(query_params)
-        api_config["before_req"] = ""
-        api_config["map_code"] = ""
 
         rsp = bk.http(config=api_config)
 

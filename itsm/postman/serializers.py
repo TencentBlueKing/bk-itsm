@@ -57,7 +57,7 @@ CUSTOM_SCRIPT_DISABLED_ERROR = _(
 
 def validate_custom_script_disabled(value):
     if value and value.strip():
-        raise ParamError(CUSTOM_SCRIPT_DISABLED_ERROR)
+        raise serializers.ValidationError(CUSTOM_SCRIPT_DISABLED_ERROR)
     return value
 
 
