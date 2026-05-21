@@ -202,6 +202,7 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
     permission_action_mapping = {
         "list": ["project_view"],
     }
+    permission_free_actions = ["run_api"]
 
     filter_fields = {
         "is_activated": ["exact"],
