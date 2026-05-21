@@ -17,6 +17,7 @@ from unittest.mock import MagicMock, patch
 
 from django.test import SimpleTestCase
 
+from pipeline.core.data.base import DataObject
 from pipeline.engine.core.data.redis_backend import (
     JSON_MAGIC,
     PICKLE_MAGIC,
@@ -52,7 +53,7 @@ class RedisDataBackendTestCase(SimpleTestCase):
     def test_safe_dumps_adds_pickle_magic(self):
         dumped = _safe_dumps(self.sample)
 
-        self.assertTrue(dumped.startswith(PICKLE_MAGIC))
+        self.assertTrue(dumped.startswith(JSON_MAGIC))
         self.assertEqual(_safe_loads(dumped, "demo-key"), self.sample)
 
     def test_safe_loads_with_legacy_pickle_payload(self):
@@ -84,10 +85,27 @@ class RedisDataBackendTestCase(SimpleTestCase):
 
         self.backend.set_object("demo-key", self.sample)
         stored_payload = self.redis_inst.set.call_args[0][1]
-        self.assertTrue(stored_payload.startswith(PICKLE_MAGIC))
+        self.assertTrue(stored_payload.startswith(JSON_MAGIC))
 
         loaded = self.backend.get_object("demo-key")
         self.assertEqual(loaded, self.sample)
+
+    def test_set_and_get_data_object(self):
+        data_object = DataObject(
+            inputs={"ticket_id": 1, "state_id": "sign-node"},
+            outputs={"variables": {"foo": "bar"}},
+        )
+        dumped = _safe_dumps(data_object)
+        self.redis_inst.get.return_value = dumped
+
+        self.backend.set_object("schedule-parent-data", data_object)
+        stored_payload = self.redis_inst.set.call_args[0][1]
+        self.assertTrue(stored_payload.startswith(PICKLE_MAGIC))
+
+        loaded = self.backend.get_object("schedule-parent-data")
+        self.assertIsInstance(loaded, DataObject)
+        self.assertEqual(loaded.inputs.ticket_id, 1)
+        self.assertEqual(loaded.outputs.variables["foo"], "bar")
 
     def test_expire_cache_and_cache_for(self):
         dumped = _safe_dumps(self.sample)

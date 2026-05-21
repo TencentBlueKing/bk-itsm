@@ -11,8 +11,12 @@ an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express o
 specific language governing permissions and limitations under the License.
 """
 
+import collections
+import datetime
 import logging
 import pickle
+from decimal import Decimal
+from uuid import UUID
 
 from pipeline.conf import settings
 from pipeline.engine.core.data.base_backend import BaseDataBackend
@@ -20,20 +24,65 @@ from pipeline.engine.models.fields import (
     JSON_MAGIC,
     PICKLE_MAGIC,
     dumps_json_payload,
+    dumps_pickle_payload,
     loads_json_payload,
-    restricted_pickle_loads,
 )
+from pipeline.utils.collections import FancyDict
 from pipeline.utils.utils import convert_bytes_to_str
 
 logger = logging.getLogger(__name__)
 
 
-def _safe_pickle_loads(data, key):
+def _should_dump_as_json(data):
+    if isinstance(data, FancyDict):
+        return _should_dump_as_json(dict(data))
+
+    if isinstance(data, collections.OrderedDict):
+        return all(
+            _should_dump_as_json(key) and _should_dump_as_json(item)
+            for key, item in data.items()
+        )
+
+    if isinstance(data, collections.defaultdict):
+        return _should_dump_as_json(dict(data))
+
+    if isinstance(data, collections.deque):
+        return all(_should_dump_as_json(item) for item in data)
+
+    if isinstance(data, (list, tuple, set, frozenset)):
+        return all(_should_dump_as_json(item) for item in data)
+
+    if isinstance(data, dict):
+        return all(
+            isinstance(key, str) and _should_dump_as_json(item)
+            for key, item in data.items()
+        )
+
+    return data is None or isinstance(
+        data,
+        (
+            str,
+            int,
+            float,
+            bool,
+            bytes,
+            bytearray,
+            datetime.datetime,
+            datetime.date,
+            datetime.time,
+            datetime.timedelta,
+            Decimal,
+            UUID,
+        ),
+    )
+
+
+def _pickle_loads(data, key):
     try:
-        return restricted_pickle_loads(data)
+        return pickle.loads(data)
     except UnicodeDecodeError:
         logger.warning("RedisDataBackend 检测到历史 py2 pickle 数据，key=%s", key)
-        return convert_bytes_to_str(restricted_pickle_loads(data, encoding="bytes"))
+        return convert_bytes_to_str(pickle.loads(data, encoding="bytes"))
 
 
 def _safe_loads(data, key):
@@ -45,24 +94,19 @@ def _safe_loads(data, key):
             return loads_json_payload(data[len(JSON_MAGIC) :])
 
         if data.startswith(PICKLE_MAGIC):
-            return _safe_pickle_loads(data[len(PICKLE_MAGIC) :], key)
+            return _pickle_loads(data[len(PICKLE_MAGIC) :], key)
 
         logger.warning("RedisDataBackend 检测到历史原生 pickle 缓存，key=%s", key)
-        return _safe_pickle_loads(data, key)
-    except pickle.UnpicklingError as error:
-        logger.error(
-            "RedisDataBackend 安全拦截：拒绝反序列化不安全的 pickle 数据，key=%s error=%s",
-            key,
-            error,
-        )
-        return None
+        return _pickle_loads(data, key)
     except Exception:
         logger.exception("RedisDataBackend 反序列化异常，key=%s", key)
         return None
 
 
 def _safe_dumps(data):
-    return dumps_json_payload(data)
+    if _should_dump_as_json(data):
+        return dumps_json_payload(data)
+    return dumps_pickle_payload(data)
 
 
 class RedisDataBackend(BaseDataBackend):
