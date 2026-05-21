@@ -278,6 +278,18 @@ class WebHookService(ItsmBaseService):
         timeout = extras.get("settings", {}).get("timeout", 10)
         success_exp = extras.get("success_exp")
 
+        cleaned_headers = {}
+        for key, value in headers.items():
+            if key is None or value is None:
+                continue
+            clean_key = str(key).strip()
+            clean_value = str(value).strip()
+            if not clean_key:
+                continue
+            cleaned_headers[clean_key] = clean_value
+
+        headers = cleaned_headers
+
         # 如果是less code的数据处理节点, 针对get or post 请求，填充认证信息
         if ticket.project_key == LESSCODE_PROJECT_KEY:
             common_args = self.get_common_args()
