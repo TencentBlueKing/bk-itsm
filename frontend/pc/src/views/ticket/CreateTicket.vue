@@ -521,20 +521,7 @@
         });
       },
       onBackIconClick() {
-        let route;
-        if (this.$route.query.from) {
-          route = {
-            name: this.$route.query.from,
-          };
-        } else {
-          route = {
-            name: 'projectTicket',
-            query: {
-              project_id: this.$store.state.project.id,
-            },
-          };
-        }
-        this.$router.push(route);
+        this.$router.push({ name: 'Home' });
       },
       onCollectClick() {
         this.$store.dispatch('service/toggleServiceFavorite', {
