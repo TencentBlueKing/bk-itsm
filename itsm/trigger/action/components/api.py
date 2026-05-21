@@ -44,6 +44,7 @@ class ApiForms(BaseForm):
     response = JSONField(
         name=_("API系统返回参数"),
         display=False,
+        required=False,
         default={"ref_type": "reference", "value": "api_response_message"},
     )
 
