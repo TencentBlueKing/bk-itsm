@@ -103,7 +103,7 @@
           :prop="field.prop">
           <template slot-scope="props">
             <!-- 单号 -->
-            <column-sn v-if="field.id === 'id'" from="ticket_approval" :row="props.row"></column-sn>
+            <column-sn v-if="field.id === 'id'" from="myApprovalTicket" :row="props.row"></column-sn>
             <!-- 当前步骤 -->
             <column-current-step v-else-if="field.id === 'current_steps'"
               :row="props.row"></column-current-step>
