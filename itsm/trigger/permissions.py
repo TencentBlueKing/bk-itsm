@@ -60,9 +60,7 @@ class WorkflowTriggerPermit(IamAuthPermit):
     def has_permission(self, request, view):
         if view.action in getattr(view, "permission_action_mapping", {}):
             # 项目查看的权限
-            project_key = request.query_params.get(
-                "project_key", PUBLIC_PROJECT_PROJECT_KEY
-            )
+            project_key = request.query_params.get("project_key") or PUBLIC_PROJECT_PROJECT_KEY
             project = Project.objects.get(pk=project_key)
             apply_actions = self.get_view_iam_actions(view)
             return self.iam_auth(request, apply_actions, project)
