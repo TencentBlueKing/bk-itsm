@@ -128,12 +128,78 @@ class WebHookService(ItsmBaseService):
     """
 
     __need_schedule__ = False
+    MAX_ERROR_DETAIL_LENGTH = 500
 
     def validate_webhook_url(self, url):
         WebhookURLValidateService.validate_for_execute(url)
 
     def validate_success_exp(self, success_exp):
         WebhookURLValidateService.validate_success_exp(success_exp)
+
+    def truncate_message(self, value, max_length=None):
+        max_length = max_length or self.MAX_ERROR_DETAIL_LENGTH
+        if value is None:
+            return ""
+        value = str(value)
+        if len(value) <= max_length:
+            return value
+        return "{}...(已截断, 共{}字符)".format(value[:max_length], len(value))
+
+    def format_webhook_error_detail(self, method=None, url=None, query_params=None, headers=None, response=None, error=None):
+        detail = {
+            "method": method,
+            "url": url,
+            "query_params": query_params or {},
+            "headers": headers or {},
+        }
+
+        if response is not None:
+            detail.update(
+                {
+                    "status_code": response.status_code,
+                    "reason": getattr(response, "reason", ""),
+                    "location": response.headers.get("Location", ""),
+                }
+            )
+
+        if error is not None:
+            detail["error"] = self.truncate_message(error)
+
+        return self.truncate_message(json.dumps(detail, ensure_ascii=False))
+
+    def record_webhook_error(
+        self,
+        ticket,
+        state_id,
+        current_node,
+        error_message,
+        error_message_template,
+        processors,
+        method=None,
+        url=None,
+        query_params=None,
+        headers=None,
+        response=None,
+        error=None,
+    ):
+        detail = self.format_webhook_error_detail(
+            method=method,
+            url=url,
+            query_params=query_params,
+            headers=headers,
+            response=response,
+            error=error,
+        )
+        full_error_message = "{}，detail={}".format(error_message, detail)
+        logger.error("[webhook]节点执行失败：%s", full_error_message)
+        self.do_exit_plugins(
+            ticket,
+            state_id,
+            current_node,
+            full_error_message,
+            error_message_template,
+            processors,
+        )
 
     def update_info(self, current_node, **kwargs):
         """
@@ -349,52 +415,70 @@ class WebHookService(ItsmBaseService):
                 allow_redirects=False,
             )
         except Exception as e:
-            self.do_exit_plugins(
+            self.record_webhook_error(
                 ticket,
                 state_id,
                 current_node,
-                str(e),
+                "Webhook请求失败",
                 error_message_template,
                 processors,
+                method=method,
+                url=url,
+                query_params=query_params,
+                headers=headers,
+                error=str(e),
             )
             logger.exception("[webhook]节点请求失败，失败原因 error = {}".format(e))
             return False
         try:
             # 返回code 非 200
             if response.status_code not in [200, 201]:
-                err_message = "返回状态码非200, status_code={}".format(response.status_code)
-                self.do_exit_plugins(
+                self.record_webhook_error(
                     ticket,
                     state_id,
                     current_node,
-                    err_message,
+                    "返回状态码非200",
                     error_message_template,
                     processors,
+                    method=method,
+                    url=url,
+                    query_params=query_params,
+                    headers=headers,
+                    response=response,
                 )
                 return False
         except Exception as e:
-            err_message = "状态码解析失败， error={}".format(e)
-            self.do_exit_plugins(
+            self.record_webhook_error(
                 ticket,
                 state_id,
                 current_node,
-                err_message,
+                "【WebHookService】状态码解析失败",
                 error_message_template,
                 processors,
+                method=method,
+                url=url,
+                query_params=query_params,
+                headers=headers,
+                response=response,
+                error=str(e),
             )
             return False
 
         try:
             resp = response.json()
         except Exception:
-            err_message = "返回值非Json, status_code={}".format(response.status_code)
-            self.do_exit_plugins(
+            self.record_webhook_error(
                 ticket,
                 state_id,
                 current_node,
-                err_message,
+                "返回值非Json",
                 error_message_template,
                 processors,
+                method=method,
+                url=url,
+                query_params=query_params,
+                headers=headers,
+                response=response,
             )
             return False
 
