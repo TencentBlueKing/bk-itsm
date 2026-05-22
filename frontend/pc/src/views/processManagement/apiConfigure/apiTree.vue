@@ -466,7 +466,7 @@
           domain: item ? item.domain : '',
           code: item ? item.code : '',
           owners: item ? item.owners : '',
-          personInCharge: item ? item.owners.split(',') : [],
+          personInCharge: item && item.owners && item.owners.length > 0 ? item.owners.split(',') : [],
           contact_information: item ? item.contact_information : '',
           id: item ? item.id : '',
           system_id: item ? item.system_id : '',
