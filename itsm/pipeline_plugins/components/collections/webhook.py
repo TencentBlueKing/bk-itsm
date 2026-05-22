@@ -191,12 +191,17 @@ class WebHookService(ItsmBaseService):
             error=error,
         )
         full_error_message = "{}，detail={}".format(error_message, detail)
+        frontend_error_message = error_message
+        if response is not None:
+            frontend_error_message = "{}, status_code={}".format(
+                error_message, response.status_code
+            )
         logger.error("[webhook]节点执行失败：%s", full_error_message)
         self.do_exit_plugins(
             ticket,
             state_id,
             current_node,
-            full_error_message,
+            frontend_error_message,
             error_message_template,
             processors,
         )
