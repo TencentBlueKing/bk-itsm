@@ -29,18 +29,22 @@ def parse_template_nodes(
     code_extractor: MakoNodeCodeExtractor,
 ):
     """
-    解析mako模板节点，逐个节点解析抽象语法树并检查安全性
-    :param nodes: mako模板节点列表
-    :param node_visitor: 节点访问类，用于遍历AST节点
-    :param code_extractor: Mako 词法节点处理器，用于提取 python 代码
+    解析 mako 模板节点，逐节点抽取 Python 代码片段并做 AST 安全检查。
+
+    code_extractor.extract 契约：
+    - 返回 None：跳过
+    - 返回 str 或 list[str]：每个片段都需独立 ast.parse 后送入 visitor
     """
     for node in nodes:
         code = code_extractor.extract(node)
         if code is None:
             continue
 
-        ast_node = ast.parse(code, "<unknown>", "exec")
-        node_visitor.visit(ast_node)
+        code_snippets = [code] if isinstance(code, str) else list(code)
+        for snippet in code_snippets:
+            ast_node = ast.parse(snippet, "<unknown>", "exec")
+            node_visitor.visit(ast_node)
+
         if hasattr(node, "nodes"):
             parse_template_nodes(node.nodes, node_visitor, code_extractor)
 

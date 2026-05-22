@@ -77,11 +77,32 @@ class SingleLineNodeVisitor(ast.NodeVisitor):
         self.visit_Import(node)
 
 
+# mako 内置 filter 白名单（'n' 表示不转义，非 Python 表达式，无需 AST 校验）
+MAKO_BUILTIN_FILTER_WHITELIST = {"n"}
+
+
 class SingleLinCodeExtractor(MakoNodeCodeExtractor):
+    """
+    抽取需要做 AST 安全检查的 Python 代码片段。
+
+    返回值契约：
+    - list[str]：一个或多个独立的 Python 代码片段，调用方需逐条解析校验
+    - None：无需检查
+    异常：遇到不支持的节点直接抛 ForbiddenMakoTemplateException
+    """
+
     def extract(self, node):
-        if isinstance(node, parsetree.Code) or isinstance(node, parsetree.Expression):
-            return node.text
-        elif isinstance(node, parsetree.Text):
+        if isinstance(node, parsetree.Code):
+            return [node.text]
+        if isinstance(node, parsetree.Expression):
+            codes = [node.text]
+            # ${expr | filter} 中 filter 同样会作为 Python 代码参与渲染，
+            # 必须与主表达式一并送入 AST 黑名单校验，避免绕过。
+            for arg in node.escapes_code.args:
+                if arg in MAKO_BUILTIN_FILTER_WHITELIST:
+                    continue
+                codes.append(arg)
+            return codes
+        if isinstance(node, parsetree.Text):
             return None
-        else:
-            raise ForbiddenMakoTemplateException("Unsupported node: [{}]".format(node.__class__.__name__))
+        raise ForbiddenMakoTemplateException("Unsupported node: [{}]".format(node.__class__.__name__))

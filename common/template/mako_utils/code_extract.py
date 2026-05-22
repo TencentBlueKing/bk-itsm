@@ -23,10 +23,12 @@ class MakoNodeCodeExtractor:
     @abc.abstractmethod
     def extract(self, node):
         """
-        处理 Mako Lexer 分割出来的 code 对象，返回需要检测的 python 代码，返回 None 表示该节点不需要处理
+        处理 Mako Lexer 分割出来的节点，返回需要做 AST 安全检查的 Python 代码。
 
-        :param node: mako parsetree node
-        :return: 需要处理的代码，或 None
+        返回值：
+        - None：该节点无需检查
+        - str：单个 Python 代码片段
+        - list[str]：多个独立 Python 代码片段（例如 Expression 的主表达式 + 各 filter）
         """
         raise NotImplementedError()
 
