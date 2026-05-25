@@ -618,3 +618,23 @@ def periodic_migrate_ticket_from_old_db():
         logger.info("[periodic_migrate_ticket_from_old_db] 增量同步完成")
     except Exception as e:
         logger.error(f"[periodic_migrate_ticket_from_old_db] 同步异常: {e}")
+
+
+@periodic_task(run_every=crontab(minute=1, hour="*/1"), ignore_result=True)
+def periodic_fix_service_workflow_id():
+    """
+    每小时第1分钟执行，修复 service.workflow_id 指向旧 WorkflowVersion 的异常数据。
+    在 periodic_migrate_ticket_from_old_db（每小时第0分钟）之后1分钟运行，
+    确保旧库数据同步完成后及时修正被覆盖的 workflow_id 绑定关系。
+    """
+    if not settings.ENABLE_MIGRATE_TICKET_FROM_OLD_DB:
+        logger.info("[periodic_fix_service_workflow_id] 增量同步未开启，跳过修复")
+        return
+
+    try:
+        from django.core.management import call_command
+        logger.info("[periodic_fix_service_workflow_id] 开始修复 service.workflow_id 异常数据")
+        call_command("fix_service_workflow_id")
+        logger.info("[periodic_fix_service_workflow_id] 修复完成")
+    except Exception as e:
+        logger.error(f"[periodic_fix_service_workflow_id] 修复异常: {e}")
