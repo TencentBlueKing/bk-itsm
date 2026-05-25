@@ -47,6 +47,7 @@ from common.redis import Cache
 from dateutil.relativedelta import relativedelta
 
 from common.utils import texteditor_escape
+from itsm.meta.services.domain_validate_service import DomainValidateService
 from itsm.component.constants import (
     ACTION_CHOICES,
     ACTION_DICT,
@@ -1333,7 +1334,9 @@ class Ticket(Model, BaseTicket):
     node_status = models.ManyToManyField(Status, help_text=_("节点状态"))
 
     # 单据当前状态
-    current_status = models.CharField(_("单据状态"), max_length=LEN_SHORT, db_index=True)
+    current_status = models.CharField(
+        _("单据状态"), max_length=LEN_SHORT, db_index=True
+    )
     # 单据前一状态
     pre_status = models.CharField(
         _("单据前一状态"), max_length=LEN_SHORT, default=EMPTY_STRING
@@ -3045,6 +3048,15 @@ class Ticket(Model, BaseTicket):
         callback_url = self.meta.get("callback_url", "")
         headers = self.meta.get("headers", {})
         if callback_url:
+            if not DomainValidateService(
+                key="valid_callback_domain_regex_pattern"
+            ).is_safe_url(callback_url):
+                logger.warning(
+                    "[TICKET] blocked unsafe callback_url, callback_url is %s, ticket_id is %s",
+                    callback_url,
+                    self.id,
+                )
+                return
             message = AESVerification.gen_signature(
                 settings.APP_CODE + "_" + settings.SECRET_KEY
             )

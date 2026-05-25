@@ -62,6 +62,7 @@ from itsm.component.utils.bk_bunch import (  # noqa
     bunchify,  # noqa
     unbunchify,  # noqa
 )  # noqa
+from itsm.meta.services.domain_validate_service import DomainValidateService
 
 
 class Model(models.Model):
@@ -314,7 +315,16 @@ class RemoteApi(ObjectManagerMixin, Model):
 
     @classmethod
     def restore_api(cls, item, operator="system", is_builtin=False):
-        """导入Api接口，选择性添加系统"""
+        """导入Api接口，选择性添加系统。
+
+        约束：
+        - 当 ``system_info.code`` 在库中不存在、需自动创建 ``RemoteSystem`` 时，
+          ``system_info["domain"]`` 必须通过 ``DomainValidateService`` 白名单校验，
+          以与 ``RemoteSystemSerializer.validate_domain`` 保持同语义；不通过则抛
+          ``ParamError``，由调用方（``imports``）按单条失败计入 failed。
+        - 命中已有 ``RemoteSystem`` 时不重新校验存量 domain，避免历史数据导致
+          整批导入失败。
+        """
 
         system_info = item.pop("system_info", None)
         common = {"creator": operator, "updated_by": operator, "is_builtin": is_builtin}
@@ -322,6 +332,11 @@ class RemoteApi(ObjectManagerMixin, Model):
         try:
             remote_system = RemoteSystem.objects.get(code=system_info["code"])
         except RemoteSystem.DoesNotExist:
+            domain = (system_info or {}).get("domain", "")
+            if not DomainValidateService().is_safe_url(domain):
+                raise ParamError(
+                    _("RemoteSystem.domain 不在白名单内: %s") % domain
+                )
 
             system_info.update(common)
             system_info.pop("admin", None)

@@ -313,3 +313,83 @@ class ServiceTest(TestCase):
         data["source"] = "service"
         service = Service.objects.clone(data, "admin")
         self.assertIsInstance(service, Service)
+
+
+class CatalogServiceAuthzTest(TestCase):
+    """spec round2 C-4：CatalogServiceViewSet 写动作必须经过 IamAuthWithoutResourcePermit。"""
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.component.drf.permissions.IamAuthWithoutResourcePermit.iam_auth",
+                return_value=False)
+    def test_add_services_rejects_when_iam_denied(self, _iam):
+        resp = self.client.post(
+            "/api/service/catalog_services/add_services/",
+            data={"catalog_id": 1, "services": [1]},
+            content_type="application/json",
+        )
+
+        self.assertEqual(resp.status_code, 403)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.component.drf.permissions.IamAuthWithoutResourcePermit.iam_auth",
+                return_value=False)
+    def test_remove_services_rejects_when_iam_denied(self, _iam):
+        resp = self.client.post(
+            "/api/service/catalog_services/remove_services/",
+            data={"catalog_id": 1, "services": [1]},
+            content_type="application/json",
+        )
+
+        self.assertEqual(resp.status_code, 403)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def test_safe_list_short_circuits_without_iam(self):
+        # SAFE + detail=False 直接放行，无需 iam mock。
+        resp = self.client.get("/api/service/catalog_services/")
+        self.assertEqual(resp.status_code, 200)
+
+
+class SysDictAuthzTest(TestCase):
+    """spec round2 C-5：SysDict / SysDictData 写动作必须经过权限校验。"""
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.component.drf.permissions.IamAuthWithoutResourcePermit.iam_auth",
+                return_value=False)
+    def test_sysdict_batch_delete_rejects_when_iam_denied(self, _iam):
+        resp = self.client.post(
+            "/api/service/datadicts/batch_delete/",
+            data={"id": "1,2"},
+            content_type="application/json",
+        )
+
+        self.assertEqual(resp.status_code, 403)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def test_sysdict_get_data_by_key_short_circuits(self):
+        resp = self.client.get("/api/service/datadicts/get_data_by_key/?key=PRIORITY")
+        # detail=False + SAFE，IamAuthWithoutResourcePermit 直接放行
+        self.assertNotEqual(resp.status_code, 403)
+
+
+class ServiceFavoritePermissionTest(TestCase):
+    """spec round2 H-C：all / operate_favorite / get_favorite_service 至少要登录态。"""
+
+    @override_settings(MIDDLEWARE=())
+    def test_get_favorite_service_rejects_anonymous(self):
+        resp = self.client.get("/api/service/projects/get_favorite_service/")
+        # 未登录 IsAuthenticated → 403/401（component generics 包成 403）
+        self.assertIn(resp.status_code, (401, 403))
+
+    @override_settings(MIDDLEWARE=())
+    def test_all_rejects_anonymous(self):
+        resp = self.client.get("/api/service/projects/all/")
+        self.assertIn(resp.status_code, (401, 403))
+
+    @override_settings(MIDDLEWARE=())
+    def test_operate_favorite_rejects_anonymous(self):
+        resp = self.client.post(
+            "/api/service/projects/1/operate_favorite/",
+            data={"favorite": True},
+            content_type="application/json",
+        )
+        self.assertIn(resp.status_code, (401, 403))

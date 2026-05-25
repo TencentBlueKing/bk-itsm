@@ -100,3 +100,132 @@ class TestProject(TestCase):
             UserProjectAccessRecord.objects.filter(project_key=project_key).exists(),
             True,
         )
+
+
+class TestProjectUpdateSettingsIDOR(TestCase):
+    """spec round2 H-A：update_settings 仅可改本路径项目 settings。"""
+
+    def setUp(self):
+        Project.objects.all().delete()
+        ProjectSettings.objects.all().delete()
+        self.project_a = Project.objects.create(key="proj_a", name="A")
+        self.project_b = Project.objects.create(key="proj_b", name="B")
+        self.setting_b = ProjectSettings.objects.create(
+            type="FUNCTION",
+            key="some_key",
+            value="origin_b",
+            project=self.project_b,
+        )
+
+    def tearDown(self):
+        Project.objects.all().delete()
+        ProjectSettings.objects.all().delete()
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.has_permission",
+                return_value=True)
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.has_object_permission",
+                return_value=True)
+    def test_cannot_update_settings_of_other_project(self, *_):
+        url = "/api/project/projects/{}/update_settings/".format(self.project_a.key)
+        resp = self.client.post(
+            url,
+            data={
+                "id": self.setting_b.id,
+                "type": "FUNCTION",
+                "key": "some_key",
+                "value": "hijacked",
+                "project_key": self.project_b.key,
+            },
+            content_type="application/json",
+        )
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["result"], False)
+        self.setting_b.refresh_from_db()
+        self.assertEqual(self.setting_b.value, "origin_b")
+
+
+class TestMigrationProjectAuthz(TestCase):
+    """spec round2 M-A：migration_project 必须对源/目标项目都有 project_edit。"""
+
+    def setUp(self):
+        Project.objects.all().delete()
+        self.proj_old = Project.objects.create(key="old_proj", name="old")
+        self.proj_new = Project.objects.create(key="new_proj", name="new")
+
+    def tearDown(self):
+        Project.objects.all().delete()
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.has_permission",
+                return_value=True)
+    @mock.patch(
+        "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed"
+    )
+    def test_migration_rejects_when_target_project_not_authorized(
+        self, mock_batch, _permit
+    ):
+        mock_batch.return_value = {
+            "old_proj": {"project_edit": True},
+            "new_proj": {"project_edit": False},
+        }
+        resp = self.client.post(
+            "/api/project/projects/migration_project/",
+            data={
+                "resource_type": "service",
+                "resource_id": 1,
+                "old_project_key": "old_proj",
+                "new_project_key": "new_proj",
+            },
+            content_type="application/json",
+        )
+
+        self.assertEqual(resp.status_code, 403)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.has_permission",
+                return_value=True)
+    @mock.patch(
+        "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed"
+    )
+    @mock.patch(
+        "itsm.project.handler.migration_handler.MigrationHandlerDispatcher.migrate"
+    )
+    def test_migration_allows_when_both_project_authorized(
+        self, mock_migrate, mock_batch, _permit
+    ):
+        mock_batch.return_value = {
+            "old_proj": {"project_edit": True},
+            "new_proj": {"project_edit": True},
+        }
+        resp = self.client.post(
+            "/api/project/projects/migration_project/",
+            data={
+                "resource_type": "service",
+                "resource_id": 1,
+                "old_project_key": "old_proj",
+                "new_project_key": "new_proj",
+            },
+            content_type="application/json",
+        )
+
+        self.assertEqual(resp.status_code, 200)
+        mock_migrate.assert_called_once()
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.has_permission",
+                return_value=True)
+    def test_migration_rejects_when_project_not_exists(self, _permit):
+        resp = self.client.post(
+            "/api/project/projects/migration_project/",
+            data={
+                "resource_type": "service",
+                "resource_id": 1,
+                "old_project_key": "old_proj",
+                "new_project_key": "ghost_proj",
+            },
+            content_type="application/json",
+        )
+
+        self.assertEqual(resp.status_code, 403)

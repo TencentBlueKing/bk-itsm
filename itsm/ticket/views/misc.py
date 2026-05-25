@@ -28,6 +28,7 @@ from django.conf import settings
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from common.log import logger
@@ -38,6 +39,7 @@ from itsm.component.exceptions import ComponentCallError
 from itsm.component.notify import EmailNotifier
 from itsm.iadmin.contants import ACTION_CHOICES_DICT
 from itsm.iadmin.models import CustomNotice
+from itsm.role.models import UserRole
 from itsm.ticket.models import (
     TicketComment,
     TicketCommentInvite,
@@ -65,6 +67,8 @@ class TemplateViewSet(component_viewsets.NormalModelViewSet):
     pagination_class = None
     queryset = TicketTemplate.objects.all()
     serializer_class = TemplateSerializer
+    # 个人模板：登录态 + creator 隔离即可，避免改动业务语义
+    permission_classes = (IsAuthenticated,)
 
     filter_fields = {
         "name": ["exact"],
@@ -83,6 +87,8 @@ class StateDraftViewSet(component_viewsets.NormalModelViewSet):
     pagination_class = None
     queryset = TicketStateDraft.objects.all()
     serializer_class = StateDraftSerializer
+    # 个人草稿：登录态 + creator 隔离
+    permission_classes = (IsAuthenticated,)
 
     filter_fields = {
         "ticket_id": ["exact"],
@@ -145,18 +151,31 @@ class CommentViewSet(component_viewsets.NormalModelViewSet):
 
 
 class CommentInviteViewSet(component_viewsets.NormalModelViewSet):
-    """邀请记录"""
+    """邀请记录。
+
+    内含邀请 ``code/receiver`` 等敏感凭据，必须按归属隔离：
+    - ``TicketCommentInvite`` 自身没有 creator 字段，归属沿 ``comment.creator`` 反查
+      （评论的发起人即业务上的"邀请发起方"）。
+    - ITSM 超管走短路。本接口仅暴露只读语义，无业务侧写入。
+    """
 
     pagination_class = None
     queryset = TicketCommentInvite.objects.all()
     serializer_class = CommentInviteSerializer
+    permission_classes = (IsAuthenticated,)
+    http_method_names = ["get", "head", "options"]
 
     filter_fields = {
         "comment": ["exact"],
-        "number": ["exact"],
         "code": ["exact"],
     }
     ordering_fields = "__all__"
+
+    def get_queryset(self):
+        username = self.request.user.username
+        if UserRole.is_itsm_superuser(username):
+            return self.queryset
+        return self.queryset.filter(comment__creator=username)
     
 
 class FollowersNotifyLogViewSet(component_viewsets.NormalModelViewSet):

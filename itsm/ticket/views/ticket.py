@@ -162,6 +162,7 @@ from itsm.ticket.validators import (
     terminate_validate,
     withdraw_validate,
     ticket_status_validate,
+    unmerge_authorize_validate,
 )
 from itsm.ticket.views.sql_file import get_my_deal_tickets_sql
 from itsm.ticket_status.models import TicketStatus
@@ -1403,9 +1404,17 @@ class TicketModelViewSet(ModelViewSet):
         """绑定关联单"""
         from_ticket_id = request.data.get("from_ticket")
         to_ticket_ids = request.data.get("to_tickets")
+        username = request.user.username
 
-        if not Ticket.objects.get(pk=from_ticket_id).can_derive(request.user.username):
+        if not Ticket.objects.get(pk=from_ticket_id).can_derive(username):
             raise ValidationError(_("无操作权限"))
+
+        # 防止把任意他人单据挂为派生单：每个目标单据必须当前用户可见。
+        for to_ticket_id in to_ticket_ids or []:
+            to_ticket = Ticket.objects.filter(pk=to_ticket_id).first()
+            if to_ticket is None or not to_ticket.can_view(username):
+                raise ValidationError(_("无操作权限"))
+
         ticket_to_tickets = []
 
         bind_derive_tickets_validate(from_ticket_id, to_ticket_ids)
@@ -1416,7 +1425,7 @@ class TicketModelViewSet(ModelViewSet):
                     from_ticket_id=from_ticket_id,
                     to_ticket_id=to_ticket_id,
                     related_type=DERIVE,
-                    creator=request.user.username,
+                    creator=username,
                 )
             )
         TicketToTicket.objects.bulk_create(ticket_to_tickets)
@@ -1428,8 +1437,14 @@ class TicketModelViewSet(ModelViewSet):
         """解绑关联单"""
         from_ticket = request.data.get("from_ticket")
         to_ticket = request.data.get("to_ticket")
+        username = request.user.username
 
-        if not Ticket.objects.get(pk=from_ticket).can_derive(request.user.username):
+        if not Ticket.objects.get(pk=from_ticket).can_derive(username):
+            raise ValidationError(_("无操作权限"))
+
+        # 同 bind_derive_tickets：拒绝针对不可见目标单据的解绑操作。
+        to_ticket_obj = Ticket.objects.filter(pk=to_ticket).first()
+        if to_ticket_obj is None or not to_ticket_obj.can_view(username):
             raise ValidationError(_("无操作权限"))
 
         ticket_to_ticket = TicketToTicket.objects.filter(
@@ -1570,17 +1585,25 @@ class TicketModelViewSet(ModelViewSet):
         pagination_class=CustomPageNumberPagination,
         serializer_class=TicketLogSerializer,
         queryset=Ticket.objects.filter(is_draft=False),
-        permission_classes=(),
     )
     def get_ticket_log(self, request, *args, **kwargs):
 
+        username = request.user.username
         ticket_id = request.query_params.get("ticket_id")
         if ticket_id:
             ticket = get_object_or_404(self.queryset, pk=ticket_id)
+            # 单据查看权限：复用 TicketPermissionValidate 的对象级校验，与列表保持一致
+            if not TicketPermissionValidate().has_object_permission(
+                request, self, ticket
+            ):
+                self.permission_denied(
+                    request, message=_("抱歉，您无权查看该单据")
+                )
             ticket_serializer = self.serializer_class(ticket)
             return Response(ticket_serializer.data)
 
-        queryset = self.queryset
+        # 列表模式：限定为当前用户可见单据集合（与 list 同源）
+        queryset = Ticket.objects.get_tickets(username, self.queryset)
 
         if self.request.query_params.get("catalog_id"):
             catalog_ids = ServiceCatalog.get_descendant_ids(
@@ -1642,6 +1665,10 @@ class TicketModelViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         validated_data = serializer.validated_data
+        # 权限校验：与 merge_tickets 对称，仅母单所属服务负责人或 ITSM 超管可解绑
+        unmerge_authorize_validate(
+            validated_data["master_ticket_id"], request.user.username
+        )
         master_ticket = Ticket.objects.get(id=validated_data["master_ticket_id"])
         slave_tickets = Ticket.objects.filter(id__in=validated_data["slave_ticket_ids"])
 

@@ -33,7 +33,7 @@ from itsm.helper import views
 urlpatterns = [
     # 统一的升级接口
     re_path(r"^db_fix_from_1_1_22_to_2_1_16/$", views.db_fix_from_1_1_22_to_2_1_16),
-    re_path(r"^db_fix_from_2_1_x_to_2_2_1/$", views.db_fix_from_2_1_x_to_2_2_1),
+    # re_path(r"^db_fix_from_2_1_x_to_2_2_1/$", views.db_fix_from_2_1_x_to_2_2_1),
     re_path(r"^db_fix_after_2_2_17/$", views.db_fix_after_2_2_17),
     re_path(r"^db_fix_after_2_3_1/$", views.db_fix_after_2_3_1),
     # 杂乱的升级接口
@@ -49,8 +49,8 @@ urlpatterns = [
     re_path(r"^db_fix_after_2_0_14/$", views.db_fix_after_2_0_14),
     re_path(r"^db_fix_after_2_1_x/$", views.db_fix_after_2_1_x),
     re_path(r"^db_fix_after_2_1_1/$", views.db_fix_after_2_1_1),
-    re_path(r"^db_fix_sla/$", views.db_fix_sla),
-    re_path(r"^db_fix_after_2_1_9/$", views.db_fix_after_2_1_9),
+    # re_path(r"^db_fix_sla/$", views.db_fix_sla),
+    # re_path(r"^db_fix_after_2_1_9/$", views.db_fix_after_2_1_9),
     re_path(r"^export_api_system/$", views.export_api_system),
     re_path(r"^db_fix_for_attachments/$", views.db_fix_for_attachments),
     re_path(r"^db_fix_for_service_catalog/$", views.db_fix_for_service_catalog),

@@ -131,9 +131,13 @@ class ProjectViewSet(component_viewsets.AuthModelViewSet):
 
     @action(detail=True, methods=["post"])
     def update_settings(self, request, *args, **kwargs):
+        # 必须落在路径上的 project 范围内，避免借本项目 project_edit 改他项目 settings。
+        project = self.get_object()
         ser = ProjectSettingSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        project_settings = ProjectSettings.objects.get(id=ser.validated_data["id"])
+        project_settings = ProjectSettings.objects.filter(
+            id=ser.validated_data["id"], project_id=project.key
+        ).first()
         if project_settings is None:
             raise ProjectSettingsNotFound()
         project_settings.value = ser.validated_data["value"]
@@ -169,6 +173,29 @@ class ProjectViewSet(component_viewsets.AuthModelViewSet):
         ser = ProjectMigrateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         data = ser.validated_data
+
+        # 资源迁移要求源/目标项目都具备 project_edit；否则可借本项目 edit 权限把资源迁入/迁出他项目。
+        project_keys = [data["old_project_key"], data["new_project_key"]]
+        projects = Project.objects.filter(key__in=project_keys)
+        if projects.count() != len(set(project_keys)):
+            self.permission_denied(request, message=_("源项目或目标项目不存在"))
+
+        iam_client = IamRequest(request)
+        resources = [
+            {
+                "resource_id": p.key,
+                "resource_name": p.name,
+                "resource_type": "project",
+                "creator": getattr(p, "creator", ""),
+            }
+            for p in projects
+        ]
+        allowed = iam_client.batch_resource_multi_actions_allowed(
+            ["project_edit"], resources
+        )
+        if not all(item.get("project_edit") for item in allowed.values()):
+            self.permission_denied(request, message=_("源项目或目标项目缺少编辑权限"))
+
         MigrationHandlerDispatcher(resource_type=data["resource_type"]).migrate(
             data["resource_id"],
             data["old_project_key"],
@@ -183,9 +210,13 @@ class CostomTabViewSet(component_viewsets.ModelViewSet):
     serializer_class = CostomTabSerializer
     queryset = CostomTab.objects.filter(is_deleted=False).order_by("order")
 
+    def get_queryset(self):
+        # 个人范畴资源：所有读写均限定为当前登录用户创建的 tab。
+        # 这样 get_object()/destroy/move 等通过 pk 查询时，跨用户访问会自然 404。
+        return self.queryset.filter(creator=self.request.user.username)
+
     def get_personal_queryset(self):
-        username = self.request.user.username
-        return self.queryset.filter(creator=username)
+        return self.get_queryset()
 
     def list(self, request, *args, **kwargs):
         project_key = self.request.query_params.get("project_key", "")

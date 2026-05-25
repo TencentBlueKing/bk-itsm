@@ -148,3 +148,114 @@ class TestPriorityMatrix(TestCase):
         )
         self.assertEqual(rsp.data["result"], True)
         self.assertIsInstance(rsp.data["data"], dict)
+
+
+class TestSlaTimerRuleAuthz(TestCase):
+    """spec round1 H-5：SlaTimerRule 视为系统配置，权限切到 IamAuthSystemPermit。"""
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch(
+        "itsm.component.drf.permissions.IamAuthSystemPermit.iam_auth",
+        return_value=False,
+    )
+    def test_create_rejects_when_iam_denied(self, _iam):
+        rsp = self.client.post(
+            "/api/sla/policy/timers/",
+            data=json.dumps({"name": "t", "service_type": "request"}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(rsp.status_code, 403)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch(
+        "itsm.component.drf.permissions.IamAuthSystemPermit.iam_auth",
+        return_value=False,
+    )
+    def test_list_rejects_when_iam_denied(self, _iam):
+        rsp = self.client.get("/api/sla/policy/timers/")
+        # IamAuthSystemPermit 不区分 SAFE，统一走 operational_data_view
+        self.assertEqual(rsp.status_code, 403)
+
+
+class TestSlaProtocolTicketHighlightAuthz(TestCase):
+    """spec round2 M-C：SlaViewSet.ticket_highlight 切系统级。"""
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch(
+        "itsm.component.drf.permissions.IamAuthSystemPermit.iam_auth",
+        return_value=False,
+    )
+    def test_ticket_highlight_put_rejects_when_iam_denied(self, _iam):
+        rsp = self.client.put(
+            "/api/sla/protocols/ticket_highlight/",
+            data=json.dumps({"alert_color": "#fff", "timeout_color": "#000"}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(rsp.status_code, 403)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch(
+        "itsm.component.drf.permissions.IamAuthSystemPermit.iam_auth",
+        return_value=True,
+    )
+    def test_ticket_highlight_put_passes_when_iam_allows(self, _iam):
+        from itsm.sla.models import SlaTicketHighlight
+
+        SlaTicketHighlight.objects.all().delete()
+        SlaTicketHighlight.objects.create(
+            reply_timeout_color="#aaa", handle_timeout_color="#bbb"
+        )
+        rsp = self.client.put(
+            "/api/sla/protocols/ticket_highlight/",
+            data=json.dumps({"alert_color": "#fff", "timeout_color": "#000"}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["result"], True)
+        latest = SlaTicketHighlight.objects.first()
+        self.assertEqual(latest.reply_timeout_color, "#fff")
+        self.assertEqual(latest.handle_timeout_color, "#000")
+
+
+class TestDayViewSetAuthz(TestCase):
+    """spec round1 M-5：DayViewSet 收紧到 IamAuthSystemPermit。"""
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch(
+        "itsm.component.drf.permissions.IamAuthSystemPermit.iam_auth",
+        return_value=False,
+    )
+    def test_list_rejects_when_iam_denied(self, _iam):
+        rsp = self.client.get("/api/sla/days/")
+        self.assertEqual(rsp.status_code, 403)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch(
+        "itsm.component.drf.permissions.IamAuthSystemPermit.iam_auth",
+        return_value=False,
+    )
+    def test_post_rejects_when_iam_denied(self, _iam):
+        rsp = self.client.post(
+            "/api/sla/days/",
+            data=json.dumps({"type_of_day": "NORMAL", "day_of_week": "0"}),
+            content_type="application/json",
+        )
+        self.assertEqual(rsp.status_code, 403)
+
+
+class TestPriorityValueAuthz(TestCase):
+    """spec round1 M-5：priority_value 仅要求登录态，未登录拒绝。"""
+
+    @override_settings(MIDDLEWARE=())
+    def test_priority_value_rejects_anonymous(self):
+        rsp = self.client.post(
+            "/api/sla/matrixs/priority_value/",
+            data=json.dumps(
+                {"urgency": "1", "impact": "1", "service_type": "request"}
+            ),
+            content_type="application/json",
+        )
+        self.assertIn(rsp.status_code, (401, 403))

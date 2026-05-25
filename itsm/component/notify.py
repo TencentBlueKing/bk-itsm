@@ -148,7 +148,7 @@ class WeixinNotifier(BaseNotifier):
             "content": self.message,
             "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "remark": _(
-                '<a href="{site_url}weixin/#/detail/{ticket_id}/">点击查看详情</a>'
+                '<a href="{site_url}weixin/#/ticket/{ticket_id}/">点击查看详情</a>'
             ).format(site_url=WEIXIN_APP_EXTERNAL_HOST, ticket_id=self.ticket_id),
             "wx_qy_agentid": self.wx_qy_agentid,
             "wx_qy_corpsecret": self.wx_qy_corpsecret,

@@ -31,7 +31,6 @@ from django.urls import re_path
 from itsm.gateway import views
 
 urlpatterns = [
-    re_path(r"^test/token/$", views.get_token),
     re_path(r"^bk_login/get_batch_users/$", views.get_batch_users),
     re_path(r"^bk_login/get_all_users/$", views.get_all_users),
     re_path(r"^cmdb/get_app_list/$", views.get_app_list),

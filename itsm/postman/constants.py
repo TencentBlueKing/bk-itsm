@@ -23,6 +23,27 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+import os
+
 RPC_CODE = "source_uri"
 TICKET_CONTEXT_KEY = "ticket_id"
 TRIGGER_SOURCE = 'trigger'
+
+# RemoteApi 导入文件大小上限（字节）；默认 1 MiB，可通过 env 覆盖。
+try:
+    REMOTE_API_IMPORT_MAX_BYTES = int(
+        os.environ.get("BKAPP_REMOTE_API_IMPORT_MAX_BYTES", 1024 * 1024)
+    )
+except (TypeError, ValueError):
+    REMOTE_API_IMPORT_MAX_BYTES = 1024 * 1024
+
+# RemoteApi 单次导入条目数上限；默认 20，可通过 env 覆盖。
+try:
+    REMOTE_API_IMPORT_MAX_ITEMS = int(
+        os.environ.get("BKAPP_REMOTE_API_IMPORT_MAX_ITEMS", 20)
+    )
+except (TypeError, ValueError):
+    REMOTE_API_IMPORT_MAX_ITEMS = 20
+
+# RemoteApi 单条导入项必备字段（缺一即拒绝）。
+REMOTE_API_IMPORT_REQUIRED_FIELDS = ("name", "path", "method")

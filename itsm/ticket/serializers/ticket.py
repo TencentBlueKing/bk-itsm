@@ -90,6 +90,7 @@ from itsm.component.utils.misc import (
 from itsm.postman.serializers import TaskStateApiInfoSerializer
 from itsm.service.validators import service_validate
 from itsm.sla_engine.constants import HANDLE_TIMEOUT, RUNNING as SLA_RUNNING, PAUSED
+from itsm.meta.services.domain_validate_service import DomainValidateService
 from itsm.ticket.models import (
     Service,
     Status,
@@ -949,6 +950,14 @@ class TicketSerializer(AuthModelSerializer):
         data["auth_actions"] = actions
 
         return data
+
+    def validate_meta(self, value):
+        callback_url = (value or {}).get("callback_url")
+        if callback_url and not DomainValidateService(
+            key="valid_callback_domain_regex_pattern"
+        ).is_safe_url(callback_url):
+            raise serializers.ValidationError(_("meta.callback_url 不在白名单内"))
+        return value
 
     def run_validation(self, data):
         if self.instance is None:

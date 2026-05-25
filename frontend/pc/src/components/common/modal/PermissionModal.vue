@@ -24,7 +24,7 @@
   <bk-dialog
     width="768"
     ext-cls="permission-dialog"
-    :z-index="2010"
+    :z-index="9910"
     :mask-close="false"
     :header-position="'left'"
     :title="''"

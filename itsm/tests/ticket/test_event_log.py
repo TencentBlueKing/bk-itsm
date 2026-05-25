@@ -60,3 +60,29 @@ class TicketEventLogTestCase(TestCase):
         self.assertEqual(resp.data["code"], "OK")
         self.assertEqual(resp.data["message"], "success")
         self.assertEqual(resp.data["data"][0]["sn"], sn)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch(
+        "itsm.ticket.permissions.EventLogPermissionValidate.has_permission",
+        return_value=True,
+    )
+    def test_list_without_ticket_param_returns_empty(self, _patch_permission):
+        """spec round3 H-C：list 缺 ``ticket`` 参数时必须返回空集。
+
+        与权限链解耦的纵深：即便 ``EventLogPermissionValidate`` 出现回归，
+        ``get_queryset`` 也不会把全表泄露给调用方。
+        """
+        TicketEventLog.objects.create(
+            ticket_id=1, workflow_id=1, from_state_id=1,
+            type="state", operator="alice", message="",
+        )
+        TicketEventLog.objects.create(
+            ticket_id=2, workflow_id=1, from_state_id=1,
+            type="state", operator="bob", message="",
+        )
+
+        resp = self.client.get("/api/ticket/logs/")
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["result"], True)
+        self.assertEqual(resp.data["data"], [])

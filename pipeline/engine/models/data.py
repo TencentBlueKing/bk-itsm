@@ -43,6 +43,6 @@ class DataSnapshotManager(models.Manager):
 
 class DataSnapshot(models.Model):
     key = models.CharField(_("对象唯一键"), max_length=255, primary_key=True)
-    obj = IOField(verbose_name=_("对象存储字段"))
+    obj = IOField(verbose_name=_("对象存储字段"), restricted_loads=False)
 
     objects = DataSnapshotManager()

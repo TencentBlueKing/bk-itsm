@@ -56,7 +56,7 @@ class ProcessSnapshotManager(models.Manager):
 
 class ProcessSnapshot(models.Model):
     id = models.BigAutoField(_("ID"), primary_key=True)
-    data = IOField(verbose_name=_("pipeline 运行时数据"))
+    data = IOField(verbose_name=_("pipeline 运行时数据"), restricted_loads=False)
 
     objects = ProcessSnapshotManager()
 
@@ -1064,7 +1064,7 @@ class HistoryData(models.Model):
 class MultiCallbackData(models.Model):
     id = models.BigAutoField(_("自增ID"), primary_key=True)
     schedule_id = models.CharField(_("回调服务ID"), max_length=NAME_MAX_LENGTH)
-    data = IOField(verbose_name=_("回调数据"))
+    data = IOField(verbose_name=_("回调数据"), restricted_loads=False)
 
 
 DO_NOT_RECORD_WHEN_RERUN = frozenset(
@@ -1186,8 +1186,8 @@ class ScheduleService(models.Model):
     schedule_times = models.IntegerField(_("被调度次数"), default=0)
     wait_callback = models.BooleanField(_("是否是回调型调度"), default=False)
     multi_callback_enabled = models.BooleanField(_("是否支持多次回调"), default=False)
-    callback_data = IOField(verbose_name=_("回调数据"), default=None)
-    service_act = IOField(verbose_name=_("待调度服务"))
+    callback_data = IOField(verbose_name=_("回调数据"), default=None, restricted_loads=False)
+    service_act = IOField(verbose_name=_("待调度服务"), restricted_loads=False)
     is_finished = models.BooleanField(_("是否已完成"), default=False)
     version = models.CharField(_("Activity 的版本"), max_length=32, db_index=True)
     is_scheduling = models.BooleanField(

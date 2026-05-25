@@ -53,18 +53,19 @@ class EventLogViewSet(component_viewsets.ReadOnlyModelViewSet):
     permission_classes = (EventLogPermissionValidate,)
 
     def get_queryset(self):
-        """
-        重写get_queryset
-        :return:
+        """事件日志按 ticket 维度强制隔离。
+
+        缺少 ``ticket`` 查询参数时返回空集，与权限链解耦——
+        即便后续 ``EventLogPermissionValidate`` 出现回归，也不会泄露全表。
         """
         queryset = super(EventLogViewSet, self).get_queryset()
-        if not self.request.query_params.get("ticket"):
-            # 不存在的请求参数，直接返回全部
-            return queryset
+        ticket_id = self.request.query_params.get("ticket")
+        if not ticket_id:
+            return queryset.none()
 
-        master_ticket = Ticket.objects.get_master_ticket(self.request.query_params['ticket'])
+        master_ticket = Ticket.objects.get_master_ticket(ticket_id)
         if not master_ticket:
-            return queryset
+            return queryset.none()
 
         return queryset.filter(ticket=master_ticket)
 

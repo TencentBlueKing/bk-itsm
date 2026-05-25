@@ -32,6 +32,7 @@ from django.utils.translation import gettext as _
 from django_bulk_update.helper import bulk_update
 from rest_framework import serializers
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from itsm.component.constants import (
@@ -239,7 +240,7 @@ class CatalogServiceViewSet(component_viewsets.ReadOnlyModelViewSet):
 
     serializer_class = CatalogServiceSerializer
     queryset = CatalogService.objects.filter(is_deleted=False)
-    permission_classes = ()
+    permission_classes = (perm.IamAuthWithoutResourcePermit,)
     filter_fields = {
         "id": ["exact", "in"],
         "catalog": ["exact", "in"],
@@ -435,7 +436,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=["get"], permission_classes=())
+    @action(detail=False, methods=["get"], permission_classes=(IsAuthenticated,))
     def all(self, request, *args, **kwargs):
         context = self.get_serializer_context()
         serializer_class = ServiceListSerializer
@@ -467,7 +468,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
 
         return Response(real_deleted)
 
-    @action(detail=True, methods=["post"], permission_classes=())
+    @action(detail=True, methods=["post"], permission_classes=(IsAuthenticated,))
     def operate_favorite(self, request, *args, **kwargs):
         service = self.get_object()
         favorite = request.data.get("favorite")
@@ -477,7 +478,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
             service.delete_favorite(request.user.username)
         return Response()
 
-    @action(detail=False, methods=["get"], permission_classes=())
+    @action(detail=False, methods=["get"], permission_classes=(IsAuthenticated,))
     def get_favorite_service(self, request, *args, **kwargs):
         favorite_service = FavoriteService.objects.filter(
             user=request.user.username
@@ -522,7 +523,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
 
         return Response()
 
-    @action(detail=True, methods=["post"], permission_classes=())
+    @action(detail=True, methods=["post"])
     def source(self, request, *args, **kwargs):
         service = self.get_object()
         source = request.data.get("source", None)
@@ -714,7 +715,7 @@ class SysDictViewSet(DynamicListModelMixin, component_viewsets.ReadOnlyModelView
 
     serializer_class = SysDictSerializer
     queryset = SysDict.objects.filter(is_show=True).order_by("-is_builtin", "create_at")
-    # permission_classes = (perm.IamAuthWithoutResourcePermit,)
+    permission_classes = (perm.IamAuthWithoutResourcePermit,)
 
     filter_fields = {
         "id": ["exact", "in"],
@@ -760,7 +761,7 @@ class SysDictDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
     serializer_class = DictDataSerializer
     queryset = DictData.objects.all()
-    # permission_classes = (perm.IamAuthWithoutResourcePermit,)
+    permission_classes = (perm.IamAuthWithoutResourcePermit,)
 
     filter_fields = {
         "id": ["exact", "in"],

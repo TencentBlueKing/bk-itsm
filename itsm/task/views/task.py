@@ -46,6 +46,7 @@ from itsm.component.constants import (
     ACTION_SKIP,
 )
 from itsm.component.drf import viewsets as component_viewsets
+from itsm.component.drf.permissions import IamAuthWithoutResourcePermit
 from itsm.component.exceptions import CallTaskPipelineError, ComponentCallError
 from itsm.task.models import Task, TaskField, TaskLib
 from itsm.task.permissions import TaskPermissionValidate
@@ -210,6 +211,18 @@ class TaskViewSet(component_viewsets.ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         ticket_id = request.data["ticket_id"]
+        username = request.user.username
+
+        from itsm.ticket.models import Ticket
+        from itsm.role.models import UserRole
+        ticket = Ticket.objects.filter(pk=ticket_id).first()
+        if ticket is None:
+            raise ValidationError(_("单据不存在"))
+        if not (
+            UserRole.is_itsm_superuser(username) or ticket.can_operate(username)
+        ):
+            self.permission_denied(request, message=_("抱歉，您无权操作该单据的任务顺序"))
+
         # 示例数据: [{"task_id": 1, "order": 1}, {"task_id": 2, "order": 2}]
         task_orders = request.data["task_orders"]
         task_id_order_mapping = {i["task_id"]: i["order"] for i in task_orders}
@@ -319,6 +332,18 @@ class TaskViewSet(component_viewsets.ModelViewSet):
     def sync_task_status(self, request, *args, **kwargs):
         """同步标准运维任务状态"""
         ticket_id = request.query_params.get("ticket_id")
+        username = request.user.username
+
+        from itsm.ticket.models import Ticket
+        from itsm.role.models import UserRole
+        ticket = Ticket.objects.filter(pk=ticket_id).first()
+        if ticket is None:
+            raise ValidationError(_("单据不存在"))
+        if not (
+            UserRole.is_itsm_superuser(username) or ticket.can_view(username)
+        ):
+            self.permission_denied(request, message=_("抱歉，您无权查看该单据的任务状态"))
+
         Task.sync_tasks_status(ticket_id)
         return Response()
 
@@ -327,6 +352,7 @@ class TaskFieldViewSet(component_viewsets.ModelViewSet):
     queryset = TaskField.objects.all()
     serializer_class = TaskFieldSerializer
     pagination_class = None
+    permission_classes = (IamAuthWithoutResourcePermit,)
     filter_fields = {
         "task_id": ["exact"],
         "stage": ["exact", "in"],
@@ -335,7 +361,11 @@ class TaskFieldViewSet(component_viewsets.ModelViewSet):
 
     @action(detail=False, methods=["put"])
     def batch_update(self, request):
-        """批量更新任务字段"""
+        """批量更新任务字段。
+
+        校验：调用方必须是字段所属任务对应单据的处理人/创建人/ITSM 超管之一，
+        否则一律拒绝，避免任意登录用户改写他人单据任务字段。
+        """
         serializer = TaskFieldBatchUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -349,6 +379,26 @@ class TaskFieldViewSet(component_viewsets.ModelViewSet):
         task_fields = TaskField.objects.filter(id__in=fields.keys()).extra(
             select={"custom_order": ordering}, order_by=["custom_order"]
         )
+
+        username = request.user.username
+        from itsm.role.models import UserRole
+        is_superuser = UserRole.is_itsm_superuser(username)
+        if not is_superuser:
+            task_ids = {tf.task_id for tf in task_fields}
+            ticket_ids = set(
+                Task.objects.filter(id__in=task_ids).values_list(
+                    "ticket_id", flat=True
+                )
+            )
+            from itsm.ticket.models import Ticket
+            tickets = Ticket.objects.filter(id__in=ticket_ids)
+            for ticket in tickets:
+                if not (
+                    ticket.creator == username
+                    or username in ticket.real_current_processors
+                    or ticket.can_operate(username)
+                ):
+                    raise ValidationError(_("抱歉，您无权修改该单据的任务字段"))
 
         for task_field in task_fields:
             value = fields[task_field.id].get("value")
@@ -365,6 +415,7 @@ class TaskLibViewSet(component_viewsets.ModelViewSet):
     queryset = TaskLib.objects.all()
     serializer_class = TaskLibSerializer
     pagination_class = None
+    permission_classes = (IamAuthWithoutResourcePermit,)
     filter_fields = {
         "service_id": ["exact", "in"],
     }

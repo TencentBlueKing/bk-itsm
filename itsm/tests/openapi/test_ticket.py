@@ -404,3 +404,60 @@ class TicketOpenTest(TestCase):
         self.assertEqual(
             resp.data["message"], "参数验证失败: 该单据已经被评论，请勿重复评论"
         )
+    
+    @override_settings(BK_APIGW_REQUIRE_EXEMPT=False)
+    def test_proceed_approval_without_jwt_should_return_403(self):
+        """无 JWT 认证请求 proceed_approval 应返回 403，防止未鉴权伪造审批"""
+        url = "/openapi/ticket/proceed_approval/"
+        data = {
+            "process_inst_id": "NONEXISTENT_SN",
+            "activity": 1,
+            "handler": "admin",
+            "submit_action": "true",
+            "submit_opinion": "approved",
+        }
+        resp = self.client.post(
+            url, json.dumps(data), content_type="application/json"
+        )
+        # custom_apigw_required 在 request 无 jwt 属性时返回 403
+        self.assertEqual(resp.status_code, 403)
+    
+    
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.component.decorators.JWTClient")
+    def test_proceed_approval_with_jwt_should_pass_auth(self, patch_jwt_client):
+        """有 JWT 认证请求 proceed_approval 应通过鉴权层（业务逻辑取决于数据）"""
+        patch_jwt_client.is_valid.return_value = True
+        url = "/openapi/ticket/proceed_approval/"
+        data = {
+            "process_inst_id": "NONEXISTENT_SN",
+            "activity": 1,
+            "handler": "admin",
+            "submit_action": "true",
+            "submit_opinion": "approved",
+        }
+        resp = self.client.post(
+            url, json.dumps(data), content_type="application/json"
+        )
+        # 鉴权应通过，业务层因单据不存在应返回错误（非 403）
+        self.assertNotEqual(resp.status_code, 403)
+        
+    
+    @override_settings(
+        BK_APIGW_REQUIRE_EXEMPT=True,
+    )
+    def test_proceed_approval_exempt_mode_should_pass(self):
+        """BK_APIGW_REQUIRE_EXEMPT=True 时（开发模式）应跳过鉴权直接进入业务逻辑"""
+        url = "/openapi/ticket/proceed_approval/"
+        data = {
+            "process_inst_id": "NONEXISTENT_SN",
+            "activity": 1,
+            "handler": "admin",
+            "submit_action": "true",
+            "submit_opinion": "approved",
+        }
+        resp = self.client.post(
+            url, json.dumps(data), content_type="application/json"
+        )
+        # 开发模式下豁免鉴权，不应返回 403
+        self.assertNotEqual(resp.status_code, 403)

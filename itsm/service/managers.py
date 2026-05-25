@@ -139,8 +139,14 @@ class ServiceManager(managers.Manager):
         bk_base_catalog_id = create_service_catalog()
         for builtin_service in BUILTIN_BKBASE_SERVICES:
             original_workflow = Workflow.objects.filter(
-                name=builtin_service["flow_name"]
+                name=builtin_service["flow_name"], is_builtin=True
             ).first()
+            if original_workflow is None:
+                logger.warning(
+                    "skip builtin bkbase service init because workflow restore failed or workflow is missing, flow_name=%s",
+                    builtin_service["flow_name"],
+                )
+                continue
 
             obj = self.filter(name=builtin_service["name"]).first()
             if not obj:

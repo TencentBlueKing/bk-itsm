@@ -62,19 +62,6 @@ MIN_PAGE_SIZE = 1
 
 
 @fbv_exception_handler
-def get_token(request):
-    try:
-        import bkoauth
-
-        user = request.GET.get("user")
-        access_token_obj = bkoauth.get_access_token_by_user(user)
-        access_token = access_token_obj.access_token
-        return Success({"access_token": access_token}).json()
-    except Exception as err:
-        return Success({"access_token": err}).json()
-
-
-@fbv_exception_handler
 def get_batch_users(request):
     """批量获取用户信息"""
     users = (

@@ -29,22 +29,23 @@ import logging
 import jmespath
 import requests
 from django.conf import settings
-from jinja2.sandbox import SandboxedEnvironment as Environment
-from pipeline.utils.boolrule import BoolRule
-from pipeline.component_framework.component import Component
 from django.utils.translation import gettext as _
+from jinja2.sandbox import SandboxedEnvironment as Environment
+from pipeline.component_framework.component import Component
+from pipeline.utils.boolrule import BoolRule
 
 from itsm.component.constants import (
-    TRANSITION_OPERATE,
-    NODE_FAILED,
     FINISHED,
     LESSCODE_PROJECT_KEY,
+    NODE_FAILED,
+    TRANSITION_OPERATE,
 )
 from itsm.component.utils.encode import EncodeWebhook
+from itsm.meta.services.webhook_url_validate_service import WebhookURLValidateService
 from itsm.pipeline_plugins.components.collections.itsm_base_service import (
     ItsmBaseService,
 )
-from itsm.ticket.models import Ticket, TicketGlobalVariable, SYSTEM_OPERATE
+from itsm.ticket.models import SYSTEM_OPERATE, Ticket, TicketGlobalVariable
 
 logger = logging.getLogger("celery")
 
@@ -127,6 +128,83 @@ class WebHookService(ItsmBaseService):
     """
 
     __need_schedule__ = False
+    MAX_ERROR_DETAIL_LENGTH = 500
+
+    def validate_webhook_url(self, url):
+        WebhookURLValidateService.validate_for_execute(url)
+
+    def validate_success_exp(self, success_exp):
+        WebhookURLValidateService.validate_success_exp(success_exp)
+
+    def truncate_message(self, value, max_length=None):
+        max_length = max_length or self.MAX_ERROR_DETAIL_LENGTH
+        if value is None:
+            return ""
+        value = str(value)
+        if len(value) <= max_length:
+            return value
+        return "{}...(已截断, 共{}字符)".format(value[:max_length], len(value))
+
+    def format_webhook_error_detail(self, method=None, url=None, query_params=None, headers=None, response=None, error=None):
+        detail = {
+            "method": method,
+            "url": url,
+            "query_params": query_params or {},
+            "headers": headers or {},
+        }
+
+        if response is not None:
+            detail.update(
+                {
+                    "status_code": response.status_code,
+                    "reason": getattr(response, "reason", ""),
+                    "location": response.headers.get("Location", ""),
+                }
+            )
+
+        if error is not None:
+            detail["error"] = self.truncate_message(error)
+
+        return self.truncate_message(json.dumps(detail, ensure_ascii=False))
+
+    def record_webhook_error(
+        self,
+        ticket,
+        state_id,
+        current_node,
+        error_message,
+        error_message_template,
+        processors,
+        method=None,
+        url=None,
+        query_params=None,
+        headers=None,
+        response=None,
+        error=None,
+    ):
+        detail = self.format_webhook_error_detail(
+            method=method,
+            url=url,
+            query_params=query_params,
+            headers=headers,
+            response=response,
+            error=error,
+        )
+        full_error_message = "{}，detail={}".format(error_message, detail)
+        frontend_error_message = error_message
+        if response is not None:
+            frontend_error_message = "{}, status_code={}".format(
+                error_message, response.status_code
+            )
+        logger.error("[webhook]节点执行失败：%s", full_error_message)
+        self.do_exit_plugins(
+            ticket,
+            state_id,
+            current_node,
+            frontend_error_message,
+            error_message_template,
+            processors,
+        )
 
     def update_info(self, current_node, **kwargs):
         """
@@ -266,10 +344,22 @@ class WebHookService(ItsmBaseService):
         method = extras.get("method", "GET")
         url = extras.get("url")
         query_params = extras.get("query_params")
-        headers = extras.get("headers")
+        headers = extras.get("headers") or {}
         body = extras.get("body", {})["content"]
         timeout = extras.get("settings", {}).get("timeout", 10)
         success_exp = extras.get("success_exp")
+
+        cleaned_headers = {}
+        for key, value in headers.items():
+            if key is None or value is None:
+                continue
+            clean_key = str(key).strip()
+            clean_value = str(value).strip()
+            if not clean_key:
+                continue
+            cleaned_headers[clean_key] = clean_value
+
+        headers = cleaned_headers
 
         # 如果是less code的数据处理节点, 针对get or post 请求，填充认证信息
         if ticket.project_key == LESSCODE_PROJECT_KEY:
@@ -291,6 +381,34 @@ class WebHookService(ItsmBaseService):
             return False
 
         try:
+            self.validate_webhook_url(url)
+        except Exception as e:
+            err_message = "Webhook请求地址校验失败, error={}".format(e)
+            self.do_exit_plugins(
+                ticket,
+                state_id,
+                current_node,
+                err_message,
+                error_message_template,
+                processors,
+            )
+            return False
+
+        try:
+            self.validate_success_exp(success_exp)
+        except Exception as e:
+            err_message = "Webhook成功判定表达式校验失败, error={}".format(e)
+            self.do_exit_plugins(
+                ticket,
+                state_id,
+                current_node,
+                err_message,
+                error_message_template,
+                processors,
+            )
+            return False
+
+        try:
             response = requests.request(
                 method,
                 url,
@@ -299,60 +417,75 @@ class WebHookService(ItsmBaseService):
                 headers=headers,
                 timeout=int(timeout),
                 auth=auth,
-                verify=False,
+                allow_redirects=False,
             )
         except Exception as e:
-            self.do_exit_plugins(
+            self.record_webhook_error(
                 ticket,
                 state_id,
                 current_node,
-                str(e),
+                "Webhook请求失败",
                 error_message_template,
                 processors,
+                method=method,
+                url=url,
+                query_params=query_params,
+                headers=headers,
+                error=str(e),
             )
             logger.exception("[webhook]节点请求失败，失败原因 error = {}".format(e))
             return False
         try:
             # 返回code 非 200
             if response.status_code not in [200, 201]:
-                err_message = "返回状态码非200, response={}".format(response.text)
-                self.do_exit_plugins(
+                self.record_webhook_error(
                     ticket,
                     state_id,
                     current_node,
-                    err_message,
+                    "返回状态码非200",
                     error_message_template,
                     processors,
+                    method=method,
+                    url=url,
+                    query_params=query_params,
+                    headers=headers,
+                    response=response,
                 )
                 return False
         except Exception as e:
-            err_message = "状态码解析失败， error={}".format(e)
-            self.do_exit_plugins(
+            self.record_webhook_error(
                 ticket,
                 state_id,
                 current_node,
-                err_message,
+                "【WebHookService】状态码解析失败",
                 error_message_template,
                 processors,
+                method=method,
+                url=url,
+                query_params=query_params,
+                headers=headers,
+                response=response,
+                error=str(e),
             )
             return False
 
         try:
             resp = response.json()
         except Exception:
-            err_message = "返回值非Json, response={}".format(response.text)
-            self.do_exit_plugins(
+            self.record_webhook_error(
                 ticket,
                 state_id,
                 current_node,
-                err_message,
+                "返回值非Json",
                 error_message_template,
                 processors,
+                method=method,
+                url=url,
+                query_params=query_params,
+                headers=headers,
+                response=response,
             )
             return False
-
-        # 更新全局变量
-        variable_output = self.update_variables(resp, ticket_id, state_id, variables)
 
         if success_exp:
             try:
@@ -379,6 +512,9 @@ class WebHookService(ItsmBaseService):
                     processors,
                 )
                 return False
+
+        # 更新全局变量
+        variable_output = self.update_variables(resp, ticket_id, state_id, variables)
 
         # 设置状态
         self.update_info(current_node, variables=variable_output)

@@ -28,6 +28,13 @@ from rest_framework import permissions
 
 from itsm.role.models import UserRole
 
+# 任务对象级权限说明：
+# - proceed：节点处理人（沿用 task.can_process）
+# - 写动作（update / partial_update / destroy / retry / skip）：要求所属单据创建人 / 当前处理人 / can_operate / 超管
+# - 只读动作（retrieve / fields / get_task_status）：要求 can_view 或超管
+TASK_WRITE_ACTIONS = {"update", "partial_update", "destroy", "retry", "skip"}
+TASK_READ_ACTIONS = {"retrieve", "fields", "get_task_status"}
+
 
 class IsAdmin(permissions.BasePermission):
     """
@@ -72,4 +79,23 @@ class TaskPermissionValidate(permissions.BasePermission):
         if view.action == "proceed":
             return obj.can_process(username)
 
-        return True
+        if UserRole.is_itsm_superuser(username):
+            return True
+
+        if view.action not in TASK_WRITE_ACTIONS and view.action not in TASK_READ_ACTIONS:
+            return True
+
+        from itsm.ticket.models import Ticket
+        ticket = Ticket.objects.filter(pk=obj.ticket_id).first()
+        if ticket is None:
+            return False
+
+        if view.action in TASK_WRITE_ACTIONS:
+            return (
+                ticket.creator == username
+                or username in ticket.real_current_processors
+                or ticket.can_operate(username)
+            )
+
+        # TASK_READ_ACTIONS
+        return ticket.can_view(username)

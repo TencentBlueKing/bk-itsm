@@ -39,13 +39,19 @@ from itsm.component.dlls.component import ComponentLibrary
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.drf.exception import ValidationError
 from itsm.component.drf.mixins import DynamicListModelMixin
+from itsm.postman.permissions import RemoteApiPermit, RemoteApiInstancePermit, RpcApiPermit
 from itsm.component.esb.backend_component import bk
 from itsm.component.exceptions import NotAllowedError, ParamError, RpcAPIError
 from itsm.component.utils.client_backend_query import get_components, get_systems
 from itsm.component.utils.misc import JsonEncoder
-from itsm.postman.constants import RPC_CODE
+from itsm.postman.constants import (
+    REMOTE_API_IMPORT_MAX_BYTES,
+    REMOTE_API_IMPORT_MAX_ITEMS,
+    REMOTE_API_IMPORT_REQUIRED_FIELDS,
+    RPC_CODE,
+)
 from itsm.postman.models import RemoteApi, RemoteApiInstance, RemoteSystem
-from itsm.postman.permissions import RemoteApiPermit
+from itsm.postman.permissions import RemoteApiPermit, RemoteApiInstancePermit
 from itsm.postman.rpc.core.request import CompRequest
 from itsm.postman.serializers import (
     ApiInstanceSerializer,
@@ -74,7 +80,9 @@ class ModelViewSet(component_viewsets.ModelViewSet):
 class ApiInstanceViewsSet(ModelViewSet):
     serializer_class = ApiInstanceSerializer
     queryset = RemoteApiInstance._objects.all()
-    permission_classes = ()
+    permission_classes = (RemoteApiInstancePermit,)
+    permission_resource_is_project = True
+    permission_create_action = ["create"]
     
     def list(self, request, *args, **kwargs):
         raise NotAllowedError(_("不支持的请求方法"))
@@ -200,6 +208,8 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
     permission_action_mapping = {
         "list": ["project_view"],
     }
+    # run_api 必须走对象级 IAM（项目内 project_view / 平台公共登录态），不再放任意登录用户调用。
+    permission_free_actions = []
 
     filter_fields = {
         "is_activated": ["exact"],
@@ -236,11 +246,6 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
 
         api_config = api.get_api_config(query_params)
 
-        # overwrite map_code
-        map_code = request.data.get("map_code", "")
-        before_req = request.data.get("before_req", "")
-        api_config.update(map_code=map_code, before_req=before_req)
-
         rsp = bk.http(config=api_config)
 
         # 多加一层是因为前端对返回的message有一个统一添加msg的逻辑（为了屏蔽返回差异），所以此处加一层包裹，前端取data里面的值
@@ -256,8 +261,10 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
     @action(detail=False, methods=["post"])
     def batch_delete(self, request, *args, **kwargs):
         """批量删除操作
-        TODO: 缺少负责人鉴权
+
+        鉴权：仅创建人或 ITSM 超管可删除；防止项目成员相互覆盖配置。
         """
+        from itsm.role.models import UserRole
 
         id_list = [i for i in request.data.get("id").split(",") if i.isdigit()]
 
@@ -272,6 +279,14 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
         project_keys = [i.remote_system.project_key for i in will_deleted]
         if len(set(project_keys)) != 1:
             raise ValidationError(_("接口数量异常，请刷新后重试"))
+
+        username = request.user.username
+        if not UserRole.is_itsm_superuser(username):
+            unauth_creators = {
+                api.creator for api in will_deleted if api.creator != username
+            }
+            if unauth_creators:
+                raise ValidationError(_("仅可删除自己创建的接口"))
 
         will_deleted.delete()
         return Response(real_deleted)
@@ -301,29 +316,72 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
     def imports(self, request, pk=None):
         """
         导入Api接口
+
+        约束（防滥用）：
+        - 仅 ``pk == "0"`` 路径接受导入；其他 pk 一律拒绝。
+        - 文件体积不得超过 ``REMOTE_API_IMPORT_MAX_BYTES``。
+        - 顶层必须为 JSON 数组，长度不得超过 ``REMOTE_API_IMPORT_MAX_ITEMS``。
+        - 每个条目必须为 dict 且包含 ``REMOTE_API_IMPORT_REQUIRED_FIELDS`` 全部字段；
+          不满足者跳过并计入失败数，避免单个坏数据中断整批。
         """
-        if pk == "0":
-            apis = []
+        if pk != "0":
+            raise NotAllowedError(_("暂不支持当前操作"))
+
+        upload = request.FILES.get("file")
+        if upload is None:
+            raise ParamError(_("请上传待导入的json文件"))
+
+        if upload.size is not None and upload.size > REMOTE_API_IMPORT_MAX_BYTES:
+            raise ParamError(
+                _("导入文件大小超过限制（最大 {limit} 字节）").format(
+                    limit=REMOTE_API_IMPORT_MAX_BYTES
+                )
+            )
+
+        raw = upload.read(REMOTE_API_IMPORT_MAX_BYTES + 1)
+        if len(raw) > REMOTE_API_IMPORT_MAX_BYTES:
+            raise ParamError(
+                _("导入文件大小超过限制（最大 {limit} 字节）").format(
+                    limit=REMOTE_API_IMPORT_MAX_BYTES
+                )
+            )
+
+        try:
+            data = json.loads(raw)
+        except ValueError:
+            raise ParamError(_("文件格式有误，请提供从本系统导出的json文件"))
+
+        if not isinstance(data, list):
+            raise ParamError(_("文件内容必须为JSON数组"))
+
+        if len(data) > REMOTE_API_IMPORT_MAX_ITEMS:
+            raise ParamError(
+                _("单次导入条目数超过限制（最大 {limit} 条）").format(
+                    limit=REMOTE_API_IMPORT_MAX_ITEMS
+                )
+            )
+
+        remote_system = request.data.get("remote_system", "0")
+        apis = []
+        for item in data:
+            if not isinstance(item, dict):
+                continue
+            if not all(item.get(f) for f in REMOTE_API_IMPORT_REQUIRED_FIELDS):
+                continue
             try:
-                remote_system = request.data.get("remote_system", "0")
-                data = json.loads(request.FILES.get("file").read())
-            except ValueError:
-                raise ParamError(_("文件格式有误，请提供从本系统导出的json文件"))
+                item["remote_system_id"] = remote_system
+                api = RemoteApi.restore_api(item, request.user.username)
+                apis.append(api)
+            except Exception as e:
+                logger.error("import workflow exception: %s" % e)
 
-            for item in data:
-                try:
-                    item["remote_system_id"] = remote_system
-                    api = RemoteApi.restore_api(item, request.user.username)
-                    apis.append(api)
-                except Exception as e:
-                    logger.error("import workflow exception: %s" % e)
-
-            return Response({"success": len(apis), "failed": len(data) - len(apis)})
-
-        raise NotAllowedError(_("暂不支持当前操作"))
+        return Response({"success": len(apis), "failed": len(data) - len(apis)})
 
 
 class RpcApiViewSet(component_viewsets.APIView):
+    # 仅流程管理员/资源负责人可触发 RPC 组件调用；GET 列表登录态可读。
+    permission_classes = (RpcApiPermit,)
+
     def get(self, request, *args, **kwargs):
         """获取rpc的API列表"""
         ret = []
@@ -349,7 +407,7 @@ class RpcApiViewSet(component_viewsets.APIView):
         if RPC_CODE not in request.data:
             raise RpcAPIError(_("【%s】为必需参数" % RPC_CODE))
 
-        result, request_params = CompRequest.parse_params(request.data)
+        result, request_params = CompRequest.parse_params(request.data, safe_mode=True)
         # 构造参数不成功
         if not result:
             return Response(

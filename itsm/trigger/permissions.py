@@ -57,17 +57,69 @@ class WorkflowTriggerPermit(IamAuthPermit):
             and request.data.get("dst_source_type") == SOURCE_WORKFLOW
         )
 
+    def _check_target_write_permission(self, request, dst_source_type, dst_source_id):
+        """clone 的目标侧写入权限：要求对 dst 资源具备管理权限。"""
+        if dst_source_type == SOURCE_WORKFLOW:
+            try:
+                workflow = Workflow.objects.get(id=dst_source_id)
+            except Workflow.DoesNotExist:
+                raise Http404("对应的流程不存在，无法操作")
+            return self.iam_auth(
+                request, ["service_manage"], workflow.get_iam_resource()
+            )
+        if dst_source_type == SOURCE_TASK:
+            return self.iam_auth(request, ["public_task_template_manage"])
+        return self.iam_create_auth(request, apply_actions=["triggers_create"])
+
+    def _check_source_read_permission(self, request, view, src_trigger_ids):
+        """clone 的源侧读取权限：逐个 trigger 复用 retrieve 分支语义。"""
+        from itsm.trigger.models import Trigger
+
+        if not src_trigger_ids:
+            return False
+        triggers = list(Trigger.objects.filter(id__in=src_trigger_ids))
+        if len(triggers) != len(set(src_trigger_ids)):
+            return False
+        for trigger in triggers:
+            if trigger.source_type == SOURCE_WORKFLOW:
+                try:
+                    workflow = Workflow.objects.get(id=trigger.source_id)
+                except Workflow.DoesNotExist:
+                    return False
+                if not self.iam_auth(
+                    request, ["service_manage"], workflow.get_iam_resource()
+                ):
+                    return False
+                continue
+            if trigger.source_type == SOURCE_TASK:
+                if not self.iam_auth(request, ["public_task_template_manage"]):
+                    return False
+                continue
+            if not self.iam_auth(request, ["triggers_view"], trigger):
+                return False
+        return True
+
     def has_permission(self, request, view):
         if view.action in getattr(view, "permission_action_mapping", {}):
             # 项目查看的权限
-            project_key = request.query_params.get(
-                "project_key", PUBLIC_PROJECT_PROJECT_KEY
-            )
+            project_key = request.query_params.get("project_key") or PUBLIC_PROJECT_PROJECT_KEY
             project = Project.objects.get(pk=project_key)
             apply_actions = self.get_view_iam_actions(view)
             return self.iam_auth(request, apply_actions, project)
 
-        if view.action in ["clone", "create"]:
+        if view.action == "clone":
+            # clone 接口 payload 与 create 不同：dst_source_type / dst_source_id / src_trigger_ids。
+            # 必须分别校验"目标侧写权限"和"源侧读权限"，避免任意登录用户向他人流程注入触发器。
+            dst_source_type = request.data.get("dst_source_type")
+            dst_source_id = request.data.get("dst_source_id")
+            src_trigger_ids = request.data.get("src_trigger_ids") or []
+            if not self._check_target_write_permission(
+                request, dst_source_type, dst_source_id
+            ):
+                return False
+            return self._check_source_read_permission(request, view, src_trigger_ids)
+
+        if view.action == "create":
             # 通过流程配置需要有对应服务的管理权限
             source_type = request.data.get("source_type")
             if source_type == SOURCE_WORKFLOW:
@@ -135,8 +187,8 @@ class TicketTriggerPermit(TicketPermissionValidate):
                 return True
             return self.iam_ticket_view_auth(request, ticket)
         
-        # 操作权限
+        # 操作权限：非 can_operate 角色一律拒绝写动作，避免任意登录用户改单据触发器
         if ticket.can_operate(username):
             return True
-        
-        return True
+
+        return False

@@ -788,7 +788,6 @@ paths:
         isPublic: false
         allowApplyPermission: false
         matchSubpath: false
-        enableWebsocket: false
         backend:
           name: default
           method: get
@@ -813,7 +812,6 @@ paths:
         isPublic: false
         allowApplyPermission: false
         matchSubpath: false
-        enableWebsocket: false
         backend:
           name: default
           method: get
@@ -838,7 +836,6 @@ paths:
         isPublic: false
         allowApplyPermission: false
         matchSubpath: false
-        enableWebsocket: false
         backend:
           name: default
           method: post
@@ -863,7 +860,6 @@ paths:
         isPublic: false
         allowApplyPermission: false
         matchSubpath: false
-        enableWebsocket: false
         backend:
           name: default
           method: get

@@ -199,3 +199,133 @@ class TicketRemarkTest(TestCase):
         self.assertEqual(rsp.data["result"], True)
         self.assertIsInstance(rsp.data["data"], dict)
         self.assertEqual(len(rsp.data["data"]["items"]), 3)
+
+
+class TicketRemarkAuthzRegressionTest(TestCase):
+    """spec round3 C-1：集合级 / 创建侧鉴权回归。
+
+    覆盖：
+    - ``tree_view`` 缺 ``ticket_id`` 校验 → 越权用户拿不到他人单据评论树。
+    - ``list`` 缺 ``ticket.can_view`` 校验 → 越权用户拿不到他人单据 PUBLIC 评论。
+    - ``create`` 缺 ``has_permission`` → 越权用户无法对他人单据写评论。
+    """
+
+    def setUp(self):
+        app.conf.update(CELERY_ALWAYS_EAGER=True)
+        Ticket.objects.all().delete()
+        AttentionUsers.objects.all().delete()
+        CatalogService.objects.create(
+            service_id=1, is_deleted=False, catalog_id=3, creator="admin"
+        )
+
+    def _create_ticket(self):
+        data = {
+            "catalog_id": 3,
+            "service_id": 1,
+            "service_type": "request",
+            "fields": [
+                {"type": "STRING", "id": 1, "key": "title",
+                 "value": "regression_ticket", "choice": []},
+                {"type": "STRING", "id": 5, "key": "apply_content",
+                 "value": "测试内容"},
+                {"type": "STRING", "key": "ZHIDINGSHENPIREN", "value": "test"},
+                {"type": "STRING", "key": "apply_reason", "value": "test"},
+            ],
+            "creator": "admin",
+            "attention": True,
+        }
+        rsp = self.client.post(
+            path="/api/ticket/receipts/",
+            data=json.dumps(data),
+            content_type="application/json",
+        )
+        return rsp.data["data"]["id"]
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    @mock.patch("itsm.ticket.permissions.UserRole.is_itsm_superuser")
+    @mock.patch("itsm.ticket.views.ticket_remark.UserRole.is_itsm_superuser")
+    @mock.patch("itsm.ticket.models.ticket.Ticket.can_view")
+    def test_tree_view_rejects_unauthorized_user(
+        self,
+        patch_can_view,
+        patch_is_superuser_view,
+        patch_is_superuser_perm,
+        patch_get_user_departments,
+    ):
+        patch_get_user_departments.return_value = {}
+        patch_is_superuser_perm.return_value = False
+        patch_is_superuser_view.return_value = False
+        patch_can_view.return_value = False
+
+        ticket_id = self._create_ticket()
+
+        rsp = self.client.get(
+            path="/api/ticket/remark/tree_view/?ticket_id={}".format(ticket_id),
+            content_type="application/json",
+        )
+
+        # 越权用户：has_permission 已返回 False，DRF 直接 403
+        # （与 _ensure_ticket_viewable 抛 ValidateError 等价拒绝，二者择一即拦截）
+        self.assertEqual(rsp.data["result"], False)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    @mock.patch("itsm.ticket.permissions.UserRole.is_itsm_superuser")
+    @mock.patch("itsm.ticket.views.ticket_remark.UserRole.is_itsm_superuser")
+    @mock.patch("itsm.ticket.models.ticket.Ticket.can_view")
+    def test_list_rejects_unauthorized_user(
+        self,
+        patch_can_view,
+        patch_is_superuser_view,
+        patch_is_superuser_perm,
+        patch_get_user_departments,
+    ):
+        patch_get_user_departments.return_value = {}
+        patch_is_superuser_perm.return_value = False
+        patch_is_superuser_view.return_value = False
+        patch_can_view.return_value = False
+
+        ticket_id = self._create_ticket()
+
+        rsp = self.client.get(
+            path="/api/ticket/remark/?ticket_id={}&show_type=PUBLIC&page=1&page_size=10".format(
+                ticket_id
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(rsp.data["result"], False)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    @mock.patch("itsm.ticket.permissions.UserRole.is_itsm_superuser")
+    @mock.patch("itsm.ticket.models.ticket.Ticket.can_view")
+    @mock.patch("itsm.ticket.models.ticket.Ticket.can_operate")
+    def test_create_rejects_unauthorized_user(
+        self,
+        patch_can_operate,
+        patch_can_view,
+        patch_is_superuser_perm,
+        patch_get_user_departments,
+    ):
+        patch_get_user_departments.return_value = {}
+        patch_is_superuser_perm.return_value = False
+        patch_can_view.return_value = False
+        patch_can_operate.return_value = False
+
+        ticket_id = self._create_ticket()
+        # ticket.creator == "admin"，与 request.user.username 相同，故再 mock 一次
+        # 强制 has_permission 走 can_view → False 分支
+        Ticket.objects.filter(id=ticket_id).update(creator="someone_else")
+
+        rsp = self.client.post(
+            path="/api/ticket/remark/",
+            data={
+                "content": "越权评论",
+                "ticket_id": ticket_id,
+                "remark_type": "PUBLIC",
+                "users": [],
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(rsp.data["result"], False)

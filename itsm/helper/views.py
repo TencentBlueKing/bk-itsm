@@ -236,20 +236,20 @@ def db_fix_after_2_1_1(request):
         return HttpResponse("任务下发异常：%s" % e)
 
 
-def db_fix_sla(request):
-    try:
-        _db_fix_sla.apply_async()
-        return HttpResponse("任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
-    except Exception as e:
-        return HttpResponse("任务下发异常：%s" % e)
+# def db_fix_sla(request):
+#     try:
+#         _db_fix_sla.apply_async()
+#         return HttpResponse("任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
+#     except Exception as e:
+#         return HttpResponse("任务下发异常：%s" % e)
 
 
-def db_fix_after_2_1_9(request):
-    try:
-        _db_fix_after_2_1_9.apply_async()
-        return HttpResponse("任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
-    except Exception as e:
-        return HttpResponse("任务下发异常：%s" % e)
+# def db_fix_after_2_1_9(request):
+#     try:
+#         _db_fix_after_2_1_9.apply_async()
+#         return HttpResponse("任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
+#     except Exception as e:
+#         return HttpResponse("任务下发异常：%s" % e)
 
 
 @permission_required('is_superuser')
@@ -261,12 +261,12 @@ def db_fix_from_1_1_22_to_2_1_16(request):
         return HttpResponse("任务下发异常：%s" % e)
 
 
-def db_fix_from_2_1_x_to_2_2_1(request):
-    try:
-        _db_fix_from_2_1_x_to_2_2_1.apply_async()
-        return HttpResponse("任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
-    except Exception as e:
-        return HttpResponse("任务下发异常：%s" % e)
+# def db_fix_from_2_1_x_to_2_2_1(request):
+#     try:
+#         _db_fix_from_2_1_x_to_2_2_1.apply_async()
+#         return HttpResponse("任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
+#     except Exception as e:
+#         return HttpResponse("任务下发异常：%s" % e)
 
 
 @permission_required('is_superuser')

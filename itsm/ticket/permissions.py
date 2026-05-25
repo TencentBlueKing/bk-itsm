@@ -81,18 +81,18 @@ class TicketPermissionValidate(permissions.BasePermission):
 
         username = request.user.username
 
-        # 函数内实现的，超级管理员的放最前面
-        # 单据正常处理/撤销/通知关注人的权限在函数体内实现, 超级管理员直接返回，不需要鉴权
+        # 函数内自做权限/邀请码/管理员校验的真豁免：
+        # - proceed/withdraw/notify/send_sms/send_email：函数体内按业务规则校验；
+        # - can_exception_distribute：视图内自校验管理员。
+        # master_or_slave / get_ticket_output / get_step_process_info 已回落到下方
+        # "可见性校验"分支（SAFE_METHODS → can_view ∨ iam_ticket_view_auth），与单据查看权限对齐。
         if view.action in [
             "proceed",
             "withdraw",
             "notify",
             "send_sms",
             "send_email",
-            "master_or_slave",
             "can_exception_distribute",
-            "get_ticket_output",
-            "get_step_process_info",
         ]:
             return True
 
@@ -249,9 +249,8 @@ class EventLogPermissionValidate(permissions.BasePermission):
             return True
 
         ticket_id = request.query_params.get("ticket")
-        try:
-            ticket = Ticket.objects.get(id=ticket_id)
-        except Ticket.DoesNotExist:
+        ticket = Ticket.objects.filter(id=ticket_id).first()
+        if ticket is None:
             self.message = _("单据不存在：%s，请检查") % ticket_id
             return False
 
@@ -259,9 +258,14 @@ class EventLogPermissionValidate(permissions.BasePermission):
 
 
 class TicketFieldPermissionValidate(permissions.BasePermission):
+    """工单字段权限。
+
+    对象级 (``api_field_choices`` / ``download_file``) 必须沿 ``obj.ticket`` 反查归属，
+    复用 ``TicketPermissionValidate`` 的"单据可见性"语义。其余 action 仅 ITSM 超管可达。
+    集合级仅做白名单透传，对象级会再次校验。
     """
-    目前FieldViewSet只使用了api_field_choices的方法
-    """
+
+    OBJECT_ACTIONS = ("api_field_choices", "download_file")
 
     def __init__(self):
         self.message = _("抱歉，您无权限查看此信息")
@@ -269,15 +273,20 @@ class TicketFieldPermissionValidate(permissions.BasePermission):
     def has_permission(self, request, view):
         if UserRole.is_itsm_superuser(request.user.username):
             return True
-        if view.action in ["api_field_choices", "download_file"]:
+        if view.action in self.OBJECT_ACTIONS:
             return True
         return False
 
     def has_object_permission(self, request, view, obj):
         if UserRole.is_itsm_superuser(request.user.username):
             return True
-        if view.action in ["api_field_choices", "download_file"]:
-            return True
+        if view.action in self.OBJECT_ACTIONS:
+            ticket = getattr(obj, "ticket", None)
+            if ticket is None:
+                return False
+            return TicketPermissionValidate().has_object_permission(
+                request, view, ticket
+            )
         return False
 
 
@@ -301,6 +310,31 @@ class FollowersNotifyLogPermissionValidate(permissions.BasePermission):
 class CommentPermissionValidate(permissions.BasePermission):
     def __init__(self):
         self.message = _("抱歉，您无权查看该单据的评价信息")
+
+    def has_permission(self, request, view):
+        username = request.user.username
+        if UserRole.is_itsm_superuser(username):
+            return True
+
+        # create 集合级写入：必须是该单据的提单人或邮件邀请评价持有者，
+        # 否则任意登录用户可"抢占"评价占位（TicketComment.ticket 是 OneToOne）。
+        if view.action == "create":
+            ticket_id = request.data.get("ticket")
+            if not ticket_id:
+                return False
+            ticket = Ticket.objects.filter(id=ticket_id).first()
+            if ticket is None:
+                self.message = _("单据不存在：%s，请检查") % ticket_id
+                return False
+            if ticket.creator == username:
+                return True
+            token = request.data.get("token")
+            if token and ticket.is_email_invite_token(username, token):
+                return True
+            return False
+
+        # 其它 action 交由 has_object_permission 兜底
+        return True
 
     def has_object_permission(self, request, view, obj):
 
@@ -330,8 +364,51 @@ class CommentPermissionValidate(permissions.BasePermission):
 
 
 class RemarkPermissionValidate(permissions.BasePermission):
+    """评论 (TicketRemark) 权限。
+
+    - 集合级（list / tree_view / create）按 ticket_id 反查归属，保证：
+      - 只读：调用方对该单据具备 ``can_view``；
+      - 写入：调用方还需 ``can_operate`` 或 ITSM 超管。
+    - 对象级（update / destroy）保留原有 creator/operator 判定。
+    """
+
+    SAFE_ACTIONS = ("list", "retrieve", "tree_view")
+
     def __init__(self):
         self.message = _("抱歉，您无权处理该单据的评论信息")
+
+    def _resolve_ticket_id(self, request, view):
+        action = getattr(view, "action", None)
+        if action in self.SAFE_ACTIONS:
+            return request.query_params.get("ticket_id")
+        return request.data.get("ticket_id") or request.query_params.get("ticket_id")
+
+    def has_permission(self, request, view):
+        username = request.user.username
+        if UserRole.is_itsm_superuser(username):
+            return True
+
+        action = getattr(view, "action", None)
+        # retrieve / update / destroy 通过 has_object_permission 兜底
+        if action in ("retrieve", "update", "partial_update", "destroy"):
+            return True
+
+        ticket_id = self._resolve_ticket_id(request, view)
+        if not ticket_id:
+            return True
+
+        ticket = Ticket.objects.filter(id=ticket_id).first()
+        if ticket is None:
+            self.message = _("单据不存在：%s，请检查") % ticket_id
+            return False
+
+        if request.method in permissions.SAFE_METHODS:
+            return ticket.can_view(username)
+
+        # 写动作：写评论必须能查看该单据，且具备处理人身份或为提单人
+        if not ticket.can_view(username):
+            return False
+        return ticket.can_operate(username) or username == ticket.creator
 
     def has_object_permission(self, request, view, obj):
 

@@ -5,6 +5,7 @@ import mock
 from django.test import TestCase, override_settings
 from requests import Response
 
+from itsm.meta.services.webhook_url_validate_service import WebhookURLValidateService
 from itsm.pipeline_plugins.components.collections.webhook import (
     WebHookService,
     ParamsBuilder,
@@ -73,11 +74,16 @@ class PipelineTest(TestCase):
     @mock.patch(
         "itsm.pipeline_plugins.components.collections.webhook.Ticket.do_before_enter_state"
     )
+    @mock.patch(
+        "itsm.meta.services.webhook_url_validate_service.ContextService.get_context_value"
+    )
     @mock.patch("itsm.pipeline_plugins.components.collections.webhook.requests.request")
-    def test_excute(self, request, do_before_enter_state, build_params):
+    def test_excute(
+        self, request, get_context_value, do_before_enter_state, build_params
+    ):
         extras = {
             "method": "GET",
-            "url": "http://127.0.0.1/",
+            "url": "https://api.example.com/",
             "query_params": [
                 {"key": "bk_app_code", "value": "itsm"},
             ],
@@ -87,6 +93,7 @@ class PipelineTest(TestCase):
             "success_exp": "",
         }
 
+        get_context_value.return_value = "api.example.com,*.example.com"
         build_params.return_value = extras
         do_before_enter_state.return_value = None
 
@@ -106,6 +113,23 @@ class PipelineTest(TestCase):
         auto_service._runtime_attrs = {"by_flow": 1}
         result = auto_service.execute(excute_data, excute_parent_data)
         self.assertEqual(result, True)
+        self.assertEqual(request.call_args.kwargs["allow_redirects"], False)
+
+    @mock.patch(
+        "itsm.meta.services.webhook_url_validate_service.ContextService.get_context_value"
+    )
+    def test_webhook_url_validate_service_for_config(self, get_context_value):
+        get_context_value.return_value = "api.example.com,*.example.com"
+
+        WebhookURLValidateService.validate_for_config(
+            "https://api.example.com/webhook"
+        )
+        WebhookURLValidateService.validate_for_config("{{ URL }}")
+
+        with self.assertRaises(ValueError):
+            WebhookURLValidateService.validate_for_config(
+                "https://not-allowed.example.org/webhook"
+            )
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_params_builder(self):

@@ -53,6 +53,16 @@ class BaseForm:
         """
         return {_attr: _object for _attr, _object in cls.__dict__.items() if isinstance(_object, BaseField)}
 
+    @staticmethod
+    def _is_empty_value(value):
+        if value is None:
+            return True
+        if isinstance(value, str):
+            return value == ""
+        if isinstance(value, (list, tuple, dict, set)):
+            return len(value) == 0
+        return False
+
     def __init__(self, params_schema, inputs=None):
         if inputs is None:
             inputs = {}
@@ -94,14 +104,29 @@ class BaseForm:
     def validate_params(self):
         """输入参数配置校验"""
         related_fields = self.declared_fields()
-        for field_key, field in related_fields:
-            if not field.is_required:
+        params = {
+            param.get("key"): param
+            for param in copy.deepcopy(self.params_schema)
+            if isinstance(param, dict) and param.get("key")
+        }
+        for field_key, field in related_fields.items():
+            if not field.required:
                 continue
-            if field_key not in self.params_schema:
-                raise FieldRequiredError("字段【{}】缺失".format(field['name']))
-                # 每一个字段需要有自身的参数校验填写
-            if not field.to_internal_data(self.params_schema['field_key'], self.inputs):
-                raise FieldRequiredError("字段【{}】缺失".format(field['name']))
+            if field_key not in params:
+                raise FieldRequiredError("字段【{}】缺失".format(field.name))
+            field_value = params[field_key]
+            if not isinstance(field_value, dict):
+                raise FieldRequiredError("字段【{}】缺失".format(field.name))
+
+            if field.type == "SUBCOMPONENT":
+                if self._is_empty_value(field_value.get("sub_components")):
+                    raise FieldRequiredError("字段【{}】缺失".format(field.name))
+                continue
+
+            if "value" not in field_value:
+                raise FieldRequiredError("字段【{}】缺失".format(field.name))
+            if self._is_empty_value(field_value.get("value")):
+                raise FieldRequiredError("字段【{}】缺失".format(field.name))
 
 
 class SMSMessageForms(BaseForm):

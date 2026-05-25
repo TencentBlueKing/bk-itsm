@@ -208,11 +208,15 @@ class Template:
         try:
             resolved = tm.render_unicode(**data)
         except Exception as e:
+            # 严格模式下，沙箱屏蔽词的 _ForbiddenProxy 在 __repr__/__str__ 中也会抛异常，
+            # 因此这里禁止直接将 data 字典（含代理对象）传入 logger 格式化，
+            # 改为仅记录上下文键名 + 异常类型/消息，避免日志静默丢失，且降低敏感数据外溢风险。
             logger.warning(
-                "constant content(%s) is invalid, data=>%s, error=>%s",
+                "constant content(%s) is invalid, context_keys=%s, error_type=%s, error=%s",
                 sanitize_user_content(template),
-                data,
-                e,
+                sorted(list(context.keys())) if isinstance(context, dict) else type(context).__name__,
+                type(e).__name__,
+                sanitize_user_content(str(e)),
             )
             return template
         else:

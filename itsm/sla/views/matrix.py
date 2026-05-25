@@ -31,6 +31,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from itsm.component.constants import PRIORITY, PX_URGENCY, PY_IMPACT, ResponseCodeStatus
@@ -156,7 +157,7 @@ class PriorityMatrixViewSet(ModelViewSet):
              'priority_matrix': priority_matrices}
         )
 
-    @action(detail=False, methods=['post'], permission_classes=())
+    @action(detail=False, methods=['post'], permission_classes=(IsAuthenticated,))
     def priority_value(self, request, *args, **kwargs):
         """根据影响范围、紧急度获取优先级"""
         service_type = request.data.get('service_type')

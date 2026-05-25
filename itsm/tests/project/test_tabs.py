@@ -47,3 +47,42 @@ class CostomTabViewTest(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data["result"], True)
         self.assertIsInstance(resp.data["data"]["items"], list)
+
+
+class CostomTabPersonalScopeTest(TestCase):
+    """spec round2 H-8：CostomTabViewSet.get_queryset 限定 creator=当前用户。"""
+
+    def setUp(self):
+        CostomTab.objects.all().delete()
+        CostomTab.objects.create(
+            name="other-tab", project_key="0", conditions={}, order=1,
+            creator="other", updated_by="other",
+        )
+        CostomTab.objects.create(
+            name="my-tab", project_key="0", conditions={}, order=2,
+            creator="admin", updated_by="admin",
+        )
+
+    def tearDown(self):
+        CostomTab.objects.all().delete()
+
+    def test_get_queryset_filters_by_request_user(self):
+        from itsm.project.views import CostomTabViewSet
+
+        view = CostomTabViewSet()
+        request = mock.MagicMock()
+        request.user.username = "admin"
+        view.request = request
+
+        names = list(view.get_queryset().values_list("name", flat=True))
+        self.assertEqual(names, ["my-tab"])
+
+    def test_get_queryset_for_unrelated_user_is_empty(self):
+        from itsm.project.views import CostomTabViewSet
+
+        view = CostomTabViewSet()
+        request = mock.MagicMock()
+        request.user.username = "stranger"
+        view.request = request
+
+        self.assertFalse(view.get_queryset().exists())

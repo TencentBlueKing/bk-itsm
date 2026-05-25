@@ -37,6 +37,7 @@ from itsm.sla.validators import schedule_can_destroy
 from .basic import ModelViewSet
 from ..permissions import SchedulePermit
 from ...component.constants import DEFAULT_PROJECT_PROJECT_KEY
+from ...component.drf.permissions import IamAuthSystemPermit
 from ...component.drf.viewsets import AuthModelViewSet
 
 
@@ -99,6 +100,7 @@ class DayViewSet(ModelViewSet):
     serializer_class = DaySerializer
     queryset = Day.objects.all()
     pagination_class = None
+    permission_classes = (IamAuthSystemPermit,)
     filter_fields = {
         "id": ["exact", "in"],
         "type_of_day": ["exact", "in"],

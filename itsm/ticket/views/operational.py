@@ -581,7 +581,6 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         methods=["get"],
         serializer_class=OperationalDataTicketSerializer,
         queryset=Ticket._objects.all(),
-        permission_classes=(),
     )
     def get_tickets(self, request, *args, **kwargs):
         def get_queryset_by_fields(query_set, request):
@@ -669,7 +668,6 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         methods=["get"],
         queryset=Workflow.objects.prefetch_related("notify").all(),
         serializer_class=OperationalDataWorkflowSerializer,
-        permission_classes=(),
     )
     def workflows(self, request, *args, **kwargs):
         """获取流程列表"""
@@ -688,7 +686,6 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         methods=["get"],
         queryset=TicketComment.objects.all(),
         serializer_class=CommentSerializer,
-        permission_classes=(),
     )
     def comments(self, request, *args, **kwargs):
         """获取评论"""

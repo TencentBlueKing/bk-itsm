@@ -40,6 +40,8 @@ from itsm.component.constants import (
 )
 from itsm.component.dlls.component import ComponentLibrary
 from itsm.component.drf import viewsets as component_viewsets
+from itsm.component.drf.permissions import IamAuthPermit, IamAuthWithoutResourcePermit
+from itsm.component.constants.trigger import SOURCE_WORKFLOW
 from itsm.trigger.models import Trigger, TriggerRule, ActionSchema, Action
 from itsm.trigger.serializers import (
     TriggerSerializer,
@@ -48,6 +50,7 @@ from itsm.trigger.serializers import (
     ActionSerializer,
     ActionDetailSerializer,
 )
+from itsm.workflow.models import Workflow
 from .api import import_trigger
 from .validators import BulkTriggerRuleValidator
 from .permissions import WorkflowTriggerPermit
@@ -343,6 +346,7 @@ class ActionViewSet(component_viewsets.ModelViewSet):
 
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
+    permission_classes = (IamAuthWithoutResourcePermit,)
     filter_fields = {
         "id": ["exact", "in"],
         "sender": ["exact", "in"],
@@ -381,6 +385,15 @@ class ActionViewSet(component_viewsets.ModelViewSet):
     def run(self, request, *args, **kwargs):
         self.queryset = self.queryset.filter(status=ACTION_STATUS_CREATED)
         instance = self.get_object()
+        # 限定 workflow 来源的响应动作仅由具备 service_manage 的人触发，避免任意登录用户重放动作。
+        if instance.source_type == SOURCE_WORKFLOW and instance.source_id:
+            try:
+                workflow = Workflow.objects.get(id=instance.source_id)
+            except Workflow.DoesNotExist:
+                raise ValidationError(_("响应事件对应的流程不存在"))
+            IamAuthPermit().iam_auth(
+                request, ["service_manage"], workflow.get_iam_resource()
+            )
         instance.params = request.data.get("params", {})
         instance.save()
         instance.execute(operator=request.user.username, need_update_context=True)

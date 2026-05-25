@@ -50,6 +50,17 @@ from itsm.postman.models import RemoteApi, RemoteApiInstance, RemoteSystem
 from itsm.workflow.models import Field, State
 
 
+CUSTOM_SCRIPT_DISABLED_ERROR = _(
+    "出于安全考虑，已禁用自定义 Python 预处理/后处理脚本，请改用声明式字段映射。"
+)
+
+
+def validate_custom_script_disabled(value):
+    if value and value.strip():
+        raise serializers.ValidationError(CUSTOM_SCRIPT_DISABLED_ERROR)
+    return value
+
+
 class RemoteSystemSerializer(BaseModelSerializer):
     """API系统序列化"""
 
@@ -242,6 +253,12 @@ class RemoteApiSerializer(DynamicFieldsModelSerializer):
             raise ParamError(_("接口路径不能包含http://或https://"))
         return value
 
+    def validate_map_code(self, value):
+        return validate_custom_script_disabled(value)
+
+    def validate_before_req(self, value):
+        return validate_custom_script_disabled(value)
+
 
 class ApiInstanceSerializer(serializers.ModelSerializer):
     req_params = JSONField(required=False, initial=[])
@@ -280,6 +297,12 @@ class ApiInstanceSerializer(serializers.ModelSerializer):
             system_info=instance.remote_api.remote_system.data_to_dict()
         )
         return data
+
+    def validate_map_code(self, value):
+        return validate_custom_script_disabled(value)
+
+    def validate_before_req(self, value):
+        return validate_custom_script_disabled(value)
 
 
 class TaskStateApiInfoSerializer(ApiInstanceSerializer):

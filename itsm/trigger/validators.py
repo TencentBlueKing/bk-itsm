@@ -24,9 +24,13 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from common.log import logger
+from common.template.mako_utils import mako_safety
+from common.template.mako_utils.checker import check_mako_template_safety
+from common.template.mako_utils.exceptions import ForbiddenMakoTemplateException
+from common.template.template import Template as CommonTemplate
 from django.utils.translation import gettext as _
 from itsm.component.drf.exception import ValidationError
-from itsm.component.exceptions import ComponentNotExist
+from itsm.component.exceptions import ComponentNotExist, FieldRequiredError
 from itsm.trigger.models import Trigger, ActionSchema
 from itsm.component.dlls.component import ComponentLibrary
 
@@ -96,14 +100,36 @@ class ActionSchemaValidator:
 
     def __call__(self, value):
         self.component_validate(value)
+        self.template_validate(value.get("params", []))
+
+    @staticmethod
+    def _iter_import_template_values(params):
+        if isinstance(params, list):
+            for item in params:
+                for template_value in ActionSchemaValidator._iter_import_template_values(item):
+                    yield template_value
+            return
+
+        if isinstance(params, dict):
+            if params.get("ref_type") == "import" and isinstance(params.get("value"), str):
+                yield params["value"]
+            for item in params.values():
+                for template_value in ActionSchemaValidator._iter_import_template_values(item):
+                    yield template_value
 
     def component_validate(self, value):
         try:
             component_class = ComponentLibrary.get_component_class(
                 "trigger", component_code=value["component_type"]
             )
+            form_class = getattr(component_class, "form_class", None)
+            if form_class is None:
+                return
+            form_class(value.get("params", []), {}).validate_params()
         except ComponentNotExist:
             raise ValidationError("非法的组件类型,请确认组件是否选择正确")
+        except FieldRequiredError as error:
+            raise ValidationError(str(error))
         except BaseException as error:
             logger.exception(
                 "校验错误，instance id {}".format(
@@ -112,4 +138,25 @@ class ActionSchemaValidator:
             )
             raise ValidationError("组件异常错误：{}".format(str(error)))
 
-        component_class(value["params"]).validate_params()
+    def template_validate(self, params):
+        for template_value in self._iter_import_template_values(params):
+            for template in CommonTemplate(template_value).get_templates():
+                try:
+                    check_mako_template_safety(
+                        template,
+                        mako_safety.SingleLineNodeVisitor(),
+                        mako_safety.SingleLinCodeExtractor(),
+                    )
+                except ForbiddenMakoTemplateException as error:
+                    raise ValidationError(
+                        _("参数模板存在非法表达式: {} ").format(str(error))
+                    )
+                except BaseException as error:
+                    logger.exception(
+                        "模板校验错误，instance id {}".format(
+                            self.instance.id if self.instance else "None"
+                        )
+                    )
+                    raise ValidationError(
+                        _("参数模板校验失败: {} ").format(str(error))
+                    )

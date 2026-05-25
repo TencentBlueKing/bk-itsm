@@ -427,6 +427,28 @@ def merge_validate(from_ticket_ids, to_ticket_id, operator):
         raise serializers.ValidationError(_("子单不存在，请联系管理员"))
 
 
+def unmerge_authorize_validate(master_ticket_id, operator):
+    """母子单解绑权限校验：仅母单所在服务的负责人或 ITSM 超管可解绑。
+
+    - 与 `merge_validate` 中"操作者权限"片段保持一致
+    - 不复用 `merge_validate` 是因为后者还会校验母/子单状态前置条件，与解绑场景语义不一致
+    """
+    try:
+        master_ticket = Ticket.objects.get(id=master_ticket_id)
+    except Ticket.DoesNotExist:
+        raise serializers.ValidationError(_("母单不存在，请联系管理员"))
+
+    try:
+        service = Service.objects.get(id=master_ticket.service_id)
+    except Service.DoesNotExist:
+        raise serializers.ValidationError(_("母单关联服务不存在，请联系管理员"))
+
+    if not (
+        UserRole.is_itsm_superuser(operator) or dotted_name(operator) in service.owners
+    ):
+        raise serializers.ValidationError(_("抱歉，您没有解绑母子单的权限"))
+
+
 def ticket_can_be_master(ticket_id):
     """
     是否可以成为母单

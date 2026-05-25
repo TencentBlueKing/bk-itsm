@@ -2,7 +2,7 @@
 """
 Tencent is pleased to support the open source community by making 蓝鲸智云PaaS平台社区版 (BlueKing PaaS Community
 Edition) available.
-Copyright (C) 2025 Tencent. All rights reserved.
+Copyright (C) 2017 THL A29 Limited, a Tencent company. All rights reserved.
 Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 http://opensource.org/licenses/MIT
@@ -19,8 +19,18 @@ from mako import parsetree
 from mako.exceptions import MakoException
 from mako.lexer import Lexer
 
+from . import mako_safety
 from .code_extract import MakoNodeCodeExtractor
 from .exceptions import ForbiddenMakoTemplateException
+
+
+def validate_node_filter_callables(node: parsetree.Node):
+    # Mako stores inline `${expr | ...}` filter callables in `escapes_code`;
+    # tag-level filters use `filter_args`. Both are executed by create_filter_callable().
+    if hasattr(node, "escapes_code"):
+        mako_safety.validate_filter_args(node.escapes_code.args)
+    if hasattr(node, "filter_args"):
+        mako_safety.validate_filter_args(node.filter_args.args)
 
 
 def parse_template_nodes(
@@ -35,14 +45,15 @@ def parse_template_nodes(
     :param code_extractor: Mako 词法节点处理器，用于提取 python 代码
     """
     for node in nodes:
-        code = code_extractor.extract(node)
-        if code is None:
-            continue
+        validate_node_filter_callables(node)
 
-        ast_node = ast.parse(code, "<unknown>", "exec")
-        node_visitor.visit(ast_node)
+        code = code_extractor.extract(node)
+        if code is not None:
+            ast_node = ast.parse(code, "<unknown>", "exec")
+            node_visitor.visit(ast_node)
+
         if hasattr(node, "nodes"):
-            parse_template_nodes(node.nodes, node_visitor)
+            parse_template_nodes(node.nodes, node_visitor, code_extractor)
 
 
 def check_mako_template_safety(text: str, node_visitor: ast.NodeVisitor, code_extractor: MakoNodeCodeExtractor) -> bool:
@@ -54,6 +65,8 @@ def check_mako_template_safety(text: str, node_visitor: ast.NodeVisitor, code_ex
     try:
         lexer_template = Lexer(text).parse()
     except MakoException as mako_error:
-        raise ForbiddenMakoTemplateException("非mako模板，解析失败, {err_msg}".format(err_msg=mako_error.__class__.__name__))
+        raise ForbiddenMakoTemplateException(
+            "非mako模板，解析失败, {err_msg}".format(err_msg=mako_error.__class__.__name__)
+        )
     parse_template_nodes(lexer_template.nodes, node_visitor, code_extractor)
     return True

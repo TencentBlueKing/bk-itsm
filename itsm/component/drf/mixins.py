@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from rest_framework import status
 from rest_framework.mixins import ListModelMixin
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from itsm.component.constants import ResponseCodeStatus
@@ -34,8 +35,17 @@ from itsm.component.utils.basic import dotted_name
 class ApiGenericMixin(object):
     """API视图类通用函数"""
 
-    # TODO 权限部分加载基类中
-    permission_classes = ()
+    # 默认要求登录态；对于真正需要匿名访问的视图（healthz/ping/index/get_footer/IAM 回调等），
+    # 须显式覆盖 permission_classes 为 (AllowAny,) 或继续使用 login_exempt 装饰器。
+    permission_classes = (IsAuthenticated,)
+
+    def get_permissions(self):
+        # /openapi/ 路径走网关 JWT + app_code 鉴权，
+        # 这里豁免 DRF 的 IsAuthenticated，避免 AnonymousUser 被拒。
+        request = self.request
+        if request and "/openapi/" in request.path:
+            return [AllowAny()]
+        return super().get_permissions()
 
     def finalize_response(self, request, response, *args, **kwargs):
         """统一数据返回格式"""
@@ -43,29 +53,41 @@ class ApiGenericMixin(object):
         if not isinstance(response, Response):
             return response
         if response.data is None:
-            response.data = {'result': True, 'code': ResponseCodeStatus.OK, 'message': 'success', 'data': []}
+            response.data = {
+                "result": True,
+                "code": ResponseCodeStatus.OK,
+                "message": "success",
+                "data": [],
+            }
         elif isinstance(response.data, (list, tuple)):
             response.data = {
-                'result': True,
+                "result": True,
                 "code": ResponseCodeStatus.OK,
-                "message": 'success',
+                "message": "success",
                 "data": response.data,
             }
-        elif isinstance(response.data, dict) and not ("code" in response.data and "result" in response.data):
+        elif isinstance(response.data, dict) and not (
+            "code" in response.data and "result" in response.data
+        ):
             response.data = {
-                'result': True,
+                "result": True,
                 "code": ResponseCodeStatus.OK,
-                "message": 'success',
+                "message": "success",
                 "data": response.data,
             }
-        if response.status_code == status.HTTP_204_NO_CONTENT and request.method == "DELETE":
+        if (
+            response.status_code == status.HTTP_204_NO_CONTENT
+            and request.method == "DELETE"
+        ):
             response.status_code = status.HTTP_200_OK
 
         # trace_id
         if hasattr(request, "otel_trace_id") and isinstance(request.data, dict):
-            response.data['trace_id'] = request.otel_trace_id
+            response.data["trace_id"] = request.otel_trace_id
 
-        return super(ApiGenericMixin, self).finalize_response(request, response, *args, **kwargs)
+        return super(ApiGenericMixin, self).finalize_response(
+            request, response, *args, **kwargs
+        )
 
 
 class PermissionApiGenericMixin(ApiGenericMixin):
@@ -76,36 +98,50 @@ class PermissionApiGenericMixin(ApiGenericMixin):
 
         response_data = {
             "auth_meta": {
-                "auth_resource": getattr(self.serializer_class.Meta.model, "auth_resource", {}),
-                "auth_operations": getattr(self.serializer_class.Meta.model, "auth_operations", {}),
+                "auth_resource": getattr(
+                    self.serializer_class.Meta.model, "auth_resource", {}
+                ),
+                "auth_operations": getattr(
+                    self.serializer_class.Meta.model, "auth_operations", {}
+                ),
             }
         }
 
         if response.data is None:
-            response.data = {'result': True, 'code': ResponseCodeStatus.OK, 'message': 'success', 'data': response_data}
+            response.data = {
+                "result": True,
+                "code": ResponseCodeStatus.OK,
+                "message": "success",
+                "data": response_data,
+            }
         elif isinstance(response.data, (list, tuple)):
             response_data.update({"items": response.data})
             response.data = {
-                'result': True,
+                "result": True,
                 "code": ResponseCodeStatus.OK,
-                "message": 'success',
+                "message": "success",
                 "data": response_data,
             }
         elif isinstance(response.data, dict):
             if not ("code" in response.data and "result" in response.data):
                 response_data.update(response.data)
                 response.data = {
-                    'result': True,
+                    "result": True,
                     "code": ResponseCodeStatus.OK,
-                    "message": 'success',
+                    "message": "success",
                     "data": response_data,
                 }
             else:
-                response.data['data'].update(response_data)
-        if response.status_code == status.HTTP_204_NO_CONTENT and request.method == "DELETE":
+                response.data["data"].update(response_data)
+        if (
+            response.status_code == status.HTTP_204_NO_CONTENT
+            and request.method == "DELETE"
+        ):
             response.status_code = status.HTTP_200_OK
 
-        return super(PermissionApiGenericMixin, self).finalize_response(request, response, *args, **kwargs)
+        return super(PermissionApiGenericMixin, self).finalize_response(
+            request, response, *args, **kwargs
+        )
 
 
 class AuthListModelMixin(ListModelMixin):
@@ -120,12 +156,21 @@ class AuthListModelMixin(ListModelMixin):
     def auth_mixin(self, response):
         response_data = {
             "auth_meta": {
-                "auth_resource": getattr(self.serializer_class.Meta.model, "auth_resource", {}),
-                "auth_operations": getattr(self.serializer_class.Meta.model, "auth_operations", {}),
+                "auth_resource": getattr(
+                    self.serializer_class.Meta.model, "auth_resource", {}
+                ),
+                "auth_operations": getattr(
+                    self.serializer_class.Meta.model, "auth_operations", {}
+                ),
             }
         }
         if isinstance(response.data, list):
-            response_data.update(code=ResponseCodeStatus.OK, message="success", data=response.data, result=True)
+            response_data.update(
+                code=ResponseCodeStatus.OK,
+                message="success",
+                data=response.data,
+                result=True,
+            )
 
         elif isinstance(response.data, dict):
             response_data.update(response.data)
@@ -135,9 +180,9 @@ class AuthListModelMixin(ListModelMixin):
 
 class ApiGatewayMixin(object):
     """对外开放API返回格式统一
-        错误码返回规范为数字：
-            正确：0
-            错误：39XXXXX
+    错误码返回规范为数字：
+        正确：0
+        错误：39XXXXX
     """
 
     def finalize_response(self, request, response, *args, **kwargs):
@@ -147,23 +192,32 @@ class ApiGatewayMixin(object):
             return response
 
         if response.data is None:
-            response.data = {'result': True, 'code': 0, 'message': 'success', 'data': []}
+            response.data = {
+                "result": True,
+                "code": 0,
+                "message": "success",
+                "data": [],
+            }
         elif isinstance(response.data, (list, tuple)):
             response.data = {
-                'result': True,
+                "result": True,
                 "code": 0,
-                "message": 'success',
+                "message": "success",
                 "data": response.data,
             }
-        elif isinstance(response.data, dict) and not ("code" in response.data and "result" in response.data):
+        elif isinstance(response.data, dict) and not (
+            "code" in response.data and "result" in response.data
+        ):
             response.data = {
-                'result': True,
+                "result": True,
                 "code": 0,
-                "message": 'success',
+                "message": "success",
                 "data": response.data,
             }
 
-        return super(ApiGatewayMixin, self).finalize_response(request, response, *args, **kwargs)
+        return super(ApiGatewayMixin, self).finalize_response(
+            request, response, *args, **kwargs
+        )
 
 
 class DynamicListModelMixin(object):
@@ -175,8 +229,10 @@ class DynamicListModelMixin(object):
 
     def list(self, request, *args, **kwargs):
         serializer_kwargs = {}
-        if request.query_params.get('scope') == 'shortcut':
-            serializer_kwargs.update(fields=('id', 'name', 'key', 'desc', 'owners', 'creator', 'updated_by'))
+        if request.query_params.get("scope") == "shortcut":
+            serializer_kwargs.update(
+                fields=("id", "name", "key", "desc", "owners", "creator", "updated_by")
+            )
 
         queryset = self.filter_queryset(self.get_queryset())
 

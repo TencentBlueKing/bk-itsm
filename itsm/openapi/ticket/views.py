@@ -368,9 +368,11 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
             return Response(
                 {
-                    "code": ResponseCodeStatus.OK
-                    if res.result
-                    else ResponseCodeStatus.FAILED,
+                    "code": (
+                        ResponseCodeStatus.OK
+                        if res.result
+                        else ResponseCodeStatus.FAILED
+                    ),
                     "message": res.message,
                     "result": res.result,
                 }
@@ -407,10 +409,14 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         node_status = ticket.node_status.get(state_id=state_id)
 
         if node_status.type != "APPROVAL":
-            raise OperateTicketError("单据审批失败，目标节点{}不是审批节点".format(node_status.name))
+            raise OperateTicketError(
+                "单据审批失败，目标节点{}不是审批节点".format(node_status.name)
+            )
 
         if not node_status.can_sign_state_operate(approver):
-            raise OperateTicketError("单据审批失败，{}不是当前节点的审批人，无法审批".format(approver))
+            raise OperateTicketError(
+                "单据审批失败，{}不是当前节点的审批人，无法审批".format(approver)
+            )
 
         node_fields = TicketField.objects.filter(state_id=state_id, ticket_id=ticket.id)
         fields = []
@@ -487,7 +493,9 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         """
         # 创建单据
         data = copy.deepcopy(request.data)
-        logger.info("[openapi][create_ticket]-> 正在开始创建单据, request_data={}".format(data))
+        logger.info(
+            "[openapi][create_ticket]-> 正在开始创建单据, request_data={}".format(data)
+        )
         fast_approval = data.pop("fast_approval", False)
         if fast_approval:
             data["catalog_id"] = ServiceCatalog.objects.get(
@@ -655,6 +663,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"])
     @catch_openapi_exception
+    @custom_apigw_required
     def proceed_approval(self, request):
         # 审批节点的处理
         serializer = ProceedApprovalSerializer(
@@ -667,13 +676,17 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         try:
             ticket = Ticket.objects.get(sn=ticket_id)
         except Exception:
-            raise ValidationError("process_inst_id = {} 对应的单据不存在！".format(ticket_id))
+            raise ValidationError(
+                "process_inst_id = {} 对应的单据不存在！".format(ticket_id)
+            )
 
         node_status = ticket.node_status.get(state_id=state_id)
 
         if not node_status.can_sign_state_operate(serializer.validated_data["handler"]):
             raise OperateTicketError(
-                "单据审批失败，{}不是当前节点的审批人，无法审批".format(serializer.validated_data["handler"])
+                "单据审批失败，{}不是当前节点的审批人，无法审批".format(
+                    serializer.validated_data["handler"]
+                )
             )
 
         try:
@@ -727,7 +740,26 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
                     }
                 )
             else:
-                if not remarked:
+                if remarked:
+                    break
+                if (
+                    serializer.validated_data["submit_action"] == "true"
+                    and field.validate_type == "OPTION"
+                ):
+                    fields.append(
+                        {
+                            "id": field.id,
+                            "key": field.key,
+                            "type": field.type,
+                            "choice": field.choice,
+                            "value": serializer.validated_data["submit_opinion"],
+                        }
+                    )
+                    remarked = True
+                if (
+                    serializer.validated_data["submit_action"] == "false"
+                    and field.validate_type == "REQUIRE"
+                ):
                     fields.append(
                         {
                             "id": field.id,
@@ -909,10 +941,14 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         try:
             status = Status.objects.get(ticket_id=ticket.id, state_id=state_id)
         except Exception:
-            raise ParamError("sn[{}], state[{}] 未查到对应的节点状态".format(sn, state_id))
+            raise ParamError(
+                "sn[{}], state[{}] 未查到对应的节点状态".format(sn, state_id)
+            )
 
         if status.status != "FINISHED":
-            raise ParamError("sn[{}], state[{}] 当前节点状态为非结束状态".format(sn, state_id))
+            raise ParamError(
+                "sn[{}], state[{}] 当前节点状态为非结束状态".format(sn, state_id)
+            )
 
         approve_result = False
         approve_remark = ""

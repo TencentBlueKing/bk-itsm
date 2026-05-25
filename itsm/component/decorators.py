@@ -29,17 +29,15 @@ from functools import wraps
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from rest_framework.exceptions import ValidationError as RrfValidationError
 from django.http import JsonResponse, HttpResponse
 from django.utils.translation import gettext as _
-
-from itsm.component.bkoauth.jwt_client import JWTClient, jwt_invalid_view
-from itsm.component.exceptions import ServerError, ParamError
-from itsm.component.utils.response import Fail
-
-from itsm.component.utils.basic import ComplexRegexField, size_mapper
+from rest_framework.exceptions import ValidationError as RrfValidationError
 
 from common.log import logger
+from itsm.component.bkoauth.jwt_client import JWTClient, jwt_invalid_view
+from itsm.component.exceptions import ServerError, ParamError
+from itsm.component.utils.basic import ComplexRegexField, size_mapper
+from itsm.component.utils.response import Fail
 
 
 def no_args_template(view_func):
@@ -310,6 +308,9 @@ def custom_apigw_required(view_func):
 
         exempt = getattr(settings, "BK_APIGW_REQUIRE_EXEMPT", False)
         if exempt:
+            return view_func(self, request, *args, **kwargs)
+
+        if settings.RUN_VER == "ieod":
             return view_func(self, request, *args, **kwargs)
 
         if not hasattr(request, "jwt"):

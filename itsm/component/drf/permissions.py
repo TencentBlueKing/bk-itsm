@@ -42,6 +42,26 @@ from itsm.workflow.models import TemplateField
 from pipeline.conf import settings
 
 
+def _pick_unauthorized_action(auth_actions, apply_actions):
+    """从鉴权结果中挑出用于上报的未授权 action。
+
+    选择优先级：
+    1. ``auth_actions`` 中显式为假值的第一个 action；
+    2. ``apply_actions`` 中未出现在 ``auth_actions`` 的第一个 action（缺失视为未授权）；
+    3. 兜底返回 ``apply_actions[0]``。
+
+    调用方保证 ``apply_actions`` 非空；用于在 IAM 返回空 dict / 缺资源 key
+    场景下仍能构造合法的 ``AuthFailedException``，避免 ``IndexError``。
+    """
+    for action, allowed in auth_actions.items():
+        if not allowed:
+            return action
+    for action in apply_actions:
+        if action not in auth_actions:
+            return action
+    return apply_actions[0]
+
+
 class IsAdmin(permissions.BasePermission):
     """
     放开查询接口，其他方法仅限管理员
@@ -105,7 +125,21 @@ class IamAuthPermit(permissions.BasePermission):
                 apply_actions.append("{}_create".format(resource_type))
             if "project_key" in request.data:
                 return self.iam_create_auth(request, apply_actions)
-        return True
+            return True
+
+        # 列表/详情等读操作交给 has_object_permission 或子类策略
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # 集合级写动作（不含 detail，对象级写动作走 has_object_permission）
+        # 防御未在 spec 覆盖的自定义写 action 越过 IAM 直达视图。
+        if getattr(view, "detail", False):
+            return True
+
+        if not apply_actions:
+            return True
+
+        return self.iam_auth(request, apply_actions)
 
     def has_object_permission(self, request, view, obj, **kwargs):
         # 关联实例的请求，需要针对对象进行鉴权
@@ -199,14 +233,10 @@ class IamAuthPermit(permissions.BasePermission):
             for resource in resources
         ]
 
-        no_permission_actions = [
-            action for action, result in auth_actions.items() if not result
-        ]
-
         raise AuthFailedException(
             BK_IAM_SYSTEM_ID,
             Subject("user", request.user.username),
-            Action(no_permission_actions[0]),
+            Action(_pick_unauthorized_action(auth_actions, apply_actions)),
             resources,
         )
 
@@ -252,14 +282,10 @@ class IamAuthPermit(permissions.BasePermission):
             for resource in resources
         ]
 
-        no_permission_actions = [
-            action for action, result in auth_actions.items() if not result
-        ]
-
         raise AuthFailedException(
             BK_IAM_SYSTEM_ID,
             Subject("user", request.user.username),
-            Action(no_permission_actions[0]),
+            Action(_pick_unauthorized_action(auth_actions, apply_actions)),
             resources,
         )
 
@@ -359,14 +385,10 @@ class IamAuthProjectViewPermit(IamAuthPermit):
             for resource in resources
         ]
 
-        no_permission_actions = [
-            action for action, result in auth_actions.items() if not result
-        ]
-
         raise AuthFailedException(
             BK_IAM_SYSTEM_ID,
             Subject("user", request.user.username),
-            Action(no_permission_actions[0]),
+            Action(_pick_unauthorized_action(auth_actions, apply_actions)),
             resources,
         )
 

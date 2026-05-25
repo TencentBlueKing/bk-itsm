@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from itsm.component.drf.viewsets import ModelViewSet
 from itsm.component.exceptions import ValidateError
+from itsm.role.models import UserRole
 from itsm.ticket.models import TicketRemark, Ticket
 from itsm.ticket.permissions import RemarkPermissionValidate
 from itsm.ticket.serializers import TicketRemarkSerializer
@@ -18,14 +19,28 @@ class TicketRemarkModelViewSet(ModelViewSet):
     serializer_class = TicketRemarkSerializer
     permission_classes = (RemarkPermissionValidate,)
 
-    def list(self, request, *args, **kwargs):
-        # 后面这个接口要重构一部分
-        ticket_id = request.query_params.get("ticket_id", "")
+    @staticmethod
+    def _ensure_ticket_viewable(request, ticket_id):
+        """集合级评论接口的 ticket 归属校验。
+
+        - ticket_id 必填；不存在或不可见 → ValidateError。
+        - 返回查到的 ``Ticket`` 实例，供调用方继续使用。
+        """
         if not ticket_id:
             raise ValidateError(_("ticket_id 不能为空"))
+        ticket = Ticket.objects.filter(id=ticket_id).first()
+        if ticket is None:
+            raise ValidateError(_("单据不存在：%s，请检查") % ticket_id)
+        username = request.user.username
+        if UserRole.is_itsm_superuser(username) or ticket.can_view(username):
+            return ticket
+        raise ValidateError(_("抱歉，您无权查看该单据的评论"))
+
+    def list(self, request, *args, **kwargs):
+        ticket_id = request.query_params.get("ticket_id", "")
+        ticket = self._ensure_ticket_viewable(request, ticket_id)
         show_type = request.query_params.get("show_type", "PUBLIC")
 
-        ticket = Ticket.objects.get(id=ticket_id)
         history_operators = ticket.updated_by.split(",")
 
         remark_type = ["ROOT", show_type]
@@ -60,6 +75,7 @@ class TicketRemarkModelViewSet(ModelViewSet):
     def tree_view(self, request):
         """评论视图"""
         ticket_id = request.query_params.get("ticket_id", "")
+        self._ensure_ticket_viewable(request, ticket_id)
         show_type = request.query_params.get("show_type", "PUBLIC")
         tree_data = TicketRemark.root_subtree(ticket_id=ticket_id, show_type=show_type)
         return Response(tree_data)
