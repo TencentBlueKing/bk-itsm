@@ -253,7 +253,14 @@ class Client(TenantBaseClient):
         Operation,
         name="get_template_schemes",
         method="GET",
-        path="/get_template_schemes/{template_id}/{bk_biz_id}/",
+        path="/get_template_schemes/{bk_biz_id}/{template_id}/",
+    )
+    
+    system_get_template_schemes = bind_property(
+        Operation,
+        name="system_get_template_schemes",
+        method="GET",
+        path="/system/get_template_schemes/{bk_biz_id}/{template_id}/",
     )
 
     # 修改任务参数
@@ -277,7 +284,13 @@ class Client(TenantBaseClient):
         Operation,
         name="preview_task_tree",
         method="POST",
-        path="/preview_task_tree/{template_id}/{bk_biz_id}/",
+        path="/preview_task_tree/{bk_biz_id}/{template_id}/",
+    )
+    system_preview_task_tree = bind_property(
+        Operation,
+        name="system_preview_task_tree",
+        method="POST",
+        path="/system/preview_task_tree/{bk_biz_id}/{template_id}/",
     )
 
     # 获取公共流程节点选择后新的任务树

@@ -139,9 +139,23 @@ class BkOpsService(ItsmBaseService):
         state_id = data.inputs.state_id
         ticket = Ticket.objects.get(id=ticket_id)
         ticket.do_before_enter_state(state_id, by_flow=self.by_flow)
-        processors = ticket.current_processors[1:-1]
         data.set_outputs("params_sops_result_%s" % state_id, False)
         current_node = ticket.node_status.get(state_id=state_id)
+
+        # 从节点配置的处理人中取 operator
+        # PERSON 类型直接读 processors 字段（避免 get_processors() 对自动节点返回"系统自动处理"中文）
+        # 其他类型（GENERAL/CMDB 等）调用 get_processors() 解析角色后过滤中文
+        if current_node.processors_type == "PERSON":
+            raw_processors = [p.strip() for p in current_node.processors.strip(",").split(",") if p.strip()]
+        else:
+            raw_processors = [u for u in current_node.get_processors() if u and u.isascii()]
+        processors = ",".join(raw_processors)
+        operator = next(
+            (u for u in raw_processors if u and u != "system"),
+            ticket.creator,
+        )
+        logger.info("[bk_sops] operator resolved: %s (raw_processors: %s)", operator, raw_processors)
+        data.set_outputs("operator", operator)
 
         error_message_template = "标准运维任务【{name}】执行失败，失败信息 {detail_message}"
 
@@ -178,13 +192,6 @@ class BkOpsService(ItsmBaseService):
             fields=api_info,
         )
         self.update_info(current_node, sops_result, task_params=task_params)
-
-        operator = next(
-            (u.strip() for u in processors.split(",") if u.strip() and u.strip() != "system"),
-            ticket.creator,
-        )
-        logger.info("[bk_sops] operator resolved: %s (current_processors: %s)", operator, processors)
-        data.set_outputs("operator", operator)
         try:
             logger.info("[bk_sops][execute] 开始 create_task, operator=%s, template_id=%s, bk_biz_id=%s",
                         operator, task_params["template_id"], task_params["bk_biz_id"])
@@ -339,16 +346,24 @@ class BkOpsService(ItsmBaseService):
         api_info = data.outputs.get("api_info", None)
         state_id = data.inputs.state_id
         ticket = Ticket.objects.get(id=parent_data.inputs.ticket_id)
+        current_node = ticket.node_status.get(state_id=state_id)
+
+        # 从节点配置的处理人中取 operator
+        # PERSON 类型直接读 processors 字段（避免 get_processors() 对自动节点返回"系统自动处理"中文）
+        # 其他类型（GENERAL/CMDB 等）调用 get_processors() 解析角色后过滤中文
+        if current_node.processors_type == "PERSON":
+            raw_processors = [p.strip() for p in current_node.processors.strip(",").split(",") if p.strip()]
+        else:
+            raw_processors = [u for u in current_node.get_processors() if u and u.isascii()]
+        processors = ",".join(raw_processors)
         operator = (
             data.outputs.get("operator")
             or next(
-                (u.strip() for u in ticket.current_processors[1:-1].split(",") if u.strip() and u.strip() != "system"),
+                (u for u in raw_processors if u and u != "system"),
                 None,
             )
             or ticket.creator
         )
-        current_node = ticket.node_status.get(state_id=state_id)
-        processors = ticket.current_processors[1:-1]
 
         sops_result, created = TicketGlobalVariable.objects.get_or_create(
             key="sops_result_" + str(state_id),

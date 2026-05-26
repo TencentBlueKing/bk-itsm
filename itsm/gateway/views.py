@@ -488,7 +488,7 @@ def get_sops_template_schemes(request):
         if bk_biz_id:
             template_id = request.GET.get("template_id")
             sops_client = BkSopsApi.get_client_by_request(request)
-            response = sops_client.get_template_schemes(
+            response = sops_client.system_get_template_schemes(
                 path_params={"bk_biz_id": bk_biz_id, "template_id": template_id}
             )
             res = response.get("data", [])
@@ -507,8 +507,8 @@ def get_sops_preview_task_tree(request):
         exclude_task_nodes_id = data.get("exclude_task_nodes_id", [])
         
         sops_client = BkSopsApi.get_client_by_request(request)
-        response = sops_client.preview_task_tree(
-            path_params={"template_id": template_id, "bk_biz_id": bk_biz_id},
+        response = sops_client.system_preview_task_tree(
+            path_params={"bk_biz_id": bk_biz_id,"template_id": template_id},
             data={"exclude_task_nodes_id": exclude_task_nodes_id}
         )
         res = response.get("data", {})
@@ -530,9 +530,8 @@ def get_sops_preview_common_task_tree(request):
             path_params={"template_id": template_id},
             data={"exclude_task_nodes_id": exclude_task_nodes_id}
         )
-        res = response.get("data", {})
         
-        return Success(res).json()
+        return Success(response).json()
     except (ComponentCallError, APIGatewayResponseError) as e:
         return Fail(str(e), "SOPS.GET_COMMON_SOPS_PREVIEW_TASK_TREE").json()
 
