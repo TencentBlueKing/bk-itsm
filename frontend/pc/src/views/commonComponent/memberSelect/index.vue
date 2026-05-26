@@ -25,7 +25,7 @@
     <BKMultiTenantUserSelector
       v-if="isMultiTenantMode"
       exact-search-key="bk_username"
-      :value="value"
+      :model-value="value"
       :api-base-url="apiBaseUrl"
       :tenant-id="tenantId"
       :placeholder="placeholder"
