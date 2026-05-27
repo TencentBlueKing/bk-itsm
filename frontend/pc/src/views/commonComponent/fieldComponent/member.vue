@@ -83,7 +83,7 @@
       },
       selectedItems: {
         handler() {
-          this.item.val = this.selectedItems.join(',');
+          this.item.val = Array.isArray(this.selectedItems) ? this.selectedItems.join(',') : this.selectedItems || '';
         },
       },
     },
