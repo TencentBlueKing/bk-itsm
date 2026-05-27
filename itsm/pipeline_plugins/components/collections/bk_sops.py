@@ -150,10 +150,11 @@ class BkOpsService(ItsmBaseService):
         else:
             raw_processors = [u for u in current_node.get_processors() if u and u.isascii()]
         processors = ",".join(raw_processors)
-        operator = next(
-            (u for u in raw_processors if u and u != "system"),
-            ticket.creator,
-        )
+        operator = next((u for u in raw_processors if u and u != "system"), None)
+        if not operator:
+            raise ValueError(
+                "标准运维节点[state_id={}]未配置处理人，请检查节点配置".format(state_id)
+            )
         logger.info("[bk_sops] operator resolved: %s (raw_processors: %s)", operator, raw_processors)
         data.set_outputs("operator", operator)
 
@@ -356,14 +357,14 @@ class BkOpsService(ItsmBaseService):
         else:
             raw_processors = [u for u in current_node.get_processors() if u and u.isascii()]
         processors = ",".join(raw_processors)
-        operator = (
-            data.outputs.get("operator")
-            or next(
-                (u for u in raw_processors if u and u != "system"),
-                None,
-            )
-            or ticket.creator
+        operator = data.outputs.get("operator") or next(
+            (u for u in raw_processors if u and u != "system"),
+            None,
         )
+        if not operator:
+            raise ValueError(
+                "标准运维节点[state_id={}]未配置处理人，请检查节点配置".format(state_id)
+            )
 
         sops_result, created = TicketGlobalVariable.objects.get_or_create(
             key="sops_result_" + str(state_id),

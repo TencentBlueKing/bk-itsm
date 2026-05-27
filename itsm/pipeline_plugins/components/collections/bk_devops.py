@@ -190,10 +190,20 @@ class BkDevOpsService(ItsmBaseService):
         state_id = data.inputs.state_id
         ticket = Ticket.objects.get(id=ticket_id)
         ticket.do_before_enter_state(state_id, by_flow=self.by_flow)
-        processors = ticket.current_processors[1:-1]
 
         data.set_outputs("params_devops_result_{}".format(state_id), False)
         current_node = ticket.node_status.get(state_id=state_id)
+
+        # 从节点配置的处理人中取 processors，而非工单级别的 current_processors
+        if current_node.processors_type == "PERSON":
+            raw_processors = [p.strip() for p in current_node.processors.strip(",").split(",") if p.strip()]
+        else:
+            raw_processors = [u for u in current_node.get_processors() if u and u.isascii()]
+        if not raw_processors:
+            raise ValueError(
+                "蓝盾节点[state_id={}]未配置处理人，请检查节点配置".format(state_id)
+            )
+        processors = ",".join(raw_processors)
 
         error_message_template = "蓝盾流水线【{name}】启动失败，失败信息 {detail_message}"
 
@@ -334,7 +344,17 @@ class BkDevOpsService(ItsmBaseService):
         state_id = data.inputs.state_id
         ticket = Ticket.objects.get(id=parent_data.inputs.ticket_id)
         current_node = ticket.node_status.get(state_id=state_id)
-        processors = ticket.current_processors[1:-1]
+
+        # 从节点配置的处理人中取 processors，而非工单级别的 current_processors
+        if current_node.processors_type == "PERSON":
+            raw_processors = [p.strip() for p in current_node.processors.strip(",").split(",") if p.strip()]
+        else:
+            raw_processors = [u for u in current_node.get_processors() if u and u.isascii()]
+        if not raw_processors:
+            raise ValueError(
+                "蓝盾节点[state_id={}]未配置处理人，请检查节点配置".format(state_id)
+            )
+        processors = ",".join(raw_processors)
 
         # 2.创建全局变量
         devops_result, created = TicketGlobalVariable.objects.get_or_create(

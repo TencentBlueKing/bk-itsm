@@ -226,8 +226,17 @@ class WebHookService(ItsmBaseService):
             "WebHook任务【{name}】执行失败，失败信息 {detail_message}"
         )
 
-        processors = ticket.current_processors[1:-1]
         current_node = ticket.node_status.get(state_id=state_id)
+        # 从节点配置的处理人中取 processors，而非工单级别的 current_processors
+        if current_node.processors_type == "PERSON":
+            raw_processors = [p.strip() for p in current_node.processors.strip(",").split(",") if p.strip()]
+        else:
+            raw_processors = [u for u in current_node.get_processors() if u and u.isascii()]
+        if not raw_processors:
+            raise ValueError(
+                "WebHook节点[state_id={}]未配置处理人，请检查节点配置".format(state_id)
+            )
+        processors = ",".join(raw_processors)
 
         try:
             webhook_info = (
