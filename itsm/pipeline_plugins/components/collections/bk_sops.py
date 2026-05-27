@@ -499,7 +499,7 @@ class BkOpsService(ItsmBaseService):
             return True
 
     @staticmethod
-    def get_detail_message(sops_task_id, bk_biz_id, task_info, task_node, operator="admin"):
+    def get_detail_message(sops_task_id, bk_biz_id, task_info, task_node, operator):
         failed_children = [
             child
             for child in task_info.get("children", {}).values()

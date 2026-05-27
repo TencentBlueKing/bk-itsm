@@ -710,14 +710,15 @@ class Command(BaseCommand):
             if dry_run:
                 self.stdout.write("【DRY RUN 预览】以下为待同步内容：\n")
 
-            # ---- Step 4: 同步基础配置表（service / workflow，确保 ticket 依赖的数据先到位）----
-            self.stdout.write("  【DRY RUN 基础表预览】" if dry_run else "  【同步基础配置表】")
-            sync_base_tables(
-                src_cursor, dst_cursor, dst_conn,
-                ticket_ids, dry_run, src_db, dst_db, batch_size,
-                print_fn=self.stdout.write,
-            )
-            self.stdout.write("")
+            # ---- Step 4: 同步基础配置表（service / workflow）----
+            # 已通过其他方式同步流程配置，此处跳过，只同步工单数据
+            # self.stdout.write("  【DRY RUN 基础表预览】" if dry_run else "  【同步基础配置表】")
+            # sync_base_tables(
+            #     src_cursor, dst_cursor, dst_conn,
+            #     ticket_ids, dry_run, src_db, dst_db, batch_size,
+            #     print_fn=self.stdout.write,
+            # )
+            # self.stdout.write("")
 
             # ---- Step 5: 同步 ticket 主表 ----
             ticket_common_cols = get_common_cols(src_cursor, dst_cursor, TICKET_TABLE, src_db, dst_db)
