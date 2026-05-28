@@ -226,8 +226,10 @@ def get_bk_business(bk_biz_id, role_type):
         return ""
 
     bk_business = []
-    print("----search_business_list is {}".format(search_business_list))
-    print("----search_business_list type is {}".format(type(search_business_list)))
+    # 安全修复（H8）：原代码使用 print() 把 CMDB 查询返回的完整业务列表 dump 到
+    # stdout，这会被容器采集进入运维侧日志系统，违反“日志最小化”原则。
+    # 调试需要可通过上调 logger 级别实现，生产默认不输出。
+    logger.debug("search_business_list size=%s", len(search_business_list))
     for business in search_business_list:
         if not business:
             continue

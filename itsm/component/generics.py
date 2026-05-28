@@ -38,6 +38,7 @@ from rest_framework.exceptions import (
     PermissionDenied,
     ValidationError,
 )
+from django.conf import settings
 from rest_framework.response import Response
 
 from common.log import logger
@@ -129,13 +130,25 @@ def exception_handler(exc, context):
                 }
             )
         else:
-            # 调试模式
+            # 全局兜底分支：未被识别的异常一律视为 5xx
+            # 生产环境必须屏蔽 str(exc) / traceback，避免 SQL 报错、字段名、
+            # 文件路径、KeyError 键名等敏感信息回吐至前端。
+            # 仅当 settings.DEBUG=True 时才把异常细节带给调用方，便于本地排错。
             logger.error(traceback.format_exc())
-            # 正式环境，屏蔽500
+
+            # 仅信任"已注册业务异常类（ServerError 子类）"的 message 字段；
+            # 其它异常一律使用中性提示。
+            if isinstance(exc, ServerError):
+                safe_message = exc.message
+            elif getattr(settings, "DEBUG", False):
+                safe_message = getattr(exc, "message", str(exc))
+            else:
+                safe_message = _("系统繁忙，请稍后重试")
+
             data.update(
                 {
                     "code": ResponseCodeStatus.SERVER_500_ERROR,
-                    "message": getattr(exc, "message", str(exc)),
+                    "message": safe_message,
                 }
             )
 

@@ -61,7 +61,7 @@ from itsm.component.exceptions import (
     TicketNotFoundError,
     CreateTicketError,
 )
-from itsm.openapi.decorators import catch_openapi_exception
+from itsm.openapi.decorators import catch_openapi_exception, resolve_trusted_operator
 from itsm.openapi.ticket.serializers import (
     TicketCreateSerializer,
     TicketListSerializer,
@@ -233,7 +233,11 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
         fields = request.data.get("fields")
         sn = request.data.get("sn")
-        operator = request.data.get("operator")
+        # H5: edit_field 可能被用来伪造 "处理人" 改表单字段。
+        # 优先以 JWT 主体作为 username，edit_ticket_field 内部仍会作者/处理人校验。
+        operator = resolve_trusted_operator(
+            request, request.data.get("operator")
+        )
         with transaction.atomic():
             for field in fields:
                 logger.info(
@@ -361,7 +365,10 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             ticket = Ticket.objects.get(id=ticket_id)
             state_id = str(request.data.get("state_id", ""))
             ticket_status_validate(ticket, state_id)
-            operator = request.data.get("operator", "")
+            # H5: 优先以 JWT 主体为准，防止调用方该字段冲用他人
+            operator = resolve_trusted_operator(
+                request, request.data.get("operator", "")
+            )
 
             res = ticket.skip_node(state_id, operator=operator)
             ticket.node_status.filter(state_id=state_id).update(status=FINISHED)
@@ -397,7 +404,11 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
         sn = request.data.get("sn")
         state_id = request.data.get("state_id")
-        approver = request.data.get("approver")
+        # H5: approver 以 JWT 主体为准。仅在 JWT 未生效时才使用 body 声明值，
+        # 后续仍会经过 can_sign_state_operate 判定是否为该节点合法审批人。
+        approver = resolve_trusted_operator(
+            request, request.data.get("approver")
+        )
         approve_action = request.data.get("action")
         remark = request.data.get("remark")
         ticket = Ticket.objects.get(sn=sn)
@@ -552,7 +563,11 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         sn = request.data.get("sn")
         state_id = request.data.get("state_id")
         action_type = request.data.get("action_type")
-        operator = request.data.get("operator")
+        # H5: 限制调用方只能以自身身份操作节点，防止伪造 operator 进行
+        # 转单/认领/终止/提交。openapi_operate_validate 中的处理人校验依然会走。
+        operator = resolve_trusted_operator(
+            request, request.data.get("operator")
+        )
 
         ticket = Ticket.objects.get(sn=sn)
         openapi_operate_validate(operator, ticket, state_id, action_type)
@@ -610,7 +625,10 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         处理单据（挂起、恢复、撤销）
         """
         sn = request.data.get("sn")
-        operator = request.data.get("username") or request.data.get("operator")
+        # H5: operate_ticket 以 JWT 主体为准。原代码 username/operator 任一不为空都会
+        # 被采用，这里紧贴原语义，但调用 resolve_trusted_operator 走 JWT 边界。
+        claimed_operator = request.data.get("username") or request.data.get("operator")
+        operator = resolve_trusted_operator(request, claimed_operator)
         action_type = request.data.get("action_type")
         ticket = Ticket.objects.get(sn=sn)
 

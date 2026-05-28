@@ -24,7 +24,7 @@ from common.template.mako_utils import mako_safety
 from common.template.mako_utils.checker import check_mako_template_safety
 from common.template.mako_utils.exceptions import ForbiddenMakoTemplateException
 from common.template.mako_utils.string import deformat_var_key
-from common.template.sandbox import Sandbox
+from common.template.sandbox import Sandbox, _ForbiddenProxy
 from common.utils import sanitize_user_content
 
 logger = logging.getLogger("root")
@@ -32,6 +32,13 @@ logger = logging.getLogger("root")
 TEMPLATE_PATTERN = re.compile(r"\${[^${}#]+}")
 NESTED_INDEX_STR_PATTERN = r'^(\w+)(?:\[(?:"\w+"|\'\w+\'|\d+)\])+$'
 INDEX_STR_PATTERN = r'\[("\w+"|\'\w+\'|\d+)\]'
+
+# 渲染数据中需要额外注入屏蔽代理的 Mako runtime 名。
+# 注：Mako 运行时会在模板执行命名空间内自动注入 self/local/context 等；这里在 data 中
+# 同步覆盖一份 _ForbiddenProxy，作为静态层 AST 白名单之外的纵深防御。若 Mako 运行时
+# 优先使用自身注入对象，本层覆盖无副作用；若有遗漏的代码路径读到 data 中的同名键，
+# 任何属性访问/调用/格式化都会立即抛 ForbiddenMakoTemplateException。
+_RUNTIME_SHIELD_KEYS = ("self", "local", "context", "caller", "next", "parent", "capture")
 
 
 class Template:
@@ -191,6 +198,9 @@ class Template:
         data = {}
         data.update(context)
         data.update(Sandbox().get())
+        # 运行时纵深防御：覆盖 Mako Namespace 相关名为屏蔽代理，禁止经由 data 抵达 self.module 等
+        for shield_key in _RUNTIME_SHIELD_KEYS:
+            data[shield_key] = _ForbiddenProxy(shield_key)
 
         if not isinstance(template, str):
             raise TypeError(

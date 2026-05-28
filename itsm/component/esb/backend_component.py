@@ -230,9 +230,14 @@ class BkComponent(object):
             try:
                 query_params = map_data(before_req, query_params, "query_params")
             except Exception:
+                # 不要将 traceback 细节变成响应体（包含文件路径/行号/函数名，是
+                # 内部实现信息泄露）。完整 traceback 仅进入服务端日志。
+                logger.exception(
+                    "http(): before_req map_data failed, path=%s", path
+                )
                 return {
                     "result": False,
-                    "message": traceback.format_exc().split("\n")[-2],
+                    "message": "请求参数预处理失败",
                     "data": {},
                 }
 
@@ -241,10 +246,15 @@ class BkComponent(object):
                 method, path, query_params, system_domain, **kwargs
             )
         except Exception as e:
-            logger.error("[{}] response.Exception: {}".format(path, e))
+            # 仅在服务端记录上游异常原始信息，响应体返回中性提示，
+            # 避免将 ESB / 上游 SDK 内部错误信息透传给调用方。
+            logger.exception(
+                "http(): client.request raised exception, path=%s", path
+            )
+            _ = e  # 仅为保留原名，异常仅走日志路径
             return {
                 "result": False,
-                "message": str(e),
+                "message": "外部服务暂不可用，请稍后重试",
                 "data": {},
             }
 
@@ -253,9 +263,12 @@ class BkComponent(object):
             try:
                 response = map_data(map_code, response, "response")
             except Exception:
+                logger.exception(
+                    "http(): map_code map_data failed, path=%s", path
+                )
                 return {
                     "result": False,
-                    "message": traceback.format_exc().split("\n")[-2],
+                    "message": "响应数据后处理失败",
                     "data": {},
                 }
 
