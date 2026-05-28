@@ -61,6 +61,30 @@ MAX_PAGE_SIZE = 50
 MIN_PAGE_SIZE = 1
 
 
+# ---------------------------------------------------------------------------
+# 安全提示：
+# 历史代码中大量使用 `Fail(str(e), <CODE>).json()` 把上游 ESB / 用户管理 /
+# SOPS / DEVOPS 等组件的原始异常细节（含上游 message、内部错误码、表名 /
+# 字段名、堆栈等）直接回吐前端，存在内部信息泄露风险。
+# 统一通过下面的 `_safe_external_fail` 进行包装：
+#   1. 完整异常细节仅写入服务端日志（warning + traceback）；
+#   2. 返回前端的 message 仅保留与功能相关的中性提示，不包含 str(e)。
+# ---------------------------------------------------------------------------
+_EXTERNAL_SERVICE_HINT = _("外部服务暂不可用，请稍后重试")
+
+
+def _safe_external_fail(exc, code, action_for_log, hint=None):
+    """统一处理外部组件调用异常，避免上游错误细节回吐前端
+
+    :param exc: 捕获到的异常对象（仅写日志，不回吐）
+    :param code: Fail 响应中的业务码，例如 "BK_LOGIN.GET_ALL_USERS"
+    :param action_for_log: 日志中用于定位的操作名
+    :param hint: 可选的、面向用户的中性提示文案
+    """
+    logger.exception("call external component failed: action=%s", action_for_log)
+    return Fail(hint or _EXTERNAL_SERVICE_HINT, code).json()
+
+
 @fbv_exception_handler
 def get_batch_users(request):
     """批量获取用户信息"""
@@ -103,10 +127,12 @@ def get_batch_users(request):
             return response
         return Success(res).json()
     except Exception as error:
-        logger.warning(_("批量获取用户信息出错，%s"), str(error))
-        return Fail(
-            _("批量获取用户信息出错，%s") % str(error), "BK_LOGIN.GET_BATCH_USERS"
-        ).json()
+        return _safe_external_fail(
+            error,
+            "BK_LOGIN.GET_BATCH_USERS",
+            "get_batch_users",
+            hint=_("批量获取用户信息出错，请稍后重试"),
+        )
 
 
 @fbv_exception_handler
@@ -121,7 +147,7 @@ def get_all_users(request):
     try:
         users = adapter_api.get_all_users()
     except ComponentCallError as e:
-        return Fail(str(e), "BK_LOGIN.GET_ALL_USERS").json()
+        return _safe_external_fail(e, "BK_LOGIN.GET_ALL_USERS", "get_all_users")
 
     cache.set(cache_key, users, CACHE_30MIN)
 
@@ -196,7 +222,9 @@ def get_departments(request):
         # 转换成树状结构
         res = build_tree(res, "parent", need_route=True)
     except ComponentCallError as e:
-        return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_LIST").json()
+        return _safe_external_fail(
+            e, "BK_USER_MANAGE.GET_DEPARTMENT_LIST", "get_departments"
+        )
 
     return Success(res).json()
 
@@ -211,7 +239,9 @@ def get_first_level_departments(request):
         }
         res = get_list_departments(params)
     except ComponentCallError as e:
-        return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_LIST").json()
+        return _safe_external_fail(
+            e, "BK_USER_MANAGE.GET_DEPARTMENT_LIST", "get_first_level_departments"
+        )
 
     return Success(res).json()
 
@@ -228,7 +258,9 @@ def get_department_users(request):
         ))
 
     except ComponentCallError as e:
-        return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_USERS").json()
+        return _safe_external_fail(
+            e, "BK_USER_MANAGE.GET_DEPARTMENT_USERS", "get_department_users"
+        )
 
     return Success(res).json()
 
@@ -247,7 +279,9 @@ def get_department_users_count(request):
         }
         res = client_backend.usermanage.list_department_profiles(params)
     except ComponentCallError as e:
-        return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_USERS").json()
+        return _safe_external_fail(
+            e, "BK_USER_MANAGE.GET_DEPARTMENT_USERS", "get_department_users_count"
+        )
     return Success({"count": res["count"]}).json()
 
 
@@ -262,7 +296,9 @@ def get_department_info(request):
             }
         )
     except ComponentCallError as e:
-        return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_INFO").json()
+        return _safe_external_fail(
+            e, "BK_USER_MANAGE.GET_DEPARTMENT_INFO", "get_department_info"
+        )
 
     return Success(res).json()
 
@@ -278,7 +314,9 @@ def get_user_info(request):
             }
         )
     except ComponentCallError as e:
-        return Fail(str(e), "BK_USER_MANAGE.GET_USER_INFO").json()
+        return _safe_external_fail(
+            e, "BK_USER_MANAGE.GET_USER_INFO", "get_user_info"
+        )
 
     return Success(res).json()
 
@@ -292,7 +330,9 @@ def get_user_project_list(request):
         res = client.sops.get_user_project_list({})
         return Success(res).json()
     except ComponentCallError as e:
-        return Fail(str(e), "SOPS.GET_USER_PROJECT_LIST").json()
+        return _safe_external_fail(
+            e, "SOPS.GET_USER_PROJECT_LIST", "get_user_project_list"
+        )
 
 
 @fbv_exception_handler
@@ -319,7 +359,9 @@ def get_template_list(request):
             res = client.sops.get_common_template_list(**params)
         return Success(res).json()
     except ComponentCallError as e:
-        return Fail(str(e), "SOPS.GET_COMMON_TEMPLATE_LIST").json()
+        return _safe_external_fail(
+            e, "SOPS.GET_COMMON_TEMPLATE_LIST", "get_template_list"
+        )
 
 
 @fbv_exception_handler
@@ -380,7 +422,9 @@ def get_template_detail(request):
         return JsonResponse(data, status=HTTP_499_IAM_FORBIDDEN)
 
     except ComponentCallError as e:
-        return Fail(str(e), "SOPS.GET_TEMPLATE_DETAIL").json()
+        return _safe_external_fail(
+            e, "SOPS.GET_TEMPLATE_DETAIL", "get_template_detail"
+        )
 
 
 @fbv_exception_handler
@@ -392,7 +436,9 @@ def get_unfinished_sops_tasks(request):
         )
         return Success(res).json()
     except ComponentCallError as e:
-        return Fail(str(e), "SOPS.GET_UNFINISHED_SOPS_TASKS").json()
+        return _safe_external_fail(
+            e, "SOPS.GET_UNFINISHED_SOPS_TASKS", "get_unfinished_sops_tasks"
+        )
 
 
 @fbv_exception_handler
@@ -411,7 +457,7 @@ def get_sops_tasks(request):
         res = client_backend.sops.get_task_list(query_params)
         return Success(res).json()
     except ComponentCallError as e:
-        return Fail(str(e), "SOPS.GET_SOPS_TASKS").json()
+        return _safe_external_fail(e, "SOPS.GET_SOPS_TASKS", "get_sops_tasks")
 
 
 @fbv_exception_handler
@@ -424,7 +470,9 @@ def get_sops_tasks_detail(request):
         )
         return Success(res).json()
     except ComponentCallError as e:
-        return Fail(str(e), "SOPS.GET_SOPS_TASKS_DETAIL").json()
+        return _safe_external_fail(
+            e, "SOPS.GET_SOPS_TASKS_DETAIL", "get_sops_tasks_detail"
+        )
 
 
 @fbv_exception_handler
@@ -439,7 +487,9 @@ def get_sops_template_schemes(request):
             )
         return Success(res).json()
     except ComponentCallError as e:
-        return Fail(str(e), "SOPS.GET_SOPS_TEMPLATE_SCHEMES").json()
+        return _safe_external_fail(
+            e, "SOPS.GET_SOPS_TEMPLATE_SCHEMES", "get_sops_template_schemes"
+        )
 
 
 @fbv_exception_handler
@@ -456,7 +506,9 @@ def get_sops_preview_task_tree(request):
         res = client_backend.sops.preview_task_tree(data)
         return Success(res).json()
     except ComponentCallError as e:
-        return Fail(str(e), "SOPS.GET_SOPS_PREVIEW_TASK_TREE").json()
+        return _safe_external_fail(
+            e, "SOPS.GET_SOPS_PREVIEW_TASK_TREE", "get_sops_preview_task_tree"
+        )
 
 
 @fbv_exception_handler
@@ -473,7 +525,11 @@ def get_sops_preview_common_task_tree(request):
         res = client_backend.sops.preview_common_task_tree(data)
         return Success(res).json()
     except ComponentCallError as e:
-        return Fail(str(e), "SOPS.GET_COMMON_SOPS_PREVIEW_TASK_TREE").json()
+        return _safe_external_fail(
+            e,
+            "SOPS.GET_COMMON_SOPS_PREVIEW_TASK_TREE",
+            "get_sops_preview_common_task_tree",
+        )
 
 
 @fbv_exception_handler
@@ -487,7 +543,9 @@ def get_user_pipeline_list(request):
             }
         )
     except RemoteCallError as e:
-        return Fail(str(e), "DEVOPS.GET_UESR_PIPELINE_LIST").json()
+        return _safe_external_fail(
+            e, "DEVOPS.GET_UESR_PIPELINE_LIST", "get_user_pipeline_list"
+        )
 
     pipeline_list = []
     kwarg_list = [
@@ -503,9 +561,12 @@ def get_user_pipeline_list(request):
         pipeline_list.extend(batch_process(get_user_pipeline_singel_page, kwarg_list))
         return Success(pipeline_list).json()
     except Exception as e:
-        return Fail(
-            _("批量获取流水线出错:{}".format(str(e))), "BK_LOGIN.GET_BATCH_USERS"
-        ).json()
+        return _safe_external_fail(
+            e,
+            "BK_LOGIN.GET_BATCH_USERS",
+            "get_user_pipeline_list_batch",
+            hint=_("批量获取流水线出错，请稍后重试"),
+        )
 
 
 @fbv_exception_handler
@@ -516,7 +577,9 @@ def get_user_projects(request):
         )
         return Success(res).json()
     except RemoteCallError as e:
-        return Fail(str(e), "DEVOPS.GET_UESR_PROJECTS").json()
+        return _safe_external_fail(
+            e, "DEVOPS.GET_UESR_PROJECTS", "get_user_projects"
+        )
 
 
 @fbv_exception_handler
@@ -533,7 +596,9 @@ def get_pipeline_build_list(request):
         )
         return Success(res).json()
     except RemoteCallError as e:
-        return Fail(str(e), "DEVOPS.GET_PIPELINE_BUILD_LIST").json()
+        return _safe_external_fail(
+            e, "DEVOPS.GET_PIPELINE_BUILD_LIST", "get_pipeline_build_list"
+        )
 
 
 @fbv_exception_handler
@@ -548,7 +613,11 @@ def get_pipeline_build_start_info(request):
         )
         return Success(res).json()
     except RemoteCallError as e:
-        return Fail(str(e), "DEVOPS.GET_PIPELINE_BUILD_START_INFO").json()
+        return _safe_external_fail(
+            e,
+            "DEVOPS.GET_PIPELINE_BUILD_START_INFO",
+            "get_pipeline_build_start_info",
+        )
 
 
 @fbv_exception_handler
@@ -563,7 +632,9 @@ def get_user_pipeline_detail(request):
         )
         return Success(res).json()
     except RemoteCallError as e:
-        return Fail(str(e), "DEVOPS.GET_PIPELINE_DETAIL").json()
+        return _safe_external_fail(
+            e, "DEVOPS.GET_PIPELINE_DETAIL", "get_user_pipeline_detail"
+        )
 
 
 @fbv_exception_handler
@@ -582,7 +653,9 @@ def start_user_pipeline(request):
         res = apigw_client.devops.pipeline_build_start(request.POST)
         return Success(res).json()
     except RemoteCallError as e:
-        return Fail(str(e), "DEVOPS.START_USER_PIPELINE").json()
+        return _safe_external_fail(
+            e, "DEVOPS.START_USER_PIPELINE", "start_user_pipeline"
+        )
 
 
 @fbv_exception_handler
@@ -598,7 +671,9 @@ def get_user_pipeline_build_status(request):
         )
         return Success(res).json()
     except RemoteCallError as e:
-        return Fail(str(e), "DEVOPS.GET_PIPELINE_STATUS").json()
+        return _safe_external_fail(
+            e, "DEVOPS.GET_PIPELINE_STATUS", "get_user_pipeline_build_status"
+        )
 
 
 @fbv_exception_handler
@@ -614,7 +689,9 @@ def get_user_pipeline_build_detail(request):
         )
         return Success(res).json()
     except RemoteCallError as e:
-        return Fail(str(e), "DEVOPS.GET_PIPELINE_STATUS").json()
+        return _safe_external_fail(
+            e, "DEVOPS.GET_PIPELINE_STATUS", "get_user_pipeline_build_detail"
+        )
 
 
 @fbv_exception_handler
@@ -630,7 +707,11 @@ def get_pipeline_build_artifactory(request):
         )
         return Success(res).json()
     except RemoteCallError as e:
-        return Fail(str(e), "DEVOPS.GET_PIPELINE_BUILD_ARTIFACTORY").json()
+        return _safe_external_fail(
+            e,
+            "DEVOPS.GET_PIPELINE_BUILD_ARTIFACTORY",
+            "get_pipeline_build_artifactory",
+        )
 
 
 @fbv_exception_handler
@@ -646,7 +727,11 @@ def get_pipeline_build_artifactory_download_url(request):
         )
         return Success(res).json()
     except RemoteCallError as e:
-        return Fail(str(e), "DEVOPS.GET_PIPELINE_BUILD_ARTIFACTORY_DOWNLOAD_URL").json()
+        return _safe_external_fail(
+            e,
+            "DEVOPS.GET_PIPELINE_BUILD_ARTIFACTORY_DOWNLOAD_URL",
+            "get_pipeline_build_artifactory_download_url",
+        )
 
 
 @fbv_exception_handler
@@ -654,5 +739,8 @@ def get_user_pipeline_singel_page(kwargs):
     try:
         res = apigw_client.devops.project_pipeline_list(kwargs)
         return res["records"]
-    except RemoteCallError as e:
-        logger.warning(_("批量获取流水线出错:{}, kwargs:{}".format(str(e), kwargs)))
+    except RemoteCallError:
+        # 仅记录服务端日志，不向上层（最终前端）抛出/回吐异常细节
+        logger.exception(
+            "call external component failed: action=get_user_pipeline_singel_page"
+        )

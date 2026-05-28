@@ -96,7 +96,10 @@ class ProfilerMiddleware(object):
             pstats.Stats(self.profiler, stream=s).sort_stats(sortby).print_stats(count)
             for output in outputs:
                 if output == "console":
-                    print(s.getvalue())
+                    # 安全修复（H8）：Profiler 产生的 stats 包含文件路径/函数名等内部
+                    # 实现细节，不要直接 print 到容器 stdout（会被采集为运维侧日志）。
+                    # 改走 logger.debug，生产默认不输出；PROFILER 需明示开启才生效。
+                    logger.debug(s.getvalue())
 
                 if output == "file":
                     file_location = settings.PROFILER.get("file_location", "profiles")
@@ -140,7 +143,9 @@ class InstrumentProfilerMiddleware(ProfilerMiddleware):
         for output in outputs:
             output_text = self.profiler.output_html()
             if output == "console":
-                print(output_text)
+                # 安全修复（H8）：pyinstrument 输出 HTML 含完整调用栈与参数信息，
+                # 不能直接写入容器 stdout。改为 debug 级别日志，默认不输出。
+                logger.debug("pyinstrument profiler html generated, size=%s", len(output_text))
 
             if output == "file":
                 file_location = settings.PROFILER.get("file_location", "profiles")
