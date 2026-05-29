@@ -466,6 +466,7 @@
         this.getList();
       },
       handlePageLimitChange() {
+        this.pagination.current = 1;
         this.pagination.limit = arguments[0];
         this.getList();
       },
