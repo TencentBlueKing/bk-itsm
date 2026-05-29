@@ -103,19 +103,24 @@ class ActionSchemaValidator:
         self.template_validate(value.get("params", []))
 
     @staticmethod
-    def _iter_import_template_values(params):
+    def _iter_all_string_values(params):
+        """递归收集 params 中**所有字符串值**。
+
+        历史实现仅扫描 ref_type=='import' 字段；攻击者可把 payload 放进 custom 等普通字段，
+        运行时 _render_string 仍会无差别渲染。这里改为对所有字符串字段统一抽取模板片段后再检查。
+        """
+        if isinstance(params, str):
+            yield params
+            return
         if isinstance(params, list):
             for item in params:
-                for template_value in ActionSchemaValidator._iter_import_template_values(item):
-                    yield template_value
+                for value in ActionSchemaValidator._iter_all_string_values(item):
+                    yield value
             return
-
         if isinstance(params, dict):
-            if params.get("ref_type") == "import" and isinstance(params.get("value"), str):
-                yield params["value"]
             for item in params.values():
-                for template_value in ActionSchemaValidator._iter_import_template_values(item):
-                    yield template_value
+                for value in ActionSchemaValidator._iter_all_string_values(item):
+                    yield value
 
     def component_validate(self, value):
         try:
@@ -139,7 +144,7 @@ class ActionSchemaValidator:
             raise ValidationError("组件异常错误：{}".format(str(error)))
 
     def template_validate(self, params):
-        for template_value in self._iter_import_template_values(params):
+        for template_value in self._iter_all_string_values(params):
             for template in CommonTemplate(template_value).get_templates():
                 try:
                     check_mako_template_safety(

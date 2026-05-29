@@ -28,6 +28,7 @@ from celery.schedules import crontab
 from blueapps.contrib.celery_tools.periodic import periodic_task
 from django.core.cache import cache
 from django.conf import settings
+from common.log import logger
 from itsm.component.constants import CACHE_10MIN, CACHE_5MIN
 from itsm.component.esb.esbclient import client_backend
 from itsm.component.utils.lock import share_lock
@@ -74,7 +75,10 @@ def update_bk_business(cache_key, bk_biz_id, role_type):
             cache.set(cache_key, search_business_list, CACHE_5MIN)
             return search_business_list
         except ComponentCallError as e:
-            print("获取业务角色人员失败: %s" % e)
+            # 安全修复（H8）：print() 会将异常原始信息写入容器 stdout；
+            # 改为 logger.warning，同时不拼接 str(e)，仅记录上下文变量。
+            logger.warning("获取业务角色人员失败: bk_biz_id=%s", bk_biz_id)
+            logger.debug("detail of get business roles failure: %s", e)
             return []
 
     result = update()
@@ -92,7 +96,15 @@ def update_user_departments(cache_key, username, id_only):
                 {"id": username, "with_family": True}
             )
         except ComponentCallError as e:
-            print("获取组织架构失败：username=%s，error=%s" % (username, str(e)))
+            # 安全修复（H8）：原实现会将明文 username 与上游错误拼接进 stdout，
+            # 这里进行脱敏（仅保留首末字符）并调低到 warning + debug，防止 PII 泄露。
+            masked_user = (
+                username[:1] + "***" + username[-1:]
+                if username and len(username) >= 2
+                else "***"
+            )
+            logger.warning("获取组织架构失败：user=%s", masked_user)
+            logger.debug("detail of list_profile_departments failure: %s", e)
             return []
 
         if not id_only:

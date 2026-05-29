@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import base64
 import datetime
 import importlib
+import os
 from urllib.parse import urljoin, urlparse
 
 from blueapps.conf.default_settings import *  # noqa
@@ -463,6 +464,10 @@ MAKO_TEMPLATE_DIR = (
 MAKO_TEMPLATE_MODULE_DIR = os.path.join(
     os.path.dirname(BASE_DIR), "templates_module", APP_CODE
 )
+
+# format: module_path: alias
+MAKO_SANDBOX_IMPORT_MODULES = {}
+MAKO_TEMPLATE_NAME_WHITELIST_MODE = "enforce"
 
 TEMPLATES = [
     {

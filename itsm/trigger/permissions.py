@@ -123,7 +123,13 @@ class WorkflowTriggerPermit(IamAuthPermit):
             # 通过流程配置需要有对应服务的管理权限
             source_type = request.data.get("source_type")
             if source_type == SOURCE_WORKFLOW:
-                workflow = Workflow.objects.get(id=request.data.get("source_id"))
+                # 修复点（H7）：原实现 `Workflow.objects.get(id=...)` 未捕获 DoesNotExist，
+                # 任意登录用户传入随机 source_id 即可让接口抛 500，且响应体可能携带
+                # 模型/字段细节；同时缺少"项目归属"语义（仅靠 IAM service_manage 兜底）。
+                # 这里改为：
+                #   1) 通过 get_flow_or_raise_error 统一返回 Http404，避免存在性差异；
+                #   2) 借助 workflow.get_iam_resource() 走 IAM service_manage 校验。
+                workflow = self.get_flow_or_raise_error(request.data.get("source_id"))
                 apply_actions = ["service_manage"]
                 return self.iam_auth(
                     request, apply_actions, workflow.get_iam_resource()
@@ -155,7 +161,9 @@ class WorkflowTriggerPermit(IamAuthPermit):
                 workflow_id = obj.source_id
 
             if is_workflow:
-                workflow = Workflow.objects.get(id=workflow_id)
+                # 修复点（H7）：与 has_permission 一致，统一通过 get_flow_or_raise_error
+                # 转 404，避免 DoesNotExist 直透到响应体。
+                workflow = self.get_flow_or_raise_error(workflow_id)
                 apply_actions = ["service_manage"]
                 return self.iam_auth(
                     request, apply_actions, workflow.get_iam_resource()

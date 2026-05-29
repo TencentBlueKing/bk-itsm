@@ -67,11 +67,102 @@ MAKO_SANDBOX_SHIELD_WORDS = [
 ]
 
 
-# format: module_path: alias
-MAKO_SANDBOX_IMPORT_MODULES = {
-    "datetime": "datetime",
-    "time": "time",
-}
+# 危险模块/标识符黑名单（硬编码兜底，**不可被 settings 覆盖**）
+# 即便管理员误把 "os"/"subprocess" 等写入 MAKO_SANDBOX_IMPORT_MODULES
+# 或 MAKO_TEMPLATE_NAME_EXTRA_WHITELIST，AST 白名单层也会强制剔除，
+# 形成"配置错误也安全"的最后一道防线。
+# 选取标准：可直接执行系统命令、文件 I/O、进程/线程操控、二进制内存操控、
+# 反射/序列化攻击跳板、网络外联、解释器内部对象访问。
+MAKO_SANDBOX_FORBIDDEN_MODULES = frozenset(
+    {
+        # 进程/系统调用
+        "os",
+        "posix",  # CPython 在 *nix 下 os 实际指向 posix；绕过 ``__import__("posix")`` 同样致命
+        "nt",     # Windows 下的 os 底层模块
+        "sys",
+        "subprocess",
+        "commands",  # py2 残留，防御性加入
+        "popen2",
+        "pty",
+        "pwd",
+        "grp",
+        "spwd",
+        "resource",
+        "signal",
+        "platform",
+        "runpy",  # runpy.run_module / run_path 可执行任意 .py
+        "webbrowser",  # 调用系统浏览器 → 命令注入跳板
+        # 文件/路径 I/O
+        "io",
+        "shutil",
+        "tempfile",
+        "pathlib",
+        "fileinput",
+        "glob",
+        "fcntl",
+        "linecache",  # 可读任意源码
+        # 序列化/反序列化（pickle/marshal/shelve 是经典 RCE 跳板）
+        "pickle",
+        "cPickle",
+        "marshal",
+        "shelve",
+        "dill",
+        # 动态导入/解释器内部
+        "importlib",
+        "imp",
+        "builtins",
+        "__builtin__",
+        "code",
+        "codeop",
+        "inspect",
+        "gc",
+        "ast",
+        "types",
+        "traceback",  # 可拿到 frame / locals / globals
+        # 调试器（含 .run / .runeval 等任意代码执行入口）
+        "pdb",
+        "bdb",
+        # 二进制内存操控
+        "ctypes",
+        "cffi",
+        "mmap",
+        "array",
+        # 网络/外联
+        "socket",
+        "ssl",
+        "asyncio",
+        "selectors",
+        "select",
+        "http",
+        "urllib",
+        "urllib2",
+        "urllib3",
+        "requests",
+        "ftplib",
+        "telnetlib",
+        "smtplib",
+        "poplib",
+        "imaplib",
+        "xmlrpc",
+        "httplib",
+        # 子解释器/多进程/线程
+        "multiprocessing",
+        "threading",
+        "_thread",
+        "thread",
+        "concurrent",
+        # 数据库（避免模板侧直接操纵 DB）
+        "sqlite3",
+        "dbm",
+        # 包加载 / 入口点（``pkg_resources.EntryPoint.load`` 可拉起任意可调用）
+        "pkg_resources",
+        "setuptools",
+        # 日志（``logging.config.fileConfig`` 历史 RCE 跳板）
+        "logging",
+        # Django 内部（防止读取 settings/secret_key 等敏感对象）
+        "django",
+    }
+)
 
 
 class _ForbiddenProxy:
@@ -156,8 +247,10 @@ class Sandbox:
     def get(self) -> dict:
         sandbox = {}
 
-        self._shield_words(sandbox, getattr(settings, "MAKO_SANDBOX_SHIELD_WORDS", MAKO_SANDBOX_SHIELD_WORDS))
-        self._import_modules(sandbox, getattr(settings, "MAKO_SANDBOX_IMPORT_MODULES", MAKO_SANDBOX_IMPORT_MODULES))
+        self._shield_words(
+            sandbox, getattr(settings, "MAKO_SANDBOX_SHIELD_WORDS", MAKO_SANDBOX_SHIELD_WORDS)
+        )
+        self._import_modules(sandbox, getattr(settings, "MAKO_SANDBOX_IMPORT_MODULES", {}))
 
         return sandbox
 
