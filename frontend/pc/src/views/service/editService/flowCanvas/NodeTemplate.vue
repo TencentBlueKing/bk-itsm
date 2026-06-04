@@ -54,11 +54,11 @@
           </span>
           <span class="bk-more-word" :title="(node.name || $t(`m.treeinfo['新增节点']`))">{{node.name || $t(`m.treeinfo['新增节点']`)}}</span>
           <i class="bk-itsm-icon icon-edit-bold"></i>
-          <span class="bk-node-delete"
+          <!-- <span class="bk-node-delete"
             v-if="!(node.nodeInfo && node.nodeInfo.is_builtin)"
             @click.stop="clickDelete(node)"
             @mouseup.stop
-            @mousedown.stop>×</span>
+            @mousedown.stop>×</span> -->
           <div class="bk-toop-info" v-if="!toolStatus && (node.nodeInfo && node.nodeInfo.is_builtin)">
             <p><span>{{$t(`m.treeinfo['单击：']`)}}</span>{{$t(`m.treeinfo['快速配置节点']`)}}</p>
             <p><span>{{$t(`m.treeinfo['右键：']`)}}</span>{{$t(`m.treeinfo['调出快速添加节点菜单']`)}}</p>

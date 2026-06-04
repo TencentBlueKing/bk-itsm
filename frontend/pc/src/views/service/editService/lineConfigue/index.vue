@@ -255,6 +255,7 @@
       <bk-button theme="primary"
         data-test-id="lineConfig-button-submit"
         class="mr10"
+        :disabled="true"
         :title="$t(`m.treeinfo['确认']`)"
         :loading="secondClick"
         @click="submitLine">
@@ -270,7 +271,7 @@
       <bk-button theme="default"
         class="mr10"
         :title="$t(`m.treeinfo['删除']`)"
-        :disabled="secondClick"
+        :disabled="true"
         @click="deleteLine">
         {{ $t('m.treeinfo["删除"]') }}
       </bk-button>
@@ -278,7 +279,7 @@
         v-if="lineInfo.condition_type === 'by_field'"
         style="float: right;"
         :title="lineInfo.template ? $t(`m.treeinfo['更新模板']`) : $t(`m.treeinfo['存为模版']`)"
-        :disabled="secondClick"
+        :disabled="true"
         @click="submitTemplate">
         {{lineInfo.template ? $t(`m.treeinfo['更新模板']`) : $t(`m.treeinfo['存为模版']`)}}
       </bk-button>

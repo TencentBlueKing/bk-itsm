@@ -119,7 +119,7 @@
           </bk-table>
         </bk-form-item>
       </bk-form>
-      <common-trigger-list
+      <!-- <common-trigger-list
         v-if="isStatus"
         ref="commonTriggerList"
         :origin="'state'"
@@ -127,7 +127,7 @@
         :source-id="flowInfo.id"
         :sender="configur.id"
         :table="flowInfo.table">
-      </common-trigger-list>
+      </common-trigger-list> -->
 
       <div v-if="isStatus" class="mt20" style="font-size: 0">
         <bk-button :theme="'primary'"
@@ -135,6 +135,7 @@
           :title="$t(`m.treeinfo['确定']`)"
           :loading="secondClick"
           class="mr10"
+          :disabled="true"
           @click="submit">
           {{$t(`m.treeinfo['确定']`)}}
         </bk-button>
@@ -155,13 +156,13 @@
   import requestConfig from './components/requestConfig.vue';
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import dealPerson from './components/dealPerson.vue';
-  import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
+  // import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
   export default {
     name: 'webHookNode',
     components: {
       BasicCard,
       dealPerson,
-      commonTriggerList,
+      // commonTriggerList,
       requestConfig,
       descInfo,
     },
@@ -307,7 +308,7 @@
             console.log(this.formData);
             this.processorsInfo.type = this.configur.processors_type;
             this.processorsInfo.value = this.configur.processors;
-    
+
             this.returnReslut = this.configur.variables.outputs.length !== 0 ? [...this.configur.variables.outputs, ...this.returnReslut] : [{ name: '', ref_path: '', check: false }];
           }
         } else {

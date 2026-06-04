@@ -266,18 +266,19 @@
         :flow-info="flowInfo"
         :configur="configur">
       </field-config>
-      <common-trigger-list :origin="'state'"
+      <!-- <common-trigger-list :origin="'state'"
         :node-type="configur.type"
         :source-id="flowInfo.id"
         :sender="configur.id"
         :table="flowInfo.table">
-      </common-trigger-list>
+      </common-trigger-list> -->
       <div class="bk-node-btn">
         <bk-button :theme="'primary'"
           data-test-id="approve-button-submit"
           :title="$t(`m.treeinfo['确定']`)"
           :loading="secondClick"
           class="mr10"
+          :disabled="true"
           @click="submitNode">
           {{$t(`m.treeinfo['确定']`)}}
         </bk-button>
@@ -296,7 +297,7 @@
   import descInfo from './components/descInfo.vue';
   import dealPerson from './components/dealPerson.vue';
   import fieldConfig from './components/fieldConfig.vue';
-  import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
+  // import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import { errorHandler } from '../../../../utils/errorHandler';
   export default {
@@ -305,7 +306,7 @@
       BasicCard,
       dealPerson,
       fieldConfig,
-      commonTriggerList,
+      // commonTriggerList,
       descInfo,
     },
     props: {

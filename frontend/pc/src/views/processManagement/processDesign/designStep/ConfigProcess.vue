@@ -139,7 +139,7 @@
       },
       // 下一步操作or保存流程
       submitChart() {
-        this.submitFlow();
+        // this.submitFlow();
         if (this.secondClick) {
           return;
         }
@@ -147,6 +147,7 @@
 
         const id = this.processId;
         const params = [];
+        return;
         this.$store.dispatch('cdeploy/submitChart', { params, id }).then(() => {
           this.$bkMessage({
             message: this.$t('m.treeinfo["保存成功"]'),

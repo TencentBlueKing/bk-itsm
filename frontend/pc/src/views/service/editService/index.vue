@@ -84,7 +84,7 @@
         data-test-id="service_button_nextStepAndSave"
         ext-cls="button-item"
         theme="primary"
-        :disabled="!serviceId && serviceId !== 0"
+        :disabled="true"
         :loading="isSubmitting"
         @click="onNextStepClick">
         {{ nextStepBtnName }}
@@ -286,7 +286,7 @@
           if (this.step !== 'setting') {
             const nextStep = this.step === 'basic' ? 'process' : 'setting';
             if (this.step === 'basic' && !this.serviceInfo.source) {
-              this.$refs[refName].updateServiceSource('custom');
+            //   this.$refs[refName].updateServiceSource('custom');
             }
             this.$router.push({
               name: 'projectServiceEdit',

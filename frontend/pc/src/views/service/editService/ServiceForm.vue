@@ -33,6 +33,7 @@
             pull: false,
             put: ['view-form', 'half-row-field', 'form-view-item']
           }"
+          :disabled="true"
           @end="onRowDragEnd"
           @add="onHalfRowDragToRow">
           <template v-for="(form, index) in formList">

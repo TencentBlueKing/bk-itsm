@@ -144,19 +144,19 @@
           </add-field>
         </div>
       </bk-sideslider>
-      <common-trigger-list
+      <!-- <common-trigger-list
         :origin="'state'"
         :node-type="configur.type"
         :source-id="flowInfo.id"
         :sender="configur.id"
         :table="flowInfo.table">
-      </common-trigger-list>
+      </common-trigger-list> -->
       <div class="mt20" style="font-size: 0">
         <bk-button :theme="'primary'"
           data-test-id="autoNode-button-submit"
           :title="$t(`m.treeinfo['确定']`)"
           :loading="secondClick"
-          :disabled="!formInfo.api_info.remote_api_id"
+          :disabled="true"
           class="mr10"
           @click="submitNode">
           {{$t(`m.treeinfo['确定']`)}}
@@ -180,7 +180,7 @@
   import nodeCondition from './autoComponents/nodeCondition.vue';
   import addField from './addField/index.vue';
   import mixins from '../../../commonMix/mixins_api.js';
-  import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
+  // import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
   import dealPerson from './components/dealPerson.vue';
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import { errorHandler } from '../../../../utils/errorHandler';
@@ -193,7 +193,7 @@
       responseDataNode,
       nodeCondition,
       addField,
-      commonTriggerList,
+      //  commonTriggerList,
       dealPerson,
       BasicCard,
       descInfo,
@@ -744,6 +744,7 @@
         return jsondata;
       },
       addNewItem(data) {
+        return;
         this.showTabData = data;
         this.sliderInfo.show = true;
       },

@@ -596,6 +596,7 @@
           });
       },
       async onCreateFormWayCLick(way) {
+        return;
         if (this.isBasicFormEditting) {
           try {
             await this.$refs.basicForm.validate();

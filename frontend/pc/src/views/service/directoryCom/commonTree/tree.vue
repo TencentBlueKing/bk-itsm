@@ -69,9 +69,9 @@
             style="padding-right: 32px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: calc(100% - 50px); position: absolute; top: 0; left: 42px;"
             @click="nodeSelected(item)">{{item.name}}</div>
           <span v-if="item.service_count !== undefined" class="bk-tree-count">{{ item.service_count }}</span>
-          <i class="bk-icon icon-more bk-tree-point"
+          <!-- <i class="bk-icon icon-more bk-tree-point"
             :class="{ 'bk-point-selected': item.selected }"
-            @click.stop="iconSelected(item, $event)"></i>
+            @click.stop="iconSelected(item, $event)"></i> -->
           <!-- <Render :node="item" :tpl ='tpl'/> -->
         </div>
       </div>
