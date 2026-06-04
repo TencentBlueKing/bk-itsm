@@ -44,6 +44,7 @@ from itsm.component.esb.backend_component import bk
 from itsm.component.exceptions import NotAllowedError, ParamError, RpcAPIError
 from itsm.component.utils.client_backend_query import get_components, get_systems
 from itsm.component.utils.misc import JsonEncoder
+from itsm.component.utils.sandbox import map_data
 from itsm.postman.constants import (
     REMOTE_API_IMPORT_MAX_BYTES,
     REMOTE_API_IMPORT_MAX_ITEMS,
@@ -58,6 +59,7 @@ from itsm.postman.serializers import (
     RemoteApiSerializer,
     RemoteSystemSerializer,
 )
+from itsm.postman.service import RunApiService
 from itsm.workflow.permissions import WorkflowElementManagePermission
 
 
@@ -245,6 +247,58 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
             query_params = request.data.get("req_params", {})
 
         api_config = api.get_api_config(query_params)
+
+        map_code = request.data.get("map_code", "")
+        before_req = request.data.get("before_req", "")
+        
+        service = RunApiService()
+        
+        if before_req:
+            try:
+                before_req_data = service.inner_of_update(before_req) 
+                if isinstance(before_req_data, dict):
+                    # 校验数据是否符合白名单
+                    is_valid, message = service.get_context_verify_data(
+                        "run_api_before_req", before_req_data
+                    )
+                    if not is_valid:
+                        return Response(
+                            {
+                                "result": False,
+                                "message": message,
+                                "code": ResponseCodeStatus.OK,
+                                "data": None,
+                            }
+                        )
+                    # 将解析后的数据合并到 query_params
+                    query_params.update(before_req_data)
+                    api_config["query_params"] = query_params
+                    before_req = ""
+            except (json.JSONDecodeError, TypeError, ValueError) as e:
+                logger.exception("解析 before_req 失败")
+                return Response(
+                    {
+                        "result": False,
+                        "message": _(f"before_req 格式错误：{str(e)}"),
+                        "code": ResponseCodeStatus.OK,
+                        "data": None,
+                    }
+                )
+
+        if map_code:
+            try:
+                service.inner_of_map(map_code)
+            except ValueError as e:
+                return Response(
+                    {
+                        "result": False,
+                        "message": _(f"map_code 格式错误：{str(e)}"),
+                        "code": ResponseCodeStatus.OK,
+                        "data": None,
+                    }
+                )
+
+        api_config.update(map_code=map_code, before_req=before_req)
 
         rsp = bk.http(config=api_config)
 
