@@ -380,6 +380,7 @@
         data-test-id="field_button_submit"
         :title="$t(`m.treeinfo['提交']`)"
         :loading="secondClick"
+        :disabled="true"
         class="mr10"
         @click="checkInfo">
         {{$t(`m.treeinfo['提交']`)}}

@@ -147,12 +147,12 @@
       </div>
     </basic-card>
 
-    <common-trigger-list :origin="'state'"
+    <!-- <common-trigger-list :origin="'state'"
       :node-type="configur.type"
       :source-id="flowInfo.id"
       :sender="configur.id"
       :table="flowInfo.table">
-    </common-trigger-list>
+    </common-trigger-list> -->
     <div class="bk-node-btn">
       <bk-button :theme="'primary'"
         data-test-id="signNode-button-submit"
@@ -175,7 +175,7 @@
 <script>
   import fieldConfig from './components/fieldConfig.vue';
   import memberSelect from '../../../commonComponent/memberSelect';
-  import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
+  // import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import { errorHandler } from '../../../../utils/errorHandler';
 
@@ -185,7 +185,7 @@
       BasicCard,
       fieldConfig,
       memberSelect,
-      commonTriggerList,
+      // commonTriggerList,
     },
     props: {
       // 流程信息

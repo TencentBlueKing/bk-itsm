@@ -143,18 +143,19 @@
           </template>
         </bk-table-column>
       </bk-table>
-      <common-trigger-list :origin="'state'"
+      <!-- <common-trigger-list :origin="'state'"
         :node-type="configur.type"
         :source-id="flowInfo.id"
         :sender="configur.id"
         :table="flowInfo.table">
-      </common-trigger-list>
+      </common-trigger-list> -->
 
       <div class="mt20" style="font-size: 0">
         <bk-button :theme="'primary'"
           data-test-id="devops-button-submit"
           :title="$t(`m.treeinfo['确定']`)"
           class="mr10"
+          :disabled="true"
           @click="submit">
           {{$t(`m.treeinfo['确定']`)}}
         </bk-button>
@@ -173,7 +174,7 @@
 <script>
   import descInfo from './components/descInfo.vue';
   import dealPerson from './components/dealPerson.vue';
-  import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
+  // import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import DevopsPreview from '@/components/task/DevopsPreview.vue';
   import NoData from '@/components/common/NoData.vue';
@@ -190,7 +191,7 @@
     name: 'devops',
     components: {
       BasicCard,
-      commonTriggerList,
+      // commonTriggerList,
       DevopsPreview,
       NoData,
       dealPerson,

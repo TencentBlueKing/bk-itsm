@@ -229,8 +229,11 @@
         });
       },
       validate() {
-        this.submitFlow();
-        return this.saveProcess();
+        return new Promise((resolve) => {
+          resolve(true);
+        });
+        // this.submitFlow();
+        // return this.saveProcess();
       },
     },
   };

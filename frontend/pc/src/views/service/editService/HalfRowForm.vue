@@ -43,6 +43,7 @@
             name: 'view-form',
             put: halfRowFormPut
           }"
+          :disabled="true"
           @add="$emit('onHalfRowDragToHalfRow', $event)">
           <div class="half-form-item" v-for="item in group" :key="item.id" :data-id="item.id">
             <form-view-item

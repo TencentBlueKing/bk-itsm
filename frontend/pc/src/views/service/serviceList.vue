@@ -37,6 +37,7 @@
             <bk-button
               data-test-id="service_button_createService"
               v-cursor="{ active: !hasPermission(['service_create'], $store.state.project.projectAuthActions) }"
+              :disabled="true"
               :theme="'primary'"
               icon="plus"
               :class="['mr10', 'plus-cus', {
@@ -50,6 +51,7 @@
               v-cursor="{ active: !hasPermission(['service_create'], $store.state.project.projectAuthActions) }"
               :class="['mr10', { 'btn-permission-disable': !hasPermission(['service_create'], $store.state.project.projectAuthActions) }]"
               data-test-id="service_button_batchImportService"
+              :disabled="true"
               :title="$t(`m['导入']`)"
               @click="importService">
               {{$t(`m['导入']`)}}
@@ -57,7 +59,7 @@
             <bk-button
               data-test-id="service_button_batchDeleteService"
               :title="$t(`m.serviceConfig['批量删除']`)"
-              :disabled="!checkList.length"
+              :disabled="true"
               @click="deleteCheck">
               {{$t(`m.serviceConfig['批量删除']`)}}
             </bk-button>
@@ -148,7 +150,7 @@
                       @click="changeEntry(row, 'edit')">
                       {{ row.name }}
                     </span>
-                    <i v-show="tableHoverId === row.id" @click.stop="handleChange('name', row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
+                    <!-- <i v-show="tableHoverId === row.id" @click.stop="handleChange('name', row)" class="bk-itsm-icon icon-itsm-icon-six"></i> -->
                   </div>
                   <div v-else class="hover-show-icon">
                     <bk-input v-model="editValue"></bk-input>
@@ -166,11 +168,11 @@
                       :title="type.name"
                       :key="typeIndex">
                       {{ type.name }}
-                      <i
+                      <!-- <i
                         v-show="tableHoverId === row.id && hasPermission(['service_manage'], [...row.auth_actions, ...$store.state.project.projectAuthActions])"
                         class="bk-itsm-icon icon-itsm-icon-six"
                         @click="handleChange('key', row)">
-                      </i>
+                      </i> -->
                     </span>
                   </template>
                 </template>
@@ -208,7 +210,7 @@
                       :title="row.desc">
                       {{ row.desc || '--' }}
                     </span>
-                    <i v-show="tableHoverId === row.id" @click.stop="handleChange('desc', row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
+                    <!-- <i v-show="tableHoverId === row.id" @click.stop="handleChange('desc', row)" class="bk-itsm-icon icon-itsm-icon-six"></i> -->
                   </div>
                   <div v-else class="hover-show-icon">
                     <bk-input v-model="editValue"></bk-input>
@@ -222,11 +224,11 @@
               <template v-else-if="field.id === 'bounded_catalogs'">
                 <span v-if="row.id !== changeFrom.bounded_catalogs" :title="row.bounded_catalogs[0]">
                   {{ row.bounded_catalogs[0] || '--' }}
-                  <i
+                  <!-- <i
                     v-show="tableHoverId === row.id && hasPermission(['service_manage'], [...row.auth_actions, ...$store.state.project.projectAuthActions])"
                     class="bk-itsm-icon icon-itsm-icon-six"
                     @click="handleChange('catalog_id', row)">
-                  </i>
+                  </i> -->
                 </span>
                 <div v-else class="hover-show-icon">
                   <bk-cascade
@@ -269,6 +271,7 @@
                   text
                   theme="primary"
                   class="btn-permission-disable"
+                  :disabled="true"
                   @click="onServicePermissonCheck(['service_manage'], props.row)">
                   SLA
                 </bk-button>
@@ -281,6 +284,7 @@
                 text
                 theme="primary"
                 class="btn-permission-disable"
+                :disabled="true"
                 @click="onServicePermissonCheck(['service_manage'], props.row)">
                 {{ $t('m.serviceConfig["编辑"]') }}
               </bk-button>
@@ -289,6 +293,7 @@
                 data-test-id="service_button_editService"
                 theme="primary"
                 text
+                :disabled="true"
                 @click="changeEntry(props.row, 'edit')">
                 {{ $t('m.serviceConfig["编辑"]') }}
               </bk-button>
@@ -299,6 +304,7 @@
                 text
                 theme="primary"
                 class="btn-permission-disable"
+                :disabled="true"
                 @click="onServicePermissonCheck(['service_manage'], props.row)">
                 {{ $t('m.serviceConfig["克隆"]') }}
               </bk-button>
@@ -307,6 +313,7 @@
                 data-test-id="service_button_editService"
                 theme="primary"
                 text
+                :disabled="true"
                 @click="changeEntry(props.row, 'clone')">
                 {{ $t('m.serviceConfig["克隆"]') }}
               </bk-button>
@@ -322,6 +329,7 @@
                     text
                     theme="primary"
                     class="btn-permission-disable"
+                    :disabled="true"
                     @click="onServicePermissonCheck(['service_manage'], props.row)">
                     {{ $t('m.serviceConfig["删除"]') }}
                   </bk-button>
@@ -331,6 +339,7 @@
                       data-test-id="service_button_deleteService3"
                       theme="primary"
                       text
+                      :disabled="true"
                       @click="deleteOne(props.row)">
                       {{ $t('m.serviceConfig["删除"]') }}
                     </bk-button>
@@ -342,6 +351,7 @@
                     text
                     theme="primary"
                     class="btn-permission-disable"
+                    :disabled="true"
                     @click="onServicePermissonCheck(['service_manage'], props.row)">
                     {{ $t('m["导出"]') }}
                   </bk-button>
@@ -351,6 +361,7 @@
                     data-test-id="service_button_deleteService3"
                     theme="primary"
                     text
+                    :disabled="true"
                     @click="exportService(props.row)">
                     {{ $t('m["导出"]') }}
                   </bk-button>
@@ -943,6 +954,7 @@
       },
       // 编辑
       async changeEntry(item, type) {
+        return;
         let serviceId = item.id;
         if (type === 'clone') {
           // 获取克隆id

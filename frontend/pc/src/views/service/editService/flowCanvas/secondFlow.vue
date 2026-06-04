@@ -333,6 +333,7 @@
       },
       // 连线配置确认
       submitLine(value) {
+        return;
         // 确认创建线条的label,存在label则更新
         if (this.customLine.lineValue.name) {
           this.$refs.jsFlow.removeLineOverlay(this.customLine.lineInfo, (`label_${this.customLine.lineValue.id}`));
@@ -358,6 +359,7 @@
         this.customLine.isShow = false;
       },
       deleteLine() {
+        return;
         const { id } = this.customLine.lineValue;
         if (this.clickSecond) {
           return;
@@ -538,6 +540,7 @@
           return;
         }
         this.clickSecond = true;
+        return;
         await this.$store.dispatch('deployCommon/createLine', { lineParams }).then((res) => {
           const value = [{
             source: {
@@ -706,6 +709,7 @@
           },
           extras: {},
         };
+        return;
         await this.$store.dispatch('deployCommon/creatNode', { params }).then((res) => {
           // 为新增的元素添加属性值
           this.$set(node, 'nodeInfo', res.data);
@@ -726,6 +730,7 @@
         this.deleteNode();
       },
       deleteNode() {
+        return;
         const { id } = this.deleteInfo.info.nodeInfo;
         if (this.clickSecond) {
           return;
@@ -1037,6 +1042,7 @@
       },
       // 移动节点接口保存
       moveNode(node) {
+        return;
         const params = {
           axis: {
             x: node.x,

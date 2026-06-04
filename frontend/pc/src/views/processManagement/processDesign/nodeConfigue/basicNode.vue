@@ -39,19 +39,20 @@
         :flow-info="flowInfo"
         :configur="configur">
       </field-config>
-      <common-trigger-list
+      <!-- <common-trigger-list
         ref="commonTriggerList"
         :origin="'state'"
         :node-type="configur.type"
         :source-id="flowInfo.id"
         :sender="configur.id"
         :table="flowInfo.table">
-      </common-trigger-list>
+      </common-trigger-list> -->
       <div class="bk-node-btn mt20">
         <bk-button :theme="'primary'"
           data-test-id="basicNode-button-submit"
           :title="$t(`m.treeinfo['确定']`)"
           :loading="secondClick"
+          :disabled="true"
           class="mr10"
           @click="submitNode">
           {{$t(`m.treeinfo['确定']`)}}
@@ -70,7 +71,7 @@
 <script>
   import basicInfo from './components/basicInfo.vue';
   import fieldConfig from './components/fieldConfig.vue';
-  import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
+  // import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import { deepClone } from '@/utils/util.js';
   import { errorHandler } from '../../../../utils/errorHandler';
@@ -81,7 +82,7 @@
       BasicCard,
       basicInfo,
       fieldConfig,
-      commonTriggerList,
+      // commonTriggerList,
     },
     props: {
       // 流程信息

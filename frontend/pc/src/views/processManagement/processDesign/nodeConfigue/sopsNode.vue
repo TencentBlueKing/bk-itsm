@@ -128,17 +128,18 @@
           @onChangeHook="onChangeHook">
         </sops-get-param>
         <no-data v-else></no-data>
-        <common-trigger-list :origin="'state'"
+        <!-- <common-trigger-list :origin="'state'"
           :node-type="configur.type"
           :source-id="flowInfo.id"
           :sender="configur.id"
           :table="flowInfo.table">
-        </common-trigger-list>
+        </common-trigger-list> -->
         <div class="mt20" style="font-size: 0">
           <bk-button :theme="'primary'"
             data-test-id="sopsNode-button-submit"
             :title="$t(`m.treeinfo['确定']`)"
             :loading="secondClick"
+            :disabled="true"
             class="mr10"
             @click="submit">
             {{$t(`m.treeinfo['确定']`)}}
@@ -162,7 +163,7 @@
   import dealPerson from './components/dealPerson.vue';
   import NoData from '../../../../components/common/NoData.vue';
   import sopsGetParam from './components/sopsGetParam.vue';
-  import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
+  // import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
   import BasicCard from '@/components/common/layout/BasicCard.vue';
   import { errorHandler } from '../../../../utils/errorHandler';
   import { deepClone } from '@/utils/util.js';
@@ -172,7 +173,7 @@
     components: {
       BasicCard,
       sopsGetParam,
-      commonTriggerList,
+      // commonTriggerList,
       NoData,
       dealPerson,
       descInfo,
