@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import copy
 import json
 import re
-
+import logging
 
 from django.utils.translation import gettext as _
 
@@ -33,6 +33,8 @@ from common.template.template import Template
 from itsm.component.exceptions import ParamError
 from itsm.component.utils.bk_bunch import bunchify
 from pipeline.utils.boolrule import BoolRule
+
+logger = logging.getLogger(__name__)
 
 VAR_STR_MATCH = re.compile(r"\$\{\s*[\w\|]+\s*\}")
 
@@ -240,9 +242,15 @@ def conditions_conversion(condition):
 
 def build_conditions_by_mako_template(condition, rsp):
     try:
-        condition = Template(condition).render(**rsp)
+        condition = Template(condition).render(rsp)
         return True, condition
     except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(
+            "build_conditions_by_mako_template FAILED - condition: %s, rsp_keys: %s, error: %s",
+            condition, list(rsp.keys()), e
+        )
         return False, str(e)
 
 
@@ -283,8 +291,17 @@ def show_conditions_validate(show_conditions, key_value):
         if isinstance(value, tuple):
             if len(value) == 1:
                 key_value[key] = "('{}')".format(value[0])
+                
+    # 添加调试日志
+    logger.info("show_conditions_validate - conditions: %s", conditions)
+    logger.info("show_conditions_validate - key_value: %s", key_value)
 
     b_result, b_conditions = build_conditions_by_mako_template(conditions, key_value)
     if not b_result:
+        logger.error(
+            "show_conditions_validate FAILED - conditions: %s, key_value: %s, error: %s",
+            conditions, key_value, b_conditions
+        )
         raise ParamError(_("参数转换失败，请联系管理员"))
+    logger.info("show_conditions_validate - b_conditions: %s", b_conditions)
     return BoolRule(b_conditions).test()
