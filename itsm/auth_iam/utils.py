@@ -272,7 +272,7 @@ def grant_resource_creator_related_actions(
     }
     logger.info("正在向权限中心主动授权, request_data={}".format(request_data))
     result, message = iam_client.grant_resource_creator_actions(
-        bk_token=bk_token, bk_username="admin", data=request_data
+        bk_token=bk_token, bk_username=settings.SYSTEM_CALL_USER, data=request_data
     )
     if not result:
         logger.info("权限中心主动授权发生异常, 权限中心报错: {}".format(message))

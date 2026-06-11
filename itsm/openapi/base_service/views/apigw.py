@@ -17,7 +17,7 @@ def grant(app_code, resource_names, stage):
     client.update_bkapi_authorization(
         bk_app_code=settings.BK_APP_CODE,
         bk_app_secret=settings.BK_APP_SECRET,
-        bk_username="admin",
+        bk_username=settings.SYSTEM_CALL_USER,
     )
     # 发起请求，检查 response.raise_for_status()，返回 response.json() 数据
     params = {

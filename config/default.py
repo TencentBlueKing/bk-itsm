@@ -831,7 +831,7 @@ BK_IAM_SAAS_HOST = os.environ.get(
     "BK_IAM_V3_SAAS_HOST", urljoin(BK_PAAS_HOST, "/o/{}".format(BK_IAM_APP_CODE))
 )
 
-SYSTEM_CALL_USER = "admin"
+SYSTEM_CALL_USER = os.getenv("SYSTEM_CALL_USER", "admin")
 
 BK_DESKTOP_URL = os.environ.get("BK_DESKTOP_URL") or BK_PAAS_HOST
 

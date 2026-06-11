@@ -448,8 +448,8 @@ def get_template_list(bk_biz_id=2, username=None):
         if username:
             _client = BkSopsApi.get_client_by_username(username)
         else:
-            # 如果没有传入用户名，使用 admin 作为默认用户
-            _client = BkSopsApi.get_client_by_username("admin")
+            # 如果没有传入用户名，使用 SYSTEM_CALL_USER 作为默认用户
+            _client = BkSopsApi.get_client_by_username(settings.SYSTEM_CALL_USER)
         response = _client.get_template_list(
             path_params={"bk_biz_id": bk_biz_id},
             params={"template_source": "business"}
