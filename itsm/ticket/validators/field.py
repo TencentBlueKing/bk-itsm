@@ -203,7 +203,8 @@ def get_choice(field_obj, key_value, **kwargs):
 
     if field_obj.source_type == "API":
         return RemoteApiInstance.get_api_choice_by_instance_id(
-            field_obj.api_instance_id, field_obj.kv_relation, key_value
+            field_obj.api_instance_id, field_obj.kv_relation, key_value,
+            remote_user=kwargs.get("__remote_user__")
         )["data"]
 
     if field_obj.source_type == "RPC":

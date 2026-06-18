@@ -393,7 +393,7 @@ class RemoteApiInstance(Model):
         )
 
     @classmethod
-    def get_api_choice_by_instance_id(cls, api_instance_id, kv_relation, params):
+    def get_api_choice_by_instance_id(cls, api_instance_id, kv_relation, params, remote_user=None):
         """todo: global context"""
 
         try:
@@ -401,7 +401,7 @@ class RemoteApiInstance(Model):
         except RemoteApiInstance.DoesNotExist:
             raise ParamError(_("对应的api配置不存在，请查询"))
 
-        return api_instance.get_api_choice(kv_relation, params)
+        return api_instance.get_api_choice(kv_relation, params, remote_user=remote_user)
 
     def tag_data(self):
         data = model_to_dict(self, exclude=["id"])
@@ -449,14 +449,17 @@ class RemoteApiInstance(Model):
             "query_params": query_params,
         }
 
-    def get_api_choice(self, kv_relation, params):
+    def get_api_choice(self, kv_relation, params, remote_user=None):
         """
         获取api选项
         :param kv_relation: 返回数据属性关系
         :param params: 请求参数
+        :param remote_user: 指定以该用户身份调用API，用于提单场景以creator身份拉取选项
         """
 
         api_config = self.get_config()
+        if remote_user:
+            api_config["__remote_user__"] = remote_user
         result, query_params = build_params_by_mako_template(
             api_config["query_params"], params
         )
@@ -490,7 +493,18 @@ class RemoteApiInstance(Model):
                 }
 
         api_config["query_params"] = query_params
+        logger.info(
+            "[get_api_choice] calling API: path={}, query_params={}, remote_user={}".format(
+                api_config.get("path"), query_params, remote_user
+            )
+        )
         rsp = bk_apigw.http(config=api_config)
+        logger.info(
+            "[get_api_choice] API response: result={}, code={}, message={}, data_count={}".format(
+                rsp.get("result"), rsp.get("code"), rsp.get("message"),
+                len(rsp.get("data") or []) if isinstance(rsp.get("data"), list) else rsp.get("data")
+            )
+        )
 
         api_protocol_keys = {"code", "data", "message", "result", "permission"}
 

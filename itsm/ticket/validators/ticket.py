@@ -114,7 +114,7 @@ class CreateTicketValidator(object):
             state_fields_map.update({f["key"]: f})
 
         first_state_field_validate(
-            state_fields_map, fields, service=service.key, **kwargs
+            state_fields_map, fields, service=service.key, __remote_user__=username, **kwargs
         )
 
 

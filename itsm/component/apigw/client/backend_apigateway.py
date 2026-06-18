@@ -206,7 +206,7 @@ class BkApigwComponent(object):
             config.get("__remote_user__")
             or query_params.pop("__remote_user__", None)
         )
-        
+
         bk_token = None
         access_token = None
         try:
@@ -218,7 +218,7 @@ class BkApigwComponent(object):
             bk_token = request_object.COOKIES.get("bk_token", "")
         except Exception:
             pass
-        
+
         if remote_user:
             try:
                 import bkoauth
@@ -324,6 +324,13 @@ class BkApigwComponent(object):
                 "message": "not support invalid json response: {}".format(request_url),
                 "data": {},
             }
+
+        logger.info(
+            "[BkApigwComponent] http response: url={}, auth_info_keys={}, status={}, response_result={}".format(
+                request_url, list(auth_info.keys()), result.status_code,
+                response.get("result") if isinstance(response, dict) else "non-dict"
+            )
+        )
 
         # 响应后处理
         if map_code:
