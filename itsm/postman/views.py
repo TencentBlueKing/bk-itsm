@@ -44,7 +44,6 @@ from itsm.component.esb.backend_component import bk
 from itsm.component.exceptions import NotAllowedError, ParamError, RpcAPIError
 from itsm.component.utils.client_backend_query import get_components, get_systems
 from itsm.component.utils.misc import JsonEncoder
-from itsm.component.utils.sandbox import map_data
 from itsm.postman.constants import (
     REMOTE_API_IMPORT_MAX_BYTES,
     REMOTE_API_IMPORT_MAX_ITEMS,
@@ -288,6 +287,17 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
         if map_code:
             try:
                 service.inner_of_map(map_code)
+                # 白名单校验：检查 map_code 中访问的 response 路径是否在白名单中
+                is_valid, message = service.verify_map_code_whitelist(map_code)
+                if not is_valid:
+                    return Response(
+                        {
+                            "result": False,
+                            "message": message,
+                            "code": ResponseCodeStatus.OK,
+                            "data": None,
+                        }
+                    )
             except ValueError as e:
                 return Response(
                     {
