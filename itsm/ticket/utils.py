@@ -126,8 +126,8 @@ def build_message(_notify, task_id, ticket, message, action, **kwargs):
             return None
 
     try:
-        content = Template(custom_notify.content_template).render(**context)
-        title = Template(custom_notify.title_template).render(**context)
+        content = Template(custom_notify.content_template).render(context)
+        title = Template(custom_notify.title_template).render(context)
         return content, title
     except NameError as error:
         logger.error(

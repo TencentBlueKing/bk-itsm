@@ -225,8 +225,8 @@ class FollowersNotifyLogViewSet(component_viewsets.NormalModelViewSet):
                 action=FOLLOW_OPERATE, notify_type="EMAIL", project_key="public    "
             )
 
-        message = Template(follow_notify_template.content_template).render(**context)
-        title = Template(follow_notify_template.title_template).render(**context)
+        message = Template(follow_notify_template.content_template).render(context)
+        title = Template(follow_notify_template.title_template).render(context)
 
         error_message = ""
         try:

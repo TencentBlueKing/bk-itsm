@@ -763,7 +763,7 @@ class Task(Model):
         )
         for constant in rendered_field["sops_templates"].get("constants", []):
             if constant.get("is_quoted", False):
-                constant["value"] = Template(constant["value"]).render(**outputs)
+                constant["value"] = Template(constant["value"]).render(outputs)
         return rendered_field
 
     def update_sops_task(self, **kwargs):
