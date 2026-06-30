@@ -161,7 +161,7 @@ class CompRequest(object):
                 query_params = cls._safe_render_rpc_meta(template, params_context)
             else:
                 query_params = json.loads(
-                    Template(json.dumps(template)).render(**params_context)
+                    Template(json.dumps(template)).render(params_context)
                 )
         except Exception as e:
             logger.warning(

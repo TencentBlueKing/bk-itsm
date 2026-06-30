@@ -50,6 +50,12 @@ def params_type_conversion(params, schema):
     if params is None:
         return
     if schema["type"] == "object":
+        # 确保 params 是字典类型
+        if isinstance(params, str):
+            try:
+                params = json.loads(params)
+            except (json.JSONDecodeError, TypeError):
+                params = {}
         for k, v in list(schema["properties"].items()):
             result = params_type_conversion(params.get(k), v)
             if result is not None:
@@ -95,7 +101,7 @@ def build_params_by_mako_template(api_config_query_params, params):
         for key, value in api_config_query_params.items():
             if isinstance(value, str):
                 # 如果是字符串且需要转换的
-                api_config_query_params[key] = Template(value).render(**params)
+                api_config_query_params[key] = Template(value).render(params)
             elif isinstance(value, dict):
                 # 如果是字典，直接转换
                 result, api_config_query_params[key] = build_params_by_mako_template(
@@ -113,7 +119,7 @@ def build_params_by_mako_template(api_config_query_params, params):
                         _, new_item = build_params_by_mako_template(item_value, params)
                         new_value.append(new_item)
                         continue
-                    new_value.append(Template(item_value).render(**params))
+                    new_value.append(Template(item_value).render(params))
                 api_config_query_params[key] = new_value
         return True, api_config_query_params
     except Exception as e:

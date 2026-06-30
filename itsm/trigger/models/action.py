@@ -205,7 +205,7 @@ class Action(TriggerBaseModel):
     def render_params(self, template_value):
         try:
             if isinstance(template_value, str):
-                return Template(template_value).render(**self.context)
+                return Template(template_value).render(self.context)
             if isinstance(template_value, dict):
                 render_value = {}
                 for key, value in template_value.items():
