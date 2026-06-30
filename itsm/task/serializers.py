@@ -226,9 +226,7 @@ class TaskSerializer(serializers.ModelSerializer):
                             ]
                         for constant in field["value"]["constants"]:
                             if constant.get("is_quoted", False):
-                                current_value = Template(constant["value"]).render(
-                                    **outputs
-                                )
+                                current_value = Template(constant["value"]).render(outputs)
                                 changed = (
                                     current_value != sops_constants[constant["key"]]
                                     if constant["key"] in sops_constants

@@ -530,7 +530,7 @@ class ParamParseTool:
 
     def import_parse(self, value, **kwargs):
         try:
-            return Template(value).render(**self.context)
+            return Template(value).render(self.context)
         except BaseException:
             # 可能存在参数不存在的问题，所以需要进行处理
             logger.exception("error params value %s context %s" % (value, self.context))

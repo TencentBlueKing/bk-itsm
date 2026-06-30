@@ -271,7 +271,7 @@ class Template:
             logger.error("pipeline resolve template[{}] error[{}]".format(template, e))
             return template
         try:
-            resolved = tm.render_unicode(**data)
+            resolved = tm.render_unicode(data)
         except Exception as e:
             # 注意：``data`` 中含 ``_ForbiddenProxy`` 实例，其 ``__repr__`` 会主动抛
             # ForbiddenMakoTemplateException。如果直接 ``"{}".format(data)`` 整段打印，
