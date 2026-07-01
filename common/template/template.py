@@ -251,6 +251,12 @@ class Template:
         if not isinstance(template, str):
             raise TypeError("constant resolve error, template[%s] is not a string" % template)
 
+        try:
+            tm = MakoTemplate(template)
+        except (MakoException, SyntaxError) as e:
+            logger.error("pipeline resolve template[{}] error[{}]".format(template, e))
+            return template
+
         data = {}
         data.update(context)
         data.update(Sandbox().get())
@@ -265,13 +271,26 @@ class Template:
             if shield_key not in data:
                 data[shield_key] = _ForbiddenProxy(shield_key)
 
+        # Mako 的渲染入口签名为 ``render_unicode(self, *args, **data)``，而模板编译出的
+        # ``render_body(context, **pageargs)`` 会把 ``context`` 作为位置参数。若 ``data``
+        # 中包含这些保留名，会导致：
+        #   - ``self``            -> 与 render_unicode 的 bound-method 首参撞名
+        #                              ("got multiple values for argument 'self'")
+        #   - ``context``/``UNDEFINED``/``STOP_RENDERING``/``loop`` -> Mako 在
+        #     ``Context._set_with_template`` 里检测到保留字后会抛 NameConflictError。
+        # 这些名即便注入到 ``data`` 也无法在运行期生效：
+        #   * ``self``/``local``：Mako 在 ``_populate_self_namespace`` 中会用真实
+        #     TemplateNamespace 覆盖 ``_data``；
+        #   * ``context``/``UNDEFINED``/``STOP_RENDERING``：Mako 编译期把它们编译成
+        #     直接引用（LOAD_FAST/LOAD_GLOBAL），根本不走 ``context.get()``。
+        # 因此这里统一从渲染 kwargs 中剔除，运行期防护由 AST 白名单（enforce 模式）保证，
+        # 其余经 ``context.get()`` 解析的屏蔽词（module/cache/util/...）仍保留在 ``data``
+        # 中发挥作用。
+        for reserved_name in tm.reserved_names | {"self"}:
+            data.pop(reserved_name, None)
+
         try:
-            tm = MakoTemplate(template)
-        except (MakoException, SyntaxError) as e:
-            logger.error("pipeline resolve template[{}] error[{}]".format(template, e))
-            return template
-        try:
-            resolved = tm.render_unicode(data)
+            resolved = tm.render_unicode(**data)
         except Exception as e:
             # 注意：``data`` 中含 ``_ForbiddenProxy`` 实例，其 ``__repr__`` 会主动抛
             # ForbiddenMakoTemplateException。如果直接 ``"{}".format(data)`` 整段打印，
