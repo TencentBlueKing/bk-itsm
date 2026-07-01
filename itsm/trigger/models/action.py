@@ -142,6 +142,10 @@ class Action(TriggerBaseModel):
         self.save()
         self.refresh_from_db(fields=["id"])
 
+        # 注入触发信号到上下文，供下游组件（如发送通知）渲染 ${action} 模板使用
+        if "trigger_action" not in self.context:
+            self.context["trigger_action"] = self.signal
+
         if need_update_context:
             self.update_context()
         try:
