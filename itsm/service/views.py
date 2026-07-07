@@ -631,10 +631,12 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
         workflow_config = configs["workflow_config"]
         workflow_id = service.workflow.workflow_id
         WorkflowPipelineValidator(Workflow.objects.get(id=workflow_id))()
+        username = request.user.username
 
         with transaction.atomic():
             workflow = self.update_workflow_configs(workflow_id, workflow_config)
             configs["workflow_id"] = workflow.create_version().id
+            service.updated_by=username
             service.update_service_configs(configs)
             states_info = service.workflow.states
             error_message = []
