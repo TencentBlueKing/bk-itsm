@@ -2933,6 +2933,14 @@ class Ticket(Model, BaseTicket):
         ):
             return
 
+        # 审批人/处理人为提单人时，不向提单人发送节点待办通知
+        if action in (
+            TRANSITION_OPERATE,
+            WAITING_FOR_OPERATE,
+            WAITING_FOR_CONFIRM,
+        ):
+            receivers = self.exclude_creator(receivers)
+
         logger.info(
             "[ticket->notify] is executed, state_id={}, receivers={}, message={}, action={}".format(
                 state_id, receivers, message, action
@@ -2982,6 +2990,22 @@ class Ticket(Model, BaseTicket):
             )
         except Exception as err:
             logger.exception("notify followers exception: {}".format(err))
+
+    def exclude_creator(self, receivers):
+        """从接收人中去掉提单人，避免审批人为提单人时仍收到待办通知"""
+        if not receivers or not self.creator:
+            return receivers
+
+        creator = self.creator.strip()
+        if isinstance(receivers, str):
+            receiver_list = [
+                r.strip() for r in receivers.split(",") if r.strip()
+            ]
+            receiver_list = [r for r in receiver_list if r != creator]
+            return ",".join(receiver_list)
+        if isinstance(receivers, (list, tuple, set)):
+            return [r for r in receivers if str(r).strip() != creator]
+        return receivers
 
     def set_finished(
         self, operator="", close_status=FINISHED, desc="", source=SYS, last_flow=None
