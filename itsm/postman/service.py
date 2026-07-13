@@ -27,7 +27,7 @@ class RunApiService:
     # 一旦配置了白名单，则 map_code 中只能访问白名单中列出的 response 路径
     DEFAULT_MAP_CODE_WHITELIST = {
         "response": [
-            "response.data",
+            "response.*",
         ]
     }
 
