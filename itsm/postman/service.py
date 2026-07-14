@@ -14,11 +14,7 @@ class RunApiService:
     # 格式与 DB 配置保持一致，使用全路径格式
     DEFAULT_BEFORE_REQ_WHITELIST = {
         "headers": [
-            "headers.X-Bkapi-Authorization.bk_app_code",
-            "headers.X-Bkapi-Authorization.bk_app_secret",
-            "headers.X-Bkapi-Authorization.access_token",
-            "headers.X-Bkapi-Authorization.bk_username",
-            "headers.X-Bkapi-Authorization.bk_ticket"
+            "headers.*",
         ]
     }
 
