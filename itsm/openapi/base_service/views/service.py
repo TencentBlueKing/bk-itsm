@@ -103,10 +103,12 @@ class ServiceViewSet(viewsets.ModelViewSet):
         workflow_config = configs["workflow_config"]
         workflow_id = service.workflow.workflow_id
         WorkflowPipelineValidator(Workflow.objects.get(id=workflow_id))()
+        username = request.user.username
 
         with transaction.atomic():
             self.update_workflow_configs(workflow_id, workflow_config)
             configs["workflow_id"] = service.workflow.id
+            service.updated_by = username
             service.update_service_configs(configs)
         context = self.get_serializer_context()
         return Response(self.serializer_class(instance=service, context=context).data)

@@ -89,7 +89,7 @@
       <bk-form-item
         :label="$t(`m.systemConfig['接口路径']`)"
         :desc="$t(`m.systemConfig['系统调用时将拼接系统域名、接口路径']`)">
-        <bk-input v-model="directory.formInfo.road" placeholder="please input path"
+        <bk-input v-model="directory.formInfo.road" :placeholder="$t(`m.systemConfig['请输入接口路径']`)"
           :disabled="(directory.formInfo.category === 'component' || directory.formInfo.category === 'buffet_component') && typeInfo !== 'ADD'"
           @change="$emit('change')">
           <template slot="prepend">

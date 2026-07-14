@@ -22,6 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import json
 
 from django.core.cache import cache
 
@@ -64,3 +65,15 @@ class ContextService:
             unique_values = list(set(item.strip() for item in context_value.split(",")))
             return unique_values
         return []
+    
+    @staticmethod
+    def get_context_value_dict(key: str) -> dict:
+        context_value = ContextService.get_context_value(key)
+        if context_value:
+            try:
+                return json.loads(context_value)
+            except (json.JSONDecodeError, TypeError) as e:
+                logger.error(f"解析key为'{key}'的上下文配置失败: {str(e)}")
+                return {}
+        return {}
+       

@@ -142,6 +142,10 @@ class Action(TriggerBaseModel):
         self.save()
         self.refresh_from_db(fields=["id"])
 
+        # 注入触发信号到上下文，供下游组件（如发送通知）渲染 ${action} 模板使用
+        if "trigger_action" not in self.context:
+            self.context["trigger_action"] = self.signal
+
         if need_update_context:
             self.update_context()
         try:
@@ -205,7 +209,7 @@ class Action(TriggerBaseModel):
     def render_params(self, template_value):
         try:
             if isinstance(template_value, str):
-                return Template(template_value).render(**self.context)
+                return Template(template_value).render(self.context)
             if isinstance(template_value, dict):
                 render_value = {}
                 for key, value in template_value.items():
