@@ -541,7 +541,7 @@ class TicketModelViewSet(ModelViewSet):
         # 发送前创建邀请记录
         links = []
         fail_numbers = []
-        title = Template(custom_notify.title_template).render(**context)
+        title = Template(custom_notify.title_template).render(context)
         for number in numbers:
             code = TicketCommentInvite.get_unique_code()
             ticket_url = "{}{}".format(OUT_LINK, code)
@@ -551,7 +551,7 @@ class TicketModelViewSet(ModelViewSet):
             notifier = SmsNotifier(
                 title=title,
                 receivers=receiver,
-                message=Template(content_template).render(**context),
+                message=Template(content_template).render(context),
                 receiver_nums=number,
             )
 
@@ -619,9 +619,9 @@ class TicketModelViewSet(ModelViewSet):
             context.update(ticket_url=ticket_url)
             
             notifier = EmailNotifier(
-                title=Template(custom_notify.title_template).render(**context),
+                title=Template(custom_notify.title_template).render(context),
                 receivers=[receiver_user],
-                message=Template(custom_notify.content_template).render(**context),
+                message=Template(custom_notify.content_template).render(context),
             )
             
             try:
@@ -1171,7 +1171,7 @@ class TicketModelViewSet(ModelViewSet):
         supervise_validate(ticket, username)
 
         message = request.data.get("message") or Template(SUPERVISE_MESSAGE).render(
-            **{"title": ticket.title}
+            {"title": ticket.title}
         )
         # 构造快速审批通知信息
         for step in ticket.current_steps:

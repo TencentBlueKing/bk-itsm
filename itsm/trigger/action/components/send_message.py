@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.utils.translation import gettext as _
 
-from itsm.component.constants import WEIXIN, EMAIL, SMS
+from itsm.component.constants import WEIXIN, EMAIL, SMS, TRIGGER_SIGNAL
 from itsm.component.notify import (
     EmailNotifier,
     WeixinNotifier,
@@ -49,6 +49,48 @@ from itsm.task.models import Task
 __register_ignore__ = False
 
 from itsm.workflow.utils import get_notify_type_choice
+
+
+# 触发器信号 → 标准通知动作标识（ACTION_CHOICES_DICT 的 key）
+# 用标准通知的语义对齐 ${action} 渲染结果
+_TRIGGER_SIGNAL_TO_ACTION = {
+    "CREATE_TICKET": "TRANSITION",
+    "GLOBAL_ENTER_STATE": "TRANSITION",
+    "ENTER_STATE": "TRANSITION",
+    "DISTRIBUTE_STATE": "DISTRIBUTE",
+    "CLAIM_STATE": "CLAIM",
+    "DELIVER_STATE": "DELIVER",
+    "THROUGH_TRANSITION": "TRANSITION",
+    "SUSPEND_TICKET": "SUSPEND",
+    "RECOVERY_TICKET": "UNSUSPEND",
+    "TERMINATE_TICKET": "TERMINATE",
+    "DELETE_TICKET": "TERMINATE",
+    "CLOSE_TICKET": "FINISHED",
+    "CREATE_TASK": "WAITING_FOR_OPERATE",
+    "BEFORE_START_TASK": "WAITING_FOR_OPERATE",
+    "AFTER_FINISH_TASK": "WAITING_FOR_CONFIRM",
+    "AFTER_CONFIRM_TASK": "FINISHED",
+    "DELETE_TASK": "TERMINATE",
+}
+
+
+def _build_action_name(signal):
+    """将触发器信号映射成与标准通知一致的动作名。
+
+    标准通知路径 `build_message` 中 action 取自 `ACTION_CHOICES_DICT`，
+    这里通过把信号映射到同一个 dict 的 key，保证触发器与标准通知
+    在 ${action} 渲染结果上完全对齐。
+    """
+    from itsm.iadmin.contants import ACTION_CHOICES_DICT
+
+    action_key = _TRIGGER_SIGNAL_TO_ACTION.get(signal)
+    if action_key and action_key in ACTION_CHOICES_DICT:
+        return str(ACTION_CHOICES_DICT[action_key])
+    # 兜底：未知信号回退为信号本身的中文名
+    for signal_group in TRIGGER_SIGNAL.values():
+        if signal in signal_group:
+            return str(signal_group[signal])
+    return signal
 
 
 def get_sub_components():
@@ -207,6 +249,10 @@ class SendMessage(BaseComponent):
         """
         super(SendMessage, self).__init__(context, params_schema, action_id, countdown)
 
+        # 补充标准通知命名空间下的变量（service_type_name / action 等），
+        # 保证子组件 StringField 在 validate_inputs 渲染 ${...} 时白名单可放行
+        self._enrich_notify_context()
+
         # 初始化子组件
         self.sub_actions = []
         for item in self.params_schema:
@@ -240,22 +286,38 @@ class SendMessage(BaseComponent):
         """
         return self.form.to_representation_data(sub_actions=self.sub_actions, flat=flat)
 
-    def update_context(self):
-        """
-        手动操作的时候更新context
+    def _enrich_notify_context(self):
+        """补充标准通知命名空间下的变量，保证 ${service_type_name}、${action}
+        这类模板占位符在触发器场景也能正常渲染（不放宽 Mako 白名单）。
+
+        触发器原始 context 只含 TICKET_GLOBAL_VARIABLES（键名 ticket_xxx），
+        缺少 NOTIFY_GLOBAL_VARIABLES 下的 service_type_name/sn/title 等键名；
+        且没有 action 语义。这里统一补齐。
         """
         try:
             ticket = Ticket.objects.get(sn=self.context.get("ticket_sn"))
             self.context.update(ticket.get_output_fields(return_format="dict"))
+            self.context.update(ticket.get_notify_context())
         except Ticket.DoesNotExist:
             pass
 
         try:
             task = Task.objects.get(id=self.context.get("task_id"))
             self.context.update(task.get_output_context())
-
         except Task.DoesNotExist:
             pass
+
+        # 注入 ${action}：触发器场景下用触发信号名映射成可读动作名
+        if "action" not in self.context:
+            signal = self.context.get("trigger_action")
+            if signal:
+                self.context["action"] = _build_action_name(signal)
+
+    def update_context(self):
+        """
+        手动操作的时候更新context
+        """
+        self._enrich_notify_context()
 
         for sub_action in self.sub_actions:
             sub_action.context.update(self.context)

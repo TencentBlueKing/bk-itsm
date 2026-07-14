@@ -323,8 +323,8 @@ class Action(Model):
 
         for notify in notify_objs:
             context.update(action=_(ACTION_CHOICES_DICT.get(notify.action, "待处理")))
-            content = Template(notify.content_template).render(**context)
-            title = Template(notify.title_template).render(**context)
+            content = Template(notify.content_template).render(context)
+            title = Template(notify.title_template).render(context)
             receivers = self.receivers(ticket, alert_config.receivers)
 
             notifier = BaseNotifier(
