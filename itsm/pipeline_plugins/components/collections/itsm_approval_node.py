@@ -142,8 +142,7 @@ class ItsmApprovalService(ItsmSignService):
                 countdown=settings.AUTO_APPROVE_TIME,
             )  # AUTO_APPROVE_TIME秒之后自动回调
 
-            if ticket.creator in fast_approval_notify_receivers_list:
-                fast_approval_notify_receivers_list.remove(ticket.creator)
+            fast_approval_notify_receivers_list = []
 
         # 如果节点级别开启了自动审批通过
         if is_node_auto_approve and intersecting_processors:
