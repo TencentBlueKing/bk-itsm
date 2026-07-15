@@ -25,7 +25,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
 
-from itsm.component.constants import NODE_APPROVE_RESULT, TERMINATED
+from itsm.component.constants import (
+    NODE_APPROVE_RESULT,
+    TERMINATED,
+    TRANSITION_OPERATE,
+)
 from itsm.ticket.models import Ticket, Status, TicketGlobalVariable, SignTask
 from pipeline.component_framework.component import Component
 
@@ -127,6 +131,18 @@ class ItsmSignService(ItsmBaseService):
                         )
                         ticket.close(close_status=TERMINATED, operator="system")
                     self.finish_schedule()
+                elif (
+                    source == "SYS"
+                    and operator == ticket.creator
+                    and not node_status.is_sequential
+                ):
+                    from itsm.ticket.tasks import notify_task
+
+                    remain_processors = node_status.get_processor_in_sign_state()
+                    if remain_processors:
+                        notify_task.apply_async(
+                            args=[ticket, remain_processors, "", TRANSITION_OPERATE]
+                        )
             finally:
                 self.final_execute(node_status, operator)
                 ticket.close_moa_ticket(state_id, operator)

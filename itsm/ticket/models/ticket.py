@@ -3816,10 +3816,17 @@ class Ticket(Model, BaseTicket):
 
         # Send notify
         processor = node_status.get_processor_in_sign_state()
+        notify_receivers = processor
+        if (
+            self.flow.is_auto_approve
+            and processor
+            and self.creator in processor.split(",")
+        ):
+            notify_receivers = ""
         # TODO 发送通知可用触发器替代
         self.notify(
             state_id,
-            processor,
+            notify_receivers,
             action=TRANSITION_OPERATE,
             retry=kwargs.get("retry", True),
         )
