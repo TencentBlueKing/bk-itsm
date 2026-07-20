@@ -24,6 +24,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import logging
+
+import requests
+
+from blueking.component.open.exceptions import ComponentAPIException
 from itsm.component.constants import SYSTEM_OPERATE, TRANSITION_OPERATE, NODE_FAILED
 from itsm.component.esb.esbclient import client_backend
 from itsm.ticket.serializers import StatusSerializer
@@ -39,6 +43,7 @@ logger = logging.getLogger("celery")
 class BkOpsService(ItsmBaseService):
     __need_schedule__ = True
     interval = StaticIntervalGenerator(10)
+    MAX_SCHEDULE_FAIL_COUNT = 10
 
     def prepare_task_params(self, state, ticket, sops_info):
         values = ticket.get_output_fields(return_format="dict", need_display=True)
@@ -296,6 +301,18 @@ class BkOpsService(ItsmBaseService):
             }
             task_result = client_backend.sops.get_task_status(task_status_params)
         except Exception as error:
+            fail_count = data.outputs.get("schedule_fail_count", 0) + 1
+            data.set_outputs("schedule_fail_count", fail_count)
+            if self.is_transient_error(error) and fail_count <= self.MAX_SCHEDULE_FAIL_COUNT:
+                logger.warning(
+                    "[bk_sops_schedule] get task status transient error, task_id={}, "
+                    "fail_count={}/{}, error={}".format(
+                        sops_task_id, fail_count, self.MAX_SCHEDULE_FAIL_COUNT, error
+                    )
+                )
+                return True
+            else:
+                data.set_outputs("schedule_fail_count", 0)
             self.do_exit_plugins(
                 result=False,
                 current_node=current_node,
@@ -308,6 +325,10 @@ class BkOpsService(ItsmBaseService):
             )
             self.finish_schedule()
             return False
+
+        # 接口调用成功，清零连续失败计数
+        if data.outputs.get("schedule_fail_count", 0):
+            data.set_outputs("schedule_fail_count", 0)
 
         if not task_result.get("result", False):
             error_message = task_result.get("message", "")
@@ -404,6 +425,27 @@ class BkOpsService(ItsmBaseService):
 
     def outputs_format(self):
         return []
+
+    @staticmethod
+    def is_transient_error(error):
+        """判断是否为可重试的瞬时错误（网关/网络类故障）"""
+        # 组件 SDK 抛出的 ComponentAPIException
+        if isinstance(error, ComponentAPIException):
+            resp = getattr(error, "resp", None)
+            if resp is None:
+                # 请求阶段异常（连接超时、网络中断等），尚未生成响应对象
+                return True
+            status_code = getattr(resp, "status_code", None)
+            if status_code in {500, 502, 503, 504}:
+                # 5xx 网关错误（502/503/504 等）
+                return True
+            return False
+        # requests 网络层异常（连接错误、超时等）
+        if isinstance(
+            error, (requests.exceptions.ConnectionError, requests.exceptions.Timeout)
+        ):
+            return True
+        return False
 
 
 class BkOpsComponent(Component):
