@@ -367,9 +367,10 @@ class RemarkPermissionValidate(permissions.BasePermission):
     """评论 (TicketRemark) 权限。
 
     - 集合级（list / tree_view / create）按 ticket_id 反查归属，保证：
-      - 只读：调用方对该单据具备 ``can_view``；
+      - 只读：调用方对该单据具备 ``can_view``，或具备 IAM ``ticket_view`` 权限；
       - 写入：调用方还需 ``can_operate`` 或 ITSM 超管。
-    - 对象级（update / destroy）保留原有 creator/operator 判定。
+    - 对象级（update / destroy）保留原有 creator/operator 判定；
+      retrieve 与列表读权限对齐，同样补 IAM ``ticket_view`` 兜底。
     """
 
     SAFE_ACTIONS = ("list", "retrieve", "tree_view")
@@ -382,6 +383,15 @@ class RemarkPermissionValidate(permissions.BasePermission):
         if action in self.SAFE_ACTIONS:
             return request.query_params.get("ticket_id")
         return request.data.get("ticket_id") or request.query_params.get("ticket_id")
+
+    def _iam_ticket_view_auth(self, request, ticket):
+        """复用单据详情接口的 IAM ``ticket_view`` 兜底逻辑。
+
+        - 命中 → 返回 ``True``；
+        - 未命中 → 由 ``TicketPermissionValidate.iam_ticket_view_auth`` 抛
+          ``AuthFailedException``，DRF 统一转换为 403，错误信息与详情接口一致。
+        """
+        return TicketPermissionValidate().iam_ticket_view_auth(request, ticket)
 
     def has_permission(self, request, view):
         username = request.user.username
@@ -403,7 +413,11 @@ class RemarkPermissionValidate(permissions.BasePermission):
             return False
 
         if request.method in permissions.SAFE_METHODS:
-            return ticket.can_view(username)
+            # 读：业务可见性优先，未通过再走 IAM ticket_view 兜底，
+            # 与 GET ticket/receipts/{id}/ 行为对齐。
+            if ticket.can_view(username):
+                return True
+            return self._iam_ticket_view_auth(request, ticket)
 
         # 写动作：写评论必须能查看该单据，且具备处理人身份或为提单人
         if not ticket.can_view(username):
@@ -424,6 +438,13 @@ class RemarkPermissionValidate(permissions.BasePermission):
         ticket = Ticket.objects.get(id=obj.ticket_id)
         if ticket.can_operate(request.user.username):
             return True
+
+        # 读动作（retrieve）：业务可见性之外，再走 IAM ticket_view 兜底，
+        # 与 list / tree_view 保持一致。
+        if request.method in permissions.SAFE_METHODS:
+            if ticket.can_view(username):
+                return True
+            return self._iam_ticket_view_auth(request, ticket)
 
         return False
 
