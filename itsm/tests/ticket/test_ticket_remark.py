@@ -242,6 +242,10 @@ class TicketRemarkAuthzRegressionTest(TestCase):
         return rsp.data["data"]["id"]
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch(
+        "itsm.ticket.permissions.TicketPermissionValidate.iam_ticket_view_auth",
+        return_value=False,
+    )
     @mock.patch("itsm.role.models.get_user_departments")
     @mock.patch("itsm.ticket.permissions.UserRole.is_itsm_superuser")
     @mock.patch("itsm.ticket.views.ticket_remark.UserRole.is_itsm_superuser")
@@ -252,6 +256,7 @@ class TicketRemarkAuthzRegressionTest(TestCase):
         patch_is_superuser_view,
         patch_is_superuser_perm,
         patch_get_user_departments,
+        patch_iam_view,
     ):
         patch_get_user_departments.return_value = {}
         patch_is_superuser_perm.return_value = False
@@ -265,11 +270,14 @@ class TicketRemarkAuthzRegressionTest(TestCase):
             content_type="application/json",
         )
 
-        # 越权用户：has_permission 已返回 False，DRF 直接 403
-        # （与 _ensure_ticket_viewable 抛 ValidateError 等价拒绝，二者择一即拦截）
+        # 越权用户：业务可见性 + IAM ticket_view 双双拒绝 → DRF 直接 403
         self.assertEqual(rsp.data["result"], False)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch(
+        "itsm.ticket.permissions.TicketPermissionValidate.iam_ticket_view_auth",
+        return_value=False,
+    )
     @mock.patch("itsm.role.models.get_user_departments")
     @mock.patch("itsm.ticket.permissions.UserRole.is_itsm_superuser")
     @mock.patch("itsm.ticket.views.ticket_remark.UserRole.is_itsm_superuser")
@@ -280,6 +288,7 @@ class TicketRemarkAuthzRegressionTest(TestCase):
         patch_is_superuser_view,
         patch_is_superuser_perm,
         patch_get_user_departments,
+        patch_iam_view,
     ):
         patch_get_user_departments.return_value = {}
         patch_is_superuser_perm.return_value = False
@@ -295,6 +304,72 @@ class TicketRemarkAuthzRegressionTest(TestCase):
             content_type="application/json",
         )
         self.assertEqual(rsp.data["result"], False)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch(
+        "itsm.ticket.permissions.TicketPermissionValidate.iam_ticket_view_auth",
+        return_value=True,
+    )
+    @mock.patch("itsm.role.models.get_user_departments")
+    @mock.patch("itsm.ticket.permissions.UserRole.is_itsm_superuser")
+    @mock.patch("itsm.ticket.views.ticket_remark.UserRole.is_itsm_superuser")
+    @mock.patch("itsm.ticket.models.ticket.Ticket.can_view")
+    def test_list_passes_via_iam_fallback(
+        self,
+        patch_can_view,
+        patch_is_superuser_view,
+        patch_is_superuser_perm,
+        patch_get_user_departments,
+        patch_iam_view,
+    ):
+        """业务可见性不通过，但 IAM ticket_view 通过时，list 应放行。"""
+        patch_get_user_departments.return_value = {}
+        patch_is_superuser_perm.return_value = False
+        patch_is_superuser_view.return_value = False
+        patch_can_view.return_value = False
+
+        ticket_id = self._create_ticket()
+
+        rsp = self.client.get(
+            path="/api/ticket/remark/?ticket_id={}&show_type=PUBLIC&page=1&page_size=10".format(
+                ticket_id
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(rsp.data["result"], True)
+        patch_iam_view.assert_called()
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch(
+        "itsm.ticket.permissions.TicketPermissionValidate.iam_ticket_view_auth",
+        return_value=True,
+    )
+    @mock.patch("itsm.role.models.get_user_departments")
+    @mock.patch("itsm.ticket.permissions.UserRole.is_itsm_superuser")
+    @mock.patch("itsm.ticket.views.ticket_remark.UserRole.is_itsm_superuser")
+    @mock.patch("itsm.ticket.models.ticket.Ticket.can_view")
+    def test_tree_view_passes_via_iam_fallback(
+        self,
+        patch_can_view,
+        patch_is_superuser_view,
+        patch_is_superuser_perm,
+        patch_get_user_departments,
+        patch_iam_view,
+    ):
+        """业务可见性不通过，但 IAM ticket_view 通过时，tree_view 应放行。"""
+        patch_get_user_departments.return_value = {}
+        patch_is_superuser_perm.return_value = False
+        patch_is_superuser_view.return_value = False
+        patch_can_view.return_value = False
+
+        ticket_id = self._create_ticket()
+
+        rsp = self.client.get(
+            path="/api/ticket/remark/tree_view/?ticket_id={}".format(ticket_id),
+            content_type="application/json",
+        )
+        self.assertEqual(rsp.data["result"], True)
+        patch_iam_view.assert_called()
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.role.models.get_user_departments")
