@@ -247,7 +247,7 @@ class SendMessage(BaseComponent):
         :param params_schema:
         :param action_id:
         """
-        super(SendMessage, self).__init__(context, params_schema, action_id, countdown)
+        BaseComponent.__init__(self, context, params_schema, action_id, countdown)
 
         # 补充标准通知命名空间下的变量（service_type_name / action 等），
         # 保证子组件 StringField 在 validate_inputs 渲染 ${...} 时白名单可放行
