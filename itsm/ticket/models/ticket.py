@@ -730,15 +730,15 @@ class Status(Model):
 
     def can_view(self, username, request=None):
         """能否查看节点"""
-
+        
         # 判断用户是否工单统计管理员，工单统计管理员无条件可以查看
         if UserRole.is_statics_manager(username):
             return True
-
+        
         # 超级管理员放这里，can_operate里带有工单是否结束的判断，无法过滤
         if UserRole.is_itsm_superuser(username):
             return True
-
+        
         # 我是当前处理人或历史处理人或过渡态的处理人
         return self.is_operator(username)
 
