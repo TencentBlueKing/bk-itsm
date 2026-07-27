@@ -205,6 +205,9 @@ class StatusSerializer(serializers.ModelSerializer):
             # 开放额外权限二：我能处理并行节点中的一个，就可以查看所有并行节点的详情
             elif inst.ticket.can_operate(username):
                 can_view = True
+            # 开放额外权限三：权限中心对该单据所属服务具备 ticket_view 权限
+            elif self.context.get("iam_ticket_view_authorized"):
+                can_view = True
 
         if inst.status in [RUNNING, FINISHED, QUEUEING]:
             # Only state in hand, Display fields and trigger button
