@@ -91,7 +91,7 @@ class Template:
                 templates += Template(value).get_templates()
         return list(set(templates))
 
-    def render(self, context: dict) -> Any:
+    def render(self, context: dict = None, **kwargs) -> Any:
         """
         渲染当前模板
 
@@ -100,6 +100,10 @@ class Template:
         :return: 模板渲染后的数据
         :rtype: Any
         """
+        if context is None:
+            context = kwargs
+        elif kwargs:
+            context = {**context, **kwargs}
         data = self.data
         if isinstance(data, str):
             return self._render_string(data, context)
@@ -114,9 +118,10 @@ class Template:
                 ldata[index] = Template(copy.deepcopy(item)).render(context)
             return tuple(ldata)
         if isinstance(data, dict):
-            for key, value in list(data.items()):
-                data[key] = Template(copy.deepcopy(value)).render(context)
-            return data
+            return {
+                key: Template(copy.deepcopy(value)).render(context)
+                for key, value in data.items()
+            }
         return data
 
     def _get_string_templates(self, string) -> List[str]:
