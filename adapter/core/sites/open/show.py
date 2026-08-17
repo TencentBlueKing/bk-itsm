@@ -48,4 +48,4 @@ def get_footer():
     return settings.FOOTER or FOOTER
 
 
-LOGIN_URL = settings.BK_PAAS_HOST + "/login/"
+LOGIN_URL = settings.LOGIN_URL

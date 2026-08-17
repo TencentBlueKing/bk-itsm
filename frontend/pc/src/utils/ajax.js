@@ -80,11 +80,14 @@ instance.interceptors.response.use(
   (response) => {
     if (response.config.url === 'init/') {
       if (response.status === 401) {
-        const { login_url } = response.data;
-        let [loginUrl] = login_url.split('?');
-        loginUrl = `${loginUrl}?c_url=${encodeURIComponent(location.href)}`;
+        const loginUrl = response.data && response.data.login_url ? response.data.login_url : window.login_url;
+        if (!loginUrl) {
+          return Promise.reject(new Error('登录地址未配置'));
+        }
 
-        window.open(loginUrl, '_self');
+        const loginTarget = new URL(loginUrl, window.location.origin);
+        loginTarget.searchParams.set('c_url', window.location.href);
+        window.location.replace(loginTarget.toString());
         return;
       }
       if ('IS_ITSM_ADMIN' in response.data.data) {
@@ -122,12 +125,17 @@ instance.interceptors.response.use(
       switch (response.status) {
         case 401: {
           // 登录控制
-          const data = response.data;
-          const successUrl = `${window.location.origin}${window.SITE_URL}static/assets/login_success.html`;
-          let [loginUrl] = data.login_url.split('?');
-          loginUrl = `${loginUrl}?c_url=${encodeURIComponent(successUrl)}`;
+          const data = response.data || {};
+          const loginUrl = data.login_url || window.login_url;
+          if (!loginUrl) {
+            return Promise.reject(new Error('登录地址未配置'));
+          }
 
-          showLoginModal({ loginUrl });
+          const successUrl = `${window.location.origin}${window.SITE_URL}static/assets/login_success.html`;
+          const loginTarget = new URL(loginUrl, window.location.origin);
+          loginTarget.searchParams.set('c_url', successUrl);
+
+          showLoginModal({ loginUrl: loginTarget.toString() });
           break;
         }
         case 403: {

@@ -40,6 +40,7 @@ from django.utils.functional import cached_property
 from config import (
     APP_CODE,
     BASE_DIR,
+    BK_LOGIN_URL,
     BK_URL,
     PROJECT_ROOT,
     BK_PAAS_HOST,
@@ -709,7 +710,7 @@ BK_USER_MANAGE_HOST = os.environ.get("BK_USER_MANAGE_HOST", USER_MANGE_HOST)
 
 BK_USER_MANAGE_WEIXIN_HOST = os.environ.get("BK_USER_MANAGE_WEIXIN_HOST", BK_PAAS_HOST)
 
-LOGIN_URL = BK_URL + "/login/"
+LOGIN_URL = BK_LOGIN_URL
 
 # 用户管理字段白名单
 BK_USER_DEFAULT_FIELDS = "id,username,display_name,domain,logo,category_id,category_name"

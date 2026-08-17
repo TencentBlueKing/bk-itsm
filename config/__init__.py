@@ -48,6 +48,7 @@ __all__ = [
     "RUN_VER",
     "APP_CODE",
     "SECRET_KEY",
+    "BK_LOGIN_URL",
     "BK_URL",
     "BASE_DIR",
     "PROJECT_PATH",
@@ -68,6 +69,7 @@ APP_ID = os.environ.get("BKPAAS_APP_ID", "")
 APP_TOKEN = os.environ.get("BKPAAS_APP_SECRET", "")
 # 蓝鲸SaaS平台URL，例如 http://paas.bking.com
 BK_PAAS_HOST = os.environ.get("BKAPP_PAAS_HOST", "")
+BK_LOGIN_URL = os.environ.get("BK_LOGIN_URL", "").strip()
 
 RUN_VER = os.environ.get("RUN_VER", RUN_VER)
 OPEN_VER = "enterprise"
