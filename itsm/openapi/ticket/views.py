@@ -24,9 +24,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import copy
+import traceback
+
 from django.conf import settings
 from django.db import transaction
 from django.utils.decorators import method_decorator
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -59,6 +62,8 @@ from itsm.component.exceptions import (
     OperateTicketError,
     ParamError,
     TicketNotFoundError,
+    TicketMultipleObjectsError,
+    Server500Error,
     CreateTicketError,
 )
 from itsm.openapi.decorators import catch_openapi_exception
@@ -123,17 +128,15 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             queryset = Ticket.objects.get_tickets(username, queryset, **kwargs)
         return queryset
 
-    @action(detail=False, methods=["get"], serializer_class=TicketStatusSerializer)
-    @custom_apigw_required
-    def get_ticket_status(self, request):
-        """
-        单据状态，支持根据单据sn查询
-        """
+    def _get_ticket_by_sn(self, sn):
+        """根据sn查询工单，统一处理不存在、重复及未知异常
 
+        :return: (ticket, error_response)；无异常时 error_response 为 None
+        """
         try:
-            ticket = self.queryset.get(sn=request.query_params.get("sn"))
+            return self.queryset.get(sn=sn), None
         except Ticket.DoesNotExist:
-            return Response(
+            return None, Response(
                 {
                     "result": False,
                     "code": TicketNotFoundError.ERROR_CODE_INT,
@@ -141,6 +144,39 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
                     "message": TicketNotFoundError.MESSAGE,
                 }
             )
+        except Ticket.MultipleObjectsReturned:
+            return None, Response(
+                {
+                    "result": False,
+                    "code": TicketMultipleObjectsError.ERROR_CODE_INT,
+                    "data": None,
+                    "message": TicketMultipleObjectsError.MESSAGE,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            logger.error(
+                "查询单据异常，sn={}, error={}\n{}".format(sn, e, traceback.format_exc())
+            )
+            return None, Response(
+                {
+                    "result": False,
+                    "code": Server500Error.ERROR_CODE_INT,
+                    "data": None,
+                    "message": "系统繁忙，请稍后重试",
+                }
+            )
+
+    @action(detail=False, methods=["get"], serializer_class=TicketStatusSerializer)
+    @custom_apigw_required
+    def get_ticket_status(self, request):
+        """
+        单据状态，支持根据单据sn查询
+        """
+
+        ticket, error_response = self._get_ticket_by_sn(request.query_params.get("sn"))
+        if error_response:
+            return error_response
 
         return Response(self.serializer_class(ticket).data)
 
@@ -252,17 +288,9 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         获取单据详情
         """
 
-        try:
-            ticket = self.queryset.get(sn=request.query_params.get("sn"))
-        except Ticket.DoesNotExist:
-            return Response(
-                {
-                    "result": False,
-                    "code": TicketNotFoundError.ERROR_CODE_INT,
-                    "data": None,
-                    "message": TicketNotFoundError.MESSAGE,
-                }
-            )
+        ticket, error_response = self._get_ticket_by_sn(request.query_params.get("sn"))
+        if error_response:
+            return error_response
 
         return Response(self.serializer_class(ticket).data)
 
@@ -294,17 +322,9 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         获取单据日志
         """
 
-        try:
-            ticket = self.queryset.get(sn=request.query_params.get("sn"))
-        except Ticket.DoesNotExist:
-            return Response(
-                {
-                    "result": False,
-                    "code": TicketNotFoundError.ERROR_CODE_INT,
-                    "data": None,
-                    "message": TicketNotFoundError.MESSAGE,
-                }
-            )
+        ticket, error_response = self._get_ticket_by_sn(request.query_params.get("sn"))
+        if error_response:
+            return error_response
 
         show_type = request.query_params.get("show_type", "simple")
         serializer_class = TicketLogsSerializer

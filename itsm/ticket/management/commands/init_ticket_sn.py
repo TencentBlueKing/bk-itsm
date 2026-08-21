@@ -106,7 +106,7 @@ class Command(BaseCommand):
                             f"[init_ticket_sn] {service_type}: Redis key '{key}' 已存在"
                         )
                     )
-                today_sn_prefix = prefix + now_time.strftime("%Y%m%d")
+                today_sn_prefix = prefix + "NEW" + now_time.strftime("%Y%m%d")
                 today_ticket_count = Ticket.objects.filter(
                     service_type=service_type,
                     sn__startswith=today_sn_prefix,
@@ -136,7 +136,7 @@ class Command(BaseCommand):
                 continue
 
             # 统计今天已有的工单数量
-            today_sn_prefix = prefix + now_time.strftime("%Y%m%d")
+            today_sn_prefix = prefix + "NEW" + now_time.strftime("%Y%m%d")
             today_ticket_count = Ticket.objects.filter(
                 service_type=service_type,
                 sn__startswith=today_sn_prefix,

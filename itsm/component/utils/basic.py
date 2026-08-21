@@ -620,7 +620,8 @@ def generate_random_sn(service_type):
     sn = (
         prefix_mapping[service_type]
         + "NEW"
-        + now_time.strftime("%Y%m%d")
+        + now_time.strftime("%Y%m%d%H%M%S")
+        + now_time.strftime("%f")[:3]
         + "{:0>6}".format(num)
     )
     return sn

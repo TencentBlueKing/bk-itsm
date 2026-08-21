@@ -2,6 +2,7 @@
 import traceback
 from functools import wraps
 
+from rest_framework import status
 from rest_framework.response import Response
 from django.utils.translation import gettext as _
 
@@ -9,7 +10,9 @@ from common.log import logger
 from itsm.component.drf.exception import ValidationError
 from itsm.component.exceptions import (
     TicketNotFoundError,
+    TicketMultipleObjectsError,
     ServerError,
+    Server500Error,
     ParamError,
     OperateTicketError,
     ServiceNotExist,
@@ -34,6 +37,16 @@ def catch_openapi_exception(view_func):
                     "data": None,
                     "message": TicketNotFoundError.MESSAGE,
                 }
+            )
+        except Ticket.MultipleObjectsReturned:
+            return Response(
+                {
+                    "result": False,
+                    "code": TicketMultipleObjectsError.ERROR_CODE_INT,
+                    "data": None,
+                    "message": TicketMultipleObjectsError.MESSAGE,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
         except Service.DoesNotExist:
             return Response(

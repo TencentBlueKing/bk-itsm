@@ -193,6 +193,12 @@ class TicketNotFoundError(ServerError):
     ERROR_CODE_INT = 3900022
 
 
+class TicketMultipleObjectsError(ServerError):
+    MESSAGE = _("SN 存在重复工单，请先清理历史重复数据")
+    ERROR_CODE = "TICKET_MULTIPLE_OBJECTS_ERROR"
+    ERROR_CODE_INT = 3900023
+
+
 class SlaTaskError(ServerError):
     MESSAGE = _("SLA任务异常")
     ERROR_CODE = "SLA_TASK_ERROR"
