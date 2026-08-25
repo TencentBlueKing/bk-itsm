@@ -23,5 +23,24 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from . import devops  # noqa
-from . import monitor  # noqa
+from . import base
+from . import devops
+from . import monitor
+from . import sops
+
+
+def get_client(gateway: str, username=None, request=None, **kwargs):
+    """
+    获取指定 APIGW 网关客户端，作为统一调用入口
+    """
+    from itsm.component.apigw.factory import (
+        get_client_by_request as _get_client_by_request,
+        get_client_by_username as _get_client_by_username,
+    )
+
+    if request is not None:
+        return _get_client_by_request(request, gateway=gateway, **kwargs)
+    return _get_client_by_username(username, gateway=gateway, **kwargs)
+
+
+__all__ = ["base", "devops", "monitor", "sops", "get_client"]
