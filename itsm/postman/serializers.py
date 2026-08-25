@@ -343,10 +343,10 @@ class TaskStateApiInfoSerializer(ApiInstanceSerializer):
         }
         try:
             req_body_data = json.loads(
-                Template(json.dumps(data["req_body"])).render(**params)
+                Template(json.dumps(data["req_body"])).render(params)
             )
             req_params = json.loads(
-                Template(json.dumps(data["req_params"])).render(**params)
+                Template(json.dumps(data["req_params"])).render(params)
             )
         except Exception:
             req_body_data = {}

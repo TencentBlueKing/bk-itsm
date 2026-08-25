@@ -11,15 +11,18 @@ an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express o
 specific language governing permissions and limitations under the License.
 """
 
+import copy
 import re
 import logging
 
 from typing import Any, List, Set
 
+from django.conf import settings
 from mako.template import Template as MakoTemplate
 from mako import lexer, codegen
 from mako.exceptions import MakoException
 
+from common.template import sandbox
 from common.template.mako_utils import mako_safety
 from common.template.mako_utils.checker import check_mako_template_safety
 from common.template.mako_utils.exceptions import ForbiddenMakoTemplateException
@@ -38,7 +41,13 @@ INDEX_STR_PATTERN = r'\[("\w+"|\'\w+\'|\d+)\]'
 # 同步覆盖一份 _ForbiddenProxy，作为静态层 AST 白名单之外的纵深防御。若 Mako 运行时
 # 优先使用自身注入对象，本层覆盖无副作用；若有遗漏的代码路径读到 data 中的同名键，
 # 任何属性访问/调用/格式化都会立即抛 ForbiddenMakoTemplateException。
-_RUNTIME_SHIELD_KEYS = ("self", "local", "context", "caller", "next", "parent", "capture")
+#
+# 直接复用 mako_safety.MAKO_RESERVED_NAMESPACES 作为唯一事实源（single source of truth），
+# 保证静态层 AST 白名单与运行时屏蔽两层完全对齐，避免后续维护时遗漏。
+# 额外加入 "capture"（Mako 内置的 capture() 调用代理，也可作为 SSTI 跳板）。
+_RUNTIME_SHIELD_KEYS = tuple(mako_safety.MAKO_RESERVED_NAMESPACES) + ("capture",)
+
+
 
 
 class Template:
@@ -91,15 +100,29 @@ class Template:
         :return: 模板渲染后的数据
         :rtype: Any
         """
+        if context is None:
+            context = kwargs
+        elif kwargs:
+            context = {**context, **kwargs}
         data = self.data
-        if not isinstance(data, str):
-            raise Exception(
-                "render type error, template[%s] is not a string" % self.data
-            )
-
-        context = context or kwargs
         if isinstance(data, str):
             return self._render_string(data, context)
+        if isinstance(data, list):
+            ldata = [""] * len(data)
+            for index, item in enumerate(data):
+                ldata[index] = Template(copy.deepcopy(item)).render(context)
+            return ldata
+        if isinstance(data, tuple):
+            ldata = [""] * len(data)
+            for index, item in enumerate(data):
+                ldata[index] = Template(copy.deepcopy(item)).render(context)
+            return tuple(ldata)
+        if isinstance(data, dict):
+            return {
+                key: Template(copy.deepcopy(value)).render(context)
+                for key, value in data.items()
+            }
+        return data
 
     def _get_string_templates(self, string) -> List[str]:
         return list(set(TEMPLATE_PATTERN.findall(string)))
@@ -110,7 +133,7 @@ class Template:
         try:
             node = lex.parse()
         except MakoException as e:
-            logger.warning("pipeline get template[%s] reference error[%s]", template, e)
+            logger.warning("pipeline get template[{}] reference error[{}]".format(template, e))
             return []
 
         # Dummy compiler. _Identifiers class requires one
@@ -144,7 +167,16 @@ class Template:
 
             # directly get value from context
             if deformat_string in context:
-                return context[deformat_var_key(string)]
+                return context[deformat_string]
+
+            # nested get value from tuple/list/dict
+            match = re.match(NESTED_INDEX_STR_PATTERN, deformat_string)
+            if settings.ENABLE_RENDER_OBJ_BY_MAKO_STRING and match and match.group(1) in context:
+                try:
+                    return self._nested_get_value_from_context(context[match.group(1)], deformat_string)
+                except Exception as e:
+                    logger.exception("render obj from nested mako string failed: {}".format(e))
+                    pass
 
         for tpl in templates:
             try:
@@ -154,15 +186,33 @@ class Template:
                     mako_safety.SingleLinCodeExtractor(),
                 )
             except ForbiddenMakoTemplateException as e:
-                logger.warning(
-                    "forbidden template: %s, exception: %s",
-                    sanitize_user_content(tpl),
-                    e,
-                )
+                logger.warning("forbidden template: {}, exception: {}".format(tpl, e))
                 continue
             except Exception:
-                logger.exception("%s safety check error.", sanitize_user_content(tpl))
+                logger.exception("{} safety check error.".format(tpl))
                 continue
+
+            # 根标识符白名单：只允许引用 ``context`` 已知键、导入模块别名、
+            # SAFE_BUILTIN_NAMES 与 ``MAKO_TEMPLATE_NAME_EXTRA_WHITELIST``，
+            # 显式拒绝 ``self/context/local/parent/next/caller`` 等 Mako 保留命名空间。
+            whitelist_mode = getattr(settings, "MAKO_TEMPLATE_NAME_WHITELIST_MODE", "off")
+            if whitelist_mode in {"warn", "enforce"}:
+                try:
+                    allowed_names = mako_safety.build_allowed_names(context)
+                    check_mako_template_safety(
+                        tpl,
+                        mako_safety.WhitelistNameVisitor(allowed_names, mode=whitelist_mode),
+                        mako_safety.SingleLinCodeExtractor(),
+                    )
+                except ForbiddenMakoTemplateException as e:
+                    logger.warning(
+                        "forbidden by whitelist: {}, exception: {}".format(tpl, e)
+                    )
+                    continue
+                except Exception:
+                    logger.exception("{} whitelist check error.".format(tpl))
+                    continue
+
             resolved = Template._render_template(tpl, context)
             string = string.replace(tpl, str(resolved))
         return string
@@ -179,7 +229,7 @@ class Template:
             elif isinstance(cur_context, (list, tuple)):
                 cur_context = cur_context[int(key)]
             else:
-                raise ValueError("invalid context type: %s", type(cur_context))
+                raise ValueError("invalid context type: {}".format(type(cur_context)))
         return cur_context
 
     @staticmethod
@@ -195,38 +245,69 @@ class Template:
         :return: [description]
         :rtype: str
         """
-        data = {}
-        data.update(context)
-        data.update(Sandbox().get())
-        # 运行时纵深防御：覆盖 Mako Namespace 相关名为屏蔽代理，禁止经由 data 抵达 self.module 等
-        for shield_key in _RUNTIME_SHIELD_KEYS:
-            data[shield_key] = _ForbiddenProxy(shield_key)
-
+        # 注入顺序极其关键：
+        #   1) 先放业务 ``context``，允许业务字段进入命名空间；
+        #   2) 再用 ``sandbox.get()`` 覆盖，确保 ``eval``/``exec``/``globals``/
+        #      ``getattr``/``__import__`` 等屏蔽词永远是 ``_ForbiddenProxy``，
+        #      即便业务 context 中存在同名键也无法绕过；
+        #   3) 最后差异化覆盖 Mako 保留命名空间名（``self``/``context`` 强制覆盖，
+        #      其它如 ``next``/``parent``/``local`` 仅在 data 中不存在同名键时注入，
+        #      避免误伤业务字段）。
         if not isinstance(template, str):
-            raise TypeError(
-                "constant resolve error, template[%s] is not a string", template
-            )
+            raise TypeError("constant resolve error, template[%s] is not a string" % template)
+
         try:
             tm = MakoTemplate(template)
         except (MakoException, SyntaxError) as e:
-            logger.error(
-                "pipeline resolve template[%s] error[%s]",
-                sanitize_user_content(template),
-                e,
-            )
+            logger.error("pipeline resolve template[{}] error[{}]".format(template, e))
             return template
+
+        data = {}
+        data.update(context)
+        data.update(Sandbox().get())
+
+        # 高危核心名：无条件覆盖。SSTI 主入口，绝不让步。
+        for shield_key in ("self", "context"):
+            data[shield_key] = _ForbiddenProxy(shield_key)
+        # 其它 Mako 保留名：仅在不存在同名业务键时注入，避免误伤。
+        for shield_key in _RUNTIME_SHIELD_KEYS:
+            if shield_key in ("self", "context"):
+                continue
+            if shield_key not in data:
+                data[shield_key] = _ForbiddenProxy(shield_key)
+
+        # Mako 的渲染入口签名为 ``render_unicode(self, *args, **data)``，而模板编译出的
+        # ``render_body(context, **pageargs)`` 会把 ``context`` 作为位置参数。若 ``data``
+        # 中包含这些保留名，会导致：
+        #   - ``self``            -> 与 render_unicode 的 bound-method 首参撞名
+        #                              ("got multiple values for argument 'self'")
+        #   - ``context``/``UNDEFINED``/``STOP_RENDERING``/``loop`` -> Mako 在
+        #     ``Context._set_with_template`` 里检测到保留字后会抛 NameConflictError。
+        # 这些名即便注入到 ``data`` 也无法在运行期生效：
+        #   * ``self``/``local``：Mako 在 ``_populate_self_namespace`` 中会用真实
+        #     TemplateNamespace 覆盖 ``_data``；
+        #   * ``context``/``UNDEFINED``/``STOP_RENDERING``：Mako 编译期把它们编译成
+        #     直接引用（LOAD_FAST/LOAD_GLOBAL），根本不走 ``context.get()``。
+        # 因此这里统一从渲染 kwargs 中剔除，运行期防护由 AST 白名单（enforce 模式）保证，
+        # 其余经 ``context.get()`` 解析的屏蔽词（module/cache/util/...）仍保留在 ``data``
+        # 中发挥作用。
+        for reserved_name in tm.reserved_names | {"self"}:
+            data.pop(reserved_name, None)
+
         try:
             resolved = tm.render_unicode(**data)
         except Exception as e:
-            # 严格模式下，沙箱屏蔽词的 _ForbiddenProxy 在 __repr__/__str__ 中也会抛异常，
-            # 因此这里禁止直接将 data 字典（含代理对象）传入 logger 格式化，
-            # 改为仅记录上下文键名 + 异常类型/消息，避免日志静默丢失，且降低敏感数据外溢风险。
+            # 注意：``data`` 中含 ``_ForbiddenProxy`` 实例，其 ``__repr__`` 会主动抛
+            # ForbiddenMakoTemplateException。如果直接 ``"{}".format(data)`` 整段打印，
+            # 异常会从本 except 块二次逃逸，导致这条审计日志彻底丢失。
+            # 这里只打印 data 的"键名集合"用于排障，不触达任何 value 的 repr。
+            try:
+                data_keys = sorted(data.keys())
+            except Exception:  # pragma: no cover - defensive
+                data_keys = "<unprintable>"
             logger.warning(
-                "constant content(%s) is invalid, context_keys=%s, error_type=%s, error=%s",
-                sanitize_user_content(template),
-                sorted(list(context.keys())) if isinstance(context, dict) else type(context).__name__,
-                type(e).__name__,
-                sanitize_user_content(str(e)),
+                "constant content(%s) is invalid, data_keys=%s, error: %s",
+                template, data_keys, e,
             )
             return template
         else:

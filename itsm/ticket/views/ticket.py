@@ -85,6 +85,7 @@ from itsm.component.constants import (
 )
 from itsm.component.constants.flow import EXPORT_SUPPORTED_TYPE
 from itsm.component.dlls.component import ComponentLibrary
+from itsm.auth_iam.utils import IamRequest
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.drf.pagination import CustomPageNumberPagination
 from itsm.component.drf.permissions import IamAuthSystemPermit
@@ -541,7 +542,7 @@ class TicketModelViewSet(ModelViewSet):
         # 发送前创建邀请记录
         links = []
         fail_numbers = []
-        title = Template(custom_notify.title_template).render(**context)
+        title = Template(custom_notify.title_template).render(context)
         for number in numbers:
             code = TicketCommentInvite.get_unique_code()
             ticket_url = "{}{}".format(OUT_LINK, code)
@@ -551,7 +552,7 @@ class TicketModelViewSet(ModelViewSet):
             notifier = SmsNotifier(
                 title=title,
                 receivers=receiver,
-                message=Template(content_template).render(**context),
+                message=Template(content_template).render(context),
                 receiver_nums=number,
             )
 
@@ -619,9 +620,9 @@ class TicketModelViewSet(ModelViewSet):
             context.update(ticket_url=ticket_url)
             
             notifier = EmailNotifier(
-                title=Template(custom_notify.title_template).render(**context),
+                title=Template(custom_notify.title_template).render(context),
                 receivers=[receiver_user],
-                message=Template(custom_notify.content_template).render(**context),
+                message=Template(custom_notify.content_template).render(context),
             )
             
             try:
@@ -1171,7 +1172,7 @@ class TicketModelViewSet(ModelViewSet):
         supervise_validate(ticket, username)
 
         message = request.data.get("message") or Template(SUPERVISE_MESSAGE).render(
-            **{"title": ticket.title}
+            {"title": ticket.title}
         )
         # 构造快速审批通知信息
         for step in ticket.current_steps:
@@ -1487,6 +1488,27 @@ class TicketModelViewSet(ModelViewSet):
                     ~Q(status__in=["TERMINATED"]) | Q(state_id=ticket.first_state_id)
                 )
             show_all_fields = many or status.status != "FINISHED"
+
+            # 权限中心 ticket_view 授权：用户对该单据所属服务具备查看权限时，节点 can_view 同样放行
+            # 仅当本地可见性校验不通过时才发起一次 IAM 远程调用，避免无谓开销
+            iam_ticket_view_authorized = False
+            if not ticket.can_view(request.user.username):
+                try:
+                    auth_actions = IamRequest(request).resource_multi_actions_allowed(
+                        ["ticket_view"],
+                        [
+                            {
+                                "resource_id": str(ticket.service_id),
+                                "resource_name": ticket.service_name,
+                                "resource_type": "service",
+                            }
+                        ],
+                        project_key=ticket.project_key,
+                    )
+                    iam_ticket_view_authorized = bool(auth_actions.get("ticket_view"))
+                except Exception:
+                    logger.exception("iam ticket_view check failed")
+
             ticket_status = StatusSerializer(
                 status,
                 many=many,
@@ -1495,6 +1517,7 @@ class TicketModelViewSet(ModelViewSet):
                     "bk_biz_id": ticket.bk_biz_id,
                     "show_all_fields": show_all_fields,
                     "is_master_proxy": getattr(ticket, "is_master_proxy", False),
+                    "iam_ticket_view_authorized": iam_ticket_view_authorized,
                 },
             )
             return Response(ticket_status.data)

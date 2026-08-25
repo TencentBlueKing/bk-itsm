@@ -24,10 +24,15 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django.utils.translation import gettext as _
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from itsm.component.constants import NOTIFY_GLOBAL_VARIABLES, PUBLIC_PROJECT_PROJECT_KEY
+from itsm.component.constants import (
+    NOTIFY_GLOBAL_VARIABLES,
+    PUBLIC_PROJECT_PROJECT_KEY,
+    ResponseCodeStatus,
+)
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.exceptions import MigrateDataError
 from itsm.iadmin.contants import ACTION_CHOICES, ACTION_CLASSIFY
@@ -135,6 +140,43 @@ class CustomNotifyViewSet(ModelViewSet):
         used_by = request.query_params.get("used_by")
         data = dict(ACTION_CHOICES)
         return Response(ACTION_CLASSIFY.get(used_by, data))
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            {
+                "result": True,
+                "code": ResponseCodeStatus.OK,
+                "message": _("新增成功"),
+                "data": serializer.data,
+            },
+            status=status.HTTP_201_CREATED,
+            headers=headers,
+        )
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial
+        )
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        if getattr(instance, "_prefetched_objects_cache", None):
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial
+            )
+        return Response(
+            {
+                "result": True,
+                "code": ResponseCodeStatus.OK,
+                "message": _("编辑成功"),
+                "data": serializer.data,
+            }
+        )
 
 
 class VersionLogsViewSet(component_viewsets.ReadOnlyModelViewSet):

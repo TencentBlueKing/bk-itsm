@@ -730,15 +730,15 @@ class Status(Model):
 
     def can_view(self, username, request=None):
         """能否查看节点"""
-
+        
         # 判断用户是否工单统计管理员，工单统计管理员无条件可以查看
         if UserRole.is_statics_manager(username):
             return True
-
+        
         # 超级管理员放这里，can_operate里带有工单是否结束的判断，无法过滤
         if UserRole.is_itsm_superuser(username):
             return True
-
+        
         # 我是当前处理人或历史处理人或过渡态的处理人
         return self.is_operator(username)
 
@@ -3816,10 +3816,17 @@ class Ticket(Model, BaseTicket):
 
         # Send notify
         processor = node_status.get_processor_in_sign_state()
+        notify_receivers = processor
+        if (
+            self.flow.is_auto_approve
+            and processor
+            and self.creator in processor.split(",")
+        ):
+            notify_receivers = ""
         # TODO 发送通知可用触发器替代
         self.notify(
             state_id,
-            processor,
+            notify_receivers,
             action=TRANSITION_OPERATE,
             retry=kwargs.get("retry", True),
         )

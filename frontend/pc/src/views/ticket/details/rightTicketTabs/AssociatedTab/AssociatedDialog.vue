@@ -353,6 +353,7 @@
       },
       // 分页过滤数据
       handlePageLimitChange() {
+        this.pagination.current = 1;
         this.pagination.limit = arguments[0];
         this.getList();
       },

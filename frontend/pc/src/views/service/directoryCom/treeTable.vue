@@ -498,6 +498,7 @@
       },
       // 分页过滤数据
       addPageLimitChange() {
+        this.entryInfo.pagination.current = 1;
         this.entryInfo.pagination.limit = arguments[0];
         this.getEntryList();
       },

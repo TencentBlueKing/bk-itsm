@@ -1237,6 +1237,7 @@ export const m = {
     请输入函数名称: 'Enter the name of the function. ',
     函数名称不能为空: 'Function Name is required ',
     接口路径: 'API Path ',
+    请输入接口路径: 'Enter the path of the interface ',
     版本号: 'Version Number ',
     版本号名称不能为空: 'Version Number is required ',
     API描述: 'API Description ',

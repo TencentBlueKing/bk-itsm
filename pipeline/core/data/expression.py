@@ -141,7 +141,7 @@ class ConstantTemplate(object):
             logger.error("pipeline resolve template[{}] error[{}]".format(template, e))
             return template
         try:
-            resolved = tm.render(**value_maps)
+            resolved = tm.render(value_maps)
         except (NameError, TypeError, KeyError) as e:
             logger.warning(
                 "constant content is invalid, variable referred does not exist or variable type error[%s]" % e
