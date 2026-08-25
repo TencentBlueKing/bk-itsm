@@ -941,7 +941,6 @@ OPEN_VOICE_NOTICE = (
 BK_APIGW_NAME = os.getenv("BK_APIGW_NAME", "bk-itsm")
 # APIGW 访问地址
 BK_API_URL_TMPL = os.getenv("BK_API_URL_TMPL")
-
 BK_NOTICE = {"BK_API_URL_TMPL": BK_API_URL_TMPL or ""}
 
 # 蓝鲸插件授权过滤 APP
