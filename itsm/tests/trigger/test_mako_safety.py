@@ -44,6 +44,7 @@ def _check(expr: str):
         "${a[\"a\"][0]}",
         "${a[\"a\"][\"b\"][\"c\"]}",
         "${a[0][1][2]}",
+        "${a[0, 1]}",  # 多维 tuple 下标
         # Subscript + 字符串方法
         "${a[\"a\"].upper()}",
         "${a[0][\"a\"].strip()}",
@@ -64,6 +65,13 @@ def _check(expr: str):
         "${time.time()}",
         "${time.strftime('%Y-%m-%d', t)}",
         "${time.localtime()}",
+        # 受信模块完整白名单成员（token 集合）
+        "${datetime.timedelta(days=1)}",
+        "${datetime.timezone}",
+        "${datetime.datetime.utcnow()}",
+        "${time.monotonic()}",
+        "${time.mktime(t)}",
+        "${time.sleep}",
         # 取值链 + 一次方法调用
         "${a.b.c.upper()}",
         # dict 写方法白名单：update / setdefault
@@ -274,5 +282,34 @@ def test_dynamic_subscript_rejected(expr):
     ],
 )
 def test_dict_mutation_attack_rejected(expr):
+    with pytest.raises(ForbiddenMakoTemplateException):
+        _check(expr)
+
+
+# -------- 必拒：单下划线根名（私有/内部名） --------
+
+@pytest.mark.parametrize(
+    "expr",
+    [
+        "${_private}",
+        "${_}",
+        "${_hidden}",
+    ],
+)
+def test_single_underscore_name_rejected(expr):
+    with pytest.raises(ForbiddenMakoTemplateException):
+        _check(expr)
+
+
+# -------- 必拒：函数/类定义（Code 块） --------
+
+@pytest.mark.parametrize(
+    "expr",
+    [
+        "<% def f(): pass %>",
+        "<% class C: pass %>",
+    ],
+)
+def test_function_class_def_rejected(expr):
     with pytest.raises(ForbiddenMakoTemplateException):
         _check(expr)
