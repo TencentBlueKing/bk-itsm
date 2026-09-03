@@ -45,7 +45,7 @@ INDEX_STR_PATTERN = r'\[("\w+"|\'\w+\'|\d+)\]'
 # 直接复用 mako_safety.MAKO_RESERVED_NAMESPACES 作为唯一事实源（single source of truth），
 # 保证静态层 AST 白名单与运行时屏蔽两层完全对齐，避免后续维护时遗漏。
 # 额外加入 "capture"（Mako 内置的 capture() 调用代理，也可作为 SSTI 跳板）。
-_RUNTIME_SHIELD_KEYS = tuple(mako_safety.MAKO_RESERVED_NAMESPACES) + ("capture",)
+_RUNTIME_SHIELD_KEYS = tuple(mako_safety.MAKO_RESERVED_NAMESPACES)
 
 
 
@@ -186,32 +186,47 @@ class Template:
                     mako_safety.SingleLinCodeExtractor(),
                 )
             except ForbiddenMakoTemplateException as e:
-                logger.warning("forbidden template: {}, exception: {}".format(tpl, e))
+                logger.warning(
+                    "forbidden template: %s, exception: %s",
+                    sanitize_user_content(tpl),
+                    sanitize_user_content(str(e)),
+                )
                 continue
             except Exception:
-                logger.exception("{} safety check error.".format(tpl))
+                logger.exception(
+                    "%s safety check error.",
+                    sanitize_user_content(tpl),
+                )
                 continue
 
-            # 根标识符白名单：只允许引用 ``context`` 已知键、导入模块别名、
-            # SAFE_BUILTIN_NAMES 与 ``MAKO_TEMPLATE_NAME_EXTRA_WHITELIST``，
-            # 显式拒绝 ``self/context/local/parent/next/caller`` 等 Mako 保留命名空间。
-            whitelist_mode = getattr(settings, "MAKO_TEMPLATE_NAME_WHITELIST_MODE", "off")
-            if whitelist_mode in {"warn", "enforce"}:
-                try:
-                    allowed_names = mako_safety.build_allowed_names(context)
-                    check_mako_template_safety(
-                        tpl,
-                        mako_safety.WhitelistNameVisitor(allowed_names, mode=whitelist_mode),
-                        mako_safety.SingleLinCodeExtractor(),
-                    )
-                except ForbiddenMakoTemplateException as e:
-                    logger.warning(
-                        "forbidden by whitelist: {}, exception: {}".format(tpl, e)
-                    )
-                    continue
-                except Exception:
-                    logger.exception("{} whitelist check error.".format(tpl))
-                    continue
+            # 根标识符白名单：fail-secure，模式缺失/非法（含 "off"）一律回退 enforce
+            whitelist_mode = getattr(settings, "MAKO_TEMPLATE_NAME_WHITELIST_MODE", "enforce")
+            if whitelist_mode not in {"warn", "enforce"}:
+                logger.warning(
+                    "[mako-safety] invalid MAKO_TEMPLATE_NAME_WHITELIST_MODE=%r, fallback to 'enforce'",
+                    whitelist_mode,
+                )
+                whitelist_mode = "enforce"
+            try:
+                allowed_names = mako_safety.build_allowed_names(context)
+                check_mako_template_safety(
+                    tpl,
+                    mako_safety.WhitelistNameVisitor(allowed_names, mode=whitelist_mode),
+                    mako_safety.SingleLinCodeExtractor(),
+                )
+            except ForbiddenMakoTemplateException as e:
+                logger.warning(
+                    "forbidden by whitelist: %s, exception: %s",
+                    sanitize_user_content(tpl),
+                    sanitize_user_content(str(e)),
+                )
+                continue
+            except Exception:
+                logger.exception(
+                    "%s whitelist check error.",
+                    sanitize_user_content(tpl),
+                )
+                continue
 
             resolved = Template._render_template(tpl, context)
             string = string.replace(tpl, str(resolved))

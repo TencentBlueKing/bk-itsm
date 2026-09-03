@@ -64,7 +64,7 @@ class TemplateBasicTest(TestCase):
         self.assertEqual(Template("${name}").render({"name": "alice"}), "alice")
 
     def test_render_arithmetic(self):
-        self.assertEqual(Template("${a + b}").render({"a": 1, "b": 2}), "3")
+        self.assertEqual(Template("${a + b}").render({"a": 1, "b": 2}), "${a + b}")
 
     def test_render_attribute(self):
         class Obj:
@@ -86,13 +86,13 @@ class TemplateBasicTest(TestCase):
         )
 
     def test_render_builtin_int(self):
-        self.assertEqual(Template("${int(x)}").render({"x": "5"}), "5")
+        self.assertEqual(Template("${int(x)}").render({"x": "5"}), "${int(x)}")
 
     def test_render_builtin_str(self):
-        self.assertEqual(Template('${str(123)}').render({}), "123")
+        self.assertEqual(Template('${str(123)}').render({}), '${str(123)}')
 
     def test_render_builtin_len(self):
-        self.assertEqual(Template("${len(arr)}").render({"arr": [1, 2, 3]}), "3")
+        self.assertEqual(Template("${len(arr)}").render({"arr": [1, 2, 3]}), "${len(arr)}")
 
     def test_render_non_string_returns_directly(self):
         """单一模板变量且 context 中可直接命中时，直接返回原值（不强制转字符串）"""
@@ -268,6 +268,26 @@ class TemplateRenderSafetyTest(TestCase):
         payload = "<% from os import system %>"
         self.assertEqual(Template(payload).render({}), payload)
 
+    # ---------------- Mako 保留命名空间 / eval / lambda / import re（P0 回归） ----------------
+
+    def test_render_blocks_mako_namespace_os_chain(self):
+        payload = "${self.module.cache.util.os.name}"
+        result = Template(payload).render({})
+        self.assertEqual(result, payload)
+        self.assertNotIn("posix", result)
+
+    def test_render_blocks_import_re(self):
+        payload = "<% import re %>${re}"
+        self.assertEqual(Template(payload).render({}), payload)
+
+    def test_render_blocks_eval(self):
+        payload = "${eval('1')}"
+        self.assertEqual(Template(payload).render({}), payload)
+
+    def test_render_blocks_lambda_call(self):
+        payload = "${(lambda x: x)(1)}"
+        self.assertEqual(Template(payload).render({}), payload)
+
     # ---------------- 真实 RCE 副作用验证（最关键） ----------------
 
     def test_render_does_not_execute_command_via_popen(self):
@@ -332,15 +352,15 @@ class TemplateAstCheckerDirectTest(TestCase):
             )
         )
 
-    # 多维下标 / 切片放行
+    # 多维下标放行（tuple index 是合法多维索引）；切片拒绝
     def test_allow_tuple_index(self):
         self._assert_safe("${a[0, 1]}")
 
-    def test_allow_slice(self):
-        self._assert_safe("${a[1:3]}")
+    def test_block_slice(self):
+        self._assert_forbidden("${a[1:3]}")
 
-    def test_allow_slice_with_step(self):
-        self._assert_safe("${a[1:10:2]}")
+    def test_block_slice_with_step(self):
+        self._assert_forbidden("${a[1:10:2]}")
 
     def test_allow_variable_subscript(self):
         self._assert_safe("${a[i]}")

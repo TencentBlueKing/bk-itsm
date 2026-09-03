@@ -126,7 +126,7 @@ def sanitize_user_content(content):
     elif isinstance(content, list):
         return [sanitize_user_content(element) for element in content]
     elif isinstance(content, str):
-        return content.replace("\r\n", "").replace("\n", "")
+        return content.replace("\r\n", "").replace("\n", "").replace("\r", "")
     else:
         return content
 
