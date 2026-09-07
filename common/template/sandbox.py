@@ -161,6 +161,12 @@ MAKO_SANDBOX_FORBIDDEN_MODULES = frozenset(
         "logging",
         # Django 内部（防止读取 settings/secret_key 等敏感对象）
         "django",
+        # 正则引擎（re 可作绕过辅助/ReDoS；sre_* 是其底层实现）
+        "re",
+        "sre_compile",
+        "sre_parse",
+        "sre_constants",
+        "sre",
     }
 )
 
@@ -262,6 +268,15 @@ class Sandbox:
     @staticmethod
     def _import_modules(sandbox: dict, modules: Dict[str, str]):
         for mod_path, alias in modules.items():
+            # 硬编码黑名单不可被 settings 覆盖：mod_path/alias 根名命中即拒绝加载
+            mod_root = mod_path.split(".", 1)[0]
+            alias_root = alias.split(".", 1)[0] if alias else ""
+            if mod_root in MAKO_SANDBOX_FORBIDDEN_MODULES or alias_root in MAKO_SANDBOX_FORBIDDEN_MODULES:
+                logger.error(
+                    "[mako-sandbox] refuse to import forbidden module: mod_path=%s, alias=%s",
+                    mod_path, alias,
+                )
+                continue
             mod = importlib.import_module(mod_path)
             sub_paths = alias.split(".")
             if len(sub_paths) == 1:

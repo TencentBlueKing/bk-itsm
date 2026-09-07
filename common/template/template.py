@@ -14,6 +14,7 @@ specific language governing permissions and limitations under the License.
 import copy
 import re
 import logging
+import types
 
 from typing import Any, List, Set
 
@@ -104,6 +105,8 @@ class Template:
             context = kwargs
         elif kwargs:
             context = {**context, **kwargs}
+        # 清洗渲染上下文：模块对象/可调用对象替换为代理，防止模板触达其成员
+        context = self._sanitize_render_context(context)
         data = self.data
         if isinstance(data, str):
             return self._render_string(data, context)
@@ -123,6 +126,22 @@ class Template:
                 for key, value in data.items()
             }
         return data
+
+    @staticmethod
+    def _sanitize_render_context(context):
+        """把 context 中值为模块对象/可调用对象的键替换为 _ForbiddenProxy，防止模板触达。"""
+        if not isinstance(context, dict) or not context:
+            return context
+        sanitized = dict(context)
+        for key, value in list(sanitized.items()):
+            if isinstance(value, types.ModuleType) or callable(value):
+                logger.warning(
+                    "[mako-safety] unsafe context value replaced by proxy: key=%s, type=%s",
+                    sanitize_user_content(key),
+                    type(value).__name__,
+                )
+                sanitized[key] = _ForbiddenProxy(key)
+        return sanitized
 
     def _get_string_templates(self, string) -> List[str]:
         return list(set(TEMPLATE_PATTERN.findall(string)))
