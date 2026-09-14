@@ -36,6 +36,7 @@ from django.conf import settings
 from django.test import TestCase, override_settings
 from common.cipher import AESVerification
 from common.redis import Cache
+from itsm.component.exceptions import TicketMultipleObjectsError
 from itsm.tests.openapi.params import CREATE_TICKET_DATA
 from itsm.ticket.models import Ticket, AttentionUsers, TicketComment
 from itsm.service.models import Service, CatalogService
@@ -303,6 +304,33 @@ class TicketOpenTest(TestCase):
         self.assertEqual(resp.data["code"], 0)
         self.assertEqual(resp.data["data"]["sn"], sn)
         self.assertEqual(resp.data["message"], "success")
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.component.decorators.JWTClient")
+    def test_get_ticket_info_duplicate_sn(self, patch_jwt_client):
+        """同一SN存在多条工单时，应返回明确错误码而非SERVER_500_ERROR"""
+        patch_jwt_client.is_valid.return_value = True
+        sn = "REQTEST20260821000001"
+
+        # 构造两条相同 sn 的非草稿工单，模拟历史重复数据
+        Ticket.objects.create(
+            sn=sn, title="test_ticket_1", service_id=1,
+            service_type="request", is_draft=False,
+        )
+        Ticket.objects.create(
+            sn=sn, title="test_ticket_2", service_id=1,
+            service_type="request", is_draft=False,
+        )
+
+        url = "/openapi/ticket/get_ticket_info/"
+
+        resp = self.client.get(url, {"sn": sn})
+
+        self.assertEqual(resp.data["result"], False)
+        self.assertEqual(
+            resp.data["code"], TicketMultipleObjectsError.ERROR_CODE_INT
+        )
+        self.assertIn("重复", resp.data["message"])
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.component.decorators.JWTClient")
