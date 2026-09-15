@@ -313,3 +313,45 @@ def test_single_underscore_name_rejected(expr):
 def test_function_class_def_rejected(expr):
     with pytest.raises(ForbiddenMakoTemplateException):
         _check(expr)
+
+
+# -------- 必拒：frame 反射 / 危险属性链（always-on） --------
+
+@pytest.mark.parametrize(
+    "expr",
+    [
+        "${g.gi_frame}",
+        "${g.gi_frame.f_builtins}",
+        "${g.f_globals}",
+        "${g.cr_frame}",
+        "${a['gi_frame']}",
+        "${a.path.os}",
+        "${a.sys}",
+        "${a.modules}",
+        "${a.popen()}",
+        "${a.system()}",
+    ],
+)
+def test_frame_and_dangerous_attr_rejected(expr):
+    with pytest.raises(ForbiddenMakoTemplateException):
+        _check(expr)
+
+
+def test_filter_import_modules_rejects_os_alias():
+    from common.template.sandbox import filter_import_modules
+
+    safe = filter_import_modules({"os": "safeos", "json": "json"})
+    assert "os" not in safe
+    assert safe.get("json") == "json"
+
+
+def test_sanitize_render_context_drops_module_keeps_str():
+    import re as re_mod
+
+    from common.template.sandbox import sanitize_render_context
+
+    cleaned = sanitize_render_context({"re": re_mod, "sn": "ok", "nested": {"mod": re_mod, "n": 1}})
+    assert "re" not in cleaned
+    assert cleaned["sn"] == "ok"
+    assert "mod" not in cleaned["nested"]
+    assert cleaned["nested"]["n"] == 1

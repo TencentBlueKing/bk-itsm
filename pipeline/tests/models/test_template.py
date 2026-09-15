@@ -288,6 +288,56 @@ class TemplateRenderSafetyTest(TestCase):
         payload = "${(lambda x: x)(1)}"
         self.assertEqual(Template(payload).render({}), payload)
 
+    def test_render_blocks_gi_frame_attr(self):
+        payload = "${g.gi_frame}"
+        result = Template(payload).render({"g": (i for i in [1])})
+        self.assertEqual(result, payload)
+
+    def test_render_drops_module_from_context_keeps_fields(self):
+        import re as re_mod
+
+        self.assertEqual(
+            Template("${sn}").render({"re": re_mod, "sn": "ok"}),
+            "ok",
+        )
+        self.assertEqual(Template("${re}").render({"re": re_mod, "sn": "ok"}), "${re}")
+
+    def test_render_keeps_string_field_named_re(self):
+        self.assertEqual(Template("${re}").render({"re": "field-ok"}), "field-ok")
+
+    def test_warn_mode_still_blocks_mako_namespace_os_chain(self):
+        from django.test import override_settings
+
+        payload = "${self.module.cache.util.os.name}"
+        with override_settings(MAKO_TEMPLATE_NAME_WHITELIST_MODE="warn"):
+            result = Template(payload).render({})
+        self.assertEqual(result, payload)
+        self.assertNotIn("posix", result)
+
+    def test_refuses_dangerous_import_alias(self):
+        from django.test import override_settings
+
+        from common.template.sandbox import Sandbox
+
+        with override_settings(MAKO_SANDBOX_IMPORT_MODULES={"os": "safeos"}):
+            sandbox = Sandbox().get()
+            result = Template("${safeos}").render({})
+        self.assertNotIn("safeos", sandbox)
+        self.assertEqual(result, "${safeos}")
+
+    def test_harden_template_builtins_strips_eval(self):
+        from mako.template import Template as MakoTemplate
+
+        from common.template.sandbox import harden_template_builtins
+
+        tm = MakoTemplate("${x}")
+        harden_template_builtins(tm)
+        builtins_view = tm.module.__builtins__
+        self.assertNotIn("eval", builtins_view)
+        self.assertNotIn("exec", builtins_view)
+        self.assertNotIn("open", builtins_view)
+        self.assertIn("__import__", builtins_view)
+
     # ---------------- 真实 RCE 副作用验证（最关键） ----------------
 
     def test_render_does_not_execute_command_via_popen(self):
