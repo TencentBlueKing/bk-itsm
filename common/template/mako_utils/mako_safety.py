@@ -30,7 +30,7 @@ from mako import parsetree
 
 from common.template.mako_utils.code_extract import MakoNodeCodeExtractor
 from common.template.mako_utils.exceptions import ForbiddenMakoTemplateException
-from common.template.sandbox import MAKO_SANDBOX_FORBIDDEN_MODULES
+from common.template.sandbox import MAKO_SANDBOX_FORBIDDEN_MODULES, filter_import_modules
 
 logger = logging.getLogger("root")
 
@@ -131,6 +131,85 @@ MAKO_RESERVED_NAMESPACES = frozenset(
     }
 )
 
+# attr 链路上一旦出现下列名字就立刻拒绝（always-on，与白名单开关无关）。
+# 根名白名单挡不住 ``os.path.os`` / ``datetime.sys.modules`` 这类反向跳板。
+DANGEROUS_ATTR_NAMES = frozenset(
+    {
+        "os",
+        "sys",
+        "subprocess",
+        "shutil",
+        "ctypes",
+        "socket",
+        "_thread",
+        "threading",
+        "builtins",
+        "__builtins__",
+        "modules",
+        "popen",
+        "popen2",
+        "popen3",
+        "popen4",
+        "system",
+        "spawnl",
+        "spawnle",
+        "spawnlp",
+        "spawnlpe",
+        "spawnv",
+        "spawnve",
+        "spawnvp",
+        "spawnvpe",
+        "execl",
+        "execle",
+        "execlp",
+        "execlpe",
+        "execv",
+        "execve",
+        "execvp",
+        "execvpe",
+        "fork",
+        "forkpty",
+        "kill",
+    }
+)
+
+# 生成器 / 协程 / frame / traceback 反射属性。这些名字不是 ``__`` 前缀，
+# 但任意一个都能拿到 frame，再经 ``f_builtins`` 取回真实 eval/exec。
+FRAME_INTROSPECTION_ATTRS = frozenset(
+    {
+        "gi_frame",
+        "gi_code",
+        "gi_yieldfrom",
+        "cr_frame",
+        "cr_code",
+        "cr_await",
+        "cr_origin",
+        "ag_frame",
+        "ag_code",
+        "ag_await",
+        "f_back",
+        "f_builtins",
+        "f_globals",
+        "f_locals",
+        "f_code",
+        "f_trace",
+        "tb_frame",
+        "tb_next",
+        "func_globals",
+        "func_code",
+        "func_closure",
+        "func_builtins",
+    }
+)
+
+
+def _deny_sensitive_attr(name):
+    """always-on：切断取帧反射与危险模块/原语属性。"""
+    if name in FRAME_INTROSPECTION_ATTRS:
+        raise ForbiddenMakoTemplateException(f"can not access frame or generator internals: [{name}]")
+    if name in DANGEROUS_ATTR_NAMES:
+        raise ForbiddenMakoTemplateException(f"can not access dangerous attribute: [{name}]")
+
 
 def _is_pure_value_node(node):
     """判断节点是否为纯取值表达式：常量 / Name / Attribute / Subscript / Tuple / List 嵌套。"""
@@ -194,6 +273,10 @@ class SingleLineNodeVisitor(ast.NodeVisitor):
             if isinstance(value, str):
                 if value.startswith("_"):
                     raise ForbiddenMakoTemplateException(f"can not access private key: [{value}]")
+                if value in FRAME_INTROSPECTION_ATTRS:
+                    raise ForbiddenMakoTemplateException(
+                        f"can not access frame or generator internals: [{value}]"
+                    )
                 return
             if isinstance(value, (int, float, bool)) or value is None:
                 return
@@ -203,6 +286,10 @@ class SingleLineNodeVisitor(ast.NodeVisitor):
         if hasattr(ast, "Str") and isinstance(slice_node, ast.Str):
             if slice_node.s.startswith("_"):
                 raise ForbiddenMakoTemplateException(f"can not access private key: [{slice_node.s}]")
+            if slice_node.s in FRAME_INTROSPECTION_ATTRS:
+                raise ForbiddenMakoTemplateException(
+                    f"can not access frame or generator internals: [{slice_node.s}]"
+                )
             return
         if hasattr(ast, "Num") and isinstance(slice_node, ast.Num):
             return
@@ -243,6 +330,7 @@ class SingleLineNodeVisitor(ast.NodeVisitor):
     def visit_Attribute(self, node):
         if node.attr.startswith("_"):
             raise ForbiddenMakoTemplateException(f"can not access private attribute: [{node.attr}]")
+        _deny_sensitive_attr(node.attr)
         if node.attr in FORBIDDEN_TEMPLATE_METHODS:
             raise ForbiddenMakoTemplateException("can not call forbidden method")
         # 不允许"调用结果再点属性"形态：Attribute.value=Call，否则绕过链式 Call 检查
@@ -301,6 +389,7 @@ class SingleLineNodeVisitor(ast.NodeVisitor):
         method_attr = node.func.attr
         if method_attr.startswith("_"):
             raise ForbiddenMakoTemplateException(f"can not call private method: [{method_attr}]")
+        _deny_sensitive_attr(method_attr)
         if method_attr in FORBIDDEN_TEMPLATE_METHODS:
             raise ForbiddenMakoTemplateException("can not call forbidden method")
 
@@ -470,7 +559,7 @@ def build_allowed_names(context, *, extra=()):
     for key in context.keys() if context else ():
         allowed.add(_deformat_var_key(key))
 
-    import_modules = getattr(settings, "MAKO_SANDBOX_IMPORT_MODULES", {})
+    import_modules = filter_import_modules(getattr(settings, "MAKO_SANDBOX_IMPORT_MODULES", {}))
     for alias in import_modules.values():
         if alias:
             allowed.add(alias.split(".", 1)[0])

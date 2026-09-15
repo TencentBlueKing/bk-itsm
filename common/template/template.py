@@ -27,7 +27,7 @@ from common.template.mako_utils import mako_safety
 from common.template.mako_utils.checker import check_mako_template_safety
 from common.template.mako_utils.exceptions import ForbiddenMakoTemplateException
 from common.template.mako_utils.string import deformat_var_key
-from common.template.sandbox import Sandbox, _ForbiddenProxy
+from common.template.sandbox import Sandbox, _ForbiddenProxy, harden_template_builtins, sanitize_render_context
 from common.utils import sanitize_user_content
 
 logger = logging.getLogger("root")
@@ -104,6 +104,7 @@ class Template:
             context = kwargs
         elif kwargs:
             context = {**context, **kwargs}
+        context = sanitize_render_context(context)
         data = self.data
         if isinstance(data, str):
             return self._render_string(data, context)
@@ -276,6 +277,8 @@ class Template:
         except (MakoException, SyntaxError) as e:
             logger.error("pipeline resolve template[{}] error[{}]".format(template, e))
             return template
+
+        harden_template_builtins(tm)
 
         data = {}
         data.update(context)
