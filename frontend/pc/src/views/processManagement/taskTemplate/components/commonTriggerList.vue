@@ -327,11 +327,14 @@
        */
       setFilterSignal(condition = []) {
         let conditions = condition;
+        if (this.origin === 'state' && this.nodeType !== 'WEBHOOK') {
+          conditions = Array.from(new Set(['STATE_FAILED', ...conditions]));
+        }
         if (
           ['TASK', 'TASK-SOPS', 'SIGN'].indexOf(this.nodeType) > -1
           && this.origin === 'state'
         ) { // 根据节点类型过滤
-          conditions = Array.from(new Set(['CLAIM_STATE', 'DELIVER_STATE', 'DISTRIBUTE_STATE', ...condition]));
+          conditions = Array.from(new Set(['CLAIM_STATE', 'DELIVER_STATE', 'DISTRIBUTE_STATE', ...conditions]));
         }
         const signalList = this.allSignal.split(',');
         this.signal = signalList.filter(key => conditions.indexOf(key) === -1).join(',');
