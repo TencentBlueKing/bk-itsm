@@ -27,7 +27,7 @@ from common.template.mako_utils import mako_safety
 from common.template.mako_utils.checker import check_mako_template_safety
 from common.template.mako_utils.exceptions import ForbiddenMakoTemplateException
 from common.template.mako_utils.string import deformat_var_key
-from common.template.sandbox import Sandbox, _ForbiddenProxy
+from common.template.sandbox import Sandbox, _ForbiddenProxy, harden_template_builtins, sanitize_render_context
 from common.utils import sanitize_user_content
 
 logger = logging.getLogger("root")
@@ -104,22 +104,19 @@ class Template:
             context = kwargs
         elif kwargs:
             context = {**context, **kwargs}
+        return self._render_sanitized(sanitize_render_context(context))
+
+    def _render_sanitized(self, context: dict) -> Any:
         data = self.data
         if isinstance(data, str):
             return self._render_string(data, context)
         if isinstance(data, list):
-            ldata = [""] * len(data)
-            for index, item in enumerate(data):
-                ldata[index] = Template(copy.deepcopy(item)).render(context)
-            return ldata
+            return [Template(copy.deepcopy(item))._render_sanitized(context) for item in data]
         if isinstance(data, tuple):
-            ldata = [""] * len(data)
-            for index, item in enumerate(data):
-                ldata[index] = Template(copy.deepcopy(item)).render(context)
-            return tuple(ldata)
+            return tuple(Template(copy.deepcopy(item))._render_sanitized(context) for item in data)
         if isinstance(data, dict):
             return {
-                key: Template(copy.deepcopy(value)).render(context)
+                key: Template(copy.deepcopy(value))._render_sanitized(context)
                 for key, value in data.items()
             }
         return data
@@ -275,6 +272,9 @@ class Template:
             tm = MakoTemplate(template)
         except (MakoException, SyntaxError) as e:
             logger.error("pipeline resolve template[{}] error[{}]".format(template, e))
+            return template
+
+        if not harden_template_builtins(tm):
             return template
 
         data = {}

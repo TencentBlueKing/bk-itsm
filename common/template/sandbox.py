@@ -15,7 +15,8 @@ specific language governing permissions and limitations under the License.
 
 import importlib
 import logging
-from typing import List, Dict
+import types
+from typing import Any, Dict, List
 
 from django.conf import settings
 
@@ -164,6 +165,24 @@ MAKO_SANDBOX_FORBIDDEN_MODULES = frozenset(
     }
 )
 
+# 仅用于沙箱 import 注入过滤：可做字段名（如 re）但不允许当作模块加载。
+# 不并入 MAKO_SANDBOX_FORBIDDEN_MODULES，避免 ${re} 误伤同名字段。
+MAKO_SANDBOX_FORBIDDEN_IMPORT_ROOTS = MAKO_SANDBOX_FORBIDDEN_MODULES | frozenset(
+    {
+        "re",
+        "sre_compile",
+        "sre_parse",
+        "sre_constants",
+        "operator",
+        "pydoc",
+        "trace",
+        "timeit",
+        "compileall",
+        "py_compile",
+        "_pickle",
+    }
+)
+
 
 class _ForbiddenProxy:
     """
@@ -235,6 +254,167 @@ class _ForbiddenProxy:
         self._deny("str")
 
 
+# 渲染期从模板模块 ``__builtins__`` 中摘除的危险内建。
+# 即便 AST 漏掉某条取帧路径，拿到的 builtins 视图里也不再有 eval/exec/open。
+# 刻意保留 ``__import__``：dunder 路径已被拦截，且 C 扩展渲染期可能惰性 import。
+DANGEROUS_RENDER_BUILTINS = frozenset(
+    {
+        "eval",
+        "exec",
+        "compile",
+        "open",
+        "input",
+        "breakpoint",
+    }
+)
+
+_RESTRICTED_BUILTINS = None
+
+
+def restricted_builtins() -> dict:
+    """返回去除 DANGEROUS_RENDER_BUILTINS 后的 builtins 视图（进程内缓存）。"""
+    global _RESTRICTED_BUILTINS
+    if _RESTRICTED_BUILTINS is None:
+        import builtins as _builtins
+
+        safe = {name: getattr(_builtins, name) for name in dir(_builtins)}
+        for name in DANGEROUS_RENDER_BUILTINS:
+            safe.pop(name, None)
+        _RESTRICTED_BUILTINS = safe
+    return _RESTRICTED_BUILTINS
+
+
+def harden_template_builtins(mako_template) -> bool:
+    """重新绑定模板函数，使其实际使用受限 builtins；失败时禁止继续渲染。"""
+    try:
+        module = mako_template.module
+        globals_view = dict(module.__dict__)
+        globals_view["__builtins__"] = restricted_builtins()
+        for name, value in list(module.__dict__.items()):
+            if isinstance(value, types.FunctionType) and value.__globals__ is module.__dict__:
+                bound = types.FunctionType(
+                    value.__code__, globals_view, value.__name__, value.__defaults__, value.__closure__
+                )
+                bound.__kwdefaults__ = value.__kwdefaults__
+                bound.__dict__.update(value.__dict__)
+                globals_view[name] = bound
+                setattr(module, name, bound)
+        module.__builtins__ = globals_view["__builtins__"]
+        mako_template.callable_ = module.render_body
+        return True
+    except Exception:
+        logger.exception("failed to harden mako template builtins")
+        return False
+
+
+_WARNED_DANGEROUS_IMPORTS = set()
+
+
+def _is_dangerous_import(mod_path: str, alias: str = "") -> bool:
+    roots = set()
+    if mod_path:
+        roots.add(mod_path.split(".", 1)[0])
+    if alias:
+        roots.add(alias.split(".", 1)[0])
+    return bool(roots & MAKO_SANDBOX_FORBIDDEN_IMPORT_ROOTS)
+
+
+def filter_import_modules(modules: Dict[str, str]) -> Dict[str, str]:
+    """剔除危险模块（含别名根命中黑名单），返回可安全注入沙箱的子集。"""
+    safe = {}
+    for mod_path, alias in (modules or {}).items():
+        if _is_dangerous_import(mod_path, alias):
+            warned_key = (mod_path, alias)
+            if warned_key not in _WARNED_DANGEROUS_IMPORTS:
+                _WARNED_DANGEROUS_IMPORTS.add(warned_key)
+                logger.error(
+                    "refuse to inject dangerous module into mako sandbox: %s (alias=%s)",
+                    mod_path,
+                    alias,
+                )
+            continue
+        safe[mod_path] = alias
+    return safe
+
+
+_DROP = object()
+_UNSAFE_CONTEXT_TYPES = (
+    types.ModuleType,
+    types.FunctionType,
+    types.BuiltinFunctionType,
+    types.MethodType,
+    types.BuiltinMethodType,
+    types.GeneratorType,
+    types.CodeType,
+    types.CoroutineType,
+    types.AsyncGeneratorType,
+    types.FrameType,
+    types.TracebackType,
+)
+
+
+_MAX_CONTEXT_DEPTH = 64
+
+
+def _sanitize_value(value: Any, active: set, depth: int):
+    if isinstance(value, _UNSAFE_CONTEXT_TYPES):
+        return _DROP
+    if not isinstance(value, (dict, list, tuple)):
+        return value
+
+    identity = id(value)
+    if identity in active or depth >= _MAX_CONTEXT_DEPTH:
+        return _DROP
+    active.add(identity)
+    try:
+        if isinstance(value, dict):
+            return _sanitize_mapping(value, active, depth + 1)
+
+        items = []
+        for item in value:
+            sanitized = _sanitize_value(item, active, depth + 1)
+            if sanitized is _DROP:
+                return _DROP  # 删除单个元素会改变下标语义
+            items.append(sanitized)
+
+        if isinstance(value, list):
+            return items
+        if type(value) is tuple:
+            return tuple(items)
+        if isinstance(getattr(type(value), "_fields", None), tuple):
+            try:
+                return type(value)(*items)
+            except (TypeError, ValueError):
+                return _DROP
+        if all(item is original for item, original in zip(items, value)):
+            return value
+        return _DROP
+    finally:
+        active.remove(identity)
+
+
+def _sanitize_mapping(mapping: dict, active: set, depth: int) -> dict:
+    cleaned = {}
+    for key, value in mapping.items():
+        sanitized = _sanitize_value(value, active, depth)
+        if sanitized is _DROP:
+            logger.warning(
+                "[mako-sandbox] dropped unsafe context value: key=%s type=%s",
+                key,
+                type(value).__name__,
+            )
+            continue
+        cleaned[key] = sanitized
+    return cleaned
+
+
+def sanitize_render_context(context: dict) -> dict:
+    """递归清洗业务上下文，遇到危险容器时整体丢弃，保持序列下标不变。"""
+    if not isinstance(context, dict):
+        return {}
+    return _sanitize_value(context, set(), 0)
+
+
 class ModuleObject:
     def __init__(self, sub_paths, module):
         if len(sub_paths) == 1:
@@ -261,6 +441,7 @@ class Sandbox:
 
     @staticmethod
     def _import_modules(sandbox: dict, modules: Dict[str, str]):
+        modules = filter_import_modules(modules)
         for mod_path, alias in modules.items():
             mod = importlib.import_module(mod_path)
             sub_paths = alias.split(".")

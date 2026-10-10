@@ -288,6 +288,124 @@ class TemplateRenderSafetyTest(TestCase):
         payload = "${(lambda x: x)(1)}"
         self.assertEqual(Template(payload).render({}), payload)
 
+    def test_render_blocks_gi_frame_attr(self):
+        payload = "${g.gi_frame}"
+        result = Template(payload).render({"g": (i for i in [1])})
+        self.assertEqual(result, payload)
+
+    def test_render_drops_module_from_context_keeps_fields(self):
+        import re as re_mod
+
+        self.assertEqual(
+            Template("${sn}").render({"re": re_mod, "sn": "ok"}),
+            "ok",
+        )
+        self.assertEqual(Template("${re}").render({"re": re_mod, "sn": "ok"}), "${re}")
+
+    def test_render_keeps_string_field_named_re(self):
+        self.assertEqual(Template("${re}").render({"re": "field-ok"}), "field-ok")
+
+    def test_render_namedtuple_context(self):
+        from collections import namedtuple
+
+        Point = namedtuple("Point", "x y")
+        self.assertEqual(Template("${point.x}").render({"point": Point(1, 2)}), "1")
+
+    def test_render_unsafe_list_element_does_not_shift_index(self):
+        import re as re_mod
+
+        payload = "${values[0]}"
+        context = {"values": [re_mod, "wrong-value"], "name": "ok"}
+        self.assertEqual(Template(payload).render(context), payload)
+        self.assertEqual(Template("${name}").render(context), "ok")
+
+    def test_render_unsafe_tuple_element_does_not_shift_index(self):
+        import re as re_mod
+
+        payload = "${values[0]}"
+        self.assertEqual(Template(payload).render({"values": (re_mod, "wrong-value")}), payload)
+
+    def test_render_cyclic_context_keeps_safe_fields(self):
+        context = {"name": "ok"}
+        context["cycle"] = context
+        context["items"] = [context]
+        self.assertEqual(Template("name=${name}, cycle=${cycle}").render(context), "name=ok, cycle=${cycle}")
+        self.assertEqual(Template("${items}").render(context), "${items}")
+
+    def test_render_very_deep_context_keeps_safe_fields(self):
+        nested = "leaf"
+        for _ in range(70):
+            nested = [nested]
+        context = {"deep": nested, "name": "ok"}
+        self.assertEqual(Template("${deep}").render(context), "${deep}")
+        self.assertEqual(Template("${name}").render(context), "ok")
+
+    def test_nested_template_sanitizes_context_once(self):
+        from unittest.mock import patch
+
+        from common.template.sandbox import sanitize_render_context
+
+        with patch("common.template.template.sanitize_render_context", wraps=sanitize_render_context) as sanitizer:
+            result = Template(["${name}", {"nested": "${name}"}]).render({"name": "ok"})
+        self.assertEqual(result, ["ok", {"nested": "ok"}])
+        self.assertEqual(sanitizer.call_count, 1)
+
+    def test_hardening_failure_returns_original_template(self):
+        from unittest.mock import patch
+
+        payload = "${name.upper()}"
+        with patch("common.template.template.harden_template_builtins", return_value=False):
+            self.assertEqual(Template(payload).render({"name": "ok"}), payload)
+
+    def test_warn_mode_still_blocks_mako_namespace_os_chain(self):
+        from django.test import override_settings
+
+        payload = "${self.module.cache.util.os.name}"
+        with override_settings(MAKO_TEMPLATE_NAME_WHITELIST_MODE="warn"):
+            result = Template(payload).render({})
+        self.assertEqual(result, payload)
+        self.assertNotIn("posix", result)
+
+    def test_refuses_dangerous_import_alias(self):
+        from django.test import override_settings
+
+        from common.template.sandbox import Sandbox
+
+        with override_settings(MAKO_SANDBOX_IMPORT_MODULES={"os": "safeos"}):
+            sandbox = Sandbox().get()
+            result = Template("${safeos}").render({})
+        self.assertNotIn("safeos", sandbox)
+        self.assertEqual(result, "${safeos}")
+
+    def test_harden_template_builtins_strips_eval(self):
+        from mako.template import Template as MakoTemplate
+
+        from common.template.sandbox import harden_template_builtins
+
+        tm = MakoTemplate("${x}")
+        self.assertTrue(harden_template_builtins(tm))
+        builtins_view = tm.module.render_body.__builtins__
+        self.assertIs(tm.callable_, tm.module.render_body)
+        self.assertNotIn("eval", builtins_view)
+        self.assertNotIn("exec", builtins_view)
+        self.assertNotIn("open", builtins_view)
+        self.assertIn("__import__", builtins_view)
+        self.assertEqual(tm.render_unicode(x="ok"), "ok")
+
+    def test_hardened_mako_function_uses_restricted_builtins(self):
+        from unittest.mock import patch
+
+        from mako.template import Template as MakoTemplate
+
+        from common.template.sandbox import harden_template_builtins, restricted_builtins
+
+        tm = MakoTemplate("${x}")
+        limited = {key: value for key, value in restricted_builtins().items() if key != "str"}
+        with patch("common.template.sandbox.restricted_builtins", return_value=limited):
+            self.assertTrue(harden_template_builtins(tm))
+        with self.assertRaises(NameError):
+            tm.render_unicode(x="ok")
+
     # ---------------- 真实 RCE 副作用验证（最关键） ----------------
 
     def test_render_does_not_execute_command_via_popen(self):
