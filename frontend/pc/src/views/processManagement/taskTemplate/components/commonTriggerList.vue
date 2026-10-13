@@ -388,7 +388,7 @@
           stage: this.stage,
         };
         if (type === 'cite') {
-          // 这里还有初始化已有配置的逻辑，todo
+          // 注意：这里还需要补充初始化已有配置的逻辑
           this.triggerDialogInfo.isShow = true;
         } else {
           this.triggerSliderInfo.item = item;

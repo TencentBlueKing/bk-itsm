@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 ACTION_STATUS_CREATED = "CREATED"
 ACTION_STATUS_RUNNING = "RUNNING"
@@ -31,15 +31,15 @@ ACTION_STATUS_SUCCEED = "SUCCEED"
 ACTION_STATUS_FAILED = "FAILED"
 
 ACTION_STATUS_CHOICE = [
-    (ACTION_STATUS_CREATED, _("新建")),
-    (ACTION_STATUS_RUNNING, _("执行中")),
-    (ACTION_STATUS_SUCCEED, _("成功")),
-    (ACTION_STATUS_FAILED, _("失败")),
+    (ACTION_STATUS_CREATED, gettext("新建")),
+    (ACTION_STATUS_RUNNING, gettext("执行中")),
+    (ACTION_STATUS_SUCCEED, gettext("成功")),
+    (ACTION_STATUS_FAILED, gettext("失败")),
 ]
 
 MANUAL = "MANUAL"
 BACKEND = "BACKEND"
-OPT_TYPE_CHOICE = [(MANUAL, _("手动执行")), (BACKEND, _("后台执行"))]
+OPT_TYPE_CHOICE = [(MANUAL, gettext("手动执行")), (BACKEND, gettext("后台执行"))]
 
 SOURCE_BASIC = "basic"
 SOURCE_WORKFLOW = "workflow"
@@ -47,17 +47,17 @@ SOURCE_TICKET = "ticket"
 SOURCE_TASK = "task"
 
 TRIGGER_SOURCE_TYPE = [
-    (SOURCE_BASIC, _("公共")),
-    (SOURCE_WORKFLOW, _("流程")),
-    (SOURCE_TICKET, _("流程版本")),
-    (SOURCE_TASK, _("任务")),
+    (SOURCE_BASIC, gettext("公共")),
+    (SOURCE_WORKFLOW, gettext("流程")),
+    (SOURCE_TICKET, gettext("流程版本")),
+    (SOURCE_TASK, gettext("任务")),
 ]
 
 TRIGGER_ICON_CHOICE = [
-    ("message", _("消息")),
-    ("status", _("修改状态")),
-    ("user", _("修改处理人")),
-    ("api", _("API接口")),
+    ("message", gettext("消息")),
+    ("status", gettext("修改状态")),
+    ("user", gettext("修改处理人")),
+    ("api", gettext("API接口")),
 ]
 
 # 触发信息定义

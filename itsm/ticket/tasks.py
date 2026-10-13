@@ -286,11 +286,46 @@ def notify_task(ticket, receivers, message, action, **kwargs):
     if ticket.flow.notify_rule == "NONE" or not receivers:
         return
 
+    # 单据字段上下文只计算一次，避免每个通知渠道重复查询
+    try:
+        ticket_fields = ticket.get_output_fields(
+            return_format="dict", need_display=True
+        )
+    except Exception as error:
+        logger.exception(
+            "[tasks->notify_task] get ticket fields context failed, ticket_id={}, error: {}".format(
+                ticket.id, error
+            )
+        )
+        ticket_fields = {}
+
     # 根据流程设定的通知方式通知
     for _notify in ticket.flow.notify.all():
-        content, title = build_message(
-            _notify, task_id, ticket, message, action, **kwargs
-        )
+        # 单个渠道失败不允许影响其它渠道
+        try:
+            content, title = build_message(
+                _notify,
+                task_id,
+                ticket,
+                message,
+                action,
+                ticket_fields=ticket_fields,
+                **kwargs
+            )
+        except Exception as error:
+            logger.exception(
+                "[tasks->notify_task] build message failed, ticket_id={}, notify_type={}, error: {}".format(
+                    ticket.id, getattr(_notify, "type", None), error
+                )
+            )
+            continue
+        if not content:
+            logger.warning(
+                "[tasks->notify_task] empty content, skip this notify, ticket_id={}, notify_type={}".format(
+                    ticket.id, getattr(_notify, "type", None)
+                )
+            )
+            continue
         try:
             logger.info(
                 "[tasks->notify_task] is executed, title={}, receivers={}, ticket_id={}".format(

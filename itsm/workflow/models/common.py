@@ -49,7 +49,7 @@ class Notify(models.Model):
     is_builtin = models.BooleanField(_("是否为系统内置"), default=False)
     type = models.CharField(_("通知渠道"), max_length=LEN_SHORT, default="EMAIL")
     template = models.TextField(
-        _("通知模板：可使用变量如下：xxx（TODO）"),
+        _("通知模板：可使用变量如下：xxx"),
         default=EMPTY_STRING,
         null=True,
         blank=True,

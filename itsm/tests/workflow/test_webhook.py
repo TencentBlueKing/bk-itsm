@@ -8,7 +8,7 @@ from requests import Response
 from requests.exceptions import JSONDecodeError, Timeout
 
 from itsm.component.constants import NODE_FAILED
-from itsm.component.constants.trigger import STATE_FAILED
+from itsm.component.constants.trigger import SOURCE_TICKET, STATE_FAILED
 from itsm.meta.services.webhook_url_validate_service import WebhookURLValidateService
 from itsm.pipeline_plugins.components.collections.webhook import (
     WebHookService,
@@ -16,6 +16,7 @@ from itsm.pipeline_plugins.components.collections.webhook import (
 )
 from itsm.service.models import CatalogService
 from itsm.ticket.models import SYSTEM_OPERATE, Ticket
+from itsm.trigger.models import ActionSchema, Trigger, TriggerRule
 from blueapps.core.celery.celery import app
 from pipeline.core.data.base import DataObject
 
@@ -225,7 +226,23 @@ class WebHookServiceUnitTest(SimpleTestCase):
             "",
         )
 
-        self.assertEqual(result, (False, None, "Webhook请求失败", True))
+        self.assertEqual(result[:4], (False, None, "Webhook请求失败", True))
+        self.assertTrue(result[4])
+
+    @mock.patch("itsm.pipeline_plugins.components.collections.webhook.requests.request")
+    def test_request_once_marks_timeout_as_retryable_for_post(self, request):
+        """当前口径：不区分请求方法，POST 的网络层异常同样可重试。"""
+        request.side_effect = Timeout("request timeout")
+        self.service.record_webhook_error = mock.Mock(
+            return_value="Webhook请求失败"
+        )
+
+        result = self.service.request_once(
+            "POST", "https://api.example.com/", "", {}, {}, 10, None, ""
+        )
+
+        self.assertEqual(result[:4], (False, None, "Webhook请求失败", True))
+        self.assertTrue(result[4])
 
     @mock.patch("itsm.pipeline_plugins.components.collections.webhook.requests.request")
     def test_request_once_rejects_non_success_status(self, request):
@@ -240,7 +257,7 @@ class WebHookServiceUnitTest(SimpleTestCase):
         )
 
         self.assertEqual(
-            result,
+            result[:4],
             (False, None, "返回状态码非200/201, status_code=400", False),
         )
 
@@ -255,21 +272,22 @@ class WebHookServiceUnitTest(SimpleTestCase):
             "GET", "https://api.example.com/", "", {}, {}, 10, None, ""
         )
 
-        self.assertEqual(result, (False, None, "返回值非Json", False))
+        self.assertEqual(result[:4], (False, None, "返回值非Json", False))
 
     @mock.patch("itsm.pipeline_plugins.components.collections.webhook.requests.request")
     def test_request_once_rejects_invalid_request_params(self, request):
-        self.service.record_webhook_error = mock.Mock(
-            return_value="Webhook请求参数构建失败"
-        )
+        self.service.record_webhook_error = mock.Mock(return_value="x")
 
         result = self.service.request_once(
             "GET", "https://api.example.com/", "", {}, {}, "invalid", None, ""
         )
 
+        # 非法的 timeout 应被准确归因，而不是笼统的“参数构建失败”
         self.assertEqual(
-            result, (False, None, "Webhook请求参数构建失败", False)
+            self.service.record_webhook_error.call_args[0][0],
+            "Webhook超时时间参数非法：invalid",
         )
+        self.assertFalse(result[3])
         request.assert_not_called()
 
     @mock.patch("itsm.pipeline_plugins.components.collections.webhook.BoolRule")
@@ -295,7 +313,7 @@ class WebHookServiceUnitTest(SimpleTestCase):
         )
 
         self.assertEqual(
-            result,
+            result[:4],
             (False, None, "请求成功判定失败，返回值不满足条件", False),
         )
 
@@ -324,9 +342,34 @@ class WebHookServiceUnitTest(SimpleTestCase):
         )
 
         self.assertEqual(
-            result,
+            result[:4],
             (False, None, "请求成功判定失败，返回值不满足条件", False),
         )
+
+    @mock.patch("itsm.pipeline_plugins.components.collections.webhook.BoolRule")
+    @mock.patch("itsm.pipeline_plugins.components.collections.webhook.requests.request")
+    def test_request_once_catches_unexpected_exception(self, request, bool_rule):
+        """未预期异常不允许逃逸 request_once，统一按不可重试失败处理。"""
+        response = mock.Mock(status_code=200)
+        response.json.return_value = {"result": True}
+        request.return_value = response
+        bool_rule.return_value.test.side_effect = RuntimeError("boom")
+        self.service.record_webhook_error = mock.Mock(return_value="x")
+
+        result = self.service.request_once(
+            "GET",
+            "https://api.example.com/",
+            "",
+            {},
+            {},
+            10,
+            None,
+            "resp.result == true",
+        )
+
+        self.assertFalse(result[0])
+        self.assertFalse(result[3])
+        self.assertTrue(result[4])
 
     @mock.patch(
         "itsm.pipeline_plugins.components.collections.itsm_base_service."
@@ -345,9 +388,9 @@ class WebHookServiceUnitTest(SimpleTestCase):
         ticket_get.return_value = self.ticket
         self.service.request_once = mock.Mock(
             side_effect=[
-                (False, None, "first timeout", True),
-                (False, None, "second timeout", True),
-                (True, {}, "", False),
+                (False, None, "first timeout", True, "traceback-1"),
+                (False, None, "second timeout", True, "traceback-2"),
+                (True, {}, "", False, ""),
             ]
         )
         self.service.do_exit_plugins = mock.Mock()
@@ -376,6 +419,17 @@ class WebHookServiceUnitTest(SimpleTestCase):
                 ),
             ]
         )
+        # 成功轮不再用空值覆盖 webhook_last_error，保留"曾失败过"的痕迹
+        self.assertIn(
+            mock.call(self.current_node, webhook_attempt_count=3),
+            self.service.update_info.call_args_list,
+        )
+        self.assertNotIn(
+            mock.call(
+                self.current_node, webhook_attempt_count=3, webhook_last_error=""
+            ),
+            self.service.update_info.call_args_list,
+        )
 
     @mock.patch(
         "itsm.pipeline_plugins.components.collections.itsm_base_service."
@@ -394,7 +448,7 @@ class WebHookServiceUnitTest(SimpleTestCase):
         ticket_get.return_value = self.ticket
         self.service.has_enabled_failure_trigger = mock.Mock(return_value=True)
         self.service.request_once = mock.Mock(
-            return_value=(False, None, "Webhook请求失败", True)
+            return_value=(False, None, "Webhook请求失败", True, "traceback-text")
         )
 
         result = self.service.execute(self.execute_data, self.execute_parent_data)
@@ -438,3 +492,95 @@ class WebHookServiceUnitTest(SimpleTestCase):
             action=NODE_FAILED,
             retry=False,
         )
+
+
+class HasEnabledFailureTriggerTest(SimpleTestCase):
+    """第 1 项：只有恒真条件 + 后台动作的触发器才视为会通知。
+
+    否则回退默认通知给处理人。
+    """
+
+    def setUp(self):
+        self.ticket = mock.MagicMock()
+        self.ticket.id = 1
+        self.ticket.flow.id = 99
+        switch_patcher = mock.patch(
+            "itsm.iadmin.utils.is_trigger_switch_off", return_value=False
+        )
+        self.switch = switch_patcher.start()
+        self.addCleanup(switch_patcher.stop)
+
+    @staticmethod
+    def _rule(by_condition, action_schemas):
+        return mock.Mock(by_condition=by_condition, action_schemas=action_schemas)
+
+    def _check(self, trigger_ids, rules, has_backend_action):
+        trigger_queryset = mock.MagicMock()
+        trigger_queryset.values_list.return_value = trigger_ids
+
+        trigger_manager = mock.MagicMock()
+        trigger_manager.filter.return_value = trigger_queryset
+
+        # 模拟 ORM 的 by_condition 过滤，避免桩把所有规则都返回
+        def rule_filter(**kwargs):
+            by_condition = kwargs.get("by_condition")
+            if by_condition is None:
+                return rules
+            return [rule for rule in rules if rule.by_condition == by_condition]
+
+        rule_manager = mock.MagicMock()
+        rule_manager.filter.side_effect = rule_filter
+
+        action_manager = mock.MagicMock()
+        action_manager.filter.return_value.exists.return_value = has_backend_action
+
+        self.trigger_manager = trigger_manager
+        self.rule_manager = rule_manager
+
+        with mock.patch.object(Trigger, "objects", trigger_manager), mock.patch.object(
+            TriggerRule, "objects", rule_manager
+        ), mock.patch.object(ActionSchema, "objects", action_manager):
+            return WebHookService.has_enabled_failure_trigger(self.ticket, "2")
+
+    def test_returns_false_without_trigger(self):
+        self.assertFalse(self._check([], [], True))
+
+    def test_returns_true_with_unconditional_backend_rule(self):
+        self.assertTrue(self._check([7], [self._rule(False, [11])], True))
+
+    def test_returns_false_when_rule_has_condition(self):
+        # 触发器存在但规则带条件，不保证触发，必须回退默认通知
+        self.assertFalse(self._check([7], [self._rule(True, [11])], True))
+
+    def test_queries_only_unconditional_rules(self):
+        # 契约：只查询恒真条件（by_condition=False）的规则
+        self._check([7], [self._rule(False, [11])], True)
+        self.rule_manager.filter.assert_called_once_with(
+            trigger_id__in=[7], by_condition=False
+        )
+
+    def test_trigger_query_scope(self):
+        # 契约：只匹配当前版本、当前节点、启用且非草稿的 STATE_FAILED 触发器
+        self._check([7], [self._rule(False, [11])], True)
+        self.trigger_manager.filter.assert_called_once_with(
+            signal=STATE_FAILED,
+            sender="2",
+            source_type=SOURCE_TICKET,
+            source_id=99,
+            is_enabled=True,
+            is_draft=False,
+        )
+
+    def test_returns_false_without_backend_action(self):
+        # 动作是手动执行，不会自动通知，必须回退默认通知
+        self.assertFalse(self._check([7], [self._rule(False, [11])], False))
+
+    def test_returns_false_without_any_rule(self):
+        self.assertFalse(self._check([7], [], True))
+
+    def test_returns_false_when_rule_has_no_action(self):
+        self.assertFalse(self._check([7], [self._rule(False, [])], True))
+
+    def test_returns_false_when_trigger_switch_off(self):
+        self.switch.return_value = True
+        self.assertFalse(self._check([7], [self._rule(False, [11])], True))

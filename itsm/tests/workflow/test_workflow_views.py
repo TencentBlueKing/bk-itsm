@@ -23,12 +23,18 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import copy
+import json
 
 import mock
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
+from django.utils.translation import override
+from rest_framework import serializers
+from rest_framework.renderers import JSONRenderer
 
+from itsm.component.constants.trigger import TRIGGER_SIGNAL_CHOICE
 from itsm.tests.data.datas import DATA
 from itsm.workflow.models import Workflow
+from itsm.workflow.views import WorkflowViewSet
 
 
 class WorkflowViewTest(TestCase):
@@ -39,6 +45,35 @@ class WorkflowViewTest(TestCase):
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], dict)
+
+    @mock.patch("itsm.workflow.views.get_notify_type_choice", return_value=[])
+    def test_trigger_choices_translation(self, _notify_choices):
+        expected = {
+            "zh-cn": (
+                "节点信号",
+                ["进入节点", "离开节点", "节点失败", "分派单据", "认领单据", "转单"],
+            ),
+            "en": (
+                "Node signal",
+                ["Enter node", "Leave node", "Node failed", "Assign ticket", "Claim ticket", "Re-assign"],
+            ),
+            "ja": (
+                "ノード信号",
+                ["ノードを入力します", "ノードを離れます", "ノード失敗", "配布文書", "領収書を請求します", "転送順序"],
+            ),
+        }
+        signal_keys = [
+            "ENTER_STATE", "LEAVE_STATE", "STATE_FAILED",
+            "DISTRIBUTE_STATE", "CLAIM_STATE", "DELIVER_STATE",
+        ]
+        for language in ("en", "ja", "zh-cn", "en"):
+            with self.subTest(language=language), override(language):
+                response = WorkflowViewSet().get_global_choices(None)
+                choices = json.loads(JSONRenderer().render(response.data))
+                category, labels = expected[language]
+                self.assertEqual(choices["trigger_categories"]["STATE"], category)
+                self.assertEqual(list(choices["trigger_signals"]["STATE"]), signal_keys)
+                self.assertEqual(list(choices["trigger_signals"]["STATE"].values()), labels)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_get_regex_choice(self):
@@ -391,3 +426,15 @@ class TaskSchemaViewTest(TestCase):
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
+
+
+class TriggerSignalValidationTest(SimpleTestCase):
+    def test_signal_codes_are_independent_of_language(self):
+        for language in ("zh-cn", "en", "ja"):
+            with self.subTest(language=language), override(language):
+                field = serializers.ChoiceField(choices=TRIGGER_SIGNAL_CHOICE)
+                for signal in ("ENTER_STATE", "STATE_FAILED"):
+                    self.assertEqual(field.run_validation(signal), signal)
+                    self.assertEqual(field.to_representation(signal), signal)
+                with self.assertRaises(serializers.ValidationError):
+                    field.run_validation("Node failed")

@@ -56,3 +56,48 @@ class BuildMessageTest(SimpleTestCase):
         ticket.get_output_fields.assert_called_once_with(
             return_format="dict", need_display=True
         )
+
+    @mock.patch("itsm.ticket.utils.get_custom_notify")
+    def test_fields_context_error_does_not_raise(self, get_custom_notify):
+        """第 2 项：单据字段上下文获取失败时降级为空上下文，不允许中断通知任务。"""
+        get_custom_notify.return_value = mock.Mock(
+            title_template="${title}", content_template="${message}"
+        )
+
+        ticket = mock.Mock()
+        ticket.id = 1
+        ticket.get_output_fields.side_effect = RuntimeError("fields exploded")
+        ticket.get_notify_context.return_value = {"title": "ticket title"}
+
+        content, title = build_message(
+            mock.Mock(type="EMAIL"), None, ticket, "failure message", NODE_FAILED
+        )
+
+        self.assertEqual(content, "failure message")
+        self.assertEqual(title, "ticket title")
+
+    @mock.patch("itsm.ticket.utils.get_custom_notify")
+    def test_given_ticket_fields_are_reused_without_mutation(self, get_custom_notify):
+        """第 2 项：传入缓存的 ticket_fields 时不再查询，且缓存对象不被污染。"""
+        get_custom_notify.return_value = mock.Mock(
+            title_template="${custom_field}", content_template="${message}"
+        )
+
+        ticket = mock.Mock()
+        ticket.get_notify_context.return_value = {}
+        cached_fields = {"custom_field": "field value"}
+
+        content, title = build_message(
+            mock.Mock(type="EMAIL"),
+            None,
+            ticket,
+            "failure message",
+            NODE_FAILED,
+            ticket_fields=cached_fields,
+        )
+
+        self.assertEqual(title, "field value")
+        self.assertEqual(content, "failure message")
+        ticket.get_output_fields.assert_not_called()
+        # 缓存对象不能被 message/action 等通知变量污染
+        self.assertEqual(cached_fields, {"custom_field": "field value"})

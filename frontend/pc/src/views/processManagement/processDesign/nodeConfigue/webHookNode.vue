@@ -123,7 +123,7 @@
         v-if="isStatus"
         ref="commonTriggerList"
         :origin="'state'"
-        :node-type="configur.type"
+        :node-type="'WEBHOOK'"
         :source-id="flowInfo.id"
         :sender="configur.id"
         :table="flowInfo.table">
