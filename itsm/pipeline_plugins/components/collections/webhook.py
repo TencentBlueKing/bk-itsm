@@ -26,6 +26,7 @@ import copy
 import json
 import logging
 import time
+import traceback
 
 import jmespath
 import requests
@@ -45,14 +46,14 @@ from itsm.component.constants import (
     NODE_FAILED,
     TRANSITION_OPERATE,
 )
-from itsm.component.constants.trigger import SOURCE_TICKET, STATE_FAILED
+from itsm.component.constants.trigger import BACKEND, SOURCE_TICKET, STATE_FAILED
 from itsm.component.utils.encode import EncodeWebhook
 from itsm.meta.services.webhook_url_validate_service import WebhookURLValidateService
 from itsm.pipeline_plugins.components.collections.itsm_base_service import (
     ItsmBaseService,
 )
 from itsm.ticket.models import SYSTEM_OPERATE, Ticket, TicketGlobalVariable
-from itsm.trigger.models import Trigger
+from itsm.trigger.models import ActionSchema, Trigger, TriggerRule
 
 logger = logging.getLogger("celery")
 
@@ -255,6 +256,7 @@ class WebHookService(ItsmBaseService):
         error_message_template,
         processors,
         attempts=0,
+        error_traceback="",
     ):
         logger.error(
             "[webhook]节点最终执行失败：ticket_id=%s, state_id=%s, attempts=%s, error=%s",
@@ -263,6 +265,14 @@ class WebHookService(ItsmBaseService):
             attempts,
             error_message,
         )
+        if error_traceback:
+            logger.error(
+                "[webhook]节点最终执行失败堆栈：ticket_id=%s, state_id=%s, attempts=%s\n%s",
+                getattr(ticket, "id", None),
+                state_id,
+                attempts,
+                self.truncate_message(error_traceback, 4000),
+            )
         current_node.set_failed_status(
             operator=processors,
             message=error_message_template,
@@ -271,7 +281,8 @@ class WebHookService(ItsmBaseService):
         ticket.node_status.filter(state_id=state_id).update(
             action_type=TRANSITION_OPERATE
         )
-        # 如果启用了触发器，优先使用触发器信号，未配置、未启用，则使用默认发送通知给处理人
+        # 触发器是默认通知的"替代"：只有确认触发器会真正通知时才不发默认通知，
+        # 否则仍回退到默认通知给处理人，避免出现"失败但无人知"
         if self.has_enabled_failure_trigger(ticket, state_id):
             logger.info(
                 "[webhook]执行节点失败触发器：ticket_id=%s, state_id=%s",
@@ -307,18 +318,53 @@ class WebHookService(ItsmBaseService):
 
     @staticmethod
     def has_enabled_failure_trigger(ticket, state_id):
+        """判断当前节点是否存在"一定会通知"的失败触发器。
+
+        触发器是默认通知的替代而非增强，因此不能只看"触发器存在"就跳过默认通知：
+        必须存在一条「条件恒真（by_condition=False）」且关联了「后台执行（BACKEND）动作」
+        的规则，才认为该触发器会真正通知；
+        否则视为不保证通知，回退默认通知给处理人。
+
+        已知局限：触发器动作在运行期执行失败时仍可能不通知，
+        根治需要触发器框架回传执行结果。
+        """
         from itsm.iadmin.utils import is_trigger_switch_off
 
         if is_trigger_switch_off():
             return False
 
-        return Trigger.objects.filter(
-            signal=STATE_FAILED,
-            sender=state_id,
-            source_type=SOURCE_TICKET,
-            source_id=ticket.flow.id,
-            is_enabled=True,
-        ).exists()
+        trigger_ids = list(
+            Trigger.objects.filter(
+                signal=STATE_FAILED,
+                sender=state_id,
+                source_type=SOURCE_TICKET,
+                source_id=ticket.flow.id,
+                is_enabled=True,
+                is_draft=False,
+            ).values_list("id", flat=True)
+        )
+        if not trigger_ids:
+            return False
+
+        for rule in TriggerRule.objects.filter(
+            trigger_id__in=trigger_ids, by_condition=False
+        ):
+            action_schema_ids = rule.action_schemas or []
+            if not action_schema_ids:
+                continue
+            if ActionSchema.objects.filter(
+                id__in=action_schema_ids, operate_type=BACKEND
+            ).exists():
+                return True
+
+        logger.warning(
+            "[webhook]触发器存在但缺少恒真条件或后台动作，"
+            "按不保证通知处理，回退默认通知：ticket_id=%s, state_id=%s, trigger_ids=%s",
+            getattr(ticket, "id", None),
+            state_id,
+            trigger_ids,
+        )
+        return False
 
     def get_common_args(self):
         return {
@@ -330,18 +376,29 @@ class WebHookService(ItsmBaseService):
     def request_once(
         self, method, url, body, query_params, headers, timeout, auth, success_exp
     ):
-        """执行一次请求；中间失败只返回结果，不改变节点状态或发送通知。"""
+        """执行一次请求；中间失败只返回结果，不改变节点状态或发送通知。
+
+        返回值: (success, resp, error_message, retryable, error_traceback)
+        """
         response = None
         failure = None
-        failure_message = "Webhook请求参数构建失败"
+        error_traceback = ""
+        # 中性初值：只有确实属于参数/运行阶段的问题才会被改写为更精确的文案
+        failure_message = "Webhook请求执行异常"
         try:
+            try:
+                timeout = int(timeout)
+            except (TypeError, ValueError) as error:
+                failure_message = "Webhook超时时间参数非法：{}".format(timeout)
+                raise ValueError(failure_message) from error
+
             response = requests.request(
                 method,
                 url,
                 data=body,
                 params=query_params,
                 headers=headers,
-                timeout=int(timeout),
+                timeout=timeout,
                 auth=auth,
                 allow_redirects=False,
             )
@@ -356,11 +413,15 @@ class WebHookService(ItsmBaseService):
                 failure_message = "请求成功判定失败，返回值不满足条件"
                 if not BoolRule(success_exp).test(context={"resp": resp}):
                     raise ValueError(failure_message)
+        # 网络层异常统一视为可重试（当前口径：不区分请求方法）。
+        # 注意 ReadTimeout / ChunkedEncodingError 存在"服务端已处理但响应未完整返回"的语义模糊，
+        # 非幂等接口重复执行的风险由调用方接口的幂等性兜底。
         except (
             requests.exceptions.Timeout,
             requests.exceptions.ConnectionError,
             requests.exceptions.ChunkedEncodingError,
         ) as error:
+            error_traceback = traceback.format_exc()
             failure = ("Webhook请求失败", error, True)
         except (
             requests.exceptions.RequestException,
@@ -369,6 +430,11 @@ class WebHookService(ItsmBaseService):
             MissingVariableException,
             UnknownOperatorException,
         ) as error:
+            error_traceback = traceback.format_exc()
+            failure = (failure_message, error, False)
+        # 兜底：任何未预期异常都不允许逃逸出 execute，统一按失败处理并走 do_exit_plugins
+        except Exception as error:
+            error_traceback = traceback.format_exc()
             failure = (failure_message, error, False)
 
         if failure:
@@ -382,9 +448,9 @@ class WebHookService(ItsmBaseService):
                 response=response,
                 error=error,
             )
-            return False, None, message, retryable
+            return False, None, message, retryable, error_traceback
 
-        return True, resp, "", False
+        return True, resp, "", False, ""
 
     def execute(self, data, parent_data):
         if super(WebHookService, self).execute(data, parent_data):
@@ -522,19 +588,22 @@ class WebHookService(ItsmBaseService):
             )
             return False
 
-        # MAX_RETRIES + 2 = 4,顾头不顾尾 第四次不会执行
-        for attempt in range(1, self.MAX_RETRIES + 2):
-            success, resp, error_message, retryable = self.request_once(
+        # 最多尝试 max_attempts 次 = 1 次初始请求 + MAX_RETRIES 次重试
+        max_attempts = self.MAX_RETRIES + 1
+        for attempt in range(1, max_attempts + 1):
+            success, resp, error_message, retryable, error_traceback = self.request_once(
                 method, url, body, query_params, headers, timeout, auth, success_exp
             )
+            if success:
+                # 成功时保留此前失败留下的 webhook_last_error，便于排障
+                self.update_info(current_node, webhook_attempt_count=attempt)
+                break
             self.update_info(
                 current_node,
                 webhook_attempt_count=attempt,
                 webhook_last_error=error_message,
             )
-            if success:
-                break
-            if not retryable or attempt > self.MAX_RETRIES:
+            if not retryable or attempt >= max_attempts:
                 self.do_exit_plugins(
                     ticket,
                     state_id,
@@ -543,6 +612,7 @@ class WebHookService(ItsmBaseService):
                     error_message_template,
                     processors,
                     attempts=attempt,
+                    error_traceback=error_traceback,
                 )
                 return False
             current_node.create_action_log(

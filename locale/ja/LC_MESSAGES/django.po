@@ -1232,6 +1232,10 @@ msgid "离开节点"
 msgstr "ノードを離れます"
 
 #: itsm/component/constants/trigger.py:102
+#: itsm/component/constants/trigger.py:103
+msgid "节点失败"
+msgstr "ノード失敗"
+
 msgid "分派单据"
 msgstr "配布文書"
 
@@ -5443,8 +5447,8 @@ msgid "通知渠道"
 msgstr "通知チャネル"
 
 #: itsm/workflow/models/common.py:52
-msgid "通知模板：可使用变量如下：xxx（TODO）"
-msgstr "通知テンプレート：以下の変数が使用可能：xxx（TODO）"
+msgid "通知模板：可使用变量如下：xxx"
+msgstr "通知テンプレート：以下の変数が使用可能：xxx"
 
 #: itsm/workflow/models/common.py:101
 msgid "变量类型"

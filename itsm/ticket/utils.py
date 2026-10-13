@@ -99,7 +99,7 @@ def get_custom_notify(ticket, action, notify_type, used_by=None):
     return custom_notify
 
 
-def build_message(_notify, task_id, ticket, message, action, **kwargs):
+def build_message(_notify, task_id, ticket, message, action, ticket_fields=None, **kwargs):
     if task_id:
         custom_notify = get_custom_notify(ticket, action, _notify.type, used_by="TASK")
     else:
@@ -108,8 +108,22 @@ def build_message(_notify, task_id, ticket, message, action, **kwargs):
     if task_id is not None:
         kwargs["task_id"] = task_id
 
-    # 获取单据上下文，自定义字段值优先放入，再由内置通知变量覆盖同名字段
-    context = ticket.get_output_fields(return_format="dict", need_display=True)
+    # 获取单据上下文，自定义字段值优先放入，再由内置通知变量覆盖同名字段。
+    # 上下文获取失败不允许中断通知任务：降级为空上下文继续渲染。
+    if ticket_fields is None:
+        try:
+            ticket_fields = ticket.get_output_fields(
+                return_format="dict", need_display=True
+            )
+        except Exception as error:
+            logger.exception(
+                "get ticket fields context failed, ticket_id={}, error: {}".format(
+                    getattr(ticket, "id", None), error
+                )
+            )
+            ticket_fields = {}
+    # 复制一份，避免调用方缓存的 ticket_fields 被后续 update 污染
+    context = dict(ticket_fields)
     context.update(ticket.get_notify_context())
     context.update(
         message=message, action=_(ACTION_CHOICES_DICT.get(action, "待处理")), **kwargs
