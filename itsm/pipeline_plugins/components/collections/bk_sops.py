@@ -24,6 +24,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import logging
+import time
+
 from itsm.component.constants import SYSTEM_OPERATE, TRANSITION_OPERATE, NODE_FAILED
 from itsm.ticket.serializers import StatusSerializer
 from itsm.ticket.models import Ticket, TicketGlobalVariable
@@ -42,6 +44,52 @@ logger = logging.getLogger("celery")
 class BkOpsService(ItsmBaseService):
     __need_schedule__ = True
     interval = StaticIntervalGenerator(10)
+    # 查询失败后再请求的次数。首次调用之外最多再试 3 次。
+    QUERY_RETRY_TIMES = 3
+    QUERY_RETRY_INTERVAL = 1
+
+    @staticmethod
+    def call_query_api(api_name, bk_username, path_params=None, params=None):
+        """调用查询接口。异常或返回失败时，间隔 1 秒再试，最多再试 3 次。"""
+        total = BkOpsService.QUERY_RETRY_TIMES + 1
+        last_result = None
+        for attempt in range(1, total + 1):
+            try:
+                result = BkSopsApi.call_api_with_auth(
+                    api_name,
+                    bk_username=bk_username,
+                    path_params=path_params,
+                    params=params,
+                )
+            except (APIGatewayResponseError, HTTPResponseError) as error:
+                logger.warning(
+                    "[bk_sops][query] %s 第 %s/%s 次异常, error=%s",
+                    api_name, attempt, total, error,
+                )
+                if attempt >= total:
+                    raise
+                time.sleep(BkOpsService.QUERY_RETRY_INTERVAL)
+                continue
+
+            if BkOpsService.is_api_success(result):
+                if attempt > 1:
+                    logger.info(
+                        "[bk_sops][query] %s 第 %s 次成功", api_name, attempt
+                    )
+                return result
+
+            last_result = result
+            logger.warning(
+                "[bk_sops][query] %s 第 %s/%s 次返回失败, detail=%s",
+                api_name,
+                attempt,
+                total,
+                BkOpsService.build_api_error_message(api_name, result),
+            )
+            if attempt >= total:
+                return result
+            time.sleep(BkOpsService.QUERY_RETRY_INTERVAL)
+        return last_result
 
     @staticmethod
     def is_api_success(api_result):
@@ -393,7 +441,7 @@ class BkOpsService(ItsmBaseService):
         try:
             logger.info("[bk_sops][schedule] 开始 get_task_status, operator=%s, sops_task_id=%s, bk_biz_id=%s",
                         operator, sops_task_id, bk_biz_id)
-            task_result = BkSopsApi.call_api_with_auth(
+            task_result = self.call_query_api(
                 "system_get_task_status",
                 bk_username=operator,
                 path_params={
@@ -500,15 +548,19 @@ class BkOpsService(ItsmBaseService):
 
     @staticmethod
     def get_detail_message(sops_task_id, bk_biz_id, task_info, task_node, operator):
+        status_data = task_info.get("data") if isinstance(task_info.get("data"), dict) else task_info
+        children = status_data.get("children") or {}
+        if not isinstance(children, dict):
+            children = {}
         failed_children = [
             child
-            for child in task_info.get("children", {}).values()
-            if child["state"] == "FAILED"
+            for child in children.values()
+            if isinstance(child, dict) and child.get("state") == "FAILED"
         ]
         error_messages = []
         for child in failed_children:
             try:
-                result = BkSopsApi.call_api_with_auth(
+                result = BkOpsService.call_query_api(
                     "system_get_task_node_detail",
                     bk_username=operator,
                     path_params={
@@ -518,10 +570,10 @@ class BkOpsService(ItsmBaseService):
                     params={"node_id": child["id"]}
                 )
                 if BkOpsService.is_api_success(result):
+                    detail = result.get("data") if isinstance(result.get("data"), dict) else {}
+                    ex_data = detail.get("ex_data") or result.get("ex_data") or "未知错误"
                     error_messages.append(
-                        "{}:{}".format(
-                            child["name"], result.get("ex_data") or "未知错误"
-                        )
+                        "{}:{}".format(child["name"], ex_data)
                     )
                 else:
                     error_messages.append(
