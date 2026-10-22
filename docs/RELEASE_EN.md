@@ -1,5 +1,19 @@
 # Changelog
 
+## [Version: 2.8.1] - 2026-10-22
+【Improved】Migrated Standard Operations (SOPS) API calls from ESB to API Gateway, with improved support for development, testing, and production environments and better request logging
+【Improved】Added automatic retries for SOPS task status polling on network timeouts, connection failures, and certain gateway errors to reduce node failures caused by transient issues
+【Improved】Users with permission to view tickets for the associated service can view SOPS node details
+【Feature】Added a "Node Failed" trigger event for Webhook nodes, with configurable notification recipients and the failure reason and request attempt count included in the trigger context
+【Feature】Added detection and recovery for stuck API nodes, with scheduled checks and optional monitoring event reporting
+【Improved】Enhanced exception handling, retry scheduling, and failure notification fallback for Webhook nodes
+【Improved】Flow-level automatic approval no longer sends BKChat quick approval notifications
+【Improved】Enhanced compatibility with cloud and Community Edition environments, API parameter conversion, and message template rendering
+【Fix】Fixed access errors for tickets with comments caused by inconsistent view permission checks
+【Fix】Fixed trigger email delivery failures and issues sending feedback invitation emails to multiple recipients
+【Fix】Fixed compatibility issues with template rendering arguments and mobile frontend build dependencies, and missing icons in the component library
+【Security】Updated Django 4.2 and selected third-party dependencies to address known security and compatibility issues
+
 ## [Version: 2.8.0] - 2025-10-30
 【Feature】Upgraded version dependencies: Python 3.11 and Django 4.2 
 【Feature】Added Ticket SN Number Update Tool
