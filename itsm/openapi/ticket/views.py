@@ -33,7 +33,7 @@ from rest_framework.response import Response
 
 from blueapps.account.decorators import login_exempt
 from common.log import logger
-from common.cipher import AESVerification
+from common.cipher import CallbackToken
 from common.redis import Cache
 from itsm.component.bkchat.utils import proceed_fast_approval, build_bkchat_summary
 from itsm.component.constants import (
@@ -863,14 +863,15 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     @custom_apigw_required
     def verify(self, request):
         token = request.data.get("token", "")
-        message = settings.APP_CODE + "_" + settings.SECRET_KEY
-        return Response(
-            {
-                "is_passed": AESVerification.verify(
-                    message, bytes(token, encoding="utf-8")
-                )
-            }
-        )
+        result = CallbackToken.verify(token)
+        if not result["is_passed"]:
+            logger.warning(
+                "[CALLBACK] token verify failed, reason is %s, sn is %s",
+                result["reason"],
+                result["sn"],
+            )
+        # 仅返回布尔结果，不泄露任何密钥相关信息
+        return Response({"is_passed": result["is_passed"]})
 
     @action(
         detail=False,

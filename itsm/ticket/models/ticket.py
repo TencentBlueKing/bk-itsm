@@ -3057,9 +3057,6 @@ class Ticket(Model, BaseTicket):
                     self.id,
                 )
                 return
-            message = AESVerification.gen_signature(
-                settings.APP_CODE + "_" + settings.SECRET_KEY
-            )
             request_data = {
                 "title": self.title,
                 "current_status": self.current_status,
@@ -3068,12 +3065,18 @@ class Ticket(Model, BaseTicket):
                 "update_at": str(self.update_at),
                 "updated_by": self.updated_by,
                 "approve_result": self.get_ticket_result(),
-                "token": str(message, encoding="utf-8"),
+ 
+                "token": CallbackToken.generate(self.sn, self.current_status),
                 "last_approver": self.get_last_approver(),
             }
             try:
+                # 日志仅记录结构与目标，避免令牌/自定义请求头落盘
                 logger.info(
-                    "[TICKET] callback_request params is {}".format(request_data)
+                    "[TICKET] callback_request sn is %s, status is %s, target is %s, fields is %s",
+                    self.sn,
+                    self.current_status,
+                    urlparse(callback_url).hostname,
+                    sorted(request_data.keys()),
                 )
                 session = requests.session()
                 resp = session.post(
