@@ -26,6 +26,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 __author__ = "蓝鲸智云"
 __copyright__ = "Copyright © 2012-Now Tencent BlueKing. All Rights Reserved."
 
+import base64
 import json
 import time
 from collections import OrderedDict
@@ -34,7 +35,7 @@ import mock
 from blueapps.core.celery.celery import app
 from django.conf import settings
 from django.test import TestCase, override_settings
-from common.cipher import AESVerification
+from common.cipher import CallbackToken
 from common.redis import Cache
 from itsm.tests.openapi.params import CREATE_TICKET_DATA
 from itsm.ticket.models import Ticket, AttentionUsers, TicketComment
@@ -93,11 +94,9 @@ class TicketOpenTest(TestCase):
     @mock.patch("itsm.component.decorators.JWTClient")
     def test_verify(self, patch_jwt_client):
         patch_jwt_client.is_valid.return_value = True
-        message = AESVerification.gen_signature(
-            settings.APP_CODE + "_" + settings.SECRET_KEY
-        )
+        token = CallbackToken.generate("NO20200101000001", "FINISHED")
         data = {
-            "token": str(message, encoding="utf-8"),
+            "token": token,
         }
         url = "/openapi/ticket/token/verify/"
         rsp = self.client.post(
@@ -105,6 +104,26 @@ class TicketOpenTest(TestCase):
         )
         result = rsp.data["data"]["is_passed"]
         self.assertEqual(True, result)
+
+    def test_verify_should_reject_tampered_token(self):
+        """篡改载荷或签名的令牌应校验失败。"""
+        token = CallbackToken.generate("NO20200101000001", "FINISHED")
+        body, signature = token.split(":", 1)[1].rsplit(".", 1)
+        self.assertFalse(
+            CallbackToken.verify("v2:{}.{}".format(body, "0" * 64))["is_passed"]
+        )
+        self.assertFalse(CallbackToken.verify(token[:-1] + "0")["is_passed"])
+        self.assertFalse(CallbackToken.verify(settings.APP_CODE)["is_passed"])
+
+    def test_callback_token_should_not_leak_secret(self):
+        """回归断言：令牌中不得出现可还原/可见的应用密钥。"""
+        token = CallbackToken.generate("NO20200101000001", "FINISHED")
+        self.assertNotIn(settings.SECRET_KEY, token)
+        payload = token.split(":", 1)[1].rsplit(".", 1)[0]
+        decoded = base64.urlsafe_b64decode(payload.encode("utf-8")).decode("utf-8")
+        self.assertNotIn(settings.SECRET_KEY, decoded)
+        # 明文部分只应包含单据号、状态与时间戳
+        self.assertEqual({"v", "sn", "status", "ts"}, set(json.loads(decoded)))
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.component.decorators.JWTClient")

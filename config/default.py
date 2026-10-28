@@ -846,7 +846,10 @@ BK_IAM_ESB_PAAS_HOST = os.environ.get("BK_IAM_ESB_PAAS_HOST", IAM_ESB_PAAS_HOST)
 
 IAM_INITIAL_FILE = os.environ.get("BKAPP_IAM_INITIAL_FILE", "")
 
-CALLBACK_AES_KEY = "APPROVAL_RESULT"
+# 回调令牌签名密钥，建议设为独立随机值且不等于 APP_TOKEN；留空则基于 SECRET_KEY 派生
+CALLBACK_SIGN_KEY = os.environ.get("BKAPP_CALLBACK_SIGN_KEY", "")
+# 回调令牌有效期（秒），默认 7 天
+CALLBACK_TOKEN_TTL = int(os.environ.get("BKAPP_CALLBACK_TOKEN_TTL", 7 * 24 * 3600))
 
 FRONTEND_URL = os.environ.get("BKAPP_FRONTEND_URL") or os.path.join(
     BK_PAAS_HOST, os.environ.get("BKAPP_ITSM_URL", "o/bk_itsm/")
