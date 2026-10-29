@@ -994,10 +994,14 @@ class TicketSerializer(AuthModelSerializer):
         value = value or {}
 
         callback_url = value.get("callback_url")
-        if callback_url and not DomainValidateService(
-            key="valid_callback_domain_regex_pattern"
-        ).is_safe_url(callback_url):
-            raise serializers.ValidationError(_("meta.callback_url 不在白名单内"))
+        if callback_url:
+            # URL 本身是否规范（协议、host、凭据、CRLF、长度），与域名白名单解耦
+            if not DomainValidateService.is_wellformed_url(callback_url):
+                raise serializers.ValidationError(_("meta.callback_url 格式不合法"))
+            if not DomainValidateService(
+                key="valid_callback_domain_regex_pattern"
+            ).is_safe_url(callback_url):
+                raise serializers.ValidationError(_("meta.callback_url 不在白名单内"))
 
         allowed_keys = set(get_ticket_meta_allowed_keys())
         unknown_keys = sorted(set(value) - allowed_keys)

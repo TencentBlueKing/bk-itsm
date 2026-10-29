@@ -3047,6 +3047,13 @@ class Ticket(Model, BaseTicket):
         callback_url = self.meta.get("callback_url", "")
         headers = self.meta.get("headers", {})
         if callback_url:
+            # URL 本身是否规范（协议、host、凭据、CRLF、长度），与域名白名单解耦
+            if not DomainValidateService.is_wellformed_url(callback_url):
+                logger.warning(
+                    "[TICKET] blocked malformed callback_url, ticket_id is %s",
+                    self.id,
+                )
+                return
             if not DomainValidateService(
                 key="valid_callback_domain_regex_pattern"
             ).is_safe_url(callback_url):
