@@ -27,6 +27,7 @@ import copy
 from collections import OrderedDict
 from datetime import datetime
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from rest_framework import serializers
@@ -123,6 +124,41 @@ from itsm.ticket.utils import (
 from itsm.ticket.validators import CreateTicketValidator, StateOperateValidator
 from itsm.ticket_status.models import TicketStatus
 from itsm.workflow.models import WorkflowVersion
+
+# 工单 meta 允许的键（均为代码实际使用的字段），未知键不入库
+TICKET_META_DEFAULT_ALLOWED_KEYS = (
+    "callback_url",
+    "headers",
+    "ticket_agent",
+    "ticket_status",
+    "notify_config",
+    "state_processors",
+    "envs",
+    "priority",
+)
+
+# 禁止通过 meta.headers 注入的请求头：避免 ITSM 携带自身凭据请求外部地址
+TICKET_META_FORBIDDEN_HEADERS = frozenset(
+    {
+        "authorization",
+        "proxy-authorization",
+        "cookie",
+        "set-cookie",
+        "host",
+        "content-length",
+        "transfer-encoding",
+    }
+)
+
+
+def get_ticket_meta_allowed_keys():
+    """默认键 + 运维侧增量配置：追加（EXTRA）或整体覆盖（OVERRIDE）"""
+    override = tuple(getattr(settings, "TICKET_META_ALLOWED_KEYS_OVERRIDE", ()) or ())
+    if override:
+        return override
+    extra = tuple(getattr(settings, "TICKET_META_EXTRA_ALLOWED_KEYS", ()) or ())
+    return tuple(dict.fromkeys(list(TICKET_META_DEFAULT_ALLOWED_KEYS) + list(extra)))
+
 
 BkUser = get_user_model()
 
@@ -955,11 +991,38 @@ class TicketSerializer(AuthModelSerializer):
         return data
 
     def validate_meta(self, value):
-        callback_url = (value or {}).get("callback_url")
+        value = value or {}
+
+        callback_url = value.get("callback_url")
         if callback_url and not DomainValidateService(
             key="valid_callback_domain_regex_pattern"
         ).is_safe_url(callback_url):
             raise serializers.ValidationError(_("meta.callback_url 不在白名单内"))
+
+        allowed_keys = set(get_ticket_meta_allowed_keys())
+        unknown_keys = sorted(set(value) - allowed_keys)
+
+        headers = value.get("headers") or {}
+        forbidden_headers = sorted(
+            key for key in headers if str(key).lower() in TICKET_META_FORBIDDEN_HEADERS
+        )
+
+        if not (unknown_keys or forbidden_headers):
+            return value
+
+        # 字段级拒绝：未知键与危险请求头不入库，不阻断提单主流程
+        logger.warning(
+            "[TICKET_META] 丢弃非法字段: unknown_keys=%s forbidden_headers=%s",
+            unknown_keys,
+            forbidden_headers,
+        )
+        value = {key: val for key, val in value.items() if key not in unknown_keys}
+        if forbidden_headers:
+            value["headers"] = {
+                key: val
+                for key, val in headers.items()
+                if str(key).lower() not in TICKET_META_FORBIDDEN_HEADERS
+            }
         return value
 
     def run_validation(self, data):
