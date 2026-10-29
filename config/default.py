@@ -848,6 +848,24 @@ IAM_INITIAL_FILE = os.environ.get("BKAPP_IAM_INITIAL_FILE", "")
 
 # 回调令牌签名密钥，建议设为独立随机值且不等于 APP_TOKEN；留空则基于 SECRET_KEY 派生
 CALLBACK_SIGN_KEY = os.environ.get("BKAPP_CALLBACK_SIGN_KEY", "")
+# 工单 meta 白名单的运维侧增量配置。
+# 默认键（代码实际读取的字段）定义在 itsm/ticket/serializers/ticket.py，与消费点同源，此处不重复。
+# 追加：只写要新增的键，默认键依然生效（推荐）
+TICKET_META_EXTRA_ALLOWED_KEYS = tuple(
+    dict.fromkeys(
+        i.strip()
+        for i in os.environ.get("BKAPP_TICKET_META_EXTRA_ALLOWED_KEYS", "").split(",")
+        if i.strip()
+    )
+)
+# 覆盖：非空则完整替换默认键，仅在需要精确控制白名单时使用
+TICKET_META_ALLOWED_KEYS_OVERRIDE = tuple(
+    dict.fromkeys(
+        i.strip()
+        for i in os.environ.get("BKAPP_TICKET_META_ALLOWED_KEYS", "").split(",")
+        if i.strip()
+    )
+)
 # 回调令牌有效期（秒），默认 7 天
 CALLBACK_TOKEN_TTL = int(os.environ.get("BKAPP_CALLBACK_TOKEN_TTL", 7 * 24 * 3600))
 
