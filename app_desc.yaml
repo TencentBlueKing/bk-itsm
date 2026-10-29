@@ -49,11 +49,11 @@ modules:
             pworker:
                 command: python manage.py celery worker -n prefork@%h -P threads -c 10 -l info --max-tasks-per-child=100
                 plan: 2C4G1R
-                replicas: 1
+                replicas: 2
             gworker:
                 command: python manage.py celery worker -P gevent -n gevent@%h -c 4 -l info --max-tasks-per-child=100
                 plan: 2C4G1R
-                replicas: 1
+                replicas: 2
         svc_discovery:
             bk_saas:
                 -   bk_app_code: "bk_itsm"
