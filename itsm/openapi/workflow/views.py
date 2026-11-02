@@ -46,6 +46,30 @@ class WorkflowViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     pagination_class = None
     queryset = WorkflowVersion.objects.all()
 
+    @custom_apigw_required
+    def list(self, request, *args, **kwargs):
+        return super(WorkflowViewSet, self).list(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def create(self, request, *args, **kwargs):
+        return super(WorkflowViewSet, self).create(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def retrieve(self, request, *args, **kwargs):
+        return super(WorkflowViewSet, self).retrieve(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def update(self, request, *args, **kwargs):
+        return super(WorkflowViewSet, self).update(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def partial_update(self, request, *args, **kwargs):
+        return super(WorkflowViewSet, self).partial_update(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def destroy(self, request, *args, **kwargs):
+        return super(WorkflowViewSet, self).destroy(request, *args, **kwargs)
+
     @action(detail=False, methods=["get"], serializer_class=WorkflowSerializer)
     @custom_apigw_required
     def get_workflow_detail(self, request):

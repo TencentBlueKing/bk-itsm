@@ -113,6 +113,30 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     serializer_class = TicketSerializer
     pagination_class = OpenApiPageNumberPagination
 
+    @custom_apigw_required
+    def list(self, request, *args, **kwargs):
+        return super(TicketViewSet, self).list(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def create(self, request, *args, **kwargs):
+        return super(TicketViewSet, self).create(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def retrieve(self, request, *args, **kwargs):
+        return super(TicketViewSet, self).retrieve(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def update(self, request, *args, **kwargs):
+        return super(TicketViewSet, self).update(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def partial_update(self, request, *args, **kwargs):
+        return super(TicketViewSet, self).partial_update(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def destroy(self, request, *args, **kwargs):
+        return super(TicketViewSet, self).destroy(request, *args, **kwargs)
+
     def custom_filter_queryset(self, request, username):
         """构造查询queryset"""
         queryset = self.filter_queryset(self.get_queryset())
