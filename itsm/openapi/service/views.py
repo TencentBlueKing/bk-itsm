@@ -64,6 +64,30 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
         "get_service_catalogs",
     )
 
+    @custom_apigw_required
+    def list(self, request, *args, **kwargs):
+        return super(ServiceViewSet, self).list(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def create(self, request, *args, **kwargs):
+        return super(ServiceViewSet, self).create(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def retrieve(self, request, *args, **kwargs):
+        return super(ServiceViewSet, self).retrieve(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def update(self, request, *args, **kwargs):
+        return super(ServiceViewSet, self).update(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def partial_update(self, request, *args, **kwargs):
+        return super(ServiceViewSet, self).partial_update(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def destroy(self, request, *args, **kwargs):
+        return super(ServiceViewSet, self).destroy(request, *args, **kwargs)
+
     @action(detail=False, methods=["get"], serializer_class=ServiceSerializer)
     @catch_openapi_exception
     @custom_apigw_required

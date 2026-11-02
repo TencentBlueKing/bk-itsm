@@ -53,6 +53,16 @@ class FieldViewSet(BaseFieldViewSet):
         return super(FieldViewSet, self).destroy(request, *args, **kwargs)
 
     @custom_apigw_required
+    def partial_update(self, request, *args, **kwargs):
+        return super(FieldViewSet, self).partial_update(request, *args, **kwargs)
+
+    @action(detail=True, methods=["get"])
+    @custom_apigw_required
+    def download_file(self, request, *args, **kwargs):
+        """下载字段附件：基类同时被站内视图继承，鉴权只在 openapi 侧覆写。"""
+        return super(FieldViewSet, self).download_file(request, *args, **kwargs)
+
+    @custom_apigw_required
     def list(self, request, *args, **kwargs):
         """支持根据流程和节点查询字段，关闭分页"""
 

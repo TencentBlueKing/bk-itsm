@@ -28,6 +28,18 @@ class WorkflowViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         return super(WorkflowViewSet, self).update(request, *args, **kwargs)
 
+    @custom_apigw_required
+    def create(self, request, *args, **kwargs):
+        return super(WorkflowViewSet, self).create(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def partial_update(self, request, *args, **kwargs):
+        return super(WorkflowViewSet, self).partial_update(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def destroy(self, request, *args, **kwargs):
+        return super(WorkflowViewSet, self).destroy(request, *args, **kwargs)
+
     @action(detail=False, methods=["get"])
     @custom_apigw_required
     def get_global_choices(self, request):

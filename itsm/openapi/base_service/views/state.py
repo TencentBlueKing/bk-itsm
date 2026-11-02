@@ -96,6 +96,10 @@ class StateViewSet(BaseWorkflowElementViewSet):
     def destroy(self, request, *args, **kwargs):
         return super(StateViewSet, self).destroy(request, *args, **kwargs)
 
+    @custom_apigw_required
+    def partial_update(self, request, *args, **kwargs):
+        return super(StateViewSet, self).partial_update(request, *args, **kwargs)
+
     @action(detail=True, methods=["get"])
     @custom_apigw_required
     def variables(self, request, *args, **kwargs):

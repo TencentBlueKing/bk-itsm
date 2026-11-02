@@ -30,6 +30,16 @@ class ServiceCatalogViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         return Response(tree_data)
 
     @custom_apigw_required
+    def retrieve(self, request, *args, **kwargs):
+        return super(ServiceCatalogViewSet, self).retrieve(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def partial_update(self, request, *args, **kwargs):
+        return super(ServiceCatalogViewSet, self).partial_update(
+            request, *args, **kwargs
+        )
+
+    @custom_apigw_required
     @catch_openapi_exception
     def list(self, request, *args, **kwargs):
         return Response()

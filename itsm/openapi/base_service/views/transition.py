@@ -56,6 +56,14 @@ class TransitionViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         return super(TransitionViewSet, self).create(request, *args, **kwargs)
 
+    @custom_apigw_required
+    def partial_update(self, request, *args, **kwargs):
+        return super(TransitionViewSet, self).partial_update(request, *args, **kwargs)
+
+    @custom_apigw_required
+    def destroy(self, request, *args, **kwargs):
+        return super(TransitionViewSet, self).destroy(request, *args, **kwargs)
+
     @action(detail=True, methods=["get"])
     @custom_apigw_required
     def variables(self, request, *args, **kwargs):

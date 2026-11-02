@@ -42,6 +42,10 @@ class ServiceViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         return super(ServiceViewSet, self).destroy(request, *args, **kwargs)
 
+    @custom_apigw_required
+    def partial_update(self, request, *args, **kwargs):
+        return super(ServiceViewSet, self).partial_update(request, *args, **kwargs)
+
     def update_workflow_configs(self, workflow_id, workflow_config):
         workflow = Workflow.objects.filter(id=workflow_id).first()
         workflow.update_workflow_configs(workflow_config)
