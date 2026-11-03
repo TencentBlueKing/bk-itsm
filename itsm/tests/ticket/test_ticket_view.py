@@ -1183,3 +1183,133 @@ class UnmergeTicketsAuthzTest(TestCase):
             "itsm.role.models.UserRole.is_itsm_superuser", return_value=True
         ):
             unmerge_authorize_validate(1, "bob")
+
+
+class TicketManagerScopeTest(TestCase):
+    """TicketManager.get_tickets 的通用过滤条件必须在当前用户可见范围内生效。
+
+    回归背景：overall_current_status__in / exclude_ticket_id__in 曾在命中时直接
+    return 未收敛的 queryset，普通用户可借此拿到他人单据（列表与导出同源）。
+    """
+
+    def setUp(self):
+        Ticket.objects.all().delete()
+        self.own_ticket = Ticket.objects.create(
+            sn="SN-SCOPE-OWN",
+            title="own",
+            service_id=1,
+            service_type="request",
+            creator="admin",
+            current_status="RUNNING",
+            is_draft=False,
+        )
+        self.other_ticket = Ticket.objects.create(
+            sn="SN-SCOPE-OTHER",
+            title="other",
+            service_id=1,
+            service_type="request",
+            creator="bob",
+            current_status="RUNNING",
+            is_draft=False,
+        )
+
+    def tearDown(self):
+        Ticket.objects.all().delete()
+
+    @mock.patch(
+        "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
+        return_value={},
+    )
+    def test_overall_status_filter_only_returns_visible_tickets(self, _iam):
+        queryset = Ticket.objects.get_tickets(
+            "admin",
+            Ticket.objects.all(),
+            overall_current_status__in="RUNNING",
+        )
+        sns = set(queryset.values_list("sn", flat=True))
+        self.assertIn("SN-SCOPE-OWN", sns)
+        self.assertNotIn("SN-SCOPE-OTHER", sns)
+
+    @mock.patch(
+        "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
+        return_value={},
+    )
+    def test_exclude_ticket_id_filter_only_returns_visible_tickets(self, _iam):
+        queryset = Ticket.objects.get_tickets(
+            "admin",
+            Ticket.objects.all(),
+            exclude_ticket_id__in="0",
+        )
+        sns = set(queryset.values_list("sn", flat=True))
+        self.assertIn("SN-SCOPE-OWN", sns)
+        self.assertNotIn("SN-SCOPE-OTHER", sns)
+
+    @mock.patch(
+        "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
+        return_value={},
+    )
+    def test_exclude_ticket_id_and_status_filter_combined(self, _iam):
+        queryset = Ticket.objects.get_tickets(
+            "admin",
+            Ticket.objects.all(),
+            overall_current_status__in="RUNNING",
+            exclude_ticket_id__in=str(self.own_ticket.id),
+        )
+        sns = set(queryset.values_list("sn", flat=True))
+        self.assertNotIn("SN-SCOPE-OWN", sns)
+        self.assertNotIn("SN-SCOPE-OTHER", sns)
+
+    @mock.patch(
+        "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
+        return_value={},
+    )
+    @override_settings(USE_IAM=False)
+    def test_filters_skip_iam_when_iam_disabled(self, _iam):
+        """未开启 IAM 的私有化环境：可见范围只走本地数据，不发起权限中心请求。"""
+        queryset = Ticket.objects.get_tickets(
+            "admin",
+            Ticket.objects.all(),
+            exclude_ticket_id__in="0",
+        )
+        sns = set(queryset.values_list("sn", flat=True))
+        self.assertIn("SN-SCOPE-OWN", sns)
+        self.assertNotIn("SN-SCOPE-OTHER", sns)
+        _iam.assert_not_called()
+
+    @mock.patch(
+        "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
+        return_value={},
+    )
+    def test_followed_ticket_is_visible(self, _iam):
+        """仅关注、未参与的单据也要出现在过滤后的列表里。"""
+        AttentionUsers.objects.create(
+            ticket_id=self.other_ticket.id, follower="admin"
+        )
+
+        queryset = Ticket.objects.get_tickets(
+            "admin",
+            Ticket.objects.all(),
+            exclude_ticket_id__in="0",
+        )
+        self.assertIn("SN-SCOPE-OTHER", set(queryset.values_list("sn", flat=True)))
+
+        queryset = Ticket.objects.get_tickets(
+            "admin",
+            Ticket.objects.all(),
+            overall_current_status__in="RUNNING",
+        )
+        self.assertIn("SN-SCOPE-OTHER", set(queryset.values_list("sn", flat=True)))
+
+    def test_empty_username_returns_nothing(self):
+        """openapi get_tickets_by_user 传 user='' 时不能退化成全表。"""
+        for extra in (
+            {},
+            {"exclude_ticket_id__in": "0"},
+            {"overall_current_status__in": "RUNNING"},
+            {"view_type": "my_todo"},
+        ):
+            queryset = Ticket.objects.get_tickets("", Ticket.objects.all(), **extra)
+            self.assertFalse(queryset.exists(), extra)
+
+        todo_queryset = Ticket.objects.get_todo_tickets(Ticket.objects.all(), "")
+        self.assertFalse(todo_queryset.exists())

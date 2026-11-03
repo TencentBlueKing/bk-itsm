@@ -30,6 +30,7 @@ import time
 from functools import reduce
 from itertools import chain
 
+from django.conf import settings
 from django.utils.functional import partition
 from six.moves import zip
 
@@ -179,7 +180,7 @@ class TicketManager(Manager):
         我的待办节点2 任务处理人中包含我
         """
         if not username:
-            return queryset
+            return queryset.none()
 
         role_filter = self.build_todo_role_filter(username)
         closed_status = set(
@@ -338,8 +339,30 @@ class TicketManager(Manager):
         """我关注的"""
         return queryset.filter(id__in=list(self.get_followed_ticket(username)))
 
+    def get_user_visible_tickets(self, queryset, username, with_iam=None):
+        """当前用户可见的单据：我创建的 ∪ 待办 ∪ 处理过 ∪ 关注 [∪ IAM 授权]，with_iam 为空时跟随 USE_IAM"""
+        if not username:
+            return queryset.none()
+
+        if with_iam is None:
+            with_iam = getattr(settings, "USE_IAM", True)
+
+        visible_queryset = (
+            queryset.filter(creator=username)
+            | self.get_todo_tickets(queryset, username)
+            | self.get_history_tickets(queryset, username)
+            | self.get_attention_tickets(queryset, username)
+        )
+        if not with_iam:
+            return visible_queryset
+
+        return visible_queryset | self.get_iam_auth_tickets(queryset, username)
+
     def get_tickets(self, username, queryset, **kwargs):
         """查询单据"""
+        # 空用户名不再放行全表
+        if not username:
+            return queryset.none()
 
         # 过滤非草稿单
         queryset = queryset.filter(is_draft=False)
@@ -382,16 +405,19 @@ class TicketManager(Manager):
         if current_processor:
             queryset = self.get_todo_tickets(queryset, current_processor)
 
-        # 全局视图单据状态筛选
-        if kwargs.get("overall_current_status__in"):
-            return self.get_overall_statuses_tickets(
-                queryset, kwargs.get("overall_current_status__in")
-            )
-
-        if kwargs.get("exclude_ticket_id__in"):
-            return self.get_exclude_ticket_ids_tickets(
-                queryset, kwargs.get("exclude_ticket_id__in")
-            )
+        # 状态筛选/排除单据必须先收敛到可见范围，否则会绕过下面的归属过滤
+        overall_current_status = kwargs.get("overall_current_status__in")
+        exclude_ticket_ids = kwargs.get("exclude_ticket_id__in")
+        if overall_current_status or exclude_ticket_ids:
+            if overall_current_status:
+                queryset = self.get_overall_statuses_tickets(
+                    queryset, overall_current_status
+                )
+            if exclude_ticket_ids:
+                queryset = self.get_exclude_ticket_ids_tickets(
+                    queryset, exclude_ticket_ids
+                )
+            return self.get_user_visible_tickets(queryset, username)
 
         view_type = kwargs.get("view_type", "")
 
