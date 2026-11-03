@@ -24,6 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import copy
+import hashlib
 import json
 import operator
 import time
@@ -31,6 +32,7 @@ from functools import reduce
 from itertools import chain
 
 from django.conf import settings
+from django.core.cache import cache
 from django.utils.functional import partition
 from six.moves import zip
 
@@ -69,6 +71,10 @@ from itsm.role.models import BKUserRole, UserRole
 from itsm.service.models import ServiceCatalog
 from itsm.ticket_status.models import TicketStatus
 from itsm.workflow.backend import PipelineWrapper
+
+# 权限中心「服务级查看」鉴权结果缓存，命中后不再发起远程请求；无授权时缩短 TTL，避免 IAM 抖动被放大
+IAM_AUTH_CACHE_TTL = 60
+IAM_AUTH_CACHE_TTL_ON_EMPTY = 5
 
 
 class Manager(managers.Manager):
@@ -277,36 +283,68 @@ class TicketManager(Manager):
             | Q(history_task_processors=dotted_username)
         ).exclude(creator=username)
 
-    def get_iam_auth_tickets(self, queryset, username):
-        iam_client = IamRequest(username=username)
+    @staticmethod
+    def build_iam_auth_cache_key(username, service_project_key_map):
+        """鉴权缓存 key：用户 + 服务/项目组合，避免跨用户或跨项目串权限"""
+        source = "|".join(
+            sorted(
+                "{0}:{1}".format(
+                    service_id, "NULL" if project_key is None else project_key
+                )
+                for service_id, project_key in service_project_key_map.items()
+            )
+        )
+        digest = hashlib.md5(
+            "{0}|{1}".format(username, source).encode("utf-8")
+        ).hexdigest()
+        tenant_id = getattr(settings, "BKPAAS_APP_TENANT_ID", "") or "default"
+        return "itsm:iam:ticket_view:{0}:{1}".format(tenant_id, digest)
 
-        data = queryset.values("service_id", "project_key")
+    def get_iam_auth_tickets(self, queryset, username):
         service_project_key_map = {}
-        service_ids = set()
-        for item in data:
-            service_ids.add(item["service_id"])
+        for item in queryset.values("service_id", "project_key").distinct():
             service_project_key_map[item["service_id"]] = item["project_key"]
 
-        resources = [
-            {
-                "resource_id": service_id,
-                "resource_type": "service",
-                "project_key": service_project_key_map.get(service_id),
-            }
-            for service_id in service_ids
-        ]
+        if not service_project_key_map:
+            return queryset.none()
 
-        apply_actions = ["ticket_view"]
-        auth_actions = iam_client.batch_resource_multi_actions_allowed(
-            apply_actions, resources
-        )
-        return queryset.filter(
-            service_id__in=[
+        cache_key = self.build_iam_auth_cache_key(username, service_project_key_map)
+        # 缓存异常时降级直连权限中心，不影响列表可用性
+        try:
+            allowed_service_ids = cache.get(cache_key)
+        except Exception as error:
+            logger.warning("get iam auth cache failed: %s", error)
+            allowed_service_ids = None
+
+        if allowed_service_ids is None:
+            resources = [
+                {
+                    "resource_id": service_id,
+                    "resource_type": "service",
+                    "project_key": project_key,
+                }
+                for service_id, project_key in service_project_key_map.items()
+            ]
+            auth_actions = IamRequest(
+                username=username
+            ).batch_resource_multi_actions_allowed(["ticket_view"], resources)
+            allowed_service_ids = [
                 service_id
                 for service_id, perm in auth_actions.items()
                 if perm.get("ticket_view")
             ]
-        )
+            try:
+                cache.set(
+                    cache_key,
+                    allowed_service_ids,
+                    IAM_AUTH_CACHE_TTL
+                    if allowed_service_ids
+                    else IAM_AUTH_CACHE_TTL_ON_EMPTY,
+                )
+            except Exception as error:
+                logger.warning("set iam auth cache failed: %s", error)
+
+        return queryset.filter(service_id__in=allowed_service_ids)
 
     def get_created_tickets(self, queryset, username):
         """我创建的"""

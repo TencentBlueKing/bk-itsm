@@ -31,7 +31,7 @@ from django.utils.translation import gettext as _
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from bulk_update.helper import bulk_update
 
 from common.log import logger
@@ -89,7 +89,18 @@ class TaskViewSet(component_viewsets.ModelViewSet):
         if not self.request.query_params.get("page_size"):
             self.pagination_class = None
         query_set = super().get_queryset()
+        # 列表只返回当前用户可见单据下的任务，避免越权枚举他人任务
+        if getattr(self, "action", None) == "list":
+            visible_ticket_ids = self.get_visible_ticket_ids()
+            query_set = query_set.filter(ticket_id__in=visible_ticket_ids)
         return query_set
+
+    def get_visible_ticket_ids(self):
+        from itsm.ticket.models import Ticket
+
+        return Ticket.objects.get_user_visible_tickets(
+            Ticket.objects.all(), self.request.user.username
+        ).values("id")
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
@@ -97,6 +108,9 @@ class TaskViewSet(component_viewsets.ModelViewSet):
         filter_serializer = TaskFilterSerializer(data=self.request.query_params)
         filter_serializer.is_valid(raise_exception=True)
         kwargs = filter_serializer.validated_data
+        # 不允许按他人身份检索任务
+        if kwargs.get("username") and kwargs["username"] != self.request.user.username:
+            kwargs.pop("username")
         queryset = Task.objects.get_tasks(queryset, **kwargs)
         return queryset
 
@@ -105,6 +119,11 @@ class TaskViewSet(component_viewsets.ModelViewSet):
         need_start = data.pop("need_start", False)
         serializer = TaskCreateSerializer(data=data)
         serializer.is_valid(raise_exception=True)
+
+        if need_start:
+            TaskViewSet.validate_start_permission(
+                serializer.validated_data.get("ticket_id"), username
+            )
 
         with transaction.atomic():
             fields = serializer.validated_data.pop("fields", {})
@@ -116,6 +135,21 @@ class TaskViewSet(component_viewsets.ModelViewSet):
         )  # 放在事务里会在事务未提交时去获取，导致获取不到
 
         return instance
+
+    @staticmethod
+    def validate_start_permission(ticket_id, username):
+        """启动任务会在单据下真实执行组件，仅允许创建人 / 处理人 / 超管"""
+        from itsm.role.models import UserRole
+        from itsm.ticket.models import Ticket
+
+        if UserRole.is_itsm_superuser(username):
+            return
+
+        ticket = Ticket.objects.filter(pk=ticket_id).first()
+        if ticket and TaskPermissionValidate.can_write_ticket(ticket, username):
+            return
+
+        raise PermissionDenied(_("您无权启动该单据的任务"))
 
     def create(self, request, *args, **kwargs):
         try:
@@ -358,6 +392,16 @@ class TaskFieldViewSet(component_viewsets.ModelViewSet):
         "stage": ["exact", "in"],
     }
     ordering_fields = ("sequence",)
+
+    def get_queryset(self):
+        from itsm.ticket.models import Ticket
+
+        visible_task_ids = Task.objects.filter(
+            ticket_id__in=Ticket.objects.get_user_visible_tickets(
+                Ticket.objects.all(), self.request.user.username
+            ).values("id")
+        ).values("id")
+        return super().get_queryset().filter(task_id__in=visible_task_ids)
 
     @action(detail=False, methods=["put"])
     def batch_update(self, request):

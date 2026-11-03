@@ -25,10 +25,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import json
 
 import mock
+from django.core.cache import cache
 from django.test import TestCase, override_settings
 
 from blueapps.core.celery.celery import app
 from itsm.service.models import CatalogService
+from itsm.ticket.managers import IAM_AUTH_CACHE_TTL_ON_EMPTY
 from itsm.ticket.models import Ticket, AttentionUsers
 from pipeline.engine.models import FunctionSwitch
 
@@ -1185,6 +1187,14 @@ class UnmergeTicketsAuthzTest(TestCase):
             unmerge_authorize_validate(1, "bob")
 
 
+@override_settings(
+    CACHES={
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "ticket-manager-scope-cache",
+        }
+    }
+)
 class TicketManagerScopeTest(TestCase):
     """TicketManager.get_tickets 的通用过滤条件必须在当前用户可见范围内生效。
 
@@ -1194,6 +1204,7 @@ class TicketManagerScopeTest(TestCase):
 
     def setUp(self):
         Ticket.objects.all().delete()
+        cache.clear()
         self.own_ticket = Ticket.objects.create(
             sn="SN-SCOPE-OWN",
             title="own",
@@ -1313,3 +1324,81 @@ class TicketManagerScopeTest(TestCase):
 
         todo_queryset = Ticket.objects.get_todo_tickets(Ticket.objects.all(), "")
         self.assertFalse(todo_queryset.exists())
+
+
+@override_settings(
+    CACHES={
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "iam-auth-ticket-cache",
+        }
+    }
+)
+class IamAuthTicketCacheTest(TestCase):
+    """服务级 IAM 授权结果缓存：同一用户同一服务集合不重复请求权限中心。"""
+
+    def setUp(self):
+        Ticket.objects.all().delete()
+        cache.clear()
+        Ticket.objects.create(
+            sn="SN-IAM-CACHE",
+            title="cache",
+            service_id=1,
+            service_type="request",
+            creator="bob",
+            current_status="RUNNING",
+            is_draft=False,
+        )
+
+    def tearDown(self):
+        Ticket.objects.all().delete()
+        cache.clear()
+
+    def _services(self, queryset):
+        return set(queryset.values_list("sn", flat=True))
+
+    @mock.patch(
+        "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
+        return_value={"1": {"ticket_view": True}},
+    )
+    def test_second_call_hits_cache(self, _iam):
+        queryset = Ticket.objects.all()
+        first = self._services(
+            Ticket.objects.get_iam_auth_tickets(queryset, "admin")
+        )
+        second = self._services(
+            Ticket.objects.get_iam_auth_tickets(queryset, "admin")
+        )
+        self.assertEqual(first, {"SN-IAM-CACHE"})
+        self.assertEqual(first, second)
+        self.assertEqual(_iam.call_count, 1)
+
+    @mock.patch(
+        "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
+        return_value={"1": {"ticket_view": True}},
+    )
+    def test_different_users_do_not_share_cache(self, _iam):
+        queryset = Ticket.objects.all()
+        Ticket.objects.get_iam_auth_tickets(queryset, "admin")
+        Ticket.objects.get_iam_auth_tickets(queryset, "someone")
+        self.assertEqual(_iam.call_count, 2)
+
+    @mock.patch(
+        "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
+        return_value={},
+    )
+    def test_empty_queryset_skips_iam(self, _iam):
+        queryset = Ticket.objects.none()
+        self.assertFalse(
+            Ticket.objects.get_iam_auth_tickets(queryset, "admin").exists()
+        )
+        _iam.assert_not_called()
+
+    @mock.patch(
+        "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
+        return_value={},
+    )
+    @mock.patch("itsm.ticket.managers.cache.set")
+    def test_empty_auth_uses_short_ttl(self, cache_set, _iam):
+        Ticket.objects.get_iam_auth_tickets(Ticket.objects.all(), "admin")
+        self.assertEqual(cache_set.call_args[0][2], IAM_AUTH_CACHE_TTL_ON_EMPTY)
