@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import copy
 import functools
+import hashlib
 import json
 import time
 from datetime import datetime
@@ -1299,6 +1300,10 @@ class Status(Model):
             ]
 
 
+# 单据级 IAM 管理权限（ticket_management）判定结果缓存时长
+IAM_TICKET_MANAGE_CACHE_TTL = 60
+
+
 class Ticket(Model, BaseTicket):
     """工单表"""
 
@@ -2224,6 +2229,24 @@ class Ticket(Model, BaseTicket):
         )
 
     def iam_ticket_manage_auth(self, username):
+        cache_key = "itsm:iam:ticket_manage:{0}:{1}".format(
+            getattr(settings, "BKPAAS_APP_TENANT_ID", "") or "default",
+            hashlib.md5(
+                "{0}|{1}|{2}".format(
+                    username, self.service_id, self.project_key or ""
+                ).encode("utf-8")
+            ).hexdigest(),
+        )
+        # 缓存异常时降级直连权限中心，不影响业务可用性
+        try:
+            cached = cache.get(cache_key)
+        except Exception as error:
+            logger.warning("get iam ticket manage cache failed: %s", error)
+            cached = None
+
+        if cached is not None:
+            return cached
+
         iam_client = IamRequest(username=username)
         resource_info = {
             "resource_id": str(self.service_id),
@@ -2235,10 +2258,14 @@ class Ticket(Model, BaseTicket):
         auth_actions = iam_client.resource_multi_actions_allowed(
             apply_actions, [resource_info], project_key=self.project_key
         )
-        if auth_actions.get("ticket_management"):
-            return True
+        result = bool(auth_actions.get("ticket_management"))
 
-        return False
+        try:
+            cache.set(cache_key, result, IAM_TICKET_MANAGE_CACHE_TTL)
+        except Exception as error:
+            logger.warning("set iam ticket manage cache failed: %s", error)
+
+        return result
 
     def can_operate(self, username):
         """

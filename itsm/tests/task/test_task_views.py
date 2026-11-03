@@ -14,10 +14,12 @@ import json
 from unittest import mock
 
 from django.test import TestCase, override_settings
+from rest_framework.exceptions import PermissionDenied
 
 from itsm.component.constants.task import NORMAL_TASK
 from itsm.task.models import Task, TaskField, TaskLib
 from itsm.task.permissions import TaskPermissionValidate
+from itsm.task.views.task import TaskViewSet
 from itsm.ticket.models import Ticket
 
 
@@ -284,3 +286,199 @@ class TaskLibPersonalScopeTest(TestCase):
         names = [item["name"] for item in resp.data["data"]]
         self.assertIn("mine", names)
         self.assertNotIn("other", names)
+
+
+class TaskListScopeTest(TestCase):
+    """M-02：任务列表不得枚举他人单据下的任务。"""
+
+    def setUp(self):
+        Ticket.objects.all().delete()
+        Task.objects.all().delete()
+        self.mine = _make_ticket(creator="admin", current_status="RUNNING")
+        self.other = _make_ticket(creator="bob", current_status="RUNNING")
+        self.mine_task = _make_task(self.mine, name="mine_task")
+        self.other_task = _make_task(self.other, name="other_task")
+
+    def tearDown(self):
+        Task.objects.all().delete()
+        Ticket.objects.all().delete()
+
+    def _names(self, resp):
+        return [item["name"] for item in resp.data["data"]]
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.task.serializers.TaskListSerializer.get_sops_tasks", return_value={})
+    @mock.patch(
+        "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
+        return_value={},
+    )
+    @mock.patch(
+        "itsm.role.models.BKUserRole.get_or_update_user_roles",
+        return_value={"cmdb": {}, "organization": []},
+    )
+    @mock.patch("itsm.role.models.get_user_departments", return_value=[])
+    def test_list_only_returns_visible_tasks(self, *_):
+        resp = self.client.get("/api/task/tasks/")
+        self.assertEqual(resp.status_code, 200)
+        names = self._names(resp)
+        self.assertIn("mine_task", names)
+        self.assertNotIn("other_task", names)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.task.serializers.TaskListSerializer.get_sops_tasks", return_value={})
+    @mock.patch(
+        "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
+        return_value={},
+    )
+    @mock.patch(
+        "itsm.role.models.BKUserRole.get_or_update_user_roles",
+        return_value={"cmdb": {}, "organization": []},
+    )
+    @mock.patch("itsm.role.models.get_user_departments", return_value=[])
+    def test_list_by_others_ticket_returns_empty(self, *_):
+        resp = self.client.get("/api/task/tasks/?ticket_id={}".format(self.other.id))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(self._names(resp), [])
+
+
+class TaskCreateScopeTest(TestCase):
+    """M-02：不得向他人单据注入任务。"""
+
+    def setUp(self):
+        Ticket.objects.all().delete()
+        Task.objects.all().delete()
+        self.mine = _make_ticket(creator="admin", current_status="RUNNING")
+        self.other = _make_ticket(creator="bob", current_status="RUNNING")
+
+    def tearDown(self):
+        Task.objects.all().delete()
+        Ticket.objects.all().delete()
+
+    def _payload(self, ticket_id):
+        return {
+            "ticket_id": ticket_id,
+            "state_id": 1,
+            "task_schema_id": 1,
+            "component_type": NORMAL_TASK,
+            "fields": {"task_name": "poc_task"},
+        }
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.UserRole.is_itsm_superuser", return_value=False)
+    @mock.patch("itsm.ticket.models.Ticket.can_operate", return_value=False)
+    @mock.patch(
+        "itsm.ticket.models.Ticket.real_current_processors",
+        new_callable=mock.PropertyMock,
+        return_value=[],
+    )
+    def test_create_on_others_ticket_forbidden(self, *_):
+        before = Task.objects.count()
+        resp = self.client.post(
+            "/api/task/tasks/",
+            data=json.dumps(self._payload(self.other.id)),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, 403)
+        self.assertEqual(Task.objects.count(), before)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.task.views.task.TaskViewSet.create_task")
+    @mock.patch("itsm.ticket.models.Ticket.can_operate", return_value=False)
+    @mock.patch(
+        "itsm.ticket.models.Ticket.real_current_processors",
+        new_callable=mock.PropertyMock,
+        return_value=[],
+    )
+    def test_create_on_own_ticket_allowed(self, _processors, _can_operate, create_task):
+        create_task.return_value = mock.MagicMock(id=1)
+        resp = self.client.post(
+            "/api/task/tasks/",
+            data=json.dumps(self._payload(self.mine.id)),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, 201)
+        self.assertTrue(create_task.called)
+
+
+class TaskStartPermissionTest(TestCase):
+    """M-02：need_start 会真实执行组件，必须命中单据写权限。"""
+
+    def setUp(self):
+        Ticket.objects.all().delete()
+        self.mine = _make_ticket(creator="admin", current_status="RUNNING")
+        self.other = _make_ticket(creator="bob", current_status="RUNNING")
+
+    def tearDown(self):
+        Ticket.objects.all().delete()
+
+    @mock.patch("itsm.role.models.UserRole.is_itsm_superuser", return_value=False)
+    @mock.patch("itsm.ticket.models.Ticket.can_operate", return_value=False)
+    @mock.patch(
+        "itsm.ticket.models.Ticket.real_current_processors",
+        new_callable=mock.PropertyMock,
+        return_value=[],
+    )
+    def test_start_rejects_unrelated_user(self, *_):
+        with self.assertRaises(PermissionDenied):
+            TaskViewSet.validate_start_permission(self.other.id, "admin")
+
+    @mock.patch("itsm.role.models.UserRole.is_itsm_superuser", return_value=False)
+    def test_start_allows_creator(self, *_):
+        # 不抛异常即通过
+        TaskViewSet.validate_start_permission(self.mine.id, "admin")
+
+    @mock.patch("itsm.role.models.UserRole.is_itsm_superuser", return_value=False)
+    @mock.patch("itsm.ticket.models.Ticket.can_operate", return_value=False)
+    @mock.patch(
+        "itsm.ticket.models.Ticket.real_current_processors",
+        new_callable=mock.PropertyMock,
+        return_value=[],
+    )
+    def test_start_rejects_missing_ticket(self, *_):
+        with self.assertRaises(PermissionDenied):
+            TaskViewSet.validate_start_permission(99999999, "admin")
+
+
+class TaskFieldScopeTest(TestCase):
+    """M-02：任务字段接口不得按 task_id 枚举他人任务字段。"""
+
+    def setUp(self):
+        TaskField.objects.all().delete()
+        Task.objects.all().delete()
+        Ticket.objects.all().delete()
+        self.mine = _make_ticket(creator="admin", current_status="RUNNING")
+        self.other = _make_ticket(creator="bob", current_status="RUNNING")
+        self.mine_task = _make_task(self.mine, name="mine_task")
+        self.other_task = _make_task(self.other, name="other_task")
+        TaskField.objects.create(
+            task=self.mine_task, key="k1", name="mine_field", _value="mine"
+        )
+        TaskField.objects.create(
+            task=self.other_task, key="k1", name="other_field", _value="other"
+        )
+
+    def tearDown(self):
+        TaskField.objects.all().delete()
+        Task.objects.all().delete()
+        Ticket.objects.all().delete()
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch(
+        "itsm.component.drf.permissions.IamAuthWithoutResourcePermit.has_permission",
+        return_value=True,
+    )
+    @mock.patch(
+        "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
+        return_value={},
+    )
+    @mock.patch(
+        "itsm.role.models.BKUserRole.get_or_update_user_roles",
+        return_value={"cmdb": {}, "organization": []},
+    )
+    @mock.patch("itsm.role.models.get_user_departments", return_value=[])
+    def test_field_list_scoped(self, *_):
+        resp = self.client.get(
+            "/api/task/task_fields/?task_id={}".format(self.other_task.id)
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["data"], [])

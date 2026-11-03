@@ -73,6 +73,37 @@ class TaskPermissionValidate(permissions.BasePermission):
     def __init__(self):
         self.message = _("抱歉，您无权处理该任务")
 
+    @staticmethod
+    def can_write_ticket(ticket, username):
+        """单据写权限：创建人 / 当前处理人 / 可操作（含 IAM 服务管理员）"""
+        return (
+            ticket.creator == username
+            or username in ticket.real_current_processors
+            or ticket.can_operate(username)
+        )
+
+    def has_permission(self, request, view):
+        """创建任务需要目标单据的写权限，避免向他人单据注入任务"""
+        if getattr(view, "action", None) != "create":
+            return True
+
+        username = request.user.username
+        if UserRole.is_itsm_superuser(username):
+            return True
+
+        data = request.data if isinstance(request.data, dict) else {}
+        ticket_id = data.get("ticket_id")
+        if not ticket_id:
+            return True
+
+        from itsm.ticket.models import Ticket
+
+        ticket = Ticket.objects.filter(pk=ticket_id).first()
+        if ticket is None:
+            return True
+
+        return self.can_write_ticket(ticket, username)
+
     def has_object_permission(self, request, view, obj):
 
         username = request.user.username
@@ -91,11 +122,7 @@ class TaskPermissionValidate(permissions.BasePermission):
             return False
 
         if view.action in TASK_WRITE_ACTIONS:
-            return (
-                ticket.creator == username
-                or username in ticket.real_current_processors
-                or ticket.can_operate(username)
-            )
+            return self.can_write_ticket(ticket, username)
 
         # TASK_READ_ACTIONS
         return ticket.can_view(username)
