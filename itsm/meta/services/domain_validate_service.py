@@ -34,13 +34,24 @@ logger = logging.getLogger("root")
 MAX_URL_LENGTH = 2048
 # URL 中不允许出现的字符：控制字符与空白，防 CRLF 注入请求行/请求头
 URL_FORBIDDEN_CHARS = frozenset(chr(i) for i in range(0x20)) | {"\x7f", " "}
+# 域名白名单分隔符：英文逗号/分号/换行，三选一即可
+PATTERN_SEPARATORS = frozenset({",", ";", "\n", "\r"})
+# 正则内的括号结构，其中的分隔符不作为规则边界（如 {2,3}、[^,]）
+PATTERN_BRACKETS = {"[": "]", "{": "}", "(": ")"}
+# 通配符风格规则 `*.example.com`：整条仅由 `*.` 与域名字符构成时自动转正则
+WILDCARD_PATTERN = re.compile(r"^\*\.[a-zA-Z0-9.-]+$")
 
 
 class DomainValidateService:
     def __init__(self, key: str = "domain_regex_pattern"):
         self.allow_patterns = self.compile_domain_patterns(key)
 
-    def is_safe_url(self, url):
+    def is_safe_url(self, url, fail_open=True):
+        """域名白名单校验
+
+        fail_open=True：白名单未配置时放行（Postman 远程 API 等内网场景，保持存量行为）
+        fail_open=False：白名单未配置时拒绝（工单回调等对外场景，默认拒绝）
+        """
         try:
             parsed = urlparse(url)
 
@@ -53,9 +64,14 @@ class DomainValidateService:
             if not hostname:
                 return False
 
-            # 如果没有配置允许的域名正则表达式列表，则默认允许
+            # 没有配置允许的域名正则表达式列表
             if not self.allow_patterns:
-                return True
+                logger.warning(
+                    "domain whitelist is empty, host %s is %s",
+                    hostname,
+                    "allowed" if fail_open else "rejected",
+                )
+                return fail_open
 
             # 匹配域名是否符合允许的正则表达式列表
             for pattern in self.allow_patterns:
@@ -106,9 +122,51 @@ class DomainValidateService:
         return True
 
     @staticmethod
+    def split_patterns(raw):
+        """按逗号/分号/换行拆分多条域名正则。
+
+        正则括号内（如 `a{2,3}`、`[^,]`）与转义字符（如 `\,`）中的分隔符不切分。
+        """
+        if not raw:
+            return []
+
+        parts, buffer, stack = [], [], []
+        index, length = 0, len(raw)
+        while index < length:
+            char = raw[index]
+            if char == "\\" and index + 1 < length:
+                buffer.append(raw[index : index + 2])
+                index += 2
+                continue
+            if char in PATTERN_BRACKETS:
+                stack.append(PATTERN_BRACKETS[char])
+            elif stack and char == stack[-1]:
+                stack.pop()
+            elif not stack and char in PATTERN_SEPARATORS:
+                parts.append("".join(buffer))
+                buffer = []
+                index += 1
+                continue
+            buffer.append(char)
+            index += 1
+
+        parts.append("".join(buffer))
+        return [part.strip() for part in parts if part.strip()]
+
+    @staticmethod
+    def normalize_pattern(pattern):
+        """`*.example.com` 通配符写法转正则，其余按正则原样处理。"""
+        if WILDCARD_PATTERN.match(pattern):
+            return r"^([a-z0-9-]+\.)*" + re.escape(pattern[2:].lower()) + "$"
+        return pattern
+
+    @staticmethod
     def compile_domain_patterns(key):
         """编译并返回域名正则表达式"""
         patterns = ContextService.get_context_value(key)
         if not patterns:
             return []
-        return [re.compile(i.strip()) for i in patterns.split(";") if i.strip()]
+        return [
+            re.compile(DomainValidateService.normalize_pattern(i))
+            for i in DomainValidateService.split_patterns(patterns)
+        ]

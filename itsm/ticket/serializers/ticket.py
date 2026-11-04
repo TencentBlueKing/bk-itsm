@@ -1000,7 +1000,7 @@ class TicketSerializer(AuthModelSerializer):
                 raise serializers.ValidationError(_("meta.callback_url 格式不合法"))
             if not DomainValidateService(
                 key="valid_callback_domain_regex_pattern"
-            ).is_safe_url(callback_url):
+            ).is_safe_url(callback_url, fail_open=False):
                 raise serializers.ValidationError(_("meta.callback_url 不在白名单内"))
 
         allowed_keys = set(get_ticket_meta_allowed_keys())
