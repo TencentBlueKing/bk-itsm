@@ -31,6 +31,7 @@ import time
 from datetime import datetime
 from itertools import chain
 from json import JSONDecodeError
+from urllib.parse import urlparse
 
 import requests
 import jsonfield
@@ -42,6 +43,7 @@ from django.db.models import Q, Count
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
+from common.cipher import CallbackToken
 from common.log import logger
 from common.redis import Cache
 from dateutil.relativedelta import relativedelta
@@ -3083,13 +3085,25 @@ class Ticket(Model, BaseTicket):
                 return
             if not DomainValidateService(
                 key="valid_callback_domain_regex_pattern"
-            ).is_safe_url(callback_url):
+            ).is_safe_url(callback_url, fail_open=False):
                 logger.warning(
                     "[TICKET] blocked unsafe callback_url, callback_url is %s, ticket_id is %s",
                     callback_url,
                     self.id,
                 )
                 return
+
+            try:
+                target = urlparse(callback_url).hostname
+            except Exception as err:
+                target = "<unparsable>"
+                logger.warning(
+                    "[TICKET] callback_url parse failed, callback_url is %s, err is %s, ticket_id is %s",
+                    callback_url,
+                    err,
+                    self.id,
+                )
+
             request_data = {
                 "title": self.title,
                 "current_status": self.current_status,
@@ -3108,12 +3122,18 @@ class Ticket(Model, BaseTicket):
                     "[TICKET] callback_request sn is %s, status is %s, target is %s, fields is %s",
                     self.sn,
                     self.current_status,
-                    urlparse(callback_url).hostname,
+                    target,
                     sorted(request_data.keys()),
                 )
                 session = requests.session()
+                # 不跟随跳转：避免通过 302 绕过域名白名单；超时避免异常目标阻塞工单流转
                 resp = session.post(
-                    url=callback_url, json=request_data, verify=False, headers=headers
+                    url=callback_url,
+                    json=request_data,
+                    verify=False,
+                    headers=headers,
+                    timeout=(5, 10),
+                    allow_redirects=False,
                 )
                 if resp.status_code not in {200, 201}:
                     raise Exception(
@@ -3125,14 +3145,22 @@ class Ticket(Model, BaseTicket):
                 if result.get("code") != 0:
                     raise Exception(
                         "error is {}, msg is {}".format(
-                            result["code"], result["message"]
+                            result.get("code"), result.get("message")
                         )
                     )
             except Exception as err:
                 Cache().hset("callback_error_ticket", self.sn, int(time.time()))
+                is_code_defect = isinstance(
+                    err, (NameError, AttributeError, TypeError, KeyError, ImportError)
+                )
                 logger.exception(
-                    "[TICKET] callback_error_ticket, callback_url is {},"
-                    "message is {}, ticket_id is {}".format(callback_url, err, self.id)
+                    "[TICKET] callback_error_ticket, exc_type is %s, is_code_defect is %s, "
+                    "callback_url is %s, message is %s, ticket_id is %s",
+                    type(err).__name__,
+                    is_code_defect,
+                    callback_url,
+                    err,
+                    self.id,
                 )
 
     def prepare_all_fields(self):

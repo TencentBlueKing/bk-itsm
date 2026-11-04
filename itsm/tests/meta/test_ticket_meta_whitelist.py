@@ -4,7 +4,7 @@
 覆盖 meta 字段结构收敛的安全约束：
 1. 默认键（代码实际读取的字段）通过，未知键静默丢弃，不阻断提单；
 2. meta.headers 中的凭据类请求头被过滤，大小写不敏感；
-3. callback_url 域名：未登记白名单时默认放行，登记了才按白名单匹配，非法协议拒绝；
+3. callback_url 域名：未登记白名单时拒绝（fail-closed），登记了按白名单匹配，非法协议拒绝；
 4. 环境变量追加（EXTRA）与整体覆盖（OVERRIDE）两种扩展语义。
 """
 from unittest import mock
@@ -19,12 +19,16 @@ from itsm.ticket.serializers.ticket import (
     get_ticket_meta_allowed_keys,
 )
 
-# 企业内域，未登记白名单时同样放行
+# 企业内域，需在白名单 valid_callback_domain_regex_pattern 中登记
 SAFE_CALLBACK = "https://bk-itsm.woa.com/api/v1/callback"
 
 DOMAIN_CONTEXT_PATCH = (
     "itsm.meta.services.domain_validate_service.ContextService.get_context_value"
 )
+
+# 除域名白名单专项用例外，其余用例只关注 meta 键收敛与 URL 规范性，
+# 这里用全放行模式旁路域名白名单，避免用例与白名单配置耦合。
+WHITELIST_ALLOW_ALL = r"^.*$"
 
 
 @pytest.fixture
@@ -32,7 +36,7 @@ def validate_meta():
     """执行 validate_meta，域名白名单读取走 mock，避免依赖数据库。"""
 
     def _run(meta):
-        with mock.patch(DOMAIN_CONTEXT_PATCH, return_value=None):
+        with mock.patch(DOMAIN_CONTEXT_PATCH, return_value=WHITELIST_ALLOW_ALL):
             return TicketSerializer().validate_meta(meta)
 
     return _run
@@ -156,7 +160,7 @@ class TestCallbackUrlWellformed:
         ],
     )
     def test_host_not_restricted(self, validate_meta, url):
-        """host 不做限制：内网/回环/元数据地址同样放行（仅记录，由网络侧管控）。"""
+        """URL 规范性层不限制 host：内网/回环/元数据地址同样合法，域名由白名单单独管控。"""
         assert validate_meta({"callback_url": url}) == {"callback_url": url}
 
     def test_normal_url_passed(self, validate_meta):
@@ -166,12 +170,14 @@ class TestCallbackUrlWellformed:
 
 
 class TestCallbackUrlDomain:
-    """域名不做限制：未登记白名单时默认放行，登记了才按白名单匹配。"""
+    """回调域名 fail-closed：未登记白名单时拒绝，登记了才按白名单匹配。"""
 
-    def test_unregistered_domain_allowed_by_default(self, validate_meta):
-        """未配置白名单：任意 http(s) 域名放行。"""
+    def test_unregistered_domain_rejected_by_default(self):
+        """未配置白名单：拒绝，避免回调成为任意域名的 SSRF 出口。"""
         url = "https://partner.example.com/callback"
-        assert validate_meta({"callback_url": url}) == {"callback_url": url}
+        with mock.patch(DOMAIN_CONTEXT_PATCH, return_value=None):
+            with pytest.raises(serializers.ValidationError):
+                TicketSerializer().validate_meta({"callback_url": url})
 
     def test_non_http_scheme_rejected(self, validate_meta):
         """非 http/https 协议仍然拒绝。"""
