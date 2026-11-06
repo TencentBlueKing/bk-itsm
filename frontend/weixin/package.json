@@ -19,7 +19,7 @@
     "@babel/runtime": "^7.10.2",
     "@typescript-eslint/eslint-plugin": "^4.9.1",
     "@typescript-eslint/parser": "^4.9.1",
-    "@vue/compiler-sfc": "^3.0.3",
+    "@vue/compiler-sfc": "3.5.44",
     "@vue/eslint-config-typescript": "^7.0.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
@@ -79,7 +79,7 @@
     "lodash": "^4.17.20",
     "mitt": "^2.1.0",
     "vant": "3.4.9",
-    "vue": "^3.2.26",
+    "vue": "3.5.44",
     "vue-router": "4.1.6",
     "vuex": "^4.0.0-rc.2"
   },
