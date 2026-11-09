@@ -998,9 +998,31 @@ class TicketSerializer(AuthModelSerializer):
             # URL 本身是否规范（协议、host、凭据、CRLF、长度），与域名白名单解耦
             if not DomainValidateService.is_wellformed_url(callback_url):
                 raise serializers.ValidationError(_("meta.callback_url 格式不合法"))
-            if not DomainValidateService(
-                key="valid_callback_domain_regex_pattern"
-            ).is_safe_url(callback_url, fail_open=False):
+            # 白名单加载/匹配异常转成明确提示，避免落进 openapi 兜底码 3900004
+            try:
+                domain_service = DomainValidateService(
+                    key="valid_callback_domain_regex_pattern"
+                )
+                is_safe_url = domain_service.is_safe_url(callback_url, fail_open=False)
+            except Exception:
+                logger.exception("[TICKET_META] 回调域名白名单校验异常")
+                raise serializers.ValidationError(
+                    _("回调域名白名单配置异常，请联系管理员")
+                )
+
+            if domain_service.invalid_patterns:
+                # 不影响合法规则匹配，但需留痕供运维修正配置
+                logger.error(
+                    "[TICKET_META] 回调域名白名单存在非法正则: %s",
+                    domain_service.invalid_patterns,
+                )
+
+            if not is_safe_url:
+                # 配置里有非法规则时，无法判断是“未放行”还是“规则写坏”，给出可操作提示
+                if domain_service.invalid_patterns:
+                    raise serializers.ValidationError(
+                        _("回调域名白名单配置异常，请联系管理员")
+                    )
                 raise serializers.ValidationError(_("meta.callback_url 不在白名单内"))
 
         allowed_keys = set(get_ticket_meta_allowed_keys())
@@ -1015,8 +1037,13 @@ class TicketSerializer(AuthModelSerializer):
             return value
 
         # 字段级拒绝：未知键与危险请求头不入库，不阻断提单主流程
+        # ticket 优先取单号，建单阶段尚无 sn，退回 title 以便按工单检索
+        ticket_ref = getattr(self.instance, "sn", "") or (self.initial_data or {}).get(
+            "title", ""
+        )
         logger.warning(
-            "[TICKET_META] 丢弃非法字段: unknown_keys=%s forbidden_headers=%s",
+            "[TICKET_META] 丢弃非法字段: ticket=%s unknown_keys=%s forbidden_headers=%s",
+            ticket_ref or "-",
             unknown_keys,
             forbidden_headers,
         )

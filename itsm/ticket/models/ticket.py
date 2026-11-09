@@ -3083,9 +3083,25 @@ class Ticket(Model, BaseTicket):
                     self.id,
                 )
                 return
-            if not DomainValidateService(
-                key="valid_callback_domain_regex_pattern"
-            ).is_safe_url(callback_url, fail_open=False):
+            try:
+                domain_service = DomainValidateService(
+                    key="valid_callback_domain_regex_pattern"
+                )
+            except Exception:
+                logger.exception(
+                    "[TICKET] callback domain whitelist load failed, ticket_id is %s",
+                    self.id,
+                )
+                return
+
+            if domain_service.invalid_patterns:
+                logger.error(
+                    "[TICKET] callback domain whitelist has invalid pattern, patterns is %s, ticket_id is %s",
+                    domain_service.invalid_patterns,
+                    self.id,
+                )
+
+            if not domain_service.is_safe_url(callback_url, fail_open=False):
                 logger.warning(
                     "[TICKET] blocked unsafe callback_url, callback_url is %s, ticket_id is %s",
                     callback_url,
