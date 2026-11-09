@@ -44,6 +44,9 @@ WILDCARD_PATTERN = re.compile(r"^\*\.[a-zA-Z0-9.-]+$")
 
 class DomainValidateService:
     def __init__(self, key: str = "domain_regex_pattern"):
+        self.key = key
+        # 编译失败的原始规则，供调用方区分“配置异常”与“域名未放行”
+        self.invalid_patterns = []
         self.allow_patterns = self.compile_domain_patterns(key)
 
     def is_safe_url(self, url, fail_open=True):
@@ -67,7 +70,8 @@ class DomainValidateService:
             # 没有配置允许的域名正则表达式列表
             if not self.allow_patterns:
                 logger.warning(
-                    "domain whitelist is empty, host %s is %s",
+                    "[CALLBACK_URL] 域名白名单为空, key is %s, host is %s, result is %s",
+                    self.key,
                     hostname,
                     "allowed" if fail_open else "rejected",
                 )
@@ -160,13 +164,26 @@ class DomainValidateService:
             return r"^([a-z0-9-]+\.)*" + re.escape(pattern[2:].lower()) + "$"
         return pattern
 
-    @staticmethod
-    def compile_domain_patterns(key):
-        """编译并返回域名正则表达式"""
+    def compile_domain_patterns(self, key):
+        """编译并返回域名正则表达式。
+
+        单条规则非法时仅记录并跳过，避免一条写错的配置导致全部提单请求 500；
+        非法规则会保留在 invalid_patterns 中，由调用方决定如何提示。
+        """
         patterns = ContextService.get_context_value(key)
         if not patterns:
             return []
-        return [
-            re.compile(DomainValidateService.normalize_pattern(i))
-            for i in DomainValidateService.split_patterns(patterns)
-        ]
+
+        compiled = []
+        for pattern in self.split_patterns(patterns):
+            try:
+                compiled.append(re.compile(self.normalize_pattern(pattern)))
+            except re.error as error:
+                self.invalid_patterns.append(pattern)
+                logger.error(
+                    "[CALLBACK_URL] 域名白名单正则非法, key is %s, pattern is %s, error is %s",
+                    key,
+                    pattern,
+                    error,
+                )
+        return compiled
