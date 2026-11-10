@@ -294,7 +294,7 @@ class TicketManager(Manager):
                 for service_id, project_key in service_project_key_map.items()
             )
         )
-        digest = hashlib.md5(
+        digest = hashlib.sha256(
             "{0}|{1}".format(username, source).encode("utf-8")
         ).hexdigest()
         tenant_id = getattr(settings, "BKPAAS_APP_TENANT_ID", "") or "default"

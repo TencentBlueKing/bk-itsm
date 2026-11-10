@@ -2,11 +2,11 @@
 import traceback
 from functools import wraps
 
+from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.response import Response
 from django.utils.translation import gettext as _
 
 from common.log import logger
-from itsm.component.drf.exception import ValidationError
 from itsm.component.exceptions import (
     TicketNotFoundError,
     ServerError,
@@ -104,8 +104,8 @@ def catch_openapi_exception(view_func):
                     "message": e.message,
                 }
             )
-        except ValidationError as e:
-            # 捕捉drf序列化检验原始错误
+        except DRFValidationError as e:
+            # 捕捉drf序列化检验原始错误（父类，兼容自定义 ValidationError 子类）
             return Response(
                 {
                     "result": False,

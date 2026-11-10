@@ -2233,7 +2233,7 @@ class Ticket(Model, BaseTicket):
     def iam_ticket_manage_auth(self, username):
         cache_key = "itsm:iam:ticket_manage:{0}:{1}".format(
             getattr(settings, "BKPAAS_APP_TENANT_ID", "") or "default",
-            hashlib.md5(
+            hashlib.sha256(
                 "{0}|{1}|{2}".format(
                     username, self.service_id, self.project_key or ""
                 ).encode("utf-8")
