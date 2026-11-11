@@ -47,6 +47,9 @@ class BkOpsService(ItsmBaseService):
     # 查询失败后再请求的次数。首次调用之外最多再试 3 次。
     QUERY_RETRY_TIMES = 3
     QUERY_RETRY_INTERVAL = 1
+    # create_task 仅 HTTP 502 时，5 秒后再调一次。第一次即使已经建出任务也不使用。
+    CREATE_TASK_RETRY_STATUS = 502
+    CREATE_TASK_RETRY_INTERVAL = 5
 
     @staticmethod
     def call_query_api(api_name, bk_username, path_params=None, params=None):
@@ -90,6 +93,33 @@ class BkOpsService(ItsmBaseService):
                 return result
             time.sleep(BkOpsService.QUERY_RETRY_INTERVAL)
         return last_result
+
+    @staticmethod
+    def call_create_task(bk_username, path_params, data):
+        """调用 system_create_task。HTTP 502 时等待 5 秒再调一次，其他错误立即抛出。"""
+        for attempt in (1, 2):
+            try:
+                return BkSopsApi.call_api_with_auth(
+                    "system_create_task",
+                    bk_username=bk_username,
+                    path_params=path_params,
+                    data=data,
+                )
+            except (APIGatewayResponseError, HTTPResponseError) as error:
+                status_code = getattr(error, "response_status_code", None)
+                if (
+                    attempt == 1
+                    and status_code == BkOpsService.CREATE_TASK_RETRY_STATUS
+                ):
+                    logger.warning(
+                        "[bk_sops][execute] create_task 返回 502，忽略本次结果，%s 秒后重试一次, operator=%s, error=%s",
+                        BkOpsService.CREATE_TASK_RETRY_INTERVAL,
+                        bk_username,
+                        error,
+                    )
+                    time.sleep(BkOpsService.CREATE_TASK_RETRY_INTERVAL)
+                    continue
+                raise
 
     @staticmethod
     def is_api_success(api_result):
@@ -244,9 +274,8 @@ class BkOpsService(ItsmBaseService):
         try:
             logger.info("[bk_sops][execute] 开始 create_task, operator=%s, template_id=%s, bk_biz_id=%s",
                         operator, task_params["template_id"], task_params["bk_biz_id"])
-            create_result = BkSopsApi.call_api_with_auth(
-                "system_create_task",
-                bk_username=operator,
+            create_result = self.call_create_task(
+                operator,
                 path_params={
                     "template_id": task_params["template_id"],
                     "bk_biz_id": str(task_params["bk_biz_id"]),
@@ -257,7 +286,7 @@ class BkOpsService(ItsmBaseService):
                     "name": task_params["name"],
                     "constants": task_params["constants"],
                     "exclude_task_nodes_id": task_params["exclude_task_nodes_id"],
-                }
+                },
             )
             logger.info("[bk_sops][execute] create_task 响应, operator=%s, response=%s", operator, create_result)
         except (APIGatewayResponseError, HTTPResponseError) as error:
