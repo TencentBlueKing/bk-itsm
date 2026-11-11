@@ -241,6 +241,19 @@
         } else {
           searchParams = this.searchParams;
         }
+        // 所有单据默认只查近两年；筛选里指定了提单时间时沿用筛选值
+        if (!searchParams.create_at__gte && !searchParams.create_at__lte) {
+          const end = new Date();
+          const start = new Date(end.getTime());
+          start.setFullYear(start.getFullYear() - 2);
+          const pad = (num) => (num >= 10 ? `${num}` : `0${num}`);
+          const format = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+          searchParams = {
+            ...searchParams,
+            create_at__gte: format(start),
+            create_at__lte: format(end),
+          };
+        }
         this.ticketListLoading = true;
         fixParams.is_draft = 0;
         fixParams.view_type = '';

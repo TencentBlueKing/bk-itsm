@@ -38,6 +38,7 @@ from six.moves import zip
 
 from django.db import models, connections, NotSupportedError
 from django.db.models import F, Q, QuerySet, AutoField
+from django.db.models.sql.where import NothingNode
 from django.forms import model_to_dict
 from django.utils.translation import gettext as _
 
@@ -68,7 +69,7 @@ from itsm.component.db import managers
 from itsm.component.utils.basic import create_version_number, dotted_name
 from itsm.auth_iam.utils import IamRequest
 from itsm.role.models import BKUserRole, UserRole
-from itsm.service.models import ServiceCatalog
+from itsm.service.models import Service, ServiceCatalog
 from itsm.ticket_status.models import TicketStatus
 from itsm.workflow.backend import PipelineWrapper
 
@@ -300,10 +301,26 @@ class TicketManager(Manager):
         tenant_id = getattr(settings, "BKPAAS_APP_TENANT_ID", "") or "default"
         return "itsm:iam:ticket_view:{0}:{1}".format(tenant_id, digest)
 
+    @staticmethod
+    def _queryset_is_empty(queryset):
+        """QuerySet.none() 会在 WHERE 里放 NothingNode，不必再查库。"""
+        return any(
+            isinstance(node, NothingNode) for node in queryset.query.where.children
+        )
+
+    @staticmethod
+    def iter_iam_service_projects():
+        """鉴权用的服务和项目。服务表远小于单据表，避免对单据 DISTINCT。"""
+        return Service._objects.values_list("id", "project_key")
+
     def get_iam_auth_tickets(self, queryset, username):
-        service_project_key_map = {}
-        for item in queryset.values("service_id", "project_key").distinct():
-            service_project_key_map[item["service_id"]] = item["project_key"]
+        if self._queryset_is_empty(queryset):
+            return queryset.none()
+
+        service_project_key_map = {
+            service_id: project_key
+            for service_id, project_key in self.iter_iam_service_projects()
+        }
 
         if not service_project_key_map:
             return queryset.none()

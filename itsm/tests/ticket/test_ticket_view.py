@@ -1358,10 +1358,14 @@ class IamAuthTicketCacheTest(TestCase):
         return set(queryset.values_list("sn", flat=True))
 
     @mock.patch(
+        "itsm.ticket.managers.TicketManager.iter_iam_service_projects",
+        return_value=[(1, 0)],
+    )
+    @mock.patch(
         "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
         return_value={"1": {"ticket_view": True}},
     )
-    def test_second_call_hits_cache(self, _iam):
+    def test_second_call_hits_cache(self, _iam, _service_pairs):
         queryset = Ticket.objects.all()
         first = self._services(
             Ticket.objects.get_iam_auth_tickets(queryset, "admin")
@@ -1374,10 +1378,14 @@ class IamAuthTicketCacheTest(TestCase):
         self.assertEqual(_iam.call_count, 1)
 
     @mock.patch(
+        "itsm.ticket.managers.TicketManager.iter_iam_service_projects",
+        return_value=[(1, 0)],
+    )
+    @mock.patch(
         "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
         return_value={"1": {"ticket_view": True}},
     )
-    def test_different_users_do_not_share_cache(self, _iam):
+    def test_different_users_do_not_share_cache(self, _iam, _service_pairs):
         queryset = Ticket.objects.all()
         Ticket.objects.get_iam_auth_tickets(queryset, "admin")
         Ticket.objects.get_iam_auth_tickets(queryset, "someone")
@@ -1395,10 +1403,14 @@ class IamAuthTicketCacheTest(TestCase):
         _iam.assert_not_called()
 
     @mock.patch(
+        "itsm.ticket.managers.TicketManager.iter_iam_service_projects",
+        return_value=[(1, 0)],
+    )
+    @mock.patch(
         "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
         return_value={},
     )
     @mock.patch("itsm.ticket.managers.cache.set")
-    def test_empty_auth_uses_short_ttl(self, cache_set, _iam):
+    def test_empty_auth_uses_short_ttl(self, cache_set, _iam, _service_pairs):
         Ticket.objects.get_iam_auth_tickets(Ticket.objects.all(), "admin")
         self.assertEqual(cache_set.call_args[0][2], IAM_AUTH_CACHE_TTL_ON_EMPTY)
