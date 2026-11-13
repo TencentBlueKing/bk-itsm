@@ -55,8 +55,30 @@ jobs:
     - name: Setup Mysql
       run: |
         sudo systemctl start mysql.service
+    - name: Install pytest for Django test discovery
+      run: python -m pip install "pytest==8.3.5"
     - name: Generate Report
       run: |
         ./scripts/workflows/bk_ci.sh
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v1
+
+  attachment-security:
+    name: Attachment security tests
+    runs-on: ubuntu-22.04
+    env:
+      DJANGO_SETTINGS_MODULE: itsm.tests.storage_settings
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        python-version: 3.11.10
+    - name: Install isolated test dependencies
+      run: python -m pip install "Django==4.2.26" "pytest==8.3.5"
+    - name: Run attachment security regression tests
+      run: >-
+        python -m pytest -p no:cacheprovider -c /dev/null --confcutdir=itsm/tests
+        itsm/tests/test_attachment_storage.py -q

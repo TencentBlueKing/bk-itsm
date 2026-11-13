@@ -29,7 +29,7 @@ import os
 from wsgiref.util import FileWrapper
 
 from bulk_update.helper import bulk_update
-from django.conf import settings
+from django.core.exceptions import SuspiciousFileOperation
 from django.db import transaction
 from django.db.models import Q
 from django.http import StreamingHttpResponse, FileResponse, Http404
@@ -91,6 +91,7 @@ from itsm.component.utils.basic import create_version_number
 from itsm.component.utils.bk_bunch import bunchify
 from itsm.component.utils.misc import JsonEncoder
 from itsm.iadmin.models import SystemSettings
+from itsm.component.attachment_storage import get_attachment_storage
 from itsm.auth_iam.utils import IamRequest
 from itsm.role.models import UserRole
 from itsm.service.models import Service
@@ -144,9 +145,6 @@ from .serializers import (
     TaskSchemaSerializer,
     TaskFieldSchemaSerializer,
 )
-
-# 文件存储对象
-store = settings.STORE
 
 
 class PartialUpdateModelMixin(object):
@@ -646,7 +644,12 @@ class BaseFieldViewSet(component_viewsets.ModelViewSet):
         system_file_path = SystemSettings.objects.get(key="SYS_FILE_PATH").value
         file_path = os.path.join(system_file_path, file_info["path"])
 
-        if not store.exists(file_path):
+        store = get_attachment_storage()
+        try:
+            exists = store.exists(file_path)
+        except SuspiciousFileOperation:
+            raise serializers.ValidationError(_("非法的附件路径，请重新上传附件"))
+        if not exists:
             raise serializers.ValidationError(
                 _("要下载的文件【{}】不存在, 可能已经被删除，请与管理员确认！").format(
                     file_info["name"]
