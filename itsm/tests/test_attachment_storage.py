@@ -2,6 +2,7 @@
 
 import ast
 import json
+import logging
 import os
 import time
 from pathlib import Path
@@ -15,7 +16,7 @@ from django.core.files.base import ContentFile
 from django.http import HttpResponseForbidden, StreamingHttpResponse
 from django.utils.encoding import escape_uri_path
 
-from adapter.utils.filesystem import SafeFileSystemStorage
+from itsm.component.utils.filesystem import SafeFileSystemStorage
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -47,6 +48,7 @@ def load_view(relative_path, function_name, store, root=None):
         "_": lambda value: value,
         "serializers": SimpleNamespace(ValidationError=ValueError),
         "Fail": lambda *args: SimpleNamespace(json=lambda: {"error": args}),
+        "logger": logging.getLogger("app"),
     }
     exec(
         compile(ast.Module(body=[node], type_ignores=[]), str(relative_path), "exec"),
@@ -271,3 +273,34 @@ def test_nfs_directory_swap_between_exists_and_open_is_blocked(nfs, tmp_path):
     original.symlink_to(outside)
     with pytest.raises(SuspiciousFileOperation):
         nfs.open("fields/file")
+
+
+def test_misc_storage_error_degrades_to_missing_file():
+    store = Mock()
+    store.exists.side_effect = PermissionError(13, "permission denied")
+    download, namespace = load_view("misc/views.py", "download", store, root="/tmp/x")
+    compile_path, _ = load_view("misc/views.py", "compile_file_path", store, root="/tmp/x")
+    namespace.update(
+        compile_file_path=compile_path,
+        _check_resource_access=lambda request: (True, ""),
+    )
+    response = download(
+        SimpleNamespace(GET={"ticket_id": "1", "key": "key", "file_name": "test"})
+    )
+    assert response["error"][1] == "NO_SUCH_FILE"
+
+
+def test_workflow_storage_error_degrades_to_missing_file():
+    store = Mock()
+    store.exists.side_effect = PermissionError(13, "permission denied")
+    download, _ = load_view(
+        "workflow/views.py", "download_file", store, root="/tmp/x"
+    )
+    field = SimpleNamespace(
+        type="FILE", choice={"key": {"path": "fields/abc", "name": "test"}}
+    )
+    with pytest.raises(ValueError, match="不存在"):
+        download(
+            SimpleNamespace(get_object=lambda: field),
+            SimpleNamespace(GET={"file_type": "template", "unique_key": "key"}),
+        )

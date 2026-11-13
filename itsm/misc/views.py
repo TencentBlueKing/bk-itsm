@@ -34,6 +34,7 @@ import time
 from wsgiref.util import FileWrapper
 
 from django.conf import settings
+from django.core.exceptions import SuspiciousFileOperation
 from django.db import connection
 from django.http import StreamingHttpResponse, HttpResponseForbidden
 from django.utils.encoding import escape_uri_path
@@ -227,12 +228,28 @@ def download(request):
     if not in_sys_root:
         return HttpResponseForbidden(_("非法的下载路径"))
 
-    if not store.exists(download_file_path):
+    try:
+        exists = store.exists(download_file_path)
+    except SuspiciousFileOperation:
+        return HttpResponseForbidden(_("非法的下载路径"))
+    except FileNotFoundError:
+        exists = False
+    except OSError as exc:
+        # NFS/对象存储抖动、权限漂移等按不可读处理，避免直接 500 暴露内部信息
+        logger.warning("attachment exists failed: %s, err=%s", download_file_path, exc)
+        exists = False
+    if not exists:
         return Fail(_("文件【{}】不存在").format(file_name), "NO_SUCH_FILE").json()
 
-    response = StreamingHttpResponse(
-        FileWrapper(store.open(download_file_path, "rb"), 512)
-    )
+    try:
+        stream = store.open(download_file_path, "rb")
+    except SuspiciousFileOperation:
+        return HttpResponseForbidden(_("非法的下载路径"))
+    except OSError as exc:
+        logger.warning("attachment open failed: %s, err=%s", download_file_path, exc)
+        return Fail(_("文件【{}】不存在").format(file_name), "NO_SUCH_FILE").json()
+
+    response = StreamingHttpResponse(FileWrapper(stream, 512))
     response["Content-Type"] = "application/octet-stream"
     response["Content-Disposition"] = "attachment; filename* = UTF-8''%s" % format(
         escape_uri_path(file_name)
