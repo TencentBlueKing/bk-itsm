@@ -54,6 +54,7 @@ from itsm.postman.models import RemoteApi, RemoteApiInstance, RemoteSystem
 from itsm.postman.permissions import RemoteApiPermit, RemoteApiInstancePermit
 from itsm.postman.rpc.core.request import CompRequest
 from itsm.postman.serializers import (
+    CUSTOM_SCRIPT_DISABLED_ERROR,
     ApiInstanceSerializer,
     RemoteApiSerializer,
     RemoteSystemSerializer,
@@ -245,9 +246,20 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
         else:
             query_params = request.data.get("req_params", {})
 
+        # 安全：map_code 是响应后处理的可执行 Python 片段，配置层已全局禁用，
+        # 运行时同样不允许请求体注入；非空即拒绝，且不发起外部请求。
+        if request.data.get("map_code"):
+            return Response(
+                {
+                    "result": False,
+                    "message": CUSTOM_SCRIPT_DISABLED_ERROR,
+                    "code": ResponseCodeStatus.OK,
+                    "data": None,
+                }
+            )
+
         api_config = api.get_api_config(query_params)
 
-        map_code = request.data.get("map_code", "")
         before_req = request.data.get("before_req", "")
         
         service = RunApiService()
@@ -284,31 +296,8 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
                     }
                 )
 
-        if map_code:
-            try:
-                service.inner_of_map(map_code)
-                # 白名单校验：检查 map_code 中访问的 response 路径是否在白名单中
-                is_valid, message = service.verify_map_code_whitelist(map_code)
-                if not is_valid:
-                    return Response(
-                        {
-                            "result": False,
-                            "message": message,
-                            "code": ResponseCodeStatus.OK,
-                            "data": None,
-                        }
-                    )
-            except ValueError as e:
-                return Response(
-                    {
-                        "result": False,
-                        "message": _(f"map_code 格式错误：{str(e)}"),
-                        "code": ResponseCodeStatus.OK,
-                        "data": None,
-                    }
-                )
-
-        api_config.update(map_code=map_code, before_req=before_req)
+        # map_code 一律不下发执行（含存量配置）；before_req 已解析进 query_params，此处置空
+        api_config.update(map_code="", before_req=before_req)
 
         rsp = bk.http(config=api_config)
 
