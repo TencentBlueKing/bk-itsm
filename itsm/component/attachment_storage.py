@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 
-from adapter.utils.filesystem import SafeFileSystemStorage
+from itsm.component.utils.filesystem import SafeFileSystemStorage
 from itsm.iadmin.models import SystemSettings
 
 
