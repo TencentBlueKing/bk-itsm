@@ -8,7 +8,7 @@ from itsm.component.drf.viewsets import ModelViewSet
 from itsm.component.exceptions import ValidateError
 from itsm.role.models import UserRole
 from itsm.ticket.models import TicketRemark, Ticket
-from itsm.ticket.permissions import RemarkPermissionValidate
+from itsm.ticket.permissions import RemarkPermissionValidate, TicketPermissionValidate
 from itsm.ticket.serializers import TicketRemarkSerializer
 
 
@@ -33,6 +33,9 @@ class TicketRemarkModelViewSet(ModelViewSet):
             raise ValidateError(_("单据不存在：%s，请检查") % ticket_id)
         username = request.user.username
         if UserRole.is_itsm_superuser(username) or ticket.can_view(username):
+            return ticket
+        # 业务可见性不通过时回落到 IAM ticket_view，与单据详情/列表判定保持一致
+        if TicketPermissionValidate().iam_ticket_view_auth(request, ticket):
             return ticket
         raise ValidateError(_("抱歉，您无权查看该单据的评论"))
 
