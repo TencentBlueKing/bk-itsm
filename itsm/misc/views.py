@@ -49,6 +49,7 @@ from itsm.component.decorators import (
 from itsm.component.drf.permissions import IamAuthPermit
 from itsm.component.utils.response import Fail, Success
 from itsm.iadmin.models import SystemSettings
+from itsm.component.attachment_storage import get_attachment_storage
 from weixin.core.decorators import weixin_login_exempt
 
 logger = logging.getLogger("app")
@@ -213,8 +214,7 @@ def download(request):
     file_name = request.GET.get("file_name")
 
     download_file_path = os.path.join(file_path, file_name)
-    if not store.exists(download_file_path):
-        return Fail(_("文件【{}】不存在").format(file_name), "NO_SUCH_FILE").json()
+    store = get_attachment_storage()
 
     sys_file_path = SystemSettings.objects.get(key="SYS_FILE_PATH").value
     sys_root = os.path.realpath(sys_file_path)
@@ -230,7 +230,9 @@ def download(request):
     if not store.exists(download_file_path):
         return Fail(_("文件【{}】不存在").format(file_name), "NO_SUCH_FILE").json()
 
-    response = StreamingHttpResponse(FileWrapper(store.open(file_path, "rb"), 512))
+    response = StreamingHttpResponse(
+        FileWrapper(store.open(download_file_path, "rb"), 512)
+    )
     response["Content-Type"] = "application/octet-stream"
     response["Content-Disposition"] = "attachment; filename* = UTF-8''%s" % format(
         escape_uri_path(file_name)
