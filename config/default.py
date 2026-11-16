@@ -77,6 +77,7 @@ INSTALLED_APPS += (
     "itsm.role",
     "itsm.pipeline_plugins",
     "itsm.ticket",
+    "itsm.attachment",
     "itsm.service",
     "itsm.project",
     "itsm.workflow",

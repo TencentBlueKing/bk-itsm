@@ -25,6 +25,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
 
+from django.db import transaction
+from itsm.attachment.services import bind_ticket_fields
+
 from itsm.component.constants import (
     NODE_APPROVE_RESULT,
     TERMINATED,
@@ -99,9 +102,8 @@ class ItsmSignService(ItsmBaseService):
             node_status = Status.objects.get(ticket_id=ticket_id, state_id=state_id)
             state = ticket.state(state_id)
 
+            self.save_sign_fields(ticket, node_status, fields, operator, source)
             try:
-                ticket.do_in_sign_state(node_status, fields, operator, source)
-                ticket.update_ticket_fields(fields=fields)
                 # Determine if current node is finished
                 key_value = self.get_key_value(node_status, ticket, code_key)
                 if self.task_is_finished(
@@ -152,6 +154,14 @@ class ItsmSignService(ItsmBaseService):
             raise err
 
         return True
+
+    @staticmethod
+    @transaction.atomic
+    def save_sign_fields(ticket, node_status, fields, operator, source):
+        # Reject foreign attachments before writes or the completion finally.
+        bind_ticket_fields(ticket, fields, operator)
+        ticket.do_in_sign_state(node_status, fields, operator, source)
+        ticket.update_ticket_fields(fields=fields, operator=operator)
 
     @staticmethod
     def get_key_value(node_status, ticket, code_key):

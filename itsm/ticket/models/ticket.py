@@ -50,6 +50,7 @@ from dateutil.relativedelta import relativedelta
 
 from common.utils import texteditor_escape
 from itsm.meta.services.domain_validate_service import DomainValidateService
+from itsm.attachment.services import bind_attachments
 from itsm.component.constants import (
     ACTION_CHOICES,
     ACTION_DICT,
@@ -732,15 +733,15 @@ class Status(Model):
 
     def can_view(self, username, request=None):
         """能否查看节点"""
-        
+
         # 判断用户是否工单统计管理员，工单统计管理员无条件可以查看
         if UserRole.is_statics_manager(username):
             return True
-        
+
         # 超级管理员放这里，can_operate里带有工单是否结束的判断，无法过滤
         if UserRole.is_itsm_superuser(username):
             return True
-        
+
         # 我是当前处理人或历史处理人或过渡态的处理人
         return self.is_operator(username)
 
@@ -3128,7 +3129,6 @@ class Ticket(Model, BaseTicket):
                 "update_at": str(self.update_at),
                 "updated_by": self.updated_by,
                 "approve_result": self.get_ticket_result(),
- 
                 "token": CallbackToken.generate(self.sn, self.current_status),
                 "last_approver": self.get_last_approver(),
             }
@@ -3210,7 +3210,8 @@ class Ticket(Model, BaseTicket):
 
         TicketField.objects.bulk_create(fields)
 
-    def fill_state_fields(self, fields):
+    @transaction.atomic
+    def fill_state_fields(self, fields, operator=""):
         """更新单据字段"""
 
         filter_fields = []
@@ -3222,6 +3223,15 @@ class Ticket(Model, BaseTicket):
 
         fields_map = {filed["key"]: filed for filed in filter_fields}
         filter_field_query_set = self.fields.filter(key__in=fields_map.keys())
+        bind_attachments(
+            self.pk,
+            [
+                fields_map[field.key]["value"]
+                for field in filter_field_query_set
+                if field.type == "FILE"
+            ],
+            operator,
+        )
         for ticket_field in filter_field_query_set:
             ticket_field.value = fields_map[ticket_field.key]["value"]
             if (
@@ -3250,7 +3260,8 @@ class Ticket(Model, BaseTicket):
             update_fields=["_value", "choice", "update_at", "meta"],
         )
 
-    def update_ticket_fields(self, fields):
+    @transaction.atomic
+    def update_ticket_fields(self, fields, operator=""):
         for field in fields:
             # 更新优先级由update_priority统一处理
             if field["key"] == FIELD_PRIORITY:
@@ -3258,6 +3269,8 @@ class Ticket(Model, BaseTicket):
 
             # 多个单据字段：插入到节点的基础模型字段 + 唯一基础模型字段
             for ticket_field in self.fields.filter(key=field["key"]):
+                if ticket_field.type == "FILE":
+                    bind_attachments(self.pk, [field["_value"]], operator=operator)
                 ticket_field.value = field["_value"]
                 ticket_field.save()
 
@@ -4122,7 +4135,28 @@ class Ticket(Model, BaseTicket):
             # 全局触发器
             self.send_trigger_signal(GLOBAL_LEAVE_STATE, sender=self.flow.workflow_id)
 
-    def do_after_create(self, fields, from_ticket_id=None, source=WEB):
+    @transaction.atomic
+    def prepare_initial_fields(self, fields, operator=""):
+        self.prepare_all_fields()
+        self.fill_state_fields(fields, operator=operator)
+        # Bind effective values after request overrides, including omitted defaults.
+        # Shared template attachments live in choice and must remain unbound.
+        bind_attachments(
+            self.pk,
+            [field.value for field in self.fields.filter(type="FILE")],
+            operator,
+        )
+
+    def do_after_create(
+        self,
+        fields,
+        from_ticket_id=None,
+        source=WEB,
+        operator="",
+        fields_prepared=False,
+    ):
+        if not fields_prepared:
+            self.prepare_initial_fields(fields, operator=operator)
         # 创建关联关系
         self.create_ticket_relation(from_ticket_id)
         print("----- create ticket create_ticket_relation end")
@@ -4130,15 +4164,11 @@ class Ticket(Model, BaseTicket):
         # 启动SLA任务
         print("----- create ticket create_sla_task end")
 
-        # 单据上下文准备：创建字段
-        self.prepare_all_fields()
-        print("----- create ticket prepare_all_fields end")
         # 创建开始流转日志
         TicketEventLog.objects.create_start_log(self)
         print("----- create ticket create_start_log end")
 
         # 为sla提前初始化优先级
-        self.fill_state_fields(fields)
         self.update_priority()
 
         self.do_before_enter_state(self.first_state_id)
@@ -4449,7 +4479,7 @@ class Ticket(Model, BaseTicket):
         message = _("{operator} 处理【{name}】")
         with transaction.atomic():
             # 1、更新单据字段
-            self.fill_state_fields(fields)
+            self.fill_state_fields(fields, operator=operator)
 
             # 更新优先级
             self.update_priority()

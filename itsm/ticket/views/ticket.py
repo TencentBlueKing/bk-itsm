@@ -35,6 +35,7 @@ import xlwt
 from django.conf import settings
 from django.core.cache import cache
 from django.db import connection, transaction
+from itsm.attachment.services import bind_ticket_fields
 from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.utils.translation import gettext as _
@@ -368,22 +369,21 @@ class TicketModelViewSet(ModelViewSet):
                 raise ValidationError(_("用户登录态异常"))
 
         # creator(实际提单人)和updated_by在serializer.to_internal_value(data)中获取
-        instance = serializer.save(meta=meta)
-        logger.info(
-            f"[TICKET] create ticket do_after_create begin ticket_id=>{instance.id}"
+        with transaction.atomic():
+            instance = serializer.save(meta=meta)
+            instance.prepare_initial_fields(
+                request.data["fields"], operator=request.user.username
+            )
+        # No notification or pipeline job may observe uncommitted fields.
+        transaction.on_commit(
+            lambda: instance.do_after_create(
+                request.data["fields"],
+                request.data.get("from_ticket_id", None),
+                operator=request.user.username,
+                fields_prepared=True,
+            )
         )
-
-        instance.do_after_create(
-            request.data["fields"], request.data.get("from_ticket_id", None)
-        )
-        logger.info(
-            f"[TICKET] create ticket do_after_create end ticket_id=>{instance.id}"
-        )
-
-        start_pipeline.apply_async([instance])
-        logger.info(
-            f"[TICKET] create ticket start_pipeline end ticket_id=>{instance.id}"
-        )
+        transaction.on_commit(lambda: start_pipeline.apply_async([instance]))
 
         return Response({"sn": instance.sn, "id": instance.id}, status=201)
 
@@ -611,20 +611,20 @@ class TicketModelViewSet(ModelViewSet):
         # 为每个接收者生成独立的邀请码并发送邮件
         fail_receivers = []
         success_urls = []
-        
+
         for receiver_user in receivers:
             code = TicketCommentInvite.get_unique_code()
             ticket_url = ticket.ticket_url + "&token={token}&invite=email".format(
                 token=code
             )
             context.update(ticket_url=ticket_url)
-            
+
             notifier = EmailNotifier(
                 title=Template(custom_notify.title_template).render(context),
                 receivers=[receiver_user],
                 message=Template(custom_notify.content_template).render(context),
             )
-            
+
             try:
                 notifier.send()
                 TicketCommentInvite.objects.create(
@@ -639,7 +639,7 @@ class TicketModelViewSet(ModelViewSet):
                     f"[send email] receiver=>{receiver_user}, ticket_url=>{ticket_url}, "
                     f"exception=>{error}"
                 )
-        
+
         # 返回结果
         if fail_receivers:
             return Response(
@@ -652,7 +652,7 @@ class TicketModelViewSet(ModelViewSet):
                     "code": "SEND_EMAIL_FAILED" if len(fail_receivers) == len(receivers) else "PARTIAL_SUCCESS",
                 }
             )
-        
+
         return Response(
             {
                 "result": True,
@@ -1816,7 +1816,13 @@ class TicketModelViewSet(ModelViewSet):
 
         old_value = field_obj.value
 
-        ticket.fields.filter(key=field_obj.key).update(**update_data)
+        with transaction.atomic():
+            bind_ticket_fields(
+                ticket,
+                [{"key": field_obj.key, "value": field_value}],
+                request.user.username,
+            )
+            ticket.fields.filter(key=field_obj.key).update(**update_data)
 
         field_obj.refresh_from_db()
 

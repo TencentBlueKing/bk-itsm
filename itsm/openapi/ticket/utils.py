@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import copy
 
+from django.db import transaction
+from itsm.attachment.services import bind_ticket_fields
+
 from itsm.component.constants import FIELD_TITLE
 from itsm.component.drf.exception import ValidationError
 from itsm.openapi.ticket.validators import edit_field_validate
@@ -46,7 +49,11 @@ def edit_ticket_field(field, sn, username):
 
     old_value = field_obj.value
 
-    ticket.fields.filter(key=field_obj.key).update(**update_data)
+    with transaction.atomic():
+        bind_ticket_fields(
+            ticket, [{"key": field_obj.key, "value": field_value}], username
+        )
+        ticket.fields.filter(key=field_obj.key).update(**update_data)
 
     field_obj.refresh_from_db()
 

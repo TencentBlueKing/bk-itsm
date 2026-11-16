@@ -17,6 +17,7 @@ from django.http import HttpResponseForbidden, StreamingHttpResponse
 from django.utils.encoding import escape_uri_path
 
 from itsm.component.utils.filesystem import SafeFileSystemStorage
+from itsm.attachment.services import authorize_download
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -35,6 +36,8 @@ def load_view(relative_path, function_name, store, root=None):
     )
     namespace = {
         "get_attachment_storage": lambda: store,
+        "authorize_download": authorize_download,
+        "TicketField": type("TicketField", (), {}),
         "SystemSettings": model,
         "SuspiciousFileOperation": SuspiciousFileOperation,
         "HttpResponseForbidden": HttpResponseForbidden,
