@@ -23,10 +23,19 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+from django.test import TestCase
 from django.utils.deprecation import MiddlewareMixin
 
 
-class OverrideMiddleware(MiddlewareMixin):
+class CommitCallbacksMiddleware(MiddlewareMixin):
+    """Simulate request commits inside TestCase's rollback-only transaction."""
+
+    def __call__(self, request):
+        with TestCase.captureOnCommitCallbacks(execute=True):
+            return super().__call__(request)
+
+
+class OverrideMiddleware(CommitCallbacksMiddleware):
     def process_request(self, request):
         class Base(object):
             pass
@@ -43,7 +52,7 @@ class OverrideMiddleware(MiddlewareMixin):
         request.jwt = {}
 
 
-class OverrideTestMiddleware(MiddlewareMixin):
+class OverrideTestMiddleware(CommitCallbacksMiddleware):
     def process_request(self, request):
         class Base(object):
             pass

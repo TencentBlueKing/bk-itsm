@@ -81,4 +81,4 @@ jobs:
     - name: Run attachment security regression tests
       run: >-
         python -m pytest -p no:cacheprovider -c /dev/null --confcutdir=itsm/tests
-        itsm/tests/test_attachment_storage.py -q
+        itsm/tests/test_attachment_storage.py itsm/tests/test_attachment_ownership.py -q

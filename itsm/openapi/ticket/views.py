@@ -24,7 +24,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import copy
-from django.conf import settings
 from django.db import transaction
 from django.utils.decorators import method_decorator
 from rest_framework.decorators import action
@@ -542,7 +541,6 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             data["service_type"] = "request"
         serializer = TicketCreateSerializer(data=data, context={"request": request})
         serializer.is_valid(raise_exception=True)
-        instance = serializer.save()
 
         dynamic_fields = data.get("dynamic_fields", [])
 
@@ -552,19 +550,28 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             dynamic_fields = ser.data
 
         try:
-            # 创建额外的全局字段
-            instance.create_dynamic_fields(dynamic_fields)
-            openapi_start_ticket.apply_async(
-                [instance, data["fields"], request.data.get("from_ticket_id", None)]
+            with transaction.atomic():
+                instance = serializer.save()
+                instance.create_dynamic_fields(dynamic_fields)
+                instance.prepare_initial_fields(
+                    data["fields"], operator=request.user.username
+                )
+            transaction.on_commit(
+                lambda: openapi_start_ticket.apply_async(
+                    [
+                        instance,
+                        data["fields"],
+                        request.data.get("from_ticket_id", None),
+                    ],
+                    kwargs={"operator": request.user.username, "fields_prepared": True},
+                )
             )
         except Exception as e:
             logger.exception(
                 "[openapi][create_ticket]-> 单据创建失败， 错误原因 error={}".format(e)
             )
-            instance.delete()
-            # 删除单据字段
-            keys = [field["key"] for field in dynamic_fields]
-            TicketField.objects.filter(ticket_id=instance.id, key__in=keys).delete()
+            # Creation failures roll back atomically; keep committed tickets
+            # if enqueueing fails so attachment ownership remains valid.
             raise CreateTicketError()
 
         logger.info(
