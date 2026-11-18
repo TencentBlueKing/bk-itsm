@@ -128,9 +128,10 @@ class TestRpcApiPermission(TestCase):
         "itsm.role.models.UserRole.is_workflow_manager", return_value=False
     )
     def test_post_rejects_non_manager(self, _wm, _su):
+        # 仅流程编排型组件走 service_manage 鉴权；缺少合法的 workflow 来源时应拒绝。
         resp = self.client.post(
             "/api/postman/rpc_api/",
-            data=json.dumps({"source_uri": "demo_rpc"}),
+            data=json.dumps({"source_uri": "state_fields"}),
             content_type="application/json",
         )
 

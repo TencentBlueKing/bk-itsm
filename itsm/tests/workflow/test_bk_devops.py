@@ -37,6 +37,13 @@ from pipeline.core.data.base import DataObject
 class PipelineTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def setUp(self):
+        # 建单权限校验会读取组织架构，测试环境不应发起真实 ESB 调用
+        self._dept_patcher = mock.patch(
+            "itsm.role.models.get_user_departments", return_value=[]
+        )
+        self._dept_patcher.start()
+        self.addCleanup(self._dept_patcher.stop)
+
         Ticket.objects.all().delete()
         CatalogService.objects.all().delete()
         self.ticket_id = self.create_ticket()
@@ -79,9 +86,12 @@ class PipelineTest(TestCase):
             "attention": True,
         }
         url = "/api/ticket/receipts/"
-        rsp = self.client.post(
-            path=url, data=json.dumps(data), content_type="application/json"
-        )
+        # 建单副作用已移入 transaction.on_commit，TestCase 需显式执行回调，
+        # 否则流程/状态节点未初始化，后续 pipeline 组件拿不到 current_status。
+        with self.captureOnCommitCallbacks(execute=True):
+            rsp = self.client.post(
+                path=url, data=json.dumps(data), content_type="application/json"
+            )
         data = json.loads(rsp.content.decode("utf-8"))
         return data["data"]["id"]
 

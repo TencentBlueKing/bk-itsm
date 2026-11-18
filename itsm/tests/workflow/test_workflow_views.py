@@ -38,6 +38,15 @@ from itsm.workflow.views import WorkflowViewSet
 
 
 class WorkflowViewTest(TestCase):
+    def setUp(self):
+        # serializer 内 from ... import 绑定了 transform_single_username，需 mock 其所在模块
+        self._transform_patcher = mock.patch(
+            "itsm.workflow.serializers.workflow.transform_single_username",
+            return_value="admin(admin)",
+        )
+        self._transform_patcher.start()
+        self.addCleanup(self._transform_patcher.stop)
+
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_variable_list(self):
         url = "/api/workflow/templates/get_global_choices/"

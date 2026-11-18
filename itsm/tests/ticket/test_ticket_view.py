@@ -118,9 +118,12 @@ class TicketViewTest(TestCase):
             "attention": True,
         }
         url = "/api/ticket/receipts/"
-        rsp = self.client.post(
-            path=url, data=json.dumps(data), content_type="application/json"
-        )
+        # 建单副作用已移入 transaction.on_commit，TestCase 需显式执行回调，
+        # 否则流程/节点状态未初始化，撤销等操作失败。
+        with self.captureOnCommitCallbacks(execute=True):
+            rsp = self.client.post(
+                path=url, data=json.dumps(data), content_type="application/json"
+            )
         self.assertEqual(rsp.data["code"], "OK")
         self.assertEqual(rsp.data["message"], "success")
 
@@ -980,6 +983,21 @@ class TicketLogAuthzTest(TestCase):
     """spec round1 H-1：get_ticket_log 必须经过 ticket 对象级权限。"""
 
     def setUp(self):
+        # 列表可见范围会读取组织架构/IAM 鉴权，测试环境不应发起真实外部调用
+        self._dept_patcher = mock.patch(
+            "itsm.role.models.get_user_departments", return_value=[]
+        )
+        self._dept_patcher.start()
+        self.addCleanup(self._dept_patcher.stop)
+        self._iam_patcher = mock.patch(
+            "itsm.auth_iam.utils.IamRequest.batch_resource_multi_actions_allowed",
+            return_value={},
+        )
+        self._iam_patcher.start()
+        self.addCleanup(self._iam_patcher.stop)
+        # 清理其它用例写入的 IAM 鉴权缓存，避免跨用例放行串扰
+        cache.clear()
+
         Ticket.objects.all().delete()
         self.creator_ticket = Ticket.objects.create(
             sn="SN-LOG-OWN", title="own", service_id=1, service_type="request",
@@ -1203,6 +1221,13 @@ class TicketManagerScopeTest(TestCase):
     """
 
     def setUp(self):
+        # 可见范围过滤会读取组织架构，测试环境不应发起真实 ESB 调用
+        self._dept_patcher = mock.patch(
+            "itsm.role.models.get_user_departments", return_value=[]
+        )
+        self._dept_patcher.start()
+        self.addCleanup(self._dept_patcher.stop)
+
         Ticket.objects.all().delete()
         cache.clear()
         self.own_ticket = Ticket.objects.create(

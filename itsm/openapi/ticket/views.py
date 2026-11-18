@@ -552,7 +552,8 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
         fields_payload = data["fields"]
         from_ticket_id = request.data.get("from_ticket_id", None)
-        username = request.user.username
+        # App 鉴权无用户身份时回退到 creator，否则附件绑定会因空 operator 失败
+        username = getattr(request.user, "username", None) or data.get("creator", "")
         try:
             with transaction.atomic():
                 instance = serializer.save()

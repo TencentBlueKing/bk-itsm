@@ -151,9 +151,12 @@ class TicketTest(TestCase):
             "attention": True,
         }
         url = "/api/ticket/receipts/"
-        rsp = self.client.post(
-            path=url, data=json.dumps(data), content_type="application/json"
-        )
+        # 建单副作用已移入 transaction.on_commit，TestCase 需显式执行回调，
+        # 否则流程未初始化，列表序列化的 followers 等字段不会生成。
+        with self.captureOnCommitCallbacks(execute=True):
+            rsp = self.client.post(
+                path=url, data=json.dumps(data), content_type="application/json"
+            )
         ticket_id = rsp.data["data"]["id"]
         url = "/api/ticket/receipts/"
         list_rsp = self.client.get(url)
@@ -208,9 +211,10 @@ class TicketTest(TestCase):
             "attention": True,
         }
         url = "/api/ticket/receipts/"
-        self.client.post(
-            path=url, data=json.dumps(data), content_type="application/json"
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            self.client.post(
+                path=url, data=json.dumps(data), content_type="application/json"
+            )
 
         data_test = {
             "catalog_id": 3,
@@ -244,9 +248,10 @@ class TicketTest(TestCase):
             "creator": "test",
             "attention": True,
         }
-        rsp = self.client.post(
-            path=url, data=json.dumps(data_test), content_type="application/json"
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            rsp = self.client.post(
+                path=url, data=json.dumps(data_test), content_type="application/json"
+            )
         ticket_id = rsp.data["data"]["id"]
         list_rsp = self.client.get(url)
         self.assertEqual(list_rsp.data["code"], "OK")

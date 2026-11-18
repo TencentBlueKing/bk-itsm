@@ -38,6 +38,7 @@ from django.test import TestCase, override_settings
 from common.cipher import CallbackToken
 from common.redis import Cache
 from itsm.tests.openapi.params import CREATE_TICKET_DATA
+from itsm.tests.middlewares import OverrideMiddleware
 from itsm.ticket.models import Ticket, AttentionUsers, TicketComment
 from itsm.service.models import Service, CatalogService
 from itsm.workflow.models import WorkflowVersion
@@ -264,6 +265,33 @@ class TicketOpenTest(TestCase):
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.component.decorators.JWTClient")
+    def test_create_ticket_operator_fallback_to_creator(self, patch_jwt_client):
+        """App 鉴权无 user 身份时，附件绑定的 operator 应回退到 payload 的 creator。"""
+        patch_jwt_client.is_valid.return_value = True
+        url = "/openapi/ticket/create_ticket/"
+
+        original_process_request = OverrideMiddleware.process_request
+
+        def _no_user(self, request):
+            original_process_request(self, request)
+            request.user.username = None
+
+        with mock.patch.object(OverrideMiddleware, "process_request", _no_user), mock.patch(
+            "itsm.ticket.models.ticket.Ticket.prepare_initial_fields"
+        ) as mock_prepare:
+            resp = self.client.post(
+                url, json.dumps(CREATE_TICKET_DATA), content_type="application/json"
+            )
+
+        self.assertEqual(resp.data["result"], True)
+        self.assertEqual(resp.data["code"], 0)
+        mock_prepare.assert_called_once()
+        self.assertEqual(
+            mock_prepare.call_args.kwargs["operator"], CREATE_TICKET_DATA["creator"]
+        )
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.component.decorators.JWTClient")
     def test_get_tickets(self, patch_jwt_client):
         patch_jwt_client.is_valid.return_value = True
         url = "/openapi/ticket/create_ticket/"
@@ -288,9 +316,12 @@ class TicketOpenTest(TestCase):
     def create_ticket(self):
         url = "/openapi/ticket/create_ticket/"
 
-        resp = self.client.post(
-            url, json.dumps(CREATE_TICKET_DATA), content_type="application/json"
-        )
+        # 建单副作用已移入 transaction.on_commit，TestCase 需显式执行回调，
+        # 否则流程未初始化，后续撤销等操作因缺节点状态而失败。
+        with self.captureOnCommitCallbacks(execute=True):
+            resp = self.client.post(
+                url, json.dumps(CREATE_TICKET_DATA), content_type="application/json"
+            )
 
         return resp.data["data"]["sn"]
 
