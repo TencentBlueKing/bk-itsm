@@ -202,6 +202,18 @@ def start_pipeline(ticket, **kwargs):
     ticket.start(**kwargs)
 
 
+def start_ticket(ticket, fields, from_ticket_id=None, operator=""):
+    """初始化流程后投递 pipeline，两步顺序不可拆。
+
+    先投递 pipeline 会让流程跑在半初始化的单据上；retry=True 只在投递阶段
+    遇到 broker 连接异常时重试发布。
+    """
+    ticket.do_after_create(
+        fields, from_ticket_id, operator=operator, fields_prepared=True
+    )
+    start_pipeline.apply_async([ticket], retry=True)
+
+
 class ClonePipelineCallback(Task):
     abstract = True
 
