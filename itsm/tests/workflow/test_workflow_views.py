@@ -142,7 +142,9 @@ class WorkflowViewTest(TestCase):
         self.assertIsInstance(rsp.data["data"]["id"], int)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_exports(self):
+    @mock.patch("itsm.component.drf.permissions.IamAuthPermit.iam_auth")
+    def test_exports(self, patch_iam_auth):
+        patch_iam_auth.return_value = True
         url = "/api/workflow/templates/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         url = "/api/workflow/templates/{}/exports/".format(rsp.data["data"][0]["id"])

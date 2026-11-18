@@ -983,11 +983,11 @@ class TicketLogAuthzTest(TestCase):
         Ticket.objects.all().delete()
         self.creator_ticket = Ticket.objects.create(
             sn="SN-LOG-OWN", title="own", service_id=1, service_type="request",
-            creator="admin", current_status="RUNNING",
+            creator="admin", current_status="RUNNING", is_draft=False,
         )
         self.other_ticket = Ticket.objects.create(
             sn="SN-LOG-OTHER", title="other", service_id=1, service_type="request",
-            creator="bob", current_status="RUNNING",
+            creator="bob", current_status="RUNNING", is_draft=False,
         )
 
     def tearDown(self):

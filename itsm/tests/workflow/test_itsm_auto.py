@@ -219,9 +219,13 @@ class PipelineTest(TestCase):
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch(
+        "itsm.pipeline_plugins.components.collections.itsm_auto.build_conditions_by_mako_template",
+        return_value=(False, "invalid condition"),
+    )
+    @mock.patch(
         "itsm.pipeline_plugins.components.collections.itsm_auto.conditions_conversion")
-    def test_get_rsp_content(self, conditions_conversion):
-        conditions_conversion.return_value = {}
+    def test_get_rsp_content(self, conditions_conversion, patch_build_conditions):
+        conditions_conversion.return_value = ""
         ticket = Ticket.objects.get(id=self.ticket_id)
         
         auto_service = AutoStateService(name="itsm")
