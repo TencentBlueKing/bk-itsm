@@ -10,8 +10,13 @@ COVERAGE_OMIT_PATH="*/test/*,*/virtualenv/*,*/venv/*,*/migrations/*,*/tests/*,*/
 # 删除coverage历史归档文件
 coverage erase
 
-TEST_LOGS=$(coverage run --include "$COVERAGE_INCLUDE_PATH" --omit "$COVERAGE_OMIT_PATH" ./manage.py test itsm.tests  2>&1)
+TEST_EXIT_CODE=0
+TEST_LOGS=$(coverage run --include "$COVERAGE_INCLUDE_PATH" --omit "$COVERAGE_OMIT_PATH" ./manage.py test itsm.tests  2>&1) || TEST_EXIT_CODE=$?
 echo "${TEST_LOGS}"
+# Log formatting is not a reliable test result. Preserve the runner's exit code.
+if [[ $TEST_EXIT_CODE -ne 0 ]]; then
+  exit "$TEST_EXIT_CODE"
+fi
 TEST_RESULT=$(echo "${TEST_LOGS}" | grep -Ev "'errors'|Consumer" | grep -E "Ran|OK\n|failures|errors")
 TEST_TIME=''
 TEST_COUNT=0
