@@ -1,61 +1,78 @@
-spec_version: 2
-app_version: "2.8.1"
+specVersion: 3
+appVersion: 2.8.1
 app:
-    region: default
-    bk_app_code: bk_itsm
-    bk_app_name_en: ITSM
-    bk_app_name: 流程服务
-    market:
-        category: 运维工具
-        introduction: 流程服务是蓝鲸推出的轻量级ITSM，通过可自定义设计的流程模块，覆盖IT服务中的不同管理活动或应用场景。帮助企业用户规范内部管理流程，提升沟通及管理效率。
-        introduction_en: bk_itsm is a lightweight ITSM created by Blueking. It covers different application scenarios in IT services through customizable workflows and help enterprise users to implement standardize IT workflow, improve communication and management efficiency.
-        display_options:
-            width: 1280
-            height: 720
-            is_win_maximize: True
-            open_mode: "new_tab"
+  region: default
+  bkAppCode: bk_itsm
+  bkAppName: 流程服务
+  bkAppNameEn: ITSM
+  market:
+    category: 运维工具
+    introduction: 流程服务是蓝鲸推出的轻量级ITSM，通过可自定义设计的流程模块，覆盖IT服务中的不同管理活动或应用场景。帮助企业用户规范内部管理流程，提升沟通及管理效率。
+    displayOptions:
+      width: 1280
+      height: 720
+      openMode: new_tab
+      isWinMaximize: true
 modules:
-    default:
-        is_default: True
-        source_dir: ./src
-        language: Python
-        services:               
-            - name: mysql
-            - name: rabbitmq
-            - name: redis
-            - name: bkrepo
-            - name: otel
-        env_variables:
-            - key: PIP_VERSION
-              value: 20.2.3
-              description: PIP版本
-            - key: RUN_VER
-              value: open
-              description: 运行环境
-            - key: GUNICORN_THREAD_NUM
-              value: 10
-              description: GunicornThread数量
-        scripts:
-            pre_release_hook: "bash ./bin/pre-release"
-        processes:
-            web:
-                command: bash ./bin/start_web.sh
-                plan: 2C4G1R
-                replicas: 1
-            beat:
-                command: python manage.py celery beat -l info
-                plan: 2C4G1R
-                replicas: 1
-            pworker:
-                command: python manage.py celery worker -n prefork@%h -P threads -c 10 -l info --max-tasks-per-child=100
-                plan: 2C4G1R
-                replicas: 1
-            gworker:
-                command: python manage.py celery worker -P gevent -n gevent@%h -c 4 -l info --max-tasks-per-child=100
-                plan: 2C4G1R
-                replicas: 1
-        svc_discovery:
-            bk_saas:
-                -   bk_app_code: "bk_itsm"
-        bkmonitor:
-            port: 5001
+  - name: default
+    isDefault: true
+    sourceDir: ./src
+    language: Python
+    spec:
+      addons:
+        - name: mysql
+        - name: rabbitmq
+        - name: redis
+        - name: bkrepo
+        - name: otel
+      configuration:
+        env:
+          - name: PIP_VERSION
+            value: 20.2.3
+            description: PIP版本
+          - name: RUN_VER
+            value: open
+            description: 运行环境
+          - name: GUNICORN_THREAD_NUM
+            value: '10'
+            description: GunicornThread数量
+      processes:
+        - name: web
+          procCommand: bash ./bin/start_web.sh
+          resQuotaPlan: 2C4G
+          replicas: 1
+          services:
+            - name: web
+              protocol: TCP
+              exposedType:
+                name: bk/http
+              targetPort: 5000
+              port: 80
+            - name: metrics
+              protocol: TCP
+              port: 5001
+              targetPort: 5001
+        - name: beat
+          procCommand: python manage.py celery beat -l info
+          resQuotaPlan: 2C4G
+          replicas: 1
+        - name: pworker
+          procCommand: python manage.py celery worker -n prefork@%h -P threads -c 10 -l info --max-tasks-per-child=100
+          resQuotaPlan: 2C4G
+          replicas: 1
+        - name: gworker
+          procCommand: python manage.py celery worker -P gevent -n gevent@%h -c 4 -l info --max-tasks-per-child=100
+          resQuotaPlan: 2C4G
+          replicas: 1
+      hooks:
+        preRelease:
+          procCommand: bash ./bin/pre-release
+      svcDiscovery:
+        bkSaaS:
+          - bkAppCode: bk_itsm
+      observability:
+        monitoring:
+          metrics:
+            - process: web
+              serviceName: metrics
+              path: /metrics
