@@ -24,6 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import copy
 import json
+import time
 from typing import Dict
 
 import jmespath
@@ -33,6 +34,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 
 from common.log import logger
+from common.redis import Cache
 from common.template.template import Template
 from itsm.component.constants import GENERAL_NOTICE
 from itsm.component.exceptions import GetCustomApiDataError
@@ -40,6 +42,40 @@ from itsm.component.utils.misc import transform_single_username
 from itsm.iadmin.contants import ACTION_CHOICES_DICT
 from itsm.iadmin.models import CustomNotice
 from itsm.task.models import Task as TicketTask
+
+
+START_ERROR_CACHE_KEY = "ticket_start_error"
+
+
+def safe_after_commit(ticket, action, callback):
+    """Run a post-commit side effect without turning a created ticket into an error.
+
+    The ticket and its attachment ownership are already committed, so a failure
+    here must only be recorded (log + Redis marker for alerting/compensation).
+    Raising would make the caller see a failure and retry, creating duplicates.
+    """
+    try:
+        callback()
+        return True
+    except Exception:
+        logger.exception(
+            "[create_ticket] after_commit failed, action=%s ticket_id=%s sn=%s",
+            action,
+            getattr(ticket, "id", None),
+            getattr(ticket, "sn", None),
+        )
+        try:
+            Cache().hset(
+                START_ERROR_CACHE_KEY,
+                "%s:%s" % (ticket.sn, action),
+                int(time.time()),
+            )
+        except Exception:
+            logger.exception(
+                "[create_ticket] record start error failed, sn=%s",
+                getattr(ticket, "sn", None),
+            )
+        return False
 
 
 def translate(message, cxt, related_operators=None):

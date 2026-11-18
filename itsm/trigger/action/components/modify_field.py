@@ -24,6 +24,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from django.utils.translation import gettext as _
+from django.db import transaction
+from itsm.attachment.services import bind_ticket_fields
 
 from itsm.trigger.action.core.component import BaseComponent
 from itsm.trigger.action.core import SelectField, CascadeField, BaseForm
@@ -69,7 +71,14 @@ class ModifyPublicFieldComponent(BaseComponent):
         dst_field_value = self.data.inputs["field_value"]
         dst_fields = dst_ticket.fields.filter(key=dst_field_key)
         if dst_fields.exists():
-            dst_fields.update(_value=dst_field_value)
+            with transaction.atomic():
+                # Automation cannot claim a user's pending upload.
+                bind_ticket_fields(
+                    dst_ticket,
+                    [{"key": dst_field_key, "value": dst_field_value}],
+                    operator="",
+                )
+                dst_fields.update(_value=dst_field_value)
 
             first_field = dst_fields.first()
             self.data.set_outputs("field_key__display", first_field.name)

@@ -92,6 +92,8 @@ from itsm.component.utils.bk_bunch import bunchify
 from itsm.component.utils.misc import JsonEncoder
 from itsm.iadmin.models import SystemSettings
 from itsm.component.attachment_storage import get_attachment_storage
+from itsm.attachment.services import authorize_download
+from itsm.ticket.models import TicketField
 from itsm.auth_iam.utils import IamRequest
 from itsm.role.models import UserRole
 from itsm.service.models import Service
@@ -644,6 +646,14 @@ class BaseFieldViewSet(component_viewsets.ModelViewSet):
         system_file_path = SystemSettings.objects.get(key="SYS_FILE_PATH").value
         file_path = os.path.join(system_file_path, file_info["path"])
 
+        ticket_id = (
+            field_object.ticket_id if isinstance(field_object, TicketField) else None
+        )
+        authorize_download(
+            file_path,
+            ticket_id=ticket_id,
+            allow_unbound=file_type in ("template", "version"),
+        )
         store = get_attachment_storage()
         try:
             exists = store.exists(file_path)

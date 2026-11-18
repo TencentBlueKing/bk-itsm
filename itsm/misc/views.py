@@ -27,7 +27,7 @@ __author__ = "蓝鲸智云"
 __copyright__ = "Copyright © 2025 Tencent BlueKing. All Rights Reserved."
 
 import datetime
-import hashlib
+import uuid
 import logging
 import os
 import time
@@ -35,6 +35,7 @@ from wsgiref.util import FileWrapper
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
+from django.core.files.storage import FileSystemStorage
 from django.db import connection
 from django.http import StreamingHttpResponse, HttpResponseForbidden
 from django.utils.encoding import escape_uri_path
@@ -50,6 +51,8 @@ from itsm.component.decorators import (
 from itsm.component.drf.permissions import IamAuthPermit
 from itsm.component.utils.response import Fail, Success
 from itsm.iadmin.models import SystemSettings
+from itsm.attachment.models import Attachment
+from itsm.attachment.services import FILE_PREFIX, authorize_download
 from itsm.component.attachment_storage import get_attachment_storage
 from weixin.core.decorators import weixin_login_exempt
 
@@ -182,11 +185,19 @@ def upload(request):
     file_list = request.FILES.getlist("field_file")
     for upload_file in file_list:
         origin_name = upload_file.name
-        file_name = f"{datetime.datetime.now()}{origin_name}"  # noqa
-        file_name = hashlib.md5(file_name.encode()).hexdigest()
+        attachment_id = uuid.uuid4().hex
+        file_name = FILE_PREFIX + attachment_id
 
         file_path = os.path.join(fields_root, file_name)
-        store.save(file_path, upload_file)
+        if isinstance(store, FileSystemStorage):
+            storage = get_attachment_storage()
+            saved_name = storage.save(os.path.join("fields", file_name), upload_file)
+            file_path = storage.path(saved_name)
+        else:
+            store.save(file_path, upload_file)
+        Attachment.objects.create(
+            id=attachment_id, path=file_path, uploader=request.user.username
+        )
 
         succeed_files[file_name] = {"name": origin_name, "path": file_path}
 
@@ -228,6 +239,7 @@ def download(request):
     if not in_sys_root:
         return HttpResponseForbidden(_("非法的下载路径"))
 
+    authorize_download(download_file_path, ticket_id=request.GET.get("ticket_id"))
     try:
         exists = store.exists(download_file_path)
     except SuspiciousFileOperation:

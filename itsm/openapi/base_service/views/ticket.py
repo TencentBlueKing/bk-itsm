@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import copy
+from django.db import transaction
 
 from blueapps.account.decorators import login_exempt
 from django.utils.decorators import method_decorator
@@ -13,7 +14,8 @@ from itsm.component.drf.mixins import ApiGatewayMixin
 from itsm.component.exceptions import CreateTicketError
 from itsm.openapi.base_service.serializers import TicketCreateSerializer
 from itsm.ticket.serializers import TicketSerializer, Ticket
-from itsm.ticket.tasks import start_pipeline
+from itsm.ticket.tasks import start_ticket
+from itsm.ticket.utils import safe_after_commit
 
 
 @method_decorator(login_exempt, name="dispatch")
@@ -34,25 +36,40 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ReadOnlyModelViewSet):
     def create_ticket_with_version(self, request, *args, **kwargs):
         data = copy.deepcopy(request.data)
         logger.info(
-            "[openapi][create_ticket_with_version]-> 开始创建单据， data={}".format(data)
+            "[openapi][create_ticket_with_version]-> 开始创建单据， data={}".format(
+                data
+            )
         )
         serializer = TicketCreateSerializer(data=data, context={"request": request})
         serializer.is_valid(raise_exception=True)
-        instance = serializer.save()
+        fields_payload = data["fields"]
+        from_ticket_id = request.data.get("from_ticket_id", None)
+        username = request.user.username
         try:
-            # 创建额外的全局字段
-            instance.do_after_create(
-                data["fields"], request.data.get("from_ticket_id", None)
-            )
-            start_pipeline.apply_async([instance])
+            with transaction.atomic():
+                instance = serializer.save()
+                instance.prepare_initial_fields(
+                    fields_payload, operator=username
+                )
         except Exception as e:
             logger.exception(
                 "[openapi][create_ticket_with_version]-> 单据创建失败， 错误原因 error={}".format(
                     e
                 )
             )
-            instance.delete()
             raise CreateTicketError()
+
+        # 单据与附件归属已提交：初始化流程和投递 pipeline 按顺序执行，
+        # 失败只记录告警，不改变建单结果（响应体保持不变）。
+        transaction.on_commit(
+            lambda: safe_after_commit(
+                instance,
+                "start_ticket",
+                lambda: start_ticket(
+                    instance, fields_payload, from_ticket_id, username
+                ),
+            )
+        )
 
         logger.info(
             "[openapi][create_ticket_with_version]-> 单据创建成功，sn={}, request_data={}".format(
