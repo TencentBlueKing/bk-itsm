@@ -30,7 +30,7 @@ from django.test import TestCase, override_settings
 
 from itsm.service.models import CatalogService
 from itsm.tests.ticket.params import CREATE_TICKET_PARAMS
-from itsm.ticket.models import TicketEventLog
+from itsm.ticket.models import Ticket, TicketEventLog
 
 
 class TicketEventLogTestCase(TestCase):
@@ -45,11 +45,14 @@ class TicketEventLogTestCase(TestCase):
     def test_get_index_ticket_event_log(self, patch_has_permission):
         patch_has_permission.return_value = True
         url = "/api/ticket/receipts/"
-        resp = self.client.post(
-            path=url,
-            data=json.dumps(CREATE_TICKET_PARAMS),
-            content_type="application/json",
-        )
+        # 建单把流程初始化/投递放进 transaction.on_commit；TestCase 默认不执行
+        # 回调，这里显式执行以覆盖真实的建单副作用（开始日志等）。
+        with self.captureOnCommitCallbacks(execute=True):
+            resp = self.client.post(
+                path=url,
+                data=json.dumps(CREATE_TICKET_PARAMS),
+                content_type="application/json",
+            )
 
         sn = resp.data["data"]["sn"]
 
@@ -72,12 +75,20 @@ class TicketEventLogTestCase(TestCase):
         与权限链解耦的纵深：即便 ``EventLogPermissionValidate`` 出现回归，
         ``get_queryset`` 也不会把全表泄露给调用方。
         """
+        ticket_alice = Ticket.objects.create(
+            sn="SN-LOG-A", title="a", service_id=1, service_type="request",
+            creator="alice", current_status="RUNNING", is_draft=False,
+        )
+        ticket_bob = Ticket.objects.create(
+            sn="SN-LOG-B", title="b", service_id=1, service_type="request",
+            creator="bob", current_status="RUNNING", is_draft=False,
+        )
         TicketEventLog.objects.create(
-            ticket_id=1, workflow_id=1, from_state_id=1,
+            ticket_id=ticket_alice.id, workflow_id=1, from_state_id=1,
             type="state", operator="alice", message="",
         )
         TicketEventLog.objects.create(
-            ticket_id=2, workflow_id=1, from_state_id=1,
+            ticket_id=ticket_bob.id, workflow_id=1, from_state_id=1,
             type="state", operator="bob", message="",
         )
 
