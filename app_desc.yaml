@@ -39,7 +39,7 @@ modules:
       processes:
         - name: web
           procCommand: bash ./bin/start_web.sh
-          resQuotaPlan: 2C4G
+          resQuotaPlan: 4C4G
           replicas: 1
           services:
             - name: web
@@ -54,15 +54,15 @@ modules:
               targetPort: 5001
         - name: beat
           procCommand: python manage.py celery beat -l info
-          resQuotaPlan: 2C4G
+          resQuotaPlan: 4C4G
           replicas: 1
         - name: pworker
           procCommand: python manage.py celery worker -n prefork@%h -P threads -c 10 -l info --max-tasks-per-child=100
-          resQuotaPlan: 2C4G
+          resQuotaPlan: 4C4G
           replicas: 1
         - name: gworker
           procCommand: python manage.py celery worker -P gevent -n gevent@%h -c 4 -l info --max-tasks-per-child=100
-          resQuotaPlan: 2C4G
+          resQuotaPlan: 4C4G
           replicas: 1
       hooks:
         preRelease:
