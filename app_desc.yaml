@@ -28,7 +28,7 @@ modules:
       configuration:
         env:
           - name: PIP_VERSION
-            value: 20.2.3
+            value: '24.0'
             description: PIP版本
           - name: RUN_VER
             value: open
