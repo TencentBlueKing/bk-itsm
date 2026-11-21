@@ -37,7 +37,7 @@ from django.test import TestCase, override_settings
 
 from itsm.tests.service.params import CREATE_SERVICE_DATA, CONFIGS, IMPORT_SERVICE_DATA
 from itsm.workflow.models import WorkflowVersion, Workflow, Table
-from itsm.service.models import Service, FavoriteService
+from itsm.service.models import Service, FavoriteService, ServiceCatalog
 
 
 class ServiceTest(TestCase):
@@ -280,6 +280,41 @@ class ServiceTest(TestCase):
         self.assertEqual(resp.data["result"], True)
         self.assertIsInstance(resp.data["data"], dict)
         self.assertEqual(resp.data["data"]["key"], "request")
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
+    @mock.patch("itsm.component.utils.misc.get_bk_users")
+    @mock.patch("itsm.service.permissions.ServicePermit.has_permission")
+    def test_clone_uses_source_catalog_when_default_catalog_is_missing(
+        self, patch_has_permission, patch_misc_get_bk_users, path_get_bk_users
+    ):
+        patch_has_permission.return_value = True
+        patch_misc_get_bk_users.return_value = {}
+        path_get_bk_users.return_value = {}
+
+        resp = self.client.post("/api/service/projects/", CREATE_SERVICE_DATA)
+        service_id = resp.data["data"]["id"]
+        source_service = Service.objects.get(id=service_id)
+
+        root = ServiceCatalog.objects.get(key="root")
+        source_catalog = ServiceCatalog.create_catalog(
+            name="克隆源目录",
+            key="CLONE_SOURCE_CATALOG",
+            parent=root,
+            project_key=source_service.project_key,
+        )
+        source_service.bind_catalog(source_catalog.id, source_service.project_key)
+        ServiceCatalog.objects.filter(key="FUWUFANKUI").update(is_deleted=True)
+
+        resp = self.client.post(
+            path="/api/service/projects/{}/clone/".format(service_id),
+            data=None,
+            content_type="application/json",
+        )
+
+        self.assertEqual(resp.data["result"], True)
+        cloned_service = Service.objects.get(id=resp.data["data"]["id"])
+        self.assertEqual(cloned_service.catalog_id, source_catalog.id)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")

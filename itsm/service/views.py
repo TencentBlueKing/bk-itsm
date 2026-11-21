@@ -686,8 +686,12 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
     def clone(self, request, *args, **kwargs):
         instance = self.get_object()
         tag_data = instance.tag_data()
-        service = Service.objects.clone(tag_data, request.user.username)
-        service.bind_catalog(instance.catalog_id, instance.project_key)
+        # 已绑定目录的服务直接克隆到原目录，避免依赖项目默认目录必须存在；
+        # 未绑定目录时仍传入 None，保留 ServiceManager 的默认目录逻辑。
+        catalog_id = instance.catalog_id or None
+        service = Service.objects.clone(
+            tag_data, request.user.username, catalog_id=catalog_id
+        )
         return Response(
             self.serializer_class(service, context=self.get_serializer_context()).data
         )
